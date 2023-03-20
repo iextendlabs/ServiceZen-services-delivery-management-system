@@ -1,4 +1,4 @@
-# Services Delivery Management System Cloud Made With Assistance Of ChatGPT
+# Services Delivery Management System Cloud Developed With Assistance Of ChatGPT
 
 Our Solution helps organizations manage the delivery of their services to customers. It provides end-to-end visibility into the service delivery process, from service request to delivery and ongoing support. The system allows organizations to streamline their service delivery operations, improve efficiency, and enhance customer satisfaction.
 
