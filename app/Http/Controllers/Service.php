@@ -13,7 +13,9 @@ class Service extends Controller
      */
     public function index()
     {
-        //
+        $services = Service::all();
+
+        return view('services.index', compact('services'));
     }
 
     /**
@@ -27,14 +29,32 @@ class Service extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new service object in the database.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        // Validate the input data
+        $validatedData = $request->validate([
+            'name' => 'required|max:255',
+            'description' => 'required',
+            'price' => 'required|numeric',
+        ]);
+
+        // Create a new service object
+        $service = new Service([
+            'name' => $validatedData['name'],
+            'description' => $validatedData['description'],
+            'price' => $validatedData['price'],
+        ]);
+
+        // Save the service object to the database
+        $service->save();
+
+        // Redirect to the services index page with a success message
+        return redirect('/services')->with('success', 'Service created successfully!');
     }
 
     /**
