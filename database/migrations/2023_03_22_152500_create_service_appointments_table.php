@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('service_appointments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_staff_id')->constrained()->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('service_id');
+            $table->unsignedBigInteger('service_staff_id');
+            $table->unsignedBigInteger('customer_id');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->timestamps();

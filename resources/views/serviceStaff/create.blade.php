@@ -3,10 +3,10 @@
     <div class="row">
         <div class="col-lg-12 margin-tb">
             <div class="pull-left">
-                <h2>Add New Service</h2>
+                <h2>Add New Service Staff</h2>
             </div>
             <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('services.index') }}"> Back</a>
+                <a class="btn btn-primary" href="{{ route('serviceStaff.index') }}"> Back</a>
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('services.store') }}" method="POST">
+    <form action="{{ route('serviceStaff.store') }}" method="POST">
         @csrf
          <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-12">
@@ -31,14 +31,14 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
-                    <strong>Description:</strong>
-                    <textarea class="form-control" style="height:150px" name="description" placeholder="Description"></textarea>
+                    <strong>Email:</strong>
+                    <input type="email" name="email" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
-                    <strong>Price:</strong>
-                    <input type="number" name="price" class="form-control" placeholder="Price">
+                    <strong>Phone:</strong>
+                    <input type="number" name="phone" class="form-control" placeholder="Phone">
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">

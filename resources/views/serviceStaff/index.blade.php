@@ -3,11 +3,11 @@
     <div class="row">
         <div class="col-lg-12 margin-tb">
             <div class="pull-left">
-                <h2>Services</h2>
+                <h2>Service Staff</h2>
             </div>
             <div class="pull-right">
-                @can('service-create')
-                <a class="btn btn-success" href="{{ route('services.create') }}"> Create New Service</a>
+                @can('service-staff-create')
+                <a class="btn btn-success" href="{{ route('serviceStaff.create') }}"> Create New Service</a>
                 @endcan
             </div>
         </div>
@@ -21,23 +21,23 @@
         <tr>
             <th>No</th>
             <th>Name</th>
-            <th>Details</th>
+            <th>Email</th>
             <th width="280px">Action</th>
         </tr>
-        @foreach ($services as $service)
+        @foreach ($serviceStaff as $service)
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ $service->name }}</td>
-            <td>{{ $service->detail }}</td>
+            <td>{{ $service->email }}</td>
             <td>
-                <form action="{{ route('services.destroy',$service->id) }}" method="POST">
-                    <a class="btn btn-info" href="{{ route('services.show',$service->id) }}">Show</a>
-                    @can('service-edit')
-                    <a class="btn btn-primary" href="{{ route('services.edit',$service->id) }}">Edit</a>
+                <form action="{{ route('serviceStaff.destroy',$service->id) }}" method="POST">
+                    <a class="btn btn-info" href="{{ route('serviceStaff.show',$service->id) }}">Show</a>
+                    @can('service-staff-edit')
+                    <a class="btn btn-primary" href="{{ route('serviceStaff.edit',$service->id) }}">Edit</a>
                     @endcan
                     @csrf
                     @method('DELETE')
-                    @can('service-delete')
+                    @can('service-staff-delete')
                     <button type="submit" class="btn btn-danger">Delete</button>
                     @endcan
                 </form>
@@ -45,5 +45,5 @@
         </tr>
         @endforeach
     </table>
-    {!! $services->links() !!}
+    {!! $serviceStaff->links() !!}
 @endsection

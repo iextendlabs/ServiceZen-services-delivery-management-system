@@ -14,8 +14,6 @@ return new class extends Migration
             $table->unsignedBigInteger('service_appointment_id');
             $table->float('amount');
             $table->timestamps();
-
-            $table->foreign('service_appointment_id')->references('id')->on('service_appointments');
         });
     }
 
