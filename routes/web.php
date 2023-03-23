@@ -17,4 +17,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('appointments', 'ServiceAppointment');
+Route::resource('services', 'Service');
 
