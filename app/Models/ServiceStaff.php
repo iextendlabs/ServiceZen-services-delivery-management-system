@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceStaff extends Model
 {
+    protected $table = 'users';
     protected $fillable = ['name', 'email', 'phone'];
     
     public function appointments()
