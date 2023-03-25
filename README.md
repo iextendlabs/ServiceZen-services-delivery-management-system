@@ -49,10 +49,15 @@ Business systems: This entity represents the integration points with other busin
 composer install
 
 create database with name 'chatgpt_services_delivery_management_system' then
+
 php artisan migrate
+
 php artisan db:seed
+
 php artisan serve
 
-login with 
+login with
+
 email: admin@gmail.com
+
 psw: admin1234
