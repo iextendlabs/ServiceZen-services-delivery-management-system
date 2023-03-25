@@ -2,12 +2,7 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
                 <h2>Add New Service Staff</h2>
-            </div>
-            <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('serviceStaff.index') }}"> Back</a>
-            </div>
         </div>
     </div>
     @if ($errors->any())

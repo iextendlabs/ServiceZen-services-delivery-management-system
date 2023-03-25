@@ -46,8 +46,6 @@
                                 </li>
                             @endif
                         @else
-                            <li><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
-                            <li><a class="nav-link" href="{{ route('roles.index') }}">Role</a></li>
                             <li><a class="nav-link" href="{{ route('services.index') }}">Service</a></li>
                             <li><a class="nav-link" href="{{ route('serviceStaff.index') }}">Service Staff</a></li>
                             <li class="nav-item dropdown">
@@ -56,6 +54,9 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    
+                                    <a class="dropdown-item" href="{{ route('users.index') }}">Users</a>
+                                    <a class="dropdown-item" href="{{ route('roles.index') }}">Role</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

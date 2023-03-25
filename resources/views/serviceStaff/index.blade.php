@@ -1,15 +1,13 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
-                <h2>Service Staff</h2>
-            </div>
-            <div class="pull-right">
-                @can('service-staff-create')
-                <a class="btn btn-success" href="{{ route('serviceStaff.create') }}"> Create New Service</a>
-                @endcan
-            </div>
+        <div class="col-6">
+            <h2>Service Staff</h2>
+        </div>
+        <div class="col-6">
+            @can('service-staff-create')
+            <a class="btn btn-success float-end" href="{{ route('serviceStaff.create') }}"> Create New Service</a>
+            @endcan
         </div>
     </div>
     @if ($message = Session::get('success'))
