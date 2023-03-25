@@ -2,7 +2,9 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12 margin-tb">
-            <h2>Add New Service Staff</h2>
+            <div class="float-start">
+                <h2>Add New Customer</h2>
+            </div>
         </div>
     </div>
     @if ($errors->any())
@@ -15,7 +17,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('serviceStaff.store') }}" method="POST">
+    <form action="{{ route('customers.store') }}" method="POST">
         @csrf
          <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-12">

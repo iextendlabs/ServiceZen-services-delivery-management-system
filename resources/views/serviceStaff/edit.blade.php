@@ -2,11 +2,8 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
+            <div class="float-start">
                 <h2>Edit Service Staff</h2>
-            </div>
-            <div class="pull-right">
-                <a class="btn btn-primary" href="{{ route('serviceStaff.index') }}"> Back</a>
             </div>
         </div>
     </div>
@@ -38,8 +35,14 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
-                    <strong>Phone:</strong>
-                    <input type="text" name="phone" value="{{ $serviceStaff->phone }}" class="form-control" placeholder="Phone">
+                    <strong>Password:</strong>
+                    <input type="password" name="password" class="form-control" placeholder="Password">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Confirm Password:</strong>
+                    <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">
