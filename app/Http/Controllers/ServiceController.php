@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
     
 use App\Models\Service;
 use Illuminate\Http\Request;
-    
+use Illuminate\Support\Facades\Storage;
+
 class ServiceController extends Controller
 { 
     /**
@@ -38,7 +39,8 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        return view('services.create');
+        $service = new Service;
+        return view('services.createOrEdit', compact('service'));
     }
     
     /**
@@ -53,10 +55,36 @@ class ServiceController extends Controller
             'name' => 'required',
             'description' => 'required',
             'price' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-    
-        Service::create($request->all());
-    
+
+        if ($request->id) {
+            $service = Service::find($request->id);
+            // dd(Storage::exists('/uploads/'.$service->image));
+
+            $service->update($request->all());
+            if ($service->image && file_exists(public_path('uploads').'/'.$service->image)) {
+                unlink(public_path('uploads').'/'.$service->image);
+            }
+        } else {
+            $service = Service::create($request->all());
+        }
+
+        
+        if($request->image) {
+            // create a unique filename for the image
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+        
+            // move the uploaded file to the public/uploads directory
+            $request->image->move(public_path('uploads'), $filename);
+        
+            // save the filename to the gallery object and persist it to the database
+            
+            $service->image = $filename;
+            $service->save();
+        }
+
+
         return redirect()->route('services.index')
                         ->with('success','Service created successfully.');
     }
@@ -80,29 +108,9 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
-        return view('services.edit',compact('service'));
+        return view('services.createOrEdit', compact('service'));
     }
     
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Service  $service
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Service $service)
-    {
-         request()->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-        ]);
-    
-        $service->update($request->all());
-    
-        return redirect()->route('services.index')
-                        ->with('success','Service updated successfully');
-    }
     
     /**
      * Remove the specified resource from storage.
