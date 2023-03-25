@@ -60,9 +60,8 @@ class ServiceController extends Controller
 
         if ($request->id) {
             $service = Service::find($request->id);
-            // dd(Storage::exists('/uploads/'.$service->image));
-
             $service->update($request->all());
+            //delete previous Image if new Image submitted
             if ($service->image && file_exists(public_path('uploads').'/'.$service->image)) {
                 unlink(public_path('uploads').'/'.$service->image);
             }
@@ -71,7 +70,7 @@ class ServiceController extends Controller
         }
 
         
-        if($request->image) {
+        if ($request->image) {
             // create a unique filename for the image
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
         
@@ -120,6 +119,10 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
+        //delete image for service 
+        if(file_exists(public_path('uploads').'/'.$service->image)) {
+            unlink(public_path('uploads').'/'.$service->image);
+        }
         $service->delete();
     
         return redirect()->route('services.index')
