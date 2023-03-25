@@ -1,11 +1,27 @@
 <?php
-
+    
 namespace App\Http\Controllers;
-
+    
+use App\Models\User;
 use Illuminate\Http\Request;
-
+use Spatie\Permission\Models\Role;
+use DB;
+use Hash;
+use Illuminate\Support\Arr;  
 class CustomerController extends Controller
-{
+{ 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    function __construct()
+    {
+         $this->middleware('permission:customer-list|customer-create|customer-edit|customer-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:customer-create', ['only' => ['create','store']]);
+         $this->middleware('permission:customer-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:customer-delete', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,11 +29,12 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $appointments = Appointment::all();
-        return view('appointments.index', ['appointments' => $appointments]);
+        $customers = User::latest()->paginate(5);
+
+        return view('customers.index',compact('customers'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
-
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -25,67 +42,57 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        return view('appointments.create');
+        return view('customers.create');
     }
-
-     /**
-     * Store a newly created appointment in storage.
+    
+    /**
+     * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        // Validate form input
-        $validated = $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'staff_id' => 'required|exists:staff,id',
-            'start_time' => 'required|date_format:Y-m-d H:i:s|after_or_equal:now',
-            'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'notes' => 'nullable|string|max:1000',
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|same:confirm-password',
         ]);
 
-        // Create a new appointment record
-        $appointment = new Appointment;
-        $appointment->service_id = $validated['service_id'];
-        $appointment->staff_id = $validated['staff_id'];
-        $appointment->start_time = $validated['start_time'];
-        $appointment->end_time = $validated['end_time'];
-        $appointment->name = $validated['name'];
-        $appointment->email = $validated['email'];
-        $appointment->phone = $validated['phone'];
-        $appointment->notes = $validated['notes'];
-        $appointment->save();
+        $input = $request->all();
 
-        // Redirect to confirmation page
-        return redirect()->route('confirmation')->with('success', 'Appointment booked successfully!');
+        $input['password'] = Hash::make($input['password']);
+
+        $customer = User::create($input);
+
+        $customer->assignRole('Customer');
+        
+        return redirect()->route('customers.index')
+                        ->with('success','Customer created successfully.');
     }
-
+    
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\User  $User
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $customer)
     {
-        //
+        return view('customers.show',compact('customer'));
     }
-
+    
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\User  $customer
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(User $customer)
     {
-        //
+        return view('customers.edit',compact('customer'));
     }
-
+    
     /**
      * Update the specified resource in storage.
      *
@@ -95,17 +102,37 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
-    }
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'password' => 'same:confirm-password',
+        ]);
 
+        $input = $request->all();
+        if(!empty($input['password'])){ 
+            $input['password'] = Hash::make($input['password']);
+        }else{
+            $input = Arr::except($input,array('password'));    
+        }
+
+        $customer = User::find($id);
+        $customer->update($input);
+    
+        return redirect()->route('customers.index')
+                        ->with('success','Customer updated successfully');
+    }
+    
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\User  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $customer)
     {
-        //
+        $customer->delete();
+    
+        return redirect()->route('customers.index')
+                        ->with('success','Customer deleted successfully');
     }
 }

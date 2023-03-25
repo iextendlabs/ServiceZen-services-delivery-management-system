@@ -2,9 +2,12 @@
     
 namespace App\Http\Controllers;
     
-use App\Models\ServiceStaff;
+use App\Models\User;
 use Illuminate\Http\Request;
-    
+use Spatie\Permission\Models\Role;
+use DB;
+use Hash;
+use Illuminate\Support\Arr; 
 class ServiceStaffController extends Controller
 { 
     /**
@@ -26,7 +29,8 @@ class ServiceStaffController extends Controller
      */
     public function index()
     {
-        $serviceStaff = ServiceStaff::latest()->paginate(5);
+        $serviceStaff = User::latest()->paginate(5);
+
         return view('serviceStaff.index',compact('serviceStaff'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
@@ -49,13 +53,19 @@ class ServiceStaffController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate([
+        $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|same:confirm-password',
         ]);
     
-        ServiceStaff::create($request->all());
+        $input = $request->all();
+
+        $input['password'] = Hash::make($input['password']);
+
+        $ServiceStaff = User::create($input);
+
+        $ServiceStaff->assignRole('Staff');
     
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff created successfully.');
@@ -64,10 +74,10 @@ class ServiceStaffController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\ServiceStaff  $service
+     * @param  \App\User  $service
      * @return \Illuminate\Http\Response
      */
-    public function show(ServiceStaff $serviceStaff)
+    public function show(User $serviceStaff)
     {
         return view('serviceStaff.show',compact('serviceStaff'));
     }
@@ -75,10 +85,10 @@ class ServiceStaffController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\ServiceStaff  $serviceStaff
+     * @param  \App\User  $User
      * @return \Illuminate\Http\Response
      */
-    public function edit(ServiceStaff $serviceStaff)
+    public function edit(User $serviceStaff)
     {
         return view('serviceStaff.edit',compact('serviceStaff'));
     }
@@ -90,15 +100,23 @@ class ServiceStaffController extends Controller
      * @param  \App\ServiceStaff  $serviceStaff
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ServiceStaff $serviceStaff)
+    public function update(Request $request, $id)
     {
-        request()->validate([
+        $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|,',
-            'phone' => 'required',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'password' => 'same:confirm-password',
         ]);
-    
-        $serviceStaff->update($request->all());
+
+        $input = $request->all();
+        if(!empty($input['password'])){ 
+            $input['password'] = Hash::make($input['password']);
+        }else{
+            $input = Arr::except($input,array('password'));    
+        }
+
+        $serviceStaff = User::find($id);
+        $serviceStaff->update($input);
     
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff updated successfully');

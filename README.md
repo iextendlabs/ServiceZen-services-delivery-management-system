@@ -10,7 +10,9 @@ We are developing this system with assistance of ChatGPT in Laravel for now and 
 7. Write laravel controller and view to show list of service appointments
 8. Write Laravel factory for these objects service, service staff, customer 
 9. Write Laravel seeder for these objects service, service staff, customer
-
+10. write laravel controller code to find an image in storage and delete if it exists
+11. write migration to add image field to service object
+12. write laravel view and controller function to save image for a service object
 
 Our Solution helps organizations manage the delivery of their services to customers. It provides end-to-end visibility into the service delivery process, from service request to delivery and ongoing support. The system allows organizations to streamline their service delivery operations, improve efficiency, and enhance customer satisfaction.
 
