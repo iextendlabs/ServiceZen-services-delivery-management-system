@@ -13,6 +13,9 @@ We are developing this system with assistance of ChatGPT in Laravel for now and 
 10. write laravel controller code to find an image in storage and delete if it exists
 11. write migration to add image field to service object
 12. write laravel view and controller function to save image for a service object
+13. write code to delete previously uploaded image in laravel controller
+14. write simple navbar in bootstrap 
+15. write minimal footer in bootstrap 
 
 Our Solution helps organizations manage the delivery of their services to customers. It provides end-to-end visibility into the service delivery process, from service request to delivery and ongoing support. The system allows organizations to streamline their service delivery operations, improve efficiency, and enhance customer satisfaction.
 
