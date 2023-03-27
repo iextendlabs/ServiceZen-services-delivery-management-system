@@ -43,4 +43,8 @@ Route::group(['middleware' => ['auth']], function() {
 Route::resource('appointments', ServiceAppointmentController::class);
 Route::resource('/', SiteController::class);
 
-
+Route::get('customer-login', [CustomerAuthController::class, 'index']);
+Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin']); 
+Route::get('customer-registration', [CustomerAuthController::class, 'registration']);
+Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']); 
+Route::get('customer-logout', [CustomerAuthController::class, 'logout']);

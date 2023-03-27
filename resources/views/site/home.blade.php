@@ -20,7 +20,7 @@
           <p class="card-text"><b>{{ $service->name }}</b></p>
           <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
           <div class="card-body">
-            <p class="card-text">{{ substr($service->description,0,100)}}....</p>
+            <p class="card-text">{{ substr($service->description,0,80)}}....</p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-outline-secondary">Book</button>
