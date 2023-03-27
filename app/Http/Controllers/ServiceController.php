@@ -62,8 +62,8 @@ class ServiceController extends Controller
             $service = Service::find($request->id);
             $service->update($request->all());
             //delete previous Image if new Image submitted
-            if ($service->image && file_exists(public_path('uploads').'/'.$service->image)) {
-                unlink(public_path('uploads').'/'.$service->image);
+            if ($service->image && file_exists(public_path('service-images').'/'.$service->image)) {
+                unlink(public_path('service-images').'/'.$service->image);
             }
         } else {
             $service = Service::create($request->all());
@@ -74,8 +74,8 @@ class ServiceController extends Controller
             // create a unique filename for the image
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
         
-            // move the uploaded file to the public/uploads directory
-            $request->image->move(public_path('uploads'), $filename);
+            // move the uploaded file to the public/service-images directory
+            $request->image->move(public_path('service-images'), $filename);
         
             // save the filename to the gallery object and persist it to the database
             

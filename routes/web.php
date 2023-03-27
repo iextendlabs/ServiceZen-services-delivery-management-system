@@ -10,6 +10,7 @@ use App\Http\Controllers\ServiceStaffController;
 use App\Http\Controllers\ServiceAppointmentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\CustomerAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,16 +30,17 @@ use App\Http\Controllers\SiteController;
 
 Auth::routes();
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/admin', [HomeController::class, 'index'])->name('home');
   
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
     Route::resource('services', ServiceController::class);
     Route::resource('serviceStaff', ServiceStaffController::class);
-
+    Route::resource('customers', CustomerController::class);
 });
+
 Route::resource('appointments', ServiceAppointmentController::class);
-Route::resource('customers', CustomerController::class);
-Route::resource('site', SiteController::class);
+Route::resource('/', SiteController::class);
+
 
