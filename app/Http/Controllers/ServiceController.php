@@ -55,7 +55,8 @@ class ServiceController extends Controller
             'name' => 'required',
             'description' => 'required',
             'price' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'duration' => 'required'
         ]);
 
         if ($request->id) {
