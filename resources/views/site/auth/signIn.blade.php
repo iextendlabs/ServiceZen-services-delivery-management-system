@@ -21,12 +21,12 @@
                 <div class="card-header">{{ __('Login') }}</div>
                 
                 @if(Session::has('error'))
-                    <span class="error-alert" role="alert">
+                    <span class="alert alert-danger" role="alert">
                         <strong>{{ Session::get('error') }}</strong>
                     </span>
                 @endif
                 @if(Session::has('success'))
-                <span class="success-alert" role="alert">
+                <span class="alert alert-success" role="alert">
                         <strong>{{ Session::get('success') }}</strong>
                     </span>
                 @endif

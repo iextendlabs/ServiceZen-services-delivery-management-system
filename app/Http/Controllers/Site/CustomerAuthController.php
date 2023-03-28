@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Site;
 
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -8,6 +8,7 @@ use Hash;
 use Illuminate\Support\Arr; 
 use Illuminate\Support\Facades\Auth;
 use Session;
+use App\Http\Controllers\Controller;
 
 class CustomerAuthController extends Controller
 {

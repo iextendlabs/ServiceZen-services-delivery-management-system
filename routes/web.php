@@ -7,10 +7,10 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceStaffController;
-use App\Http\Controllers\ServiceAppointmentController;
+use App\Http\Controllers\Site\ServiceAppointmentController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\SiteController;
-use App\Http\Controllers\CustomerAuthController;
+use App\Http\Controllers\Site\SiteController;
+use App\Http\Controllers\Site\CustomerAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +40,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('customers', CustomerController::class);
 });
 
-Route::resource('appointments', ServiceAppointmentController::class);
 Route::resource('/', SiteController::class);
 
 Route::get('customer-login', [CustomerAuthController::class, 'index']);
@@ -48,3 +47,7 @@ Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin'])
 Route::get('customer-registration', [CustomerAuthController::class, 'registration']);
 Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']); 
 Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
+
+// appointments
+Route::get('booking/{id}', [ServiceAppointmentController::class, 'create']);
+Route::resource('booking', ServiceAppointmentController::class);

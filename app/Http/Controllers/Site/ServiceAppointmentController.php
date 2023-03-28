@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Site;
 
+use App\Models\ServiceAppointment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class ServiceAppointmentController extends Controller
 {
@@ -13,7 +16,14 @@ class ServiceAppointmentController extends Controller
      */
     public function index()
     {
-        //
+        if(Auth::check()){
+            $booked_services = ServiceAppointment::latest()->paginate(5);
+            $customer_id = Auth::id();
+            return view('site.appointments.index',compact('booked_services','customer_id'))
+                ->with('i', (request()->input('page', 1) - 1) * 5);
+        }
+
+        return redirect("customer-login")->with('error','Oppes! You are not Login.');
     }
 
     /**
@@ -21,9 +31,15 @@ class ServiceAppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($id)
     {
-        //
+        if(Auth::check()){
+            $customer_id = Auth::id();
+            $service_id = $id;
+            return view('site.appointments.create',compact('customer_id','service_id'));
+        }
+
+        return redirect("customer-login")->with('error','Oppes! You are not Login.');
     }
 
     /**
@@ -34,7 +50,15 @@ class ServiceAppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'date' => 'required',
+            'time' => 'required',
+            'address' => 'required',
+        ]);
+
+        ServiceAppointment::create($request->all());
+
+        return redirect('/')->with('success','Your Service has been booked successfully.');
     }
 
     /**
@@ -79,6 +103,9 @@ class ServiceAppointmentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        ServiceAppointment::find($id)->delete();
+    
+        return redirect()->route('booking.index')
+                        ->with('success','Booked Service canceled successfully');
     }
 }

@@ -128,7 +128,7 @@ class ServiceStaffController extends Controller
      * @param  \App\ServiceStaff  $service
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ServiceStaff $serviceStaff)
+    public function destroy(User $serviceStaff)
     {
         $serviceStaff->delete();
     
