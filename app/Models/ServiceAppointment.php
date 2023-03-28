@@ -16,12 +16,12 @@ class ServiceAppointment extends Model
     
     public function serviceStaff()
     {
-        return $this->belongsTo(ServiceStaff::class);
+        return $this->belongsTo(User::class);
     }
     
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class);
     }
     
     public function serviceBill()

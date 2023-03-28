@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Session;
 
 class HomeController extends Controller
 {
@@ -23,6 +25,17 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if(Auth::check()){
+            if(Auth::user()->hasRole('Staff')){
+                Session::flush();
+                Auth::logout();
+                return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');;
+            }else if(Auth::user()->hasRole('Customer')){
+                Session::flush();
+                Auth::logout();
+                return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');;
+            }
+        }
         return view('home');
     }
 }

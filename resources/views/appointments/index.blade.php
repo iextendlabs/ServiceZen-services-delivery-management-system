@@ -1,35 +1,44 @@
 @extends('layouts.app')
-
 @section('content')
-    <div class="container">
-        <h2>Appointments</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Service</th>
-                    <th>Staff</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Customer Name</th>
-                    <th>Customer Email</th>
-                    <th>Customer Phone</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($appointments as $appointment)
-                    <tr>
-                        <td>{{ $appointment->service->name }}</td>
-                        <td>{{ $appointment->staff->name }}</td>
-                        <td>{{ date('F j, Y', strtotime($appointment->start_time)) }}</td>
-                        <td>{{ date('g:i A', strtotime($appointment->start_time)) }} - {{ date('g:i A', strtotime($appointment->end_time)) }}</td>
-                        <td>{{ $appointment->customer_name }}</td>
-                        <td>{{ $appointment->customer_email }}</td>
-                        <td>{{ $appointment->customer_phone }}</td>
-                        <td>{{ $appointment->notes }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col-6">
+            <h2>Appointments</h2>
+        </div>
     </div>
+    @if ($message = Session::get('success'))
+        <div class="alert alert-success">
+            <p>{{ $message }}</p>
+        </div>
+    @endif
+    <table class="table table-bordered">
+        <tr>
+            <th>No</th>
+            <th>Service</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>date</th>
+            <th>Time</th>
+            <th>Action</th>
+        </tr>
+        @foreach ($appointments as $appointment)
+        <tr>
+            <td>{{ ++$i }}</td>
+            <td>{{ $appointment->service->name }}</td>
+            <td>{{ $appointment->service->price }}</td>
+            <td>{{ $appointment->status }}</td>
+            <td>{{ $appointment->date }}</td>
+            <td>{{ $appointment->time }}</td>
+            <td>
+                <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
+                    <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>
+                    <a class="btn btn-primary" href="{{ route('appointments.edit',$appointment->id) }}">Edit</a>
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        @endforeach
+    </table>
+    {!! $appointments->links() !!}
 @endsection

@@ -29,7 +29,6 @@
             <th>Action</th>
         </tr>
         @foreach ($booked_services as $booked_service)
-        @if($booked_service->customer_id == $customer_id)
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ $booked_service->service->name }}</td>
@@ -45,7 +44,6 @@
                 </form>
             </td>
         </tr>
-        @endif
         @endforeach
     </table>
     {!! $booked_services->links() !!}

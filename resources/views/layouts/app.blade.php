@@ -20,7 +20,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
+                <a class="navbar-brand" href="{{ url('/admin') }}">
                 Services Delivery Management System
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,6 +49,7 @@
                             <li><a class="nav-link" href="{{ route('services.index') }}">Services</a></li>
                             <li><a class="nav-link" href="{{ route('serviceStaff.index') }}">Staff</a></li>
                             <li><a class="nav-link" href="{{ route('customers.index') }}">Customer</a></li>
+                            <li><a class="nav-link" href="{{ route('appointments.index') }}">Appointments</a></li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}

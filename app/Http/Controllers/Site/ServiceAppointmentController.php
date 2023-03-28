@@ -16,10 +16,14 @@ class ServiceAppointmentController extends Controller
      */
     public function index()
     {
+       
         if(Auth::check()){
-            $booked_services = ServiceAppointment::latest()->paginate(5);
-            $customer_id = Auth::id();
-            return view('site.appointments.index',compact('booked_services','customer_id'))
+            if(Auth::user()->hasRole('Staff')){
+                $booked_services = ServiceAppointment::where('service_staff_id',Auth::id())->latest()->paginate(5);
+            }else{
+                $booked_services = ServiceAppointment::where('customer_id',Auth::id())->latest()->paginate(5);
+            }
+            return view('site.appointments.index',compact('booked_services'))
                 ->with('i', (request()->input('page', 1) - 1) * 5);
         }
 

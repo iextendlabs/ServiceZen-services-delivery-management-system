@@ -4,10 +4,21 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            @if(Session::has('error'))
+                <span class="alert alert-danger" role="alert">
+                    <strong>{{ Session::get('error') }}</strong>
+                </span>
+            @endif
+            @if(Session::has('success'))
+                <span class="alert alert-success" role="alert">
+                    <strong>{{ Session::get('success') }}</strong>
+                </span>
+            @endif
             <div class="card">
                 <div class="card-header">{{ __('Login') }}</div>
 
                 <div class="card-body">
+                    
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 

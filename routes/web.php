@@ -11,6 +11,7 @@ use App\Http\Controllers\Site\ServiceAppointmentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
+use App\Http\Controllers\AppointmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('services', ServiceController::class);
     Route::resource('serviceStaff', ServiceStaffController::class);
     Route::resource('customers', CustomerController::class);
+    Route::resource('appointments', AppointmentController::class);
 });
 
 Route::resource('/', SiteController::class);

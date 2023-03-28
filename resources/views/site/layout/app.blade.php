@@ -37,11 +37,10 @@
                     <a class="dropdown-item" href="/customer-registration">Register</a>
                   @else
                     <a class="dropdown-item" href="/customer-logout">Logout</a>
+                    <a class="dropdown-item" href="{{ route('booking.index') }}">Appointments</a>
+                    <!-- <a class="dropdown-item">{{Auth::user()->name}}</a> -->
                   @endguest
                   </div>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ route('booking.index') }}">Appointments</a>
                 </li>
                 
                 <li class="nav-item">
