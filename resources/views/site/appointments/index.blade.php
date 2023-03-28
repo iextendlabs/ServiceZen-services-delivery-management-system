@@ -23,9 +23,10 @@
             <th>No</th>
             <th>Service</th>
             <th>Price</th>
+            <th>Status</th>
             <th>date</th>
             <th>Time</th>
-            <th width="280px">Action</th>
+            <th>Action</th>
         </tr>
         @foreach ($booked_services as $booked_service)
         @if($booked_service->customer_id == $customer_id)
@@ -33,13 +34,14 @@
             <td>{{ ++$i }}</td>
             <td>{{ $booked_service->service->name }}</td>
             <td>{{ $booked_service->service->price }}</td>
+            <td>{{ $booked_service->status }}</td>
             <td>{{ $booked_service->date }}</td>
             <td>{{ $booked_service->time }}</td>
             <td>
-                <form action="{{ route('booking.destroy',$booked_service->id) }}" method="POST">
+                <form action="cancelBooking/{{$booked_service->id}}" method="POST">
                     @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Cancel</button>
+                    @method('POST')
+                    <button type="submit" class="btn btn-danger" @if($booked_service->status == "Cancel") disabled @endif >Cancel</button>
                 </form>
             </td>
         </tr>

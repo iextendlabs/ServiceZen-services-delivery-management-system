@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('date');
             $table->time('time');
             $table->string('address');
+            $table->string('status');
         });
     }
 
@@ -28,7 +29,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('service_appointments', function (Blueprint $table) {
-            $table->dropColumn(['date', 'time','address']);
+            $table->dropColumn(['date', 'time','address','status']);
         });
     }
 };

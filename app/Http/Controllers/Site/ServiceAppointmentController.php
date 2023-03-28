@@ -56,7 +56,10 @@ class ServiceAppointmentController extends Controller
             'address' => 'required',
         ]);
 
-        ServiceAppointment::create($request->all());
+        $input = $request->all();
+        $input['status'] = "Open";
+
+        ServiceAppointment::create($input);
 
         return redirect('/')->with('success','Your Service has been booked successfully.');
     }
@@ -101,11 +104,15 @@ class ServiceAppointmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function cancel($id)
     {
-        ServiceAppointment::find($id)->delete();
+        $appointment = ServiceAppointment::find($id);
+
+        $appointment->status = "Cancel";
+
+        $appointment->save();
     
-        return redirect()->route('booking.index')
+        return redirect()->back()
                         ->with('success','Booked Service canceled successfully');
     }
 }
