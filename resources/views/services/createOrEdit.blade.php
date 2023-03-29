@@ -26,13 +26,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="image">Upload Image</label>
-                <input type="file" name="image" id="image" class="form-control-file @error('image') is-invalid @enderror">
-                @error('image')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
+                <strong for="image">Upload Image</strong>
+                <input type="file" name="image" id="image" class="form-control-file ">
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
@@ -50,6 +45,21 @@
                 <div class="form-group">
                     <strong>Duration:</strong>
                     <input type="number" value="{{$service->duration}}" name="duration" class="form-control" placeholder="Duration">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Category:</strong>
+                    <select name="category_id" class="form-control">
+                        <option></option>
+                        @foreach($service_categories as $category)
+                        @if($category->id == $service->category_id)
+                            <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                        @else
+                            <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                        @endif
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">

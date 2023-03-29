@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
     
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,7 +41,8 @@ class ServiceController extends Controller
     public function create()
     {
         $service = new Service;
-        return view('services.createOrEdit', compact('service'));
+        $service_categories = ServiceCategory::all();
+        return view('services.createOrEdit', compact('service','service_categories'));
     }
     
     /**
@@ -56,15 +58,18 @@ class ServiceController extends Controller
             'description' => 'required',
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'duration' => 'required'
+            'duration' => 'required',
+            'category_id' => 'required'
         ]);
 
         if ($request->id) {
             $service = Service::find($request->id);
             $service->update($request->all());
+            if (isset($request->image)) {
             //delete previous Image if new Image submitted
-            if ($service->image && file_exists(public_path('service-images').'/'.$service->image)) {
-                unlink(public_path('service-images').'/'.$service->image);
+                if ($service->image && file_exists(public_path('service-images').'/'.$service->image)) {
+                    unlink(public_path('service-images').'/'.$service->image);
+                }
             }
         } else {
             $service = Service::create($request->all());
@@ -108,7 +113,8 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
-        return view('services.createOrEdit', compact('service'));
+        $service_categories = ServiceCategory::all();
+        return view('services.createOrEdit', compact('service','service_categories'));
     }
     
     
@@ -121,8 +127,8 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         //delete image for service 
-        if(file_exists(public_path('uploads').'/'.$service->image)) {
-            unlink(public_path('uploads').'/'.$service->image);
+        if(file_exists(public_path('service-images').'/'.$service->image)) {
+            unlink(public_path('service-images').'/'.$service->image);
         }
         $service->delete();
     
