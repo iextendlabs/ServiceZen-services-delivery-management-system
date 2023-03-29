@@ -13,7 +13,7 @@
     <link href="./css/site.css" rel="stylesheet">
 
   </head>
-
+  
   <body>
 
     <header>
@@ -26,6 +26,18 @@
               <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
                   <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Services
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    @foreach($categories as $category)
+                      <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
+                    @endforeach
+                    <hr>
+                      <a class="dropdown-item text-center" href="\"><b>All</b></a>
+                  </div>
                 </li>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -52,6 +64,7 @@
               </ul>
             </div>
           </nav>
+          
 
     </header>
 

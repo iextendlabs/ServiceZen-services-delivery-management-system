@@ -44,7 +44,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('serviceCategories', ServiceCategoryController::class);
 });
 
-Route::resource('/', SiteController::class);
+// Route::resource('/', SiteController::class);
+Route::get('/', [SiteController::class, 'index']);
 
 Route::get('customer-login', [CustomerAuthController::class, 'index']);
 Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin']); 

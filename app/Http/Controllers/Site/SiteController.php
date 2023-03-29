@@ -25,7 +25,7 @@ class SiteController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         if(Auth::check()){
             if(Auth::user()->hasRole('Admin')){
@@ -34,7 +34,11 @@ class SiteController extends Controller
                 return Redirect('/customer-login')->with('error','Oppes! You have entered invalid credentials');;
             }
         }
-        $services = Service::all();
+        if(isset($request->id)){
+            $services = Service::where('category_id',$request->id)->get();
+        }else{
+            $services = Service::all();
+        }
         return view('site.home',compact('services'));
     }
 }

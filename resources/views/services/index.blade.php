@@ -19,14 +19,14 @@
         <tr>
             <th>No</th>
             <th>Name</th>
-            <th>Description</th>
+            <th>Price</th>
             <th width="280px">Action</th>
         </tr>
         @foreach ($services as $service)
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ $service->name }}</td>
-            <td>{{ $service->description }}</td>
+            <td>{{ $service->price }}</td>
             <td>
                 <form action="{{ route('services.destroy',$service->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('services.show',$service->id) }}">Show</a>

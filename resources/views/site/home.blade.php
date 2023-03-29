@@ -37,7 +37,8 @@
               <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-outline-secondary"> <a href="/booking/{{ $service->id }}">Book</a></button>
               </div>
-              <small class="text-muted"><b>${{ $service->price }}</b></small>
+              <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
+              <small class="text-muted"><b>Price:${{ $service->price }}</b></small>
             </div>
           </div>
         </div>
