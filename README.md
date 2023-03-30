@@ -68,3 +68,17 @@ login with
 email: admin@gmail.com
 
 psw: admin1234
+
+## Admin and Store Demo Links
+
+Store link: https://services.upgradeopencart.com/
+
+## Test Customer User for Store
+User: test@customer.com
+Password: testcustomer
+
+Admin panel link: https://services.upgradeopencart.com/admin
+
+## Test Admin User
+User: admin@gmail.com
+Password: admin1234
