@@ -13,6 +13,7 @@ use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ServiceCategoryController;
+use App\Http\Controllers\site\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,10 +25,6 @@ use App\Http\Controllers\ServiceCategoryController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
 
 Auth::routes();
@@ -57,3 +54,6 @@ Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::get('booking/{id}', [ServiceAppointmentController::class, 'create']);
 Route::post('cancelBooking/{id}', [ServiceAppointmentController::class, 'cancel']);
 Route::resource('booking', ServiceAppointmentController::class);
+// Order
+Route::get('checkout/{id}', [OrderController::class, 'checkout']);
+Route::resource('order', OrderController::class);

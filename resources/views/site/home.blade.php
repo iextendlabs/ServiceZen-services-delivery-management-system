@@ -39,7 +39,7 @@
             <p class="card-text">{{ $service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary"> <a href="/booking/{{ $service->id }}">Book</a></button>
+                <a href="/booking/{{ $service->id }}"><button type="button" class="btn btn-sm btn-outline-secondary"> Book</button></a>
               </div>
               <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
               <small class="text-muted"><b>Price:${{ $service->price }}</b></small>

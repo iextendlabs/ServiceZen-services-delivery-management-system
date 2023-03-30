@@ -61,11 +61,12 @@ class ServiceAppointmentController extends Controller
         ]);
 
         $input = $request->all();
-        $input['status'] = "Open";
+        $input['status'] = "Unpaid";
 
-        ServiceAppointment::create($input);
+        $appointment = ServiceAppointment::create($input);
+        $appointment_id = $appointment->id;
 
-        return redirect('/')->with('success','Your Service has been booked successfully.');
+        return redirect("checkout/$appointment_id");
     }
 
     /**
