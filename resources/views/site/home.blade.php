@@ -4,6 +4,10 @@
   .card-img-top{
     height: 250px;
   }
+  .card-body .card-text{
+    height: 96px;
+    overflow: hidden;
+  }
 </style>
 <section class="jumbotron text-center">
   <div class="container">
@@ -32,7 +36,7 @@
           <p class="card-text"><b>{{ $service->name }}</b></p>
           <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
           <div class="card-body">
-            <p class="card-text">{{ substr($service->description,0,80)}}....</p>
+            <p class="card-text">{{ $service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-outline-secondary"> <a href="/booking/{{ $service->id }}">Book</a></button>

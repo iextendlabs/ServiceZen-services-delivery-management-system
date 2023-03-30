@@ -56,6 +56,7 @@ class ServiceController extends Controller
         request()->validate([
             'name' => 'required',
             'description' => 'required',
+            'short_description' => 'required|max:120',
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'duration' => 'required',
@@ -127,8 +128,10 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         //delete image for service 
-        if(file_exists(public_path('service-images').'/'.$service->image)) {
-            unlink(public_path('service-images').'/'.$service->image);
+        if(isset($service->image)){
+            if(file_exists(public_path('service-images').'/'.$service->image)) {
+                unlink(public_path('service-images').'/'.$service->image);
+            }
         }
         $service->delete();
     

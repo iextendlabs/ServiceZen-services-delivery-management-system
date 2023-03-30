@@ -112,8 +112,10 @@ class ServiceCategoryController extends Controller
     {
         $service_category = ServiceCategory::find($id);
         //delete image for service_category 
-        if(file_exists(public_path('service-category-images').'/'.$service_category->image)) {
-            unlink(public_path('service-category-images').'/'.$service_category->image);
+        if(isset($service_category->image)){
+            if(file_exists(public_path('service-category-images').'/'.$service_category->image)) {
+                unlink(public_path('service-category-images').'/'.$service_category->image);
+            }
         }
         $service_category->delete();
     

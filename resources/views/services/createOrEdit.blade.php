@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <div class="row">
         <div class="col-lg-12 margin-tb">
             <h2>Add New Service</h2>
@@ -33,6 +34,15 @@
                 <div class="form-group">
                     <strong>Description:</strong>
                     <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$service->description}}</textarea>
+                    <script>
+                        CKEDITOR.replace( 'description' );
+                    </script>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Short Description:</strong>
+                    <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{$service->short_description}}</textarea>
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12">
@@ -56,7 +66,7 @@
                         @if($category->id == $service->category_id)
                             <option value="{{$category->id}}" selected>{{$category->title}}</option>
                         @else
-                            <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                            <option value="{{$category->id}}">{{$category->title}}</option>
                         @endif
                         @endforeach
                     </select>

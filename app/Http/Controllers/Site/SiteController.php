@@ -31,7 +31,7 @@ class SiteController extends Controller
             if(Auth::user()->hasRole('Admin')){
                 Session::flush();
                 Auth::logout();
-                return Redirect('/customer-login')->with('error','Oppes! You have entered invalid credentials');;
+                return Redirect('/');
             }
         }
         if(isset($request->id)){
