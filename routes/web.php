@@ -52,8 +52,8 @@ Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 
 // appointments
 Route::get('booking/{id}', [ServiceAppointmentController::class, 'create']);
-Route::post('cancelBooking/{id}', [ServiceAppointmentController::class, 'cancel']);
 Route::resource('booking', ServiceAppointmentController::class);
 // Order
 Route::get('checkout/{id}', [OrderController::class, 'checkout']);
+Route::get('CartCheckout', [OrderController::class, 'CartCheckout']);
 Route::resource('order', OrderController::class);

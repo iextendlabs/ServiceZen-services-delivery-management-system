@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $orders = Order::where('customer_id', Auth::id())->orderBy('id','DESC')->paginate(5);
+
+        return view('site.orders.index',compact('orders'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     
@@ -30,17 +33,22 @@ class OrderController extends Controller
             'payment_method' => 'required'
         ]);
 
-        $order = Order::create($request->all());
+        $order_input = $request->all();
+        $order_input['status'] = "Open";
 
-        $input = $request->all();
-        $input['order_id'] = $order->id;
-        OrderToAppointment::create($input);
+        // dd($order_input);
 
-        $appointment = ServiceAppointment::find($request->appointment_id);
+        $order = Order::create($order_input);
 
-        $appointment->status = "Open";
+        foreach($request->appointment_id as $single_id){
+            $appointment = ServiceAppointment::find($single_id);
 
-        $appointment->save();
+            $appointment->status = "Open";
+            $appointment->order_id = $order->id;
+    
+            $appointment->save();
+        }
+        
         
         return redirect('/')->with('success','Your Order has been replace successfully.');
     }
@@ -48,7 +56,9 @@ class OrderController extends Controller
    
     public function show($id)
     {
-        //
+        $order = Order::find($id);
+        return view('site.orders.show',compact('order'));
+
     }
 
    
@@ -70,9 +80,14 @@ class OrderController extends Controller
     }
 
     public function checkout($appointment_id){
-        $appointment = ServiceAppointment::find($appointment_id);
-        $customer_id = Auth::id();
+        $appointments = ServiceAppointment::where('id',$appointment_id)->get();
         
-        return view('site.orders.checkout',compact('customer_id','appointment'));
+        return view('site.orders.checkout',compact('appointments'));
+    }
+
+    public function CartCheckout(){
+        $appointments = ServiceAppointment::where('customer_id',Auth::id())->where('order_id',null)->get();
+        
+        return view('site.orders.checkout',compact('appointments'));
     }
 }

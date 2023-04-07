@@ -27,6 +27,7 @@
                 <li class="nav-item active">
                   <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
+                
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Services
@@ -39,6 +40,9 @@
                       <a class="dropdown-item text-center" href="\"><b>All</b></a>
                   </div>
                 </li>
+                <li class="nav-item">
+                  <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
+                </li>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Account
@@ -48,15 +52,10 @@
                     <a class="dropdown-item" href="/customer-login">Login</a>
                     <a class="dropdown-item" href="/customer-registration">Register</a>
                   @else
+                    <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
                     <a class="dropdown-item" href="/customer-logout">Logout</a>
-                    <a class="dropdown-item" href="{{ route('booking.index') }}">Appointments</a>
-                    <!-- <a class="dropdown-item">{{Auth::user()->name}}</a> -->
                   @endguest
                   </div>
-                </li>
-                
-                <li class="nav-item">
-                  <a class="nav-link" href="#">About</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#">Contact</a>

@@ -42,7 +42,8 @@
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Checkout</button>
+                <button type="submit" name="checkout" class="btn btn-success">Checkout</button>
+                <button type="submit" name="continue" class="btn btn-primary">Continue Booking</button>
             </div>
         </div>
     </form>

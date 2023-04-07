@@ -21,8 +21,11 @@ class ServiceAppointmentController extends Controller
             if(Auth::user()->hasRole('Staff')){
                 $booked_services = ServiceAppointment::where('service_staff_id',Auth::id())->latest()->paginate(5);
             }else{
-                $booked_services = ServiceAppointment::where('customer_id',Auth::id())->latest()->paginate(5);
+                $booked_services = ServiceAppointment::where('customer_id',Auth::id())->where('order_id',null)->latest()->paginate(5);
             }
+            // if($booked_services){
+            //     dd($booked_services);
+            // }
             return view('site.appointments.index',compact('booked_services'))
                 ->with('i', (request()->input('page', 1) - 1) * 5);
         }
@@ -61,12 +64,15 @@ class ServiceAppointmentController extends Controller
         ]);
 
         $input = $request->all();
-        $input['status'] = "Unpaid";
+        $input['status'] = "Open";
 
         $appointment = ServiceAppointment::create($input);
         $appointment_id = $appointment->id;
-
-        return redirect("checkout/$appointment_id");
+        if ($request->has('checkout')) {
+            return redirect("checkout/$appointment_id");
+        } elseif ($request->has('continue')) {
+            return redirect("/");
+        }
     }
 
     /**
@@ -109,14 +115,13 @@ class ServiceAppointmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function cancel($id)
+    public function destroy($id)
     {
+
         $appointment = ServiceAppointment::find($id);
 
-        $appointment->status = "Cancel";
+        $appointment->delete();
 
-        $appointment->save();
-    
         return redirect()->back()
                         ->with('success','Booked Service canceled successfully');
     }

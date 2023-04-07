@@ -60,7 +60,7 @@ class AppointmentController extends Controller
      */
     public function edit(ServiceAppointment $appointment)
     {
-        $statuses = ['Unpaid','Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
         $staffs = User::all();
         return view('appointments.edit',compact('appointment','statuses','staffs'));
     }

@@ -7,7 +7,7 @@
     </div>
 </div>
 <div class="container">
-    <div class="album bg-light">
+    <div>
     @if ($errors->any())
         <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -18,7 +18,8 @@
             </ul>
         </div>
     @endif
-    <table class="table table-bordered">
+    @if(count($booked_services) != 0)
+    <table class="table table-bordered album bg-light">
         <tr>
             <th>No</th>
             <th>Service</th>
@@ -37,16 +38,28 @@
             <td>{{ $booked_service->date }}</td>
             <td>{{ $booked_service->time }}</td>
             <td>
-                <form action="cancelBooking/{{$booked_service->id}}" method="POST">
+                <form action="{{ route('booking.destroy',$booked_service->id) }}" method="POST">
                     @csrf
-                    @method('POST')
-                    <button type="submit" class="btn btn-danger" @if($booked_service->status == "Cancel") disabled @endif >Cancel</button>
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>
         </tr>
         @endforeach
+        
     </table>
-    {!! $booked_services->links() !!}
+    @else
+    <div class="text-center">
+        <h4>Cart is Empty</h4>
+    </div>
+    @endif
+    @if(count($booked_services))
+        <div class="text-center">
+        <a href="CartCheckout">
+            <button type="button" class="btn btn-success">Checkout</button>
+        </a>
+        </div>
+    @endif
     
   </div>
 </div>

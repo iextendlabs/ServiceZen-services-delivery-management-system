@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('order_to_appointments', function (Blueprint $table) {
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('appointment_id');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('status')->nullable();
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('order_to_appointments');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
     }
 };
