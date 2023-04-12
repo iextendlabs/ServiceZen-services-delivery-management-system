@@ -48,9 +48,10 @@
                         @else
                             <li><a class="nav-link" href="{{ route('services.index') }}">Services</a></li>
                             <li><a class="nav-link" href="{{ route('serviceCategories.index') }}">Service Categories</a></li>
+                            <li><a class="nav-link" href="{{ route('appointments.index') }}">Appointments</a></li>
                             <li><a class="nav-link" href="{{ route('serviceStaff.index') }}">Staff</a></li>
                             <li><a class="nav-link" href="{{ route('customers.index') }}">Customer</a></li>
-                            <li><a class="nav-link" href="{{ route('appointments.index') }}">Appointments</a></li>
+                            <li><a class="nav-link" href="{{ route('affiliates.index') }}">Affiliate</a></li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
