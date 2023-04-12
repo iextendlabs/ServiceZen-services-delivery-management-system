@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AffiliateController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\HomeController;
@@ -39,6 +40,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('customers', CustomerController::class);
     Route::resource('appointments', AppointmentController::class);
     Route::resource('serviceCategories', ServiceCategoryController::class);
+    Route::resource('affiliates', AffiliateController::class);
 });
 
 // Route::resource('/', SiteController::class);

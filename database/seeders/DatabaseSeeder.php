@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             CreateAdminUserSeeder::class,
             StaffRoleSeeder::class,
             CustomerRoleSeeder::class,
+            AffiliateRoleSeeder::class,
+            ServiceCategorySeeder::class,
+            ServiceSeeder::class,
         ]);
     }
 }
