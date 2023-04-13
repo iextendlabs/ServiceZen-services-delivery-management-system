@@ -26,11 +26,20 @@ class Order extends Model
         return $this->hasMany(ServiceAppointment::class);
     }
 
-    public function getServiceData()
+    public function transactions()
     {
-        return ServiceAppointment::where('order_id', $this->id)
-            ->join('services', 'services.id', '=', 'service_appointments.service_id')
-            ->select('service_appointments.*', 'services.name','services.price','services.duration')
+        return $this->hasMany(Transaction::class, 'order_id', 'id');
+    }
+
+    public function affiliate()
+    {
+        return $this->hasOne(Affiliate::class,'id','affiliate_id');
+    }
+
+    public function transaction()
+    {
+        return Transaction::where('order_id', $this->id)->where('appointment_id',Null)
+            ->select('transactions.*')
             ->get();
     }
 }

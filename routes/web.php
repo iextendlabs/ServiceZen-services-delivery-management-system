@@ -16,6 +16,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\site\OrderController;
 use App\Http\Controllers\OrderController as OrderAdmin;
+use App\Http\Controllers\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,9 +44,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('serviceCategories', ServiceCategoryController::class);
     Route::resource('affiliates', AffiliateController::class);
     Route::resource('orders', OrderAdmin::class);
+    Route::resource('transactions', TransactionController::class);
 });
 
-// Route::resource('/', SiteController::class);
 Route::get('/', [SiteController::class, 'index']);
 
 Route::get('customer-login', [CustomerAuthController::class, 'index']);

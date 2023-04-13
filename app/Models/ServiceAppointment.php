@@ -23,9 +23,19 @@ class ServiceAppointment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function staff()
+    {
+        return $this->belongsTo(User::class, 'service_staff_id', 'id');
+    }
     
     public function serviceBill()
     {
         return $this->hasOne(ServiceBill::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasOne(Transaction::class, 'appointment_id', 'id');
     }
 }
