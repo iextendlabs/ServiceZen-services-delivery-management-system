@@ -15,7 +15,7 @@ use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\site\OrderController;
-use App\Http\Controllers\OrderController as OrderAdmin;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TransactionController;
 
 /*
@@ -43,7 +43,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('appointments', AppointmentController::class);
     Route::resource('serviceCategories', ServiceCategoryController::class);
     Route::resource('affiliates', AffiliateController::class);
-    Route::resource('orders', OrderAdmin::class);
+    Route::resource('orders', OrderController::class);
     Route::resource('transactions', TransactionController::class);
 });
 
@@ -59,6 +59,6 @@ Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::get('booking/{id}', [ServiceAppointmentController::class, 'create']);
 Route::resource('booking', ServiceAppointmentController::class);
 // Order
-Route::get('checkout/{id}', [OrderController::class, 'checkout']);
-Route::get('CartCheckout', [OrderController::class, 'CartCheckout']);
-Route::resource('order', OrderController::class);
+Route::get('checkout/{id}', 'App\Http\Controllers\site\OrderController@checkout');
+Route::get('CartCheckout', 'App\Http\Controllers\site\OrderController@CartCheckout');
+Route::resource('order', 'App\Http\Controllers\site\OrderController');
