@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->renameColumn('appointment_id', 'affiliate_id');
+            $table->string('affiliate_id')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->renameColumn('affiliate_id','appointment_id');
+            $table->dropColumn('affiliate_id');
         });
     }
 };
