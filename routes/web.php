@@ -14,7 +14,6 @@ use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ServiceCategoryController;
-use App\Http\Controllers\site\OrderController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TransactionController;
 
