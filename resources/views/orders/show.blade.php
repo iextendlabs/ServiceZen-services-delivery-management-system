@@ -1,5 +1,4 @@
-@extends('site.layout.app')
-<base href="/public">
+@extends('layouts.app')
 @section('content')
 <div class="row">
     <div class="col-lg-12 py-5 text-center">
@@ -7,6 +6,11 @@
     </div>
 </div>
 <div class="container">
+@if ($message = Session::get('success'))
+    <div class="alert alert-success">
+        <p>{{ $message }}</p>
+    </div>
+@endif
     <div>
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -56,8 +60,34 @@
             <td colspan="6" class="text-right"><strong>Total:</strong></td>
             <td class="text-right">${{ $order->total_amount }}</td>
         </tr>
-    </table>
-    
+    </table><br>
+    <fieldset>
+        <legend>Update Order</legend>
+    <form action="{{ route('orders.update',$order->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+         <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group"><br>
+                    <strong>Status:</strong>
+                    <select name="status" class="form-control">
+                        @foreach ($statuses as $status)
+                        @if($status == $order->status)
+                        <option value="{{ $status }}" selected>{{ $status }}</option>
+                        @else
+                        <option value="{{ $status }}">{{ $status }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </form>
+    </fieldset>
+
   </div>
 </div>
 @endsection

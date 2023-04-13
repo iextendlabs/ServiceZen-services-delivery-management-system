@@ -34,7 +34,7 @@ class OrderController extends Controller
         ]);
 
         $order_input = $request->all();
-        $order_input['status'] = "Open";
+        $order_input['status'] = "Padding";
 
         // dd($order_input);
 

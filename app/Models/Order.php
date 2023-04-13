@@ -23,6 +23,14 @@ class Order extends Model
 
     public function serviceAppointments()
     {
-        return $this->hasMany(ServiceAppointment::class, 'order_id', 'id');
+        return $this->hasMany(ServiceAppointment::class);
+    }
+
+    public function getServiceData()
+    {
+        return ServiceAppointment::where('order_id', $this->id)
+            ->join('services', 'services.id', '=', 'service_appointments.service_id')
+            ->select('service_appointments.*', 'services.name','services.price','services.duration')
+            ->get();
     }
 }
