@@ -1,7 +1,8 @@
 <?php
     
 namespace App\Http\Controllers;
-    
+
+use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -57,6 +58,7 @@ class ServiceStaffController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
+            'commission' => 'required',
         ]);
     
         $input = $request->all();
@@ -64,8 +66,13 @@ class ServiceStaffController extends Controller
         $input['password'] = Hash::make($input['password']);
 
         $ServiceStaff = User::create($input);
+        $user_id = $ServiceStaff->id;
+
+        $input['user_id'] = $user_id;
 
         $ServiceStaff->assignRole('Staff');
+        
+        Staff::create($input);
     
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff created successfully.');
@@ -106,6 +113,7 @@ class ServiceStaffController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'same:confirm-password',
+            'commission'=> 'required'
         ]);
 
         $input = $request->all();
@@ -117,6 +125,8 @@ class ServiceStaffController extends Controller
 
         $serviceStaff = User::find($id);
         $serviceStaff->update($input);
+
+        $staff = DB::table('staff')->where('user_id',$id)->update(['commission'=>$request->commission]);
     
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff updated successfully');
@@ -131,7 +141,9 @@ class ServiceStaffController extends Controller
     public function destroy(User $serviceStaff)
     {
         $serviceStaff->delete();
-    
+        
+        Staff::where('user_id',$serviceStaff->id)->delete();
+
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff deleted successfully');
     }

@@ -143,6 +143,8 @@ class AffiliateController extends Controller
     public function destroy(User $affiliate)
     {
         $affiliate->delete();
+
+        Affiliate::where('user_id',$affiliate->id)->delete();
     
         return redirect()->route('affiliates.index')
                         ->with('success','Affiliate deleted successfully');

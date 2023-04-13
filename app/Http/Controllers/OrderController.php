@@ -36,7 +36,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::find($id);
-        $statuses = ['Complete','Canceled','Denied','Padding','Processing'];
+        $statuses = ['Complete','Canceled','Denied','Pending','Processing'];
         return view('orders.show',compact('order','statuses'));
 
     }

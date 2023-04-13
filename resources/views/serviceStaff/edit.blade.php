@@ -45,6 +45,12 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Commission:</strong>
+                    <input type="number" name="commission" value="{{ $serviceStaff->staff->commission }}"  class="form-control" placeholder="Commission In %">
+                </div>
+            </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
             </div>
