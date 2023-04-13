@@ -41,15 +41,15 @@
             <th>Time</th>
             <th class="text-right">Amount</th>
         </tr>
-        @foreach($order->getServiceData() as $order_detail)
+        @foreach($order->serviceAppointments as $appointment)
             <tr>
-                <td>{{ $order_detail->name }}</td>
-                <td>{{ $order_detail->status }}</td>
-                <td>{{ $order_detail->address }}</td>
-                <td>{{ $order_detail->duration }}</td>
-                <td>{{ $order_detail->date }}</td>
-                <td>{{ $order_detail->time }}</td>
-                <td class="text-right">${{ $order_detail->price }}</td>
+                <td>{{ $appointment->service->name }}</td>
+                <td>{{ $appointment->status }}</td>
+                <td>{{ $appointment->address }}</td>
+                <td>{{ $appointment->service->duration }}</td>
+                <td>{{ $appointment->date }}</td>
+                <td>{{ $appointment->time }}</td>
+                <td class="text-right">${{ $appointment->service->price }}</td>
             </tr>
         @endforeach
         <tr>

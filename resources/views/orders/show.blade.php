@@ -99,6 +99,7 @@
             <th>Action</th>
         </tr>
         @foreach($order->serviceAppointments as $appointment)
+        @if(isset($appointment->service_staff_id))
         <form action="{{ route('transactions.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->id }}">
@@ -119,7 +120,12 @@
                         @endif
                     </td>
                 </tr>
-            </form> 
+        </form>
+        @else
+        <tr>
+            <td colspan="7" class="text-center" > There is no staff assigned on this order</td>
+        </tr>
+        @endif
         @endforeach
         </table>
     </fieldset>
