@@ -1,21 +1,4 @@
 # Services Delivery Management System Cloud Developed With Assistance Of ChatGPT
-We are developing this system with assistance of ChatGPT in Laravel for now and extend in other Frameworks / Stacks later.  
-## ChatGPT Prompts and Assistance
-1. The first help taken from ChatGPT is to write description / Readme for this Project 
-2. Second tasks done by ChatGPT is identifiying main Entities / Objects
-3. We asked ChatGPT to write Object Relation ORM Classes In laravel
-4. Asked ChatGPT to write Migrations for objects
-5. Write bootstrap html for services appointment form 
-6. Write Laravel controller to save service appointment
-7. Write laravel controller and view to show list of service appointments
-8. Write Laravel factory for these objects service, service staff, customer 
-9. Write Laravel seeder for these objects service, service staff, customer
-10. write laravel controller code to find an image in storage and delete if it exists
-11. write migration to add image field to service object
-12. write laravel view and controller function to save image for a service object
-13. write code to delete previously uploaded image in laravel controller
-14. write simple navbar in bootstrap 
-15. write minimal footer in bootstrap 
 
 Our Solution helps organizations manage the delivery of their services to customers. It provides end-to-end visibility into the service delivery process, from service request to delivery and ongoing support. The system allows organizations to streamline their service delivery operations, improve efficiency, and enhance customer satisfaction.
 
@@ -82,3 +65,20 @@ Admin panel link: https://services.upgradeopencart.com/admin
 ## Test Admin User
 User: admin@gmail.com
 Password: admin1234
+
+## ChatGPT Prompts and Assistance
+1. The first help taken from ChatGPT is to write description / Readme for this Project 
+2. Second tasks done by ChatGPT is identifiying main Entities / Objects
+3. We asked ChatGPT to write Object Relation ORM Classes In laravel
+4. Asked ChatGPT to write Migrations for objects
+5. Write bootstrap html for services appointment form 
+6. Write Laravel controller to save service appointment
+7. Write laravel controller and view to show list of service appointments
+8. Write Laravel factory for these objects service, service staff, customer 
+9. Write Laravel seeder for these objects service, service staff, customer
+10. write laravel controller code to find an image in storage and delete if it exists
+11. write migration to add image field to service object
+12. write laravel view and controller function to save image for a service object
+13. write code to delete previously uploaded image in laravel controller
+14. write simple navbar in bootstrap 
+15. write minimal footer in bootstrap 
