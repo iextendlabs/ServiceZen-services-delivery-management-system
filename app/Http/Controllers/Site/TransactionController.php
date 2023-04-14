@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Site;
 
 use App\Models\Transaction;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -14,7 +16,22 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        //
+        if(Auth::check()){
+            if(Auth::user()->hasRole('Staff')){
+                $transactions = Transaction::where('user_id',Auth::id())->latest()->paginate(5);
+                
+                return view('site.transactions.index',compact('transactions'))
+                ->with('i', (request()->input('page', 1) - 1) * 5);
+            }else{
+                $transactions = Transaction::where('user_id',Auth::id())->latest()->paginate(5);
+                
+                return view('site.transactions.index',compact('transactions'))
+                ->with('i', (request()->input('page', 1) - 1) * 5);
+            }
+            
+        }
+
+        return redirect("customer-login")->with('error','Oppes! You are not Login.');
     }
 
     /**

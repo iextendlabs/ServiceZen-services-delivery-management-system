@@ -143,7 +143,7 @@
         <form action="{{ route('transactions.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->id }}">
-                <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
+                <input type="hidden" name="user_id" value="{{ $order->affiliate->affiliate->id}}">
                 <input type="hidden" name="amount" value="{{ ($order->total_amount * $order->affiliate->commission) / 100 }}">
                 <tr>
                     <td>#{{ $order->id }}</td>

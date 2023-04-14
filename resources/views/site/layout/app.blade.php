@@ -52,6 +52,7 @@
                     <a class="dropdown-item" href="/customer-login">Login</a>
                     <a class="dropdown-item" href="/customer-registration">Register</a>
                   @else
+                    <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
                     <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
                     <a class="dropdown-item" href="/customer-logout">Logout</a>
                   @endguest

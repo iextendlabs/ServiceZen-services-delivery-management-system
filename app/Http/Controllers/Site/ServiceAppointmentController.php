@@ -19,15 +19,17 @@ class ServiceAppointmentController extends Controller
        
         if(Auth::check()){
             if(Auth::user()->hasRole('Staff')){
-                $booked_services = ServiceAppointment::where('service_staff_id',Auth::id())->latest()->paginate(5);
+                $booked_services = ServiceAppointment::where('service_staff_id',Auth::id())->where('status','Open')->latest()->paginate(5);
+                
+                return view('site.appointments.appointment',compact('booked_services'))
+                ->with('i', (request()->input('page', 1) - 1) * 5);
             }else{
                 $booked_services = ServiceAppointment::where('customer_id',Auth::id())->where('order_id',null)->latest()->paginate(5);
-            }
-            // if($booked_services){
-            //     dd($booked_services);
-            // }
-            return view('site.appointments.index',compact('booked_services'))
+                
+                return view('site.appointments.index',compact('booked_services'))
                 ->with('i', (request()->input('page', 1) - 1) * 5);
+            }
+            
         }
 
         return redirect("customer-login")->with('error','Oppes! You are not Login.');
@@ -94,7 +96,10 @@ class ServiceAppointmentController extends Controller
      */
     public function edit($id)
     {
-        //
+        $serviceAppointment = ServiceAppointment::find($id);
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+
+        return view('site.appointments.edit', compact('serviceAppointment','statuses'));
     }
 
     /**
@@ -106,7 +111,12 @@ class ServiceAppointmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $appointment = ServiceAppointment::find($id);
+
+        $appointment->update($request->all());
+    
+        return redirect()->route('booking.index')
+                        ->with('success','Appointment updated successfully');
     }
 
     /**
