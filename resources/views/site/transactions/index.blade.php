@@ -19,6 +19,16 @@
         </div>
     @endif
     @if(count($transactions) != 0)
+    @php
+        $total_balance = 0;
+    @endphp
+
+    @foreach($transactions as $transaction)
+        @php
+            $total_balance += $transaction->amount;
+        @endphp
+    @endforeach
+    <p>Your current balance is: <b>${{ $total_balance }}</b>.</p>
     <table class="table table-bordered album bg-light">
         <tr>
             <th>No</th>

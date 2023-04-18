@@ -18,12 +18,12 @@ class TransactionController extends Controller
     {
         if(Auth::check()){
             if(Auth::user()->hasRole('Staff')){
-                $transactions = Transaction::where('user_id',Auth::id())->latest()->paginate(5);
+                $transactions = Transaction::where('user_id',Auth::id())->latest()->get();
                 
                 return view('site.transactions.index',compact('transactions'))
                 ->with('i', (request()->input('page', 1) - 1) * 5);
             }else{
-                $transactions = Transaction::where('user_id',Auth::id())->latest()->paginate(5);
+                $transactions = Transaction::where('user_id',Auth::id())->latest()->get();
                 
                 return view('site.transactions.index',compact('transactions'))
                 ->with('i', (request()->input('page', 1) - 1) * 5);
