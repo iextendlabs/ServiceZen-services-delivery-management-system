@@ -19,8 +19,11 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $filter_name = '';
+        $filter_role = '';
+        $roles = Role::all();
         $data = User::orderBy('id','DESC')->paginate(5);
-        return view('users.index',compact('data'))
+        return view('users.index',compact('data','roles','filter_role','filter_name'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }
     
@@ -131,5 +134,22 @@ class UserController extends Controller
         User::find($id)->delete();
         return redirect()->route('users.index')
                         ->with('success','User deleted successfully');
+    }
+
+    public function filter(Request $request)
+    {
+        $filter_name = $request->name;
+        $filter_role = $request->role;
+       
+        $roles = Role::all();
+        $query = User::where('name','like',$filter_name.'%');
+
+        if(isset($filter_role)){
+            $query = $query->role($filter_role);
+        }
+        $data = $query->paginate(100);
+
+        return view('users.index',compact('data','roles','filter_name','filter_role'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 }

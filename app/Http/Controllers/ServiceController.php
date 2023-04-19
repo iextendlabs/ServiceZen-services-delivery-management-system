@@ -26,7 +26,7 @@ class ServiceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $services = Service::latest()->paginate(5);
         return view('services.index',compact('services'))
@@ -137,5 +137,14 @@ class ServiceController extends Controller
     
         return redirect()->route('services.index')
                         ->with('success','Service deleted successfully');
+    }
+
+    public function filter(Request $request){
+
+        $name = $request->name;
+        $price = $request->price;
+        $services = Service::where('name', 'like', $name.'%')->where('price', 'like', $price.'%')->paginate(100);
+        return view('services.index',compact('services','name','price'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 }

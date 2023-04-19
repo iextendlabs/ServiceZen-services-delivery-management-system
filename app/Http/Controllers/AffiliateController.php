@@ -149,4 +149,13 @@ class AffiliateController extends Controller
         return redirect()->route('affiliates.index')
                         ->with('success','Affiliate deleted successfully');
     }
+
+    public function filter(Request $request)
+    {
+        $name = $request->name;
+        $affiliates = User::where('name','like',$name.'%')->paginate(100);
+
+        return view('affiliates.index',compact('affiliates','name'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
 }

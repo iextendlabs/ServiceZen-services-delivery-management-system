@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use App\Models\ServiceAppointment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,8 +16,17 @@ class AppointmentController extends Controller
      */
     public function index()
     {
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $users = User::all();
+        $services = Service::all();
+        $filter = [
+            'status'=>'',
+            'staff'=>'',
+            'customer'=>'',
+            'service'=>'',
+        ];
         $appointments = ServiceAppointment::latest()->paginate(5);
-        return view('appointments.index',compact('appointments'))
+        return view('appointments.index',compact('appointments','statuses','users','services','filter'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
@@ -98,5 +108,21 @@ class AppointmentController extends Controller
     
         return redirect()->route('appointments.index')
                         ->with('success','Appointment deleted successfully');
+    }
+
+    public function filter(Request $request){
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $filter = [
+            'status'=>$request->status,
+            'staff'=>$request->staff_id,
+            'customer'=>$request->customer_id,
+            'service'=>$request->service_id,
+        ];
+        
+        $users = User::all();
+        $services = Service::all();
+        $appointments = ServiceAppointment::where('status','like',$request->status.'%')->where('service_staff_id','like',$request->staff_id.'%')->where('customer_id','like',$request->customer_id.'%')->where('service_id','like',$request->service_id.'%')->paginate(100);
+        return view('appointments.index',compact('appointments','statuses','users','services','filter'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 }

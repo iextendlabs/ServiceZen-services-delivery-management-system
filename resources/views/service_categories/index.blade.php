@@ -14,6 +14,7 @@
             <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    <hr>
     <table class="table table-bordered">
         <tr>
             <th>No</th>
@@ -21,6 +22,7 @@
             <th>Description</th>
             <th width="280px">Action</th>
         </tr>
+        @if(count($service_categories))
         @foreach ($service_categories as $service_category)
         <tr>
             <td>{{ ++$i }}</td>
@@ -37,6 +39,11 @@
             </td>
         </tr>
         @endforeach
+        @else
+        <tr>
+            <td colspan="4" class="text-center">There is no service category.</td>
+        </tr>
+        @endif
     </table>
     {!! $service_categories->links() !!}
 @endsection

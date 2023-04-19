@@ -33,8 +33,13 @@ class Order extends Model
 
     public function affiliate()
     {
-        return $this->hasOne(Affiliate::class,'id','affiliate_id');
+        return $this->belongsTo(User::class);
     }
+
+    // public function affiliate()
+    // {
+    //     return $this->hasOne(Affiliate::class,'id','affiliate_id');
+    // }
 
     public function transaction()
     {

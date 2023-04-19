@@ -147,4 +147,13 @@ class ServiceStaffController extends Controller
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff deleted successfully');
     }
+
+    public function filter(Request $request)
+    {
+        $name = $request->name;
+        $serviceStaff = User::where('name','like',$name.'%')->paginate(100);
+
+        return view('serviceStaff.index',compact('serviceStaff','name'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
 }

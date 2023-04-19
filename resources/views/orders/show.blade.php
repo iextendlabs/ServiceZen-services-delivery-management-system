@@ -144,13 +144,13 @@
         <form action="{{ route('transactions.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->id }}">
-                <input type="hidden" name="user_id" value="{{ $order->affiliate->affiliate->id}}">
-                <input type="hidden" name="amount" value="{{ ($order->total_amount * $order->affiliate->commission) / 100 }}">
+                <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
+                <input type="hidden" name="amount" value="{{ ($order->total_amount * $order->affiliate->affiliate->commission) / 100 }}">
                 <tr>
                     <td>#{{ $order->id }}</td>
                     <td>${{ $order->total_amount }}</td>
-                    <td>{{ $order->affiliate->affiliate->name }}</td>
-                    <td>${{ ($order->total_amount * $order->affiliate->commission) / 100 }}</td>
+                    <td>{{ $order->affiliate->name }}</td>
+                    <td>${{ ($order->total_amount * $order->affiliate->affiliate->commission) / 100 }}</td>
                     <td>
                         @if(empty($order->transaction()[0]->status))
                             <button type="submit" class="btn btn-primary">Approve</button>

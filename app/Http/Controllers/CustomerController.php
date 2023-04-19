@@ -135,4 +135,13 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')
                         ->with('success','Customer deleted successfully');
     }
+
+    public function filter(Request $request)
+    {
+        $name = $request->name;
+        $customers = User::where('name','like',$name.'%')->paginate(100);
+
+        return view('customers.index',compact('customers','name'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
 }

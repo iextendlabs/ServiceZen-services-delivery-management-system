@@ -44,6 +44,15 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('affiliates', AffiliateController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('transactions', TransactionController::class);
+
+    Route::post('serviceFilter', [ServiceController::class, 'filter']); 
+    Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
+    Route::post('orderFilter', [OrderController::class, 'filter']); 
+    Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
+    Route::post('customerFilter', [CustomerController::class, 'filter']); 
+    Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 
+    Route::post('userFilter', [UserController::class, 'filter']); 
+
 });
 
 Route::get('/', [SiteController::class, 'index']);
