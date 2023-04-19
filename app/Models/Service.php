@@ -13,5 +13,10 @@ class Service extends Model
     {
         return $this->hasMany(ServiceAppointment::class);
     }
+
+    public function package()
+    {
+        return $this->hasMany(ServicePackage::class);
+    }
     
 }

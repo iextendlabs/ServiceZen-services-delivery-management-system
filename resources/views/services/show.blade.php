@@ -29,5 +29,13 @@
                 {{ $service->price }}
             </div>
         </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>Package Services:</strong>
+                @foreach($service->package as $package)
+                    {{ $package->service->name }}, 
+                @endforeach
+            </div>
+        </div>
     </div>
 @endsection

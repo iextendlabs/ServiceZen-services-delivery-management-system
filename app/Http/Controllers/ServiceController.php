@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
     
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\ServicePackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,9 +41,12 @@ class ServiceController extends Controller
      */
     public function create()
     {
+        $i = 0;
+        $package_services = '';
+        $all_services = Service::all();
         $service = new Service;
         $service_categories = ServiceCategory::all();
-        return view('services.createOrEdit', compact('service','service_categories'));
+        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services'));
     }
     
     /**
@@ -72,8 +76,21 @@ class ServiceController extends Controller
                     unlink(public_path('service-images').'/'.$service->image);
                 }
             }
+            ServicePackage::where('service_id',$request->id)->delete();
+            $service_id = $request->id;
+            foreach($request->packageId as $packageId){
+                $input['service_id'] = $service_id;
+                $input['package_id'] = $packageId;
+                ServicePackage::create($input);
+            }
         } else {
             $service = Service::create($request->all());
+            $service_id = $service->id;
+            foreach($request->packageId as $packageId){
+                $input['service_id'] = $service_id;
+                $input['package_id'] = $packageId;
+                ServicePackage::create($input);
+            }
         }
 
         
@@ -114,8 +131,11 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
+        $i = 0;
+        $package_services = ServicePackage::where('service_id',$service->id)->pluck('package_id')->toArray();
+        $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.createOrEdit', compact('service','service_categories'));
+        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services'));
     }
     
     

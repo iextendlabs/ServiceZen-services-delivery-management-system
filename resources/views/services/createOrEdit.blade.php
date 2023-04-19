@@ -72,9 +72,59 @@
                     </select>
                 </div>
             </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Package Services:</strong>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Services By Name And Price">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Price</th>
+                        </tr>
+                        @foreach ($all_services as $service)
+                        <tr>
+                            <td>
+                                @if(in_array($service->id,$package_services))
+                                <input type="checkbox" checked name="packageId[{{ ++$i }}]" value="{{ $service->id }}">
+                                @else
+                                <input type="checkbox" name="packageId[{{ ++$i }}]" value="{{ $service->id }}">
+                                @endif
+                            </td>
+                            <td>{{ $service->name }}</td>
+                            <td>{{ $service->price }}</td>
+                        </tr>
+                        @endforeach
+                    </table>
+                </div>
+            </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
+    <script>
+$(document).ready(function(){
+    $("#search").keyup(function(){
+        var value = $(this).val().toLowerCase();
+        
+        $("table tr").hide();
+
+        $("table tr").each(function() {
+
+            $row = $(this);
+
+            var name = $row.find("td:first").next().text().toLowerCase();
+
+            var price = $row.find("td:last").text().toLowerCase();
+
+            if (name.indexOf(value) != -1) {
+                $(this).show();
+            }else if(price.indexOf(value) != -1) {
+                $(this).show();
+            }
+        });
+    });
+});
+</script>
 @endsection
