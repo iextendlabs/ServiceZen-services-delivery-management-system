@@ -64,7 +64,7 @@ class ServiceController extends Controller
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'duration' => 'required',
-            'category_id' => 'required'
+            'category_id' => 'required',
         ]);
 
         if ($request->id) {
@@ -78,18 +78,22 @@ class ServiceController extends Controller
             }
             ServicePackage::where('service_id',$request->id)->delete();
             $service_id = $request->id;
-            foreach($request->packageId as $packageId){
-                $input['service_id'] = $service_id;
-                $input['package_id'] = $packageId;
-                ServicePackage::create($input);
+            if(isset($request->packageId)){
+                foreach($request->packageId as $packageId){
+                    $input['service_id'] = $service_id;
+                    $input['package_id'] = $packageId;
+                    ServicePackage::create($input);
+                }
             }
         } else {
             $service = Service::create($request->all());
             $service_id = $service->id;
-            foreach($request->packageId as $packageId){
-                $input['service_id'] = $service_id;
-                $input['package_id'] = $packageId;
-                ServicePackage::create($input);
+            if(isset($request->packageId)){
+                foreach($request->packageId as $packageId){
+                    $input['service_id'] = $service_id;
+                    $input['package_id'] = $packageId;
+                    ServicePackage::create($input);
+                }
             }
         }
 
