@@ -24,6 +24,8 @@ class AppointmentController extends Controller
             'staff'=>'',
             'customer'=>'',
             'service'=>'',
+            'date_start'=>'',
+            'date_end'=>'',
         ];
         $appointments = ServiceAppointment::latest()->paginate(5);
         return view('appointments.index',compact('appointments','statuses','users','services','filter'))
@@ -117,11 +119,20 @@ class AppointmentController extends Controller
             'staff'=>$request->staff_id,
             'customer'=>$request->customer_id,
             'service'=>$request->service_id,
+            'date_start'=>$request->date_start,
+            'date_end'=>$request->date_end,
         ];
         
         $users = User::all();
         $services = Service::all();
-        $appointments = ServiceAppointment::where('status','like',$request->status.'%')->where('service_staff_id','like',$request->staff_id.'%')->where('customer_id','like',$request->customer_id.'%')->where('service_id','like',$request->service_id.'%')->paginate(100);
+        $query = ServiceAppointment::where('status','like',$request->status.'%')
+        ->where('service_staff_id','like',$request->staff_id.'%')
+        ->where('customer_id','like',$request->customer_id.'%')
+        ->where('service_id','like',$request->service_id.'%');
+        if($request->date_start && $request->date_end){
+            $query = $query->whereBetween('date', [$request->date_start, $request->date_end]);
+        }
+        $appointments = $query->paginate(100);
         return view('appointments.index',compact('appointments','statuses','users','services','filter'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }

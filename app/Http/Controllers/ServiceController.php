@@ -42,7 +42,7 @@ class ServiceController extends Controller
     public function create()
     {
         $i = 0;
-        $package_services = '';
+        $package_services = [];
         $all_services = Service::all();
         $service = new Service;
         $service_categories = ServiceCategory::all();

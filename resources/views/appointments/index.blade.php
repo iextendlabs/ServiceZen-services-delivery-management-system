@@ -123,6 +123,18 @@
                         </div>
                     </div>
                     <div class="col-12">
+                        <div class="form-group">
+                            <strong>Date Start:</strong>
+                            <input type="date" name="date_start" value="{{$filter['date_start']}}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <strong>Date End:</strong>
+                            <input type="date" name="date_end" value="{{$filter['date_end']}}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
