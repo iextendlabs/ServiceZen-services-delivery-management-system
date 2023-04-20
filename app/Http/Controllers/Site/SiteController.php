@@ -44,4 +44,9 @@ class SiteController extends Controller
             return view('site.home',compact('services'));
         }
     }
+
+    public function show($id){
+        $service = Service::find($id);
+        return view('site.serviceDetail',compact('service'));
+    }
 }

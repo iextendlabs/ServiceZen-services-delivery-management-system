@@ -56,6 +56,7 @@ Route::group(['middleware' => ['auth']], function() {
 });
 
 Route::get('/', [SiteController::class, 'index']);
+Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
 
 Route::get('customer-login', [CustomerAuthController::class, 'index']);
 Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin']); 

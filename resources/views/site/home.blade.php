@@ -39,7 +39,9 @@
       <div class="col-md-4">
         <div class="card mb-4 box-shadow">
           <p class="card-text"><b>{{ $service->name }}</b></p>
-          <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
+          <a href="/serviceDetail/{{ $service->id }}">
+            <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
+          </a>
           <div class="card-body">
             <p class="card-text">{{ $service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
