@@ -11,7 +11,16 @@
 
     <!-- Custom styles for this template -->
     <link href="./css/site.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <style>
+      @media print {
+        .no-print {
+          display: none;
+        }
+      }
+    </style>
   </head>
   
   <body>
@@ -40,9 +49,21 @@
                       <a class="dropdown-item text-center" href="\"><b>All</b></a>
                   </div>
                 </li>
+                @guest
                 <li class="nav-item">
                   <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
                 </li>
+                @else
+                  @if(Auth::user()->hasRole('Staff'))
+                    <li class="nav-item">
+                      <a href="{{ route('booking.index') }}" class="nav-link">Appointments</a>
+                    </li>
+                  @else
+                    <li class="nav-item">
+                      <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
+                    </li>
+                  @endif
+                @endguest
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Account
