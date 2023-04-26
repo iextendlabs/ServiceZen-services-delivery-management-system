@@ -2,7 +2,7 @@
 <base href="/public">
 @section('content')
 <div class="row">
-    <div class="col-lg-12 py-5 text-center">
+    <div class="col-md-12 py-5 text-center">
         <h2>Checkout</h2>
     </div>
 </div>
@@ -57,7 +57,7 @@
         <input type="hidden" name="customer_id" value="{{ Auth::id() }}">
         <input type="hidden" name="total_amount" value="{{ $total_amount }}">
          <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Payment Method:</strong>
                     <select name="payment_method" class="form-control">
@@ -66,7 +66,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+            <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Confirm Order</button>
             </div>
         </div>

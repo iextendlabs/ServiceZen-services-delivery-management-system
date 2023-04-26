@@ -2,7 +2,7 @@
 <base href="/public">
 @section('content')
 <div class="row">
-    <div class="col-lg-12 py-5 text-center">
+    <div class="col-md-12 py-5 text-center">
         <h2>Your Transactions</h2>
     </div>
 </div>

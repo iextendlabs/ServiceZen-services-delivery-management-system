@@ -22,9 +22,9 @@ class UserController extends Controller
         $filter_name = '';
         $filter_role = '';
         $roles = Role::all();
-        $data = User::orderBy('id','DESC')->paginate(5);
+        $data = User::orderBy('id','DESC')->paginate(10);
         return view('users.index',compact('data','roles','filter_role','filter_name'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 10);
     }
     
     /**

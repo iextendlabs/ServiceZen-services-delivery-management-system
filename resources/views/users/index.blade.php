@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="row">
-    <div class="col-lg-12 margin-tb">
+    <div class="col-md-lg-12 margin-tb">
         <div class="float-start">
             <h2>Users Management</h2>
         </div>
@@ -18,7 +18,7 @@
 @endif
 <hr>
 <div class="row">
-    <div class="col-9">
+    <div class="col-md-9">
         <table class="table table-bordered">
             <tr>
                 <th>No</th>
@@ -57,19 +57,19 @@
         </table>
         {!! $data->render() !!}
     </div>
-    <div class="col-3">
+    <div class="col-md-3">
             <h3>Filter</h3><hr>
             <form action="userFilter" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
                             <input type="text" name="name" value="{{$filter_name}}" class="form-control" placeholder="Name">
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Role:</strong>
                             <select name="role" class="form-control">
@@ -84,7 +84,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>

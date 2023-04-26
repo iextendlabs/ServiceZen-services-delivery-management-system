@@ -2,7 +2,7 @@
 <base href="/public">
 @section('content')
 <div class="row">
-    <div class="col-lg-12 py-5 text-center">
+    <div class="col-md-12 py-5 text-center">
         <h2>Book Your Service</h2>
     </div>
 </div>
@@ -23,25 +23,25 @@
         <input type="hidden" name="service_id" value="{{ $service_id }}">
         <input type="hidden" name="customer_id" value="{{ $customer_id }}">
          <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Date:</strong>
                     <input type="date" name="date" class="form-control" placeholder="Date">
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Time:</strong>
                     <input type="time" name="time" class="form-control" placeholder="Time">
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Address:</strong>
                     <textarea name="address" class="form-control" cols="10" rows="5"></textarea>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+            <div class="col-md-12 text-center">
                 <button type="submit" name="checkout" class="btn btn-success">Checkout</button>
                 <button type="submit" name="continue" class="btn btn-primary">Continue Booking</button>
             </div>

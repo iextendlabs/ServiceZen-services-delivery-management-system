@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="row">
-    <div class="col-lg-12 margin-tb">
+    <div class="col-md-12 margin-tb">
             <h2>Edit Role</h2>
     </div>
 </div>
@@ -17,13 +17,13 @@
 @endif
 {!! Form::model($role, ['method' => 'PATCH','route' => ['roles.update', $role->id]]) !!}
 <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="col-md-12">
         <div class="form-group">
             <strong>Name:</strong>
             {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
         </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-12">
+    <div class="col-md-12">
         <div class="form-group">
             <strong>Permission:</strong>
             <br/>
@@ -34,7 +34,7 @@
             @endforeach
         </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+    <div class="col-md-12 text-center">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </div>

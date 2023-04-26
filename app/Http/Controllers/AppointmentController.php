@@ -27,9 +27,9 @@ class AppointmentController extends Controller
             'date_start'=>'',
             'date_end'=>'',
         ];
-        $appointments = ServiceAppointment::latest()->paginate(5);
+        $appointments = ServiceAppointment::latest()->paginate(10);
         return view('appointments.index',compact('appointments','statuses','users','services','filter'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+            ->with('i', (request()->input('page', 1) - 1) * 10);
     }
 
     /**

@@ -15,9 +15,9 @@ class ServiceCategoryController extends Controller
      */
     public function index()
     {
-        $service_categories = ServiceCategory::latest()->paginate(5);
+        $service_categories = ServiceCategory::latest()->paginate(10);
         return view('service_categories.index',compact('service_categories'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+            ->with('i', (request()->input('page', 1) - 1) * 10);
     }
     
     /**

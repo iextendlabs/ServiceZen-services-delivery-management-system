@@ -2,7 +2,7 @@
 @section('content')
 <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <div class="row">
-        <div class="col-lg-12 margin-tb">
+        <div class="col-md-12 margin-tb">
             <h2>Add New Service</h2>
         </div>
     </div>
@@ -20,7 +20,7 @@
         @csrf
         <input type="hidden" name="id" value="{{$service->id}}">
          <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Name:</strong>
                     <input type="text" name="name" value="{{$service->name}}" class="form-control" placeholder="Name">
@@ -30,7 +30,7 @@
                 <strong for="image">Upload Image</strong>
                 <input type="file" name="image" id="image" class="form-control-file ">
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Description:</strong>
                     <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$service->description}}</textarea>
@@ -39,25 +39,25 @@
                     </script>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Short Description:</strong>
                     <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{$service->short_description}}</textarea>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Price:</strong>
                     <input type="number" value="{{$service->price}}" name="price" class="form-control" placeholder="Price">
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Duration:</strong>
                     <input type="text" value="{{$service->duration}}" name="duration" class="form-control" placeholder="Duration">
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Category:</strong>
                     <select name="category_id" class="form-control">
@@ -72,7 +72,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Package Services:</strong>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Search Services By Name And Price">
@@ -98,7 +98,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+            <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>

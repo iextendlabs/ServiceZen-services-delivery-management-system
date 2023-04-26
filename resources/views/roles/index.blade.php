@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="row">
-    <div class="col-lg-12 margin-tb">
+    <div class="col-md-12 margin-tb">
         <div class="float-start">
             <h2>Role Management</h2>
         </div>

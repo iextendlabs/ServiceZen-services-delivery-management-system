@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-lg-12 margin-tb">
+        <div class="col-md-12 margin-tb">
             <div class="float-start">
                 <h2>Affiliate</h2>
             </div>
@@ -20,7 +20,7 @@
     @endif
     <hr>
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
             <table class="table table-bordered">
                 <tr>
                     <th>No</th>
@@ -61,25 +61,25 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5" class="text-center">There is no Affiliate.</td>
+                    <td -mdspan="5" class="text-center">There is no Affiliate.</td>
                 </tr>
                 @endif
             </table>
             {!! $affiliates->links() !!}
         </div>
-        <div class="col-3">
+        <div class="col-md-3">
             <h3>Filter</h3><hr>
             <form action="affiliateFilter" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
                             <input type="text" name="name" @if(isset($name)) value="{{$name}}"  @endif class="form-control" placeholder="Name">
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>

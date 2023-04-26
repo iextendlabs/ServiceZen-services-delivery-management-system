@@ -14,10 +14,10 @@ class OrderController extends Controller
     
     public function index(Request $request)
     {
-        $orders = Order::where('customer_id', Auth::id())->orderBy('id','DESC')->paginate(5);
+        $orders = Order::where('customer_id', Auth::id())->orderBy('id','DESC')->paginate(10);
 
         return view('site.orders.index',compact('orders'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
     

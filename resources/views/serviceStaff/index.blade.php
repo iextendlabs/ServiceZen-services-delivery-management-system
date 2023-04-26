@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-6">
+        <div class="col-md-6">
             <h2>Service Staff</h2>
         </div>
-        <div class="col-6">
+        <div class="col-md-6">
             @can('service-staff-create')
             <a class="btn btn-success float-end" href="{{ route('serviceStaff.create') }}"> Create New Staff</a>
             @endcan
@@ -18,7 +18,7 @@
     @endif
     <hr>
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
             <table class="table table-bordered">
                 <tr>
                     <th>No</th>
@@ -65,19 +65,19 @@
             </table>
             {!! $serviceStaff->links() !!} 
         </div>
-        <div class="col-3">
+        <div class="col-md-3">
             <h3>Filter</h3><hr>
             <form action="serviceStaffFilter" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
                             <input type="text" name="name" @if(isset($name)) value="{{$name}}"  @endif class="form-control" placeholder="Name">
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
     @extends('layouts.app')
     @section('content')
     <div class="row">
-        <div class="col-6">
+        <div class="col-md-6">
             <h2>Orders</h2>
         </div>
     </div>
@@ -13,7 +13,7 @@
     @endif
     <hr>
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
             <table class="table table-bordered">
                 <tr>
                     <th>No</th>
@@ -51,13 +51,13 @@
             </table>
             {!! $orders->links() !!}
         </div>
-        <div class="col-3">
+        <div class="col-md-3">
             <h3>Filter</h3><hr>
             <form action="orderFilter" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Payment Method:</strong>
                             <select name="payment_method" class="form-control">
@@ -72,7 +72,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
@@ -87,7 +87,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Affiliate:</strong>
                             <select name="affiliate_id" class="form-control">
@@ -104,7 +104,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Customer:</strong>
                             <select name="customer_id" class="form-control">
@@ -121,7 +121,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>

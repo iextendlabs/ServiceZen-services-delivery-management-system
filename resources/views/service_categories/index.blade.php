@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-6">
+        <div class="col-md-6">
             <h2>Service Categories</h2>
         </div>
-        <div class="col-6">
+        <div class="col-md-6">
             <a class="btn btn-success  float-end" href="{{ route('serviceCategories.create') }}"> Create New Service Category</a>
         </div>
     </div>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-lg-12 margin-tb">
+        <div class="col-md-12 margin-tb">
             <div class="float-start">
                 <h2>Edit Appointment</h2>
             </div>
@@ -21,7 +21,7 @@
         @csrf
         @method('PUT')
          <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Staff:</strong>
                     <select name="service_staff_id" class="form-control">
@@ -38,7 +38,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Status:</strong>
                     <select name="status" class="form-control">
@@ -52,7 +52,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+            <div class="col-md-12 text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>

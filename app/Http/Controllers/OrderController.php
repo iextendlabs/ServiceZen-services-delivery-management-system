@@ -24,10 +24,10 @@ class OrderController extends Controller
             'customer'=>'',
             'payment_method'=>'',
         ];
-        $orders = Order::orderBy('id','DESC')->paginate(5);
+        $orders = Order::orderBy('id','DESC')->paginate(10);
 
         return view('orders.index',compact('orders','statuses','payment_methods','users','filter'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
     

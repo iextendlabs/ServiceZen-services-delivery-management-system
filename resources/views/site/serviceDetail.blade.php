@@ -15,10 +15,10 @@
 <div class="album py-5 bg-light">
   <div class="container">
     <div class="row">
-        <div class="col-8">
+        <div class="col-md-8">
           <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
         </div>
-        <div class="col-4 box-shadow">
+        <div class="col-md-4 box-shadow">
           <h4 class="card-text"><b>{{ $service->name }}</b></h4>
           <div class="card-body">
             <p class="card-text">{!! $service->description !!}</p>
@@ -34,7 +34,7 @@
     <h2>Package</h2><br>
     <div class="row">
       @foreach($service->package as $package)
-      <div class="col-md-4">
+      <div class="col-md-md-4">
         <div class="card mb-4 box-shadow">
           <p class="card-text"><b>{{ $package->service->name }}</b></p>
           <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">

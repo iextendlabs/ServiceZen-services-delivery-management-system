@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-6">
+        <div class="col-md-6">
             <h2>Appointments</h2>
         </div>
     </div>
@@ -13,7 +13,7 @@
     @endif
     <hr>
     <div class="row">
-        <div class="col-9">
+        <div class="col-md-9">
             <table class="table table-bordered">
                 <tr>
                     <th>No</th>
@@ -52,13 +52,13 @@
             </table>
             {!! $appointments->links() !!}
         </div>
-        <div class="col-3">
+        <div class="col-md-3">
             <h3>Filter</h3><hr>
             <form action="appointmentFilter" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                 <div class="row">
-                <div class="col-12">
+                <div class="col-md-12">
                         <div class="form-group">
                             <strong>Service:</strong>
                             <select name="service_id" class="form-control">
@@ -73,7 +73,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
@@ -88,7 +88,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Staff:</strong>
                             <select name="staff_id" class="form-control">
@@ -105,7 +105,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Customer:</strong>
                             <select name="customer_id" class="form-control">
@@ -122,19 +122,19 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Date Start:</strong>
                             <input type="date" name="date_start" value="{{$filter['date_start']}}" class="form-control">
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <strong>Date End:</strong>
                             <input type="date" name="date_end" value="{{$filter['date_end']}}" class="form-control">
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
