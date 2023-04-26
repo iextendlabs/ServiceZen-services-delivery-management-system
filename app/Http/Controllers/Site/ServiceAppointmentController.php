@@ -137,34 +137,34 @@ class ServiceAppointmentController extends Controller
     }
 
     public function downloadCSV(Request $request)
-{
-    // Retrieve data from database
-    $data = ServiceAppointment::where('service_staff_id',Auth::id())->where('status','Open')->latest()->get();
-    
-    // Define headers for CSV file
-    $headers = array(
-        "Content-type" => "text/csv",
-        "Content-Disposition" => "attachment; filename=appointment.csv",
-        "Pragma" => "no-cache",
-        "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-        "Expires" => "0"
-    );
-    
-    // Define output stream for CSV file
-    $output = fopen("php://output", "w");
-    
-    // Write headers to output stream
-    fputcsv($output, array('Service', 'Price', 'Status','date','Time'));
-    
-    // Loop through data and write to output stream
-    foreach ($data as $row) {
-        fputcsv($output, array($row->service->name, '$'.$row->service->price, $row->status, $row->date, $row->time));
+    {
+        // Retrieve data from database
+        $data = ServiceAppointment::where('service_staff_id',Auth::id())->where('status','Open')->latest()->get();
+        
+        // Define headers for CSV file
+        $headers = array(
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=Appointment.csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        );
+        
+        // Define output stream for CSV file
+        $output = fopen("php://output", "w");
+        
+        // Write headers to output stream
+        fputcsv($output, array('Service', 'Price', 'Status','Date','Time','Address'));
+        
+        // Loop through data and write to output stream
+        foreach ($data as $row) {
+            fputcsv($output, array($row->service->name, '$'.$row->service->price, $row->status, $row->date, $row->time,$row->address));
+        }
+        
+        // Close output stream
+        fclose($output);
+        
+        // Return CSV file as download
+        return Response::make('', 200, $headers);
     }
-    
-    // Close output stream
-    fclose($output);
-    
-    // Return CSV file as download
-    return Response::make('', 200, $headers);
-}
 }

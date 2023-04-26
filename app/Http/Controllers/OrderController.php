@@ -9,6 +9,7 @@ use App\Models\ServiceAppointment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 class OrderController extends Controller
 {
@@ -95,5 +96,41 @@ class OrderController extends Controller
 
         return view('orders.index',compact('orders','statuses','payment_methods','users','filter'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
+    }
+
+    public function downloadCSV(Request $request)
+    {
+        // Retrieve data from database
+        $data = Order::get();
+        
+        // Define headers for CSV file
+        $headers = array(
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=Orders.csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        );
+        
+        // Define output stream for CSV file
+        $output = fopen("php://output", "w");
+        
+        // Write headers to output stream
+        fputcsv($output, array('Order ID','Amount','Status','Date','Customer','Appointments'));
+        
+        // Loop through data and write to output stream
+        foreach ($data as $row) {
+            foreach($row->serviceAppointments as $appointment){
+                $appointments[] = $appointment->service->name;
+            }
+
+            fputcsv($output, array($row->id, '$'.$row->total_amount, $row->status, $row->created_at, $row->customer->name,implode(",", $appointments)));
+        }
+        
+        // Close output stream
+        fclose($output);
+        
+        // Return CSV file as download
+        return Response::make('', 200, $headers);
     }
 }

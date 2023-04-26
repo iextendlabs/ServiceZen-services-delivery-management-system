@@ -6,6 +6,7 @@ use App\Models\Service;
 use App\Models\ServiceAppointment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class AppointmentController extends Controller
 {
@@ -135,5 +136,37 @@ class AppointmentController extends Controller
         $appointments = $query->paginate(100);
         return view('appointments.index',compact('appointments','statuses','users','services','filter'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
+
+    public function downloadCSV(Request $request)
+    {
+        // Retrieve data from database
+        $data = ServiceAppointment::get();
+        
+        // Define headers for CSV file
+        $headers = array(
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=AppointmentDetail.csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        );
+        
+        // Define output stream for CSV file
+        $output = fopen("php://output", "w");
+        
+        // Write headers to output stream
+        fputcsv($output, array('Service','Price','Status','Date','Time','Address','Customer','Staff'));
+        
+        // Loop through data and write to output stream
+        foreach ($data as $row) {
+            fputcsv($output, array($row->service->name, '$'.$row->service->price, $row->status, $row->date, $row->time, $row->address, $row->customer->name, $row->serviceStaff->name));
+        }
+        
+        // Close output stream
+        fclose($output);
+        
+        // Return CSV file as download
+        return Response::make('', 200, $headers);
     }
 }

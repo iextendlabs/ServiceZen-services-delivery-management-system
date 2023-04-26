@@ -1,8 +1,13 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-md-6">
-            <h2>Appointments</h2>
+        <div class="col-md-12 margin-tb">
+            <div class="float-start">
+                <h2>Appointments</h2>
+            </div>
+            <div class="float-end">
+                <a class="btn btn-primary float-end no-print" href="appointmentDetailCSV"><i class="fa fa-download"></i>Export CSV</a>
+            </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
