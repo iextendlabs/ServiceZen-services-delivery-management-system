@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="pull-left">
-                <h2> Show Service</h2>
+                <h2> Show Staff Zone</h2>
             </div>
         </div>
     </div>
@@ -11,26 +11,20 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Name:</strong>
-                {{ $service->name }}
+                {{ $staffZone->name }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Description:</strong>
-                {{ $service->description }}
+                {{ $staffZone->description }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Price:</strong>
-                {{ $service->price }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Package Services:</strong>
-                @foreach($service->package as $package)
-                    {{ $package->service->name }}, 
+                <strong>Staff Id:</strong>
+                @foreach(unserialize($staffZone->staff_ids) as $staff)
+                    {{ $staff }}, 
                 @endforeach
             </div>
         </div>

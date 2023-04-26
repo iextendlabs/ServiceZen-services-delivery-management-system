@@ -15,7 +15,9 @@ use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StaffZoneController;
 use App\Http\Controllers\TransactionController;
+use App\Models\StaffZone;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +46,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('affiliates', AffiliateController::class);
     Route::resource('orders', OrderController::class);
     Route::resource('transactions', TransactionController::class);
+    Route::resource('staffZones', StaffZoneController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']); 
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
