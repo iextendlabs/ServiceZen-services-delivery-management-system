@@ -18,6 +18,7 @@
         </div>
     @endif
     <form action="{{ route('affiliates.update',$affiliate->id) }}" method="POST">
+        <input type="hidden" value="{{ $affiliate->affiliate->id }}" name="affiliate_id">
         @csrf
         @method('PUT')
          <div class="row">

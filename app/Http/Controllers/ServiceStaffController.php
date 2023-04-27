@@ -43,7 +43,8 @@ class ServiceStaffController extends Controller
      */
     public function create()
     {
-        return view('serviceStaff.create');
+        $users = User::all();
+        return view('serviceStaff.create',compact('users'));
     }
     
     /**
@@ -97,7 +98,8 @@ class ServiceStaffController extends Controller
      */
     public function edit(User $serviceStaff)
     {
-        return view('serviceStaff.edit',compact('serviceStaff'));
+        $users = User::all();
+        return view('serviceStaff.edit',compact('serviceStaff','users'));
     }
     
     /**
@@ -126,8 +128,9 @@ class ServiceStaffController extends Controller
         $serviceStaff = User::find($id);
         $serviceStaff->update($input);
 
-        $staff = DB::table('staff')->where('user_id',$id)->update(['commission'=>$request->commission]);
-    
+        $staff = Staff::find($input['staff_id']);
+        $staff->update($input);
+        
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff updated successfully');
     }

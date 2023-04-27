@@ -9,6 +9,6 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission'];
+    protected $fillable = ['user_id', 'commission','manager_id','supervisor_id'];
 
 }

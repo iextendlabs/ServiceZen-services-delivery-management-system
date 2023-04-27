@@ -111,8 +111,8 @@ class AffiliateController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|same:confirm-password',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'password' => 'same:confirm-password',
             'code' => 'required',
             'commission' => 'required',
         ]);
@@ -126,8 +126,8 @@ class AffiliateController extends Controller
 
         $affiliate = User::find($id);
         $affiliate->update($input);
-    
-        $affiliate = Affiliate::find($id);
+
+        $affiliate = Affiliate::find($input['affiliate_id']);
         $affiliate->update($input);
 
         return redirect()->route('affiliates.index')
