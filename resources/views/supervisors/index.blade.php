@@ -3,11 +3,11 @@
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
-                <h2>Affiliate</h2>
+                <h2>Supervisor</h2>
             </div>
             <div class="float-end">
-                @can('affiliate-create')
-                    <a class="btn btn-success" href="{{ route('affiliates.create') }}"> Create New Affiliate</a>
+                @can('supervisor-create')
+                    <a class="btn btn-success" href="{{ route('supervisors.create') }}"> Create New Supervisor</a>
                 @endcan
             </div>
         </div>
@@ -29,29 +29,29 @@
                     <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
-                @if(count($affiliates))
-                @foreach ($affiliates as $affiliate)
-                @if($affiliate->getRoleNames() == '["Affiliate"]')
+                @if(count($supervisors))
+                @foreach ($supervisors as $supervisor)
+                @if($supervisor->getRoleNames() == '["Supervisor"]')
                 <tr>
                     <td>{{ ++$i }}</td>
-                    <td>{{ $affiliate->name }}</td>
-                    <td>{{ $affiliate->email }}</td>
+                    <td>{{ $supervisor->name }}</td>
+                    <td>{{ $supervisor->email }}</td>
                     <td>
-                        @if(!empty($affiliate->getRoleNames()))
-                            @foreach($affiliate->getRoleNames() as $v)
+                        @if(!empty($supervisor->getRoleNames()))
+                            @foreach($supervisor->getRoleNames() as $v)
                                 <span class="badge rounded-pill bg-dark">{{ $v }}</span>
                             @endforeach
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('affiliates.show',$affiliate->id) }}">Show</a>
-                            @can('affiliate-edit')
-                            <a class="btn btn-primary" href="{{ route('affiliates.edit',$affiliate->id) }}">Edit</a>
+                        <form action="{{ route('supervisors.destroy',$supervisor->id) }}" method="POST">
+                            <a class="btn btn-info" href="{{ route('supervisors.show',$supervisor->id) }}">Show</a>
+                            @can('supervisor-edit')
+                            <a class="btn btn-primary" href="{{ route('supervisors.edit',$supervisor->id) }}">Edit</a>
                             @endcan
                             @csrf
                             @method('DELETE')
-                            @can('affiliate-delete')
+                            @can('supervisor-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
@@ -61,15 +61,15 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5" class="text-center">There is no Affiliate.</td>
+                    <td colspan="5" class="text-center">There is no Supervisor.</td>
                 </tr>
                 @endif
             </table>
-            {!! $affiliates->links() !!}
+            {!! $supervisors->links() !!}
         </div>
         <div class="col-md-3">
             <h3>Filter</h3><hr>
-            <form action="affiliateFilter" method="POST" enctype="multipart/form-data">
+            <form action="supervisorFilter" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                 <div class="row">

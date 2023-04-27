@@ -13,9 +13,11 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StaffZoneController;
+use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\TransactionController;
 use App\Models\StaffZone;
 
@@ -47,6 +49,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('orders', OrderController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('staffZones', StaffZoneController::class);
+    Route::resource('managers', ManagerController::class);
+    Route::resource('supervisors', SupervisorController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']); 
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
@@ -55,9 +59,11 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('customerFilter', [CustomerController::class, 'filter']); 
     Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 
     Route::post('userFilter', [UserController::class, 'filter']); 
+    Route::post('managerFilter', [ManagerController::class, 'filter']); 
+    Route::post('supervisorFilter', [SupervisorController::class, 'filter']); 
+
     Route::get('appointmentDetailCSV', [AppointmentController::class,'downloadCSV']);
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
-
 });
 
 Route::get('/', [SiteController::class, 'index']);

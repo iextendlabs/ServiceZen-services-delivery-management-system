@@ -60,6 +60,7 @@
                             <th>Total</th>
                             <th>Action</th>
                         </tr>
+                        @if(count($orders))
                         @foreach ($orders as $order)
                         <tr>
                             <td>{{ $order->id }}</td>
@@ -72,6 +73,11 @@
                             </td>
                         </tr>
                         @endforeach
+                        @else
+                        <tr>
+                            <td colspan="6" class="text-center">There is no order.</td>
+                        </tr>
+                        @endif
                     </table>
                 </div>
             </div>
