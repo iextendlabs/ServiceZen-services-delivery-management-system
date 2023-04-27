@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Affiliate;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,6 +22,12 @@ class AffiliateRoleSeeder extends Seeder
             'name' => 'Affiliate', 
             'email' => 'affiliate@gmail.com',
             'password' => bcrypt('affiliate1234')
+        ]);
+
+        $affiliate = Affiliate::create([
+            'user_id' => $user->id, 
+            'code' => '1111',
+            'commission' => '10'
         ]);
         
         $role = Role::create(['name' => 'Affiliate']);

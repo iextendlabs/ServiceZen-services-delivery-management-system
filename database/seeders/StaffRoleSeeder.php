@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,6 +22,11 @@ class StaffRoleSeeder extends Seeder
             'name' => 'Staff', 
             'email' => 'staff@gmail.com',
             'password' => bcrypt('staff1234')
+        ]);
+
+        $staff = Staff::create([
+            'user_id' => $user->id, 
+            'commission' => '10'
         ]);
         
         $role = Role::create(['name' => 'Staff']);
