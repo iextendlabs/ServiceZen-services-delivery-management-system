@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             AffiliateRoleSeeder::class,
             ServiceCategorySeeder::class,
             ServiceSeeder::class,
+            ManagerRoleSeeder::class,
+            SupervisorRoleSeeder::class
         ]);
     }
 }

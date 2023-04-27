@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-
-class CustomerRoleSeeder extends Seeder
+class ManagerRoleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,17 +18,17 @@ class CustomerRoleSeeder extends Seeder
     public function run()
     {
         $user = User::create([
-            'name' => 'Customer', 
-            'email' => 'customer@gmail.com',
-            'password' => bcrypt('customer1234')
+            'name' => 'Manager', 
+            'email' => 'manager@gmail.com',
+            'password' => bcrypt('manager1234')
         ]);
-        
-        $role = Role::create(['name' => 'Customer']);
 
-        $permissions = Permission::where('name', 'like', 'customer%')->pluck('id','id');
+        $role = Role::create(['name' => 'Manager']);
+
+        $permissions = Permission::where('name', 'like', 'manager%')->pluck('id','id');
 
         $role->syncPermissions($permissions);
-        
+
         $user->assignRole([$role->id]);
     }
 }

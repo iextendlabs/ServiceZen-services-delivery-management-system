@@ -37,7 +37,15 @@ class PermissionTableSeeder extends Seeder
             'affiliate-list',
             'affiliate-create',
             'affiliate-edit',
-            'affiliate-delete'
+            'affiliate-delete',
+            'manager-list',
+            'manager-create',
+            'manager-edit',
+            'manager-delete',
+            'supervisor-list',
+            'supervisor-create',
+            'supervisor-edit',
+            'supervisor-delete'
         ];
        
         foreach ($permissions as $permission) {

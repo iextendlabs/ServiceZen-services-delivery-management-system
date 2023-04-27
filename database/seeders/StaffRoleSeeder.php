@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,10 +17,18 @@ class StaffRoleSeeder extends Seeder
      */
     public function run()
     {
+        $user = User::create([
+            'name' => 'Staff', 
+            'email' => 'staff@gmail.com',
+            'password' => bcrypt('staff1234')
+        ]);
+        
         $role = Role::create(['name' => 'Staff']);
 
         $permissions = Permission::where('name', 'like', 'service-staff%')->pluck('id','id');
 
         $role->syncPermissions($permissions);
+        
+        $user->assignRole([$role->id]);
     }
 }
