@@ -2,6 +2,7 @@
     
 namespace App\Http\Controllers;
 
+use App\Models\SupervisorToManager;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -42,7 +43,9 @@ class SupervisorController extends Controller
      */
     public function create()
     {
-        return view('supervisors.create');
+        $managers = User::all();
+
+        return view('supervisors.create',compact('managers'));
     }
     
     /**
@@ -57,6 +60,7 @@ class SupervisorController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
+            'manager_id' => 'required',
         ]);
 
         $input = $request->all();
@@ -64,8 +68,12 @@ class SupervisorController extends Controller
         $input['password'] = Hash::make($input['password']);
 
         $supervisor = User::create($input);
-
+        
         $supervisor->assignRole('Supervisor');
+        
+        $input['supervisor_id'] = $supervisor->id;
+
+        SupervisorToManager::create($input);
 
         return redirect()->route('supervisors.index')
                         ->with('success','Supervisor created successfully.');
@@ -90,7 +98,9 @@ class SupervisorController extends Controller
      */
     public function edit(User $supervisor)
     {
-        return view('supervisors.edit',compact('supervisor'));
+        $managers = User::all();
+
+        return view('supervisors.edit',compact('supervisor','managers'));
     }
     
     /**
@@ -106,6 +116,7 @@ class SupervisorController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'same:confirm-password',
+            'manager_id' => 'required',
         ]);
 
         $input = $request->all();
@@ -118,7 +129,13 @@ class SupervisorController extends Controller
         $supervisor = User::find($id);
        
         $supervisor->update($input);
+        
+        $input['supervisor_id'] = $id;
+        
+        SupervisorToManager::where('supervisor_id',$id)->delete();
 
+        SupervisorToManager::create($input);
+        
         return redirect()->route('supervisors.index')
                         ->with('success','Supervisor updated successfully');
     }
@@ -132,6 +149,8 @@ class SupervisorController extends Controller
     public function destroy(User $supervisor)
     {
         $supervisor->delete();
+        
+        SupervisorToManager::where('supervisor_id',$supervisor->id)->delete();
     
         return redirect()->route('supervisors.index')
                         ->with('success','Supervisor deleted successfully');

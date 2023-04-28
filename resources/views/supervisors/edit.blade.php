@@ -45,6 +45,29 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Manager:</strong>
+                    <select name="manager_id" class="form-control">
+                        <option></option>
+                        @foreach($managers as $manager)
+                            @if($manager->getRoleNames() == '["Manager"]')
+                                @if(count($supervisor->SupervisorToManager))
+                                    @foreach($supervisor->SupervisorToManager as $supervisorToManager)
+                                    @if($manager->id == $supervisorToManager->manager_id)
+                                        <option value="{{ $manager->id }}" selected>{{ $manager->name }}</option>
+                                    @else
+                                        <option value="{{ $manager->id }}">{{ $manager->name }}</option>
+                                    @endif
+                                    @endforeach
+                                @else
+                                    <option value="{{ $manager->id }}">{{ $manager->name }}</option>
+                                @endif
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
             </div>

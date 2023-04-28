@@ -2,6 +2,7 @@
     
 namespace App\Http\Controllers;
 
+use App\Models\SupervisorToManager;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -132,7 +133,9 @@ class ManagerController extends Controller
     public function destroy(User $manager)
     {
         $manager->delete();
-    
+        
+        SupervisorToManager::where('manager_id',$manager->id)->delete();
+        
         return redirect()->route('managers.index')
                         ->with('success','Manager deleted successfully');
     }

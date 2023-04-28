@@ -54,9 +54,20 @@
                   <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
                 </li>
                 @else
-                  @if(Auth::user()->hasRole('Staff') || Auth::user()->hasRole('Manager') || Auth::user()->hasRole('Supervisor'))
+                  @if(Auth::user()->hasRole('Staff'))
                     <li class="nav-item">
                       <a href="{{ route('booking.index') }}" class="nav-link">Appointments</a>
+                    </li>
+                  @elseif(Auth::user()->hasRole('Manager'))
+                    <li class="nav-item">
+                      <a href="/manageAppointment" class="nav-link">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="/supervisor" class="nav-link">Supervisor List</a>
+                    </li>
+                  @elseif(Auth::user()->hasRole('Supervisor'))
+                    <li class="nav-item">
+                      <a href="/manageAppointment" class="nav-link">Appointments</a>
                     </li>
                   @else
                     <li class="nav-item">

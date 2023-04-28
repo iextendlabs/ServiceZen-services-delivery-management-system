@@ -44,6 +44,19 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Manager:</strong>
+                    <select name="manager_id" class="form-control">
+                        <option></option>
+                        @foreach($managers as $manager)
+                            @if($manager->getRoleNames() == '["Manager"]')
+                                <option value="{{ $manager->id }}">{{ $manager->name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>

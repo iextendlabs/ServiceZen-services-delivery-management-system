@@ -6,7 +6,6 @@ use App\Models\ServiceAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use App\Models\Staff;
 use Illuminate\Support\Facades\Response;
 class ServiceAppointmentController extends Controller
 {
@@ -19,17 +18,7 @@ class ServiceAppointmentController extends Controller
     {
        
         if(Auth::check()){
-            if(Auth::user()->hasRole('Manager')){
-                $staffs = Staff::where('manager_id',Auth::id())->get();
-                
-                return view('site.appointments.manageAppointment',compact('staffs'))
-                ->with('i', (request()->input('page', 1) - 1) * 5);
-            }else if(Auth::user()->hasRole('Supervisor')){
-                $staffs = Staff::where('supervisor_id',Auth::id())->get();
-                
-                return view('site.appointments.manageAppointment',compact('staffs'))
-                ->with('i', (request()->input('page', 1) - 1) * 5);
-            }else if(Auth::user()->hasRole('Staff')){
+            if(Auth::user()->hasRole('Staff')){
                 $booked_services = ServiceAppointment::where('service_staff_id',Auth::id())->where('status','Open')->latest()->get();
                 
                 return view('site.appointments.appointment',compact('booked_services'))

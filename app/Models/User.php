@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Staff::class);
     }
+
+    public function SupervisorToManager()
+    {
+        return $this->hasMany(SupervisorToManager::class,'supervisor_id','id');
+    }
 }

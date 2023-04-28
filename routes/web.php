@@ -84,3 +84,5 @@ Route::get('checkout/{id}', 'App\Http\Controllers\Site\OrderController@checkout'
 Route::get('CartCheckout', 'App\Http\Controllers\Site\OrderController@CartCheckout');
 Route::resource('order', 'App\Http\Controllers\Site\OrderController');
 Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
+Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
+Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
