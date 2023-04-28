@@ -18,8 +18,8 @@ use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StaffZoneController;
 use App\Http\Controllers\SupervisorController;
+use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\TransactionController;
-use App\Models\StaffZone;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +51,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('staffZones', StaffZoneController::class);
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
+    Route::resource('timeSlots', TimeSlotController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']); 
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
