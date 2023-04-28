@@ -54,7 +54,7 @@
                   <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
                 </li>
                 @else
-                  @if(Auth::user()->hasRole('Staff'))
+                  @if(Auth::user()->hasRole('Staff') || Auth::user()->hasRole('Manager') || Auth::user()->hasRole('Supervisor'))
                     <li class="nav-item">
                       <a href="{{ route('booking.index') }}" class="nav-link">Appointments</a>
                     </li>

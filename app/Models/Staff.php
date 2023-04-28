@@ -11,4 +11,13 @@ class Staff extends Model
 
     protected $fillable = ['user_id', 'commission','manager_id','supervisor_id'];
 
+    public function appointments()
+    {
+        return $this->hasMany(ServiceAppointment::class, 'service_staff_id', 'user_id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 }
