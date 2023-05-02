@@ -6,7 +6,11 @@ use App\Models\ServiceAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Holiday;
+use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Response;
+use Symfony\Component\Console\Command\DumpCompletionCommand;
+
 class ServiceAppointmentController extends Controller
 {
     /**
@@ -43,9 +47,20 @@ class ServiceAppointmentController extends Controller
     public function create($id)
     {
         if(Auth::check()){
+            $holiday = Holiday::where('date',date("Y-m-d"))->get();
+            if(count($holiday) == 0){
+                $slots = TimeSlot::where('active','Enable')->where('date',date("Y-m-d"))->get();
+                if(count($slots)){
+                    $timeSlots = $slots;
+                }else{
+                    $timeSlots = TimeSlot::where('active','Enable')->get();
+                }
+            }else{
+                $timeSlots = " ";
+            }
             $customer_id = Auth::id();
             $service_id = $id;
-            return view('site.appointments.create',compact('customer_id','service_id'));
+            return view('site.appointments.create',compact('customer_id','service_id','timeSlots'));
         }
 
         return redirect("customer-login")->with('error','Oppes! You are not Login.');
@@ -166,5 +181,20 @@ class ServiceAppointmentController extends Controller
         
         // Return CSV file as download
         return Response::make('', 200, $headers);
+    }
+
+    public function slots(Request $request){
+        $holiday = Holiday::where('date',$request->date)->get();
+        if(count($holiday) == 0){
+            $slots = TimeSlot::where('active','Enable')->where('date',$request->date)->get();
+            if(count($slots)){
+                $timeSlots = $slots;
+            }else{
+                $timeSlots = TimeSlot::where('active','Enable')->get();
+            }
+        }else{
+            $timeSlots = "There is no Slots";
+        }
+        return response()->json($timeSlots);
     }
 }

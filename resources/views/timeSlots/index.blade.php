@@ -18,8 +18,7 @@
     <table class="table table-bordered">
         <tr>
             <th>No</th>
-            <th>Time Start</th>
-            <th>Time End</th>
+            <th>Time Start -- Time End</th>
             <th>Active</th>
             <th width="280px">Action</th>
         </tr>
@@ -27,8 +26,7 @@
         @foreach ($time_slots as $time_slot)
         <tr>
             <td>{{ ++$i }}</td>
-            <td>{{ $time_slot->time_start }}</td>
-            <td>{{ $time_slot->time_end }}</td>
+            <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->active }}</td>
             <td>
                 <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
