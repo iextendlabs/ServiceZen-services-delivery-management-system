@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TimeSlot;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,9 +41,11 @@ class TimeSlotController extends Controller
     public function store(Request $request)
     {
         request()->validate([
+            'type' => ['required', Rule::in(['Specific', 'General'])],
             'time_start' => 'required',
             'time_end' => 'required',
             'active' => 'required',
+            'date' => Rule::requiredIf($request->type === 'Specific')
         ]);
 
         if ($request->id) {

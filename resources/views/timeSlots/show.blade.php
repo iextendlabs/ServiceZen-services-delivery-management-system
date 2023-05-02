@@ -10,6 +10,12 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Type:</strong>
+                {{ $time_slot->type }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <strong>Time Start:</strong>
                 {{ $time_slot->time_start }}
             </div>
@@ -20,6 +26,14 @@
                 {{ $time_slot->time_end }}
             </div>
         </div>
+        @if($time_slot->type == 'Specific')
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Date:</strong>
+                {{ $time_slot->date }}
+            </div>
+        </div>
+        @endif
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Active:</strong>

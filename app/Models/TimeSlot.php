@@ -9,5 +9,5 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['time_start','time_end','active'];
+    protected $fillable = ['time_start','time_end','active','type','date','group_id'];
 }
