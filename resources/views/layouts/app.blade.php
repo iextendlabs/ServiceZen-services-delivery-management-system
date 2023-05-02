@@ -52,6 +52,7 @@
                             <li><a class="nav-link" href="{{ route('appointments.index') }}">Appointments</a></li>
                             <li><a class="nav-link" href="{{ route('orders.index') }}">Orders</a></li>
                             <li><a class="nav-link" href="{{ route('timeSlots.index') }}">Time Slots</a></li>
+                            <li><a class="nav-link" href="{{ route('holidays.index') }}">Holidays</a></li>
                             <li><a class="nav-link" href="{{ route('staffZones.index') }}">Staff Zone</a></li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

@@ -99,4 +99,9 @@ class TimeSlotController extends Controller
         return redirect()->route('timeSlots.index')
                         ->with('success','Time slot deleted successfully');
     }
+
+    function dayName($dateString)
+    {
+        return \Carbon\Carbon::parse($dateString)->format('l');
+    }
 }

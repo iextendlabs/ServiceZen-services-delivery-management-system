@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
@@ -52,6 +53,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
+    Route::resource('holidays', HolidayController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']); 
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
