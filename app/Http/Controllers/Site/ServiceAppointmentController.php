@@ -49,11 +49,11 @@ class ServiceAppointmentController extends Controller
         if(Auth::check()){
             $holiday = Holiday::where('date',date("Y-m-d"))->get();
             if(count($holiday) == 0){
-                $slots = TimeSlot::where('active','Enable')->where('date',date("Y-m-d"))->get();
+                $slots = TimeSlot::where('date',date("Y-m-d"))->get();
                 if(count($slots)){
                     $timeSlots = $slots;
                 }else{
-                    $timeSlots = TimeSlot::where('active','Enable')->get();
+                    $timeSlots = TimeSlot::get();
                 }
             }else{
                 $timeSlots = " ";
@@ -186,11 +186,11 @@ class ServiceAppointmentController extends Controller
     public function slots(Request $request){
         $holiday = Holiday::where('date',$request->date)->get();
         if(count($holiday) == 0){
-            $slots = TimeSlot::where('active','Enable')->where('date',$request->date)->get();
+            $slots = TimeSlot::where('date',$request->date)->get();
             if(count($slots)){
                 $timeSlots = $slots;
             }else{
-                $timeSlots = TimeSlot::where('active','Enable')->get();
+                $timeSlots = TimeSlot::get();
             }
         }else{
             $timeSlots = "There is no Slots";

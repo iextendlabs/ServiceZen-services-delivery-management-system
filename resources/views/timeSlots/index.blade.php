@@ -27,7 +27,12 @@
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
-            <td>{{ $time_slot->active }}</td>
+            <td>@if($time_slot->active == "Available")
+                <span class="badge rounded-pill bg-primary">{{ $time_slot->active }}</span>
+                @else
+                <span class="badge rounded-pill bg-danger">{{ $time_slot->active }}</span>
+                @endif
+            </td>
             <td>
                 <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>

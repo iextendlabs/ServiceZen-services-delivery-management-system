@@ -17,13 +17,13 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Time Start:</strong>
-                {{ $time_slot->time_start }}
+                {{ date('h:i A', strtotime($time_slot->time_start)) }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Time End:</strong>
-                {{ $time_slot->time_end }}
+                {{ date('h:i A', strtotime($time_slot->time_end)) }}
             </div>
         </div>
         @if($time_slot->type == 'Specific')

@@ -55,15 +55,15 @@
             <div class="form-group">
                 <strong for="image">Active</strong>
                 <select name="active" class="form-control">
-                    @if($time_slot->active == "Enable")
-                        <option value="Enable" selected>Enable</option>
-                        <option value="Disable">Disable</option>
-                    @elseif($time_slot->active == "Disable")
-                        <option value="Enable">Enable</option>
-                        <option value="Disable" selected>Disable</option>
+                    @if($time_slot->active == "Available")
+                        <option value="Available" selected>Available</option>
+                        <option value="Unavailable">Unavailable</option>
+                    @elseif($time_slot->active == "Unavailable")
+                        <option value="Available">Available</option>
+                        <option value="Unavailable" selected>Unavailable</option>
                     @else
-                        <option value="Enable">Enable</option>
-                        <option value="Disable">Disable</option>
+                        <option value="Available">Available</option>
+                        <option value="Unavailable">Unavailable</option>
                     @endif
                 </select>
             </div>
