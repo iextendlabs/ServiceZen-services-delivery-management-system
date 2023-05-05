@@ -15,6 +15,9 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <style>
     .table td, .table th {
@@ -49,12 +52,12 @@
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                    <a class="dropdown-item" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>
                             @endif
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                    <a class="dropdown-item" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
                             @endif
                         @else
@@ -65,20 +68,19 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="nav-link" href="{{ route('appointments.index') }}">Appointments</a>
-                                    <a class="nav-link" href="{{ route('orders.index') }}">Orders</a>
+                                    <a class="dropdown-item" href="{{ route('appointments.index') }}">Appointments</a>
+                                    <a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Store Config
                                 </a>
-
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="nav-link" href="{{ route('timeSlots.index') }}">Time Slots</a>
-                                    <a class="nav-link" href="{{ route('holidays.index') }}">Holidays</a>
-                                    <a class="nav-link" href="{{ route('services.index') }}">Services</a>
-                                    <a class="nav-link" href="{{ route('serviceCategories.index') }}">Service Categories</a>
+                                    <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
+                                    <a class="dropdown-item" href="/holidays">Holidays</a>
+                                    <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
+                                    <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -88,7 +90,7 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('serviceStaff.index') }}">Staff</a>
-                                    <a class="nav-link" href="{{ route('staffZones.index') }}">Staff Groups</a>
+                                    <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Groups</a>
                                     <a class="dropdown-item" href="{{ route('customers.index') }}">Customer</a>
                                     <a class="dropdown-item" href="{{ route('affiliates.index') }}">Affiliate</a>
                                     <a class="dropdown-item" href="{{ route('managers.index') }}">Manager</a>
@@ -128,10 +130,11 @@
         </main>
     </div>
 </body>
-<!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         $(document).ready(function(){
         $(".smsId").click(function(){

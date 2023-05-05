@@ -56,7 +56,7 @@ class ServiceAppointmentController extends Controller
                     $timeSlots = TimeSlot::get();
                 }
             }else{
-                $timeSlots = " ";
+                $timeSlots = [];
             }
             $customer_id = Auth::id();
             $service_id = $id;

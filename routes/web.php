@@ -53,7 +53,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
-    Route::resource('holidays', HolidayController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']); 
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
@@ -67,6 +66,9 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::get('appointmentDetailCSV', [AppointmentController::class,'downloadCSV']);
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
+
+    Route::get('holidays', [HolidayController::class, 'index']);
+    Route::post('/holidays/crud-ajax', [HolidayController::class, 'store']);
 });
 
 Route::get('/', [SiteController::class, 'index']);
