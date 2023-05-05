@@ -2,15 +2,14 @@
 
 namespace App\Providers;
 
-use App\Models\ServiceCategory;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
+use App\Http\View\Composers\CategoryComposer;
 
-class AppServiceProvider extends ServiceProvider
+class ComposerServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register services.
      *
      * @return void
      */
@@ -20,13 +19,12 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap services.
      *
      * @return void
      */
     public function boot()
     {
-        Paginator::useBootstrapFive();
-        Paginator::useBootstrapFour();
+        View::composer('*', CategoryComposer::class);
     }
 }
