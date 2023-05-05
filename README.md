@@ -66,6 +66,9 @@ Admin panel link: https://services.upgradeopencart.com/admin
 User: admin@gmail.com
 Password: admin1234
 
+## Project Status
+Development is in final stages , we will launch version 1 soon this year.
+
 ## ChatGPT Prompts and Assistance
 1. The first help taken from ChatGPT is to write description / Readme for this Project 
 2. Second tasks done by ChatGPT is identifiying main Entities / Objects
