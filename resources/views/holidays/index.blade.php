@@ -1,7 +1,18 @@
 @extends('layouts.app')
+<style>
+.fc-day-grid-event {
+    padding: 13px 0px !important;
+}
+.alert {
+    padding: 0.5rem 0.5rem !important;
+}
+</style>
 @section('content')
     <div class="container" style="max-width: 700px">
         <h3 class="h3 text-center border-bottom pb-3">Holiday Calender</h3>
+        <div class="alert alert-success">
+            <b>Note: </b><span>Click on date to add holiday and click on holiday date to delete.</span>
+        </div>
         <div id='full_calendar_events'></div>
     </div>
     
@@ -59,7 +70,7 @@
             });
         });
         function displayMessage(message) {
-            toastr.success(message, 'Event');            
+            toastr.success(message, 'Message');            
         }
     </script>
 @endsection

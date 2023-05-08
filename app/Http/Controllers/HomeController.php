@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
 use App\Models\Order;
+use App\Models\ServiceAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
@@ -65,7 +66,10 @@ class HomeController extends Controller
                     $sale = $sale + $single_order->total_amount;
                 }
 
-                return view('home',compact('orders','affiliate_commission','staff_commission','sale'));
+                $appointments = ServiceAppointment::latest()->take(5)->get();
+
+                $i = 0;
+                return view('home',compact('orders','affiliate_commission','staff_commission','sale','appointments','i'));
             }else{
                 Session::flush();
                 Auth::logout();

@@ -83,5 +83,51 @@
             </div>
         </div>
     </div>
+    <div class="py-2"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Appointments</div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>No</th>
+                            <th>Service</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>date</th>
+                            <th>Time</th>
+                            <th>Action</th>
+                        </tr>
+                        @if(count($appointments))
+                        @foreach ($appointments as $appointment)
+                        <tr>
+                            <td>{{ ++$i }}</td>
+                            <td>{{ $appointment->service->name }}</td>
+                            <td>{{ $appointment->service->price }}</td>
+                            <td>{{ $appointment->status }}</td>
+                            <td>{{ $appointment->date }}</td>
+                            <td>{{ $appointment->time }}</td>
+                            <td>
+                                <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
+                                    <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>
+                                    <a class="btn btn-primary" href="{{ route('appointments.edit',$appointment->id) }}">Edit</a>
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                        @else
+                        <tr>
+                            <td colspan="7" class="text-center" >There is no appointment.</td>
+                        </tr>
+                        @endif
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
