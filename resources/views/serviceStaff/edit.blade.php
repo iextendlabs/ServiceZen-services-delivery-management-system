@@ -17,7 +17,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST">
+    <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
         <input type="hidden" value="{{ $serviceStaff->staff->id }}" name="staff_id">
         @csrf
         @method('PUT')
@@ -32,6 +32,14 @@
                 <div class="form-group">
                     <strong>Email:</strong>
                     <input type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong for="image">Upload Image</strong>
+                    <input type="file" name="image" id="image" class="form-control-file ">
+                    <br>
+                    <img id="preview" src="/staff-images/{{$serviceStaff->staff->image}}" height="130px">
                 </div>
             </div>
             <div class="col-md-12">
@@ -95,4 +103,10 @@
             </div>
         </div>
     </form>
+<script>
+    document.getElementById('image').addEventListener('change', function(e) {
+        var preview = document.getElementById('preview');
+        preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
 @endsection

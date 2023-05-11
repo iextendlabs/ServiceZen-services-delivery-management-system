@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
 use App\Models\TimeSlot;
+use App\Models\User;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\Console\Command\DumpCompletionCommand;
 
@@ -60,7 +61,9 @@ class ServiceAppointmentController extends Controller
             }
             $customer_id = Auth::id();
             $service_id = $id;
-            return view('site.appointments.create',compact('customer_id','service_id','timeSlots'));
+
+            $staffs = User::get();
+            return view('site.appointments.create',compact('customer_id','service_id','timeSlots','staffs'));
         }
 
         return redirect("customer-login")->with('error','Oppes! You are not Login.');

@@ -28,24 +28,24 @@
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($serviceStaff))
-                @foreach ($serviceStaff as $service)
-                @if($service->getRoleNames() == '["Staff"]')
+                @foreach ($serviceStaff as $staff)
+                @if($staff->getRoleNames() == '["Staff"]')
                 <tr>
                     <td>{{ ++$i }}</td>
-                    <td>{{ $service->name }}</td>
-                    <td>{{ $service->email }}</td>
+                    <td>{{ $staff->name }}</td>
+                    <td>{{ $staff->email }}</td>
                     <td>
-                        @if(!empty($service->getRoleNames()))
-                            @foreach($service->getRoleNames() as $v)
+                        @if(!empty($staff->getRoleNames()))
+                            @foreach($staff->getRoleNames() as $v)
                                 <span class="badge rounded-pill bg-dark">{{ $v }}</span>
                             @endforeach
                         @endif
                     </td>
                     <td>
-                        <form action="{{ route('serviceStaff.destroy',$service->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('serviceStaff.show',$service->id) }}">Show</a>
+                        <form action="{{ route('serviceStaff.destroy',$staff->id) }}" method="POST">
+                            <a class="btn btn-info" href="{{ route('serviceStaff.show',$staff->id) }}">Show</a>
                             @can('service-staff-edit')
-                            <a class="btn btn-primary" href="{{ route('serviceStaff.edit',$service->id) }}">Edit</a>
+                            <a class="btn btn-primary" href="{{ route('serviceStaff.edit',$staff->id) }}">Edit</a>
                             @endcan
                             @csrf
                             @method('DELETE')

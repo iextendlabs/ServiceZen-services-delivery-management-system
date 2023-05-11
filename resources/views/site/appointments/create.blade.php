@@ -64,12 +64,12 @@
                         <input type="date" name="date" id="date" min="{{ date('Y-m-d'); }}" value="{{ date('Y-m-d'); }}" class="form-control" placeholder="Date">
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <strong>Time Slots</strong>
                     <div class="list-group" id="time-slots-container">
                         @if(count($timeSlots))
                         @foreach($timeSlots as $timeSlot)
-                        <label><div class="list-group-item d-flex justify-content-between align-items-center">
+                        <label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">
                                 <input style="display: none;" type="radio" class="form-check-input" name="time_slot" value="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" @if($timeSlot->active == "Unavailable") disabled @endif>
                                 {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} 
                                 @if($timeSlot->active == "Unavailable") 
@@ -78,6 +78,26 @@
                                     <span class="badge badge-available">Available</span> 
                                 @endif
                         </div></label>
+                        @endforeach
+                        @else
+                            <div class="alert alert-danger">
+                                <strong>Whoops!</strong> There were Holiday on your selected date.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <strong>Staff</strong>
+                    <div class="list-group" id="staff-container">
+                        @if(count($staffs))
+                        @foreach($staffs as $staff)
+                        @if($staff->getRoleNames() == '["Staff"]')
+                        <label><div class="list-group-item d-flex justify-content-between align-items-center staff">
+                                <input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="{{ $staff->id }}">
+                                <img src="/staff-images/{{ $staff->staff->image }}" height="100px" alt="Staff Image">
+                                <span>{{ $staff->name }}</span>
+                        </div></label>
+                        @endif
                         @endforeach
                         @else
                             <div class="alert alert-danger">
@@ -115,10 +135,17 @@
 
     $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
         if ($(this).is(':checked')) {
-            $(".list-group-item").removeClass("active");
+            $(".time-slot").removeClass("active");
             $(this).parents().addClass('active');
             selected_time.val($(this).val());
             time.val($(this).val());
+        }
+    });
+
+    $('#staff-container').on('change', 'input[name="service_staff_id"]', function() {
+        if ($(this).is(':checked')) {
+            $(".staff").removeClass("active");
+            $(this).parents().addClass('active');
         }
     });
 </script>
@@ -153,7 +180,7 @@
                     $('input[name="time"]').val('');
 
                     timeSlots.forEach(function(timeSlot) {
-                        var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center">';
+                        var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">';
                         if (timeSlot.active == "Unavailable") {
                             html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '" disabled>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + ' <span class="badge badge-unavailable">Unavailable</span>'
                         } else {

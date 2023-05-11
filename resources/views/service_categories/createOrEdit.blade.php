@@ -25,9 +25,13 @@
                     <input type="text" name="title" value="{{$service_category->title}}" class="form-control" placeholder="Title">
                 </div>
             </div>
-            <div class="form-group">
-                <strong for="image">Upload Image</strong>
-                <input type="file" name="image" id="image" class="form-control-file">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong for="image">Upload Image</strong>
+                    <input type="file" name="image" id="image" class="form-control-file">
+                    <br>
+                    <img id="preview" src="/service-category-images/{{$service_category->image}}" height="130px">
+                </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
@@ -40,4 +44,10 @@
             </div>
         </div>
     </form>
+<script>
+    document.getElementById('image').addEventListener('change', function(e) {
+        var preview = document.getElementById('preview');
+        preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
 @endsection

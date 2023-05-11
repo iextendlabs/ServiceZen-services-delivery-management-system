@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use DB;
 use Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Arr; 
 class ServiceStaffController extends Controller
 { 
@@ -58,6 +57,7 @@ class ServiceStaffController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
         ]);
@@ -73,7 +73,20 @@ class ServiceStaffController extends Controller
 
         $ServiceStaff->assignRole('Staff');
         
-        Staff::create($input);
+        $staff = Staff::create($input);
+
+        if ($request->image) {
+            // create a unique filename for the image
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+        
+            // move the uploaded file to the public/staff-images directory
+            $request->image->move(public_path('staff-images'), $filename);
+        
+            // save the filename to the gallery object and persist it to the database
+            
+            $staff->image = $filename;
+            $staff->save();
+        }
     
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff created successfully.');
@@ -114,6 +127,7 @@ class ServiceStaffController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
             'commission'=> 'required'
         ]);
@@ -130,6 +144,23 @@ class ServiceStaffController extends Controller
 
         $staff = Staff::find($input['staff_id']);
         $staff->update($input);
+
+        if (isset($request->image)) {
+            //delete previous Image if new Image submitted
+            if ($staff->image && file_exists(public_path('staff-images').'/'.$staff->image)) {
+                unlink(public_path('staff-images').'/'.$staff->image);
+            }
+
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+        
+            // move the uploaded file to the public/staff-images directory
+            $request->image->move(public_path('staff-images'), $filename);
+        
+            // save the filename to the gallery object and persist it to the database
+            
+            $staff->image = $filename;
+            $staff->save();
+        }
         
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff updated successfully');
