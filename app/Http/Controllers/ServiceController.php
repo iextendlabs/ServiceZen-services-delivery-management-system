@@ -99,8 +99,6 @@ class ServiceController extends Controller
 
         
         if ($request->image) {
-            dd($request->image);
-
             // create a unique filename for the image
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
         
