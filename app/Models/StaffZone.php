@@ -13,6 +13,6 @@ class StaffZone extends Model
 
     public function staff()
     {
-        return $this->hasOne(User::class,'id','staff_ids');
+        return $this->hasMany(User::class,'id','staff_ids');
     }
 }

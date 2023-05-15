@@ -67,6 +67,19 @@
                     @endif
                 </select>
             </div>
+            <div class="form-group">
+                <strong for="image">Staff Group</strong>
+                <select name="group_id" class="form-control">
+                    <option></option>
+                    @foreach($staff_groups as $staff_group )
+                    @if($time_slot->group_id == $staff_group->id)
+                        <option value="{{$staff_group->id}}" selected>{{$staff_group->name}}</option>
+                    @else
+                        <option value="{{$staff_group->id}}">{{$staff_group->name}}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>

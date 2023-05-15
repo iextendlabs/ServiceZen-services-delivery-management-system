@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
+use App\Models\StaffGroup;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Support\Facades\Response;
@@ -81,6 +82,7 @@ class ServiceAppointmentController extends Controller
             'date' => 'required',
             'time' => 'required',
             'address' => 'required',
+            'service_staff_id' => 'required',
         ]);
 
         $input = $request->all();
@@ -199,5 +201,14 @@ class ServiceAppointmentController extends Controller
             $timeSlots = "There is no Slots";
         }
         return response()->json($timeSlots);
+    }
+
+    public function staff_group(Request $request){
+        $staff_group = StaffGroup::find($request->group);
+        foreach(unserialize($staff_group->staff_ids) as $id){
+            $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')->where('users.id',$id)->get();
+        }   
+       
+        return response()->json($selected_staff);
     }
 }

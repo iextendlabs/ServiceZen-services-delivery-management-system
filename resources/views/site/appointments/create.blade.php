@@ -64,13 +64,13 @@
                         <input type="date" name="date" id="date" min="{{ date('Y-m-d'); }}" value="{{ date('Y-m-d'); }}" class="form-control" placeholder="Date">
                     </div>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-8">
                     <strong>Time Slots</strong>
                     <div class="list-group" id="time-slots-container">
                         @if(count($timeSlots))
                         @foreach($timeSlots as $timeSlot)
                         <label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">
-                                <input style="display: none;" type="radio" class="form-check-input" name="time_slot" value="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" @if($timeSlot->active == "Unavailable") disabled @endif>
+                                <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" @if($timeSlot->active == "Unavailable") disabled @endif>
                                 {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} 
                                 @if($timeSlot->active == "Unavailable") 
                                     <span class="badge badge-unavailable">Unavailable</span> 
@@ -86,24 +86,12 @@
                         @endif
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <strong>Staff</strong>
+                <div class="col-md-3"><br>
+                    <strong>Available Staff</strong>
                     <div class="list-group" id="staff-container">
-                        @if(count($staffs))
-                        @foreach($staffs as $staff)
-                        @if($staff->getRoleNames() == '["Staff"]')
-                        <label><div class="list-group-item d-flex justify-content-between align-items-center staff">
-                                <input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="{{ $staff->id }}">
-                                <img src="/staff-images/{{ $staff->staff->image }}" height="100px" alt="Staff Image">
-                                <span>{{ $staff->name }}</span>
-                        </div></label>
-                        @endif
-                        @endforeach
-                        @else
-                            <div class="alert alert-danger">
-                                <strong>Whoops!</strong> There were Holiday on your selected date.
-                            </div>
-                        @endif
+                        <div class="alert alert-danger">
+                            <strong>Please!</strong> First select time slot.
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -182,9 +170,9 @@
                     timeSlots.forEach(function(timeSlot) {
                         var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">';
                         if (timeSlot.active == "Unavailable") {
-                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '" disabled>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + ' <span class="badge badge-unavailable">Unavailable</span>'
+                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="'+timeSlot.group_id+'" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '" disabled>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + ' <span class="badge badge-unavailable">Unavailable</span>'
                         } else {
-                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '">' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '<span class="badge badge-available">Available</span> '
+                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="'+timeSlot.group_id+'" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '">' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '<span class="badge badge-available">Available</span> '
                         }
                         html += '</div></label>'
                         timeSlotsContainer.append(html);
@@ -212,5 +200,46 @@
         // Return formatted time
         return hour + ':' + minute + ' ' + amPm;
     }
+</script>
+<script>
+    // JavaScript Code
+    $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
+        var group = $(this).attr('data-group');
+        console.log(group);
+        if(group){
+            // Make AJAX call to retrieve time slots for selected date
+            $.ajax({
+                url: '/staff-group',
+                method: 'GET',
+                data: {
+                    group: group
+                },
+                success: function(response) {
+                    var staffs = response;
+
+                    var staffContainer = $('#staff-container');
+                    staffContainer.empty();
+
+                    staffs.forEach(function(staff) {
+                        var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center staff"><input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="'+ staff[0].id+'">';
+                        html += '<img src="/staff-images/'+staff[0].image+'" height="100px" alt="Staff Image" class="rounded-circle">'
+                        html += '<span>'+staff[0].name+'</span>'
+                        html += '</div></label>'
+                        staffContainer.append(html);
+                    });
+                },
+                error: function() {
+                    alert('Error retrieving staffs.');
+                }
+            });
+        }else{
+            var timeSlotsContainer = $('#staff-container');
+            timeSlotsContainer.empty();
+
+            var html = '<div class="alert alert-danger"><strong>Whoops!</strong> There is no staff on your select time slot.</div>';
+            timeSlotsContainer.append(html);
+        }
+        
+    });
 </script>
 @endsection

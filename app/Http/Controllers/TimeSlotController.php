@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StaffGroup;
 use App\Models\TimeSlot;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -29,7 +30,8 @@ class TimeSlotController extends Controller
     public function create()
     {
         $time_slot = new TimeSlot;
-        return view('timeSlots.createOrEdit', compact('time_slot'));
+        $staff_groups =StaffGroup::all();
+        return view('timeSlots.createOrEdit', compact('time_slot','staff_groups'));
     }
     
     /**
@@ -79,8 +81,9 @@ class TimeSlotController extends Controller
      */
     public function edit($id)
     {
+        $staff_groups =StaffGroup::all();
         $time_slot = TimeSlot::find($id);
-        return view('timeSlots.createOrEdit', compact('time_slot'));
+        return view('timeSlots.createOrEdit', compact('time_slot','staff_groups'));
     }
     
     

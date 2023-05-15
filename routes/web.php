@@ -17,6 +17,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StaffGroupController;
 use App\Http\Controllers\StaffZoneController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\TimeSlotController;
@@ -50,6 +51,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('orders', OrderController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('staffZones', StaffZoneController::class);
+    Route::resource('staffGroups', StaffGroupController::class);
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
@@ -85,6 +87,7 @@ Route::get('booking/{id}', [ServiceAppointmentController::class, 'create']);
 Route::resource('booking', ServiceAppointmentController::class);
 Route::get('appointmentCSV', [ServiceAppointmentController::class,'downloadCSV']);
 Route::get('slots', [ServiceAppointmentController::class,'slots']);
+Route::get('staff-group', [ServiceAppointmentController::class,'staff_group']);
 // Order
 Route::get('checkout/{id}', 'App\Http\Controllers\Site\OrderController@checkout');
 Route::get('CartCheckout', 'App\Http\Controllers\Site\OrderController@CartCheckout');

@@ -90,7 +90,8 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('serviceStaff.index') }}">Staff</a>
-                                    <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Groups</a>
+                                    <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
+                                    <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
                                     <a class="dropdown-item" href="{{ route('customers.index') }}">Customer</a>
                                     <a class="dropdown-item" href="{{ route('affiliates.index') }}">Affiliate</a>
                                     <a class="dropdown-item" href="{{ route('managers.index') }}">Manager</a>
