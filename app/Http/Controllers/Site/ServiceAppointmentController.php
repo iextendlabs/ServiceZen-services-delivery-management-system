@@ -206,9 +206,11 @@ class ServiceAppointmentController extends Controller
     public function staff_group(Request $request){
         $staff_group = StaffGroup::find($request->group);
         foreach(unserialize($staff_group->staff_ids) as $id){
-            $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')->where('users.id',$id)->get();
+            $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
+            ->select('users.*', 'staff.image')
+            ->where('users.id',$id)->get();
         }   
-       
+
         return response()->json($selected_staff);
     }
 }
