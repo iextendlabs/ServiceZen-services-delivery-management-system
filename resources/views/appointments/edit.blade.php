@@ -250,16 +250,18 @@
     });
 
     function convertTo12Hour(time) {
-        var hour = parseInt(time.split(':')[0]);
-        var minute = parseInt(time.split(':')[1]);
-        var amPm = hour >= 12 ? 'PM' : 'AM';
+        var parts = time.split(':');
+        var hours = parseInt(parts[0]);
+        var minutes = parseInt(parts[1]);
 
-        hour = hour % 12;
-        hour = hour ? hour : 12; // 0 should be 12 in 12-hour format
+        var suffix = hours >= 12 ? 'PM' : 'AM';
 
-        minute = minute < 10 ? '0' + minute : minute;
+        hours = hours % 12;
+        hours = hours ? hours : 12; // Convert 0 to 12
 
-        return hour + ':' + minute + ' ' + amPm;
+        var formattedTime = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ' ' + suffix;
+
+        return formattedTime;
     }
 </script>
 
