@@ -69,6 +69,7 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('appointments.index') }}">Appointments</a>
+                                    <a class="dropdown-item" href="{{ route('cashCollection.index') }}">Cash Collections</a>
                                     <a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a>
                                 </div>
                             </li>

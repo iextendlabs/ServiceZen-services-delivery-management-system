@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\CashCollectionController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ServiceCategoryController;
@@ -55,6 +56,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
+    Route::resource('cashCollection', CashCollectionController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']); 
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
@@ -95,3 +97,4 @@ Route::resource('order', 'App\Http\Controllers\Site\OrderController');
 Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
+Route::resource('cashCollections', 'App\Http\Controllers\Site\CashCollectionController');

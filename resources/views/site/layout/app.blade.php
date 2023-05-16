@@ -84,6 +84,9 @@
                     <a class="dropdown-item" href="/customer-login">Login</a>
                     <a class="dropdown-item" href="/customer-registration">Register</a>
                   @else
+                    @if(Auth::user()->hasRole('Staff'))
+                      <a class="dropdown-item" href="{{ route('cashCollections.index') }}">Cash Collection</a>
+                    @endif
                     <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
                     <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
                     <a class="dropdown-item" href="/customer-logout">Logout</a>
