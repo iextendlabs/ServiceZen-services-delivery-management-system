@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Holiday;
 use App\Models\Service;
 use App\Models\ServiceAppointment;
+use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class AppointmentController extends Controller
@@ -73,9 +76,21 @@ class AppointmentController extends Controller
      */
     public function edit(ServiceAppointment $appointment)
     {
+        $holiday = Holiday::where('date',date("Y-m-d"))->get();
+        if(count($holiday) == 0){
+            $slots = TimeSlot::where('date',date("Y-m-d"))->get();
+            if(count($slots)){
+                $timeSlots = $slots;
+            }else{
+                $timeSlots = TimeSlot::get();
+            }
+        }else{
+            $timeSlots = [];
+        }
+
         $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
         $staffs = User::all();
-        return view('appointments.edit',compact('appointment','statuses','staffs'));
+        return view('appointments.edit',compact('appointment','statuses','staffs','timeSlots'));
     }
 
     /**

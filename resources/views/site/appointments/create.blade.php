@@ -205,7 +205,7 @@
     // JavaScript Code
     $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
         var group = $(this).attr('data-group');
-        console.log(group);
+        
         if(group){
             // Make AJAX call to retrieve time slots for selected date
             $.ajax({
