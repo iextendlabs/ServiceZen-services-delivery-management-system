@@ -269,7 +269,6 @@
 <script>
     $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
         var group = $(this).attr('data-group');
-        console.log(group);
         if (group) {
             $.ajax({
                 url: '/staff-group',

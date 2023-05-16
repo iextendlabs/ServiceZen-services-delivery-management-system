@@ -37,7 +37,7 @@
                     <td>{{ $cash_collection->staff->name }}</td>
                     <td>
                         <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('cashCollection.show',$cash_collection->id) }}">Show</a>
+                            <!-- <a class="btn btn-info" href="{{ route('cashCollection.show',$cash_collection->id) }}">Show</a> -->
                             <a class="btn btn-primary" href="{{ route('cashCollection.edit',$cash_collection->id) }}">Edit</a>
                             @csrf
                             @method('DELETE')
@@ -48,7 +48,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="4" class="text-center">There is no staff zone.</td>
+                    <td colspan="8" class="text-center">There is no staff zone.</td>
                 </tr>
                 @endif  
             </table>
