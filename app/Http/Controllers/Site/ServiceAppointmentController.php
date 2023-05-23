@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
+use App\Models\Service;
 use App\Models\StaffGroup;
 use App\Models\TimeSlot;
 use App\Models\User;
@@ -80,13 +81,21 @@ class ServiceAppointmentController extends Controller
     {
         $this->validate($request, [
             'date' => 'required',
-            'time' => 'required',
+            'time_slot_id' => 'required',
             'address' => 'required',
             'service_staff_id' => 'required',
         ]);
 
         $input = $request->all();
         $input['status'] = "Open";
+
+        $service = Service::find($request->service_id);
+
+        if(isset($service->discount)){
+            $input['price'] = $service->discount;
+        }else{
+            $input['price'] = $service->price;
+        }
 
         $appointment = ServiceAppointment::create($input);
         $appointment_id = $appointment->id;
@@ -117,7 +126,7 @@ class ServiceAppointmentController extends Controller
     public function edit($id)
     {
         $serviceAppointment = ServiceAppointment::find($id);
-        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel','Not Available'];
 
         return view('site.appointments.edit', compact('serviceAppointment','statuses'));
     }
@@ -175,10 +184,9 @@ class ServiceAppointmentController extends Controller
         
         // Write headers to output stream
         fputcsv($output, array('Service', 'Price', 'Status','Date','Time','Address'));
-        
         // Loop through data and write to output stream
         foreach ($data as $row) {
-            fputcsv($output, array($row->service->name, '$'.$row->service->price, $row->status, $row->date, $row->time,$row->address));
+            fputcsv($output, array($row->service->name, '$'.$row->price, $row->status, $row->date, date('h:i A', strtotime($row->time_slot->time_start)). "--" .date('h:i A', strtotime($row->time_slot->time_end)),$row->address));
         }
         
         // Close output stream

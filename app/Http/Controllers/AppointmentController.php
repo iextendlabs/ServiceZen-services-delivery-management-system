@@ -20,7 +20,7 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel','Not Available'];
         $users = User::all();
         $services = Service::all();
         $filter = [
@@ -88,7 +88,7 @@ class AppointmentController extends Controller
             $timeSlots = [];
         }
 
-        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel','Not Available'];
         $staffs = User::all();
         return view('appointments.edit',compact('appointment','statuses','staffs','timeSlots'));
     }
@@ -129,7 +129,7 @@ class AppointmentController extends Controller
     }
 
     public function filter(Request $request){
-        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel'];
+        $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel','Not Available'];
         $filter = [
             'status'=>$request->status,
             'staff'=>$request->staff_id,
@@ -171,11 +171,11 @@ class AppointmentController extends Controller
         $output = fopen("php://output", "w");
         
         // Write headers to output stream
-        fputcsv($output, array('Service','Price','Status','Date','Time','Address','Customer','Staff'));
+        fputcsv($output, array('Service','Price','Discount','Status','Date','Time','Address','Customer','Staff'));
         
         // Loop through data and write to output stream
         foreach ($data as $row) {
-            fputcsv($output, array($row->service->name, '$'.$row->service->price, $row->status, $row->date, $row->time, $row->address, $row->customer->name, $row->serviceStaff->name));
+            fputcsv($output, array($row->service->name, '$'.$row->service->price,'$'.$row->service->discount, $row->status, $row->date, $row->time, $row->address, $row->customer->name, $row->serviceStaff->name));
         }
         
         // Close output stream

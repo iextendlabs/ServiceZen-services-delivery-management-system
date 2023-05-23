@@ -104,10 +104,10 @@
                         <tr>
                             <td>{{ ++$i }}</td>
                             <td>{{ $appointment->service->name }}</td>
-                            <td>{{ $appointment->service->price }}</td>
+                            <td>{{ $appointment->price }}</td>
                             <td>{{ $appointment->status }}</td>
                             <td>{{ $appointment->date }}</td>
-                            <td>{{ $appointment->time }}</td>
+                            <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
                             <td>
                                 <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
                                     <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>

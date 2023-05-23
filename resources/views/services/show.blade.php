@@ -17,7 +17,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Description:</strong>
-                {{ $service->description }}
+                {!! $service->description !!}
             </div>
         </div>
         <div class="col-md-12">

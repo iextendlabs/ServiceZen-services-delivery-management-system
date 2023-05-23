@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceAppointment extends Model
 {
-    protected $fillable = ['service_id', 'service_staff_id','customer_id', 'time', 'date','address','status'];
+    protected $fillable = ['service_id', 'service_staff_id','customer_id', 'time_slot_id','price', 'date','address','status'];
     
     public function service()
     {
@@ -37,5 +37,10 @@ class ServiceAppointment extends Model
     public function transactions()
     {
         return $this->hasOne(Transaction::class, 'appointment_id', 'id');
+    }
+
+    public function time_slot()
+    {
+        return $this->hasOne(TimeSlot::class, 'id', 'time_slot_id');
     }
 }

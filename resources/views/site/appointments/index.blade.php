@@ -33,10 +33,10 @@
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ $booked_service->service->name }}</td>
-            <td>{{ $booked_service->service->price }}</td>
+            <td>${{ $booked_service->price }}</td>
             <td>{{ $booked_service->status }}</td>
             <td>{{ $booked_service->date }}</td>
-            <td>{{ $booked_service->time }}</td>
+            <td>{{ date('h:i A', strtotime($booked_service->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($booked_service->time_slot->time_end)) }}</td>
             <td>
                 <form action="{{ route('booking.destroy',$booked_service->id) }}" method="POST">
                     @csrf

@@ -70,8 +70,8 @@
                         @if(count($timeSlots))
                         @foreach($timeSlots as $timeSlot)
                         <label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">
-                                <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" @if($timeSlot->active == "Unavailable") disabled @endif>
-                                {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} 
+                                <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ $timeSlot->id }}" @if($timeSlot->active == "Unavailable") disabled @endif>
+                                <p>{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </p>
                                 @if($timeSlot->active == "Unavailable") 
                                     <span class="badge badge-unavailable">Unavailable</span> 
                                 @else
@@ -98,7 +98,7 @@
                     <div class="form-group">
                         <strong>Time:</strong>
                         <input type="text" name="selected_time" class="form-control" disabled placeholder="Select the Time Slots">
-                        <input type="hidden" name="time" class="form-control">
+                        <input type="hidden" name="time_slot_id" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -108,8 +108,8 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <button type="submit" name="checkout" class="btn btn-success">Checkout</button>
-                    <button type="submit" name="continue" class="btn btn-primary">Continue Booking</button>
+                    <button type="submit" name="checkout" class="btn btn-success">Proceed Order</button>
+                    <button type="submit" name="continue" class="btn btn-primary">Add More</button>
                 </div>
             </div>
         </form>
@@ -119,13 +119,14 @@
     var time_slot = $('input[name="time_slot"]');
 
     var selected_time = $('input[name="selected_time"]');
-    var time = $('input[name="time"]');
+    var time = $('input[name="time_slot_id"]');
 
     $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
+
         if ($(this).is(':checked')) {
             $(".time-slot").removeClass("active");
             $(this).parents().addClass('active');
-            selected_time.val($(this).val());
+            selected_time.val($(this).parent().find('p').text());
             time.val($(this).val());
         }
     });
@@ -156,7 +157,7 @@
                     var timeSlotsContainer = $('#time-slots-container');
                     timeSlotsContainer.empty();
                     $('input[name="selected_time"]').val('');
-                    $('input[name="time"]').val('');
+                    $('input[name="time_slot_id"]').val('');
 
                     var html = '<div class="alert alert-danger"><strong>Whoops!</strong> There were Holiday on your selected date.</div>';
                     timeSlotsContainer.append(html);
@@ -165,14 +166,14 @@
                     var timeSlotsContainer = $('#time-slots-container');
                     timeSlotsContainer.empty();
                     $('input[name="selected_time"]').val('');
-                    $('input[name="time"]').val('');
+                    $('input[name="time_slot_id"]').val('');
 
                     timeSlots.forEach(function(timeSlot) {
                         var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">';
                         if (timeSlot.active == "Unavailable") {
-                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="'+timeSlot.group_id+'" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '" disabled>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + ' <span class="badge badge-unavailable">Unavailable</span>'
+                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="'+timeSlot.group_id+'" value="' + timeSlot.id + '" disabled><p>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '</p> <span class="badge badge-unavailable">Unavailable</span>'
                         } else {
-                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="'+timeSlot.group_id+'" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '">' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '<span class="badge badge-available">Available</span> '
+                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="'+timeSlot.group_id+'" value="' + timeSlot.id + '"><p>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '</p> <span class="badge badge-available">Available</span> '
                         }
                         html += '</div></label>'
                         timeSlotsContainer.append(html);

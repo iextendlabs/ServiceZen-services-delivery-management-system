@@ -45,13 +45,13 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Time:</strong>
-                {{ $appointment->time }}
+                {{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Price:</strong>
-                {{ $appointment->service->price }}
+                {{ $appointment->price }}
             </div>
         </div>
         <div class="col-md-12">

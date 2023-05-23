@@ -53,8 +53,8 @@
                 <td>{{ $appointment->address }}</td>
                 <td>{{ $appointment->service->duration }}</td>
                 <td>{{ $appointment->date }}</td>
-                <td>{{ $appointment->time }}</td>
-                <td class="text-right">${{ $appointment->service->price }}</td>
+                <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
+                <td class="text-right">${{ $appointment->price }}</td>
             </tr>
         @endforeach
         <tr>
@@ -110,9 +110,9 @@
                 <tr>
                     <td>{{ $appointment->service->name }}</td>
                     <td>{{ $appointment->status }}</td>
-                    <td>${{ $appointment->service->price }}</td>
+                    <td>${{ $appointment->price }}</td>
                     <td>{{ $appointment->staff->name }}</td>
-                    <td>${{ ($appointment->service->price * $appointment->staff->staff->commission) / 100 }}</td>
+                    <td>${{ ($appointment->price * $appointment->staff->staff->commission) / 100 }}</td>
                     <td>
                         @if(empty($appointment->transactions->status))
                             <button type="submit" class="btn btn-primary">Approve</button>

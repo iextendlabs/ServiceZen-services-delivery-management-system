@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\ServicePackage;
+use App\Models\ServiceToUserNote;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,9 +46,10 @@ class ServiceController extends Controller
         $i = 0;
         $package_services = [];
         $all_services = Service::all();
+        $users = User::all();
         $service = new Service;
         $service_categories = ServiceCategory::all();
-        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services'));
+        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services','users'));
     }
     
     /**
@@ -67,6 +70,8 @@ class ServiceController extends Controller
             'category_id' => 'required',
         ]);
 
+        $input = $request->all();
+
         if ($request->id) {
             $service = Service::find($request->id);
             $service->update($request->all());
@@ -76,6 +81,7 @@ class ServiceController extends Controller
                     unlink(public_path('service-images').'/'.$service->image);
                 }
             }
+
             ServicePackage::where('service_id',$request->id)->delete();
             $service_id = $request->id;
             if(isset($request->packageId)){
@@ -85,6 +91,12 @@ class ServiceController extends Controller
                     ServicePackage::create($input);
                 }
             }
+
+            ServiceToUserNote::where('service_id',$request->id)->delete();
+            $input['service_id'] =  $request->id;
+            $input['user_ids'] = serialize($request->userIds);
+            ServiceToUserNote::create($input);
+
         } else {
             $service = Service::create($request->all());
             $service_id = $service->id;
@@ -95,6 +107,9 @@ class ServiceController extends Controller
                     ServicePackage::create($input);
                 }
             }
+            $input['user_ids'] = serialize($request->userIds);
+            $input['service_id'] = $service->id;
+            ServiceToUserNote::create($input);
         }
 
         
@@ -135,11 +150,13 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
+        $userNote = $service->userNote;
         $i = 0;
         $package_services = ServicePackage::where('service_id',$service->id)->pluck('package_id')->toArray();
+        $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services'));
+        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services','users','userNote'));
     }
     
     
@@ -158,7 +175,9 @@ class ServiceController extends Controller
             }
         }
         $service->delete();
-    
+
+        ServiceToUserNote::where('service_id',$service->id)->delete();
+
         return redirect()->route('services.index')
                         ->with('success','Service deleted successfully');
     }

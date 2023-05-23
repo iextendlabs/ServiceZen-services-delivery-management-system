@@ -45,12 +45,19 @@
           <div class="card-body">
             <p class="card-text">{{ $service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted"><b>
+                @if(isset($service->discount))<s>@endif
+                  Price: ${{ $service->price }}</b>
+                @if(isset($service->discount))</s>@endif
+              </small>
+              <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
               <div class="btn-group">
                 <a href="/booking/{{ $service->id }}"><button type="button" class="btn btn-sm btn-outline-secondary"> Book</button></a>
               </div>
-              <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
-              <small class="text-muted"><b>Price:${{ $service->price }}</b></small>
             </div>
+            @if(isset($service->discount))
+              <small class="text-muted float-end"><b>Discount Price: ${{ $service->discount }}</b></small>
+            @endif  
           </div>
         </div>
       </div>

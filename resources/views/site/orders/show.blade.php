@@ -48,8 +48,8 @@
                 <td>{{ $appointment->address }}</td>
                 <td>{{ $appointment->service->duration }}</td>
                 <td>{{ $appointment->date }}</td>
-                <td>{{ $appointment->time }}</td>
-                <td class="text-right">${{ $appointment->service->price }}</td>
+                <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
+                <td class="text-right">${{ $appointment->price }}</td>
             </tr>
         @endforeach
         <tr>

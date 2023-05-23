@@ -19,9 +19,13 @@
         <tr>
             <td>{{ $appointment->service->name }}</td>
             <td>{{ $appointment->date }}</td>
-            <td>{{ $appointment->time }}</td>
+            <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
             <td>{{ $appointment->address }}</td>
-            <td class="text-right">${{ $appointment->service->price }}</td>
+            @if(isset($appointment->service->discount))
+                <td class="text-right">${{ $appointment->service->discount }}</td>
+            @else
+                <td class="text-right">${{ $appointment->service->price }}</td>
+            @endif
         </tr>
         @endforeach
         @php
@@ -29,9 +33,15 @@
         @endphp
 
         @foreach($appointments as $appointment)
+            @if(isset($appointment->service->discount))
+            @php
+                $total_amount += $appointment->service->discount;
+            @endphp
+            @else
             @php
                 $total_amount += $appointment->service->price;
             @endphp
+            @endif
         @endforeach
         <tr>
             <td colspan="4" class="text-right"><strong>Total:</strong></td>

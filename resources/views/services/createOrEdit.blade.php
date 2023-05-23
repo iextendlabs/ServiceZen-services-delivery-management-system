@@ -57,6 +57,12 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Discount Price:</strong>
+                    <input type="number" value="{{$service->discount}}" name="discount" class="form-control" placeholder="Discount Price">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Duration:</strong>
                     <input type="text" value="{{$service->duration}}" name="duration" class="form-control" placeholder="Duration">
                 </div>
@@ -80,7 +86,7 @@
                 <div class="form-group">
                     <strong>Package Services:</strong>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Search Services By Name And Price">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered services-table">
                         <tr>
                             <th></th>
                             <th>Name</th>
@@ -102,22 +108,59 @@
                     </table>
                 </div>
             </div>
+            <hr>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Note:</strong>
+                    <textarea class="form-control" style="height:150px" name="note" placeholder="Note">@if(isset($userNote)){{$userNote->note}}@endif</textarea>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Select User For Note:</strong>
+                    <input type="text" name="search_user" id="search-user" class="form-control" placeholder="Search User By Name And Price">
+                    <table class="table table-bordered user-table">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                        @foreach ($users as $user)
+                        <tr>
+                            <td>
+                                @if(isset($userNote))
+                                @if(in_array($user->id,unserialize($userNote->user_ids)))
+                                    <input type="checkbox" checked name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
+                                    @else
+                                    <input type="checkbox" name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
+                                    @endif
+                                @else
+                                <input type="checkbox" name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
+                                @endif
+                            </td>
+                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->email }}</td>
+                        </tr>
+                        @endforeach
+                    </table>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
-    <script>
+<script>
 $(document).ready(function(){
     $("#search").keyup(function(){
         var value = $(this).val().toLowerCase();
         
-        $("table tr").hide();
+        $(".services-table tr").hide();
 
-        $("table tr").each(function() {
+        $(".services-table tr").each(function() {
 
             $row = $(this);
-
+            
             var name = $row.find("td:first").next().text().toLowerCase();
 
             var price = $row.find("td:last").text().toLowerCase();
@@ -125,6 +168,30 @@ $(document).ready(function(){
             if (name.indexOf(value) != -1) {
                 $(this).show();
             }else if(price.indexOf(value) != -1) {
+                $(this).show();
+            }
+        });
+    });
+});
+</script>
+<script>
+$(document).ready(function(){
+    $("#search-user").keyup(function(){
+        var value = $(this).val().toLowerCase();
+        
+        $(".user-table tr").hide();
+
+        $(".user-table tr").each(function() {
+
+            $row = $(this);
+
+            var name = $row.find("td:first").next().text().toLowerCase();
+
+            var email = $row.find("td:last").text().toLowerCase();
+
+            if (name.indexOf(value) != -1) {
+                $(this).show();
+            }else if(email.indexOf(value) != -1) {
                 $(this).show();
             }
         });

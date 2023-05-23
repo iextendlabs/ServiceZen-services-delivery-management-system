@@ -19,6 +19,7 @@
         <tr>
             <th>No</th>
             <th>Time Start -- Time End</th>
+            <th>Group</th>
             <th>Active</th>
             <th width="280px">Action</th>
         </tr>
@@ -27,6 +28,7 @@
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
+            <td>{{ $time_slot->group->name }}</td>
             <td>@if($time_slot->active == "Available")
                 <span class="badge rounded-pill bg-primary">{{ $time_slot->active }}</span>
                 @else
