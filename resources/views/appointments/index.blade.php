@@ -1,12 +1,18 @@
 @extends('layouts.app')
+<style>
+    .no-print{
+        margin: 2px;
+    }
+</style>
 @section('content')
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
                 <h2>Appointments</h2>
             </div>
-            <div class="float-end">
+            <div class="text-right">
                 <a class="btn btn-primary float-end no-print" href="appointmentDetailCSV"><i class="fa fa-download"></i>Export CSV</a>
+                <a class="btn btn-primary float-end no-print" target="_blank" href="appointmentPrint"><i class="fa fa-print"></i>Download PDF</a>
             </div>
         </div>
     </div>

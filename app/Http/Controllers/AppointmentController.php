@@ -184,4 +184,11 @@ class AppointmentController extends Controller
         // Return CSV file as download
         return Response::make('', 200, $headers);
     }
+
+    public function print()
+    {
+        $appointments = ServiceAppointment::all();
+        return view('appointments.print',compact('appointments'))
+            ->with('i', (request()->input('page', 1) - 1) * 10);
+    }
 }

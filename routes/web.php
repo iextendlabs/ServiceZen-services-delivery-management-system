@@ -71,6 +71,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('serviceFilterCategory', [ServiceController::class, 'filter']); 
 
     Route::get('appointmentDetailCSV', [AppointmentController::class,'downloadCSV']);
+    Route::get('appointmentPrint', [AppointmentController::class,'print']);
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
 
     Route::get('holidays', [HolidayController::class, 'index']);
