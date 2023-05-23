@@ -74,6 +74,21 @@
                         </div>
                     </div>
                     <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Category:</strong>
+                            <select name="category_id" class="form-control">
+                                <option></option>
+                                @foreach($service_categories as $category)
+                                    @if($category->id == $category_id)
+                                        <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                                    @else
+                                        <option value="{{$category->id}}">{{$category->title}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>

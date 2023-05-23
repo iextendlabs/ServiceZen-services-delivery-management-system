@@ -1,4 +1,9 @@
 @extends('layouts.app')
+<style>
+  a {
+    text-decoration: none !important;
+  }
+</style>
 @section('content')
     <div class="row">
         <div class="col-md-6">
@@ -26,7 +31,7 @@
         @foreach ($service_categories as $service_category)
         <tr>
             <td>{{ ++$i }}</td>
-            <td>{{ $service_category->title }}</td>
+            <td><a href="/serviceFilterCategory?category_id={{$service_category->id}}">{{ $service_category->title }}</a></td>
             <td>{{ $service_category->description }}</td>
             <td>
                 <form action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">

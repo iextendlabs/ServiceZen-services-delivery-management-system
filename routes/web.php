@@ -66,7 +66,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 
     Route::post('userFilter', [UserController::class, 'filter']); 
     Route::post('managerFilter', [ManagerController::class, 'filter']); 
-    Route::post('supervisorFilter', [SupervisorController::class, 'filter']); 
+    Route::post('supervisorFilter', [SupervisorController::class, 'filter']);
+     
+    Route::get('serviceFilterCategory', [ServiceController::class, 'filter']); 
 
     Route::get('appointmentDetailCSV', [AppointmentController::class,'downloadCSV']);
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);

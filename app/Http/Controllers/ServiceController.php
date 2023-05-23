@@ -31,8 +31,10 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
+        $category_id = '';
         $services = Service::latest()->paginate(10);
-        return view('services.index',compact('services'))
+        $service_categories = ServiceCategory::all();
+        return view('services.index',compact('services','service_categories','category_id'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
     
@@ -186,8 +188,10 @@ class ServiceController extends Controller
 
         $name = $request->name;
         $price = $request->price;
-        $services = Service::where('name', 'like', $name.'%')->where('price', 'like', $price.'%')->paginate(100);
-        return view('services.index',compact('services','name','price'))
+        $category_id = $request->category_id;
+        $service_categories = ServiceCategory::all();
+        $services = Service::where('name', 'like', $name.'%')->where('price', 'like', $price.'%')->where('category_id', $category_id)->paginate(100);
+        return view('services.index',compact('services','name','price','category_id','service_categories'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 }
