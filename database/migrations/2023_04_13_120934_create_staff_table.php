@@ -17,6 +17,9 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('user_id');
             $table->string('commission');
+            $table->unsignedBigInteger('manager_id')->nullable();
+            $table->unsignedBigInteger('supervisor_id')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

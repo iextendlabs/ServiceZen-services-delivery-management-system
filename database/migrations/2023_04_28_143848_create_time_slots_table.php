@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('time_start');
             $table->string('time_end');
             $table->string('active');
+            $table->string('date')->nullable();
+            $table->string('type');
+            $table->string('group_id')->nullable();
             $table->timestamps();
         });
     }

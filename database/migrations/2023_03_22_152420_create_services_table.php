@@ -12,7 +12,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
+            $table->string('short_description');
             $table->string('price');
+            $table->string('duration');
+            $table->string('image');
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->string('discount')->nullable();
             $table->timestamps();
         });
     }

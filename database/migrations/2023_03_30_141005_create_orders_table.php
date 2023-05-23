@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('customer_id');
             $table->decimal('total_amount', 8, 2);
             $table->string('payment_method');
+            $table->string('status')->nullable();
+            $table->string('affiliate_id')->nullable();
             $table->timestamps();
         });
     }

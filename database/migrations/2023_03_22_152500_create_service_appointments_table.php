@@ -13,6 +13,12 @@ return new class extends Migration
             $table->unsignedBigInteger('service_id');
             $table->unsignedBigInteger('service_staff_id')->nullable();
             $table->unsignedBigInteger('customer_id');
+            $table->date('date');
+            $table->string('time_slot_id');
+            $table->string('address');
+            $table->string('status');
+            $table->unsignedBigInteger('order_id')->nullable();
+            $table->string('price');
             $table->timestamps();
         });
     }
