@@ -22,10 +22,24 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Commission:</strong>
-                {{ $serviceStaff->staff->commission }}
+                <strong>Phone Number:</strong>
+                {{ $serviceStaff->staff->phone }}
             </div>
         </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Commission:</strong>
+                {{ $serviceStaff->staff->commission }}%
+            </div>
+        </div>
+        @if(isset( $serviceStaff->staff->charges ))
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Additional Charges:</strong>
+                ${{ $serviceStaff->staff->charges }}
+            </div>
+        </div>
+        @endif
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Roles:</strong>

@@ -32,6 +32,12 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Phone Number:</strong>
+                    <input type="number" name="phone" class="form-control" placeholder="Phone Number">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong for="image">Upload Image</strong>
                     <input type="file" name="image" id="image" class="form-control-file">
                     <br>
@@ -84,6 +90,12 @@
                 <div class="form-group">
                     <strong>Commission:</strong>
                     <input type="number" name="commission" class="form-control" placeholder="Commission In %">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Additional Charges:</strong>
+                    <input type="number" name="charges" class="form-control" placeholder="Additional Charges">
                 </div>
             </div>
             <div class="col-md-12 text-center">

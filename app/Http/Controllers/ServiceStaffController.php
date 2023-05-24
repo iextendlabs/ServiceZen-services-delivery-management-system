@@ -56,6 +56,7 @@ class ServiceStaffController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'phone' => 'required',
             'email' => 'required|email|unique:users,email',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
@@ -126,6 +127,7 @@ class ServiceStaffController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'phone' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
