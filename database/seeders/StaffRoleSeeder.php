@@ -26,7 +26,8 @@ class StaffRoleSeeder extends Seeder
 
         $staff = Staff::create([
             'user_id' => $user->id, 
-            'commission' => '10'
+            'commission' => '10',
+            'phone' => ' '
         ]);
         
         $role = Role::create(['name' => 'Staff']);

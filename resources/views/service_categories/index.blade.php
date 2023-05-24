@@ -10,7 +10,9 @@
             <h2>Service Categories</h2>
         </div>
         <div class="col-md-6">
+            @can('service-category-create')
             <a class="btn btn-success  float-end" href="{{ route('serviceCategories.create') }}"> Create New Service Category</a>
+            @endcan
         </div>
     </div>
     @if ($message = Session::get('success'))
@@ -36,10 +38,14 @@
             <td>
                 <form action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('serviceCategories.show',$service_category->id) }}">Show</a>
+                    @can('service-category-edit')
                     <a class="btn btn-primary" href="{{ route('serviceCategories.edit',$service_category->id) }}">Edit</a>
+                    @endcan
                     @csrf
                     @method('DELETE')
+                    @can('service-category-delete')
                     <button type="submit" class="btn btn-danger">Delete</button>
+                    @endcan
                 </form>
             </td>
         </tr>

@@ -7,7 +7,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Arr; 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+
 class ServiceStaffController extends Controller
 { 
     /**
@@ -29,8 +31,15 @@ class ServiceStaffController extends Controller
      */
     public function index()
     {
-        $serviceStaff = User::latest()->paginate(10);
-
+        if(Auth::user()->hasRole('Supervisor')){
+            $serviceStaff = User::join('staff', 'staff.user_id', '=', 'users.id')
+            ->select('users.id', 'users.name', 'users.email')
+            ->where('staff.supervisor_id',Auth::id())->paginate(10);
+        }elseif(Auth::user()->hasRole('Staff')){
+            $serviceStaff = User::where('id',Auth::id())->paginate(10);
+        }else{
+            $serviceStaff = User::latest()->paginate(10);
+        }
         return view('serviceStaff.index',compact('serviceStaff'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }

@@ -83,7 +83,9 @@
                 </div>
             </div>
             <div class="col-md-12 text-right">
+                @can('order-edit')
                 <button type="submit" class="btn btn-primary">Update</button>
+                @endcan
             </div>
         </div>
     </form>
@@ -115,7 +117,9 @@
                     <td>${{ ($appointment->price * $appointment->staff->staff->commission) / 100 }}</td>
                     <td>
                         @if(empty($appointment->transactions->status))
+                        @can('order-edit')
                             <button type="submit" class="btn btn-primary">Approve</button>
+                        @endcan
                         @else
                             <button type="submit" class="btn btn-primary" disabled>Approved</button>
                         @endif
@@ -153,7 +157,9 @@
                     <td>${{ ($order->total_amount * $order->affiliate->affiliate->commission) / 100 }}</td>
                     <td>
                         @if(empty($order->transaction()[0]->status))
+                        @can('order-edit')
                             <button type="submit" class="btn btn-primary">Approve</button>
+                        @endcan
                         @else
                             <button type="submit" class="btn btn-primary" disabled>Approved</button>
                         @endif

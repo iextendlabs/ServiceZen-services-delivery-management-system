@@ -6,7 +6,9 @@
                 <h2>Orders</h2>
             </div>
             <div class="float-end">
+            @can('order-download')
                 <a class="btn btn-primary float-end no-print" href="orderCSV"><i class="fa fa-download"></i>Export CSV</a>
+            @endcan
             </div>
         </div>
     </div>
@@ -43,7 +45,9 @@
                             <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">Show</a>
                             @csrf
                             @method('DELETE')
+                            @can('order-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
+                            @endcan
                         </form>
                     </td>
                 </tr>

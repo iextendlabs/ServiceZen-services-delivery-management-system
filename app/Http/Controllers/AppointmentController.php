@@ -18,6 +18,18 @@ class AppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:appointment-list|appointment-download|appointment-edit|appointment-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:appointment-download', ['only' => ['downloadCSV','print']]);
+         $this->middleware('permission:appointment-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:appointment-delete', ['only' => ['destroy']]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $statuses = ['Open', 'Accepted', 'Rejected','Complete','Cancel','Not Available'];
@@ -31,7 +43,15 @@ class AppointmentController extends Controller
             'date_start'=>'',
             'date_end'=>'',
         ];
-        $appointments = ServiceAppointment::latest()->paginate(10);
+        if(Auth::user()->hasRole('Supervisor')){
+            $appointments = ServiceAppointment::join('staff', 'staff.user_id', '=', 'service_appointments.service_staff_id')
+            ->select('service_appointments.*')
+            ->where('staff.supervisor_id',Auth::id())->paginate(10);
+        }elseif(Auth::user()->hasRole('Staff')){
+            $appointments = ServiceAppointment::where('service_staff_id',Auth::id())->paginate(10);
+        }else{
+            $appointments = ServiceAppointment::latest()->paginate(10);
+        }
         return view('appointments.index',compact('appointments','statuses','users','services','filter'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
@@ -155,10 +175,16 @@ class AppointmentController extends Controller
 
     public function downloadCSV(Request $request)
     {
-        // Retrieve data from database
-        $data = ServiceAppointment::get();
+        if(Auth::user()->hasRole('Supervisor')){
+            $data = ServiceAppointment::join('staff', 'staff.user_id', '=', 'service_appointments.service_staff_id')
+            ->select('service_appointments.*')
+            ->where('staff.supervisor_id',Auth::id())->get();
+        }elseif(Auth::user()->hasRole('Staff')){
+            $data = ServiceAppointment::where('service_staff_id',Auth::id())->get();
+        }else{
+            $data = ServiceAppointment::all();
+        }
         
-        // Define headers for CSV file
         $headers = array(
             "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=AppointmentDetail.csv",
@@ -171,11 +197,11 @@ class AppointmentController extends Controller
         $output = fopen("php://output", "w");
         
         // Write headers to output stream
-        fputcsv($output, array('Service','Price','Discount','Status','Date','Time','Address','Customer','Staff'));
+        fputcsv($output, array('Service','Price','Status','Date','Time','Address','Customer','Staff'));
         
         // Loop through data and write to output stream
         foreach ($data as $row) {
-            fputcsv($output, array($row->service->name, '$'.$row->service->price,'$'.$row->service->discount, $row->status, $row->date, $row->time, $row->address, $row->customer->name, $row->serviceStaff->name));
+            fputcsv($output, array($row->service->name, '$'.$row->price, $row->status, $row->date, date('h:i A', strtotime($row->time_slot->time_start)). "--" .date('h:i A', strtotime($row->time_slot->time_end)), $row->address, $row->customer->name, $row->serviceStaff->name));
         }
         
         // Close output stream
@@ -187,7 +213,15 @@ class AppointmentController extends Controller
 
     public function print()
     {
-        $appointments = ServiceAppointment::all();
+        if(Auth::user()->hasRole('Supervisor')){
+            $appointments = ServiceAppointment::join('staff', 'staff.user_id', '=', 'service_appointments.service_staff_id')
+            ->select('service_appointments.*')
+            ->where('staff.supervisor_id',Auth::id())->get();
+        }elseif(Auth::user()->hasRole('Staff')){
+            $appointments = ServiceAppointment::where('service_staff_id',Auth::id())->get();
+        }else{
+            $appointments = ServiceAppointment::all();
+        }
         return view('appointments.print',compact('appointments'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }

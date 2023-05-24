@@ -68,9 +68,15 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @can('appointment-list')
                                     <a class="dropdown-item" href="{{ route('appointments.index') }}">Appointments</a>
+                                    @endcan
+                                    @can('cash-collection-list')
                                     <a class="dropdown-item" href="{{ route('cashCollection.index') }}">Cash Collections</a>
+                                    @endcan
+                                    @can('order-list')
                                     <a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a>
+                                    @endcan
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -78,10 +84,18 @@
                                     Store Config
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @can('time-slot-list')
                                     <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
+                                    @endcan
+                                    @can('holiday-list')
                                     <a class="dropdown-item" href="/holidays">Holidays</a>
+                                    @endcan
+                                    @can('service-list')
                                     <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
+                                    @endcan
+                                    @can('service-category-list')
                                     <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
+                                    @endcan
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -90,13 +104,27 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @can('service-staff-list')
                                     <a class="dropdown-item" href="{{ route('serviceStaff.index') }}">Staff</a>
+                                    @endcan
+                                    @can('staff-zone-list')
                                     <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
+                                    @endcan
+                                    @can('staff-group-list')
                                     <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
+                                    @endcan
+                                    @can('customer-list')
                                     <a class="dropdown-item" href="{{ route('customers.index') }}">Customer</a>
+                                    @endcan
+                                    @can('affiliate-list')
                                     <a class="dropdown-item" href="{{ route('affiliates.index') }}">Affiliate</a>
+                                    @endcan
+                                    @can('manager-list')
                                     <a class="dropdown-item" href="{{ route('managers.index') }}">Manager</a>
+                                    @endcan
+                                    @can('supervisor-list')
                                     <a class="dropdown-item" href="{{ route('supervisors.index') }}">Supervisor</a>
+                                    @endcan
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -106,8 +134,12 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" target="_blank" href="/">Your Store</a>
+                                    @can('user-list')
                                     <a class="dropdown-item" href="{{ route('users.index') }}">Users</a>
+                                    @endcan
+                                    @can('role-list')
                                     <a class="dropdown-item" href="{{ route('roles.index') }}">Role</a>
+                                    @endcan
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class HolidayController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    function __construct()
+    {
+         $this->middleware('permission:holiday-list', ['only' => ['index','show']]);
+    }
     
     public function index(Request $request)
     {

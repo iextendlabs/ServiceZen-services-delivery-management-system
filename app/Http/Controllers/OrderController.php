@@ -13,6 +13,18 @@ use Illuminate\Support\Facades\Response;
 
 class OrderController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    function __construct()
+    {
+         $this->middleware('permission:order-list|order-download|order-edit|order-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:order-download', ['only' => ['downloadCSV','print']]);
+         $this->middleware('permission:order-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:order-delete', ['only' => ['destroy']]);
+    }
     
     public function index(Request $request)
     {

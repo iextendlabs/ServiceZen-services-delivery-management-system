@@ -13,6 +13,18 @@ class ServiceCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:service-category-list|service-category-create|service-category-edit|service-category-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:service-category-create', ['only' => ['create','store']]);
+         $this->middleware('permission:service-category-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:service-category-delete', ['only' => ['destroy']]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $service_categories = ServiceCategory::latest()->paginate(10);

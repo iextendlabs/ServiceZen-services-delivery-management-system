@@ -5,7 +5,9 @@
             <h2>Time Slots</h2>
         </div>
         <div class="col-md-6">
+            @can('time-slot-create')
             <a class="btn btn-success  float-end" href="{{ route('timeSlots.create') }}"> Create New Time Slot</a>
+            @endcan
         </div>
     </div>
     @if ($message = Session::get('success'))
@@ -38,10 +40,14 @@
             <td>
                 <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>
+                    @can('time-slot-edit')
                     <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
+                    @endcan
                     @csrf
                     @method('DELETE')
+                    @can('time-slot-delete')
                     <button type="submit" class="btn btn-danger">Delete</button>
+                    @endcan
                 </form>
             </td>
         </tr>

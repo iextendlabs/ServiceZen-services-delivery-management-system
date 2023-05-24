@@ -5,7 +5,9 @@
             <h2>Staff Zone</h2>
         </div>
         <div class="col-md-6">
+            @can('staff-zone-create')
             <a class="btn btn-success  float-end" href="{{ route('staffZones.create') }}"> Create New Staff Zone</a>
+            @endcan
         </div>
     </div>
     @if ($message = Session::get('success'))
@@ -33,10 +35,14 @@
                     <td>
                         <form action="{{ route('staffZones.destroy',$staffZone->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('staffZones.show',$staffZone->id) }}">Show</a>
+                            @can('staff-zone-edit')
                             <a class="btn btn-primary" href="{{ route('staffZones.edit',$staffZone->id) }}">Edit</a>
+                            @endcan
                             @csrf
                             @method('DELETE')
+                            @can('staff-zone-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
+                            @endcan
                         </form>
                     </td>
                 </tr>

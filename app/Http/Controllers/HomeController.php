@@ -31,7 +31,11 @@ class HomeController extends Controller
     {
 
         if(Auth::check()){
-            if(Auth::user()->hasRole('Admin')){
+            if(Auth::user()->hasRole('Customer')){
+                Session::flush();
+                Auth::logout();
+                return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');
+            }else{
                 $orders = Order::latest()->take(10)->get();
                 
                 $affiliate_transaction = DB::table('transactions')
@@ -39,41 +43,37 @@ class HomeController extends Controller
                 ->select(DB::raw('SUM(transactions.amount) as amount'))
                 ->groupBy('affiliates.user_id')
                 ->get();
-
+        
                 $affiliate_commission = 0;
                 
                 foreach($affiliate_transaction as $transaction){
                     $affiliate_commission = $affiliate_commission + $transaction->amount;
                 }
-
+        
                 $staff_transaction = DB::table('transactions')
                 ->join('staff', 'transactions.user_id', '=', 'staff.user_id')
                 ->select(DB::raw('SUM(transactions.amount) as amount'))
                 ->groupBy('staff.user_id')
                 ->get();
-
+        
                 $staff_commission = 0;
                 
                 foreach($staff_transaction as $transaction){
                     $staff_commission = $staff_commission + $transaction->amount;
                 }
-
+        
                 $order = Order::get();
                 
                 $sale = 0;
-
+        
                 foreach($order as $single_order){
                     $sale = $sale + $single_order->total_amount;
                 }
-
+        
                 $appointments = ServiceAppointment::latest()->take(5)->get();
-
+        
                 $i = 0;
-                return view('home',compact('orders','affiliate_commission','staff_commission','sale','appointments','i'));
-            }else{
-                Session::flush();
-                Auth::logout();
-                return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');
+                return view('home',compact('orders','affiliate_commission','staff_commission','sale','appointments','i'));  
             }
         }
 

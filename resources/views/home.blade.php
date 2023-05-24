@@ -111,10 +111,14 @@
                             <td>
                                 <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
                                     <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>
+                                    @can('appointment-edit')
                                     <a class="btn btn-primary" href="{{ route('appointments.edit',$appointment->id) }}">Edit</a>
+                                    @endcan
                                     @csrf
                                     @method('DELETE')
+                                    @can('appointment-delete')
                                     <button type="submit" class="btn btn-danger">Delete</button>
+                                    @endcan
                                 </form>
                             </td>
                         </tr>

@@ -11,8 +11,10 @@
                 <h2>Appointments</h2>
             </div>
             <div class="text-right">
+            @can('appointment-download')
                 <a class="btn btn-primary float-end no-print" href="appointmentDetailCSV"><i class="fa fa-download"></i>Export CSV</a>
                 <a class="btn btn-primary float-end no-print" target="_blank" href="appointmentPrint"><i class="fa fa-print"></i>Download PDF</a>
+            @endcan
             </div>
         </div>
     </div>
@@ -53,10 +55,14 @@
                     <td>
                         <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>
+                            @can('appointment-edit')
                             <a class="btn btn-primary" href="{{ route('appointments.edit',$appointment->id) }}">Edit</a>
+                            @endcan
                             @csrf
                             @method('DELETE')
+                            @can('appointment-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
+                            @endcan
                         </form>
                     </td>
                 </tr>

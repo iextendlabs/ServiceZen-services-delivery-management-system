@@ -14,6 +14,17 @@ class CashCollectionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:cash-collection-list|cash-collection-edit|cash-collection-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:cash-collection-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:cash-collection-delete', ['only' => ['destroy']]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $cash_collections = CashCollection::latest()->paginate(10);

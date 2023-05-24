@@ -15,6 +15,18 @@ class StaffZoneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:staff-zone-list|staff-zone-create|staff-zone-edit|staff-zone-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:staff-zone-create', ['only' => ['create','store']]);
+         $this->middleware('permission:staff-zone-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:staff-zone-delete', ['only' => ['destroy']]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $staffZones = StaffZone::latest()->paginate(10);
@@ -77,7 +89,8 @@ class StaffZoneController extends Controller
      */
     public function show(StaffZone $staffZone)
     {
-        return view('staffZones.show',compact('staffZone'));
+        $users = User::all();
+        return view('staffZones.show',compact('staffZone','users'));
     }
     
     /**

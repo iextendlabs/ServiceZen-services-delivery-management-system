@@ -15,6 +15,18 @@ class TimeSlotController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:time-slot-list|time-slot-create|time-slot-edit|time-slot-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:time-slot-create', ['only' => ['create','store']]);
+         $this->middleware('permission:time-slot-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:time-slot-delete', ['only' => ['destroy']]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $time_slots = TimeSlot::latest()->paginate(10);

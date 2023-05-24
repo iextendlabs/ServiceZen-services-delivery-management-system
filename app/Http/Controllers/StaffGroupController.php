@@ -15,6 +15,18 @@ class StaffGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:staff-group-list|staff-group-create|staff-group-edit|staff-group-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:staff-group-create', ['only' => ['create','store']]);
+         $this->middleware('permission:staff-group-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:staff-group-delete', ['only' => ['destroy']]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $staffGroups = StaffGroup::latest()->paginate(10);

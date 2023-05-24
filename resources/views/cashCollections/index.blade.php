@@ -38,10 +38,14 @@
                     <td>
                         <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
                             <!-- <a class="btn btn-info" href="{{ route('cashCollection.show',$cash_collection->id) }}">Show</a> -->
+                            @can('cash-collection-edit')
                             <a class="btn btn-primary" href="{{ route('cashCollection.edit',$cash_collection->id) }}">Edit</a>
+                            @endcan
                             @csrf
                             @method('DELETE')
+                            @can('cash-collection-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
+                            @endcan
                         </form>
                     </td>
                 </tr>
