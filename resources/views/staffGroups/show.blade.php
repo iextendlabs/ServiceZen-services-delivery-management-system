@@ -16,16 +16,23 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Description:</strong>
-                {{ $staffGroup->description }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Staff Id:</strong>
-                @foreach(unserialize($staffGroup->staff_ids) as $staff)
-                    {{ $staff }}, 
-                @endforeach
+                <strong>Staff</strong><br><br>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                    </tr>
+                    @foreach($users as $user)
+                    @if(in_array($user->id, unserialize($staffGroup->staff_ids))) 
+                    <tr>
+                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->staff->phone}}</td>
+                    </tr>
+                    @endif
+                    @endforeach
+                </table>
             </div>
         </div>
     </div>

@@ -76,7 +76,8 @@ class StaffGroupController extends Controller
      */
     public function show(StaffGroup $staffGroup)
     {
-        return view('staffGroups.show',compact('staffGroup'));
+        $users = User::all();
+        return view('staffGroups.show',compact('staffGroup','users'));
     }
     
     /**
