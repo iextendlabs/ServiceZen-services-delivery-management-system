@@ -24,37 +24,37 @@
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Name:</strong>
+                    <span style="color: red;">*</span><strong>Name:</strong>
                     <input type="text" name="name" value="{{ $affiliate->name }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Email:</strong>
+                    <span style="color: red;">*</span><strong>Email:</strong>
                     <input type="email" name="email" value="{{ $affiliate->email }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Password:</strong>
+                    <span style="color: red;">*</span><strong>Password:</strong>
                     <input type="password" name="password" class="form-control" placeholder="Password">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Confirm Password:</strong>
+                    <span style="color: red;">*</span><strong>Confirm Password:</strong>
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div><hr>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Code:</strong>
+                    <span style="color: red;">*</span><strong>Code:</strong>
                     <input type="text" name="code" value="{{ $affiliate->affiliate->code }}" class="form-control" placeholder="Code">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Commission:</strong>
+                    <span style="color: red;">*</span><strong>Commission:</strong>
                     <input type="number" name="commission" value="{{ $affiliate->affiliate->commission }}" class="form-control" placeholder="Commission In %">
                 </div>
             </div>

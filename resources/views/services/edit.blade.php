@@ -3,7 +3,7 @@
 <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <div class="row">
         <div class="col-md-12 margin-tb">
-            <h2>Add New Service</h2>
+            <h2>Update Service</h2>
         </div>
     </div>
     @if ($errors->any())
@@ -16,19 +16,19 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('services.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('services.update',$service->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="id" value="{{$service->id}}">
+        @method('PUT')
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Name:</strong>
+                    <span style="color: red;">*</span><strong>Name:</strong>
                     <input type="text" name="name" value="{{$service->name}}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong for="image">Upload Image</strong>
+                    <span style="color: red;">*</span><strong for="image">Upload Image</strong>
                     <input type="file" name="image" id="image" class="form-control-file ">
                     <br>
                     <img id="preview" src="/service-images/{{$service->image}}" height="130px">
@@ -36,7 +36,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Description:</strong>
+                    <span style="color: red;">*</span><strong>Description:</strong>
                     <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$service->description}}</textarea>
                     <script>
                         CKEDITOR.replace( 'description' );
@@ -45,13 +45,13 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Short Description:</strong>
+                    <span style="color: red;">*</span><strong>Short Description:</strong>
                     <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{$service->short_description}}</textarea>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Price:</strong>
+                    <span style="color: red;">*</span><strong>Price:</strong>
                     <input type="number" value="{{$service->price}}" name="price" class="form-control" placeholder="Price">
                 </div>
             </div>
@@ -63,13 +63,13 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Duration:</strong>
+                    <span style="color: red;">*</span><strong>Duration:</strong>
                     <input type="text" value="{{$service->duration}}" name="duration" class="form-control" placeholder="Duration">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Category:</strong>
+                    <span style="color: red;">*</span><strong>Category:</strong>
                     <select name="category_id" class="form-control">
                         <option></option>
                         @foreach($service_categories as $category)

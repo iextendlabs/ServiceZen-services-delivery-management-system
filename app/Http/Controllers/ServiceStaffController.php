@@ -67,7 +67,7 @@ class ServiceStaffController extends Controller
             'name' => 'required',
             'phone' => 'required',
             'email' => 'required|email|unique:users,email',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
         ]);

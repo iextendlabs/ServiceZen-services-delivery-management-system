@@ -49,9 +49,8 @@ class ServiceController extends Controller
         $package_services = [];
         $all_services = Service::all();
         $users = User::all();
-        $service = new Service;
         $service_categories = ServiceCategory::all();
-        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services','users'));
+        return view('services.create', compact('service_categories','all_services','i','package_services','users'));
     }
     
     /**
@@ -67,63 +66,37 @@ class ServiceController extends Controller
             'description' => 'required',
             'short_description' => 'required|max:120',
             'price' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'duration' => 'required',
             'category_id' => 'required',
         ]);
 
         $input = $request->all();
 
-        if ($request->id) {
-            $service = Service::find($request->id);
-            $service->update($request->all());
-            if (isset($request->image)) {
-            //delete previous Image if new Image submitted
-                if ($service->image && file_exists(public_path('service-images').'/'.$service->image)) {
-                    unlink(public_path('service-images').'/'.$service->image);
-                }
+        $service = Service::create($input);
+        
+        $service_id = $service->id;
+        
+        if(isset($request->packageId)){
+            foreach($request->packageId as $packageId){
+                $input['service_id'] = $service_id;
+                $input['package_id'] = $packageId;
+                ServicePackage::create($input);
             }
-
-            ServicePackage::where('service_id',$request->id)->delete();
-            $service_id = $request->id;
-            if(isset($request->packageId)){
-                foreach($request->packageId as $packageId){
-                    $input['service_id'] = $service_id;
-                    $input['package_id'] = $packageId;
-                    ServicePackage::create($input);
-                }
-            }
-
-            ServiceToUserNote::where('service_id',$request->id)->delete();
-            $input['service_id'] =  $request->id;
-            $input['user_ids'] = serialize($request->userIds);
-            ServiceToUserNote::create($input);
-
-        } else {
-            $service = Service::create($request->all());
-            $service_id = $service->id;
-            if(isset($request->packageId)){
-                foreach($request->packageId as $packageId){
-                    $input['service_id'] = $service_id;
-                    $input['package_id'] = $packageId;
-                    ServicePackage::create($input);
-                }
-            }
-            $input['user_ids'] = serialize($request->userIds);
-            $input['service_id'] = $service->id;
+        }
+        
+        $input['user_ids'] = serialize($request->userIds);
+        $input['service_id'] = $service->id;
+        
+        if(isset($request->note) && isset($request->userIds)){
             ServiceToUserNote::create($input);
         }
 
-        
         if ($request->image) {
-            // create a unique filename for the image
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
         
-            // move the uploaded file to the public/service-images directory
             $request->image->move(public_path('service-images'), $filename);
         
-            // save the filename to the gallery object and persist it to the database
-            
             $service->image = $filename;
             $service->save();
         }
@@ -158,10 +131,66 @@ class ServiceController extends Controller
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.createOrEdit', compact('service','service_categories','all_services','i','package_services','users','userNote'));
+        return view('services.edit', compact('service','service_categories','all_services','i','package_services','users','userNote'));
     }
     
+    public function update(Request $request, $id)
+    {
+        request()->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'short_description' => 'required|max:120',
+            'price' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'duration' => 'required',
+            'category_id' => 'required',
+        ]);
+
+        $input = $request->all();
+
+        $service = Service::find($id);
+        
+        $service->update($input);
+        if (isset($request->image)) {
+            if ($service->image && file_exists(public_path('service-images').'/'.$service->image)) {
+                unlink(public_path('service-images').'/'.$service->image);
+            }
+        }
+
+        ServicePackage::where('service_id',$id)->delete();
+        
+        $service_id = $id;
+        
+        if(isset($request->packageId)){
+            foreach($request->packageId as $packageId){
+                $input['service_id'] = $service_id;
+                $input['package_id'] = $packageId;
+                ServicePackage::create($input);
+            }
+        }
+        ServiceToUserNote::where('service_id',$id)->delete();
+
+        if(isset($request->note) && isset($request->userIds)){
+        
+            $input['service_id'] =  $id;
+            $input['user_ids'] = serialize($request->userIds);
+            
+            ServiceToUserNote::create($input);
+        }
     
+        if ($request->image) {
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            $request->image->move(public_path('service-images'), $filename);
+        
+            $service->image = $filename;
+            $service->save();
+        }
+
+
+        return redirect()->route('services.index')
+                        ->with('success','Service Update successfully.');
+    }
     /**
      * Remove the specified resource from storage.
      *

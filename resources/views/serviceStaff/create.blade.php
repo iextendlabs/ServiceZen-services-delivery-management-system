@@ -20,25 +20,25 @@
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Name:</strong>
-                    <input type="text" name="name" class="form-control" placeholder="Name">
+                    <span style="color: red;">*</span><strong>Name:</strong>
+                    <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Email:</strong>
-                    <input type="email" name="email" class="form-control" placeholder="abc@gmail.com">
+                    <span style="color: red;">*</span><strong>Email:</strong>
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Phone Number:</strong>
-                    <input type="number" name="phone" class="form-control" placeholder="Phone Number">
+                    <span style="color: red;">*</span><strong>Phone Number:</strong>
+                    <input type="number" name="phone" class="form-control" value="{{ old('phone') }}" placeholder="Phone Number">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong for="image">Upload Image</strong>
+                    <span style="color: red;">*</span><strong for="image">Upload Image</strong>
                     <input type="file" name="image" id="image" class="form-control-file">
                     <br>
                     <img id="preview" src="" height="130px">
@@ -46,13 +46,13 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Password:</strong>
+                    <span style="color: red;">*</span><strong>Password:</strong>
                     <input type="password" name="password" class="form-control" placeholder="Password">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Confirm Password:</strong>
+                    <span style="color: red;">*</span><strong>Confirm Password:</strong>
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
@@ -88,14 +88,14 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Commission:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Commission In %">
+                    <span style="color: red;">*</span><strong>Commission:</strong>
+                    <input type="number" name="commission" class="form-control" value="{{ old('commission') }}" placeholder="Commission In %">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Additional Charges:</strong>
-                    <input type="number" name="charges" class="form-control" placeholder="Additional Charges">
+                    <input type="number" name="charges" class="form-control" value="{{ old('charges') }}" placeholder="Additional Charges">
                 </div>
             </div>
             <div class="col-md-12 text-center">

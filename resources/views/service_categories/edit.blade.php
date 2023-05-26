@@ -15,13 +15,13 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('serviceCategories.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('serviceCategories.update',$service_category->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="id" value="{{$service_category->id}}">
+        @method('PUT')
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Title:</strong>
+                    <span style="color: red;">*</span><strong>Title:</strong>
                     <input type="text" name="title" value="{{$service_category->title}}" class="form-control" placeholder="Title">
                 </div>
             </div>
@@ -35,7 +35,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Description:</strong>
+                    <span style="color: red;">*</span><strong>Description:</strong>
                     <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$service_category->description}}</textarea>
                 </div>
             </div>

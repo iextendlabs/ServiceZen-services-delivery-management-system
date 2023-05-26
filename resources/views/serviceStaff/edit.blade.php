@@ -24,19 +24,19 @@
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Name:</strong>
+                    <span style="color: red;">*</span><strong>Name:</strong>
                     <input type="text" name="name" value="{{ $serviceStaff->name }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Email:</strong>
+                    <span style="color: red;">*</span><strong>Email:</strong>
                     <input type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Phone Number:</strong>
+                    <span style="color: red;">*</span><strong>Phone Number:</strong>
                     <input type="number" name="phone" value="{{ $serviceStaff->staff->phone }}" class="form-control" placeholder="Phone Number">
                 </div>
             </div>
@@ -50,13 +50,13 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Password:</strong>
+                    <span style="color: red;">*</span><strong>Password:</strong>
                     <input type="password" name="password" class="form-control" placeholder="Password">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Confirm Password:</strong>
+                    <span style="color: red;">*</span><strong>Confirm Password:</strong>
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
@@ -100,7 +100,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Commission:</strong>
+                    <span style="color: red;">*</span><strong>Commission:</strong>
                     <input type="number" name="commission" value="{{ $serviceStaff->staff->commission }}"  class="form-control" placeholder="Commission In %">
                 </div>
             </div>

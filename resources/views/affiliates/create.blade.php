@@ -22,38 +22,38 @@
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Name:</strong>
-                    <input type="text" name="name" class="form-control" placeholder="Name">
+                    <span style="color: red;">*</span><strong>Name:</strong>
+                    <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Email:</strong>
-                    <input type="email" name="email" class="form-control" placeholder="abc@gmail.com">
+                    <span style="color: red;">*</span><strong>Email:</strong>
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Password:</strong>
+                    <span style="color: red;">*</span><strong>Password:</strong>
                     <input type="password" name="password" class="form-control" placeholder="Password">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Confirm Password:</strong>
+                    <span style="color: red;">*</span><strong>Confirm Password:</strong>
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div><hr>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Code:</strong>
-                    <input type="text" name="code" class="form-control" placeholder="Code">
+                    <span style="color: red;">*</span><strong>Code:</strong>
+                    <input type="text" name="code" class="form-control" value="{{ old('code') }}" placeholder="Code">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Commission:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Commission In %">
+                    <span style="color: red;">*</span><strong>Commission:</strong>
+                    <input type="number" name="commission" class="form-control" value="{{ old('commission') }}" placeholder="Commission In %">
                 </div>
             </div>
             <div class="col-md-12 text-center">

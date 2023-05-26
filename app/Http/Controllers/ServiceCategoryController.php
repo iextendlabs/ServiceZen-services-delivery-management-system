@@ -39,8 +39,7 @@ class ServiceCategoryController extends Controller
      */
     public function create()
     {
-        $service_category = new ServiceCategory;
-        return view('service_categories.createOrEdit', compact('service_category'));
+        return view('service_categories.create');
     }
     
     /**
@@ -57,29 +56,13 @@ class ServiceCategoryController extends Controller
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($request->id) {
-            $service_category = ServiceCategory::find($request->id);
-            $service_category->update($request->all());
-            if (isset($request->image)) {
-            //delete previous Image if new Image submitted
-                if ($service_category->image && file_exists(public_path('service-category-images').'/'.$service_category->image)) {
-                    unlink(public_path('service-category-images').'/'.$service_category->image);
-                }
-            }
-        } else {
-            $service_category = ServiceCategory::create($request->all());
-        }
-
+        $service_category = ServiceCategory::create($request->all());
         
         if ($request->image) {
-            // create a unique filename for the image
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
         
-            // move the uploaded file to the public/service-images directory
             $request->image->move(public_path('service-category-images'), $filename);
         
-            // save the filename to the gallery object and persist it to the database
-            
             $service_category->image = $filename;
             $service_category->save();
         }
@@ -110,9 +93,39 @@ class ServiceCategoryController extends Controller
     public function edit($id)
     {
         $service_category = ServiceCategory::find($id);
-        return view('service_categories.createOrEdit', compact('service_category'));
+        return view('service_categories.edit', compact('service_category'));
     }
-    
+    public function update(Request $request, $id)
+    {
+        request()->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $service_category = ServiceCategory::find($id);
+
+        $service_category->update($request->all());
+
+        if (isset($request->image)) {
+            if ($service_category->image && file_exists(public_path('service-category-images').'/'.$service_category->image)) {
+                unlink(public_path('service-category-images').'/'.$service_category->image);
+            }
+        }
+        
+        if ($request->image) {
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+        
+            $request->image->move(public_path('service-category-images'), $filename);
+        
+            $service_category->image = $filename;
+            $service_category->save();
+        }
+
+
+        return redirect()->route('serviceCategories.index')
+                        ->with('success','Service Category Update successfully.');
+    }
     
     /**
      * Remove the specified resource from storage.
