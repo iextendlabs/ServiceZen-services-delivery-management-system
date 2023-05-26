@@ -41,10 +41,7 @@ class StaffZoneController extends Controller
      */
     public function create()
     {
-        $i = 0;
-        $staffs = User::all();
-        $staffZone = new StaffZone;
-        return view('staffZones.createOrEdit', compact('staffZone','staffs','i'));
+        return view('staffZones.create');
     }
     
     /**
@@ -58,23 +55,14 @@ class StaffZoneController extends Controller
         request()->validate([
             'name' => 'required',
             'description' => 'required',
-            'ids' => 'required',
         ]);
 
         if ($request->id) {
             $staffZone = StaffZone::find($request->id);
             
-            $input = $request->all();
-            
-            $input['staff_ids'] = serialize($request->ids);
-            
-            $staffZone->update($input);
+            $staffZone->update($request->all());
         } else {
-            $input = $request->all();
-            
-            $input['staff_ids'] = serialize($request->ids);
-
-            $staffZone = StaffZone::create($input);
+            $staffZone = StaffZone::create($request->all());
         }
 
         return redirect()->route('staffZones.index')
@@ -89,7 +77,6 @@ class StaffZoneController extends Controller
      */
     public function show(StaffZone $staffZone)
     {
-        $users = User::all();
         return view('staffZones.show',compact('staffZone','users'));
     }
     
@@ -101,11 +88,23 @@ class StaffZoneController extends Controller
      */
     public function edit(StaffZone $staffZone)
     {
-        $i = 0;
-        $staffs = User::all();
-        return view('staffZones.createOrEdit', compact('staffZone','staffs','i'));
+        return view('staffZones.edit', compact('staffZone'));
     }
     
+    public function update(Request $request, $id)
+    {
+        request()->validate([
+            'name' => 'required',
+            'description' => 'required',
+        ]);
+
+        $staffZone = StaffZone::find($id);
+            
+        $staffZone->update($request->all());
+
+        return redirect()->route('staffZones.index')
+                        ->with('success','Staff Zone update successfully.');
+    }
     
     /**
      * Remove the specified resource from storage.

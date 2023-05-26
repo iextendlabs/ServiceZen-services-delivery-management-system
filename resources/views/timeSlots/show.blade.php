@@ -10,6 +10,12 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Name:</strong>
+                {{ $time_slot->name }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <strong>Type:</strong>
                 {{ $time_slot->type }}
             </div>
@@ -38,6 +44,33 @@
             <div class="form-group">
                 <strong>Active:</strong>
                 {{ $time_slot->active }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Staff Group:</strong>
+                {{ $time_slot->group->name }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Available Staff of Group</strong><br><br>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                    </tr>
+                    @foreach($staffs as $staff)
+                    @if(in_array($staff->id, unserialize($time_slot->available_staff))) 
+                    <tr>
+                        <td>{{ $staff->id }}</td>
+                        <td>{{ $staff->name }}</td>
+                        <td>{{ $staff->staff->phone}}</td>
+                    </tr>
+                    @endif
+                    @endforeach
+                </table>
             </div>
         </div>
     </div>

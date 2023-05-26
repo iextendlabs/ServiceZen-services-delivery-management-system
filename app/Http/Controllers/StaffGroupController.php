@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Staff;
 use App\Models\StaffGroup;
+use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -43,8 +44,8 @@ class StaffGroupController extends Controller
     {
         $i = 0;
         $staffs = User::all();
-        $staffGroup = new StaffGroup;
-        return view('staffGroups.createOrEdit', compact('staffGroup','staffs','i'));
+        $staff_zones = StaffZone::all();
+        return view('staffGroups.create', compact('staffs','i','staff_zones'));
     }
     
     /**
@@ -58,6 +59,7 @@ class StaffGroupController extends Controller
         request()->validate([
             'name' => 'required',
             'ids' => 'required',
+            'staff_zone_id' => 'required',
         ]);
 
         if ($request->id) {
@@ -101,10 +103,30 @@ class StaffGroupController extends Controller
     public function edit(StaffGroup $staffGroup)
     {
         $i = 0;
+        $staff_zones = StaffZone::all();
         $staffs = User::all();
-        return view('staffGroups.createOrEdit', compact('staffGroup','staffs','i'));
+        return view('staffGroups.edit', compact('staffGroup','staffs','i','staff_zones'));
     }
     
+    public function update(Request $request, $id)
+    {
+        request()->validate([
+            'name' => 'required',
+            'ids' => 'required',
+            'staff_zone_id' => 'required',
+        ]);
+
+        $staffGroup = StaffGroup::find($id);
+            
+        $input = $request->all();
+            
+        $input['staff_ids'] = serialize($request->ids);
+            
+        $staffGroup->update($input);
+
+        return redirect()->route('staffGroups.index')
+                        ->with('success','Staff Group update successfully.');
+    }
     
     /**
      * Remove the specified resource from storage.

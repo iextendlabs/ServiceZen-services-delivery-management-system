@@ -23,6 +23,7 @@
                 <tr>
                     <th>No</th>
                     <th>Name</th>
+                    <!-- <th>Staff Zone</th> -->
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($staffGroups))
@@ -30,6 +31,7 @@
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $staffGroup->name }}</td>
+                    <!-- <td>{{ $staffGroup->staffZone }}</td> -->
                     <td>
                         <form action="{{ route('staffGroups.destroy',$staffGroup->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('staffGroups.show',$staffGroup->id) }}">Show</a>

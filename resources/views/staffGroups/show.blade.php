@@ -16,6 +16,12 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Staff Zone:</strong>
+                {{ $staffGroup->staffZone->name }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <strong>Staff</strong><br><br>
                 <table class="table table-bordered">
                     <tr>

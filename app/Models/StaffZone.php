@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StaffZone extends Model
 {
-    protected $fillable = ['name', 'description','staff_ids'];
+    protected $fillable = ['name', 'description','transport_charges'];
 
     use HasFactory;
 

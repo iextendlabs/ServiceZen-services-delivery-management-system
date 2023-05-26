@@ -3,7 +3,7 @@
 <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <div class="row">
         <div class="col-md-12 margin-tb">
-            <h2>Add New Staff Zone</h2>
+            <h2>Add New Staff Group</h2>
         </div>
     </div>
     @if ($errors->any())
@@ -16,25 +16,29 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('staffZones.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('staffGroups.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="id" value="{{$staffZone->id}}">
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Name:</strong>
-                    <input type="text" name="name" value="{{$staffZone->name}}" class="form-control" placeholder="Name">
+                    <span style="color: red;">*</span><strong>Name:</strong>
+                    <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Description:</strong>
-                    <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$staffZone->description}}</textarea>
+                    <span style="color: red;">*</span><strong>Staff Zone:</strong>
+                    <select name="staff_zone_id" class="form-control">
+                        <option></option>
+                        @foreach($staff_zones as $staff_zone)
+                            <option value="{{ $staff_zone->id }}">{{ $staff_zone->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Staffs:</strong>
+                    <span style="color: red;">*</span><strong>Staffs:</strong>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
                     <table class="table table-bordered">
                         <tr>
@@ -46,15 +50,7 @@
                         @if($staff->getRoleNames() == '["Staff"]')
                         <tr>
                             <td>
-                                @if(isset($staffZone->staff_ids))
-                                    @if(in_array($staff->id,unserialize($staffZone->staff_ids)))
-                                    <input type="checkbox" checked name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                    @else
-                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                    @endif
-                                @else
                                 <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                @endif
                             </td>
                             <td>{{ $staff->name }}</td>
                             <td>{{ $staff->email }}</td>

@@ -24,6 +24,7 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Transport Charges</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($staffZones))
@@ -32,6 +33,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $staffZone->name }}</td>
                     <td>{{ $staffZone->description }}</td>
+                    <td>{{ $staffZone->transport_charges }}</td>
                     <td>
                         <form action="{{ route('staffZones.destroy',$staffZone->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('staffZones.show',$staffZone->id) }}">Show</a>

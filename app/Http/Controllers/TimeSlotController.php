@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StaffGroup;
 use App\Models\TimeSlot;
+use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -41,9 +42,8 @@ class TimeSlotController extends Controller
      */
     public function create()
     {
-        $time_slot = new TimeSlot;
         $staff_groups =StaffGroup::all();
-        return view('timeSlots.createOrEdit', compact('time_slot','staff_groups'));
+        return view('timeSlots.create', compact('staff_groups'));
     }
     
     /**
@@ -55,19 +55,22 @@ class TimeSlotController extends Controller
     public function store(Request $request)
     {
         request()->validate([
+            'name' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General'])],
             'time_start' => 'required',
             'time_end' => 'required',
             'active' => 'required',
+            'ids' => 'required',
             'date' => Rule::requiredIf($request->type === 'Specific')
         ]);
 
-        if ($request->id) {
-            $time_slot = TimeSlot::find($request->id);
-            $time_slot->update($request->all());
-        } else {
-            $time_slot = TimeSlot::create($request->all());
+        $input = $request->all();
+            
+        if($request->ids != null){
+            $input['available_staff'] = serialize($request->ids);
         }
+
+        TimeSlot::create($input);
 
         return redirect()->route('timeSlots.index')
                         ->with('success','Time slot created successfully.');
@@ -81,8 +84,9 @@ class TimeSlotController extends Controller
      */
     public function show($id)
     {
+        $staffs = User::all();
         $time_slot = TimeSlot::find($id);
-        return view('timeSlots.show',compact('time_slot'));
+        return view('timeSlots.show',compact('time_slot','staffs'));
     }
     
     /**
@@ -93,9 +97,42 @@ class TimeSlotController extends Controller
      */
     public function edit($id)
     {
+        $i = 0;
         $staff_groups =StaffGroup::all();
         $time_slot = TimeSlot::find($id);
-        return view('timeSlots.createOrEdit', compact('time_slot','staff_groups'));
+        $staff_group = StaffGroup::find($time_slot->group_id);
+        $staffs = User::all();
+        foreach(unserialize($staff_group->staff_ids) as $id){
+            $group_staff[] = $id;
+        }
+
+        return view('timeSlots.edit', compact('time_slot','staff_groups','group_staff','i','staffs'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        request()->validate([
+            'name' => 'required',
+            'type' => ['required', Rule::in(['Specific', 'General'])],
+            'time_start' => 'required',
+            'time_end' => 'required',
+            'active' => 'required',
+            'ids' => 'required',
+            'date' => Rule::requiredIf($request->type === 'Specific')
+        ]);
+
+        $time_slot = TimeSlot::find($id);
+        
+        $input = $request->all();
+        
+        if($request->ids != null){
+            $input['available_staff'] = serialize($request->ids);
+        }
+
+        $time_slot->update($input);
+
+        return redirect()->route('timeSlots.index')
+                        ->with('success','Time slot update successfully.');
     }
     
     

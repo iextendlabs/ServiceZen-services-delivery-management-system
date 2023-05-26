@@ -22,23 +22,8 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Staff</strong><br><br>
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                    </tr>
-                    @foreach($users as $user)
-                    @if(in_array($user->id, unserialize($staffZone->staff_ids))) 
-                    <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->staff->phone}}</td>
-                    </tr>
-                    @endif
-                    @endforeach
-                </table>
+                <strong>Transport Charges:</strong>
+                {{ $staffZone->transport_charges }}
             </div>
         </div>
     </div>

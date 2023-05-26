@@ -20,6 +20,7 @@
     <table class="table table-bordered">
         <tr>
             <th>No</th>
+            <th>Name</th>
             <th>Time Start -- Time End</th>
             <th>Group</th>
             <th>Active</th>
@@ -29,6 +30,7 @@
         @foreach ($time_slots as $time_slot)
         <tr>
             <td>{{ ++$i }}</td>
+            <td>{{ $time_slot->name }}</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
             <td>@if($time_slot->active == "Available")
