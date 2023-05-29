@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             ServiceCategorySeeder::class,
             ServiceSeeder::class,
             ManagerRoleSeeder::class,
-            SupervisorRoleSeeder::class
+            SupervisorRoleSeeder::class,
+            AssistantSupervisorRoleSeeder::class
         ]);
     }
 }

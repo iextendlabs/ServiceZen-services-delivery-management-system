@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Site\CustomerAuthController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AssistantSupervisorController;
 use App\Http\Controllers\CashCollectionController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ManagerController;
@@ -57,8 +58,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
     Route::resource('cashCollection', CashCollectionController::class);
+    Route::resource('assistantSupervisors', AssistantSupervisorController::class);
 
-    Route::post('serviceFilter', [ServiceController::class, 'filter']); 
+    Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
     Route::post('orderFilter', [OrderController::class, 'filter']); 
     Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
@@ -67,6 +69,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('userFilter', [UserController::class, 'filter']); 
     Route::post('managerFilter', [ManagerController::class, 'filter']); 
     Route::post('supervisorFilter', [SupervisorController::class, 'filter']);
+    Route::post('assistantSupervisorFilter', [AssistantSupervisorController::class, 'filter']);
      
     Route::get('serviceFilterCategory', [ServiceController::class, 'filter']); 
 

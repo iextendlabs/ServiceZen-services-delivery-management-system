@@ -125,6 +125,9 @@
                                     @can('supervisor-list')
                                     <a class="dropdown-item" href="{{ route('supervisors.index') }}">Supervisor</a>
                                     @endcan
+                                    @can('assistant-supervisor-list')
+                                    <a class="dropdown-item" href="{{ route('assistantSupervisors.index') }}">Assistant Supervisor</a>
+                                    @endcan
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
