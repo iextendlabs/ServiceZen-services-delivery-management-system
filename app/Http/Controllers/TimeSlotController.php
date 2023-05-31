@@ -129,6 +129,10 @@ class TimeSlotController extends Controller
             $input['available_staff'] = serialize($request->ids);
         }
 
+        if($request->type == 'General'){
+            $input['date'] = Null;
+        }
+
         $time_slot->update($input);
 
         return redirect()->route('timeSlots.index')

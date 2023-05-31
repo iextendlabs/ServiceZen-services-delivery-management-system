@@ -19,6 +19,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Site\CheckOutController;
 use App\Http\Controllers\StaffGroupController;
 use App\Http\Controllers\StaffZoneController;
 use App\Http\Controllers\SupervisorController;
@@ -94,8 +95,6 @@ Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::get('booking/{id}', [ServiceAppointmentController::class, 'create']);
 Route::resource('booking', ServiceAppointmentController::class);
 Route::get('appointmentCSV', [ServiceAppointmentController::class,'downloadCSV']);
-Route::get('slots', [ServiceAppointmentController::class,'slots']);
-Route::get('staff-group', [ServiceAppointmentController::class,'staff_group']);
 // Order
 Route::get('checkout/{id}', 'App\Http\Controllers\Site\OrderController@checkout');
 Route::get('CartCheckout', 'App\Http\Controllers\Site\OrderController@CartCheckout');
@@ -104,3 +103,14 @@ Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
 Route::resource('cashCollections', 'App\Http\Controllers\Site\CashCollectionController');
+
+Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
+Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
+Route::post('addressSession', [CheckOutController::class, 'addressSession']);
+Route::post('timeSlotsSession', [CheckOutController::class, 'timeSlotsSession']);
+Route::resource('cart', CheckOutController::class);
+Route::get('step1', [CheckOutController::class, 'step1']);
+Route::get('step2', [CheckOutController::class, 'step2']); 
+Route::get('step3', [CheckOutController::class, 'step3']); 
+Route::get('slots', [CheckOutController::class,'slots']);
+Route::get('staff-group', [CheckOutController::class,'staff_group']);

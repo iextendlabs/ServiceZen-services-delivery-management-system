@@ -15,4 +15,13 @@ class TimeSlot extends Model
     {
         return $this->hasOne(StaffGroup::class,'id','group_id');
     }
+
+    public function appointment(){
+        return $this->hasMany(ServiceAppointment::class,'time_slot_id','id');
+    }
+
+    public function staffGroup()
+    {
+        return $this->belongsTo(StaffGroup::class, 'group_id');
+    }
 }

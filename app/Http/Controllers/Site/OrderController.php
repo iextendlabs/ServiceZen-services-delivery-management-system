@@ -5,10 +5,13 @@ namespace App\Http\Controllers\site;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderToAppointment;
+use App\Models\Service;
 use App\Models\ServiceAppointment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Session;
+use Hash;
 class OrderController extends Controller
 {
     
@@ -32,23 +35,61 @@ class OrderController extends Controller
         $this->validate($request, [
             'payment_method' => 'required'
         ]);
-
-        $order_input = $request->all();
-        $order_input['status'] = "Pending";
-
-        // dd($order_input);
-
-        $order = Order::create($order_input);
-
-        foreach($request->appointment_id as $single_id){
-            $appointment = ServiceAppointment::find($single_id);
-
-            $appointment->status = "Open";
-            $appointment->order_id = $order->id;
-    
-            $appointment->save();
-        }
         
+        $input = $request->all();
+        
+        $staff_and_time = Session::get('staff_and_time');
+        $address = Session::get('address');
+        $serviceIds = Session::get('serviceIds');
+
+        $user = User::where('email',$address['email'])->get();
+        if(count($user)){
+            $input['customer_id'] = $user['0']->id;
+        }else{
+            $input['name'] = 'Visiter Customer';
+
+            $input['email'] = $address['email'];
+            
+            $input['password'] = Hash::make('12345678');
+
+            $customer = User::create($input);
+            
+            $input['customer_id'] = $customer->id;
+
+            $customer->assignRole('Customer');
+        }
+
+        $input['buildingName'] = $address['buildingName'];
+        $input['area'] = $address['area'];
+        $input['flatVilla'] = $address['flatVilla'];
+        $input['street'] = $address['street'];
+        $input['city'] = $address['city'];
+        $input['number'] = $address['number'];
+        $input['status'] = "Pending";
+
+        $order = Order::create($input);
+        
+        $input['order_id'] = $order->id;
+
+        foreach($serviceIds as $id){
+            $services = Service::find($id);
+
+            $input['service_id'] = $id;
+            $input['service_staff_id'] = $staff_and_time['service_staff_id'];
+            $input['date'] = $staff_and_time['date'];
+            $input['time_slot_id'] = $staff_and_time['time_slot'];
+            $input['status'] = 'Open';
+            if($services->discount){
+                $input['price'] = $services->discount;
+            }else{
+                $input['price'] = $services->price;
+            }
+
+            ServiceAppointment::create($input);
+        }
+        Session::forget('address');
+        Session::forget('staff_and_time');
+        Session::forget('serviceIds');
         
         return redirect('/')->with('success','Your Order has been replace successfully.');
     }

@@ -52,7 +52,7 @@
               </small>
               <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
               <div class="btn-group">
-                <a href="/booking/{{ $service->id }}"><button type="button" class="btn btn-sm btn-outline-secondary"> Book</button></a>
+                <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-sm btn-outline-secondary"> Add to Cart</button></a>
               </div>
             </div>
             @if(isset($service->discount))

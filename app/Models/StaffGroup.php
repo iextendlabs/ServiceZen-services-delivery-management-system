@@ -13,6 +13,6 @@ class StaffGroup extends Model
 
     public function staffZone()
     {
-        return $this->hasOne(StaffZone::class,'id','staff_zone_id');
+        return $this->belongsTo(StaffZone::class, 'staff_zone_id');
     }
 }

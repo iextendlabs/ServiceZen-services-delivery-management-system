@@ -51,7 +51,7 @@
                 </li>
                 @guest
                 <li class="nav-item">
-                  <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
+                  <a href="{{ route('cart.index') }}" class="nav-link">View Cart</a>
                 </li>
                 @else
                   @if(Auth::user()->hasRole('Staff'))
@@ -71,7 +71,7 @@
                     </li>
                   @else
                     <li class="nav-item">
-                      <a href="{{ route('booking.index') }}" class="nav-link">Checkout</a>
+                      <a href="{{ route('cart.index') }}" class="nav-link">View Cart</a>
                     </li>
                   @endif
                 @endguest
