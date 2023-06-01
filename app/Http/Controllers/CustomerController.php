@@ -29,7 +29,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = User::latest()->paginate(10);
+        $customers = User::latest()->get();
 
         return view('customers.index',compact('customers'))
             ->with('i', (request()->input('page', 1) - 1) * 10);

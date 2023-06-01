@@ -30,7 +30,7 @@ class SupervisorController extends Controller
      */
     public function index()
     {
-        $supervisors = User::latest()->paginate(10);
+        $supervisors = User::latest()->get();
 
         return view('supervisors.index',compact('supervisors'))
             ->with('i', (request()->input('page', 1) - 1) * 10);

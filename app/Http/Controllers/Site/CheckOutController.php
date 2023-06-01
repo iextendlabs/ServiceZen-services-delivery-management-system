@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
 use App\Models\Service;
+use App\Models\Staff;
 use App\Models\StaffGroup;
+use App\Models\StaffHoliday;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
@@ -251,10 +253,13 @@ class CheckOutController extends Controller
 
         $staff_group = StaffGroup::find($request->group);
         foreach (unserialize($staff_group->staff_ids) as $id) {
-            if (in_array($id, unserialize($time_slot->available_staff))) {
-                $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
-                    ->select('users.*', 'staff.image')
-                    ->where('users.id', $id)->get();
+            $staff_holiday = StaffHoliday::where('staff_id',$id)->where('date',date("Y-m-d"))->get();
+            if(count($staff_holiday) == 0 ){
+                if (in_array($id, unserialize($time_slot->available_staff))) {
+                    $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
+                        ->select('users.*', 'staff.image')
+                        ->where('users.id', $id)->get();
+                }
             }
         }
 

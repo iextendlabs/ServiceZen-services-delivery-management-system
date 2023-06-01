@@ -65,7 +65,6 @@
                 </tr>
                 @endif
             </table>
-            {!! $affiliates->links() !!}
         </div>
         <div class="col-md-3">
             <h3>Filter</h3><hr>

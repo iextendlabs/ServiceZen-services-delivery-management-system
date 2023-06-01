@@ -90,6 +90,15 @@
                                     @can('holiday-list')
                                     <a class="dropdown-item" href="/holidays">Holidays</a>
                                     @endcan
+                                    @can('service-staff-list')
+                                    <a class="dropdown-item" href="{{ route('staffHolidays.index') }}">Staff Holiday</a>
+                                    @endcan
+                                    @can('staff-zone-list')
+                                    <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
+                                    @endcan
+                                    @can('staff-group-list')
+                                    <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
+                                    @endcan
                                     @can('service-list')
                                     <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
                                     @endcan
@@ -107,12 +116,7 @@
                                     @can('service-staff-list')
                                     <a class="dropdown-item" href="{{ route('serviceStaff.index') }}">Staff</a>
                                     @endcan
-                                    @can('staff-zone-list')
-                                    <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
-                                    @endcan
-                                    @can('staff-group-list')
-                                    <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
-                                    @endcan
+                                    
                                     @can('customer-list')
                                     <a class="dropdown-item" href="{{ route('customers.index') }}">Customer</a>
                                     @endcan

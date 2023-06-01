@@ -21,6 +21,7 @@ use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Site\CheckOutController;
 use App\Http\Controllers\StaffGroupController;
+use App\Http\Controllers\StaffHolidayController;
 use App\Http\Controllers\StaffZoneController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\TimeSlotController;
@@ -60,6 +61,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('timeSlots', TimeSlotController::class);
     Route::resource('cashCollection', CashCollectionController::class);
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
+    Route::resource('staffHolidays', StaffHolidayController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 

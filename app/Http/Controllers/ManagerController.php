@@ -30,7 +30,7 @@ class ManagerController extends Controller
      */
     public function index()
     {
-        $managers = User::latest()->paginate(10);
+        $managers = User::latest()->get();
 
         return view('managers.index',compact('managers'))
             ->with('i', (request()->input('page', 1) - 1) * 10);

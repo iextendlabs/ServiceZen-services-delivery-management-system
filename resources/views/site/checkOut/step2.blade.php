@@ -229,17 +229,23 @@
                 },
                 success: function(response) {
                     var staffs = response;
-
+                    console.log(staffs[0]);
                     var staffContainer = $('#staff-container');
                     staffContainer.empty();
-
-                    staffs.forEach(function(staff) {
-                        var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center staff"><input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="' + staff[0].id + '">';
-                        html += '<img src="/staff-images/' + staff[0].image + '" height="100px" width="100px" alt="Staff Image" class="rounded-circle">'
-                        html += '<span>' + staff[0].name + '</span>'
-                        html += '</div></label>'
-                        staffContainer.append(html);
-                    });
+                    
+                    if(staffs[0].length == 0){
+                            var html = '<div class="alert alert-danger"><strong>Whoops!</strong> There is no staff on your select time slot.</div>';
+                            staffContainer.append(html);
+                    }else{
+                        staffs.forEach(function(staff) {
+                            var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center staff"><input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="' + staff[0].id + '">';
+                            html += '<img src="/staff-images/' + staff[0].image + '" height="100px" width="100px" alt="Staff Image" class="rounded-circle">'
+                            html += '<span>' + staff[0].name + '</span>'
+                            html += '</div></label>'
+                            staffContainer.append(html);
+                        });
+                    }
+                    
                 },
                 error: function() {
                     alert('Error retrieving staffs.');

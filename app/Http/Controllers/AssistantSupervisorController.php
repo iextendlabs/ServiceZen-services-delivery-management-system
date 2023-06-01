@@ -31,7 +31,7 @@ class AssistantSupervisorController extends Controller
      */
     public function index()
     {
-        $assistant_supervisors = User::latest()->paginate(10);
+        $assistant_supervisors = User::latest()->get();
 
         return view('assistantSupervisors.index',compact('assistant_supervisors'))
             ->with('i', (request()->input('page', 1) - 1) * 10);

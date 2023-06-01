@@ -30,7 +30,7 @@ class AffiliateController extends Controller
      */
     public function index()
     {
-        $affiliates = User::latest()->paginate(10);
+        $affiliates = User::latest()->get();
 
         return view('affiliates.index',compact('affiliates'))
             ->with('i', (request()->input('page', 1) - 1) * 10);

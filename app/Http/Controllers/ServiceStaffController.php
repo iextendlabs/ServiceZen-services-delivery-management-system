@@ -34,11 +34,11 @@ class ServiceStaffController extends Controller
         if(Auth::user()->hasRole('Supervisor')){
             $serviceStaff = User::join('staff', 'staff.user_id', '=', 'users.id')
             ->select('users.id', 'users.name', 'users.email')
-            ->where('staff.supervisor_id',Auth::id())->paginate(10);
+            ->where('staff.supervisor_id',Auth::id())->get();
         }elseif(Auth::user()->hasRole('Staff')){
-            $serviceStaff = User::where('id',Auth::id())->paginate(10);
+            $serviceStaff = User::where('id',Auth::id())->get();
         }else{
-            $serviceStaff = User::latest()->paginate(10);
+            $serviceStaff = User::latest()->get();
         }
         return view('serviceStaff.index',compact('serviceStaff'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
