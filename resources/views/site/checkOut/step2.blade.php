@@ -32,6 +32,12 @@
     .badge {
         color: white
     }
+
+    .scroll-div {
+        height: 330px; /* Set the desired height */
+        overflow: hidden; /* Hide overflow */
+        overflow-y: scroll; /* Enable vertical scrolling */
+    }
 </style>
 
 <base href="/public">
@@ -74,7 +80,7 @@
                         <input type="date" name="date" id="date" min="{{ date('Y-m-d'); }}" value="{{ date('Y-m-d'); }}" class="form-control" placeholder="Date">
                     </div>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-9 scroll-div">
                     <strong>Time Slots</strong>
                     <div class="list-group" id="time-slots-container">
                         @if(count($holiday) == 0)
@@ -112,7 +118,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-3"><br>
+                <div class="col-md-3 scroll-div"><br>
                     <strong>Available Staff</strong>
                     <div class="list-group" id="staff-container">
                         <div class="alert alert-danger">
@@ -232,7 +238,7 @@
                     console.log(staffs[0]);
                     var staffContainer = $('#staff-container');
                     staffContainer.empty();
-                    
+
                     if(staffs[0].length == 0){
                             var html = '<div class="alert alert-danger"><strong>Whoops!</strong> There is no staff on your select time slot.</div>';
                             staffContainer.append(html);
