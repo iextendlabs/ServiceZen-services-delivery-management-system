@@ -213,7 +213,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <strong>Street:</strong>
+                        <span style="color: red;">*</span><strong>Street:</strong>
                         <input type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ old('street') }}">
                     </div>
                 </div>
@@ -221,6 +221,20 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>City:</strong>
                         <input type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <br>
+                    <h3><strong>Personal information</strong></h3>
+                    <hr>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span style="color: red;">*</span><strong>Name:</strong>
+                        <input type="text" name="name" id="name" class="form-control" placeholder="Name" value="{{ $name }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -235,12 +249,12 @@
                         <input type="email" name="email" id="email" class="form-control" placeholder="abc@gmail.com" value="{{ $email }}">
                     </div>
                 </div>
-                <div class="col-md-12 text-center">
-                    <a href="cart">
-                        <button type="button" class="btn btn-primary">Back</button>
-                    </a>
-                    <button type="submit" class="btn btn-success">Next</button>
-                </div>
+            </div>
+            <div class="col-md-12 text-center">
+                <a href="cart">
+                    <button type="button" class="btn btn-primary">Back</button>
+                </a>
+                <button type="submit" class="btn btn-success">Next</button>
             </div>
         </form>
     </div>

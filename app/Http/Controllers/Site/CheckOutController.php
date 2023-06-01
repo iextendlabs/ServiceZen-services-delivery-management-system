@@ -78,7 +78,8 @@ class CheckOutController extends Controller
             'street' => 'required',
             'city' => 'required',
             'number' => 'required',
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'name' => 'required'
         ]);
 
         $address = [];
@@ -90,6 +91,7 @@ class CheckOutController extends Controller
         $address['city'] = $request->city;
         $address['number'] = $request->number;
         $address['email'] = $request->email;
+        $address['name'] = $request->name;
 
         if (session()->has('address')) {
             Session::forget('address');
@@ -130,10 +132,12 @@ class CheckOutController extends Controller
         if (Session::get('serviceIds')) {
             if(Auth::check()){
                 $email = Auth::user()->email;
+                $name = Auth::user()->name;
             }else{
                 $email = '';
+                $name = '';
             }
-            return view('site.checkOut.step1',compact('email'));
+            return view('site.checkOut.step1',compact('email','name'));
         } else {
             return redirect('/')->with('error', 'There is no Services in Your Cart.');
         }

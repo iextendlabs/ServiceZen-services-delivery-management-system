@@ -43,4 +43,10 @@ class ServiceAppointment extends Model
     {
         return $this->hasOne(TimeSlot::class, 'id', 'time_slot_id');
     }
+
+    public function staffData()
+    {
+        return $this->hasOne(staff::class, 'user_id', 'service_staff_id');
+    }
+
 }

@@ -22,7 +22,15 @@
       }
     </style>
   </head>
-  
+    @if(session()->has('serviceIds'))
+      @php
+        $cart_product = count(Session::get('serviceIds'));
+      @endphp
+    @else
+      @php
+        $cart_product = 0;
+      @endphp
+    @endif
   <body>
 
     <header>
@@ -51,7 +59,7 @@
                 </li>
                 @guest
                 <li class="nav-item">
-                  <a href="{{ route('cart.index') }}" class="nav-link">View Cart</a>
+                  <a href="{{ route('cart.index') }}" class="nav-link">View Cart({{$cart_product}})</a>
                 </li>
                 @else
                   @if(Auth::user()->hasRole('Staff'))
@@ -71,7 +79,7 @@
                     </li>
                   @else
                     <li class="nav-item">
-                      <a href="{{ route('cart.index') }}" class="nav-link">View Cart</a>
+                      <a href="{{ route('cart.index') }}" class="nav-link">View Cart({{$cart_product}})</a>
                     </li>
                   @endif
                 @endguest

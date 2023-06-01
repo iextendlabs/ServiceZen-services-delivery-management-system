@@ -28,11 +28,6 @@ class ServiceAppointmentController extends Controller
             if(Auth::user()->hasRole('Staff')){
                 $booked_services = ServiceAppointment::where('service_staff_id',Auth::id())->where('status','Open')->latest()->get();
                 
-                return view('site.appointments.appointment',compact('booked_services'))
-                ->with('i', (request()->input('page', 1) - 1) * 5);
-            }else{
-                $booked_services = ServiceAppointment::where('customer_id',Auth::id())->where('order_id',null)->latest()->get();
-                
                 return view('site.appointments.index',compact('booked_services'))
                 ->with('i', (request()->input('page', 1) - 1) * 5);
             }
@@ -42,76 +37,6 @@ class ServiceAppointmentController extends Controller
         return redirect("customer-login")->with('error','Oppes! You are not Login.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create($id)
-    {
-        if(Auth::check()){
-            $holiday = Holiday::where('date',date("Y-m-d"))->get();
-            if(count($holiday) == 0){
-                $slots = TimeSlot::where('date',date("Y-m-d"))->get();
-                if(count($slots)){
-                    $timeSlots = $slots;
-                }else{
-                    $timeSlots = TimeSlot::get();
-                }
-            }else{
-                $timeSlots = [];
-            }
-            $customer_id = Auth::id();
-            $service_id = $id;
-
-            $staffs = User::get();
-            return view('site.appointments.create',compact('customer_id','service_id','timeSlots','staffs'));
-        }
-
-        return redirect("customer-login")->with('error','Oppes! You are not Login.');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $this->validate($request, [
-            'date' => 'required',
-            'time_slot_id' => 'required',
-            'address' => 'required',
-            'service_staff_id' => 'required',
-        ]);
-
-        $input = $request->all();
-        $input['status'] = "Open";
-
-        $service = Service::find($request->service_id);
-
-        if(isset($service->discount)){
-            $input['price'] = $service->discount;
-        }else{
-            $input['price'] = $service->price;
-        }
-
-        $appointment = ServiceAppointment::create($input);
-        $appointment_id = $appointment->id;
-        if ($request->has('checkout')) {
-            return redirect("checkout/$appointment_id");
-        } elseif ($request->has('continue')) {
-            return redirect("/");
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
@@ -154,16 +79,6 @@ class ServiceAppointmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-
-        $appointment = ServiceAppointment::find($id);
-
-        $appointment->delete();
-
-        return redirect()->back()
-                        ->with('success','Booked Service canceled successfully');
-    }
 
     public function downloadCSV(Request $request)
     {
@@ -195,6 +110,4 @@ class ServiceAppointmentController extends Controller
         // Return CSV file as download
         return Response::make('', 200, $headers);
     }
-
-   
 }

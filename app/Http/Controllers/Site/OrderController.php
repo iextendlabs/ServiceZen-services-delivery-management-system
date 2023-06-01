@@ -4,7 +4,6 @@ namespace App\Http\Controllers\site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\OrderToAppointment;
 use App\Models\Service;
 use App\Models\ServiceAppointment;
 use App\Models\User;
@@ -12,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Hash;
+use App\Mail\OrderEmail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 class OrderController extends Controller
 {
     
@@ -45,12 +47,15 @@ class OrderController extends Controller
         $user = User::where('email',$address['email'])->get();
         if(count($user)){
             $input['customer_id'] = $user['0']->id;
+            $customer_type = "Old";
         }else{
-            $input['name'] = 'Visiter Customer';
+            $customer_type = "New";
+
+            $input['name'] = $address['name'];
 
             $input['email'] = $address['email'];
             
-            $input['password'] = Hash::make('12345678');
+            $input['password'] = Hash::make($input['name'].'1094');
 
             $customer = User::create($input);
             
@@ -87,11 +92,14 @@ class OrderController extends Controller
 
             ServiceAppointment::create($input);
         }
+
+        $this->sendEmail($input['customer_id'],$customer_type);
+
         Session::forget('address');
         Session::forget('staff_and_time');
         Session::forget('serviceIds');
         
-        return redirect('/')->with('success','Your Order has been replace successfully.');
+        return redirect('/orderSuccess');
     }
 
    
@@ -119,16 +127,30 @@ class OrderController extends Controller
     {
         //
     }
+    
+    public function sendEmail($customer_id,$type)
+    {
+        if($type == "Old"){
+            $customer = User::find($customer_id);
 
-    public function checkout($appointment_id){
-        $appointments = ServiceAppointment::where('id',$appointment_id)->get();
-        
-        return view('site.orders.checkout',compact('appointments'));
-    }
+            $dataArray = [
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'password' => ' ',
+            ];
+        }elseif($type == "New"){
+            $customer = User::find($customer_id);
 
-    public function CartCheckout(){
-        $appointments = ServiceAppointment::where('customer_id',Auth::id())->where('order_id',null)->get();
+            $dataArray = [
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'password' => $customer->name.'1094',
+            ];
+        }
         
-        return view('site.orders.checkout',compact('appointments'));
+
+        Mail::to($dataArray['email'])->send(new OrderEmail($dataArray));
+        
+        return redirect()->back();
     }
 }
