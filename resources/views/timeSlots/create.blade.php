@@ -110,7 +110,7 @@
         var group = $('select[name="group_id"]').val();
         
         $.ajax({
-                url: '/staff-group',
+                url: '/staff-by-group',
                 method: 'GET',
                 data: {
                     group: group

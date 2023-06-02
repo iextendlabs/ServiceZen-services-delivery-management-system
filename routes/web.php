@@ -82,6 +82,8 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::get('holidays', [HolidayController::class, 'index']);
     Route::post('/holidays/crud-ajax', [HolidayController::class, 'store']);
+    Route::get('time-slots', [TimeSlotController::class,'slots']);
+    Route::get('staff-by-group', [TimeSlotController::class,'staff_group']);
 });
 
 Route::get('/', [SiteController::class, 'index']);

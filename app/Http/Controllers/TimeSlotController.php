@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Holiday;
 use App\Models\StaffGroup;
 use App\Models\TimeSlot;
 use App\Models\User;
@@ -159,5 +160,31 @@ class TimeSlotController extends Controller
     function dayName($dateString)
     {
         return \Carbon\Carbon::parse($dateString)->format('l');
+    }
+
+    public function slots(Request $request){
+        $holiday = Holiday::where('date',$request->date)->get();
+        if(count($holiday) == 0){
+            $slots = TimeSlot::where('date',$request->date)->get();
+            if(count($slots)){
+                $timeSlots = $slots;
+            }else{
+                $timeSlots = TimeSlot::get();
+            }
+        }else{
+            $timeSlots = "There is no Slots";
+        }
+        return response()->json($timeSlots);
+    }
+
+    public function staff_group(Request $request){
+        $staff_group = StaffGroup::find($request->group);
+        foreach(unserialize($staff_group->staff_ids) as $id){
+            $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
+            ->select('users.*', 'staff.image')
+            ->where('users.id',$id)->get();
+        }   
+
+        return response()->json($selected_staff);
     }
 }

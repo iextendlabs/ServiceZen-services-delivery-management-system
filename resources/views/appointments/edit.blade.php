@@ -65,30 +65,41 @@
             <strong>Time Slots</strong>
             <div class="list-group" id="time-slots-container">
                 @foreach($timeSlots as $timeSlot)
-                @php
-                $slot = date('h:i A', strtotime($timeSlot->time_start)).' -- '.date('h:i A', strtotime($timeSlot->time_end));
-                @endphp
-                @if($slot == $appointment->time)
+                @if($timeSlot->id == $appointment->time_slot_id)
                 <label>
-                    <div class="list-group-item d-flex justify-content-between align-items-center time-slot active">
-                        <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" @if($timeSlot->active == "Unavailable") disabled @endif>
-                        {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}
+                    <div class="list-group-item d-flex justify-content-between align-items-center time-slot">
+                        <input style="display: none;" checked type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ $timeSlot->id }}" @if($timeSlot->active == "Unavailable") disabled @endif>
+                        <div>
+                            <h6><b>{{ strtoupper($timeSlot->name) }}</b></h6>
+                            <h6 id="selected_time">{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </h6>
+                            @if(isset($timeSlot->space_availability))
+                                <span style="font-size: 13px;">Space Availability:{{ $timeSlot->space_availability }}</span>
+                            @endif
+                        </div>
+
                         @if($timeSlot->active == "Unavailable")
-                        <span class="badge badge-unavailable">Unavailable</span>
+                            <span class="badge badge-unavailable">Unavailable</span>
                         @else
-                        <span class="badge badge-available">Available</span>
+                            <span class="badge badge-available">Available</span>
                         @endif
                     </div>
                 </label>
                 @else
                 <label>
-                    <div class="list-group-item d-flex justify-content-between align-items-center time-slot">
-                        <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" @if($timeSlot->active == "Unavailable") disabled @endif>
-                        {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}
+                <div class="list-group-item d-flex justify-content-between align-items-center time-slot">
+                        <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ $timeSlot->id }}" @if($timeSlot->active == "Unavailable") disabled @endif>
+                        <div>
+                            <h6><b>{{ strtoupper($timeSlot->name) }}</b></h6>
+                            <h6 id="selected_time">{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </h6>
+                            @if(isset($timeSlot->space_availability))
+                                <span style="font-size: 13px;">Space Availability:{{ $timeSlot->space_availability }}</span>
+                            @endif
+                        </div>
+
                         @if($timeSlot->active == "Unavailable")
-                        <span class="badge badge-unavailable">Unavailable</span>
+                            <span class="badge badge-unavailable">Unavailable</span>
                         @else
-                        <span class="badge badge-available">Available</span>
+                            <span class="badge badge-available">Available</span>
                         @endif
                     </div>
                 </label>
@@ -107,8 +118,8 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Time:</strong>
-                <input type="text" name="selected_time" class="form-control" value="{{ $appointment->time }}" disabled placeholder="Select the Time Slots">
-                <input type="hidden" name="time" class="form-control" value="{{ $appointment->time }}">
+                <input type="text" name="selected_time" class="form-control" disabled placeholder="Select the Time Slots">
+                <input type="hidden" name="time" class="form-control" value="{{ $appointment->time_slot_id }}">
             </div>
         </div>
         
@@ -133,15 +144,17 @@
 </form>
 <script>
     $(document).ready(function() {
+        $('input[name="time_slot"]:checked').parents().addClass('active');
         var group = $('#time-slots-container').find('.active').find('input[name="time_slot"]').attr('data-group');
-
+        var time_slot = $('input[name="time_slot"]:checked').val();
         if (group) {
             // Make AJAX call to retrieve time slots for selected date
             $.ajax({
                 url: '/staff-group',
                 method: 'GET',
                 data: {
-                    group: group
+                    group: group,
+                    time_slot: time_slot
                 },
                 success: function(response) {
                     var staffs = response;
@@ -153,13 +166,13 @@
                         var service_staff = {!! json_encode($appointment->service_staff_id) !!};
                         if(staff[0].id == service_staff){
                             var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center staff active"><input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" checked value="' + staff[0].id + '">';
-                            html += '<img src="/staff-images/' + staff[0].image + '" height="100px" alt="Staff Image" class="rounded-circle">'
+                            html += '<img src="/staff-images/' + staff[0].image + '" height="100px" width="100px" alt="Staff Image" class="rounded-circle">'
                             html += '<span>' + staff[0].name + '</span>'
                             html += '</div></label>'
                             staffContainer.append(html);
                         }else{
                             var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center staff"><input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="' + staff[0].id + '">';
-                            html += '<img src="/staff-images/' + staff[0].image + '" height="100px" alt="Staff Image" class="rounded-circle">'
+                            html += '<img src="/staff-images/' + staff[0].image + '" height="100px" width="100px" alt="Staff Image" class="rounded-circle">'
                             html += '<span>' + staff[0].name + '</span>'
                             html += '</div></label>'
                             staffContainer.append(html);
@@ -191,7 +204,7 @@
         if ($(this).is(':checked')) {
             $(".time-slot").removeClass("active");
             $(this).parents().addClass('active');
-            selected_time.val($(this).val());
+            selected_time.val($(this).parent().find('#selected_time').text());
             time.val($(this).val());
         }
     });
@@ -208,7 +221,7 @@
         var selectedDate = $(this).val();
 
         $.ajax({
-            url: '/slots',
+            url: '/time-slots',
             method: 'GET',
             data: {
                 date: selectedDate
@@ -234,11 +247,22 @@
                     timeSlots.forEach(function(timeSlot) {
                         var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center time-slot">';
                         if (timeSlot.active == "Unavailable") {
-                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="' + timeSlot.group_id + '" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '" disabled>' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + ' <span class="badge badge-unavailable">Unavailable</span>'
+                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="' + timeSlot.group_id + '" value="' + timeSlot.id + '" disabled>';
                         } else {
-                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="' + timeSlot.group_id + '" value="' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '">' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '<span class="badge badge-available">Available</span> '
+                            html += '<input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="' + timeSlot.group_id + '" value="' + timeSlot.id + '">';
                         }
-                        html += '</div></label>'
+                        html += '<div><h6><b>' + timeSlot.name.toUpperCase() + '</b></h6>';
+                        html += '<h6 id="selected_time">' + convertTo12Hour(timeSlot.time_start) + ' -- ' + convertTo12Hour(timeSlot.time_end) + '</h6>';
+                        if (timeSlot.space_availability) {
+                            html += '<span style="font-size: 13px;">Space Availability:' + timeSlot.space_availability + '</span>';
+                        }
+                        html += '</div>';
+                        if (timeSlot.active == "Unavailable") {
+                            html += '<span class="badge badge-unavailable">Unavailable</span>';
+                        } else {
+                            html += '</p> <span class="badge badge-available">Available</span>';
+                        }
+                        html += '</div></label>';
                         timeSlotsContainer.append(html);
                     });
                 }
@@ -264,17 +288,18 @@
         return formattedTime;
     }
 </script>
-
-
 <script>
     $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
         var group = $(this).attr('data-group');
+        var time_slot = $(this).val();
+        
         if (group) {
             $.ajax({
                 url: '/staff-group',
                 method: 'GET',
                 data: {
-                    group: group
+                    group: group,
+                    time_slot: time_slot
                 },
                 success: function(response) {
                     var staffs = response;
@@ -284,7 +309,7 @@
 
                     staffs.forEach(function(staff) {
                         var html = '<label><div class="list-group-item d-flex justify-content-between align-items-center staff"><input style="display: none;" type="radio" class="form-check-input" name="service_staff_id" value="' + staff[0].id + '">';
-                        html += '<img src="/staff-images/' + staff[0].image + '" height="100px" alt="Staff Image" class="rounded-circle">'
+                        html += '<img src="/staff-images/' + staff[0].image + '" height="100px" width="100px" alt="Staff Image" class="rounded-circle">'
                         html += '<span>' + staff[0].name + '</span>'
                         html += '</div></label>'
                         staffContainer.append(html);
