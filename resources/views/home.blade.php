@@ -83,7 +83,7 @@
             </div>
         </div>
     </div>
-    <div class="py-2"></div>
+    <!-- <div class="py-2"></div>
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -95,8 +95,6 @@
                             <th>Service</th>
                             <th>Price</th>
                             <th>Status</th>
-                            <th>date</th>
-                            <th>Time</th>
                             <th>Action</th>
                         </tr>
                         @if(count($appointments))
@@ -106,8 +104,6 @@
                             <td>{{ $appointment->service->name }}</td>
                             <td>{{ $appointment->price }}</td>
                             <td>{{ $appointment->status }}</td>
-                            <td>{{ $appointment->date }}</td>
-                            <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
                             <td>
                                 <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
                                     <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>
@@ -132,6 +128,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
 @endsection

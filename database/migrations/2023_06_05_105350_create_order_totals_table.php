@@ -13,9 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('staff', function (Blueprint $table) {
-            $table->string('charges')->nullable()->after('commission');
-            $table->string('phone')->after('user_id');
+        Schema::create('order_totals', function (Blueprint $table) {
+            $table->id();
+            $table->string('order_id');
+            $table->string('sub_total');
+            $table->string('staff_charges')->nullable();
+            $table->string('transport_charges')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -26,9 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('staff', function (Blueprint $table) {
-            $table->dropColumn('charges');
-            $table->dropColumn('phone');
-        });
+        Schema::dropIfExists('order_totals');
     }
 };

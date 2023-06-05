@@ -98,6 +98,7 @@ Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 // appointments
 Route::get('appointmentCSV', [ServiceAppointmentController::class,'downloadCSV']);
 // Order
+Route::resource('booking', ServiceAppointmentController::class);
 Route::resource('order', 'App\Http\Controllers\Site\OrderController');
 Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
@@ -115,3 +116,4 @@ Route::get('step3', [CheckOutController::class, 'step3']);
 Route::get('slots', [CheckOutController::class,'slots']);
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::view('/orderSuccess', 'site.orders.success');
+Route::get('staffOrderCSV', 'App\Http\Controllers\Site\OrderController@downloadCSV');

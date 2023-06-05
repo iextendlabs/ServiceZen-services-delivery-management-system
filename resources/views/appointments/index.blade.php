@@ -34,10 +34,6 @@
                     <th>Duration</th>
                     <th>Price</th>
                     <th>Status</th>
-                    <th>date</th>
-                    <th>Time</th>
-                    <th>Staff</th>
-                    <th>Group</th>
                     <th>Action</th>
                 </tr>
                 @if(count($appointments))
@@ -48,10 +44,6 @@
                     <td>{{ $appointment->service->duration }}</td>
                     <td>${{ $appointment->price }}</td>
                     <td>{{ $appointment->status }}</td>
-                    <td>{{ $appointment->date }}</td>
-                    <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
-                    <td>{{ $appointment->staff->name }}</td>
-                    <td>{{ $appointment->time_slot->group->name }}</td>
                     <td>
                         <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('appointments.show',$appointment->id) }}">Show</a>
@@ -69,7 +61,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="10" class="text-center" >There is no appointment.</td>
+                    <td colspan="7" class="text-center" >There is no appointment.</td>
                 </tr>
                 @endif
             </table>

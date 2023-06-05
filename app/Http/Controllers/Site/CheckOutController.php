@@ -50,7 +50,7 @@ class CheckOutController extends Controller
             Session::put('serviceIds', $serviceIds);
         }
 
-        return redirect()->back()->with('success', 'Service Add to Cart Successfully.');
+        return redirect()->back()->with('cart-success', 'Service Add to Cart Successfully.');
     }
 
     public function removeToCart(Request $request, $id)
@@ -78,10 +78,12 @@ class CheckOutController extends Controller
             'area' => 'required',
             'flatVilla' => 'required',
             'street' => 'required',
-            'city' => 'required',
+            'landmark' => 'required',
+            'name' => 'required',
             'number' => 'required',
             'email' => 'required|email',
-            'name' => 'required'
+            'name' => 'required',
+            'whatsapp' => 'required',
         ]);
 
         $address = [];
@@ -90,10 +92,14 @@ class CheckOutController extends Controller
         $address['area'] = $request->area;
         $address['flatVilla'] = $request->flatVilla;
         $address['street'] = $request->street;
+        $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
         $address['number'] = $request->number;
+        $address['whatsapp'] = $request->whatsapp;
         $address['email'] = $request->email;
         $address['name'] = $request->name;
+        $address['latitude'] = $request->latitude;
+        $address['longitude'] = $request->longitude;
 
         if (session()->has('address')) {
             Session::forget('address');

@@ -1,4 +1,9 @@
 @extends('site.layout.app')
+<style>
+    .table {
+        margin-bottom: 0px !important;
+    }
+</style>
 <base href="/public">
 @section('content')
 <div class="row">
@@ -14,114 +19,157 @@ $staff_transport_charges = 0;
 @endphp
 <div class="container">
     <div>
-    @if ($errors->any())
+        @if ($errors->any())
         <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
             <ul>
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
-    @endif
-    <table class="table table-bordered album bg-light">
-        <td class="text-left" colspan="2">Order Details</td>
-        <tr>
-            <td>
-                <b>Order ID:</b>#{{ $order->id }} <br><br>
-                <b>Date Added:</b>{{ $order->created_at }}
-            </td>
-            <td>
-                <b>Total Amount:</b>${{ $order->total_amount }} <br><br>
-                <b>Payment Method:</b>{{ $order->payment_method }}
-            </td>
-        </tr>
-        <td class="text-left" colspan="2">Address Details</td>
-        <tr>
-            <td colspan="2">
-                <b>Building Name:</b> {{ $order->buildingName }} <br>
-                <b>Area:</b> {{ $order->area }} <br>
-                <b>Flat / Villa:</b> {{ $order->flatVilla }} <br>
-                <b>Street:</b> {{ $order->street }} <br>
-                <b>City:</b> {{ $order->city }} <br>
-                <b>Number:</b> {{ $order->number }}
-            </td>
-        </tr>
-    </table>
-    <table class="table table-bordered album bg-light">
-        <tr>
-            <th>Service Name</th>
-            <th>Status</th>
-            <th>Duration</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th class="text-right">Amount</th>
-        </tr>
-        @foreach($order->serviceAppointments as $appointment)
+        @endif
+        <div class="text-right">
+            <button type="button" class="btn btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
+        </div>
+        <table class="table table-bordered album bg-light">
+            <td class="text-left" colspan="2">Order Details</td>
+            <tr>
+                <td>
+                    <b>Order ID:</b> #{{ $order->id }} <br><br>
+                    <b>Date Added:</b> {{ $order->created_at }} <br><br>
+                    <b>Order Status:</b> {{ $order->status }}
+                </td>
+                <td>
+                    <b>Total Amount:</b> ${{ $order->total_amount }} <br><br>
+                    <b>Payment Method:</b> {{ $order->payment_method }}
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered album bg-light">
+            <td class="text-left" colspan="2">Time Slot and Staff</td>
+            <tr>
+                <td>
+                    <b>Staff:</b> {{ $order->staff->user->name }} <br><br>
+                    <b>Date:</b> {{ $order->date }}
+                </td>
+                <td>
+                    <b>Time Slot:</b> {{ $order->time_slot->name }} <br><br>
+                    <b>Time:</b> {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered album bg-light">
+            <td class="text-left" colspan="3">Address Details</td>
+            <tr>
+                <td>
+                    <b>Building Name:</b> {{ $order->buildingName }} <br><br>
+                    <b>Area:</b> {{ $order->area }}
+                </td>
+                <td>
+                    <b>Flat / Villa:</b> {{ $order->total_amount }} <br><br>
+                    <b>Land Mark:</b> {{ $order->landmark }}
+                </td>
+                <td>
+                    <b>Street:</b> {{ $order->street }} <br><br>
+                    <b>City:</b> {{ $order->city }}
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered album bg-light">
+            <td class="text-left" colspan="2">Customer Details</td>
+            <tr>
+                <td>
+                    <b>Name:</b> {{ $order->customer->name }} <br><br>
+                    <b>Email:</b> {{ $order->customer->email }}
+                </td>
+                <td>
+                    <b>Phone Number:</b> {{ $order->number }} <br><br>
+                    <b>Whatsapp Number:</b> {{ $order->whatsapp }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-left">
+                    <b>Location of customer:</b> <a href="https://maps.google.com/maps?q={{ $order->latitude }},+{{ $order->longitude }}" target="_blank">click</a>
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered album bg-light">
+            <td class="text-left" colspan="4">Services Details</td>
+            <tr>
+                <th>Service Name</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th class="text-right">Amount</th>
+            </tr>
+            @foreach($order->serviceAppointments as $appointment)
             <tr>
                 <td>{{ $appointment->service->name }}</td>
                 <td>{{ $appointment->status }}</td>
                 <td>{{ $appointment->service->duration }}</td>
-                <td>{{ $appointment->date }}</td>
-                <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>
                 <td class="text-right">${{ $appointment->price }}</td>
             </tr>
-
-            @php
-                $sub_total = $appointment->price + $sub_total;
-            @endphp
-            
-            @if($appointment->staffData)
-            @php
-                $staff_charges = $appointment->staffData->charges;
-            @endphp
-            @else
-            @php
-                $staff_charges = 0;
-            @endphp
+            @endforeach
+            <tr>
+                <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
+                <td class="text-right">${{ $order->order_total->sub_total }}</td>
+            </tr>
+            @if($order->order_total->transport_charges != 0)
+            <tr>
+                <td colspan="3" class="text-right"><strong>Staff Transport Charges:</strong></td>
+                <td class="text-right">${{ $order->order_total->transport_charges }}</td>
+            </tr>
             @endif
-
-            @if($appointment->time_slot->staffGroup->staffZone->transport_charges)
-            @php
-                $staff_transport_charges = $appointment->time_slot->staffGroup->staffZone->transport_charges;
-            @endphp
-            @else
-            @php
-                $staff_transport_charges = 0;
-            @endphp
+            @if($order->order_total->staff_charges != 0)
+            <tr>
+                <td colspan="3" class="text-right"><strong>Staff Charges:</strong></td>
+                <td class="text-right">${{ $order->order_total->staff_charges }}</td>
+            </tr>
             @endif
-        @endforeach
-        <tr>
-            <td colspan="5" class="text-right"><strong>Sub Total:</strong></td>
-            <td class="text-right">${{ $sub_total }}</td>
-            @php
-                $total_amount = $sub_total +$total_amount;
-            @endphp
-        </tr>
-        @if($staff_transport_charges != 0)
-        <tr>
-            <td colspan="5" class="text-right"><strong>Staff Transport Charges:</strong></td>
-            <td class="text-right">${{ $staff_transport_charges }}</td>
-            @php
-                $total_amount = $staff_transport_charges +$total_amount;
-            @endphp
-        </tr>
+            <tr>
+                <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                <td class="text-right">${{ $order->total_amount }}</td>
+            </tr>
+        </table>
+        @guest
+        @else
+        @if(Auth::user()->hasRole('Staff'))
+        <fieldset>
+            <legend>Update Order</legend>
+            <form action="{{ route('order.update',$order->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Status:</strong>
+                            <select name="status" class="form-control">
+                                @foreach ($statuses as $status)
+                                @if($status == $order->status)
+                                <option value="{{ $status }}" selected>{{ $status }}</option>
+                                @else
+                                <option value="{{ $status }}">{{ $status }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right no-print">
+                        @can('order-edit')
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        @endcan
+                    </div>
+                </div>
+            </form>
+        </fieldset>
         @endif
-        @if($staff_charges != 0)
-        <tr>
-            <td colspan="5" class="text-right"><strong>Staff Charges:</strong></td>
-            <td class="text-right">${{ $staff_charges }}</td>
-            @php
-                $total_amount = $staff_charges +$total_amount;
-            @endphp
-        </tr>
-        @endif
-        <tr>
-            <td colspan="5" class="text-right"><strong>Total:</strong></td>
-            <td class="text-right">${{ $total_amount }}</td>
-        </tr>
-    </table>
-    
-  </div>
+        @endguest
+
+    </div>
 </div>
+<script>
+    function printDiv() {
+        window.print();
+    }
+    </script>
 @endsection

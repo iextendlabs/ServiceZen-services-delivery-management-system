@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('staff_ids');
+            $table->string('staff_zone_id');
             $table->timestamps();
         });
     }

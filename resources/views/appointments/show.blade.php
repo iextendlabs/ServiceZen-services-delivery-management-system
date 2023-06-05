@@ -27,25 +27,19 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Customer:</strong>
-                {{ $appointment->customer->name }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Address:</strong>
-                {{ $appointment->address }}
+                {{ $appointment->order->customer->name }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Date:</strong>
-                {{ $appointment->date }}
+                {{ $appointment->order->date }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Time:</strong>
-                {{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}
+                {{ date('h:i A', strtotime($appointment->order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->order->time_slot->time_end)) }}
             </div>
         </div>
         <div class="col-md-12">

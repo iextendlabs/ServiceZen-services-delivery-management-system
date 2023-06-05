@@ -57,32 +57,9 @@
                       <a class="dropdown-item text-center" href="\"><b>All</b></a>
                   </div>
                 </li>
-                @guest
                 <li class="nav-item">
                   <a href="{{ route('cart.index') }}" class="nav-link">View Cart({{$cart_product}})</a>
                 </li>
-                @else
-                  @if(Auth::user()->hasRole('Staff'))
-                    <li class="nav-item">
-                      <a href="{{ route('booking.index') }}" class="nav-link">Appointments</a>
-                    </li>
-                  @elseif(Auth::user()->hasRole('Manager'))
-                    <li class="nav-item">
-                      <a href="/manageAppointment" class="nav-link">Appointments</a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="/supervisor" class="nav-link">Supervisor List</a>
-                    </li>
-                  @elseif(Auth::user()->hasRole('Supervisor'))
-                    <li class="nav-item">
-                      <a href="/manageAppointment" class="nav-link">Appointments</a>
-                    </li>
-                  @else
-                    <li class="nav-item">
-                      <a href="{{ route('cart.index') }}" class="nav-link">View Cart({{$cart_product}})</a>
-                    </li>
-                  @endif
-                @endguest
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Account
@@ -94,10 +71,13 @@
                   @else
                     @if(Auth::user()->hasRole('Staff'))
                       <a class="dropdown-item" href="{{ route('cashCollections.index') }}">Cash Collection</a>
+                      <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
+                      <a class="dropdown-item" href="{{ route('order.index') }}">Assigned Orders</a>
+                      <a class="dropdown-item" href="/customer-logout">Logout</a>
+                    @else
+                      <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
+                      <a class="dropdown-item" href="/customer-logout">Logout</a>
                     @endif
-                    <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
-                    <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
-                    <a class="dropdown-item" href="/customer-logout">Logout</a>
                   @endguest
                   </div>
                 </li>

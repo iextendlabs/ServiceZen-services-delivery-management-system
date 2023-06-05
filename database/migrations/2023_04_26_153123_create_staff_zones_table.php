@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->string('staff_ids');
+            $table->string('transport_charges')->nullable();
             $table->timestamps();
         });
     }

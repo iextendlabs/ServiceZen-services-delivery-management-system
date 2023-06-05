@@ -20,6 +20,8 @@ return new class extends Migration
             $table->unsignedBigInteger('manager_id')->nullable();
             $table->unsignedBigInteger('supervisor_id')->nullable();
             $table->string('image')->nullable();
+            $table->string('charges')->nullable();
+            $table->string('phone');
             $table->timestamps();
         });
     }

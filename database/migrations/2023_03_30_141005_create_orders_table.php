@@ -20,6 +20,19 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('status')->nullable();
             $table->string('affiliate_id')->nullable();
+            $table->string('buildingName')->nullable();
+            $table->string('area')->nullable();
+            $table->string('landmark');
+            $table->string('flatVilla')->nullable();
+            $table->string('street')->nullable();
+            $table->string('city')->nullable();
+            $table->string('number')->nullable();
+            $table->string('whatsapp');
+            $table->string('service_staff_id');
+            $table->string('date');
+            $table->string('time_slot_id');
+            $table->string('latitude');
+            $table->string('longitude');
             $table->timestamps();
         });
     }

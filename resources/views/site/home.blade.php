@@ -31,6 +31,12 @@
       <strong>{{ Session::get('success') }}</strong>
     </span>
     @endif
+    @if(Session::has('cart-success'))
+    <span class="alert alert-success" role="alert">
+    You have added service to your <a href="cart">shopping cart!</a><br>
+      <!-- <strong>{{ Session::get('cart-success') }}</strong> -->
+    </span>
+    @endif
 </div>
 <div class="album py-5 bg-light">
   <div class="container">

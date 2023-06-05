@@ -4,9 +4,6 @@
         height: 100%;
         width: 100%;
     }
-
-    .popup img {}
-
     .popup {
         display: none;
         position: fixed;
@@ -25,7 +22,7 @@
         font-weight: bold;
         position: absolute;
         top: 10px;
-        right: 50px;
+        left: 25%;
         opacity: 1;
         /* cursor: pointer; */
     }
@@ -118,6 +115,9 @@
         width: 18px;
         height: 18px;
     }
+    .full-width-button {
+      width: 50%;
+    }
 </style>
 
 <base href="/public">
@@ -160,7 +160,7 @@
                         </svg>
                     </div>
                     <div class="location-search-input-wrapper">
-                        <input id="searchInput" type="text" name="location-input" placeholder="Search for area, street name, landmark..." autocomplete="off" value="" class="location-search-input">
+                        <input id="searchField" type="text" name="location-input" placeholder="Search for area, street name, landmark..." autocomplete="off" value="" class="location-search-input">
                     </div>
                     <div class="location-search-right en">
                         <div class="location-search-clear en" style="display:none;">
@@ -182,7 +182,14 @@
         </div>
         <div class="popup">
             <div id="map"></div>
-            <span class="close">&times;</span>
+            <div class="container-fluid close">
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary full-width-button">Submit</button>
+                        <span>&times;</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <form action="addressSession" method="POST">
@@ -201,12 +208,6 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Area:</strong>
-                        <input type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ old('area') }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
                         <span style="color: red;">*</span><strong>Flat / Villa:</strong>
                         <input type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ old('flatVilla') }}">
                     </div>
@@ -219,10 +220,24 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
+                        <span style="color: red;">*</span><strong>Area:</strong>
+                        <input type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ old('area') }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span style="color: red;">*</span><strong>Landmark:</strong>
+                        <input type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('Landmark') }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
                         <span style="color: red;">*</span><strong>City:</strong>
                         <input type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city') }}">
                     </div>
                 </div>
+                <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') }}">
+                <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') }}">
             </div>
 
             <div class="row">
@@ -239,14 +254,20 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Phone Number:</strong>
-                        <input type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') }}">
+                        <span style="color: red;">*</span><strong>Email:</strong>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="abc@gmail.com" value="{{ $email }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Email:</strong>
-                        <input type="email" name="email" id="email" class="form-control" placeholder="abc@gmail.com" value="{{ $email }}">
+                        <span style="color: red;">*</span><strong>Phone Number:</strong>
+                        <input type="number" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
+                        <input type="number" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') }}">
                     </div>
                 </div>
             </div>
@@ -273,92 +294,27 @@
 
 <!-- Map Loading -->
 <script>
-    function initMap() {
-        const map = new google.maps.Map(document.getElementById('map'), {
-            center: {
-                lat: 23.4241,
-                lng: 53.8478
-            },
-            zoom: 7
-        });
- 
-        const geocoder = new google.maps.Geocoder();
+    var map;
+    var marker;
+    var autocomplete;
 
-        let marker;
+    document.getElementById('manualLocationButton').addEventListener('click', function() {
+        showMap();
+    });
 
-        document.getElementById('searchInput').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                searchLocation();
-            }
-        });
+    function showMap() {
+            var searchValue = document.getElementById('searchField').value;
 
-        document.getElementById('searchInput').addEventListener('blur', function() {
-            searchLocation();
-        });
+            if (searchValue) {
+                var geocoder = new google.maps.Geocoder();
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 0, lng: 0 },
+                    zoom: 15
+                });
 
-        document.getElementById('manualLocationButton').addEventListener('click', function() {
-            const manualLocation = map.getCenter();
-
-            if (marker) {
-                marker.setMap(null);
-            }
-
-            marker = new google.maps.Marker({
-                map: map,
-                position: manualLocation
-            });
-
-            geocoder.geocode({
-                location: manualLocation,
-                language: 'en'
-            }, function(results, status) {
-                if (status === 'OK') {
-                    if (results[0]) {
-                        updateAddressFields(results[0]);
-                    }
-                } else {
-                    alert('Geocoder failed due to: ' + status);
-                }
-            });
-        });
-
-        map.addListener('click', function(event) {
-            if (marker) {
-                marker.setMap(null);
-            }
-
-            marker = new google.maps.Marker({
-                position: event.latLng,
-                map: map
-            });
-
-            geocoder.geocode({
-                location: event.latLng,
-                language: 'en'
-            }, function(results, status) {
-                if (status === 'OK') {
-                    if (results[0]) {
-                        updateAddressFields(results[0]);
-                        $(".popup").fadeOut();
-                    }
-                } else {
-                    alert('Geocoder failed due to: ' + status);
-                }
-            });
-        });
-
-        function searchLocation() {
-            const searchInput = document.getElementById('searchInput').value;
-
-            geocoder.geocode({
-                address: searchInput,
-                language: 'en'
-            }, function(results, status) {
-                if (status === 'OK') {
-                    if (results[0]) {
+                geocoder.geocode({ address: searchValue }, function(results, status) {
+                    if (status === 'OK') {
                         map.setCenter(results[0].geometry.location);
-                        map.setZoom(15);
 
                         if (marker) {
                             marker.setMap(null);
@@ -369,23 +325,85 @@
                             position: results[0].geometry.location
                         });
 
-                        updateAddressFields(results[0]);
+                        map.addListener('click', function(event) {
+                            placeMarker(event.latLng);
+                        });
+
+                        fillAddressFields(results[0]);
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
                     }
+                });
+            } else {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: { lat: position.coords.latitude, lng: position.coords.longitude },
+                            zoom: 15
+                        });
+
+                        if (marker) {
+                            marker.setMap(null);
+                        }
+
+                        map.addListener('click', function(event) {
+                            placeMarker(event.latLng);
+                        });
+
+                        fillAddressFieldsFromMarker();
+                    }, function() {
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: { lat: 23.4241, lng: 53.8478 },
+                            zoom: 7
+                        });
+
+                        if (marker) {
+                            marker.setMap(null);
+                        }
+
+                        map.addListener('click', function(event) {
+                            placeMarker(event.latLng);
+                        });
+
+                        fillAddressFieldsFromMarker();
+                    });
                 } else {
-                    alert('Geocoder failed due to: ' + status);
+                    handleLocationError(false);
                 }
-            });
+            }
         }
 
-        function updateAddressFields(place) {
+        function placeMarker(location) {
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                draggable: true
+            });
+
+            marker.addListener('dragend', function() {
+                fillAddressFieldsFromMarker();
+            });
+
+            fillAddressFieldsFromMarker();
+        }
+
+        function fillAddressFields(place) {
             const buildingNameField = document.getElementById('buildingName');
             const landmarkField = document.getElementById('landmark');
             const areaField = document.getElementById('area');
             const flatVillaField = document.getElementById('flatVilla');
             const streetField = document.getElementById('street');
             const cityField = document.getElementById('city');
+            const latitudeField = document.getElementById('latitude');
+            const longitudeField = document.getElementById('longitude');
 
             const addressComponents = place.address_components;
+            
+            console.log(addressComponents);
             for (let i = 0; i < addressComponents.length; i++) {
                 const component = addressComponents[i];
                 const types = component.types;
@@ -403,9 +421,59 @@
                 } else if (types.includes('locality')) {
                     cityField.value = component.long_name;
                 }
+                latitudeField.value = place.geometry.location.lat();
+                longitude.value = place.geometry.location.lng();
             }
         }
-    }
+
+        function reverseGeocode(latitude, longitude) {
+            var geocoder = new google.maps.Geocoder();
+            var latLng = new google.maps.LatLng(latitude, longitude);
+
+            geocoder.geocode({ 'latLng': latLng }, function(results, status) {
+                if (status === 'OK') {
+                    if (results[0]) {
+                        fillAddressFields(results[0]);
+                    } else {
+                        alert('No address found for the current location');
+                    }
+                } else {
+                    alert('Geocoder failed due to: ' + status);
+                }
+            });
+        }
+
+        function handleLocationError(browserHasGeolocation) {
+            alert(browserHasGeolocation ? 'Error: The Geolocation service failed.' : 'Error: Your browser doesn\'t support geolocation.');
+        }
+
+        function fillAddressFieldsFromMarker() {
+            if (marker) {
+                var markerPosition = marker.getPosition();
+                reverseGeocode(markerPosition.lat(), markerPosition.lng());
+            }
+        }
+
+        function initAutocomplete() {
+            autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchField'));
+            autocomplete.addListener('place_changed', function() {
+                var place = autocomplete.getPlace();
+
+                if (!place.geometry) {
+                    alert('No details available for input: ' + place.name);
+                    return;
+                }
+
+                if (marker) {
+                    marker.setMap(null);
+                }
+
+                map.setCenter(place.geometry.location);
+                placeMarker(place.geometry.location);
+
+                fillAddressFields(place);
+            });
+        }
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJ0A4bxdhZ4FWomyO-tSEa4Qn0KY1jpT8&callback=initMap"></script>

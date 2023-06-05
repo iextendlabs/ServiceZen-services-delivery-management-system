@@ -51,7 +51,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="4" class="text-center">There is no staff zone.</td>
+                    <td colspan="5" class="text-center">There is no staff zone.</td>
                 </tr>
                 @endif  
             </table>

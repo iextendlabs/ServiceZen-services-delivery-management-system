@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\ServiceAppointment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
@@ -128,15 +129,16 @@ class OrderController extends Controller
         $output = fopen("php://output", "w");
         
         // Write headers to output stream
-        fputcsv($output, array('Order ID','Amount','Status','Date','Customer','Appointments'));
+        fputcsv($output, array('Order ID','Amount','Status','Order Added Date','Customer','Staff','Appointment Date','Time','Services'));
         
         // Loop through data and write to output stream
         foreach ($data as $row) {
+            $appointments= array();
             foreach($row->serviceAppointments as $appointment){
                 $appointments[] = $appointment->service->name;
             }
 
-            fputcsv($output, array($row->id, '$'.$row->total_amount, $row->status, $row->created_at, $row->customer->name,implode(",", $appointments)));
+            fputcsv($output, array($row->id, '$'.$row->total_amount, $row->status, $row->created_at, $row->customer->name,$row->staff->user->name,$row->date,date('h:i A', strtotime($row->time_slot->time_start)). "--" .date('h:i A', strtotime($row->time_slot->time_end)),implode(",", $appointments)));
         }
         
         // Close output stream

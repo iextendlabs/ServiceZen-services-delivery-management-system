@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['customer_id', 'total_amount','payment_method','status','buildingName','area','flatVilla','street','city','number'];
+    protected $fillable = ['customer_id', 'total_amount','payment_method','status','affiliate_id','buildingName','area','landmark','flatVilla','street','city','number','whatsapp','service_staff_id','date','time_slot_id','latitude','longitude'];
 
     protected $table = 'orders';
 
@@ -28,7 +28,7 @@ class Order extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class, 'order_id', 'id');
+        return $this->hasOne(Transaction::class, 'order_id', 'id');
     }
 
     public function affiliate()
@@ -47,4 +47,19 @@ class Order extends Model
             ->select('transactions.*')
             ->get();
     }
+
+    public function time_slot()
+    {
+        return $this->hasOne(TimeSlot::class, 'id', 'time_slot_id');
+    }
+
+    public function staff()
+    {
+        return $this->hasOne(Staff::class,'user_id','service_staff_id');
+    }
+
+    public function order_total(){
+        return $this->hasOne(OrderTotal::class);
+    }
+    
 }

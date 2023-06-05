@@ -42,17 +42,6 @@
             <td>
                 <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>
-                    @if(count($time_slot->appointment))
-                        @can('time-slot-edit')
-                        <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}" style="pointer-events: none; cursor: default;">Edit</a>
-                        @endcan
-                        @csrf
-                        @method('DELETE')
-                        @can('time-slot-delete')
-                            <button type="submit" class="btn btn-danger" disabled>Delete</button>
-                        @endcan
-                        <p><b>Note:</b><span>There are appointment on this time slot.</span></p>
-                    @else
                         @can('time-slot-edit')
                         <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
                         @endcan
@@ -61,14 +50,13 @@
                         @can('time-slot-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
                         @endcan
-                    @endif
                 </form>
             </td>
         </tr>
         @endforeach
         @else
         <tr>
-            <td colspan="5" class="text-center">There is no time slots.</td>
+            <td colspan="6" class="text-center">There is no time slots.</td>
         </tr>
         @endif
     </table>
