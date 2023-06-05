@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Affiliate;
 use App\Models\Order;
 use App\Models\ServiceAppointment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
@@ -36,7 +37,20 @@ class HomeController extends Controller
                 Auth::logout();
                 return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');
             }else{
-                $orders = Order::latest()->take(10)->get();
+                if(Auth::user()->hasRole('Supervisor')){
+                    $supervisor = User::find(Auth::id());
+        
+                    $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+        
+                    $orders = Order::whereIn('service_staff_id', $staffIds)
+                        ->take(10)->get(); 
+        
+                }elseif(Auth::user()->hasRole('Staff')){
+                    $orders = Order::where('service_staff_id',Auth::id())->take(10)->get();
+                    // dd($orders);
+                }else{
+                    $orders = Order::orderBy('id','DESC')->take(10)->get();
+                }
                 
                 $affiliate_transaction = DB::table('transactions')
                 ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')

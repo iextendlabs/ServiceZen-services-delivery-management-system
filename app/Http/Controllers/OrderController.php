@@ -38,7 +38,21 @@ class OrderController extends Controller
             'customer'=>'',
             'payment_method'=>'',
         ];
-        $orders = Order::orderBy('id','DESC')->paginate(10);
+
+        if(Auth::user()->hasRole('Supervisor')){
+            $supervisor = User::find(Auth::id());
+
+            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+
+            $orders = Order::whereIn('service_staff_id', $staffIds)
+                ->paginate(10); 
+
+        }elseif(Auth::user()->hasRole('Staff')){
+            $orders = Order::where('service_staff_id',Auth::id())->paginate(10);
+            // dd($orders);
+        }else{
+            $orders = Order::orderBy('id','DESC')->paginate(10);
+        }
 
         return view('orders.index',compact('orders','statuses','payment_methods','users','filter'))
             ->with('i', ($request->input('page', 1) - 1) * 10);
@@ -113,8 +127,20 @@ class OrderController extends Controller
 
     public function downloadCSV(Request $request)
     {
-        // Retrieve data from database
-        $data = Order::get();
+        if(Auth::user()->hasRole('Supervisor')){
+            $supervisor = User::find(Auth::id());
+
+            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+
+            $data = Order::whereIn('service_staff_id', $staffIds)
+                ->get(); 
+
+        }elseif(Auth::user()->hasRole('Staff')){
+            $data = Order::where('service_staff_id',Auth::id())->get();
+            // dd($data);
+        }else{
+            $data = Order::orderBy('id','DESC')->get();
+        }
         
         // Define headers for CSV file
         $headers = array(

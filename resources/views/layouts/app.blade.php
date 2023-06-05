@@ -94,8 +94,11 @@
                                 Store Config
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @can('time-slot-list')
-                                <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
+                                @can('service-list')
+                                <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
+                                @endcan
+                                @can('service-category-list')
+                                <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
                                 @endcan
                                 @can('holiday-list')
                                 <a class="dropdown-item" href="/holidays">Holidays</a>
@@ -109,11 +112,8 @@
                                 @can('staff-group-list')
                                 <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
                                 @endcan
-                                @can('service-list')
-                                <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
-                                @endcan
-                                @can('service-category-list')
-                                <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
+                                @can('time-slot-list')
+                                <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
                                 @endcan
                             </div>
                         </li>

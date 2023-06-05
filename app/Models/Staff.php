@@ -20,4 +20,9 @@ class Staff extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'service_staff_id','user_id');
+    }
 }
