@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderEmail extends Mailable
+class OrderCustomerEmail extends Mailable
 {
 
     use Queueable, SerializesModels;
@@ -34,7 +34,7 @@ class OrderEmail extends Mailable
     {
         $from = env('MAIL_FROM_ADDRESS');
         return $this->from($from)
-                    ->view('site.emails.order_email')
+                    ->view('site.emails.customer_order_email')
                     ->subject('Order Place')
                     ->with([
                         'data' => $this->dataArray

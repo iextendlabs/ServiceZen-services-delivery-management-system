@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\site;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderAdminEmail;
+use App\Mail\OrderCustomerEmail;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServiceAppointment;
@@ -11,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Hash;
-use App\Mail\OrderEmail;
 use App\Models\OrderTotal;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
@@ -53,6 +54,8 @@ class OrderController extends Controller
         $staff_and_time = Session::get('staff_and_time');
         $address = Session::get('address');
         $serviceIds = Session::get('serviceIds');
+        
+        $input['email'] = $address['email'];
 
         $user = User::where('email',$address['email'])->get();
         if(count($user)){
@@ -108,7 +111,8 @@ class OrderController extends Controller
             ServiceAppointment::create($input);
         }
 
-        $this->sendEmail($input['customer_id'],$customer_type);
+        $this->sendAdminEmail($input['order_id'],$input['email']);
+        $this->sendCustomerEmail($input['customer_id'],$customer_type);
 
         Session::forget('address');
         Session::forget('staff_and_time');
@@ -149,7 +153,7 @@ class OrderController extends Controller
         //
     }
     
-    public function sendEmail($customer_id,$type)
+    public function sendCustomerEmail($customer_id,$type)
     {
         if($type == "Old"){
             $customer = User::find($customer_id);
@@ -170,7 +174,16 @@ class OrderController extends Controller
         }
         
 
-        Mail::to($dataArray['email'])->send(new OrderEmail($dataArray));
+        Mail::to($dataArray['email'])->send(new OrderCustomerEmail($dataArray));
+        
+        return redirect()->back();
+    }
+
+    public function sendAdminEmail($order_id,$recipient_email)
+    {
+        $order = Order::find($order_id);        
+        $to = env('MAIL_FROM_ADDRESS');
+        Mail::to($to)->send(new OrderAdminEmail($order,$recipient_email));
         
         return redirect()->back();
     }
