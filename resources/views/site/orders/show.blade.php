@@ -165,9 +165,7 @@ $staff_transport_charges = 0;
                         </div>
                     </div>
                     <div class="col-md-12 text-right no-print">
-                        @can('order-edit')
                         <button type="submit" class="btn btn-primary">Update</button>
-                        @endcan
                     </div>
                 </div>
             </form>

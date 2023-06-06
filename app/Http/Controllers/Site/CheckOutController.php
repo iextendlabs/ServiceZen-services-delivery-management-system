@@ -233,9 +233,8 @@ class CheckOutController extends Controller
                         $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
                     }
                 });
-            })->where('date', '=', date("Y-m-d"))
+            })->where('date', 'like', $request->date)
                 ->get();
-
             if (count($slots)) {
                 $timeSlots = $slots;
             } else {
@@ -259,7 +258,7 @@ class CheckOutController extends Controller
 
         $staff_group = StaffGroup::find($request->group);
         foreach (unserialize($staff_group->staff_ids) as $id) {
-            $staff_holiday = StaffHoliday::where('staff_id',$id)->where('date',date("Y-m-d"))->get();
+            $staff_holiday = StaffHoliday::where('staff_id',$id)->where('date',$request->date)->get();
             if(count($staff_holiday) == 0 ){
                 if (in_array($id, unserialize($time_slot->available_staff))) {
                     $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')

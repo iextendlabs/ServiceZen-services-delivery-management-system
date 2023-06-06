@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServiceAppointment;
+use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -82,9 +83,21 @@ class OrderController extends Controller
    
     public function edit($id)
     {
-        //
-    }
+        $order = Order::find($id);
+        
+        $statuses = ['Complete','Canceled','Denied','Pending','Processing'];
 
+        $staffZoneNames = [$order->area, $order->city];
+
+        $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+            $query->where(function ($query) use ($staffZoneNames) {
+                foreach ($staffZoneNames as $staffZoneName) {
+                    $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                }
+            });
+        })->get();
+        return view('orders.edit',compact('order','timeSlots','statuses'));
+    }
     
     public function update(Request $request, $id)
     {
@@ -92,7 +105,7 @@ class OrderController extends Controller
 
         $order->update($request->all());
     
-        return redirect()->back()
+        return redirect()->route('orders.index')
                         ->with('success','Order updated successfully');
     }
 

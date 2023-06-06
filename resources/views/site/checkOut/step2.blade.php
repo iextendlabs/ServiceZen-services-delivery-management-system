@@ -223,6 +223,7 @@
     $('#time-slots-container').on('change', 'input[name="time_slot"]', function() {
         var group = $(this).attr('data-group');
         var time_slot = $(this).val();
+        var date = $('#date').val();
 
         if (group) {
             // Make AJAX call to retrieve time slots for selected date
@@ -231,7 +232,8 @@
                 method: 'GET',
                 data: {
                     group: group,
-                    time_slot: time_slot
+                    time_slot: time_slot,
+                    date: date
                 },
                 success: function(response) {
                     var staffs = response;

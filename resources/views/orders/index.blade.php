@@ -43,6 +43,9 @@
                     <td>
                         <form action="{{ route('orders.destroy',$order->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">Show</a>
+                            @can('order-edit')
+                            <a class="btn btn-primary" href="{{ route('orders.edit',$order->id) }}">Edit</a>
+                            @endcan
                             @csrf
                             @method('DELETE')
                             @can('order-delete')

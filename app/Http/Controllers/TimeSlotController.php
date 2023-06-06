@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Holiday;
+use App\Models\Order;
 use App\Models\StaffGroup;
 use App\Models\TimeSlot;
 use App\Models\User;
@@ -162,16 +163,33 @@ class TimeSlotController extends Controller
         return \Carbon\Carbon::parse($dateString)->format('l');
     }
 
-    public function slots(Request $request){
-        $holiday = Holiday::where('date',$request->date)->get();
-        if(count($holiday) == 0){
-            $slots = TimeSlot::where('date',$request->date)->get();
-            if(count($slots)){
+    public function slots(Request $request)
+    {
+        $order = Order::find($request->order_id);
+        $holiday = Holiday::where('date', $request->date)->get();
+        if (count($holiday) == 0) {
+            $staffZoneNames = [$order->area, $order->city];
+
+            $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+                $query->where(function ($query) use ($staffZoneNames) {
+                    foreach ($staffZoneNames as $staffZoneName) {
+                        $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                    }
+                });
+            })->where('date', 'like', $request->date)
+                ->get();
+            if (count($slots)) {
                 $timeSlots = $slots;
-            }else{
-                $timeSlots = TimeSlot::get();
+            } else {
+                $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+                    $query->where(function ($query) use ($staffZoneNames) {
+                        foreach ($staffZoneNames as $staffZoneName) {
+                            $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                        }
+                    });
+                })->get();
             }
-        }else{
+        } else {
             $timeSlots = "There is no Slots";
         }
         return response()->json($timeSlots);

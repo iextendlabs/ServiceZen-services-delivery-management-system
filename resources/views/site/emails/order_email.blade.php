@@ -1,9 +1,9 @@
 <html>
 <head>
-    <title>Order Replaced</title>
+    <title>Order Placed</title>
 </head>
 <body>
-    <h1>Your Order Has Been Successfully Replaced.</h1>
+    <h1>Your Order Has Been Successfully Placed.</h1>
     @if( empty($data['password']))
         <p>We have create your user, you can visit our website to see your order detail</p>
         <p>Your Login credentials are.</p>

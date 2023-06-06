@@ -35,7 +35,7 @@ class OrderEmail extends Mailable
         $from = env('MAIL_FROM_ADDRESS');
         return $this->from($from)
                     ->view('site.emails.order_email')
-                    ->subject('Order Replace')
+                    ->subject('Order Place')
                     ->with([
                         'data' => $this->dataArray
                     ]);
