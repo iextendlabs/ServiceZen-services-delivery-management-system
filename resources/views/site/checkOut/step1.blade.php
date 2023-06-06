@@ -476,5 +476,5 @@
         }
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBJ0A4bxdhZ4FWomyO-tSEa4Qn0KY1jpT8&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&callback=initMap"></script>
 @endsection
