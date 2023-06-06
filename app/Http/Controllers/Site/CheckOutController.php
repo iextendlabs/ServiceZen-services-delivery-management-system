@@ -265,6 +265,8 @@ class CheckOutController extends Controller
                         ->select('users.*', 'staff.image')
                         ->where('users.id', $id)->get();
                 }
+            }else{
+                $selected_staff = array();
             }
         }
 

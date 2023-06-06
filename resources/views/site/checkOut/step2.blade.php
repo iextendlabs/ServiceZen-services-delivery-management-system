@@ -237,11 +237,10 @@
                 },
                 success: function(response) {
                     var staffs = response;
-                    console.log(staffs[0]);
                     var staffContainer = $('#staff-container');
                     staffContainer.empty();
 
-                    if(staffs[0].length == 0){
+                    if(staffs.length == 0){
                             var html = '<div class="alert alert-danger"><strong>Whoops!</strong> There is no staff on your select time slot.</div>';
                             staffContainer.append(html);
                     }else{
