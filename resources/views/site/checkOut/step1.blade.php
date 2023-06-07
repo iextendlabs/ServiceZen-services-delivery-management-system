@@ -185,7 +185,7 @@
             <div class="container-fluid close">
                 <div class="row">
                     <div class="col">
-                        <button class="btn btn-primary full-width-button">Submit</button>
+                        <button class="btn btn-primary full-width-button">Confirm</button>
                         <span>&times;</span>
                     </div>
                 </div>
@@ -337,6 +337,8 @@
             } else {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(function(position) {
+                        var latitude = position.coords.latitude;
+                        var longitude = position.coords.longitude;
                         map = new google.maps.Map(document.getElementById('map'), {
                             center: { lat: position.coords.latitude, lng: position.coords.longitude },
                             zoom: 15
@@ -345,6 +347,11 @@
                         if (marker) {
                             marker.setMap(null);
                         }
+
+                        marker = new google.maps.Marker({
+                            position: { lat: latitude, lng: longitude },
+                            map: map,
+                        });
 
                         map.addListener('click', function(event) {
                             placeMarker(event.latLng);

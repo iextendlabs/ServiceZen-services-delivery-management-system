@@ -1,10 +1,11 @@
 @extends('site.layout.app')
 @section('content')
 <style>
-  .card-img-top{
+  .card-img-top {
     height: 250px;
   }
-  .card-body .card-text{
+
+  .card-body .card-text {
     height: 96px;
     overflow: hidden;
   }
@@ -12,34 +13,36 @@
 <section class="jumbotron text-center">
   <div class="container">
     @if(isset($category))
-      <h1 class="jumbotron-heading">{{$category->title}}</h1>
-      <p class="lead text-muted">{{$category->description}}</p>
+    <h1 class="jumbotron-heading">{{$category->title}}</h1>
+    <p class="lead text-muted">{{$category->description}}</p>
     @else
-      <h1 class="jumbotron-heading">Best In the Town Saloon Services</h1>
-      <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and just few clicks away.</p>
+    <h1 class="jumbotron-heading">Best In the Town Saloon Services</h1>
+    <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and just few clicks away.</p>
     @endif
   </div>
 </section>
-<div class="text-center">
-  @if(Session::has('error'))
-    <span class="alert alert-danger" role="alert">
-      <strong>{{ Session::get('error') }}</strong>
-    </span>
-    @endif
-    @if(Session::has('success'))
-    <span class="alert alert-success" role="alert">
-      <strong>{{ Session::get('success') }}</strong>
-    </span>
-    @endif
-    @if(Session::has('cart-success'))
-    <span class="alert alert-success" role="alert">
-    You have added service to your <a href="cart">shopping cart!</a><br>
-      <!-- <strong>{{ Session::get('cart-success') }}</strong> -->
-    </span>
-    @endif
-</div>
+
 <div class="album py-5 bg-light">
   <div class="container">
+    <div class="text-center">
+      @if(Session::has('error'))
+      <span class="alert alert-danger" role="alert">
+        <strong>{{ Session::get('error') }}</strong>
+      </span>
+      @endif
+      @if(Session::has('success'))
+      <span class="alert alert-success" role="alert">
+        <strong>{{ Session::get('success') }}</strong>
+      </span>
+      @endif
+      @if(Session::has('cart-success'))
+      <div class="alert alert-success" role="alert">
+        <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
+        <span>To add more service<a href="/"> Continue</a></span>
+      </div>
+      @endif
+
+    </div>
     <div class="row">
       @foreach ($services as $service)
       <div class="col-md-4">
@@ -52,8 +55,8 @@
             <p class="card-text">{{ $service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted"><b>
-                @if(isset($service->discount))<s>@endif
-                  Price: ${{ $service->price }}</b>
+                  @if(isset($service->discount))<s>@endif
+                    Price: ${{ $service->price }}</b>
                 @if(isset($service->discount))</s>@endif
               </small>
               <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
@@ -62,8 +65,8 @@
               </div>
             </div>
             @if(isset($service->discount))
-              <small class="text-muted float-end"><b>Discount Price: ${{ $service->discount }}</b></small>
-            @endif  
+            <small class="text-muted float-end"><b>Discount Price: ${{ $service->discount }}</b></small>
+            @endif
           </div>
         </div>
       </div>

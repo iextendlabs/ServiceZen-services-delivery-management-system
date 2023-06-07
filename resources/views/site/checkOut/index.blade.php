@@ -6,22 +6,24 @@
         <h2>Your Booked Service</h2>
     </div>
 </div>
-<div class="text-center" style="margin-bottom: 20px;">
-    @if(Session::has('error'))
-    <span class="alert alert-danger" role="alert">
-        <strong>{{ Session::get('error') }}</strong>
-    </span>
-    @endif
-    @if(Session::has('success'))
-    <span class="alert alert-success" role="alert">
-        <strong>{{ Session::get('success') }}</strong>
-    </span>
-    @endif
-</div>
 @php
-    $total_amount = 0;
+$total_amount = 0;
 @endphp
 <div class="container">
+    <div class="text-center" style="margin-bottom: 20px;">
+        @if(Session::has('error'))
+        <span class="alert alert-danger" role="alert">
+            <strong>{{ Session::get('error') }}</strong>
+        </span>
+        @endif
+        @if(Session::has('success'))
+        <div class="alert alert-success" role="alert">
+            <span>{{ Session::get('success') }}</span><br>
+            <span>To add more service<a href="/"> Continue</a></span>
+        </div>
+        </span>
+        @endif
+    </div>
     @if(count($booked_services) != 0)
     <table class="table table-bordered album bg-light">
         <tr>
@@ -50,13 +52,13 @@
             </td>
         </tr>
         @if(isset($booked_service->discount))
-            @php
-                $total_amount += $booked_service->discount;
-            @endphp
+        @php
+        $total_amount += $booked_service->discount;
+        @endphp
         @else
-            @php
-                $total_amount += $booked_service->price;
-            @endphp
+        @php
+        $total_amount += $booked_service->price;
+        @endphp
         @endif
         @endforeach
     </table>
