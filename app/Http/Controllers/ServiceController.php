@@ -219,7 +219,26 @@ class ServiceController extends Controller
         $price = $request->price;
         $category_id = $request->category_id;
         $service_categories = ServiceCategory::all();
-        $services = Service::where('name', 'like', $name.'%')->where('price', 'like', $price.'%')->where('category_id', $category_id)->paginate(100);
+
+        $query = Service::query();
+
+        // Filter by name
+        if ($request->name) {
+            $query->where('name', 'like', $request->name.'%');
+        }
+
+        // Filter by price
+        if ($request->price) {
+            $query->where('price', $request->price);
+        }
+
+        // Filter by category_id
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $services = $query->paginate(100);
+
         return view('services.index',compact('services','name','price','category_id','service_categories'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }

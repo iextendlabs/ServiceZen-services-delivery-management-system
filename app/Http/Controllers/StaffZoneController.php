@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Staff;
+use App\Models\StaffGroup;
 use App\Models\StaffZone;
+use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -116,7 +118,11 @@ class StaffZoneController extends Controller
     {
         
         $staffZone->delete();
-    
+        $staffGroup = StaffGroup::where('staff_zone_id',$staffZone->id)->get();
+        TimeSlot::where('group_id',$staffGroup[0]->id)->delete();
+        StaffGroup::where('staff_zone_id',$staffZone->id)->delete();
+
+        
         return redirect()->route('staffZones.index')
                         ->with('success','Staff Zone deleted successfully');
     }

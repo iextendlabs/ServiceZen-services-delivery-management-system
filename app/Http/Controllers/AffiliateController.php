@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -145,6 +146,7 @@ class AffiliateController extends Controller
         $affiliate->delete();
 
         Affiliate::where('user_id',$affiliate->id)->delete();
+        Transaction::where('user_id',$affiliate->id)->delete();
     
         return redirect()->route('affiliates.index')
                         ->with('success','Affiliate deleted successfully');

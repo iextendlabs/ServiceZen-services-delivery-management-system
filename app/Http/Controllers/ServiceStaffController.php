@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Staff;
+use App\Models\StaffHoliday;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Hash;
@@ -188,6 +190,8 @@ class ServiceStaffController extends Controller
         $serviceStaff->delete();
         
         Staff::where('user_id',$serviceStaff->id)->delete();
+        Transaction::where('user_id',$serviceStaff->id)->delete();
+        StaffHoliday::where('staff_id',$serviceStaff->id)->delete();
 
         return redirect()->route('serviceStaff.index')
                         ->with('success','Service Staff deleted successfully');

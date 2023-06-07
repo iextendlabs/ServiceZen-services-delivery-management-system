@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\ServiceAppointment;
 use App\Models\TimeSlot;
@@ -115,6 +116,7 @@ class OrderController extends Controller
         $order = Order::find($id);
         $order->delete();
         ServiceAppointment::where('order_id',$id)->delete();
+        OrderTotal::where('order_id',$id)->delete();
 
         return redirect()->route('orders.index')
                         ->with('success','Order deleted successfully');

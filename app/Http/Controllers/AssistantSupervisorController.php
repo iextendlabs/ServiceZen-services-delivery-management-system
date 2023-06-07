@@ -151,11 +151,12 @@ class AssistantSupervisorController extends Controller
      * @param  \App\User  $assistant_supervisor
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $assistant_supervisor)
+    public function destroy($id)
     {
+        $assistant_supervisor = User::find($id);
         $assistant_supervisor->delete();
         
-        AssistantSupervisorToSupervisor::where('assistant_supervisor_id',$assistant_supervisor->id)->delete();
+        AssistantSupervisorToSupervisor::where('assistant_supervisor_id',$id)->delete();
         
         return redirect()->route('assistantSupervisors.index')
                         ->with('success','Assistant Supervisor deleted successfully');

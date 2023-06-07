@@ -49,12 +49,12 @@
             <td class="text-left" colspan="2">Time Slot and Staff</td>
             <tr>
                 <td>
-                    <b>Staff:</b> {{ $order->staff->user->name }} <br><br>
+                    <b>Staff:</b>@if($order->staff) {{ $order->staff->user->name }} @endif <br><br>
                     <b>Date:</b> {{ $order->date }}
                 </td>
                 <td>
-                    <b>Time Slot:</b> {{ $order->time_slot->name }} <br><br>
-                    <b>Time:</b> {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}
+                    <b>Time Slot:</b>@if($order->time_slot) {{ $order->time_slot->name }} @endif <br><br>
+                    <b>Time:</b>@if($order->time_slot)  {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif
                 </td>
             </tr>
         </table>
@@ -130,6 +130,7 @@
                 <td class="text-right">${{ $order->total_amount }}</td>
             </tr>
         </table>
+        @if(isset($order->staff))
         <fieldset>
             <legend>Staff Commission</legend>
             <table class="table table-bordered album bg-light">
@@ -165,6 +166,7 @@
                 </form>
             </table>
         </fieldset>
+        @endif
         @if(isset($order->affiliate))
         <fieldset>
             <legend>Affiliate Commission</legend>
