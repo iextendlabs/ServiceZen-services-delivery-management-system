@@ -3,29 +3,27 @@
 use App\Http\Controllers\AffiliateController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\ServiceStaffController;
-use App\Http\Controllers\Site\ServiceAppointmentController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\Site\SiteController;
-use App\Http\Controllers\Site\CustomerAuthController;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\AssistantSupervisorController;
-use App\Http\Controllers\CashCollectionController;
-use App\Http\Controllers\HolidayController;
-use App\Http\Controllers\ManagerController;
-use App\Http\Controllers\ServiceCategoryController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\Site\CheckOutController;
-use App\Http\Controllers\StaffGroupController;
-use App\Http\Controllers\StaffHolidayController;
-use App\Http\Controllers\StaffZoneController;
-use App\Http\Controllers\SupervisorController;
-use App\Http\Controllers\TimeSlotController;
-use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\{
+    HomeController,
+    RoleController,
+    UserController,
+    ServiceController,
+    ServiceStaffController,
+    CustomerController,
+    AppointmentController,
+    AssistantSupervisorController,
+    CashCollectionController,
+    HolidayController,
+    ManagerController,
+    ServiceCategoryController,
+    OrderController,
+    StaffGroupController,
+    StaffHolidayController,
+    StaffZoneController,
+    SupervisorController,
+    TimeSlotController,
+    TransactionController
+};
 
 /*
 |--------------------------------------------------------------------------
