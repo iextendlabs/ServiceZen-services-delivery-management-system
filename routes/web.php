@@ -19,6 +19,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\Site\CheckOutController;
 use App\Http\Controllers\StaffGroupController;
 use App\Http\Controllers\StaffHolidayController;
@@ -62,6 +63,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('cashCollection', CashCollectionController::class);
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
+    Route::resource('partners', PartnerController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 

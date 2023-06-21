@@ -9,12 +9,15 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Session;
 use App\Http\Controllers\Controller;
+use App\Models\CustomerToPartner;
+use App\Models\Partner;
 
 class CustomerAuthController extends Controller
 {
     public function registration()
     {
-        return view('site.auth.signUp');
+        $partners = Partner::get();
+        return view('site.auth.signUp',compact('partners'));
     }
 
     public function postRegistration(Request $request)
@@ -31,13 +34,18 @@ class CustomerAuthController extends Controller
 
         $customer = User::create($input);
 
+        $input['customer_id'] = $customer->id;
+
         $customer->assignRole('Customer');
+        
+        CustomerToPartner::create($input);
         
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             return redirect('/')
                         ->with('success','You have Successfully loggedin');
         }
+
         return redirect("customer-registration")->with('error','Oppes! You have entered invalid credentials');
     }
 

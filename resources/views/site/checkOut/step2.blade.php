@@ -87,7 +87,7 @@
                             @if(count($timeSlots))
                                 @foreach($timeSlots as $timeSlot)
                                 <label>
-                                    <div class="list-group-item d-flex justify-content-between align-items-center time-slot">
+                                    <div class="list-group-item d-  flex justify-content-between align-items-center time-slot">
                                         <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ $timeSlot->id }}" @if($timeSlot->active == "Unavailable") disabled @endif>
                                         <div>
                                             <h6><b>{{ strtoupper($timeSlot->name) }}</b></h6>
