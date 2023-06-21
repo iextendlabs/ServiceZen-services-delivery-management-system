@@ -3,6 +3,7 @@
 use App\Http\Controllers\AffiliateController;
 use Illuminate\Support\Facades\Route;
 
+<<<<<<< HEAD
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -27,6 +28,29 @@ use App\Http\Controllers\StaffZoneController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\TransactionController;
+=======
+use App\Http\Controllers\{
+    HomeController,
+    RoleController,
+    UserController,
+    ServiceController,
+    ServiceStaffController,
+    CustomerController,
+    AppointmentController,
+    AssistantSupervisorController,
+    CashCollectionController,
+    HolidayController,
+    ManagerController,
+    ServiceCategoryController,
+    OrderController,
+    StaffGroupController,
+    StaffHolidayController,
+    StaffZoneController,
+    SupervisorController,
+    TimeSlotController,
+    TransactionController
+};
+>>>>>>> edf4adcb0461b8efe0411c285221ee3556b01c9f
 
 /*
 |--------------------------------------------------------------------------
