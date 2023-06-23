@@ -1,12 +1,12 @@
 @extends('site.layout.app')
 <base href="/public">
 @section('content')
-<div class="row">
-    <div class="col-md-12 py-5 text-center">
-        <h2>Orders</h2>
-    </div>
-</div>
 <div class="container">
+    <div class="row">
+        <div class="col-md-12 py-5 text-center">
+            <h2>Orders</h2>
+        </div>
+    </div>
     @if ($errors->any())
     <div class="alert alert-danger">
         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -42,6 +42,9 @@
                 <td>{{ $order->created_at }}</td>
                 <td>
                     <a class="btn btn-info" href="{{ route('order.show',$order->id) }}">Show</a>
+                    @if($order->status == "Pending")
+                    <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
+                    @endif
                 </td>
             </tr>
             @endforeach

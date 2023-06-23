@@ -10,14 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Session;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerToPartner;
-use App\Models\Partner;
 
 class CustomerAuthController extends Controller
 {
     public function registration()
     {
-        $partners = Partner::get();
-        return view('site.auth.signUp',compact('partners'));
+        return view('site.auth.signUp');
     }
 
     public function postRegistration(Request $request)

@@ -27,16 +27,20 @@ class CheckOutController extends Controller
     public function index()
     {
         $services = Session::get('serviceIds');
-        if ($services) {
-            foreach ($services as $service) {
-                $booked_services[] = Service::find($service);
-            }
+        if (Session::get('address') && Session::get('serviceIds')) {
+            return redirect('step3');
         } else {
-            $booked_services = array();
-        }
+            if ($services) {
+                foreach ($services as $service) {
+                    $booked_services[] = Service::find($service);
+                }
+            } else {
+                $booked_services = array();
+            }
 
-        return view('site.checkOut.index', compact('booked_services'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+            return view('site.checkOut.index', compact('booked_services'))
+                ->with('i', (request()->input('page', 1) - 1) * 5);
+        }
     }
 
     public function addToCart(Request $request, $id)
@@ -138,14 +142,14 @@ class CheckOutController extends Controller
     public function step1()
     {
         if (Session::get('serviceIds')) {
-            if(Auth::check()){
+            if (Auth::check()) {
                 $email = Auth::user()->email;
                 $name = Auth::user()->name;
-            }else{
+            } else {
                 $email = '';
                 $name = '';
             }
-            return view('site.checkOut.step1',compact('email','name'));
+            return view('site.checkOut.step1', compact('email', 'name'));
         } else {
             return redirect('/')->with('error', 'There is no Services in Your Cart.');
         }
@@ -207,7 +211,7 @@ class CheckOutController extends Controller
 
             $i = 0;
 
-            return view('site.checkOut.step3', compact('services', 'time_slot', 'address', 'staff','i','staff_and_time'));
+            return view('site.checkOut.step3', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time'));
         } elseif (Session::get('serviceIds') && Session::get('address')) {
 
             return redirect('step2')->with('error', 'There is no Time Slots Data Saved.');
@@ -258,14 +262,14 @@ class CheckOutController extends Controller
 
         $staff_group = StaffGroup::find($request->group);
         foreach (unserialize($staff_group->staff_ids) as $id) {
-            $staff_holiday = StaffHoliday::where('staff_id',$id)->where('date',$request->date)->get();
-            if(count($staff_holiday) == 0 ){
+            $staff_holiday = StaffHoliday::where('staff_id', $id)->where('date', $request->date)->get();
+            if (count($staff_holiday) == 0) {
                 if (in_array($id, unserialize($time_slot->available_staff))) {
                     $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
                         ->select('users.*', 'staff.image')
                         ->where('users.id', $id)->get();
                 }
-            }else{
+            } else {
                 $selected_staff = array();
             }
         }

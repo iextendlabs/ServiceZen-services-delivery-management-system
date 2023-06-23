@@ -1,6 +1,7 @@
 @extends('site.layout.app')
 <base href="/public">
 @section('content')
+<div class="container">
 <div class="row">
     <div class="col-md-12 py-5 text-center">
         <h2>Your Booked Service</h2>
@@ -9,7 +10,6 @@
 @php
 $total_amount = 0;
 @endphp
-<div class="container">
     <div class="text-center" style="margin-bottom: 20px;">
         @if(Session::has('error'))
         <span class="alert alert-danger" role="alert">

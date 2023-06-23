@@ -10,6 +10,9 @@
         <li>Your order has been successfully processed!</li>
         <li>We have send you email with your login credentials.</li>
         <li>Visit our website for your order detail and book more service</li>
+        @if($customer_type == "Old")
+        <li>You can view your order history by clicking on <a href="/order">Order History</a>.</li>
+        @endif
         <li>Please direct any questions you have to the store owner.</li>
         <li>Thanks for booking our service!</li>
         <div class="col-md-12 text-right">

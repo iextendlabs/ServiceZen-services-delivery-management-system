@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Hash;
 use App\Models\OrderTotal;
+use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 class OrderController extends Controller
@@ -118,7 +119,7 @@ class OrderController extends Controller
         Session::forget('staff_and_time');
         Session::forget('serviceIds');
         
-        return redirect('/orderSuccess');
+        return view('site.orders.success',compact('customer_type'));
     }
 
    
@@ -133,7 +134,18 @@ class OrderController extends Controller
    
     public function edit($id)
     {
-        //
+        $order = Order::find($id);
+        
+        $staffZoneNames = [$order->area, $order->city];
+
+        $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+            $query->where(function ($query) use ($staffZoneNames) {
+                foreach ($staffZoneNames as $staffZoneName) {
+                    $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                }
+            });
+        })->get();
+        return view('site.orders.edit',compact('order','timeSlots',));
     }
 
     
@@ -143,7 +155,7 @@ class OrderController extends Controller
 
         $order->update($request->all());
     
-        return redirect()->back()
+        return redirect()->route('order.index')
                         ->with('success','Order updated successfully');
     }
 

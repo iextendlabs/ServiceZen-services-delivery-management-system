@@ -1,13 +1,13 @@
 @extends('site.layout.app')
 <base href="/public">
 @section('content')
-<div class="row">
-    <div class="col-md-12 py-5 text-center">
-        <h2>Submit Cash</h2>
-    </div>
-</div>
 <div class="album bg-light">
     <div class="container">
+        <div class="row">
+            <div class="col-md-12 py-5 text-center">
+                <h2>Submit Cash</h2>
+            </div>
+        </div>
         @if ($errors->any())
         <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -46,7 +46,7 @@
                         <select name="appointment_id" class="form-control">
                             <option></option>
                             @foreach($appointments as $appointment)
-                                <option value="{{ $appointment->id }}">{{ $appointment->service->name }}</option>
+                            <option value="{{ $appointment->id }}">{{ $appointment->service->name }}</option>
                             @endforeach
                         </select>
                     </div>

@@ -188,4 +188,24 @@ class OrderController extends Controller
         // Return CSV file as download
         return Response::make('', 200, $headers);
     }
+
+    public function print()
+    {
+        
+        if(Auth::user()->hasRole('Supervisor')){
+            $supervisor = User::find(Auth::id());
+
+            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+
+            $orders = Order::whereIn('service_staff_id', $staffIds)->get(); 
+
+        }elseif(Auth::user()->hasRole('Staff')){
+            $orders = Order::where('service_staff_id',Auth::id())->get();
+            // dd($orders);
+        }else{
+            $orders = Order::orderBy('id','DESC')->get();
+        }
+
+        return view('orders.print',compact('orders'));
+    }
 }

@@ -20,30 +20,31 @@
 
 <base href="/public">
 @section('content')
-<div class="row">
-    <div class="col-md-12 py-5 text-center">
-        <h2>Summary</h2>
-    </div>
-</div>
-<div class="text-center" style="margin-bottom: 20px;">
-    @if(Session::has('error'))
-    <span class="alert alert-danger" role="alert">
-        <strong>{{ Session::get('error') }}</strong>
-    </span>
-    @endif
-    @if(Session::has('success'))
-    <span class="alert alert-success" role="alert">
-        <strong>{{ Session::get('success') }}</strong>
-    </span>
-    @endif
-</div>
-@php
-$sub_total = 0;
-$total_amount = 0;
-$staff_charges = 0;
-$transport_charges = 0;
-@endphp
+
 <div class="album bg-light">
+    <div class="row">
+        <div class="col-md-12 py-5 text-center">
+            <h2>Summary</h2>
+        </div>
+    </div>
+    <div class="text-center" style="margin-bottom: 20px;">
+        @if(Session::has('error'))
+        <span class="alert alert-danger" role="alert">
+            <strong>{{ Session::get('error') }}</strong>
+        </span>
+        @endif
+        @if(Session::has('success'))
+        <span class="alert alert-success" role="alert">
+            <strong>{{ Session::get('success') }}</strong>
+        </span>
+        @endif
+    </div>
+    @php
+    $sub_total = 0;
+    $total_amount = 0;
+    $staff_charges = 0;
+    $transport_charges = 0;
+    @endphp
     <div class="container">
         @if ($errors->any())
         <div class="alert alert-danger">
@@ -181,8 +182,17 @@ $transport_charges = 0;
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Comment:</strong>
+                                <textarea name="order_comment" class="form-control" cols="30" rows="5"></textarea>
+                            </div>
+                        </div>
                         <div class="col-md-12 text-center">
-                            <button type="submit" class="btn btn-primary">Confirm Order</button>
+                            <button type="submit" class="btn btn-primary">Confirm Order</button><br><br>
+                            <a href="/">
+                                <button type="button" class="btn btn-primary">Continue Shopping</button>
+                            </a>
                         </div>
                     </div>
                 </form>

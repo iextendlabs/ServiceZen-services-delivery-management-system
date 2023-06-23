@@ -64,7 +64,7 @@
                         @foreach ($orders as $order)
                         <tr>
                             <td>{{ $order->id }}</td>
-                            <td>{{ $order->customer->name }}</td>
+                            <td>@if($order->customer){{ $order->customer->name }}@endif</td>
                             <td>{{ $order->status }}</td>
                             <td>{{ $order->created_at }}</td>
                             <td>${{ $order->total_amount }}</td>

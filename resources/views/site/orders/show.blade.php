@@ -6,18 +6,18 @@
 </style>
 <base href="/public">
 @section('content')
-<div class="row">
-    <div class="col-md-12 py-5 text-center">
-        <h2>Order</h2>
-    </div>
-</div>
-@php
-$sub_total = 0;
-$staff_charges = 0;
-$total_amount = 0;
-$staff_transport_charges = 0;
-@endphp
 <div class="container">
+    <div class="row">
+        <div class="col-md-12 py-5 text-center">
+            <h2>Order</h2>
+        </div>
+    </div>
+    @php
+    $sub_total = 0;
+    $staff_charges = 0;
+    $total_amount = 0;
+    $staff_transport_charges = 0;
+    @endphp
     <div>
         @if ($errors->any())
         <div class="alert alert-danger">

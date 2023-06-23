@@ -8,6 +8,7 @@
             <div class="float-end">
             @can('order-download')
                 <a class="btn btn-primary float-end no-print" href="orderCSV"><i class="fa fa-download"></i>Export CSV</a>
+                <a class="btn btn-primary float-end no-print" target="_blank" href="orderPrint" style="margin-right: 10px;"><i class="fa fa-print"></i>Download PDF</a>    
             @endcan
             </div>
         </div>
@@ -21,13 +22,17 @@
     <hr>
     <div class="row">
         <div class="col-md-9">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-responsive">
                 <tr>
                     <th>No</th>
+                    <th>Order Id</th>
                     <th>Customer</th>
-                    <th width="90px">Total Amount</th>
+                    <th>Staff</th>
+                    <th>Data \ Time Slot</th>
+                    <th>Total Amount</th>
                     <th>Payment Method</th>
                     <th>Status</th>
+                    <th>Comment</th>
                     <th>Date Added</th>
                     <th>Action</th>
                 </tr>
@@ -35,10 +40,15 @@
                 @foreach ($orders as $order)
                 <tr>
                     <td>{{ ++$i }}</td>
-                    <td>{{ $order->customer->name }}</td>
+                    <td>#{{ $order->id }}</td>
+                    
+                    <td>@if($order->customer){{ $order->customer->name }}@endif</td>
+                    <td>@if($order->staff){{ $order->staff->user->name }}@endif</td>
+                    <td>{{ $order->date }} \ @if($order->time_slot)  {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif</td>
                     <td>{{ $order->total_amount }}</td>
                     <td>{{ $order->payment_method }}</td>
                     <td>{{ $order->status }}</td>
+                    <td>{{ $order->order_comment }}</td>
                     <td>{{ $order->created_at }}</td>
                     <td>
                         <form action="{{ route('orders.destroy',$order->id) }}" method="POST">
