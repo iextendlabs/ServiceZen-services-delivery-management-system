@@ -117,6 +117,7 @@
                             <th>Email</th>
                         </tr>
                         @foreach ($users as $user)
+                        @if($user->getRoleNames() == '["Customer"]')
                         <tr>
                             <td>
                                 @if(isset($userNote))
@@ -132,6 +133,7 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                         </tr>
+                        @endif
                         @endforeach
                     </table>
                 </div>

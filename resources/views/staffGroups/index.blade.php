@@ -23,7 +23,7 @@
                 <tr>
                     <th>No</th>
                     <th>Name</th>
-                    <!-- <th>Staff Zone</th> -->
+                    <th>Staffs</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($staffGroups))
@@ -31,7 +31,13 @@
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $staffGroup->name }}</td>
-                    <!-- <td>{{ $staffGroup->staffZone }}</td> -->
+                    <td>
+                        @foreach($users as $user)
+                        @if(in_array($user->id, unserialize($staffGroup->staff_ids))) 
+                            {{ $user->name }},
+                        @endif
+                        @endforeach
+                    </td>
                     <td>
                         <form action="{{ route('staffGroups.destroy',$staffGroup->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('staffGroups.show',$staffGroup->id) }}">Show</a>

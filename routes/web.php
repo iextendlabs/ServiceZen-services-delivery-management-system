@@ -72,7 +72,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
-    Route::post('orderFilter', [OrderController::class, 'filter']); 
+    Route::get('orderFilter', [OrderController::class, 'filter']); 
     Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
     Route::post('customerFilter', [CustomerController::class, 'filter']); 
     Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 

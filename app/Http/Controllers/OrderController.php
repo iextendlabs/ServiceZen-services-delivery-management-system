@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 class OrderController extends Controller
@@ -23,70 +24,71 @@ class OrderController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:order-list|order-download|order-edit|order-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:order-download', ['only' => ['downloadCSV','print']]);
-         $this->middleware('permission:order-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:order-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:order-list|order-download|order-edit|order-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:order-download', ['only' => ['downloadCSV', 'print']]);
+        $this->middleware('permission:order-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:order-delete', ['only' => ['destroy']]);
     }
-    
+
     public function index(Request $request)
     {
-        $statuses = ['Complete','Canceled','Denied','Pending','Processing'];
+        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $filter = [
-            'status'=>'',
-            'affiliate'=>'',
-            'customer'=>'',
-            'payment_method'=>'',
+            'status' => '',
+            'affiliate' => '',
+            'customer' => '',
+            'staff' => '',
+            'payment_method' => '',
+            'appointment_date' => '',
+            'created_at' => '',
         ];
 
-        if(Auth::user()->hasRole('Supervisor')){
+        if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
 
             $orders = Order::whereIn('service_staff_id', $staffIds)
-                ->paginate(10); 
-
-        }elseif(Auth::user()->hasRole('Staff')){
-            $orders = Order::where('service_staff_id',Auth::id())->paginate(10);
+                ->paginate(10);
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $orders = Order::where('service_staff_id', Auth::id())->paginate(10);
             // dd($orders);
-        }else{
-            $orders = Order::orderBy('id','DESC')->paginate(10);
+        } else {
+            $orders = Order::orderBy('id', 'DESC')->paginate(10);
         }
 
-        return view('orders.index',compact('orders','statuses','payment_methods','users','filter'))
+        return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))
             ->with('i', ($request->input('page', 1) - 1) * 10);
     }
 
-    
+
     public function create()
     {
         //
     }
 
-   
+
     public function store(Request $request)
     {
         //    
     }
 
-   
+
     public function show($id)
     {
         $order = Order::find($id);
-        $statuses = ['Complete','Canceled','Denied','Pending','Processing'];
-        return view('orders.show',compact('order','statuses'));
-
+        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
+        return view('orders.show', compact('order', 'statuses'));
     }
 
-   
+
     public function edit($id)
     {
         $order = Order::find($id);
-        
-        $statuses = ['Complete','Canceled','Denied','Pending','Processing'];
+
+        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
 
         $staffZoneNames = [$order->area, $order->city];
 
@@ -97,66 +99,111 @@ class OrderController extends Controller
                 }
             });
         })->get();
-        return view('orders.edit',compact('order','timeSlots','statuses'));
+        return view('orders.edit', compact('order', 'timeSlots', 'statuses'));
     }
-    
+
     public function update(Request $request, $id)
     {
         $order = Order::find($id);
 
         $order->update($request->all());
-    
+
         return redirect()->route('orders.index')
-                        ->with('success','Order updated successfully');
+            ->with('success', 'Order updated successfully');
     }
 
-    
+
     public function destroy($id)
     {
         $order = Order::find($id);
         $order->delete();
-        ServiceAppointment::where('order_id',$id)->delete();
-        OrderTotal::where('order_id',$id)->delete();
+        ServiceAppointment::where('order_id', $id)->delete();
+        OrderTotal::where('order_id', $id)->delete();
 
         return redirect()->route('orders.index')
-                        ->with('success','Order deleted successfully');
+            ->with('success', 'Order deleted successfully');
     }
 
     public function filter(Request $request)
     {
-        $statuses = ['Complete','Canceled','Denied','Pending','Processing'];
+        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $filter = [
-            'status'=>$request->status,
-            'affiliate'=>$request->affiliate_id,
-            'customer'=>$request->customer_id,
-            'payment_method'=>$request->payment_method,
+            'status' => $request->status,
+            'affiliate' => $request->affiliate_id,
+            'customer' => $request->customer_id,
+            'staff' => $request->staff_id,
+            'payment_method' => $request->payment_method,
+            'appointment_date' => $request->appointment_date,
+            'created_at' => $request->created_at,
         ];
-        
-        $orders = Order::where('status','like',$request->status.'%')->where('affiliate_id','like',$request->affiliate_id.'%')->where('customer_id','like',$request->customer_id.'%')->where('payment_method','like',$request->payment_method.'%')->paginate(100);
 
-        return view('orders.index',compact('orders','statuses','payment_methods','users','filter'))
+        if (Auth::user()->hasRole('Supervisor')) {
+            $supervisor = User::find(Auth::id());
+
+            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+
+            $query = Order::whereIn('service_staff_id', $staffIds);
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $query = Order::where('service_staff_id', Auth::id());
+        } else {
+            $query = Order::orderBy('id', 'DESC');
+        }
+
+        // $query = Order::query();
+
+        if ($request->status) {
+            $query->where('status', 'like', $request->status . '%');
+        }
+
+        if ($request->affiliate_id) {
+            $query->where('affiliate_id', 'like', $request->affiliate_id . '%');
+        }
+
+        if ($request->customer_id) {
+            $query->where('customer_id', 'like', $request->customer_id . '%');
+        }
+
+        if ($request->staff_id) {
+            $query->where('service_staff_id', 'like', $request->staff_id . '%');
+        }
+
+        if ($request->payment_method) {
+            $query->where('payment_method', 'like', $request->payment_method . '%');
+        }
+
+        if ($request->appointment_date) {
+            $query->where('date', $request->appointment_date);
+        }
+
+        if ($request->created_at) {
+            $query->where('created_at', 'like', $request->created_at . '%');
+        }
+
+        $orders = $query->paginate(100);
+        // $orders = Order::where('status','like',$request->status.'%')->where('customer_id','like',$request->customer_id.'%')->where('payment_method','like',$request->payment_method.'%')->where('service_staff_id','like',$request->staff_id.'%')->where('affiliate_id','like',$request->affiliate_id.'%')->paginate(100);
+        // dd($orders);
+        return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     public function downloadCSV(Request $request)
     {
-        if(Auth::user()->hasRole('Supervisor')){
+        if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
 
             $data = Order::whereIn('service_staff_id', $staffIds)
-                ->get(); 
-
-        }elseif(Auth::user()->hasRole('Staff')){
-            $data = Order::where('service_staff_id',Auth::id())->get();
+                ->get();
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $data = Order::where('service_staff_id', Auth::id())->get();
             // dd($data);
-        }else{
-            $data = Order::orderBy('id','DESC')->get();
+        } else {
+            $data = Order::orderBy('id', 'DESC')->get();
         }
-        
+
         // Define headers for CSV file
         $headers = array(
             "Content-type" => "text/csv",
@@ -165,47 +212,46 @@ class OrderController extends Controller
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
             "Expires" => "0"
         );
-        
+
         // Define output stream for CSV file
         $output = fopen("php://output", "w");
-        
+
         // Write headers to output stream
-        fputcsv($output, array('Order ID','Amount','Status','Order Added Date','Customer','Staff','Appointment Date','Time','Services'));
-        
+        fputcsv($output, array('Order ID', 'Amount', 'Status', 'Order Added Date', 'Customer', 'Staff', 'Appointment Date', 'Time', 'Services'));
+
         // Loop through data and write to output stream
         foreach ($data as $row) {
-            $appointments= array();
-            foreach($row->serviceAppointments as $appointment){
+            $appointments = array();
+            foreach ($row->serviceAppointments as $appointment) {
                 $appointments[] = $appointment->service->name;
             }
 
-            fputcsv($output, array($row->id, '$'.$row->total_amount, $row->status, $row->created_at, $row->customer->name,$row->staff->user->name,$row->date,date('h:i A', strtotime($row->time_slot->time_start)). "--" .date('h:i A', strtotime($row->time_slot->time_end)),implode(",", $appointments)));
+            fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer->name, $row->staff->user->name, $row->date, date('h:i A', strtotime($row->time_slot->time_start)) . "--" . date('h:i A', strtotime($row->time_slot->time_end)), implode(",", $appointments)));
         }
-        
+
         // Close output stream
         fclose($output);
-        
+
         // Return CSV file as download
         return Response::make('', 200, $headers);
     }
 
     public function print()
     {
-        
-        if(Auth::user()->hasRole('Supervisor')){
+
+        if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
 
-            $orders = Order::whereIn('service_staff_id', $staffIds)->get(); 
-
-        }elseif(Auth::user()->hasRole('Staff')){
-            $orders = Order::where('service_staff_id',Auth::id())->get();
+            $orders = Order::whereIn('service_staff_id', $staffIds)->get();
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $orders = Order::where('service_staff_id', Auth::id())->get();
             // dd($orders);
-        }else{
-            $orders = Order::orderBy('id','DESC')->get();
+        } else {
+            $orders = Order::orderBy('id', 'DESC')->get();
         }
 
-        return view('orders.print',compact('orders'));
+        return view('orders.print', compact('orders'));
     }
 }

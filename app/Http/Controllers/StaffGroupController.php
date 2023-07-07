@@ -30,8 +30,9 @@ class StaffGroupController extends Controller
      */
     public function index(Request $request)
     {
+        $users = USer::all();
         $staffGroups = StaffGroup::latest()->paginate(10);
-        return view('staffGroups.index',compact('staffGroups'))
+        return view('staffGroups.index',compact('staffGroups','users'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
     

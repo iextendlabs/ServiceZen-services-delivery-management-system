@@ -40,6 +40,7 @@
                         <th>Data \ Time Slot</th>
                         <th>Total Amount</th>
                         <th>Payment Method</th>
+                        <th>City</th>
                         <th>Status</th>
                         <th>Comment</th>
                         <th>Date Added</th>
@@ -53,6 +54,7 @@
                         <td>{{ $order->date }} \ @if($order->time_slot) {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif</td>
                         <td>{{ $order->total_amount }}</td>
                         <td>{{ $order->payment_method }}</td>
+                        <td>{{ $order->city }}</td>
                         <td>{{ $order->status }}</td>
                         <td>{{ $order->order_comment }}</td>
                         <td>{{ $order->created_at }}</td>

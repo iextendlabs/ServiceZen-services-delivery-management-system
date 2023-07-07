@@ -47,9 +47,20 @@
     </div>
     <div class="py-2"></div>
     <div class="row">
+        <div class="col-md-12 margin-tb">
+            <div class="float-start">
+                <h2>Orders</h2>
+            </div>
+            <div class="float-end">
+                <a class="btn btn-primary float-end" href="/orderFilter?status=Pending">Pending Order</a>
+                <a class="btn btn-success float-end" href="/orderFilter?status=Complete" style="margin-right: 10px;">Complete Order</a>
+                <a class="btn btn-danger float-end" href="/orderFilter?status=Canceled" style="margin-right: 10px;">Canceled Order</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">Orders</div>
                 <div class="card-body">
                     <table class="table">
                         <tr>
