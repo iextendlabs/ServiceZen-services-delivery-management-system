@@ -51,7 +51,7 @@
                     <b>Order Status:</b> {{ $order->status }}
                 </td>
                 <td>
-                    <b>Total Amount:</b> ${{ $order->total_amount }} <br><br>
+                    <b>Total Amount:</b> @currency( $order->total_amount ) <br><br>
                     <b>Payment Method:</b> {{ $order->payment_method }}
                 </td>
             </tr>
@@ -117,28 +117,28 @@
                 <td>{{ $appointment->service->name }}</td>
                 <td>{{ $appointment->status }}</td>
                 <td>{{ $appointment->service->duration }}</td>
-                <td class="text-right">${{ $appointment->price }}</td>
+                <td class="text-right">@currency( $appointment->price )</td>
             </tr>
             @endforeach
             <tr>
                 <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
-                <td class="text-right">${{ $order->order_total->sub_total }}</td>
+                <td class="text-right">@currency( $order->order_total->sub_total )</td>
             </tr>
             @if($order->order_total->transport_charges != 0)
             <tr>
                 <td colspan="3" class="text-right"><strong>Staff Transport Charges:</strong></td>
-                <td class="text-right">${{ $order->order_total->transport_charges }}</td>
+                <td class="text-right">@currency( $order->order_total->transport_charges )</td>
             </tr>
             @endif
             @if($order->order_total->staff_charges != 0)
             <tr>
                 <td colspan="3" class="text-right"><strong>Staff Charges:</strong></td>
-                <td class="text-right">${{ $order->order_total->staff_charges }}</td>
+                <td class="text-right">@currency( $order->order_total->staff_charges )</td>
             </tr>
             @endif
             <tr>
                 <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                <td class="text-right">${{ $order->total_amount }}</td>
+                <td class="text-right">@currency( $order->total_amount )</td>
             </tr>
         </table>
         @guest

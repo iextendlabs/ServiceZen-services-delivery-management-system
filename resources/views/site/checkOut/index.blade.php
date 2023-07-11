@@ -40,9 +40,9 @@ $total_amount = 0;
             <td><img src="service-images/{{ $booked_service->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"></td>
             <td>{{ $booked_service->name }}</td>
             @if(isset($booked_service->discount))
-            <td>${{ $booked_service->discount }}</td>
+            <td>@currency( $booked_service->discount)</td>
             @else
-            <td>${{ $booked_service->price }}</td>
+            <td>@currency( $booked_service->price)</td>
             @endif
             <td>{{ $booked_service->duration }}</td>
             <td>
@@ -72,7 +72,7 @@ $total_amount = 0;
                     </tr>
                     <tr>
                         <td class="text-right"><strong>Total:</strong></td>
-                        <td class="text-right">${{$total_amount}}</td>
+                        <td class="text-right">@currency($total_amount)</td>
                     </tr>
                 </tbody>
             </table>

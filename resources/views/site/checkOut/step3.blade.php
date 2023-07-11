@@ -77,9 +77,9 @@
                             <td>{{ $service->name }}</td>
                             <td>{{ $service->duration }}</td>
                             @if(isset($service->discount))
-                            <td>${{ $service->discount }}</td>
+                            <td>@currency( $service->discount )</td>
                             @else
-                            <td>${{ $service->price }}</td>
+                            <td>@currency( $service->price )</td>
                             @endif
                         </tr>
                         @if(isset($service->discount))
@@ -132,7 +132,7 @@
                 <table class="table">
                     <tr>
                         <td class="text-right"><strong> Service Total:</strong></td>
-                        <td>${{$sub_total}}</td>
+                        <td>@currency($sub_total)</td>
                         @php
                         $total_amount = $sub_total +$total_amount;
                         @endphp
@@ -140,7 +140,7 @@
                     @if($staff->staff->charges)
                     <tr>
                         <td class="text-right"><strong>Staff Charges:</strong></td>
-                        <td>${{$staff->staff->charges}}</td>
+                        <td>@currency($staff->staff->charges)</td>
                         @php
                         $staff_charges = $staff->staff->charges;
                         $total_amount = $staff_charges +$total_amount;
@@ -150,7 +150,7 @@
                     @if($time_slot->staffGroup->staffZone->transport_charges)
                     <tr>
                         <td class="text-right"><strong>Transport Charges:</strong></td>
-                        <td>${{$time_slot->staffGroup->staffZone->transport_charges}}</td>
+                        <td>@currency($time_slot->staffGroup->staffZone->transport_charges)</td>
                         @php
                         $transport_charges = $time_slot->staffGroup->staffZone->transport_charges;
                         $total_amount = $transport_charges +$total_amount;
@@ -159,7 +159,7 @@
                     @endif
                     <tr>
                         <td class="text-right"><strong>Total:</strong></td>
-                        <td>${{$total_amount}}</td>
+                        <td>@currency($total_amount)</td>
                     </tr>
                 </table>
             </div>

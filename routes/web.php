@@ -124,3 +124,6 @@ Route::get('step3', [CheckOutController::class, 'step3']);
 Route::get('slots', [CheckOutController::class,'slots']);
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::get('staffOrderCSV', 'App\Http\Controllers\Site\OrderController@downloadCSV');
+Route::get('/test',function(){
+    dd(formatCurrency(100));
+});

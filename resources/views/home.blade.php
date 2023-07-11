@@ -22,7 +22,7 @@
                 <div class="card-header">TOTAL SALES</div>
                 <div class="card-body analytic">
                     <i class="fa fa-credit-card"></i>
-                    <span class="float-end">${{ $sale }}</span>
+                    <span class="float-end">@currency($sale)</span>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 <div class="card-header">TOTAL AFFILIATE COMMISSION</div>
                 <div class="card-body analytic">
                     <i class="fa fa-dollar-sign"></i>
-                    <span class="float-end">${{ $affiliate_commission }}</span>
+                    <span class="float-end">@currency($affiliate_commission)</span>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                 <div class="card-header">TOTAL STAFF COMMISSION</div>
                 <div class="card-body analytic">
                     <i class="fa fa-dollar-sign"></i>
-                    <span class="float-end">${{ $staff_commission }}</span>
+                    <span class="float-end">@currency($staff_commission)</span>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
                             <td>@if($order->customer){{ $order->customer->name }}@endif</td>
                             <td>{{ $order->status }}</td>
                             <td>{{ $order->created_at }}</td>
-                            <td>${{ $order->total_amount }}</td>
+                            <td>@currency($order->total_amount)</td>
                             <td>
                                 <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">View</a>
                             </td>

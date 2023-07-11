@@ -31,7 +31,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $cash_collection->name }}</td>
                     <td>{{ $cash_collection->description }}</td>
-                    <td>${{ $cash_collection->amount }}</td>
+                    <td>@currency($cash_collection->amount)</td>
                     <td>{{ $cash_collection->status }}</td>
                     <td>{{ $cash_collection->appointment->service->name }}</td>
                     <td>{{ $cash_collection->staff->name }}</td>
@@ -52,7 +52,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="8" class="text-center">There is no staff zone.</td>
+                    <td colspan="8" class="text-center">There is no Cash Collection.</td>
                 </tr>
                 @endif  
             </table>

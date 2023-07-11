@@ -45,7 +45,7 @@
                     <td>@if($order->customer){{ $order->customer->name }}@endif</td>
                     <td>@if($order->staff){{ $order->staff->user->name }}@endif</td>
                     <td>{{ $order->date }} \ @if($order->time_slot) {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif</td>
-                    <td>{{ $order->total_amount }}</td>
+                    <td>@currency($order->total_amount)</td>
                     <td>{{ $order->payment_method }}</td>
                     <td>{{ $order->status }}</td>
                     <td>{{ $order->order_comment }}</td>

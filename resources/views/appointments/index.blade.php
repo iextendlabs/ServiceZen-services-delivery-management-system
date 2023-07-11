@@ -42,7 +42,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $appointment->service->name }}</td>
                     <td>{{ $appointment->service->duration }}</td>
-                    <td>${{ $appointment->price }}</td>
+                    <td>@currency($appointment->price)</td>
                     <td>{{ $appointment->status }}</td>
                     <td>
                         <form action="{{ route('appointments.destroy',$appointment->id) }}" method="POST">

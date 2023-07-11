@@ -36,7 +36,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Additional Charges:</strong>
-                ${{ $serviceStaff->staff->charges }}
+                @currency($serviceStaff->staff->charges)
             </div>
         </div>
         @endif

@@ -51,3 +51,19 @@ hr {
   margin-top: 0px !important;
   margin-bottom: 10px !important;
 }
+
+.service-box button{
+  margin-top: 1em;
+}
+
+.discount,.service-box i {
+  color: #007bff;
+}
+
+.service-box .card {
+  padding: 1em !important;
+}
+
+.service-social-icon{
+  margin-top: 1em;
+}

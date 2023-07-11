@@ -31,7 +31,7 @@
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $service->name }}</td>
-                    <td>{{ $service->price }}</td>
+                    <td>@currency( $service->price )</td>
                     <td>
                         <form action="{{ route('services.destroy',$service->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('services.show',$service->id) }}">Show</a>

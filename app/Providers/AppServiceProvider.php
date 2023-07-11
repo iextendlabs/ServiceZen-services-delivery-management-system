@@ -6,6 +6,7 @@ use App\Models\ServiceCategory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +29,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
         Paginator::useBootstrapFour();
+
+        Blade::directive('currency', function ($expression) {
+            return "<?php echo formatCurrency($expression); ?>";
+        });
     }
 }

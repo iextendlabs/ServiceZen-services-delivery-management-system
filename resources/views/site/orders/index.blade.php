@@ -36,7 +36,7 @@
             <tr>
                 <td>{{ ++$i }}</td>
                 <td>{{ $order->customer->name }}</td>
-                <td>{{ $order->total_amount }}</td>
+                <td>@currency( $order->total_amount )</td>
                 <td>{{ $order->payment_method }}</td>
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>

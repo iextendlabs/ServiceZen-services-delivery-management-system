@@ -26,29 +26,38 @@
 </div>
 <div class="album py-5 bg-light">
   <div class="container">
-    <!-- AddToAny BEGIN -->
-    <div class="a2a_kit a2a_kit_size_32 a2a_default_style" style="margin-bottom: 20px;">
-      <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
-      <a class="a2a_button_facebook"></a>
-      <a class="a2a_button_twitter"></a>
-      <a class="a2a_button_whatsapp"></a>
-      <a class="a2a_button_telegram"></a>
-    </div>
-    <script async src="https://static.addtoany.com/menu/page.js"></script>
-    <!-- AddToAny END -->
+
+    <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
+
     <div class="row">
+
       <div class="col-md-8">
         <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
       </div>
       <div class="col-md-4 box-shadow">
-        <h4 class="card-text"><b>{{ $service->name }}</b></h4>
         <div class="card-body">
-          <p class="card-text">{!! $service->description !!}</p>
-          <p class="card-text"><b>Duration:</b>{{ $service->duration }}</p>
-          <p class="card-text"><b>Price:</b>${{ $service->price }}</p>
-          <div class="btn-group">
-            <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-sm btn-outline-secondary">Add to Cart</button></a>
+          <p class="text-muted">
+            @if(isset($service->discount))<s>@endif
+              @currency($service->price)
+              @if(isset($service->discount))</s>@endif
+            @if(isset($service->discount))
+            <b class="discount"> @currency( $service->discount )</b>
+            @endif
+          </p>
+
+          <p class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></p>
+          <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary">Add to Cart</button></a>
+          <!-- AddToAny BEGIN -->
+          <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
+            <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+            <a class="a2a_button_facebook"></a>
+            <a class="a2a_button_twitter"></a>
+            <a class="a2a_button_whatsapp"></a>
+            <a class="a2a_button_telegram"></a>
           </div>
+          <script async src="https://static.addtoany.com/menu/page.js"></script>
+          <!-- AddToAny END -->
+          <p class="card-text">{!! $service->description !!}</p>
         </div>
       </div>
     </div>
@@ -65,7 +74,7 @@
             <p class="card-text">{{ $package->service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted"><b>Duration:{{ $package->service->duration }}</b></small>
-              <small class="text-muted"><b>Price:${{ $package->service->price }}</b></small>
+              <small class="text-muted"><b>Price:@currency( $package->service->price )</b></small>
             </div>
           </div>
         </div>

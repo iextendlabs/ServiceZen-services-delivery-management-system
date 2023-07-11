@@ -45,28 +45,29 @@
     </div>
     <div class="row">
       @foreach ($services as $service)
-      <div class="col-md-4">
+      <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
-          <p class="card-text"><b>{{ $service->name }}</b></p>
+          <p class="card-text text-center"><b>{{ $service->name }}</b></p>
           <a href="/serviceDetail/{{ $service->id }}">
             <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
           </a>
           <div class="card-body">
-            <p class="card-text">{{ $service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted"><b>
+              <small class="text-muted">
                   @if(isset($service->discount))<s>@endif
-                    Price: ${{ $service->price }}</b>
+                    @currency($service->price)
                 @if(isset($service->discount))</s>@endif
+                @if(isset($service->discount))
+                <b class="discount"> @currency( $service->discount )</b>
+              @endif
               </small>
-              <small class="text-muted"><b>Duration:{{ $service->duration }}</b></small>
-              <div class="btn-group">
-                <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-sm btn-outline-secondary"> Add to Cart</button></a>
-              </div>
+
+              <small class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></small>
             </div>
-            @if(isset($service->discount))
-            <small class="text-muted float-end"><b>Discount Price: ${{ $service->discount }}</b></small>
-            @endif
+            
+            <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Add to Cart</button></a>
+
+            
           </div>
         </div>
       </div>

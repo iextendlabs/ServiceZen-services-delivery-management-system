@@ -28,7 +28,7 @@
         $total_balance += $transaction->amount;
         @endphp
         @endforeach
-        <p>Your current balance is: <b>${{ $total_balance }}</b></p>
+        <p>Your current balance is: <b>@currency( $total_balance )</b></p>
         <table class="table table-bordered album bg-light">
             <tr>
                 <th>No</th>
@@ -41,7 +41,7 @@
                 <td>{{ ++$i }}</td>
                 <td>{{ $transaction->created_at }}</td>
                 <td>Order ID: #{{ $transaction->id }}</td>
-                <td>${{ $transaction->amount }}</td>
+                <td>@currency( $transaction->amount )</td>
 
             </tr>
             @endforeach

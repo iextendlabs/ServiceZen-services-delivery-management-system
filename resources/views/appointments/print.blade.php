@@ -59,7 +59,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $appointment->service->name }}</td>
                     <td>{{ $appointment->service->duration }}</td>
-                    <td>${{ $appointment->price }}</td>
+                    <td>@currency($appointment->price)</td>
                     <td>{{ $appointment->status }}</td>
                     <td>{{ $appointment->date }}</td>
                     <td>{{ date('h:i A', strtotime($appointment->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($appointment->time_slot->time_end)) }}</td>

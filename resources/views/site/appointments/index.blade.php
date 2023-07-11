@@ -39,7 +39,7 @@
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $booked_service->service->name }}</td>
-                    <td>${{ $booked_service->price }}</td>
+                    <td>@currency( $booked_service->price )</td>
                     <td>{{ $booked_service->status }}</td>
                     <td>{{ $booked_service->date }}</td>
                     <td>{{ date('h:i A', strtotime($booked_service->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($booked_service->time_slot->time_end)) }}</td>
