@@ -55,7 +55,7 @@
                         @if($staff->getRoleNames() == '["Staff"]')
                         <tr>
                             <td>
-                                @if(in_array($staff->id,unserialize($staffGroup->staff_ids)))
+                                @if(in_array($staff->id,$staff_ids))
                                 <input type="checkbox" checked name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
                                 @else
                                 <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">

@@ -32,10 +32,8 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $staffGroup->name }}</td>
                     <td>
-                        @foreach($users as $user)
-                        @if(in_array($user->id, unserialize($staffGroup->staff_ids))) 
-                            {{ $user->name }},
-                        @endif
+                        @foreach($staffGroup->staffs as $staff)
+                            {{ $staff->name }},
                         @endforeach
                     </td>
                     <td>

@@ -123,7 +123,7 @@
                     var i = 1;
 
                     staffs.forEach(function(staff) {
-                        var html = '<tr><td><input type="checkbox" checked name="ids[' + i + ']" value="' + staff[0].id + '"></td><td>' + staff[0].name + '</td><td>' + staff[0].email + '</td></tr>';
+                        var html = '<tr><td><input type="checkbox" checked name="ids[' + i + ']" value="' + staff.id + '"></td><td>' + staff.name + '</td><td>' + staff.email + '</td></tr>';
                         staffContainer.append(html);
                         i++;
                     });

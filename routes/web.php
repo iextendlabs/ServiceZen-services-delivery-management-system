@@ -72,7 +72,6 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
-    Route::get('orderFilter', [OrderController::class, 'filter']); 
     Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
     Route::post('customerFilter', [CustomerController::class, 'filter']); 
     Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 
@@ -80,7 +79,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('managerFilter', [ManagerController::class, 'filter']); 
     Route::post('supervisorFilter', [SupervisorController::class, 'filter']);
     Route::post('assistantSupervisorFilter', [AssistantSupervisorController::class, 'filter']);
-    Route::get('orderPrint', [OrderController::class,'print']);
      
     Route::get('serviceFilterCategory', [ServiceController::class, 'filter']); 
 

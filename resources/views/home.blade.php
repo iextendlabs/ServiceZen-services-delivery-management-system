@@ -52,9 +52,9 @@
                 <h2>Orders</h2>
             </div>
             <div class="float-end">
-                <a class="btn btn-primary float-end" href="/orderFilter?status=Pending">Pending Order</a>
-                <a class="btn btn-success float-end" href="/orderFilter?status=Complete" style="margin-right: 10px;">Complete Order</a>
-                <a class="btn btn-danger float-end" href="/orderFilter?status=Canceled" style="margin-right: 10px;">Canceled Order</a>
+                <a class="btn btn-primary float-end" href="/orders?status=Pending">Pending Order</a>
+                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">Complete Order</a>
+                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">Canceled Order</a>
             </div>
         </div>
     </div>

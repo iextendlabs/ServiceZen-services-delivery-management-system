@@ -1,16 +1,17 @@
 <?php
-    
+
 namespace App\Http\Controllers;
 
 use App\Models\Staff;
 use App\Models\StaffGroup;
+use App\Models\StaffGroupToStaff;
 use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class StaffGroupController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -18,10 +19,10 @@ class StaffGroupController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:staff-group-list|staff-group-create|staff-group-edit|staff-group-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:staff-group-create', ['only' => ['create','store']]);
-         $this->middleware('permission:staff-group-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:staff-group-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:staff-group-list|staff-group-create|staff-group-edit|staff-group-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:staff-group-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:staff-group-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:staff-group-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -30,12 +31,11 @@ class StaffGroupController extends Controller
      */
     public function index(Request $request)
     {
-        $users = USer::all();
         $staffGroups = StaffGroup::latest()->paginate(10);
-        return view('staffGroups.index',compact('staffGroups','users'))
+        return view('staffGroups.index', compact('staffGroups'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -46,9 +46,9 @@ class StaffGroupController extends Controller
         $i = 0;
         $staffs = User::all();
         $staff_zones = StaffZone::all();
-        return view('staffGroups.create', compact('staffs','i','staff_zones'));
+        return view('staffGroups.create', compact('staffs', 'i', 'staff_zones'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -63,26 +63,23 @@ class StaffGroupController extends Controller
             'staff_zone_id' => 'required',
         ]);
 
-        if ($request->id) {
-            $staffGroup = StaffGroup::find($request->id);
-            
-            $input = $request->all();
-            
-            $input['staff_ids'] = serialize($request->ids);
-            
-            $staffGroup->update($input);
-        } else {
-            $input = $request->all();
-            
-            $input['staff_ids'] = serialize($request->ids);
 
-            $staffGroup = StaffGroup::create($input);
+        $input = $request->all();
+
+        $staffGroup = StaffGroup::create($input);
+
+        $input['staff_group_id'] = $staffGroup->id;
+
+        foreach ($request->ids as $id) {
+            $input['staff_id'] = $id;
+
+            StaffGroupToStaff::create($input);
         }
 
         return redirect()->route('staffGroups.index')
-                        ->with('success','Staff Group created successfully.');
+            ->with('success', 'Staff Group created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -91,10 +88,9 @@ class StaffGroupController extends Controller
      */
     public function show(StaffGroup $staffGroup)
     {
-        $users = User::all();
-        return view('staffGroups.show',compact('staffGroup','users'));
+        return view('staffGroups.show', compact('staffGroup'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -106,9 +102,10 @@ class StaffGroupController extends Controller
         $i = 0;
         $staff_zones = StaffZone::all();
         $staffs = User::all();
-        return view('staffGroups.edit', compact('staffGroup','staffs','i','staff_zones'));
+        $staff_ids = StaffGroupToStaff::where('staff_group_id',$staffGroup->id)->pluck('staff_id')->toArray();
+        return view('staffGroups.edit', compact('staffGroup', 'staffs', 'i', 'staff_zones','staff_ids'));
     }
-    
+
     public function update(Request $request, $id)
     {
         request()->validate([
@@ -118,17 +115,26 @@ class StaffGroupController extends Controller
         ]);
 
         $staffGroup = StaffGroup::find($id);
-            
+
         $input = $request->all();
-            
+
         $input['staff_ids'] = serialize($request->ids);
-            
+
         $staffGroup->update($input);
 
+        $input['staff_group_id'] = $id;
+
+        StaffGroupToStaff::where('staff_group_id', $id)->delete();
+
+        foreach ($request->ids as $staff_id) {
+            $input['staff_id'] = $staff_id;
+            StaffGroupToStaff::create($input);
+        }
+        
         return redirect()->route('staffGroups.index')
-                        ->with('success','Staff Group update successfully.');
+            ->with('success', 'Staff Group update successfully.');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -137,10 +143,10 @@ class StaffGroupController extends Controller
      */
     public function destroy(StaffGroup $staffGroup)
     {
-        
+
         $staffGroup->delete();
-    
+
         return redirect()->route('staffGroups.index')
-                        ->with('success','Staff Group deleted successfully');
+            ->with('success', 'Staff Group deleted successfully');
     }
 }

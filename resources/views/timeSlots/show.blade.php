@@ -62,13 +62,11 @@
                         <th>Phone</th>
                     </tr>
                     @foreach($staffs as $staff)
-                    @if(in_array($staff->id, unserialize($time_slot->available_staff))) 
                     <tr>
                         <td>{{ $staff->id }}</td>
                         <td>{{ $staff->name }}</td>
                         <td>{{ $staff->staff->phone}}</td>
                     </tr>
-                    @endif
                     @endforeach
                 </table>
             </div>

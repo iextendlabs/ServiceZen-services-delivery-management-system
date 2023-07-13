@@ -7,9 +7,12 @@
             </div>
             <div class="float-end">
                 @can('order-download')
-                <a class="btn btn-success float-end no-print" href="orderCSV"><i class="fa fa-download"></i> Export XSL</a>
-                <a class="btn btn-danger float-end no-print" target="_blank" href="orderPrint" style="margin-right: 10px;"><i class="fa fa-print"></i> Download PDF</a>
+                <button type="button" class="btn btn-success float-end no-print" id="csvButton"><i class="fa fa-download"></i> Excel</button>
+                <button type="button" class="btn btn-danger float-end no-print" id="printButton" style="margin-right: 10px;"><i class="fa fa-print"></i> PDF</button>
                 @endcan
+                <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">Pending Order</a>
+                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">Complete Order</a>
+                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">Canceled Order</a>
             </div>
         </div>
     </div>
@@ -71,13 +74,13 @@
                 </tr>
                 @endif
             </table>
-            {!! $orders->links() !!}
+            {!! $orders->appends($existingParameters)->links() !!}
         </div>
         <div class="col-md-3">
             <h3>Filter</h3>
             <hr>
-            <form action="orderFilter" method="GET" enctype="multipart/form-data">
-                
+            <form action="{{ route('orders.index') }}" method="GET" enctype="multipart/form-data">
+
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -179,5 +182,82 @@
             </form>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            // Function to add or update a URL parameter
+            function updateUrlParameter(url, key, value) {
+                var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+                var separator = url.indexOf('?') !== -1 ? "&" : "?";
+
+                if (url.match(re)) {
+                    return url.replace(re, '$1' + key + "=" + value + '$2');
+                } else {
+                    return url + separator + key + "=" + value;
+                }
+            }
+
+            // Function to get the current URL parameters
+            function getUrlParameters(url) {
+                var params = {};
+                var parser = document.createElement('a');
+                parser.href = url;
+                var query = parser.search.substring(1);
+                var vars = query.split('&');
+
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split('=');
+                    params[pair[0]] = decodeURIComponent(pair[1]);
+                }
+
+                return params;
+            }
+
+            // Function to update the URL and redirect to the modified URL
+            function redirectToPrint() {
+                var currentUrl = window.location.href;
+
+                var params = getUrlParameters(currentUrl);
+
+                params.print = 1; // Add or update the "print" parameter
+
+                var modifiedUrl = updateUrlParameter(currentUrl, 'print', 1);
+                for (var key in params) {
+                    if (key !== 'print') {
+                        modifiedUrl = updateUrlParameter(modifiedUrl, key, params[key]);
+                    }
+                }
+
+                window.location.href = modifiedUrl;
+            }
+
+            // Function to update the URL and redirect to the modified URL
+            function redirectToCSV() {
+                var currentUrl = window.location.href;
+
+                var params = getUrlParameters(currentUrl);
+
+                params.csv = 1; // Add or update the "csv" parameter
+
+                var modifiedUrl = updateUrlParameter(currentUrl, 'csv', 1);
+                for (var key in params) {
+                    if (key !== 'csv') {
+                        modifiedUrl = updateUrlParameter(modifiedUrl, key, params[key]);
+                    }
+                }
+
+                window.location.href = modifiedUrl;
+            }
+
+            $('#printButton').click(function(e) {
+                e.preventDefault();
+                redirectToPrint();
+            });
+
+            $('#csvButton').click(function(e) {
+                e.preventDefault();
+                redirectToCSV();
+            });
+        });
+    </script>
 
     @endsection

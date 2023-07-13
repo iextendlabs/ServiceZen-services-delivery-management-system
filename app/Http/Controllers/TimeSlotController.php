@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Holiday;
 use App\Models\Order;
 use App\Models\StaffGroup;
+use App\Models\StaffGroupToStaff;
 use App\Models\TimeSlot;
+use App\Models\TimeSlotToStaff;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -20,10 +22,10 @@ class TimeSlotController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:time-slot-list|time-slot-create|time-slot-edit|time-slot-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:time-slot-create', ['only' => ['create','store']]);
-         $this->middleware('permission:time-slot-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:time-slot-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:time-slot-list|time-slot-create|time-slot-edit|time-slot-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:time-slot-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:time-slot-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:time-slot-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -33,10 +35,10 @@ class TimeSlotController extends Controller
     public function index()
     {
         $time_slots = TimeSlot::latest()->paginate(10);
-        return view('timeSlots.index',compact('time_slots'))
+        return view('timeSlots.index', compact('time_slots'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -44,10 +46,10 @@ class TimeSlotController extends Controller
      */
     public function create()
     {
-        $staff_groups =StaffGroup::all();
+        $staff_groups = StaffGroup::all();
         return view('timeSlots.create', compact('staff_groups'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -67,17 +69,25 @@ class TimeSlotController extends Controller
         ]);
 
         $input = $request->all();
-            
-        if($request->ids != null){
+
+
+        if ($request->ids != null) {
             $input['available_staff'] = serialize($request->ids);
         }
 
-        TimeSlot::create($input);
+        $time_slot = TimeSlot::create($input);
+
+        $input['time_slot_id'] = $time_slot->id;
+
+        foreach ($request->ids as $id) {
+            $input['staff_id'] = $id;
+            TimeSlotToStaff::create($input);
+        }
 
         return redirect()->route('timeSlots.index')
-                        ->with('success','Time slot created successfully.');
+            ->with('success', 'Time slot created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -86,11 +96,15 @@ class TimeSlotController extends Controller
      */
     public function show($id)
     {
-        $staffs = User::all();
         $time_slot = TimeSlot::find($id);
-        return view('timeSlots.show',compact('time_slot','staffs'));
+
+        $staffGroup = StaffGroup::find($time_slot->group_id);
+        $staffs = $staffGroup->staffs;
+
+        $time_slot = TimeSlot::find($id);
+        return view('timeSlots.show', compact('time_slot', 'staffs'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -100,15 +114,15 @@ class TimeSlotController extends Controller
     public function edit($id)
     {
         $i = 0;
-        $staff_groups =StaffGroup::all();
+        $staff_groups = StaffGroup::all();
         $time_slot = TimeSlot::find($id);
-        $staff_group = StaffGroup::find($time_slot->group_id);
-        $staffs = User::all();
-        foreach(unserialize($staff_group->staff_ids) as $id){
-            $group_staff[] = $id;
-        }
 
-        return view('timeSlots.edit', compact('time_slot','staff_groups','group_staff','i','staffs'));
+        $staffGroup = StaffGroup::find($time_slot->group_id);
+        $staffs = $staffGroup->staffs;
+
+        $selected_staff = $time_slot->staffs->pluck('id')->toArray();
+
+        return view('timeSlots.edit', compact('time_slot', 'staff_groups', 'i', 'staffs','selected_staff'));
     }
 
     public function update(Request $request, $id)
@@ -124,24 +138,29 @@ class TimeSlotController extends Controller
         ]);
 
         $time_slot = TimeSlot::find($id);
-        
-        $input = $request->all();
-        
-        if($request->ids != null){
-            $input['available_staff'] = serialize($request->ids);
-        }
 
-        if($request->type == 'General'){
+        $input = $request->all();
+
+        if ($request->type == 'General') {
             $input['date'] = Null;
         }
 
         $time_slot->update($input);
 
+        $input['time_slot_id'] = $id;
+
+        TimeSlotToStaff::where('time_slot_id', $id)->delete();
+
+        foreach ($request->ids as $staff_id) {
+            $input['staff_id'] = $staff_id;
+            TimeSlotToStaff::create($input);
+        }
+        
         return redirect()->route('timeSlots.index')
-                        ->with('success','Time slot update successfully.');
+            ->with('success', 'Time slot update successfully.');
     }
-    
-    
+
+
     /**
      * Remove the specified resource from storage.
      *
@@ -151,11 +170,11 @@ class TimeSlotController extends Controller
     public function destroy($id)
     {
         $time_slot = TimeSlot::find($id);
-        
+
         $time_slot->delete();
-    
+
         return redirect()->route('timeSlots.index')
-                        ->with('success','Time slot deleted successfully');
+            ->with('success', 'Time slot deleted successfully');
     }
 
     function dayName($dateString)
@@ -195,14 +214,12 @@ class TimeSlotController extends Controller
         return response()->json($timeSlots);
     }
 
-    public function staff_group(Request $request){
-        $staff_group = StaffGroup::find($request->group);
-        foreach(unserialize($staff_group->staff_ids) as $id){
-            $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
-            ->select('users.*', 'staff.image')
-            ->where('users.id',$id)->get();
-        }   
+    public function staff_group(Request $request)
+    {
+        $staffGroup = StaffGroup::find($request->group);
 
-        return response()->json($selected_staff);
+        $staff = $staffGroup->staffs;
+
+        return response()->json($staff);
     }
 }

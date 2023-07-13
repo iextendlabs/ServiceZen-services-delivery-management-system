@@ -29,15 +29,16 @@
                         <th>Name</th>
                         <th>Phone</th>
                     </tr>
-                    @foreach($users as $user)
-                    @if(in_array($user->id, unserialize($staffGroup->staff_ids))) 
+                    @if(isset($staffGroup->staffs))
+                        @foreach($staffGroup->staffs as $staff) 
                     <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->staff->phone}}</td>
+                        <td>{{ $staff->id }}</td>
+                        <td>{{ $staff->name }}</td>
+                        <td>{{ $staff->staff->phone}}</td>
                     </tr>
-                    @endif
                     @endforeach
+                    @endif
+
                 </table>
             </div>
         </div>

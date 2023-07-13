@@ -9,7 +9,7 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','time_start','time_end','active','type','date','group_id','space_availability','available_staff'];
+    protected $fillable = ['name','time_start','time_end','active','type','date','group_id','space_availability'];
 
     public function group()
     {
@@ -23,5 +23,11 @@ class TimeSlot extends Model
     public function staffGroup()
     {
         return $this->belongsTo(StaffGroup::class, 'group_id');
+    }
+
+
+    public function staffs()
+    {
+        return $this->belongsToMany(User::class, 'time_slot_to_staff', 'time_slot_id', 'staff_id');
     }
 }

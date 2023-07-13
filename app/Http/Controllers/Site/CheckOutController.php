@@ -119,15 +119,15 @@ class CheckOutController extends Controller
     {
         $this->validate($request, [
             'date' => 'required',
-            'time_slot' => 'required',
             'service_staff_id' => 'required',
         ]);
 
         $staff_and_time = [];
 
         $staff_and_time['date'] = $request->date;
-        $staff_and_time['time_slot'] = $request->time_slot;
-        $staff_and_time['service_staff_id'] = $request->service_staff_id;
+        [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
+        $staff_and_time['time_slot'] =$time_slot;
+        $staff_and_time['service_staff_id'] = $staff_id;
 
         if (session()->has('staff_and_time')) {
             Session::forget('staff_and_time');

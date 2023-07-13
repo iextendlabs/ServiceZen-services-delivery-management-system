@@ -36,33 +36,98 @@ class OrderController extends Controller
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $filter = [
-            'status' => '',
-            'affiliate' => '',
-            'customer' => '',
-            'staff' => '',
-            'payment_method' => '',
-            'appointment_date' => '',
-            'created_at' => '',
+            'status' => $request->status,
+            'affiliate' => $request->affiliate_id,
+            'customer' => $request->customer_id,
+            'staff' => $request->staff_id,
+            'payment_method' => $request->payment_method,
+            'appointment_date' => $request->appointment_date,
+            'created_at' => $request->created_at,
         ];
+
+        $existingParameters = $request->except('page');
 
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
 
-            $orders = Order::whereIn('service_staff_id', $staffIds)
-                ->paginate(10);
+            $query = Order::whereIn('service_staff_id', $staffIds);
         } elseif (Auth::user()->hasRole('Staff')) {
-            $orders = Order::where('service_staff_id', Auth::id())->paginate(10);
-            // dd($orders);
+            $query = Order::where('service_staff_id', Auth::id());
         } else {
-            $orders = Order::orderBy('id', 'DESC')->paginate(10);
+            $query = Order::orderBy('id', 'DESC');
         }
 
-        return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))
-            ->with('i', ($request->input('page', 1) - 1) * 10);
-    }
+        // $query = Order::query();
 
+        if ($request->status) {
+            $query->where('status', 'like', $request->status . '%');
+        }
+
+        if ($request->affiliate_id) {
+            $query->where('affiliate_id', 'like', $request->affiliate_id . '%');
+        }
+
+        if ($request->customer_id) {
+            $query->where('customer_id', 'like', $request->customer_id . '%');
+        }
+
+        if ($request->staff_id) {
+            $query->where('service_staff_id', 'like', $request->staff_id . '%');
+        }
+
+        if ($request->payment_method) {
+            $query->where('payment_method', 'like', $request->payment_method . '%');
+        }
+
+        if ($request->appointment_date) {
+            $query->where('date', $request->appointment_date);
+        }
+
+        if ($request->created_at) {
+            $query->where('created_at', 'like', $request->created_at . '%');
+        }
+
+        $orders = $query->paginate(5)->appends($existingParameters);
+
+        if($request->csv == 1){
+            $headers = array(
+                "Content-type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=Orders.csv",
+                "Pragma" => "no-cache",
+                "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+                "Expires" => "0"
+            );
+    
+            // Define output stream for CSV file
+            $output = fopen("php://output", "w");
+    
+            // Write headers to output stream
+            fputcsv($output, array('Order ID', 'Amount', 'Status', 'Order Added Date', 'Customer', 'Staff', 'Appointment Date', 'Time', 'Services'));
+    
+            // Loop through orders and write to output stream
+            foreach ($orders as $row) {
+                $appointments = array();
+                foreach ($row->serviceAppointments as $appointment) {
+                    $appointments[] = $appointment->service->name;
+                }
+    
+                fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer->name, $row->staff->user->name, $row->date, date('h:i A', strtotime($row->time_slot->time_start)) . "--" . date('h:i A', strtotime($row->time_slot->time_end)), implode(",", $appointments)));
+            }
+    
+            // Close output stream
+            fclose($output);
+    
+            // Return CSV file as download
+            return Response::make('', 200, $headers);
+        }else if($request->print == 1){
+            return view('orders.print', compact('orders','existingParameters'));
+        }else{
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter','existingParameters'))
+            ->with('i', ($request->input('page', 1) - 1) * 10);
+        }
+    }
 
     public function create()
     {
@@ -122,136 +187,5 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')
             ->with('success', 'Order deleted successfully');
-    }
-
-    public function filter(Request $request)
-    {
-        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
-        $payment_methods = ['Cash-On-Delivery'];
-        $users = User::all();
-        $filter = [
-            'status' => $request->status,
-            'affiliate' => $request->affiliate_id,
-            'customer' => $request->customer_id,
-            'staff' => $request->staff_id,
-            'payment_method' => $request->payment_method,
-            'appointment_date' => $request->appointment_date,
-            'created_at' => $request->created_at,
-        ];
-
-        if (Auth::user()->hasRole('Supervisor')) {
-            $supervisor = User::find(Auth::id());
-
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
-
-            $query = Order::whereIn('service_staff_id', $staffIds);
-        } elseif (Auth::user()->hasRole('Staff')) {
-            $query = Order::where('service_staff_id', Auth::id());
-        } else {
-            $query = Order::orderBy('id', 'DESC');
-        }
-
-        // $query = Order::query();
-
-        if ($request->status) {
-            $query->where('status', 'like', $request->status . '%');
-        }
-
-        if ($request->affiliate_id) {
-            $query->where('affiliate_id', 'like', $request->affiliate_id . '%');
-        }
-
-        if ($request->customer_id) {
-            $query->where('customer_id', 'like', $request->customer_id . '%');
-        }
-
-        if ($request->staff_id) {
-            $query->where('service_staff_id', 'like', $request->staff_id . '%');
-        }
-
-        if ($request->payment_method) {
-            $query->where('payment_method', 'like', $request->payment_method . '%');
-        }
-
-        if ($request->appointment_date) {
-            $query->where('date', $request->appointment_date);
-        }
-
-        if ($request->created_at) {
-            $query->where('created_at', 'like', $request->created_at . '%');
-        }
-
-        $orders = $query->paginate(100);
-        // $orders = Order::where('status','like',$request->status.'%')->where('customer_id','like',$request->customer_id.'%')->where('payment_method','like',$request->payment_method.'%')->where('service_staff_id','like',$request->staff_id.'%')->where('affiliate_id','like',$request->affiliate_id.'%')->paginate(100);
-        // dd($orders);
-        return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
-    }
-
-    public function downloadCSV(Request $request)
-    {
-        if (Auth::user()->hasRole('Supervisor')) {
-            $supervisor = User::find(Auth::id());
-
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
-
-            $data = Order::whereIn('service_staff_id', $staffIds)
-                ->get();
-        } elseif (Auth::user()->hasRole('Staff')) {
-            $data = Order::where('service_staff_id', Auth::id())->get();
-            // dd($data);
-        } else {
-            $data = Order::orderBy('id', 'DESC')->get();
-        }
-
-        // Define headers for CSV file
-        $headers = array(
-            "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=Orders.csv",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
-        );
-
-        // Define output stream for CSV file
-        $output = fopen("php://output", "w");
-
-        // Write headers to output stream
-        fputcsv($output, array('Order ID', 'Amount', 'Status', 'Order Added Date', 'Customer', 'Staff', 'Appointment Date', 'Time', 'Services'));
-
-        // Loop through data and write to output stream
-        foreach ($data as $row) {
-            $appointments = array();
-            foreach ($row->serviceAppointments as $appointment) {
-                $appointments[] = $appointment->service->name;
-            }
-
-            fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer->name, $row->staff->user->name, $row->date, date('h:i A', strtotime($row->time_slot->time_start)) . "--" . date('h:i A', strtotime($row->time_slot->time_end)), implode(",", $appointments)));
-        }
-
-        // Close output stream
-        fclose($output);
-
-        // Return CSV file as download
-        return Response::make('', 200, $headers);
-    }
-
-    public function print()
-    {
-
-        if (Auth::user()->hasRole('Supervisor')) {
-            $supervisor = User::find(Auth::id());
-
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
-
-            $orders = Order::whereIn('service_staff_id', $staffIds)->get();
-        } elseif (Auth::user()->hasRole('Staff')) {
-            $orders = Order::where('service_staff_id', Auth::id())->get();
-            // dd($orders);
-        } else {
-            $orders = Order::orderBy('id', 'DESC')->get();
-        }
-
-        return view('orders.print', compact('orders'));
     }
 }
