@@ -169,9 +169,15 @@ class OrderController extends Controller
 
     public function update(Request $request, $id)
     {
+        $input = $request->all();
+
+        [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
+        $input['time_slot_id'] =$time_slot;
+        $input['service_staff_id'] = $staff_id;
+
         $order = Order::find($id);
 
-        $order->update($request->all());
+        $order->update($input);
 
         return redirect()->route('orders.index')
             ->with('success', 'Order updated successfully');

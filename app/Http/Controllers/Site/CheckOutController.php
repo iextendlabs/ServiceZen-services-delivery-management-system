@@ -157,7 +157,6 @@ class CheckOutController extends Controller
 
     public function step2(Request $request)
     {
-
         if (Session::get('address') && Session::get('serviceIds')) {
             $address = Session::get('address');
             $staffZoneNames = [$address['area'], $address['city']];
@@ -226,9 +225,7 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
-        $holiday = Holiday::where('date', $request->date)->get();
-        if (count($holiday) == 0) {
-            $address = Session::get('address');
+        $address = Session::get('address');
             $staffZoneNames = [$address['area'], $address['city']];
 
             $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
@@ -237,8 +234,9 @@ class CheckOutController extends Controller
                         $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
                     }
                 });
-            })->where('date', 'like', $request->date)
+            })->where('date', '=', $request->date)
                 ->get();
+
             if (count($slots)) {
                 $timeSlots = $slots;
             } else {
@@ -250,30 +248,10 @@ class CheckOutController extends Controller
                     });
                 })->get();
             }
-        } else {
-            $timeSlots = "There is no Slots";
-        }
-        return response()->json($timeSlots);
-    }
 
-    public function staff_group(Request $request)
-    {
-        $time_slot = TimeSlot::find($request->time_slot);
+            $holiday = Holiday::where('date', $request->date)->get();
+            return view('site.checkOut.timeSlots', compact('timeSlots', 'holiday'));
 
-        $staff_group = StaffGroup::find($request->group);
-        foreach (unserialize($staff_group->staff_ids) as $id) {
-            $staff_holiday = StaffHoliday::where('staff_id', $id)->where('date', $request->date)->get();
-            if (count($staff_holiday) == 0) {
-                if (in_array($id, unserialize($time_slot->available_staff))) {
-                    $selected_staff[] =  User::Join('staff', 'users.id', '=', 'staff.user_id')
-                        ->select('users.*', 'staff.image')
-                        ->where('users.id', $id)->get();
-                }
-            } else {
-                $selected_staff = array();
-            }
-        }
-
-        return response()->json($selected_staff);
+        // return response()->json($timeSlots);
     }
 }

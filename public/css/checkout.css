@@ -1,0 +1,45 @@
+.list-group-item {
+    font-family: 'Helvetica', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    background-color: #fff;
+    border-color: #333;
+}
+
+.list-group-item:hover {
+    background-color: #333;
+    color: #fff;
+    border-color: #333;
+}
+
+.list-group-item.active {
+    background-color: #b4b3b3 !important;
+    color: #fff !important;
+    border-color: #b4b3b3 !important;
+}
+
+.badge-available {
+    background-color: #28a745;
+}
+
+.badge-unavailable {
+    background-color: #dc3545;
+}
+
+.badge {
+    color: white
+}
+
+.scroll-div {
+    height: 330px;
+    /* Set the desired height */
+    overflow: hidden;
+    /* Hide overflow */
+    overflow-y: scroll;
+    /* Enable vertical scrolling */
+}
+
+input[type=radio]:checked+.staff-label {
+    border: 1px solid green;
+}

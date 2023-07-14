@@ -109,7 +109,7 @@
                 </div>
             </div>
             <hr>
-            <div class="col-md-12">
+            <!-- <div class="col-md-12">
                 <div class="form-group">
                     <strong>Note:</strong>
                     <textarea class="form-control" style="height:150px" name="note" placeholder="Note">@if(isset($userNote)){{$userNote->note}}@endif</textarea>
@@ -146,7 +146,7 @@
                         @endforeach
                     </table>
                 </div>
-            </div>
+            </div> -->
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
