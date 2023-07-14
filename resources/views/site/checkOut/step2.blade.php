@@ -45,6 +45,8 @@
                     <strong>Time Slots</strong>
                     <div id="loading" style="display: none;">Loading...</div>
                     <div class="list-group" id="time-slots-container">
+                        <input type="hidden" name="city" value="{{ $city }}">
+                        <input type="hidden" name="area" value="{{ $area }}">
                         @include('site.checkOut.timeSlots')
                         
                     </div>

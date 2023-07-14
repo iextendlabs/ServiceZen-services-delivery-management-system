@@ -1,13 +1,15 @@
 $('#date').change(function() {
     // $('#detail-container').empty();
     var selectedDate = $(this).val();
-
+    
     // Make AJAX call to retrieve time slots for selected date
     $.ajax({
         url: '/slots',
         method: 'GET',
         data: {
-            date: selectedDate
+            date: selectedDate,
+            city: $('input[name="city"]').val(),
+            area: $('input[name="area"]').val(),
         },
         beforeSend: function() {
             $('#loading').show(); // Show the loading element

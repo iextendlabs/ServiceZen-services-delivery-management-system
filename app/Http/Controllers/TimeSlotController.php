@@ -213,13 +213,4 @@ class TimeSlotController extends Controller
         }
         return response()->json($timeSlots);
     }
-
-    public function staff_group(Request $request)
-    {
-        $staffGroup = StaffGroup::find($request->group);
-
-        $staff = $staffGroup->staffs;
-
-        return response()->json($staff);
-    }
 }

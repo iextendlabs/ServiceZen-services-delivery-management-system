@@ -158,7 +158,10 @@ class CheckOutController extends Controller
     public function step2(Request $request)
     {
         if (Session::get('address') && Session::get('serviceIds')) {
+
             $address = Session::get('address');
+            $area = $address['area'];
+            $city = $address['city'];
             $staffZoneNames = [$address['area'], $address['city']];
 
             $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
@@ -184,7 +187,7 @@ class CheckOutController extends Controller
 
             $holiday = Holiday::where('date', date("Y-m-d"))->get();
 
-            return view('site.checkOut.step2', compact('timeSlots', 'holiday'));
+            return view('site.checkOut.step2', compact('timeSlots', 'holiday','city','area'));
         } elseif (Session::get('serviceIds')) {
             return redirect('step1')->with('error', 'There is no Address Saved.');
         } else {
@@ -226,7 +229,7 @@ class CheckOutController extends Controller
     public function slots(Request $request)
     {
         $address = Session::get('address');
-            $staffZoneNames = [$address['area'], $address['city']];
+            $staffZoneNames = [$request->area, $request->city];
 
             $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
                 $query->where(function ($query) use ($staffZoneNames) {

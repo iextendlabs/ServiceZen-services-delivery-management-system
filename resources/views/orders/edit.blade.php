@@ -37,6 +37,8 @@
                 <div class="col-md-12">
                     <strong>Time Slots</strong>
                     <div class="list-group" id="time-slots-container">
+                    <input type="hidden" name="city" value="{{ $order->city }}">
+                    <input type="hidden" name="area" value="{{ $order->area }}">
                     @foreach($timeSlots as $timeSlot)
                         
                         <div class="list-group-item d-flex justify-content-between align-items-center time-slot">
