@@ -30,7 +30,7 @@
             </ul>
         </div>
         @endif
-        <div class="location-search-wrapper">
+        <div class="location-search-wrapper" style="display: none;">
             <div class="location-container welcome-section">
                 <div id="navbar-location-button" class="location-search lg">
                     <div class="location-search-left">
@@ -39,7 +39,7 @@
                         </svg>
                     </div>
                     <div class="location-search-input-wrapper">
-                        <input id="searchField" type="text" name="location-input" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $address['searchField']}}" class="location-search-input">
+                        <input id="searchField" type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $address['searchField']}}" class="location-search-input">
                     </div>
                     <div class="location-search-right en">
                         <div class="location-search-clear en" style="display:none;">
@@ -59,20 +59,11 @@
                 </div>
             </div>
         </div>
-        <div class="popup">
-            <div id="map"></div>
-            <div class="container-fluid close">
-                <div class="row">
-                    <div class="col">
-                        <button class="btn btn-primary full-width-button">Confirm</button>
-                        <span>&times;</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <form action="addressSession" method="POST">
             @csrf
+            <input id="searchField" type="hidden" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $address['searchField']}}" class="location-search-input">
             <div class="row">
                 <div class="col-md-12 text-center">
                     <br>
@@ -160,138 +151,7 @@
     </div>
 </div>
 <script>
-    $(document).ready(function() {
-        $("#manualLocationButton").click(function() {
-            $(".popup").fadeIn();
-        });
-
-        $(".close").click(function() {
-            $(".popup").fadeOut();
-        });
-    });
-</script>
-
-<!-- Map Loading -->
-<script>
-    var map;
-    var marker;
-    var autocomplete;
-
-    document.getElementById('manualLocationButton').addEventListener('click', function() {
-        showMap();
-    });
-
-    function showMap() {
-        var searchValue = document.getElementById('searchField').value;
-
-        if (searchValue) {
-            var geocoder = new google.maps.Geocoder();
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: {
-                    lat: 0,
-                    lng: 0
-                },
-                zoom: 15
-            });
-
-            geocoder.geocode({
-                address: searchValue
-            }, function(results, status) {
-                if (status === 'OK') {
-                    map.setCenter(results[0].geometry.location);
-
-                    if (marker) {
-                        marker.setMap(null);
-                    }
-
-                    marker = new google.maps.Marker({
-                        map: map,
-                        position: results[0].geometry.location
-                    });
-
-                    map.addListener('click', function(event) {
-                        placeMarker(event.latLng);
-                    });
-
-                    fillAddressFields(results[0]);
-                } else {
-                    alert('Geocode was not successful for the following reason: ' + status);
-                }
-            });
-        } else {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var latitude = position.coords.latitude;
-                    var longitude = position.coords.longitude;
-                    map = new google.maps.Map(document.getElementById('map'), {
-                        center: {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        },
-                        zoom: 15
-                    });
-
-                    if (marker) {
-                        marker.setMap(null);
-                    }
-
-                    marker = new google.maps.Marker({
-                        position: {
-                            lat: latitude,
-                            lng: longitude
-                        },
-                        map: map,
-                    });
-
-                    map.addListener('click', function(event) {
-                        placeMarker(event.latLng);
-                    });
-
-                    fillAddressFieldsFromMarker();
-                }, function() {
-                    map = new google.maps.Map(document.getElementById('map'), {
-                        center: {
-                            lat: 23.4241,
-                            lng: 53.8478
-                        },
-                        zoom: 7
-                    });
-
-                    if (marker) {
-                        marker.setMap(null);
-                    }
-
-                    map.addListener('click', function(event) {
-                        placeMarker(event.latLng);
-                    });
-
-                    fillAddressFieldsFromMarker();
-                });
-            } else {
-                handleLocationError(false);
-            }
-        }
-    }
-
-    function placeMarker(location) {
-        if (marker) {
-            marker.setMap(null);
-        }
-
-        marker = new google.maps.Marker({
-            position: location,
-            map: map,
-            draggable: true
-        });
-
-        marker.addListener('dragend', function() {
-            fillAddressFieldsFromMarker();
-        });
-
-        fillAddressFieldsFromMarker();
-    }
-
-    function fillAddressFields(place) {
+     function fillFormAddressFields(place) {
         const buildingNameField = document.getElementById('buildingName');
         const landmarkField = document.getElementById('landmark');
         const areaField = document.getElementById('area');
@@ -300,6 +160,7 @@
         const cityField = document.getElementById('city');
         const latitudeField = document.getElementById('latitude');
         const longitudeField = document.getElementById('longitude');
+        const searchField = document.getElementById("searchField");
 
         const addressComponents = place.address_components;
 
@@ -323,40 +184,26 @@
             latitudeField.value = place.geometry.location.lat();
             longitude.value = place.geometry.location.lng();
         }
+        popup_searchField.value = address;
+    
+    }
+    function initMap(){
+        $('.location-search-wrapper').show();
+        initAutocompleteLocal();
     }
 
-    function reverseGeocode(latitude, longitude) {
-        var geocoder = new google.maps.Geocoder();
-        var latLng = new google.maps.LatLng(latitude, longitude);
+    $(document).ready(function() {
+        $("#manualLocationButton").click(function() {
+            $("#locationPopup").modal('show');
+            var map = document.getElementById("map");
 
-        geocoder.geocode({
-            'latLng': latLng
-        }, function(results, status) {
-            if (status === 'OK') {
-                if (results[0]) {
-                    fillAddressFields(results[0]);
-                } else {
-                    alert('No address found for the current location');
-                }
-            } else {
-                alert('Geocoder failed due to: ' + status);
-            }
+            map.style.display = "block";
+            
+            showMap();
         });
-    }
-
-    function handleLocationError(browserHasGeolocation) {
-        alert(browserHasGeolocation ? 'Error: The Geolocation service failed.' : 'Error: Your browser doesn\'t support geolocation.');
-    }
-
-    function fillAddressFieldsFromMarker() {
-        if (marker) {
-            var markerPosition = marker.getPosition();
-            reverseGeocode(markerPosition.lat(), markerPosition.lng());
-        }
-    }
-
-    function initAutocomplete() {
-        autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchField'));
+    });
+    function initAutocompleteLocal() {
+        var autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchField'));
         autocomplete.addListener('place_changed', function() {
             var place = autocomplete.getPlace();
 
@@ -372,10 +219,11 @@
             map.setCenter(place.geometry.location);
             placeMarker(place.geometry.location);
 
-            fillAddressFields(place);
+            fillFormAddressFields(place);
         });
     }
+
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&callback=initMap"></script>
+<!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&callback=initMap"></script> -->
 @endsection

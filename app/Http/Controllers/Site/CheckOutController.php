@@ -101,7 +101,8 @@ class CheckOutController extends Controller
         $address['name'] = $request->name;
         $address['latitude'] = $request->latitude;
         $address['longitude'] = $request->longitude;
-
+        $address['searchField'] = $request->searchField;
+        
         if (session()->has('address')) {
             Session::forget('address');
             Session::put('address', $address);

@@ -14,19 +14,19 @@
       <div class="modal-body">
         <div class="input-group mb-3">
           @csrf
-          <input type="hidden" name="buildingName" id="buildingName">
-          <input type="hidden" name="flatVilla" id="flatVilla">
-          <input type="hidden" name="street" id="street">
-          <input type="hidden" name="area" id="area">
-          <input type="hidden" name="landmark" id="landmark">
-          <input type="hidden" name="city" id="city">
-          <input type="hidden" name="latitude" id="latitude">
-          <input type="hidden" name="longitude" id="longitude">
+          <input type="hidden" name="buildingName" id="popup_buildingName">
+          <input type="hidden" name="flatVilla" id="popup_flatVilla">
+          <input type="hidden" name="street" id="popup_street">
+          <input type="hidden" name="area" id="popup_area">
+          <input type="hidden" name="landmark" id="popup_landmark">
+          <input type="hidden" name="city" id="popup_city">
+          <input type="hidden" name="latitude" id="popup_latitude">
+          <input type="hidden" name="longitude" id="popup_longitude">
 
-          <div class="input-group-prepend" onclick="$('#searchField').val('')">
+          <div class="input-group-prepend" onclick="$('#popup_searchField').val('')">
             <span class="input-group-text">x</span>
           </div>
-          <input type="text" class="form-control" id="searchField" name="searchField" placeholder="Search on map">
+          <input type="text" class="form-control" id="popup_searchField" value="{{ session('address') ? session('address')['searchField'] : '' }}" name="searchField" placeholder="Search on map">
           <div class="input-group-append">
             <button class="btn btn-primary" id="setLocation" type="button">Search on map</button>
           </div>

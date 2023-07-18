@@ -10,6 +10,9 @@ function mapReady() {
             $("#locationPopup").modal("show");
         });
         initAutocomplete();
+        if($('.location-search-wrapper').length){
+            initMap();
+        }
     });
 }
 
@@ -50,7 +53,7 @@ document.getElementById("setLocation").addEventListener("click", function () {
 });
 
 function showMap() {
-    var searchValue = document.getElementById("searchField").value;
+    var searchValue = document.getElementById("popup_searchField").value;
 
     if (searchValue) {
         var geocoder = new google.maps.Geocoder();
@@ -174,24 +177,24 @@ function placeMarker(location) {
 }
 
 function fillAddressFields(place) {
-    const buildingNameField = document.getElementById("buildingName");
-    const landmarkField = document.getElementById("landmark");
-    const areaField = document.getElementById("area");
-    const flatVillaField = document.getElementById("flatVilla");
-    const streetField = document.getElementById("street");
-    const cityField = document.getElementById("city");
-    const latitudeField = document.getElementById("latitude");
-    const longitudeField = document.getElementById("longitude");
-    const searchField = document.getElementById("searchField");
+    const popup_buildingNameField = document.getElementById("popup_buildingName");
+    const popup_landmarkField = document.getElementById("popup_landmark");
+    const popup_areaField = document.getElementById("popup_area");
+    const popup_flatVillaField = document.getElementById("popup_flatVilla");
+    const popup_streetField = document.getElementById("popup_street");
+    const popup_cityField = document.getElementById("popup_city");
+    const popup_latitudeField = document.getElementById("popup_latitude");
+    const popup_longitudeField = document.getElementById("popup_longitude");
+    const popup_searchField = document.getElementById("popup_searchField");
 
-    buildingNameField.value = "";
-    landmarkField.value = "";
-    areaField.value = "";
-    flatVillaField.value = "";
-    streetField.value = "";
-    latitudeField.value = "";
-    longitudeField.value = "";
-    cityField.value = "";
+    popup_buildingNameField.value = "";
+    popup_landmarkField.value = "";
+    popup_areaField.value = "";
+    popup_flatVillaField.value = "";
+    popup_streetField.value = "";
+    popup_latitudeField.value = "";
+    popup_longitudeField.value = "";
+    popup_cityField.value = "";
     
     const addressComponents = place.address_components;
 
@@ -200,31 +203,34 @@ function fillAddressFields(place) {
         const types = component.types;
 
         if (types.includes("premise")) {
-            buildingNameField.value = component.long_name;
+            popup_buildingNameField.value = component.long_name;
         } else if (types.includes("point_of_interest")) {
-            landmarkField.value = component.long_name;
+            popup_landmarkField.value = component.long_name;
         } else if (
             types.includes("neighborhood") ||
             types.includes("sublocality")
         ) {
-            areaField.value = component.long_name;
-        } else if (types.includes("street_number")) {
-            flatVillaField.value = component.long_name;
+            popup_areaField.value = component.long_name;
+        } else if (types.includes("popup_street_number")) {
+            popup_flatVillaField.value = component.long_name;
         } else if (types.includes("route")) {
-            streetField.value = component.long_name;
+            popup_streetField.value = component.long_name;
         } else if (types.includes("locality")) {
-            cityField.value = component.long_name;
+            popup_cityField.value = component.long_name;
         }
-        latitudeField.value = place.geometry.location.lat();
-        longitude.value = place.geometry.location.lng();
+        popup_latitudeField.value = place.geometry.location.lat();
+        popup_longitude.value = place.geometry.location.lng();
     }
 
     const address = place["formatted_address"];
 
-    searchField.value = address;
-    if(!areaField.value){
-    searchField.value = "";
+    popup_searchField.value = address;
+    if(!popup_areaField.value){
+    popup_searchField.value = "";
         alert('Address is not accurate. On map and select address.')
+    }
+    if (typeof fillFormAddressFields === 'function') {
+        fillFormAddressFields(place);
     }
 }
 
@@ -268,7 +274,7 @@ function fillAddressFieldsFromMarker() {
 var autocomplete;
 function initAutocomplete() {
     autocomplete = new google.maps.places.Autocomplete(
-        document.getElementById("searchField")
+        document.getElementById("popup_searchField")
     );
     autocomplete.addListener("place_changed", function () {
         var place = autocomplete.getPlace();
