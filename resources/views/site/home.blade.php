@@ -1,13 +1,20 @@
 @extends('site.layout.app')
 @section('content')
 <style>
-  .card-img-top {
-    height: 250px;
+  .pac-container {
+    background-color: #FFF;
+    z-index: 20;
+    position: fixed;
+    display: inline-block;
+    float: left;
   }
 
-  .card-body .card-text {
-    height: 96px;
-    overflow: hidden;
+  .modal {
+    z-index: 20;
+  }
+
+  .modal-backdrop {
+    z-index: 10;
   }
 </style>
 <section class="jumbotron text-center">
@@ -21,6 +28,44 @@
     @endif
   </div>
 </section>
+
+<input type="hidden" name="session" id="session" @if(isset($address)) value="true" @else value="false" @endif>
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Popup Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">Popup Title</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Popup Body -->
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <input type="hidden" name="city" id="city">
+          <input type="hidden" name="area" id="area">
+          <div class="input-group-prepend" onclick="$('#searchField').val('')">
+            <span class="input-group-text">x</span>
+          </div>
+          <input type="text" class="form-control" id="searchField" placeholder="Search on map">
+          <div class="input-group-append">
+            <button class="btn btn-primary" id="setLocation" type="button">Search on map</button>
+          </div>
+        </div>
+
+        <div id="mapContainer" style="height: 400px; margin-top: 20px; display:none"></div>
+      </div>
+
+      <!-- Popup Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save Changes</button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <div class="album py-5 bg-light">
   <div class="container">
@@ -54,20 +99,20 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">
-                  @if(isset($service->discount))<s>@endif
-                    @currency($service->price)
-                @if(isset($service->discount))</s>@endif
+                @if(isset($service->discount))<s>@endif
+                  @currency($service->price)
+                  @if(isset($service->discount))</s>@endif
                 @if(isset($service->discount))
                 <b class="discount"> @currency( $service->discount )</b>
-              @endif
+                @endif
               </small>
 
               <small class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></small>
             </div>
-            
+
             <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Add to Cart</button></a>
 
-            
+
           </div>
         </div>
       </div>
@@ -75,4 +120,8 @@
     </div>
   </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="{{ asset('js/site.js') }}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address"></script>
+
 @endsection

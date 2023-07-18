@@ -41,6 +41,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav ml-auto">
+                @if(isset($address))
+              <li class="nav-item">
+                  <a class="nav-link" id="change-address">{{$address['area']}}  {{$address['city']}}</a>
+                </li>
+                @endif
                 <li class="nav-item active">
                   <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>

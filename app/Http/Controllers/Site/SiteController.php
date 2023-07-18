@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\Auth;
-use Session;
+use Illuminate\Support\Facades\Session;
+
 
 class SiteController extends Controller
 {
@@ -28,20 +29,31 @@ class SiteController extends Controller
      */
     public function index(Request $request)
     {
-        // if(Auth::check()){
-        //     if(Auth::user()->hasRole('Admin')){
-        //         Session::flush();
-        //         Auth::logout();
-        //         return Redirect('/');
-        //     }
-        // }
+        if($request->city){
+            $address = [];
+
+            $address['area'] = $request->area;
+            $address['city'] = $request->city;
+    
+            if (session()->has('address')) {
+                Session::forget('address');
+                Session::put('address', $address);
+            } else {
+                Session::put('address', $address);
+            }
+
+            return response()->json("successfully save data.");
+        }
+        
+        $address = Session::get('address');
+
         if(isset($request->id)){
             $services = Service::where('category_id',$request->id)->get();
             $category = ServiceCategory::find($request->id);
-            return view('site.home',compact('services','category'));
+            return view('site.home',compact('services','category','address'));
         }else{
             $services = Service::all();
-            return view('site.home',compact('services'));
+            return view('site.home',compact('services','address'));
         }
     }
 

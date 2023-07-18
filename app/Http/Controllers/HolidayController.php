@@ -22,7 +22,6 @@ class HolidayController extends Controller
         if($request->ajax()) {  
             $data =  Holiday::all();
             return response()->json($data);
-            dd('asd');
         }
         return view('holidays.index');
     }
