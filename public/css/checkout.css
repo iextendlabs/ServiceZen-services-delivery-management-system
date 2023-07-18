@@ -7,11 +7,6 @@
     border-color: #333;
 }
 
-.list-group-item:hover {
-    background-color: #333;
-    color: #fff;
-    border-color: #333;
-}
 
 .list-group-item.active {
     background-color: #b4b3b3 !important;
@@ -42,4 +37,21 @@
 
 input[type=radio]:checked+.staff-label {
     border: 1px solid green;
+}
+
+.shadow-image {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Adjust the shadow properties as needed */
+    transition: box-shadow 0.3s ease; /* Add a smooth transition effect */
+}
+
+.shadow-image:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); /* Adjust the shadow properties as needed */
+}
+
+.staff-label:hover {
+    border: 1px solid #ccc; /* Add your desired border properties */
+}
+
+.staff-label {
+    border: 1px solid transparent; /* Add your desired border properties */
 }

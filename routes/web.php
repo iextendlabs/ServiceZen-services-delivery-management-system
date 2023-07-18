@@ -116,12 +116,10 @@ Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('addressSession', [CheckOutController::class, 'addressSession']);
 Route::post('timeSlotsSession', [CheckOutController::class, 'timeSlotsSession']);
 Route::resource('cart', CheckOutController::class);
-Route::get('step1', [CheckOutController::class, 'step1']);
-Route::get('step2', [CheckOutController::class, 'step2']); 
-Route::get('step3', [CheckOutController::class, 'step3']); 
+Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
+Route::get('locationStep', [CheckOutController::class, 'locationStep']); 
+Route::get('confirmStep', [CheckOutController::class, 'confirmStep']); 
 Route::get('slots', [CheckOutController::class,'slots']);
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::get('staffOrderCSV', 'App\Http\Controllers\Site\OrderController@downloadCSV');
-Route::get('/test',function(){
-    dd(formatCurrency(100));
-});
+Route::post('saveLocation', [SiteController::class, 'saveLocation']);

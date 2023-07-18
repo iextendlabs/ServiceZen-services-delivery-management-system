@@ -12,6 +12,7 @@ use App\Models\StaffHoliday;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\Console\Command\DumpCompletionCommand;
@@ -27,20 +28,16 @@ class CheckOutController extends Controller
     public function index()
     {
         $services = Session::get('serviceIds');
-        if (Session::get('address') && Session::get('serviceIds')) {
-            return redirect('step3');
-        } else {
-            if ($services) {
-                foreach ($services as $service) {
-                    $booked_services[] = Service::find($service);
-                }
-            } else {
-                $booked_services = array();
+        if ($services) {
+            foreach ($services as $service) {
+                $booked_services[] = Service::find($service);
             }
-
-            return view('site.checkOut.index', compact('booked_services'))
-                ->with('i', (request()->input('page', 1) - 1) * 5);
+        } else {
+            $booked_services = array();
         }
+
+        return view('site.checkOut.index', compact('booked_services'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
     public function addToCart(Request $request, $id)
@@ -112,7 +109,7 @@ class CheckOutController extends Controller
             Session::put('address', $address);
         }
 
-        return redirect('step2');
+        return redirect('confirmStep');
     }
 
     public function timeSlotsSession(Request $request)
@@ -126,7 +123,7 @@ class CheckOutController extends Controller
 
         $staff_and_time['date'] = $request->date;
         [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
-        $staff_and_time['time_slot'] =$time_slot;
+        $staff_and_time['time_slot'] = $time_slot;
         $staff_and_time['service_staff_id'] = $staff_id;
 
         if (session()->has('staff_and_time')) {
@@ -136,10 +133,10 @@ class CheckOutController extends Controller
             Session::put('staff_and_time', $staff_and_time);
         }
 
-        return redirect('step3');
+        return redirect('locationStep');
     }
 
-    public function step1()
+    public function locationStep()
     {
         if (Session::get('serviceIds')) {
             if (Auth::check()) {
@@ -149,15 +146,35 @@ class CheckOutController extends Controller
                 $email = '';
                 $name = '';
             }
-            return view('site.checkOut.step1', compact('email', 'name'));
+            if (Session::get('address')) {
+                $address = Session::get('address');
+            } else {
+                $address = [
+                    'buildingName' => '',
+                    'area' => '',
+                    'flatVilla' => '',
+                    'street' => '',
+                    'landmark' => '',
+                    'city' => '',
+                    'number' => '',
+                    'whatsapp' => '',
+                    'email' => '',
+                    'name' => '',
+                    'latitude' => '',
+                    'longitude' => '',
+                    'searchField' => '',
+                ];
+            }
+            
+            return view('site.checkOut.locationStep', compact('email', 'name', 'address'));
         } else {
             return redirect('/')->with('error', 'There is no Services in Your Cart.');
         }
     }
 
-    public function step2(Request $request)
+    public function bookingStep(Request $request)
     {
-        if (Session::get('address') && Session::get('serviceIds')) {
+        if (Session::get('address')) {
 
             $address = Session::get('address');
             $area = $address['area'];
@@ -187,15 +204,13 @@ class CheckOutController extends Controller
 
             $holiday = Holiday::where('date', date("Y-m-d"))->get();
 
-            return view('site.checkOut.step2', compact('timeSlots', 'holiday','city','area'));
-        } elseif (Session::get('serviceIds')) {
-            return redirect('step1')->with('error', 'There is no Address Saved.');
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'holiday', 'city', 'area'));
         } else {
-            return redirect('/')->with('error', 'There is no Services in Your Cart.');
+            return redirect('/')->with('error', 'Please Set Location first.');
         }
     }
 
-    public function step3(Request $request)
+    public function confirmStep(Request $request)
     {
         if (Session::get('staff_and_time') && Session::get('address') && Session::get('serviceIds')) {
 
@@ -213,13 +228,13 @@ class CheckOutController extends Controller
 
             $i = 0;
 
-            return view('site.checkOut.step3', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time'));
+            return view('site.checkOut.confirmStep', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time'));
         } elseif (Session::get('serviceIds') && Session::get('address')) {
 
-            return redirect('step2')->with('error', 'There is no Time Slots Data Saved.');
+            return redirect('locationStep')->with('error', 'There is no Time Slots Data Saved.');
         } elseif (Session::get('serviceIds')) {
 
-            return redirect('step1')->with('error', 'There is no Address Saved.');
+            return redirect('bookingStep')->with('error', 'There is no Address Saved.');
         } else {
 
             return redirect('/')->with('error', 'There is no Services in Your Cart.');
@@ -229,31 +244,31 @@ class CheckOutController extends Controller
     public function slots(Request $request)
     {
         $address = Session::get('address');
-            $staffZoneNames = [$request->area, $request->city];
+        $staffZoneNames = [$request->area, $request->city];
 
-            $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+        $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+            $query->where(function ($query) use ($staffZoneNames) {
+                foreach ($staffZoneNames as $staffZoneName) {
+                    $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                }
+            });
+        })->where('date', '=', $request->date)
+            ->get();
+
+        if (count($slots)) {
+            $timeSlots = $slots;
+        } else {
+            $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
                 $query->where(function ($query) use ($staffZoneNames) {
                     foreach ($staffZoneNames as $staffZoneName) {
                         $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
                     }
                 });
-            })->where('date', '=', $request->date)
-                ->get();
+            })->get();
+        }
 
-            if (count($slots)) {
-                $timeSlots = $slots;
-            } else {
-                $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                    $query->where(function ($query) use ($staffZoneNames) {
-                        foreach ($staffZoneNames as $staffZoneName) {
-                            $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
-                        }
-                    });
-                })->get();
-            }
-
-            $holiday = Holiday::where('date', $request->date)->get();
-            return view('site.checkOut.timeSlots', compact('timeSlots', 'holiday'));
+        $holiday = Holiday::where('date', $request->date)->get();
+        return view('site.checkOut.timeSlots', compact('timeSlots', 'holiday'));
 
         // return response()->json($timeSlots);
     }

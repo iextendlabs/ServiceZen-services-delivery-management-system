@@ -1,10 +1,15 @@
     @if(count($holiday) == 0)
     @if(count($timeSlots))
     @foreach($timeSlots as $timeSlot)
-    <div class="list-group-item d-flex justify-content-between align-items-center time-slot">
-        <!-- <input style="display: none;" type="radio" class="form-check-input" name="time_slot" data-group="{{ $timeSlot->group_id }}" value="{{ $timeSlot->id }}" @if($timeSlot->active == "Unavailable") disabled @endif> -->
-        <div>
-            <h6 id="selected_time">{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </h6>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            @if($timeSlot->active == "Unavailable")
+            <p class="badge badge-unavailable">Unavailable</p>
+            @else
+            <p class="badge badge-available">Available</p>
+            @endif
+
+            <h4 id="selected_time"><i class="fa fa-clock"></i> {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </h4>
             @if(isset($timeSlot->space_availability))
             <span style="font-size: 13px;">Space Availability:{{ $timeSlot->space_availability }}</span>
             @endif
@@ -14,22 +19,18 @@
                     <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if($timeSlot->active == "Unavailable") disabled @endif >
                     <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                         <div class="p-2">
-                            <img src="/staff-images/{{$staff->staff->image}}" alt="Staff 1" class="rounded-circle" width="100">
+                            <img src="/staff-images/{{$staff->staff->image}}" alt="@if($timeSlot->active == " Unavailable") Not Available @endif" class="rounded-circle shadow-image" width="100">
                             <p class="text-center">{{ $staff->name }}</p>
                         </div>
                     </label>
 
                     @endforeach
                 </div>
+                <hr>
             </div>
         </div>
-
-        @if($timeSlot->active == "Unavailable")
-        <span class="badge badge-unavailable">Unavailable</span>
-        @else
-        <span class="badge badge-available">Available</span>
-        @endif
     </div>
+
     @endforeach
     @else
     <div class="alert alert-danger">

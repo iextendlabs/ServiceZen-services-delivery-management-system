@@ -29,12 +29,42 @@ class SiteController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->city){
+        $address = Session::get('address');
+
+        if (isset($request->id)) {
+            $services = Service::where('category_id', $request->id)->get();
+            $category = ServiceCategory::find($request->id);
+            return view('site.home', compact('services', 'category', 'address'));
+        } else {
+            $services = Service::all();
+            return view('site.home', compact('services', 'address'));
+        }
+    }
+
+    public function show($id)
+    {
+        $service = Service::find($id);
+        return view('site.serviceDetail', compact('service'));
+    }
+
+    public function saveLocation(Request $request){
+        if ($request->city) {
             $address = [];
 
+            $address['buildingName'] = $request->buildingName;
             $address['area'] = $request->area;
+            $address['flatVilla'] = $request->flatVilla;
+            $address['street'] = $request->street;
+            $address['landmark'] = $request->landmark;
             $address['city'] = $request->city;
-    
+            $address['number'] = $request->number;
+            $address['whatsapp'] = $request->whatsapp;
+            $address['email'] = $request->email;
+            $address['name'] = $request->name;
+            $address['latitude'] = $request->latitude;
+            $address['longitude'] = $request->longitude;
+            $address['searchField'] = $request->searchField;
+
             if (session()->has('address')) {
                 Session::forget('address');
                 Session::put('address', $address);
@@ -44,21 +74,5 @@ class SiteController extends Controller
 
             return response()->json("successfully save data.");
         }
-        
-        $address = Session::get('address');
-
-        if(isset($request->id)){
-            $services = Service::where('category_id',$request->id)->get();
-            $category = ServiceCategory::find($request->id);
-            return view('site.home',compact('services','category','address'));
-        }else{
-            $services = Service::all();
-            return view('site.home',compact('services','address'));
-        }
-    }
-
-    public function show($id){
-        $service = Service::find($id);
-        return view('site.serviceDetail',compact('service'));
     }
 }

@@ -7,7 +7,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 py-5 text-center">
-                <h2>Step 2</h2>
+                <h2>Booking Step</h2>
             </div>
         </div>
         <div class="text-center" style="margin-bottom: 20px;">
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <a href="step1">
+                    <a href="cart">
                         <button type="button" class="btn btn-primary">Back</button>
                     </a>
                     <button type="submit" class="btn btn-success">Next</button>

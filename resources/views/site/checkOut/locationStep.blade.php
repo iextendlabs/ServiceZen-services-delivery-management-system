@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 py-5 text-center">
-                <h2>Step 1</h2>
+                <h2>Location Step</h2>
             </div>
         </div>
         <div class="text-center" style="margin-bottom: 20px;">
@@ -39,7 +39,7 @@
                         </svg>
                     </div>
                     <div class="location-search-input-wrapper">
-                        <input id="searchField" type="text" name="location-input" placeholder="Search for area, street name, landmark..." autocomplete="off" value="" class="location-search-input">
+                        <input id="searchField" type="text" name="location-input" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $address['searchField']}}" class="location-search-input">
                     </div>
                     <div class="location-search-right en">
                         <div class="location-search-clear en" style="display:none;">
@@ -82,41 +82,41 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Building Name:</strong>
-                        <input type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ old('buildingName') }}">
+                        <input type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ old('buildingName') ? old('buildingName') : $address['buildingName']}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Flat / Villa:</strong>
-                        <input type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ old('flatVilla') }}">
+                        <input type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ old('flatVilla') ? old('flatVilla') : $address['flatVilla']}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Street:</strong>
-                        <input type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ old('street') }}">
+                        <input type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ old('street') ? old('street') : $address['street']}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Area:</strong>
-                        <input type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ old('area') }}">
+                        <input type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ old('area') ? old('area') : $address['area']}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Landmark:</strong>
-                        <input type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('landmark') }}">
+                        <input type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('landmark') ? old('landmark') : $address['landmark']}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>City:</strong>
-                        <input type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city') }}">
+                        <input type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city') ? old('city') : $address['city']}}">
                     </div>
                 </div>
-                <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') }}">
-                <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') }}">
+                <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') ? old('latitude') : $address['latitude']}}">
+                <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') ? old('longitude') : $address['longitude']}}">
             </div>
 
             <div class="row">
@@ -151,7 +151,7 @@
                 </div>
             </div>
             <div class="col-md-12 text-center">
-                <a href="cart">
+                <a href="step1">
                     <button type="button" class="btn btn-primary">Back</button>
                 </a>
                 <button type="submit" class="btn btn-success">Next</button>

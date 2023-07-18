@@ -85,7 +85,7 @@ $total_amount = 0;
     @endif
     @if(count($booked_services))
     <div class="text-center">
-        <a href="step1">
+        <a href="bookingStep">
             <button type="button" class="btn btn-success">Checkout</button>
         </a>
     </div>

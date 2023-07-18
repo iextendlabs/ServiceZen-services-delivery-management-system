@@ -9,7 +9,6 @@
 
     .detail-item .detail-item-value {
         width: 55%;
-        text-align: right;
     }
 
     ._sb {
@@ -24,7 +23,7 @@
 <div class="album bg-light">
     <div class="row">
         <div class="col-md-12 py-5 text-center">
-            <h2>Summary</h2>
+            <h2>Confirm Order</h2>
         </div>
     </div>
     <div class="text-center" style="margin-bottom: 20px;">
@@ -57,7 +56,7 @@
         </div>
         @endif
         <div class="row">
-            <div class="col-md-7 mt-3">
+            <div class="col-md-12 mt-3">
                 <h5>Services</h5>
                 <table class="table" style="border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <thead>
@@ -95,7 +94,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-md-5 mt-3">
+            <div class="col-md-12 mt-3">
                 <h5>Booking Details</h5>
                 <div class="detail-item _sb pb-3 pt-3">
                     <div class="detail-item-label pt-5">
@@ -127,11 +126,11 @@
         </div>
 
         <div class="row">
-            <div class="col-md-3 mt-3 mt-3 offset-sm-9 ">
+            <div class="col-md-6 mt-3 mt-3 offset-md-3 ">
                 <h5>Payment Summary</h5>
                 <table class="table">
                     <tr>
-                        <td class="text-right"><strong> Service Total:</strong></td>
+                        <td class="text-left"><strong> Service Total:</strong></td>
                         <td>@currency($sub_total)</td>
                         @php
                         $total_amount = $sub_total +$total_amount;
@@ -139,7 +138,7 @@
                     </tr>
                     @if($staff->staff->charges)
                     <tr>
-                        <td class="text-right"><strong>Staff Charges:</strong></td>
+                        <td class="text-left"><strong>Staff Charges:</strong></td>
                         <td>@currency($staff->staff->charges)</td>
                         @php
                         $staff_charges = $staff->staff->charges;
@@ -149,7 +148,7 @@
                     @endif
                     @if($time_slot->staffGroup->staffZone->transport_charges)
                     <tr>
-                        <td class="text-right"><strong>Transport Charges:</strong></td>
+                        <td class="text-left"><strong>Transport Charges:</strong></td>
                         <td>@currency($time_slot->staffGroup->staffZone->transport_charges)</td>
                         @php
                         $transport_charges = $time_slot->staffGroup->staffZone->transport_charges;
@@ -158,14 +157,14 @@
                     </tr>
                     @endif
                     <tr>
-                        <td class="text-right"><strong>Total:</strong></td>
+                        <td class="text-left"><strong>Total:</strong></td>
                         <td>@currency($total_amount)</td>
                     </tr>
                 </table>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3 offset-sm-9">
+            <div class="col-md-6 offset-md-3">
                 <form action="{{ route('order.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="total_amount" value="{{ $total_amount }}">
