@@ -8,6 +8,7 @@
         <div class="row">
             <div class="col-md-12 py-5 text-center">
                 <h2>Booking Step</h2>
+                <h3>Your Current Area: {{ $area }}</h3>
             </div>
         </div>
         <div class="text-center" style="margin-bottom: 20px;">
