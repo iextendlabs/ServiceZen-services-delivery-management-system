@@ -175,7 +175,7 @@ class CheckOutController extends Controller
     }
 
     private function getTimeSlots($city, $area, $date) {
-        $staffZoneNames = [$area, $city];
+        $staffZoneNames = [$area];
         $timeSlots = [];
         $holiday = Holiday::where('date', $date)->get();
         $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
