@@ -160,6 +160,13 @@ class TimeSlotController extends Controller
             ->with('success', 'Time slot update successfully.');
     }
 
+    public function staff_group(Request $request)
+    {
+        $staffGroup = StaffGroup::find($request->group);
+        $staff = $staffGroup->staffs;
+        return response()->json($staff);
+    }
+
 
     /**
      * Remove the specified resource from storage.
