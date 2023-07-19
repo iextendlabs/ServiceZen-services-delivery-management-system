@@ -160,6 +160,7 @@ class TimeSlotController extends Controller
             ->with('success', 'Time slot update successfully.');
     }
 
+    // Search staff by staff group
     public function staff_group(Request $request)
     {
         $staffGroup = StaffGroup::find($request->group);
