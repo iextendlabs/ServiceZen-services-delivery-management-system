@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\Console\Command\DumpCompletionCommand;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class CheckOutController extends Controller
 {
@@ -173,39 +174,43 @@ class CheckOutController extends Controller
         }
     }
 
-    public function bookingStep(Request $request)
-    {
-        if (Session::get('address')) {
-
-            $address = Session::get('address');
-            $area = $address['area'];
-            $city = $address['city'];
-            $staffZoneNames = [$address['area'], $address['city']];
-
-            $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
+    private function getTimeSlots($city, $area, $date) {
+        $staffZoneNames = [$area, $city];
+        $timeSlots = [];
+        $holiday = Holiday::where('date', $date)->get();
+        $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
+        if(count($holiday) == 0) {
+            $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
                 $query->where(function ($query) use ($staffZoneNames) {
                     foreach ($staffZoneNames as $staffZoneName) {
-                        $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                        $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
                     }
                 });
-            })->where('date', '=', date("Y-m-d"))
-                ->get();
+            })->where('date', '=', $date)->get();
 
-            if (count($slots)) {
-                $timeSlots = $slots;
-            } else {
+            if(count($timeSlots) == 0) {
                 $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
                     $query->where(function ($query) use ($staffZoneNames) {
                         foreach ($staffZoneNames as $staffZoneName) {
-                            $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                            $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
                         }
                     });
                 })->get();
             }
+        }
 
-            $holiday = Holiday::where('date', date("Y-m-d"))->get();
+        return [$timeSlots, $staff_ids];
+    }
 
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'holiday', 'city', 'area'));
+    public function bookingStep(Request $request)
+    {
+        if (Session::get('address')) {
+            $date = date('Y-m-d');
+            $address = Session::get('address');
+            $area = $address['area'];
+            $city = $address['city'];
+            [$timeSlots, $staff_ids] = $this->getTimeSlots($city, $area, $date);
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids'));
         } else {
             return redirect('/')->with('error', 'Please Set Location first.');
         }
@@ -244,32 +249,7 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
-        $staffZoneNames = [$request->area, $request->city];
-
-        $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-            $query->where(function ($query) use ($staffZoneNames) {
-                foreach ($staffZoneNames as $staffZoneName) {
-                    $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
-                }
-            });
-        })->where('date', '=', $request->date)
-            ->get();
-
-        if (count($slots)) {
-            $timeSlots = $slots;
-        } else {
-            $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                $query->where(function ($query) use ($staffZoneNames) {
-                    foreach ($staffZoneNames as $staffZoneName) {
-                        $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
-                    }
-                });
-            })->get();
-        }
-
-        $holiday = Holiday::where('date', $request->date)->get();
-        return view('site.checkOut.timeSlots', compact('timeSlots', 'holiday'));
-
-        // return response()->json($timeSlots);
+        [$timeSlots, $staff_ids] = $this->getTimeSlots($request->city, $request->area,$request->date);
+        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids'));
     }
 }

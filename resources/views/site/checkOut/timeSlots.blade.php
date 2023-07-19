@@ -1,4 +1,4 @@
-    @if(count($holiday) == 0)
+    
     @if(count($timeSlots))
     @foreach($timeSlots as $timeSlot)
     <div class="row">
@@ -16,6 +16,7 @@
             <div class="col">
                 <div class="d-flex flex-row">
                     @foreach($timeSlot->staffs as $staff)
+                    @if(!in_array($staff->id, $staff_ids))
                     <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if($timeSlot->active == "Unavailable") disabled @endif >
                     <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                         <div class="p-2">
@@ -23,7 +24,7 @@
                             <p class="text-center">{{ $staff->name }}</p>
                         </div>
                     </label>
-
+                    @endif
                     @endforeach
                 </div>
                 <hr>
@@ -35,10 +36,5 @@
     @else
     <div class="alert alert-danger">
         <strong>Whoops!</strong> There were no time slot available in your selected zone.
-    </div>
-    @endif
-    @else
-    <div class="alert alert-danger">
-        <strong>Whoops!</strong> There were Holiday on your selected date.
     </div>
     @endif
