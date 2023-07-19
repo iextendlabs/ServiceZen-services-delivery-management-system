@@ -244,13 +244,12 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
-        $address = Session::get('address');
         $staffZoneNames = [$request->area, $request->city];
 
         $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
             $query->where(function ($query) use ($staffZoneNames) {
                 foreach ($staffZoneNames as $staffZoneName) {
-                    $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
+                    $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
                 }
             });
         })->where('date', '=', $request->date)
