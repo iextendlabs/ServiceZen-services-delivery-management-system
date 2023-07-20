@@ -17,7 +17,7 @@
                 <div class="d-flex flex-row">
                     @foreach($timeSlot->staffs as $staff)
                     @if(!in_array($staff->id, $staff_ids))
-                    <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(!$timeSlot->space_availability > 0 ) disabled @endif >
+                    <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}"  @if(!$timeSlot->space_availability > 0 ) disabled @endif    @if(isset($order) && $order->service_staff_id == $staff->id) checked @endif >
                     <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                         <div class="p-2">
                             <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100">
