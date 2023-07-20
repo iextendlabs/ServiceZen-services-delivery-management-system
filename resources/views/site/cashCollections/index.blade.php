@@ -4,52 +4,56 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 py-5 text-center">
-            <h2>Your Cash Collection</h2>
+            <h2>Cash Collection</h2>
         </div>
     </div>
-    <div class="text-right">
-        <a class="btn btn-success float-end" href="{{ route('cashCollections.create') }}"> Create New Cash Collection</a>
-    </div><br>
-    <div>
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-        @if(count($cash_collections) != 0)
-        <table class="table table-bordered album bg-light">
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+    <div class="album bg-light">
+        <table class="table table-bordered">
             <tr>
                 <th>No</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Amount</th>
+                <th>Customer</th>
+                <th>Total Amount</th>
+                <th>Payment Method</th>
                 <th>Status</th>
-                <th>Appointment</th>
-                <th>Staff</th>
+                <th>Date Added</th>
+                <th></th>
             </tr>
-            @foreach ($cash_collections as $cash_collection)
+
+            @foreach ($orders as $order)
             <tr>
                 <td>{{ ++$i }}</td>
-                <td>{{ $cash_collection->name }}</td>
-                <td>{{ $cash_collection->description }}</td>
-                <td>@currency( $cash_collection->amount )</td>
-                <td>{{ $cash_collection->status }}</td>
-                <td>{{ $cash_collection->appointment->service->name }}</td>
-                <td>{{ $cash_collection->staff->name }}</td>
+                <td>{{ $order->customer->name }}</td>
+                <td>@currency( $order->total_amount )</td>
+                <td>{{ $order->payment_method }}</td>
+                <td>{{ $order->status }}</td>
+                <td>{{ $order->created_at }}</td>
+                <td>
+                    @if(!$order->cashCollection)
+                    <a class="btn btn-info" href="{{ route('cashCollections.create',$order->id) }}">Create</a>
+                    @endif
+                    {{$order->cashCollection->status}} : 
+                    @currency($order->cashCollection->amount)
+                </td>
             </tr>
             @endforeach
-
+            @if(count($orders) == 0)
+            <tr>
+                <td colspan="7" class="text-center"> There is no Order</td>
+            </tr>
+            @endif
         </table>
-        @else
-        <div class="text-center">
-            <h4>There is no Cash Collections</h4>
-        </div>
-        @endif
+        {!! $orders->links() !!}
+
     </div>
 </div>
 @endsection

@@ -15,11 +15,10 @@ return new class extends Migration
     {
         Schema::create('cash_collections', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->string('description');
             $table->string('amount');
             $table->string('staff_id');
-            $table->string('appointment_id');
+            $table->string('order_id');
             $table->string('status');
             $table->timestamps();
         });

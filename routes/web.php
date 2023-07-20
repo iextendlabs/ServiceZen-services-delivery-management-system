@@ -23,14 +23,17 @@ use App\Http\Controllers\{
     StaffZoneController,
     SupervisorController,
     TimeSlotController,
-    TransactionController
+    TransactionController,
+    
 };
 
 use App\Http\Controllers\Site\{
     CheckOutController,
     CustomerAuthController,
     SiteController,
+    SiteOrdersController,
     ServiceAppointmentController,
+    SiteCashCollectionController,
     
 };
 
@@ -105,11 +108,12 @@ Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::get('appointmentCSV', [ServiceAppointmentController::class,'downloadCSV']);
 // Order
 Route::resource('booking', ServiceAppointmentController::class);
-Route::resource('order', 'App\Http\Controllers\Site\OrderController');
+Route::resource('order', SiteOrdersController::class);
 Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
-Route::resource('cashCollections', 'App\Http\Controllers\Site\CashCollectionController');
+Route::resource('cashCollections',SiteCashCollectionController::class);
+Route::get('cashCollections/create/{order}',[SiteCashCollectionController::class, 'createCollection'])->name('cashCollections.create');
 
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
@@ -121,5 +125,5 @@ Route::get('locationStep', [CheckOutController::class, 'locationStep']);
 Route::get('confirmStep', [CheckOutController::class, 'confirmStep']); 
 Route::get('slots', [CheckOutController::class,'slots']);
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
-Route::get('staffOrderCSV', 'App\Http\Controllers\Site\OrderController@downloadCSV');
+Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);

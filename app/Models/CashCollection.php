@@ -9,11 +9,11 @@ class CashCollection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','description','amount','staff_id','appointment_id','status'];
+    protected $fillable = ['description','amount','staff_id','order_id','status'];
 
-    public function appointment()
+    public function order()
     {
-        return $this->hasOne(ServiceAppointment::class,'id','appointment_id');
+        return $this->hasOne(Order::class,'id','order_id');
     }
 
     public function staff(){

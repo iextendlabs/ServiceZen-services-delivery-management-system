@@ -7,8 +7,8 @@ use App\Models\CashCollection;
 use App\Models\ServiceAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-class CashCollectionController extends Controller
+use App\Models\Order;
+class SiteCashCollectionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,9 +17,9 @@ class CashCollectionController extends Controller
      */
     public function index()
     {
-        $cash_collections = CashCollection::where('staff_id',Auth::id())->latest()->get();
-        
-        return view('site.cashCollections.index',compact('cash_collections'))
+        $orders = Order::where(['service_staff_id'=>Auth::id(),'status'=>'Complete'])->orderBy('id','DESC')->paginate(10);                
+                
+        return view('site.cashCollections.index',compact('orders'))
             ->with('i', (request()->input('page', 1) - 1) * 10);      
     }
 
@@ -28,11 +28,9 @@ class CashCollectionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function createCollection(Order $order)
     {
-        $staff_id = Auth::id();
-        $appointments = ServiceAppointment::where('service_staff_id',Auth::id())->latest()->get();
-        return view('site.cashCollections.create',compact('appointments','staff_id'));
+        return view('site.cashCollections.create',compact('order'));
     }
 
     /**
@@ -44,10 +42,9 @@ class CashCollectionController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
             'description' => 'required',
             'staff_id' => 'required',
-            'appointment_id' => 'required',
+            'order_id' => 'required',
         ]);
 
         $input = $request->all();

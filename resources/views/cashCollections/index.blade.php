@@ -17,23 +17,19 @@
             <table class="table table-bordered">
                 <tr>
                     <th>No</th>
-                    <th>Name</th>
                     <th>Description</th>
                     <th>Amount</th>
                     <th>Status</th>
-                    <th>Appointment</th>
                     <th>Staff</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($cash_collections))
                 @foreach ($cash_collections as $cash_collection)
                 <tr>
-                    <td>{{ ++$i }}</td>
-                    <td>{{ $cash_collection->name }}</td>
+                    <td>{{ $cash_collection->order->id }}</td>
                     <td>{{ $cash_collection->description }}</td>
                     <td>@currency($cash_collection->amount)</td>
                     <td>{{ $cash_collection->status }}</td>
-                    <td>{{ $cash_collection->appointment->service->name }}</td>
                     <td>{{ $cash_collection->staff->name }}</td>
                     <td>
                         <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">

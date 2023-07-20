@@ -61,5 +61,9 @@ class Order extends Model
     public function order_total(){
         return $this->hasOne(OrderTotal::class);
     }
+
+    public function cashCollection(){
+        return $this->hasOne(CashCollection::class,'order_id');
+    }
     
 }

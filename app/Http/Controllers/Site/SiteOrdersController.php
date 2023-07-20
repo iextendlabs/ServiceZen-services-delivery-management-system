@@ -1,8 +1,8 @@
 <?php
-
-namespace App\Http\Controllers\site;
-
+namespace App\Http\Controllers\Site;
 use App\Http\Controllers\Controller;
+
+use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Models\Order;
@@ -12,12 +12,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Hash;
 use App\Models\OrderTotal;
 use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
-class OrderController extends Controller
+class SiteOrdersController extends Controller
 {
     
     public function index(Request $request)
@@ -130,6 +129,14 @@ class OrderController extends Controller
         return view('site.orders.show',compact('order','statuses'));
 
     }
+
+    // public function accept($id)
+    // {
+    //     $order = Order::find($id);
+    //     $order->update($input); 
+    //     return view('site.orders.index');
+
+    // }
 
    
     public function edit($id)

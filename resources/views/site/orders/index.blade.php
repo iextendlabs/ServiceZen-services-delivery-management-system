@@ -17,8 +17,8 @@
         </ul>
     </div>
     @endif
-    <div class="text-right">
-        <a class="btn btn-primary text-right no-print" href="staffOrderCSV"><i class="fa fa-download"></i>Export CSV</a>
+    <div class="text-right mb-2">
+        <a class="btn btn-success text-right no-print" href="staffOrderCSV"><i class="fa fa-download"></i> Export Excel</a>
     </div>
     <div class="album bg-light">
         <table class="table table-bordered">
@@ -41,9 +41,9 @@
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>
                 <td>
-                    <a class="btn btn-info" href="{{ route('order.show',$order->id) }}">Show</a>
+                    <a class="btn btn-sm btn-info" href="{{ route('order.show',$order->id) }}">Show</a>
                     @if($order->status == "Pending")
-                    <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
+                    <a class="btn btn-sm btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
                     @endif
                 </td>
             </tr>
