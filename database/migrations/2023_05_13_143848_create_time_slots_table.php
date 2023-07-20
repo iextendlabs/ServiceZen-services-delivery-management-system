@@ -18,13 +18,16 @@ return new class extends Migration
             $table->string('name');
             $table->string('time_start');
             $table->string('time_end');
-            $table->string('active');
             $table->string('date')->nullable();
             $table->string('type');
-            $table->string('group_id')->nullable();
-            $table->string('available_staff')->nullable();
-            $table->string('space_availability')->nullable();
+            $table->unsignedBigInteger('group_id')->nullable();
+            $table->integer('space_availability')->default(0);
             $table->timestamps();
+
+            $table->foreign('group_id')
+                ->references('id')
+                ->on('staff_groups')
+                ->onDelete('CASCADE');
         });
     }
 

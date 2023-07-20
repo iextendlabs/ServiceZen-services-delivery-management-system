@@ -10,7 +10,6 @@ use App\Http\Controllers\{
     ServiceController,
     ServiceStaffController,
     CustomerController,
-    AppointmentController,
     AssistantSupervisorController,
     CashCollectionController,
     HolidayController,
@@ -32,7 +31,6 @@ use App\Http\Controllers\Site\{
     CustomerAuthController,
     SiteController,
     SiteOrdersController,
-    ServiceAppointmentController,
     SiteCashCollectionController,
     
 };
@@ -59,7 +57,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('services', ServiceController::class);
     Route::resource('serviceStaff', ServiceStaffController::class);
     Route::resource('customers', CustomerController::class);
-    Route::resource('appointments', AppointmentController::class);
     Route::resource('serviceCategories', ServiceCategoryController::class);
     Route::resource('affiliates', AffiliateController::class);
     Route::resource('orders', OrderController::class);
@@ -74,7 +71,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('staffHolidays', StaffHolidayController::class);
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
-    Route::post('appointmentFilter', [AppointmentController::class, 'filter']); 
     Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
     Route::post('customerFilter', [CustomerController::class, 'filter']); 
     Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 
@@ -85,8 +81,6 @@ Route::group(['middleware' => ['auth']], function() {
      
     Route::get('serviceFilterCategory', [ServiceController::class, 'filter']); 
 
-    Route::get('appointmentDetailCSV', [AppointmentController::class,'downloadCSV']);
-    Route::get('appointmentPrint', [AppointmentController::class,'print']);
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
 
     Route::get('holidays', [HolidayController::class, 'index']);
@@ -104,10 +98,7 @@ Route::get('customer-registration', [CustomerAuthController::class, 'registratio
 Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']); 
 Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 
-// appointments
-Route::get('appointmentCSV', [ServiceAppointmentController::class,'downloadCSV']);
-// Order
-Route::resource('booking', ServiceAppointmentController::class);
+
 Route::resource('order', SiteOrdersController::class);
 Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');

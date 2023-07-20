@@ -13,7 +13,7 @@ class Order extends Model
 
     public function services()
     {
-        return $this->hasManyThrough(Service::class, ServiceAppointment::class, 'order_id', 'id', 'id', 'service_id');
+        return $this->hasManyThrough(Service::class, OrderService::class, 'order_id', 'id', 'id', 'service_id');
     }
 
     public function customer()
@@ -21,9 +21,9 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function serviceAppointments()
+    public function orderServices()
     {
-        return $this->hasMany(ServiceAppointment::class);
+        return $this->hasMany(OrderService::class);
     }
 
     public function transactions()
@@ -43,9 +43,7 @@ class Order extends Model
 
     public function transaction()
     {
-        return Transaction::where('order_id', $this->id)->where('appointment_id',Null)
-            ->select('transactions.*')
-            ->get();
+        return  $this->hasOne(Transaction::class);
     }
 
     public function time_slot()

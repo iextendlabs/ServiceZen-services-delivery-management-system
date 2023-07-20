@@ -15,11 +15,16 @@ return new class extends Migration
     {
         Schema::create('order_totals', function (Blueprint $table) {
             $table->id();
-            $table->string('order_id');
+            $table->unsignedBigInteger('order_id');
             $table->string('sub_total');
             $table->string('staff_charges')->nullable();
             $table->string('transport_charges')->nullable();
             $table->timestamps();
+
+            $table->foreign('order_id')
+                ->references('id')
+                ->on('orders')
+                ->onDelete('CASCADE');
         });
     }
 

@@ -112,12 +112,12 @@
                 <th>Duration</th>
                 <th class="text-right">Amount</th>
             </tr>
-            @foreach($order->serviceAppointments as $appointment)
+            @foreach($order->orderServices as $orderService)
             <tr>
-                <td>{{ $appointment->service->name }}</td>
-                <td>{{ $appointment->status }}</td>
-                <td>{{ $appointment->service->duration }}</td>
-                <td class="text-right">@currency( $appointment->price )</td>
+                <td>{{ $orderService->service->name }}</td>
+                <td>{{ $orderService->status }}</td>
+                <td>{{ $orderService->service->duration }}</td>
+                <td class="text-right">@currency($orderService->price)</td>
             </tr>
             @endforeach
             <tr>

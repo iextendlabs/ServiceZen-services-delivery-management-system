@@ -24,7 +24,8 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ManagerRoleSeeder::class,
             SupervisorRoleSeeder::class,
-            AssistantSupervisorRoleSeeder::class
+            AssistantSupervisorRoleSeeder::class,
+            StaffZoneSeeder::class
         ]);
     }
 }

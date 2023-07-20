@@ -150,8 +150,6 @@ class SupervisorController extends Controller
     {
         $supervisor->delete();
         
-        SupervisorToManager::where('supervisor_id',$supervisor->id)->delete();
-    
         return redirect()->route('supervisors.index')
                         ->with('success','Supervisor deleted successfully');
     }

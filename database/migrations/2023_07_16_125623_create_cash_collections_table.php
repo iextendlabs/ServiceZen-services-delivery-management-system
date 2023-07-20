@@ -17,10 +17,21 @@ return new class extends Migration
             $table->id();
             $table->string('description');
             $table->string('amount');
-            $table->string('staff_id');
-            $table->string('order_id');
+            $table->string('staff_name');
+            $table->unsignedBigInteger('staff_id')->nullable();
+            $table->unsignedBigInteger('order_id');
             $table->string('status');
             $table->timestamps();
+
+            $table->foreign('order_id')
+                ->references('id')
+                ->on('orders')
+                ->onDelete('CASCADE');
+
+                $table->foreign('staff_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('SET NULL');
         });
     }
 

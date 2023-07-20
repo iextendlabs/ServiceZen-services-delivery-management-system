@@ -15,9 +15,14 @@ return new class extends Migration
     {
         Schema::create('staff_holidays', function (Blueprint $table) {
             $table->id();
-            $table->string('staff_id');
+            $table->unsignedBigInteger('staff_id');
             $table->date('date');
             $table->timestamps();
+
+            $table->foreign('staff_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('CASCADE');
         });
     }
 

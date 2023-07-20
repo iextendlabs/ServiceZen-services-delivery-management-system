@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('commission');
             $table->unsignedBigInteger('manager_id')->nullable();
             $table->unsignedBigInteger('supervisor_id')->nullable();
@@ -23,6 +23,21 @@ return new class extends Migration
             $table->string('charges')->nullable();
             $table->string('phone');
             $table->timestamps();
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('CASCADE');
+
+            $table->foreign('manager_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('SET NULL');
+
+            $table->foreign('supervisor_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('SET NULL');
         });
     }
 

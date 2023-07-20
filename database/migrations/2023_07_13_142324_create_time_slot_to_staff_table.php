@@ -17,8 +17,17 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('staff_id');
             $table->unsignedBigInteger('time_slot_id');
-            
             $table->timestamps();
+
+            $table->foreign('time_slot_id')
+                ->references('id')
+                ->on('time_slots')
+                ->onDelete('CASCADE');
+
+            $table->foreign('staff_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('CASCADE');
         });
     }
 

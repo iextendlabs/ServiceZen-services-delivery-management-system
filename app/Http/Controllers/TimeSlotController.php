@@ -60,10 +60,10 @@ class TimeSlotController extends Controller
     {
         request()->validate([
             'name' => 'required',
+            'space_availability' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General'])],
             'time_start' => 'required',
             'time_end' => 'required',
-            'active' => 'required',
             'ids' => 'required',
             'date' => Rule::requiredIf($request->type === 'Specific')
         ]);
@@ -122,17 +122,17 @@ class TimeSlotController extends Controller
 
         $selected_staff = $time_slot->staffs->pluck('id')->toArray();
 
-        return view('timeSlots.edit', compact('time_slot', 'staff_groups', 'i', 'staffs','selected_staff'));
+        return view('timeSlots.edit', compact('time_slot', 'staff_groups', 'i', 'staffs', 'selected_staff'));
     }
 
     public function update(Request $request, $id)
     {
         request()->validate([
+            'space_availability' => 'required',
             'name' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General'])],
             'time_start' => 'required',
             'time_end' => 'required',
-            'active' => 'required',
             'ids' => 'required',
             'date' => Rule::requiredIf($request->type === 'Specific')
         ]);
@@ -155,7 +155,7 @@ class TimeSlotController extends Controller
             $input['staff_id'] = $staff_id;
             TimeSlotToStaff::create($input);
         }
-        
+
         return redirect()->route('timeSlots.index')
             ->with('success', 'Time slot update successfully.');
     }

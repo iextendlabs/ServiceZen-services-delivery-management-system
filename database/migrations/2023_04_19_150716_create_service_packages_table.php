@@ -16,6 +16,16 @@ return new class extends Migration
         Schema::create('service_packages', function (Blueprint $table) {
             $table->unsignedBigInteger('service_id');
             $table->unsignedBigInteger('package_id');
+
+            $table->foreign('service_id')
+                ->references('id')
+                ->on('services')
+                ->onDelete('CASCADE');
+
+            $table->foreign('package_id')
+                ->references('id')
+                ->on('services')
+                ->onDelete('CASCADE');
         });
     }
 

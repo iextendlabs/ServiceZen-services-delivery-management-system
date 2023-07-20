@@ -3,7 +3,7 @@
     @foreach($timeSlots as $timeSlot)
     <div class="row">
         <div class="col-md-12 text-center">
-            @if($timeSlot->active == "Unavailable")
+            @if(!$timeSlot->space_availability > 0 )
             <p class="badge badge-unavailable">Unavailable</p>
             @else
             <p class="badge badge-available">Available</p>
@@ -17,10 +17,10 @@
                 <div class="d-flex flex-row">
                     @foreach($timeSlot->staffs as $staff)
                     @if(!in_array($staff->id, $staff_ids))
-                    <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if($timeSlot->active == "Unavailable") disabled @endif >
+                    <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(!$timeSlot->space_availability > 0 ) disabled @endif >
                     <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                         <div class="p-2">
-                            <img src="/staff-images/{{$staff->staff->image}}" alt="@if($timeSlot->active == " Unavailable") Not Available @endif" class="rounded-circle shadow-image" width="100">
+                            <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100">
                             <p class="text-center">{{ $staff->name }}</p>
                         </div>
                     </label>

@@ -78,9 +78,6 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <!-- @can('appointment-list')
-                                    <a class="dropdown-item" href="{{ route('appointments.index') }}">Appointments</a>
-                                    @endcan -->
                                 @can('order-list')
                                 <a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a>
                                 @endcan

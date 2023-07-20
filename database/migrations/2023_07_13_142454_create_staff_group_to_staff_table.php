@@ -18,6 +18,16 @@ return new class extends Migration
             $table->unsignedBigInteger('staff_id');
             $table->unsignedBigInteger('staff_group_id');
             $table->timestamps();
+
+            $table->foreign('staff_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('CASCADE');
+
+            $table->foreign('staff_group_id')
+                ->references('id')
+                ->on('staff_groups')
+                ->onDelete('CASCADE');
         });
     }
 

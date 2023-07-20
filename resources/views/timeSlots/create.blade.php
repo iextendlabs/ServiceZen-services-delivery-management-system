@@ -51,16 +51,9 @@
                     <input type="date" name="date" value="{{ old('date') }}" class="form-control" placeholder="Date">
                 </div>
             </div>
-            <div class="form-group">
-                <strong for="image">Active</strong>
-                <select name="active" class="form-control">
-                    <option value="Available">Available</option>
-                    <option value="Unavailable">Unavailable</option>
-                </select>
-            </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Space Availability:</strong>
+                    <span style="color: red;">*</span><strong>Space Availability:</strong>
                     <input type="text" name="space_availability" value="{{ old('space_availability') }}" class="form-control" placeholder="Space">
                 </div>
             </div>

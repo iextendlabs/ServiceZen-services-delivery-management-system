@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderTotal;
 use App\Models\Service;
-use App\Models\ServiceAppointment;
+use App\Models\OrderService;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -108,12 +108,12 @@ class OrderController extends Controller
     
             // Loop through orders and write to output stream
             foreach ($orders as $row) {
-                $appointments = array();
-                foreach ($row->serviceAppointments as $appointment) {
-                    $appointments[] = $appointment->service->name;
+                $services = array();
+                foreach ($row->orderServices as $service) {
+                    $services[] = $service->service->name;
                 }
     
-                fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer->name, $row->staff->user->name, $row->date, date('h:i A', strtotime($row->time_slot->time_start)) . "--" . date('h:i A', strtotime($row->time_slot->time_end)), implode(",", $appointments)));
+                fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer->name, $row->staff->user->name, $row->date, date('h:i A', strtotime($row->time_slot->time_start)) . "--" . date('h:i A', strtotime($row->time_slot->time_end)), implode(",", $services)));
             }
     
             // Close output stream
@@ -156,15 +156,10 @@ class OrderController extends Controller
         $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
 
         $staffZoneNames = [$order->area, $order->city];
+        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date);
 
-        $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-            $query->where(function ($query) use ($staffZoneNames) {
-                foreach ($staffZoneNames as $staffZoneName) {
-                    $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
-                }
-            });
-        })->get();
-        return view('orders.edit', compact('order', 'timeSlots', 'statuses'));
+
+       return view('orders.edit', compact('order', 'timeSlots', 'statuses','staff_ids'));
     }
 
     public function update(Request $request, $id)
@@ -188,8 +183,6 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
         $order->delete();
-        ServiceAppointment::where('order_id', $id)->delete();
-        OrderTotal::where('order_id', $id)->delete();
 
         return redirect()->route('orders.index')
             ->with('success', 'Order deleted successfully');

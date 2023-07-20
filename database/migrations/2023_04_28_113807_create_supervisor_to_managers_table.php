@@ -14,8 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('supervisor_to_managers', function (Blueprint $table) {
-            $table->bigInteger('supervisor_id');
-            $table->bigInteger('manager_id');
+            $table->unsignedBigInteger('supervisor_id');
+            $table->unsignedBigInteger('manager_id');
+
+            $table->foreign('manager_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('CASCADE');
         });
     }
 

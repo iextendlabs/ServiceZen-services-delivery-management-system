@@ -16,9 +16,13 @@ return new class extends Migration
         Schema::create('staff_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('staff_ids');
-            $table->string('staff_zone_id');
+            $table->unsignedBigInteger('staff_zone_id');
             $table->timestamps();
+
+            $table->foreign('staff_zone_id')
+                ->references('id')
+                ->on('staff_zones')
+                ->onDelete('CASCADE');
         });
     }
 

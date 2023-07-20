@@ -42,12 +42,6 @@
         @endif
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Active:</strong>
-                {{ $time_slot->active }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
                 <strong>Staff Group:</strong>
                 {{ $time_slot->group->name }}
             </div>

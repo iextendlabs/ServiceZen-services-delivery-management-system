@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Models\Order;
-use App\Models\Service;
-use App\Models\ServiceAppointment;
+use App\Models\OrderService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\OrderTotal;
+use App\Models\Service;
 use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
@@ -93,10 +93,17 @@ class SiteOrdersController extends Controller
         $input['longitude'] = $address['longitude'];
         
         $order = Order::create($input);
+
+        $time_slot=$order->time_slot;
+        $time_slot->space_availability  --;
+        $time_slot->save();
         
         $input['order_id'] = $order->id;
         
         $order_total = OrderTotal::create($input);
+
+        $this->sendAdminEmail($input['order_id'],$input['email']);
+        $this->sendCustomerEmail($input['customer_id'],$customer_type);
 
         foreach($serviceIds as $id){
             $services = Service::find($id);
@@ -108,13 +115,9 @@ class SiteOrdersController extends Controller
                 $input['price'] = $services->price;
             }
 
-            ServiceAppointment::create($input);
+            OrderService::create($input);
         }
 
-        $this->sendAdminEmail($input['order_id'],$input['email']);
-        $this->sendCustomerEmail($input['customer_id'],$customer_type);
-
-        Session::forget('address');
         Session::forget('staff_and_time');
         Session::forget('serviceIds');
         
@@ -240,12 +243,12 @@ class SiteOrdersController extends Controller
         
         // Loop through data and write to output stream
         foreach ($data as $row) {
-            $appointments= array();
-            foreach($row->serviceAppointments as $appointment){
-                $appointments[] = $appointment->service->name;
+            $services= array();
+            foreach($row->orderServices as $services){
+                $services[] = $services->service->name;
             }
 
-            fputcsv($output, array($row->id, '$'.$row->total_amount, $row->status, $row->created_at, $row->customer->name,$row->staff->user->name,$row->date,date('h:i A', strtotime($row->time_slot->time_start)). "--" .date('h:i A', strtotime($row->time_slot->time_end)),implode(",", $appointments)));
+            fputcsv($output, array($row->id, '$'.$row->total_amount, $row->status, $row->created_at, $row->customer->name,$row->staff->user->name,$row->date,date('h:i A', strtotime($row->time_slot->time_start)). "--" .date('h:i A', strtotime($row->time_slot->time_end)),implode(",", $services)));
         }
         
         // Close output stream

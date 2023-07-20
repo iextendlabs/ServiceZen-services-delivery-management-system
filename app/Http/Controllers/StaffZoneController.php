@@ -118,9 +118,6 @@ class StaffZoneController extends Controller
     {
         
         $staffZone->delete();
-        $staffGroup = StaffGroup::where('staff_zone_id',$staffZone->id)->get();
-        TimeSlot::where('group_id',$staffGroup[0]->id)->delete();
-        StaffGroup::where('staff_zone_id',$staffZone->id)->delete();
 
         
         return redirect()->route('staffZones.index')

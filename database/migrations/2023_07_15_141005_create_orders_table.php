@@ -15,11 +15,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->integer('customer_id');
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->string('customer_name')->nullable();
+            $table->string('customer_email')->nullable();
             $table->decimal('total_amount', 8, 2);
             $table->string('payment_method');
             $table->string('status')->nullable();
-            $table->string('affiliate_id')->nullable();
+            $table->unsignedBigInteger('affiliate_id')->nullable();
             $table->string('buildingName')->nullable();
             $table->string('area')->nullable();
             $table->string('landmark');
@@ -28,12 +30,35 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('number')->nullable();
             $table->string('whatsapp');
-            $table->string('service_staff_id');
+            $table->unsignedBigInteger('service_staff_id')->nullable();
+            $table->string('staff_name')->nullable();
             $table->string('date');
-            $table->string('time_slot_id');
+            $table->unsignedBigInteger('time_slot_id')->nullable();
+            $table->string('time_slot_value')->nullable();
             $table->string('latitude');
             $table->string('longitude');
+            $table->string('order_comment')->nullable();
             $table->timestamps();
+
+            $table->foreign('customer_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('SET NULL');
+
+                $table->foreign('affiliate_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('SET NULL');
+
+                $table->foreign('service_staff_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('SET NULL');
+
+                $table->foreign('time_slot_id')
+                ->references('id')
+                ->on('time_slots')
+                ->onDelete('SET NULL');
         });
     }
 

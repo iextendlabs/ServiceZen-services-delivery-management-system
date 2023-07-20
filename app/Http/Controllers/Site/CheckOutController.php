@@ -174,34 +174,7 @@ class CheckOutController extends Controller
         }
     }
 
-    private function getTimeSlots($city, $area, $date) {
-        // only area based
-        $staffZoneNames = [$area];
-        $timeSlots = [];
-        $holiday = Holiday::where('date', $date)->get();
-        $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
-        if(count($holiday) == 0) {
-            $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                $query->where(function ($query) use ($staffZoneNames) {
-                    foreach ($staffZoneNames as $staffZoneName) {
-                        $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
-                    }
-                });
-            })->where('date', '=', $date)->get();
-
-            if(count($timeSlots) == 0) {
-                $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                    $query->where(function ($query) use ($staffZoneNames) {
-                        foreach ($staffZoneNames as $staffZoneName) {
-                            $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
-                        }
-                    });
-                })->get();
-            }
-        }
-
-        return [$timeSlots, $staff_ids];
-    }
+    
 
     public function bookingStep(Request $request)
     {
@@ -210,7 +183,7 @@ class CheckOutController extends Controller
             $address = Session::get('address');
             $area = $address['area'];
             $city = $address['city'];
-            [$timeSlots, $staff_ids] = $this->getTimeSlots($city, $area, $date);
+            [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($area, $date);
             return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids'));
         } else {
             return redirect('/')->with('error', 'Please Set Location first.');
@@ -250,7 +223,7 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
-        [$timeSlots, $staff_ids] = $this->getTimeSlots($request->city, $request->area,$request->date);
+        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($request->area,$request->date);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids'));
     }
 }

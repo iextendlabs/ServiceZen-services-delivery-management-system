@@ -134,8 +134,6 @@ class ManagerController extends Controller
     {
         $manager->delete();
         
-        SupervisorToManager::where('manager_id',$manager->id)->delete();
-        
         return redirect()->route('managers.index')
                         ->with('success','Manager deleted successfully');
     }

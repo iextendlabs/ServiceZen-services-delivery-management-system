@@ -57,21 +57,9 @@
                 <input type="date" name="date" value="{{$time_slot->date}}" class="form-control" placeholder="Date">
             </div>
         </div>
-        <div class="form-group">
-            <strong for="image">Active</strong>
-            <select name="active" class="form-control">
-                @if($time_slot->active == "Available")
-                <option value="Available" selected>Available</option>
-                <option value="Unavailable">Unavailable</option>
-                @elseif($time_slot->active == "Unavailable")
-                <option value="Available">Available</option>
-                <option value="Unavailable" selected>Unavailable</option>
-                @endif
-            </select>
-        </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Space Availability:</strong>
+                <span style="color: red;">*</span><strong>Space Availability:</strong>
                 <input type="text" name="space_availability" value="{{$time_slot->space_availability}}" class="form-control" placeholder="Space">
             </div>
         </div>

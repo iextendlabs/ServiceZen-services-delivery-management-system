@@ -156,8 +156,6 @@ class AssistantSupervisorController extends Controller
         $assistant_supervisor = User::find($id);
         $assistant_supervisor->delete();
         
-        AssistantSupervisorToSupervisor::where('assistant_supervisor_id',$id)->delete();
-        
         return redirect()->route('assistantSupervisors.index')
                         ->with('success','Assistant Supervisor deleted successfully');
     }

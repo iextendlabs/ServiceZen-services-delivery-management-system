@@ -13,7 +13,7 @@ class Staff extends Model
 
     public function appointments()
     {
-        return $this->hasMany(ServiceAppointment::class, 'service_staff_id', 'user_id');
+        return $this->hasMany(OrderService::class, 'service_staff_id', 'user_id');
     }
 
     public function user()

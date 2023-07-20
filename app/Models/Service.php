@@ -11,7 +11,7 @@ class Service extends Model
     
     public function appointments()
     {
-        return $this->hasMany(ServiceAppointment::class);
+        return $this->hasMany(OrderService::class);
     }
 
     public function package()
@@ -22,6 +22,10 @@ class Service extends Model
     public function userNote()
     {
         return $this->hasOne(ServiceToUserNote::class);
+    }
+    public function orderServices(){
+        return $this->hasMany(OrderService::class);
+
     }
     
 }
