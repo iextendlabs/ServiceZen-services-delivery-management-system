@@ -39,7 +39,7 @@
                     <input type="hidden" name="city" value="{{ $order->city }}">
                     <input type="hidden" name="area" value="{{ $order->area }}">
                     <div class="list-group" id="time-slots-container">
-                    @include('site.checkout.timeSlots')
+                    @include('site.checkOut.timeSlots')
                     </div>
                 </div>
                 <div class="col-md-12">
