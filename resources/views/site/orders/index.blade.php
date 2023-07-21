@@ -42,8 +42,15 @@
                 <td>{{ $order->created_at }}</td>
                 <td>
                     <a class="btn btn-sm btn-info" href="{{ route('order.show',$order->id) }}">Show</a>
+                    @if(Auth::User()->getRoleNames() == '["Customer"]')
                     @if($order->status == "Pending")
                     <a class="btn btn-sm btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
+                    @endif
+                    @endif
+                    @if($order->status !== "Complete" && Auth::User()->getRoleNames() == '["Staff"]')
+                    <a class="btn  btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Processing">Accept</a>
+                    <a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Canceled">Reject</a>
+                    <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Complete">Complete</a>
                     @endif
                 </td>
             </tr>

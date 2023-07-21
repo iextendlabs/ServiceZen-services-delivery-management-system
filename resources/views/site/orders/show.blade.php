@@ -39,8 +39,8 @@
         </div>
         <script async src="https://static.addtoany.com/menu/page.js"></script>
         <!-- AddToAny END -->
-        <div class="text-right">
-            <button type="button" class="btn btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
+        <div class="text-right mb-2">
+            <button type="button" class="btn btn-danger float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i> Download PDF</button>
         </div>
         <table class="table table-bordered album bg-light">
             <td class="text-left" colspan="2">Order Details</td>
@@ -141,38 +141,6 @@
                 <td class="text-right">@currency( $order->total_amount )</td>
             </tr>
         </table>
-        @guest
-        @else
-        @if(Auth::user()->hasRole('Staff'))
-        <fieldset>
-            <legend>Update Order</legend>
-            <form action="{{ route('order.update',$order->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Status:</strong>
-                            <select name="status" class="form-control">
-                                @foreach ($statuses as $status)
-                                @if($status == $order->status)
-                                <option value="{{ $status }}" selected>{{ $status }}</option>
-                                @else
-                                <option value="{{ $status }}">{{ $status }}</option>
-                                @endif
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-12 text-right no-print">
-                        <button type="submit" class="btn btn-primary">Update</button>
-                    </div>
-                </div>
-            </form>
-        </fieldset>
-        @endif
-        @endguest
-
     </div>
 </div>
 <script>

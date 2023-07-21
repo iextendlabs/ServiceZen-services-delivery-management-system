@@ -137,18 +137,8 @@ class SiteOrdersController extends Controller
     public function show($id)
     {
         $order = Order::find($id);
-        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
-        return view('site.orders.show', compact('order', 'statuses'));
+        return view('site.orders.show', compact('order'));
     }
-
-    // public function accept($id)
-    // {
-    //     $order = Order::find($id);
-    //     $order->update($input); 
-    //     return view('site.orders.index');
-
-    // }
-
 
     public function edit($id)
     {
@@ -184,6 +174,13 @@ class SiteOrdersController extends Controller
 
         return redirect()->route('order.index')
             ->with('success', 'Order updated successfully');
+    }
+
+    public function updateOrderStatus(Order $order, Request $request)
+    {
+        $order->status = $request->status;
+        $order->save();
+        return redirect()->route('order.index')->with('success', 'Order updated successfully');
     }
 
 

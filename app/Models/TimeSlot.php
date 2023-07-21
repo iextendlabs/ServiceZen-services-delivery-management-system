@@ -62,6 +62,12 @@ class TimeSlot extends Model
             }
         }
 
+        if (count($timeSlots)) {
+            foreach($timeSlots as $timeSlot) {
+                $count = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->count();
+                $timeSlot->space_availability -= $count;
+            }
+        }
         return [$timeSlots, $staff_ids];
     }
 }
