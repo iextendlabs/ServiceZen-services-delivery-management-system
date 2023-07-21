@@ -17,9 +17,13 @@
         </ul>
     </div>
     @endif
+    @if(Auth::User()->getRoleNames() == '["Staff"]')
+
     <div class="text-right mb-2">
         <a class="btn btn-success text-right no-print" href="staffOrderCSV"><i class="fa fa-download"></i> Export Excel</a>
     </div>
+    @endif
+
     <div class="album bg-light">
         <table class="table table-bordered">
             <tr>
