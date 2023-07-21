@@ -60,7 +60,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-block mb-2 btn-success">Next</button>
+                    <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
                     <a href="cart">
                         <button type="button" class="btn btn-block btn-secondary">Back</button>
                     </a>
