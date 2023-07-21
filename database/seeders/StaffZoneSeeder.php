@@ -30,6 +30,13 @@ class StaffZoneSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name' => 'Sharjah',
+                'description' => 'This is Sharjah',
+                'transport_charges' => '15.00',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             // Add more data here if needed
         ];
 

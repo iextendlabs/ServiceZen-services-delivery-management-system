@@ -21,7 +21,25 @@ class StaffRoleSeeder extends Seeder
         $user = User::create([
             'name' => 'Staff', 
             'email' => 'staff@gmail.com',
-            'password' => bcrypt('staff1234')
+            'password' => bcrypt('test')
+        ]);
+
+        $user = User::create([
+            'name' => 'Staff1', 
+            'email' => 'staff1@gmail.com',
+            'password' => bcrypt('test')
+        ]);
+
+        $user = User::create([
+            'name' => 'Staff2', 
+            'email' => 'staff2@gmail.com',
+            'password' => bcrypt('test')
+        ]);
+
+        $user = User::create([
+            'name' => 'Staff3', 
+            'email' => 'staff3@gmail.com',
+            'password' => bcrypt('test')
         ]);
 
         $staff = Staff::create([

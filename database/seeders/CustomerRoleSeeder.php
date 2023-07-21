@@ -20,7 +20,22 @@ class CustomerRoleSeeder extends Seeder
         $user = User::create([
             'name' => 'Customer', 
             'email' => 'customer@gmail.com',
-            'password' => bcrypt('customer1234')
+            'password' => bcrypt('test')
+        ],
+        [
+            'name' => 'Customer1', 
+            'email' => 'customer1@gmail.com',
+            'password' => bcrypt('test')
+        ],
+        [
+            'name' => 'Customer2', 
+            'email' => 'customer2@gmail.com',
+            'password' => bcrypt('test')
+        ],
+        [
+            'name' => 'Customer3', 
+            'email' => 'customer3@gmail.com',
+            'password' => bcrypt('test')
         ]);
         
         $role = Role::create(['name' => 'Customer']);

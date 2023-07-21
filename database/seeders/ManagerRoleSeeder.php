@@ -20,7 +20,7 @@ class ManagerRoleSeeder extends Seeder
         $user = User::create([
             'name' => 'Manager', 
             'email' => 'manager@gmail.com',
-            'password' => bcrypt('manager1234')
+            'password' => bcrypt('test')
         ]);
 
         $role = Role::create(['name' => 'Manager']);

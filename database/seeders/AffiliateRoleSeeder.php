@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Affiliate;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 use Spatie\Permission\Models\Role;
@@ -21,7 +20,7 @@ class AffiliateRoleSeeder extends Seeder
         $user = User::create([
             'name' => 'Affiliate', 
             'email' => 'affiliate@gmail.com',
-            'password' => bcrypt('affiliate1234')
+            'password' => bcrypt('test')
         ]);
 
         $affiliate = Affiliate::create([
