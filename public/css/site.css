@@ -70,6 +70,14 @@ hr {
 
 .card-img-top {
   height: 250px;
+  object-fit: cover;
+}
+
+.staff-label .rounded-circle {
+  border-radius: 50% !important;
+  object-fit: cover;
+  height: 100px;
+  width: 100px
 }
 
 .card-body .card-text {
