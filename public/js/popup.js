@@ -23,7 +23,7 @@ $(document).ready(function () {
             method: "POST", // Use the appropriate HTTP method
             data: $("#locationPopup input"),
             success: function (response) {
-                $("#locationPopup").modal("hide");
+                location.reload(true);
             },
             error: function (xhr, status, error) {
                 console.log("Save Changes error:", error);
