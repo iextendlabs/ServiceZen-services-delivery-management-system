@@ -62,34 +62,55 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <table class="table">
-                        <tr>
-                            <th>Id</th>
-                            <th>Customer</th>
-                            <th>Status</th>
-                            <th>Date Added</th>
-                            <th>Total</th>
-                            <th>Action</th>
-                        </tr>
-                        @if(count($orders))
-                        @foreach ($orders as $order)
-                        <tr>
-                            <td>{{ $order->id }}</td>
-                            <td>@if($order->customer){{ $order->customer->name }}@endif</td>
-                            <td>{{ $order->status }}</td>
-                            <td>{{ $order->created_at }}</td>
-                            <td>@currency($order->total_amount)</td>
-                            <td>
-                                <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">View</a>
-                            </td>
-                        </tr>
-                        @endforeach
-                        @else
-                        <tr>
-                            <td colspan="6" class="text-center">There is no order.</td>
-                        </tr>
-                        @endif
-                    </table>
+                <table class="table table-bordered table-responsive">
+                <tr>
+                    <th>No</th>
+                    <th>Order Id</th>
+                    <th>Customer</th>
+                    <th>Staff</th>
+                    <th>Data \ Time Slot</th>
+                    <th>Total Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                    <th>Date Added</th>
+                    <th>Action</th>
+                </tr>
+                @if(count($orders))
+                @foreach ($orders as $order)
+                <tr>
+                    <td>{{ ++$i }}</td>
+                    <td>#{{ $order->id }}</td>
+
+                    <td>{{ $order->customer_name }}</td>
+                    <td>{{ $order->staff_name }}</td>
+                    <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
+                    <td>@currency($order->total_amount)</td>
+                    <td>{{ $order->payment_method }}</td>
+                    <td>{{ $order->status }}</td>
+                    <td>{{ $order->order_comment }}</td>
+                    <td>{{ $order->created_at }}</td>
+                    <td>
+                        <form action="{{ route('orders.destroy',$order->id) }}" method="POST">
+                            <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">Show</a>
+                            @can('order-edit')
+                            <a class="btn btn-primary" href="{{ route('orders.edit',$order->id) }}">Edit</a>
+                            @endcan
+                            @csrf
+                            @method('DELETE')
+                            @can('order-delete')
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            @endcan
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+                @else
+                <tr>
+                    <td colspan="11" class="text-center"> There is no Order</td>
+                </tr>
+                @endif
+            </table>
                 </div>
             </div>
         </div>

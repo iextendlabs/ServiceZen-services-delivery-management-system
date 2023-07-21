@@ -51,29 +51,19 @@ class HomeController extends Controller
                     $orders = Order::orderBy('id','DESC')->take(10)->get();
                 }
                 
-                $affiliate_transaction = DB::table('transactions')
-                ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')
-                ->select(DB::raw('SUM(transactions.amount) as amount'))
+                $affiliate_commission = DB::table('affiliates')
+                ->select('affiliates.user_id', DB::raw('SUM(transactions.amount) as total_amount'))
+                ->join('transactions', 'affiliates.user_id', '=', 'transactions.user_id')
                 ->groupBy('affiliates.user_id')
-                ->get();
+                ->pluck('total_amount')
+                ->sum();
         
-                $affiliate_commission = 0;
-                
-                foreach($affiliate_transaction as $transaction){
-                    $affiliate_commission = $affiliate_commission + $transaction->amount;
-                }
-        
-                $staff_transaction = DB::table('transactions')
-                ->join('staff', 'transactions.user_id', '=', 'staff.user_id')
-                ->select(DB::raw('SUM(transactions.amount) as amount'))
+                $staff_commission = DB::table('staff')
+                ->select('staff.user_id', DB::raw('SUM(transactions.amount) as total_amount'))
+                ->join('transactions', 'staff.user_id', '=', 'transactions.user_id')
                 ->groupBy('staff.user_id')
-                ->get();
-        
-                $staff_commission = 0;
-                
-                foreach($staff_transaction as $transaction){
-                    $staff_commission = $staff_commission + $transaction->amount;
-                }
+                ->pluck('total_amount')
+                ->sum();
         
                 $order = Order::get();
                 
