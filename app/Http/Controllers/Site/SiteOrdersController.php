@@ -168,11 +168,12 @@ class SiteOrdersController extends Controller
         [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
         $input['time_slot_id'] = $time_slot;
         $input['service_staff_id'] = $staff_id;
-
         $order = Order::find($id);
-
         $order->update($input);
-
+        
+        $staff = User::find($staff_id);
+        $order->staff_name = $staff->name;
+        $order->save();
         return redirect()->route('order.index')
             ->with('success', 'Order updated successfully');
     }
