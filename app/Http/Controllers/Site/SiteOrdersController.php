@@ -170,7 +170,7 @@ class SiteOrdersController extends Controller
         $input['service_staff_id'] = $staff_id;
         $order = Order::find($id);
         $order->update($input);
-        
+
         $staff = User::find($staff_id);
         $order->staff_name = $staff->name;
         $order->save();
@@ -249,8 +249,8 @@ class SiteOrdersController extends Controller
         // Loop through data and write to output stream
         foreach ($data as $row) {
             $services = array();
-            foreach ($row->orderServices as $services) {
-                $services[] = $services->service_name;
+            foreach ($row->orderServices as $service) {
+                $services[] = $service->service_name;
             }
 
             fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer_name, $row->staff_name, $row->date, $row->time_slot_value, implode(",", $services)));
