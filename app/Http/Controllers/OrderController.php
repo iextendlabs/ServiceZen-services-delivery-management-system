@@ -171,8 +171,13 @@ class OrderController extends Controller
         $input['service_staff_id'] = $staff_id;
 
         $order = Order::find($id);
+        $staff = User::find($staff_id);
 
         $order->update($input);
+
+        $order->staff_name = $staff->name;
+
+        $order->save();
 
         return redirect()->route('orders.index')
             ->with('success', 'Order updated successfully');

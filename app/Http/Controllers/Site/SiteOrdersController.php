@@ -110,9 +110,6 @@ class SiteOrdersController extends Controller
 
         $order_total = OrderTotal::create($input);
 
-        $this->sendAdminEmail($input['order_id'], $input['email']);
-        $this->sendCustomerEmail($input['customer_id'], $customer_type);
-
         foreach ($serviceIds as $id) {
             $services = Service::find($id);
             $input['service_id'] = $id;
@@ -123,10 +120,14 @@ class SiteOrdersController extends Controller
             } else {
                 $input['price'] = $services->price;
             }
-
             OrderService::create($input);
         }
-
+        try {
+            $this->sendAdminEmail($input['order_id'], $input['email']);
+            $this->sendCustomerEmail($input['customer_id'], $customer_type);
+        } catch (\Throwable $th) {
+            //TODO: log error or queue job later
+        }
         Session::forget('staff_and_time');
         Session::forget('serviceIds');
 
