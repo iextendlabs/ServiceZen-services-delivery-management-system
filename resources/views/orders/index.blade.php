@@ -6,6 +6,8 @@
                 <h2>Orders</h2>
             </div>
             <div class="float-end">
+            <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;"> All Orders </a>
+
                 @can('order-download')
                 <button type="button" class="btn btn-success float-end no-print" id="csvButton"><i class="fa fa-download"></i> Excel</button>
                 <button type="button" class="btn btn-danger float-end no-print" id="printButton" style="margin-right: 10px;"><i class="fa fa-print"></i> PDF</button>

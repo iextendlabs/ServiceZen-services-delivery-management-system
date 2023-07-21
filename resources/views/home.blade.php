@@ -52,9 +52,10 @@
                 <h2>Orders</h2>
             </div>
             <div class="float-end">
-                <a class="btn btn-primary float-end" href="/orders?status=Pending">Pending Order</a>
-                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">Complete Order</a>
-                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">Canceled Order</a>
+                <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;"> All Orders </a>
+                <a class="btn btn-primary float-end" href="/orders?status=Pending">Pending Orders</a>
+                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">Complete Orders</a>
+                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">Canceled Orders</a>
             </div>
         </div>
     </div>
