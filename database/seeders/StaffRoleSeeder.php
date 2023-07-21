@@ -18,42 +18,31 @@ class StaffRoleSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::create([
-            'name' => 'Staff', 
-            'email' => 'staff@gmail.com',
-            'password' => bcrypt('test')
-        ]);
-
-        $user = User::create([
-            'name' => 'Staff1', 
-            'email' => 'staff1@gmail.com',
-            'password' => bcrypt('test')
-        ]);
-
-        $user = User::create([
-            'name' => 'Staff2', 
-            'email' => 'staff2@gmail.com',
-            'password' => bcrypt('test')
-        ]);
-
-        $user = User::create([
-            'name' => 'Staff3', 
-            'email' => 'staff3@gmail.com',
-            'password' => bcrypt('test')
-        ]);
-
-        $staff = Staff::create([
-            'user_id' => $user->id, 
-            'commission' => '10',
-            'phone' => ' '
-        ]);
-        
+        // Create a "Staff" role
         $role = Role::create(['name' => 'Staff']);
 
-        $permissions = Permission::where('name', 'like', 'service-staff%')->pluck('id','id');
+        // Define the permissions that "Staff" role should have
+        $permissions = Permission::where('name', 'like', 'service-staff%')->pluck('id', 'id');
 
+        // Assign the permissions to the "Staff" role
         $role->syncPermissions($permissions);
-        
-        $user->assignRole([$role->id]);
+
+        // Create and assign four staff members
+        for ($i = 1; $i <= 4; $i++) {
+            $user = User::create([
+                'name' => 'Staff ' . $i,
+                'email' => 'staff' . $i . '@gmail.com',
+                'password' => bcrypt('test')
+            ]);
+
+            Staff::create([
+                'user_id' => $user->id,
+                'commission' => '10',
+                'phone' => ' '
+            ]);
+
+            // Assign the "Staff" role to the staff member
+            $user->assignRole([$role->id]);
+        }
     }
 }

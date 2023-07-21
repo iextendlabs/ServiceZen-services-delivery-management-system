@@ -17,33 +17,19 @@ class CustomerRoleSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::create([
-            'name' => 'Customer', 
-            'email' => 'customer@gmail.com',
-            'password' => bcrypt('test')
-        ],
-        [
-            'name' => 'Customer1', 
-            'email' => 'customer1@gmail.com',
-            'password' => bcrypt('test')
-        ],
-        [
-            'name' => 'Customer2', 
-            'email' => 'customer2@gmail.com',
-            'password' => bcrypt('test')
-        ],
-        [
-            'name' => 'Customer3', 
-            'email' => 'customer3@gmail.com',
-            'password' => bcrypt('test')
-        ]);
-        
-        $role = Role::create(['name' => 'Customer']);
-
         $permissions = Permission::where('name', 'like', 'customer%')->pluck('id','id');
 
+        $role = Role::create(['name' => 'Customer']);
         $role->syncPermissions($permissions);
+
+        for ($i = 0; $i <= 4; $i++) {
+            $user = User::create([
+                'name' => "Customer {$i}", 
+                'email' => "customer{$i}@gmail.com",
+                'password' => bcrypt('test')
+            ]);
         
-        $user->assignRole([$role->id]);
+            $user->assignRole([$role->id]);
+        }
     }
 }
