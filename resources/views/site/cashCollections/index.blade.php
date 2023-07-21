@@ -40,9 +40,11 @@
                 <td>
                     @if(!$order->cashCollection)
                     <a class="btn btn-info" href="{{ route('cashCollections.create',$order->id) }}">Create</a>
-                    @endif
+                    @else
                     {{$order->cashCollection->status}} : 
                     @currency($order->cashCollection->amount)
+
+                    @endif
                 </td>
             </tr>
             @endforeach

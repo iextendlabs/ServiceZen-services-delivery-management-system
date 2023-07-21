@@ -49,12 +49,12 @@
             <td class="text-left" colspan="2">Time Slot and Staff</td>
             <tr>
                 <td>
-                    <b>Staff:</b>@if($order->staff) {{ $order->staff->user->name }} @endif <br><br>
+                    <b>Staff:</b>{{ $order->staff_name }}<br><br>
                     <b>Date:</b> {{ $order->date }}
                 </td>
                 <td>
                     <b>Time Slot:</b>@if($order->time_slot) {{ $order->time_slot->name }} @endif <br><br>
-                    <b>Time:</b>@if($order->time_slot)  {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif
+                    <b>Time:</b>{{ $order->time_slot_value }}
                 </td>
             </tr>
         </table>
@@ -79,8 +79,8 @@
             <td class="text-left" colspan="2">Customer Details</td>
             <tr>
                 <td>
-                    <b>Name:</b> {{ $order->customer->name }} <br><br>
-                    <b>Email:</b> {{ $order->customer->email }}
+                    <b>Name:</b> {{ $order->customer_name }} <br><br>
+                    <b>Email:</b> {{ $order->customer_email }}
                 </td>
                 <td>
                     <b>Phone Number:</b> {{ $order->number }} <br><br>
@@ -103,7 +103,7 @@
             </tr>
             @foreach($order->orderServices as $orderService)
             <tr>
-                <td>{{ $orderService->service->name }}</td>
+                <td>{{ $orderService->service_name }}</td>
                 <td>{{ $orderService->status }}</td>
                 <td>{{ $orderService->service->duration }}</td>
                 <td class="text-right">@currency($orderService->price)</td>
@@ -150,7 +150,7 @@
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>{{ $order->status }}</td>
-                        <td>{{ $order->staff->user->name }}</td>
+                        <td>{{ $order->staff_name }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
                         <td>@currency(($order->order_total->sub_total * $order->staff->commission) / 100)</td>
                         <td class="no-print">

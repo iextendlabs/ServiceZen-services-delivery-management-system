@@ -30,7 +30,7 @@
                     <td>{{ $cash_collection->description }}</td>
                     <td>@currency($cash_collection->amount)</td>
                     <td>{{ $cash_collection->status }}</td>
-                    <td>{{ $cash_collection->staff->name }}</td>
+                    <td>{{ $cash_collection->staff_name }}</td>
                     <td>
                         <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
                             <!-- <a class="btn btn-info" href="{{ route('cashCollection.show',$cash_collection->id) }}">Show</a> -->

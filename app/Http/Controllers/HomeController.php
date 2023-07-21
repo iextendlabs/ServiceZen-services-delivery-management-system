@@ -42,7 +42,7 @@ class HomeController extends Controller
                     $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
         
                     $orders = Order::whereIn('service_staff_id', $staffIds)
-                        ->take(10)->get(); 
+                        ->take(10)->get();
         
                 }elseif(Auth::user()->hasRole('Staff')){
                     $orders = Order::where('service_staff_id',Auth::id())->take(10)->get();

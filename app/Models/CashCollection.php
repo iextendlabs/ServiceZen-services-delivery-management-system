@@ -9,7 +9,7 @@ class CashCollection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['description','amount','staff_id','order_id','status'];
+    protected $fillable = ['description','amount','staff_id','staff_name','order_id','status'];
 
     public function order()
     {

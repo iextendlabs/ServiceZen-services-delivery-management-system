@@ -5,7 +5,7 @@
             <h2>Staff Holidays</h2>
         </div>
         <div class="col-md-6">
-            @can('service-staff-create')
+            @can('staff-holiday-create')
             <a class="btn btn-success  float-end" href="{{ route('staffHolidays.create') }}"> Create New Staff Holiday</a>
             @endcan
         </div>
@@ -36,7 +36,7 @@
                         <form action="{{ route('staffHolidays.destroy',$staffHoliday->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            @can('service-staff-delete')
+                            @can('staff-holiday-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>

@@ -91,7 +91,7 @@ class OrderController extends Controller
 
         $orders = $query->paginate(5)->appends($existingParameters);
 
-        if($request->csv == 1){
+        if ($request->csv == 1) {
             $headers = array(
                 "Content-type" => "text/csv",
                 "Content-Disposition" => "attachment; filename=Orders.csv",
@@ -99,33 +99,33 @@ class OrderController extends Controller
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             );
-    
+
             // Define output stream for CSV file
             $output = fopen("php://output", "w");
-    
+
             // Write headers to output stream
             fputcsv($output, array('Order ID', 'Amount', 'Status', 'Order Added Date', 'Customer', 'Staff', 'Appointment Date', 'Time', 'Services'));
-    
+
             // Loop through orders and write to output stream
             foreach ($orders as $row) {
                 $services = array();
                 foreach ($row->orderServices as $service) {
-                    $services[] = $service->service->name;
+                    $services[] = $service->service_name;
                 }
-    
-                fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer->name, $row->staff->user->name, $row->date, date('h:i A', strtotime($row->time_slot->time_start)) . "--" . date('h:i A', strtotime($row->time_slot->time_end)), implode(",", $services)));
+
+                fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer_name, $row->staff_name, $row->date, $row->time_slot_value, implode(",", $services)));
             }
-    
+
             // Close output stream
             fclose($output);
-    
+
             // Return CSV file as download
             return Response::make('', 200, $headers);
-        }else if($request->print == 1){
-            return view('orders.print', compact('orders','existingParameters'));
-        }else{
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter','existingParameters'))
-            ->with('i', ($request->input('page', 1) - 1) * 10);
+        } else if ($request->print == 1) {
+            return view('orders.print', compact('orders', 'existingParameters'));
+        } else {
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'existingParameters'))
+                ->with('i', ($request->input('page', 1) - 1) * 10);
         }
     }
 
@@ -159,7 +159,7 @@ class OrderController extends Controller
         [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date);
 
 
-       return view('orders.edit', compact('order', 'timeSlots', 'statuses','staff_ids'));
+        return view('orders.edit', compact('order', 'timeSlots', 'statuses', 'staff_ids'));
     }
 
     public function update(Request $request, $id)
@@ -167,7 +167,7 @@ class OrderController extends Controller
         $input = $request->all();
 
         [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
-        $input['time_slot_id'] =$time_slot;
+        $input['time_slot_id'] = $time_slot;
         $input['service_staff_id'] = $staff_id;
 
         $order = Order::find($id);

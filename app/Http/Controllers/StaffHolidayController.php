@@ -8,6 +8,7 @@ use App\Models\StaffHoliday;
 use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class StaffHolidayController extends Controller
@@ -19,10 +20,9 @@ class StaffHolidayController extends Controller
      */
     function __construct()
     {
-        $this->middleware('permission:service-staff-list|service-staff-create|service-staff-edit|service-staff-delete', ['only' => ['index','show']]);
-        $this->middleware('permission:service-staff-create', ['only' => ['create','store']]);
-        $this->middleware('permission:service-staff-edit', ['only' => ['edit','update']]);
-        $this->middleware('permission:service-staff-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:staff-holiday-list|staff-holiday-create|staff-holiday-delete', ['only' => ['index','show']]);
+        $this->middleware('permission:staff-holiday-create', ['only' => ['create','store']]);
+        $this->middleware('permission:staff-holiday-delete', ['only' => ['destroy']]);
    }
     /**
      * Display a listing of the resource.
@@ -31,7 +31,18 @@ class StaffHolidayController extends Controller
      */
     public function index(Request $request)
     {
-        $staffHolidays = StaffHoliday::latest()->paginate(10);
+        if (Auth::user()->hasRole('Supervisor')) {
+            $supervisor = User::find(Auth::id());
+
+            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+
+            $staffHolidays = StaffHoliday::whereIn('staff_id', $staffIds)->paginate(10);
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $staffHolidays = StaffHoliday::where('staff_id', Auth::id())->paginate(10);
+        } else {
+            $staffHolidays = StaffHoliday::latest()->paginate(10);
+        }
+
         return view('staffHolidays.index',compact('staffHolidays'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
@@ -44,7 +55,19 @@ class StaffHolidayController extends Controller
     public function create()
     {
         $i = 0;
-        $staffs = User::all();
+        if (Auth::user()->hasRole('Supervisor')) {
+            $supervisor = User::find(Auth::id());
+
+            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+
+            $staffs = User::whereIn('id', $staffIds)->get();
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $staffs = User::where('id', Auth::id())->get();
+        } else {
+            $staffs = User::all();
+        }
+
+        
         return view('staffHolidays.create',compact('staffs','i'));
     }
     

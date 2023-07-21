@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('description');
             $table->string('amount');
-            $table->string('staff_name');
+            $table->string('staff_name')->nullable();
             $table->unsignedBigInteger('staff_id')->nullable();
             $table->unsignedBigInteger('order_id');
             $table->string('status');

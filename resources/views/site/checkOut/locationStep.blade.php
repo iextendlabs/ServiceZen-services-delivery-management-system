@@ -131,13 +131,13 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Phone Number:</strong>
-                        <input type="number" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') }}">
+                        <input type="number" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : $address['number']}}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                        <input type="number" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') }}">
+                        <input type="number" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : $address['whatsapp']}}">
                     </div>
                 </div>
             </div>

@@ -100,7 +100,7 @@
                                 @can('holiday-list')
                                 <a class="dropdown-item" href="/holidays">Holidays</a>
                                 @endcan
-                                @can('service-staff-list')
+                                @can('staff-holiday-list')
                                 <a class="dropdown-item" href="{{ route('staffHolidays.index') }}">Staff Holiday</a>
                                 @endcan
                                 @can('staff-zone-list')

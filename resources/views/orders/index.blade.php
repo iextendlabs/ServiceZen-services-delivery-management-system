@@ -45,9 +45,9 @@
                     <td>{{ ++$i }}</td>
                     <td>#{{ $order->id }}</td>
 
-                    <td>@if($order->customer){{ $order->customer->name }}@endif</td>
-                    <td>@if($order->staff){{ $order->staff->user->name }}@endif</td>
-                    <td>{{ $order->date }} \ @if($order->time_slot) {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif</td>
+                    <td>{{ $order->customer_name }}</td>
+                    <td>{{ $order->staff_name }}</td>
+                    <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
                     <td>@currency($order->total_amount)</td>
                     <td>{{ $order->payment_method }}</td>
                     <td>{{ $order->status }}</td>

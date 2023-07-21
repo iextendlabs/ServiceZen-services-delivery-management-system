@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderService extends Model
 {
-    protected $fillable = ['service_id','service','price','address','status','order_id'];
+    protected $fillable = ['service_id','service_name','price','address','status','order_id'];
     
     public function service()
     {

@@ -23,6 +23,7 @@
         <form action="{{ route('cashCollections.store') }}" method="POST">
             @csrf
             <input type="hidden" name="staff_id" value="{{ $order->service_staff_id }}">
+            <input type="hidden" name="staff_name" value="{{ $order->staff->user->name }}">
             <input type="hidden" name="order_id" value="{{ $order->id }}">
             <div class="row">
 
