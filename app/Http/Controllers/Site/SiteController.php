@@ -75,4 +75,28 @@ class SiteController extends Controller
             return response()->json("successfully save data.");
         }
     }
+
+    public function updateZone(Request $request){
+        if ($request->zone) {
+            $address = [];
+
+            $address['buildingName'] = '';
+            $address['area'] = $request->zone;
+            $address['flatVilla'] = '';
+            $address['street'] = '';
+            $address['landmark'] = '';
+            $address['city'] = '';
+            $address['number'] = '';
+            $address['whatsapp'] = '';
+            $address['email'] = '';
+            $address['name'] = '';
+            $address['latitude'] = '';
+            $address['longitude'] = '';
+            $address['searchField'] = '';
+
+            Session::put('address', $address);
+
+            return redirect('/');
+        }
+    }
 }

@@ -31,6 +31,16 @@
             <button class="btn btn-primary" id="setLocation" type="button">Search on map</button>
           </div>
         </div>
+        OR 
+
+        <label for="zoneSelect">Select Zone:</label>
+        <select class="form-control" id="zoneSelect" onchange="window.location.href='/updateZone?zone='+this.value">
+        <option value="">-- Select Zone -- </option>
+          <!-- Loop through the $zones array to generate options -->
+          @foreach ($zones as $zone)
+            <option value="{{ $zone }}">{{ $zone }}</option>
+          @endforeach
+        </select>
 
         <div id="mapContainer" style="height: 400px; margin-top: 20px; display:none"></div>
       </div>
