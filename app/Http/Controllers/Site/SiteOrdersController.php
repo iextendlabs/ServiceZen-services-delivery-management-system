@@ -24,19 +24,17 @@ class SiteOrdersController extends Controller
 
     public function index(Request $request)
     {
-        if (Auth::check()) {
+        if (Auth::check()) { // TODO use middleware instead of this
             if (Auth::user()->hasRole('Staff')) {
                 $orders = Order::where('service_staff_id', Auth::id())->orderBy('id', 'DESC')->paginate(10);
-
-                return view('site.orders.index', compact('orders'))
-                    ->with('i', ($request->input('page', 1) - 1) * 10);
             } else {
                 $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(10);
-
-                return view('site.orders.index', compact('orders'))
-                    ->with('i', ($request->input('page', 1) - 1) * 10);
             }
+            return view('site.orders.index', compact('orders'))
+                    ->with('i', ($request->input('page', 1) - 1) * 10);
         }
+
+        // TODO add redirect to home with error
     }
 
 
