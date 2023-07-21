@@ -29,7 +29,7 @@
         </div>
         @endif
         @can('order-download')
-            <button type="button" class="btn btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
+            <button type="button" class="btn mb-2 btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
         @endcan
         <table class="table table-bordered album bg-light">
             <td class="text-left" colspan="2">Order Details</td>

@@ -52,10 +52,26 @@
                 <h2>Orders</h2>
             </div>
             <div class="float-end">
-                <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;"> All Orders </a>
-                <a class="btn btn-primary float-end" href="/orders?status=Pending">Pending Orders</a>
-                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">Complete Orders</a>
-                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">Canceled Orders</a>
+                <!-- All Orders -->
+                <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;">
+                <i class="fas fa-list"></i> All Orders
+                </a>
+
+                <!-- Pending Order -->
+                <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">
+                <i class="fas fa-clock"></i> Pending Order
+                </a>
+
+                <!-- Complete Order -->
+                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">
+                <i class="fas fa-check"></i> Complete Order
+                </a>
+
+                <!-- Canceled Order -->
+                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">
+                <i class="fas fa-times"></i> Canceled Order
+                </a>
+
             </div>
         </div>
     </div>
@@ -93,14 +109,22 @@
                     <td>{{ $order->created_at }}</td>
                     <td>
                         <form action="{{ route('orders.destroy',$order->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">Show</a>
+                            <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">
+                            <i class="fas fa-eye"></i> 
+                            </a>
+
                             @can('order-edit')
-                            <a class="btn btn-primary" href="{{ route('orders.edit',$order->id) }}">Edit</a>
+                            <a class="btn btn-primary" href="{{ route('orders.edit',$order->id) }}">
+                            <i class="fas fa-edit"></i> 
+                            </a>
                             @endcan
                             @csrf
                             @method('DELETE')
                             @can('order-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> 
+                            </button>
+
                             @endcan
                         </form>
                     </td>

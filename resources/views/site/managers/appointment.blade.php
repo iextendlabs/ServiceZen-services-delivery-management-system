@@ -19,7 +19,7 @@
             </div>
             @endif
             <div class="text-right">
-                <a class="btn btn-primary float-end no-print" onclick="printDiv()" href=""><i class="fa fa-print"></i>Download PDF</a>
+                <a class="btn btn-primary mb-2  float-end no-print" onclick="printDiv()" href=""><i class="fa fa-print"></i>Download PDF</a>
                 <a class="btn btn-primary float-end no-print" href="appointmentCSV"><i class="fa fa-download"></i>Export CSV</a>
             </div><br>
             @if(count($staffs) != 0)

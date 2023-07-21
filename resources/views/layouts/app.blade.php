@@ -176,18 +176,28 @@
             </div>
         </main>
     </div>
-</body>
+    <footer class="text-muted">
+    <div class="container">
+    <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
+      <p class="float-right">
+        © 2023 Saloon X UAE
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $(".smsId").click(function() {
-            $('.btn-close').css('display', 'none')
+      </p>
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          $(".smsId").click(function() {
+              $('.btn-close').css('display', 'none')
+            });
         });
-    });
-</script>
+    </script>
 
+</body>
 </html>
