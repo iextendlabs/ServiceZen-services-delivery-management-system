@@ -154,7 +154,7 @@
     <div class="col-md-12 mt-3">
     <table class="table table-bordered table-responsive">
                 <tr>
-                    <th>Order Id</th>
+                    <th>Order #</th>
                     <th>Customer</th>
                     <th>Staff</th>
                     <th>Data \ Time Slot</th>
