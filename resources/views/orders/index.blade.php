@@ -154,7 +154,6 @@
     <div class="col-md-12 mt-3">
     <table class="table table-bordered table-responsive">
                 <tr>
-                    <th>No</th>
                     <th>Order Id</th>
                     <th>Customer</th>
                     <th>Staff</th>
@@ -169,7 +168,6 @@
                 @if(count($orders))
                 @foreach ($orders as $order)
                 <tr>
-                    <td>{{ ++$i }}</td>
                     <td>#{{ $order->id }}</td>
 
                     <td>{{ $order->customer_name }}</td>
