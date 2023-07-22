@@ -27,7 +27,7 @@
     <div class="album bg-light">
         <table class="table table-bordered">
             <tr>
-                <th>No</th>
+                <th>Order #</th>
                 <th>Customer</th>
                 <th>Staff</th>
                 <th>Data \ Time Slot</th>
