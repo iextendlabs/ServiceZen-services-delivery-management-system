@@ -148,7 +148,7 @@ class SiteOrdersController extends Controller
 
         $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
 
-        return view('site.orders.edit', compact('order', 'timeSlots', 'statuses'));
+        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses'));
     }
 
 
