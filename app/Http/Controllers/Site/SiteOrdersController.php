@@ -23,7 +23,7 @@ class SiteOrdersController extends Controller
 {
     public function appOrders(Request $request){
         if ($request->has('status')){
-            $orders = Order::where('status', '=',$request->status)->toArray();
+            $orders = Order::where('status', '=',$request->status)->get()->toArray();
         } else {
             $orders = Order::all()->toArray();
         }
