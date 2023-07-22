@@ -26,7 +26,7 @@
           <div class="input-group-prepend" onclick="$('#popup_searchField').val('')">
             <span class="input-group-text">x</span>
           </div>
-          <input type="text" class="form-control" id="popup_searchField" value="{{ session('address') ? session('address')['searchField'] : '' }}" name="searchField" placeholder="Search on map">
+          <input type="text" class="form-control" id="popup_searchField" value="{{ session('address') ? (session('address')['searchField'] ? session('address')['searchField'] : session('address')['area']) : '' }}" name="searchField" placeholder="Search on map">
           <div class="input-group-append">
             <button class="btn btn-primary" id="setLocation" type="button">Search on map</button>
           </div>

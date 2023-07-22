@@ -11,7 +11,7 @@ class CategoryComposer
     {
         $categories = ServiceCategory::all();
         $address = Session::get('address');
-        $zones = StaffZone::all()->pluck('name')->toArray();
+        $zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
         $view->with([
             'categories' => $categories,

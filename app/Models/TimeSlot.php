@@ -64,8 +64,14 @@ class TimeSlot extends Model
 
         if (count($timeSlots)) {
             foreach($timeSlots as $timeSlot) {
-                $count = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->count();
-                $timeSlot->space_availability -= $count;
+                $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
+                $timeSlot->space_availability = $timeSlot->staffs->count();
+                foreach($orders as $order){
+                    $timeSlot->space_availability--;
+                    if ( !in_array($order->service_staff_id, $staff_ids)) {
+                        $staff_ids[]=$order->service_staff_id;
+                    }
+                }
             }
         }
         return [$timeSlots, $staff_ids];
