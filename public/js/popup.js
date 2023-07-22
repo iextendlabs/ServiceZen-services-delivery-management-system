@@ -1,3 +1,4 @@
+var showMapError = false;
 function mapReady() {
     $(document).ready(function () {
         var session = $('input[name="session"]').val();
@@ -40,7 +41,7 @@ $(document).ready(function () {
     var mapContainer = document.getElementById("mapContainer");
 
     mapContainer.style.display = "block";
-
+    showMapError = false;
     showMap();
 });
 
@@ -48,7 +49,7 @@ document.getElementById("setLocation").addEventListener("click", function () {
     var mapContainer = document.getElementById("mapContainer");
 
     mapContainer.style.display = "block";
-
+    showMapError = true;
     showMap();
 });
 
@@ -227,6 +228,7 @@ function fillAddressFields(place) {
     popup_searchField.value = address;
     if(!popup_areaField.value){
     popup_searchField.value = "";
+    if (showMapError)
         alert('Address is not accurate. On map and select address.')
     }
     if (typeof fillFormAddressFields === 'function') {
@@ -247,9 +249,11 @@ function reverseGeocode(latitude, longitude) {
                 if (results[0]) {
                     fillAddressFields(results[0]);
                 } else {
+            if (showMapError)
                     alert("No address found for the current location");
                 }
             } else {
+            if (showMapError)
                 alert("Geocoder failed due to: " + status);
             }
         }
@@ -280,6 +284,7 @@ function initAutocomplete() {
         var place = autocomplete.getPlace();
 
         if (!place.geometry) {
+            if (showMapError)
             alert("No details available for input: " + place.name);
             return;
         }
