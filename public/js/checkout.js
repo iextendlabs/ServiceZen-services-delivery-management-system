@@ -10,6 +10,7 @@ $('#date').change(function() {
             date: selectedDate,
             city: $('input[name="city"]').val(),
             area: $('input[name="area"]').val(),
+            order_id: $('input[name="order_id"]').length ? $('input[name="order_id"]').val() : '',
         },
         beforeSend: function() {
             $('#loading').show(); // Show the loading element

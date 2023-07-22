@@ -224,7 +224,10 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
-        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($request->area,$request->date);
+        if ($request->has('order_id') && (int)$request->order_id)
+            [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($request->area,$request->date,$request->order_id);
+        else
+            [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($request->area,$request->date);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids'));
     }
 }

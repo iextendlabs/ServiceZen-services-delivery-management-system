@@ -119,7 +119,7 @@ $cart_product = 0;
   <script src="./js/vendor/popper.min.js"></script>
   <script src="./js/bootstrap.min.js"></script>
   <script src="./js/vendor/holder.min.js"></script>
-  <script src="{{ asset('js/popup.js') }}"></script>
+  <script src="{{ asset('js/popup.js') }}?v=1"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address"></script>
 </body>
 

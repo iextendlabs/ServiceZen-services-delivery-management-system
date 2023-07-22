@@ -38,6 +38,11 @@
                 </div>
                 <div class="col-md-12">
                     <strong>Time Slots</strong>
+                    
+                    <input type="hidden" name="city" value="{{ $order->city }}">
+                    <input type="hidden" name="area" value="{{ $order->area }}">
+                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+
                     <div class="list-group" id="time-slots-container">
                         @include('site.checkOut.timeSlots')
                     </div>
@@ -71,6 +76,6 @@
         </form>
     </div>
 </div>
-<script src="{{ asset('js/checkout.js') }}"></script>
+<script src="{{ asset('js/checkout.js') }}?v=1"></script>
 
 @endsection

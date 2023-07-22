@@ -70,5 +70,5 @@
         </form>
     </div>
 </div>
-<script src="{{ asset('js/checkout.js') }}"></script>
+<script src="{{ asset('js/checkout.js') }}?v=1"></script>
 @endsection
