@@ -155,8 +155,7 @@ class OrderController extends Controller
 
         $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
 
-        $staffZoneNames = [$order->area, $order->city];
-        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date);
+        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
 
         return view('orders.edit', compact('order', 'timeSlots', 'statuses', 'staff_ids'));

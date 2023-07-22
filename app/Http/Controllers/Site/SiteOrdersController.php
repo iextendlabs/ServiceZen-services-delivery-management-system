@@ -143,15 +143,8 @@ class SiteOrdersController extends Controller
     {
         $order = Order::find($id);
 
-        $staffZoneNames = [$order->area, $order->city];
+        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
-        $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-            $query->where(function ($query) use ($staffZoneNames) {
-                foreach ($staffZoneNames as $staffZoneName) {
-                    $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
-                }
-            });
-        })->get();
 
         $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
 

@@ -35,7 +35,7 @@ class TimeSlot extends Model
         return (int)$this->space_availability > 0;
     }
 
-    public static function getTimeSlotsForArea($area, $date)
+    public static function getTimeSlotsForArea($area, $date, $currentOrder = null)
     {
         $staffZoneNames = [$area];
         $timeSlots = [];
@@ -64,6 +64,9 @@ class TimeSlot extends Model
 
         if (count($timeSlots)) {
             foreach($timeSlots as $timeSlot) {
+                if ($currentOrder) 
+                $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->get();
+                else 
                 $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
                 $timeSlot->space_availability = $timeSlot->staffs->count();
                 foreach($orders as $order){
