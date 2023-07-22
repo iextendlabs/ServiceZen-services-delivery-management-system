@@ -36,7 +36,7 @@
                     <td>@currency( $cash_collection->order->total_amount )</td>
                     <td>{{ $cash_collection->description }}</td>
                     
-                    <td> $cash_collection->order->comment</td>
+                    <td> {{$cash_collection->order->comment}}</td>
 
                     <td>{{ $cash_collection->status }}</td>
                     <td>
