@@ -29,6 +29,8 @@
             <tr>
                 <th>No</th>
                 <th>Customer</th>
+                <th>Staff</th>
+                <th>Data \ Time Slot</th>
                 <th>Total Amount</th>
                 <th>Payment Method</th>
                 <th>Status</th>
@@ -40,6 +42,9 @@
             <tr>
                 <td>{{ ++$i }}</td>
                 <td>{{ $order->customer->name }}</td>
+                
+                <td>{{ $order->staff_name }}</td>
+                    <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
                 <td>@currency( $order->total_amount )</td>
                 <td>{{ $order->payment_method }}</td>
                 <td>{{ $order->status }}</td>

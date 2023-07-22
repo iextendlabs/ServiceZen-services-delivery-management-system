@@ -26,7 +26,7 @@ class SiteOrdersController extends Controller
     {
         if (Auth::check()) { // TODO use middleware instead of this
             if (Auth::user()->hasRole('Staff')) {
-                $orders = Order::where('service_staff_id', Auth::id())->orderBy('id', 'DESC')->paginate(10);
+                $orders = Order::where('service_staff_id', Auth::id())->where('status', '!=','Complete')->orderBy('id', 'DESC')->paginate(10);
             } else {
                 $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(10);
             }
