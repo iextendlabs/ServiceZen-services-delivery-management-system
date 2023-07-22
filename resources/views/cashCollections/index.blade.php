@@ -32,10 +32,10 @@
                     <td>{{ $cash_collection->order->id }}</td>
                     <td>{{ $cash_collection->description }}</td>
                     
-                    <td>{{ $order->customer->name }}</td>
-                    <td>@currency( $order->total_amount )</td>
+                    <td>{{ $cash_collection->order->customer->name }}</td>
+                    <td>@currency( $cash_collection->order->total_amount )</td>
                     <td>@currency($cash_collection->amount)</td>
-                    <td>@currency( $order->comment )</td>
+                    <td>@currency( $cash_collection->order->comment )</td>
 
                     <td>{{ $cash_collection->status }}</td>
                     <td>{{ $cash_collection->staff_name }}</td>
