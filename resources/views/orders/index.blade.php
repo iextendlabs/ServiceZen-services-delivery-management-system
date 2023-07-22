@@ -164,7 +164,7 @@
                     <th>Status</th>
                     <th>Comment</th>
                     <th>Date Added</th>
-                    <th>Action</th>
+                    <th style="min-width:160px">Action</th>
                 </tr>
                 @if(count($orders))
                 @foreach ($orders as $order)

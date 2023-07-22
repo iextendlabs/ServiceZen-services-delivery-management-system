@@ -110,6 +110,10 @@ svg {
       box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
   }
 
+  .actions-header {
+    min-width: 140px;
+  }
+
   .location-container {
       position: relative;
   }

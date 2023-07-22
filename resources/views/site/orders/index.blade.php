@@ -60,7 +60,7 @@
                 <th>Payment Method</th>
                 <th>Status</th>
                 <th>Date Added</th>
-                <th>Action</th>
+                <th class="actions-header">Action</th>
             </tr>
 
             @foreach ($orders as $order)
@@ -76,7 +76,9 @@
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>
                 <td>
-                    <a class="btn btn-sm btn-info" href="{{ route('order.show',$order->id) }}">Show</a>
+                    <a class="btn btn-sm btn-info" href="{{ route('order.show', $order->id) }}">
+  <i class="fas fa-eye"></i> </a>
+
                     @if(Auth::User()->getRoleNames() == '["Customer"]')
                     @if($order->status == "Pending")
                     <a class="btn btn-sm btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
@@ -85,8 +87,14 @@
                     @if($order->status !== "Complete" && Auth::User()->getRoleNames() == '["Staff"]')
                     @if($order->status == "Pending")
 
-                    <a class="btn  btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">Accept</a>
-                    <a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">Reject</a>
+                    <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
+  <i class="fas fa-thumbs-up"></i> 
+</a>
+
+<a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">
+  <i class="fas fa-thumbs-down"></i> 
+</a>
+
                     @endif
                     @if($order->status == "Accepted")
                     <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Complete">Complete</a>
