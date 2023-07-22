@@ -31,6 +31,7 @@
                 <th>Customer</th>
                 <th>Staff</th>
                 <th>Data \ Time Slot</th>
+                <th>Area</th>
                 <th>Total Amount</th>
                 <th>Payment Method</th>
                 <th>Status</th>
@@ -44,7 +45,8 @@
                 <td>{{ $order->customer->name }}</td>
                 
                 <td>{{ $order->staff_name }}</td>
-                    <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
+                <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
+                <td>{{ $order->area}}</td>
                 <td>@currency( $order->total_amount )</td>
                 <td>{{ $order->payment_method }}</td>
                 <td>{{ $order->status }}</td>
@@ -57,9 +59,15 @@
                     @endif
                     @endif
                     @if($order->status !== "Complete" && Auth::User()->getRoleNames() == '["Staff"]')
-                    <a class="btn  btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Processing">Accept</a>
-                    <a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Canceled">Reject</a>
+                    @if($order->status == "Pending")
+
+                    <a class="btn  btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">Accept</a>
+                    <a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">Reject</a>
+                    @endif
+                    @if($order->status == "Accepted")
                     <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Complete">Complete</a>
+                    @endif
+
                     @endif
                 </td>
             </tr>

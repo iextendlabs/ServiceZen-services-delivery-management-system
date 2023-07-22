@@ -20,13 +20,14 @@
     <div class="album bg-light">
         <table class="table table-bordered">
             <tr>
-                <th>No</th>
+                <th>Order #</th>
                 <th>Customer</th>
                 <th>Total Amount</th>
                 <th>Payment Method</th>
-                <th>Status</th>
+                <th>Slot</th>
+                <th>Order Status</th>
                 <th>Date Added</th>
-                <th></th>
+                <th>Collection Status</th>
             </tr>
 
             @foreach ($orders as $order)
@@ -35,6 +36,7 @@
                 <td>{{ $order->customer->name }}</td>
                 <td>@currency( $order->total_amount )</td>
                 <td>{{ $order->payment_method }}</td>
+                <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>
                 <td>

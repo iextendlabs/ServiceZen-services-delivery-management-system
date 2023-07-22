@@ -13,7 +13,7 @@ function formatCurrency($amount)
     $symbol = $currencySymbols[$currencyCode] ?? '';
 
     // Format the amount with proper separators and currency symbol
-    $formattedAmount = $symbol . number_format($amount, 2, $decimalSeparator, $thousandsSeparator);
+    $formattedAmount = $symbol . number_format((float)$amount, 2, $decimalSeparator, $thousandsSeparator);
 
     return $formattedAmount;
 }
