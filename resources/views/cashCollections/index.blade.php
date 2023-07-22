@@ -17,28 +17,28 @@
             <table class="table table-bordered">
                 <tr>
                     <th>Order #</th>
-                    <th>Description</th>
-                    <th>Customer</th>
+                    <th>Staff</th>
                     <th>Collected Amount</th>
+                    <th>Customer</th>
                     <th>Order Total</th>
+                    <th>Description</th>
                     <th>Order Comment</th>
                     <th>Status</th>
-                    <th>Staff</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($cash_collections))
                 @foreach ($cash_collections as $cash_collection)
                 <tr>
                     <td>{{ $cash_collection->order->id }}</td>
-                    <td>{{ $cash_collection->description }}</td>
-                    
+                    <td>{{ $cash_collection->staff_name }}</td>
+                    <td>@currency($cash_collection->amount)</td>
                     <td>{{ $cash_collection->order->customer->name }}</td>
                     <td>@currency( $cash_collection->order->total_amount )</td>
-                    <td>@currency($cash_collection->amount)</td>
-                    <td>@currency( $cash_collection->order->comment )</td>
+                    <td>{{ $cash_collection->description }}</td>
+                    
+                    <td> $cash_collection->order->comment</td>
 
                     <td>{{ $cash_collection->status }}</td>
-                    <td>{{ $cash_collection->staff_name }}</td>
                     <td>
                         <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
                             <!-- <a class="btn btn-info" href="{{ route('cashCollection.show',$cash_collection->id) }}">Show</a> -->
