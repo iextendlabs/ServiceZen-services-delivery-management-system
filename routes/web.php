@@ -119,4 +119,5 @@ Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
 Route::get('slots', [CheckOutController::class,'slots']);
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
+Route::get('appOrders', [SiteOrdersController::class, 'appOrders']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
