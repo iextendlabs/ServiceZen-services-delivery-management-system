@@ -16,9 +16,12 @@
         <div class="col-md-12">
             <table class="table table-bordered">
                 <tr>
-                    <th>No</th>
+                    <th>Order #</th>
                     <th>Description</th>
-                    <th>Amount</th>
+                    <th>Customer</th>
+                    <th>Collected Amount</th>
+                    <th>Order Total</th>
+                    <th>Order Comment</th>
                     <th>Status</th>
                     <th>Staff</th>
                     <th width="280px">Action</th>
@@ -28,7 +31,12 @@
                 <tr>
                     <td>{{ $cash_collection->order->id }}</td>
                     <td>{{ $cash_collection->description }}</td>
+                    
+                    <td>{{ $order->customer->name }}</td>
+                    <td>@currency( $order->total_amount )</td>
                     <td>@currency($cash_collection->amount)</td>
+                    <td>@currency( $order->comment )</td>
+
                     <td>{{ $cash_collection->status }}</td>
                     <td>{{ $cash_collection->staff_name }}</td>
                     <td>
