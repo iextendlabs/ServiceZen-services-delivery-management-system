@@ -22,7 +22,11 @@ use Illuminate\Support\Facades\Response;
 class SiteOrdersController extends Controller
 {
     public function appOrders(Request $request){
-        $orders = Order::all()->toArray();
+        if ($request->has('status')){
+            $orders = Order::where('status', '=',$request->status)->toArray();
+        } else {
+            $orders = Order::all()->toArray();
+        }
         return response()->json($orders);
     }
 
