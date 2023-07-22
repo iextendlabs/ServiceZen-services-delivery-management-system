@@ -20,6 +20,27 @@
     @if(Auth::User()->getRoleNames() == '["Staff"]')
 
     <div class="text-right mb-2">
+
+      <!-- Pending Order -->
+                <a class="btn btn-primary float-end" href="/order?status=Pending" style="margin-right: 10px;">
+                <i class="fas fa-clock"></i> Pending Orders
+                </a>
+
+                <!-- Complete Order -->
+                <a class="btn btn-success float-end" href="/order?status=Complete" style="margin-right: 10px;">
+                <i class="fas fa-check"></i> Complete Orders
+                </a>
+
+                <a class="btn btn-success float-end" href="/order?status=Accepted" style="margin-right: 10px;">
+                <i class="fas fa-check"></i> Accepted Orders
+                </a>
+
+
+                <!-- Canceled Order -->
+                <a class="btn btn-danger float-end" href="/order?status=Rejected" style="margin-right: 10px;">
+                <i class="fas fa-times"></i> Rejected Orders
+                </a>
+
         <a class="btn btn-success text-right no-print" href="staffOrderCSV"><i class="fa fa-download"></i> Export Excel</a>
         <a class="btn btn-primary text-right no-print" href="cashCollections"><i class="fas fa-money-bill-wave"></i>
  Cash Collection</a>
