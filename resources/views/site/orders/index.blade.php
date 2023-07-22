@@ -21,7 +21,10 @@
 
     <div class="text-right mb-2">
         <a class="btn btn-success text-right no-print" href="staffOrderCSV"><i class="fa fa-download"></i> Export Excel</a>
+        <a class="btn btn-primary text-right no-print" href="cashCollections"><i class="fas fa-money-bill-wave"></i>
+ Cash Collection</a>
     </div>
+    
     @endif
 
     <div class="album bg-light">
