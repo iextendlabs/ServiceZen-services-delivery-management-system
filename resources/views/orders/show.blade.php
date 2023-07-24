@@ -46,14 +46,13 @@
             </tr>
         </table>
         <table class="table table-bordered album bg-light">
-            <td class="text-left" colspan="2">Time Slot and Staff</td>
+            <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
             <tr>
                 <td>
                     <b>Staff:</b>{{ $order->staff_name }}<br><br>
                     <b>Date:</b> {{ $order->date }}
                 </td>
                 <td>
-                    <b>Time Slot:</b>@if($order->time_slot) {{ $order->time_slot->name }} @endif <br><br>
                     <b>Time:</b>{{ $order->time_slot_value }}
                 </td>
             </tr>

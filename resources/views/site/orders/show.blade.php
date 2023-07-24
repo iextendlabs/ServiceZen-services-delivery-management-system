@@ -43,7 +43,7 @@
             <button type="button" class="btn btn-danger float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i> Download PDF</button>
         </div>
         <table class="table table-bordered album bg-light">
-            <td class="text-left" colspan="2">Order Details</td>
+            <td class="text-left" colspan="2"><i class="fas fa-shopping-cart"></i> Order Details</td>
             <tr>
                 <td>
                     <b>Order ID:</b> #{{ $order->id }} <br><br>
@@ -57,14 +57,16 @@
             </tr>
         </table>
         <table class="table table-bordered album bg-light">
-            <td class="text-left" colspan="2">Time Slot and Staff</td>
+            <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
             <tr>
                 <td>
-                    <b>Staff:</b> {{ $order->staff_name }} <br><br>
-                    <b>Date:</b> {{ $order->date }}
+                    <b>Staff:</b> {{ $order->staff_name }} 
+                    
                 </td>
                 <td>
-                    <b>Time Slot:</b> {{ $order->time_slot->name }} <br><br>
+                <b>Date:</b> {{ $order->date }}  
+                </td>
+                <td>
                     <b>Time:</b> {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}
                 </td>
             </tr>
@@ -105,7 +107,7 @@
             </tr>
         </table>
         <table class="table table-bordered album bg-light">
-            <td class="text-left" colspan="4">Services Details</td>
+            <td class="text-left" colspan="4"><i class="fas fa-spa"></i> Services Details</td>
             <tr>
                 <th>Service Name</th>
                 <th>Status</th>
