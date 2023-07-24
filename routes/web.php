@@ -23,6 +23,7 @@ use App\Http\Controllers\{
     SupervisorController,
     TimeSlotController,
     TransactionController,
+    AppController,
     
 };
 
@@ -119,5 +120,10 @@ Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
 Route::get('slots', [CheckOutController::class,'slots']);
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
-Route::get('appOrders', [SiteOrdersController::class, 'appOrders']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
+
+
+// app url
+
+Route::get('appOrders', [AppController::class,'orders']);
+Route::get('appAddOrderComment/{order}', [AppController::class,'addComment']);

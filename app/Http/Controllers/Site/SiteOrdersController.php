@@ -21,15 +21,6 @@ use Illuminate\Support\Facades\Response;
 
 class SiteOrdersController extends Controller
 {
-    public function appOrders(Request $request){
-        if ($request->has('status')){
-            $orders = Order::where('status', '=',$request->status)->get()->toArray();
-        } else {
-            $orders = Order::all()->toArray();
-        }
-        return response()->json($orders);
-    }
-
     public function index(Request $request)
     {
         if (Auth::check()) { // TODO use middleware instead of this
