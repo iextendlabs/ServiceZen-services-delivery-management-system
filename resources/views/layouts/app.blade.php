@@ -152,9 +152,7 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @if(auth()->user()->getRoleNames() == '["Supervisor"]' || auth()->user()->getRoleNames() == '["Staff"]')
                                     <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
-                                @endif
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
                                 @can('user-list')
                                 <a class="dropdown-item" href="{{ route('users.index') }}">Users</a>
