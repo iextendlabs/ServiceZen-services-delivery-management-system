@@ -159,7 +159,9 @@
                 <tr>
                     <th>Order #</th>
                     <th>Staff</th>
-                    <th>Data \ Time Slot</th>
+                    <th><i class="fas fa-clock"></i> Appointment Date</th>
+                    <th><i class="fas fa-clock"></i> Slots</th>
+
                     @if(auth()->user()->getRoleNames() == '["Supervisor"]')
                     <th>Landmark</th>
                     <th>Area</th>
@@ -180,7 +182,8 @@
                 <tr>
                     <th>#{{ $order->id }}</th>
                     <td>{{ $order->staff_name }}</td>
-                    <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
+                    <td>{{ $order->date }}</td>
+                    <td>{{ $order->time_slot_value }}</td>
                     @if(auth()->user()->getRoleNames() == '["Supervisor"]')
                     <td>{{ $order->landmark }}</td>
                     <td>{{ $order->area }}</td>

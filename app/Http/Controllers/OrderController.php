@@ -32,7 +32,7 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
+        $statuses = config('app.statuses');
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $filter = [
@@ -144,7 +144,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::find($id);
-        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
+        $statuses = config('app.statuses');
         return view('orders.show', compact('order', 'statuses'));
     }
 
@@ -153,7 +153,7 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
 
-        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
+        $statuses = config('app.statuses');
 
         [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
