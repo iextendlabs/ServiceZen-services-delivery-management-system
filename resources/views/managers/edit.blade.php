@@ -35,13 +35,13 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Password:</strong>
+                    <strong>Password:</strong>
                     <input type="password" name="password" class="form-control" placeholder="Password">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Confirm Password:</strong>
+                    <strong>Confirm Password:</strong>
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
