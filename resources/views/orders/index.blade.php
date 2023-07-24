@@ -57,6 +57,7 @@
                             <input type="date" name="appointment_date" class="form-control" value="{{ $filter['appointment_date'] }}">
                         </div>
                     </div>
+                    @if(auth()->user()->getRoleNames() != '["Staff"]')
                     <div class="col-md-4">
                         <div class="form-group">
                             <strong>Staff:</strong>
@@ -74,6 +75,7 @@
                             </select>
                         </div>
                     </div>
+                    @endif
                     <div class="col-md-4">
                         <div class="form-group">
                             <strong>Status:</strong>
@@ -91,7 +93,7 @@
                     </div>
 
                     <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
-
+                    @if(auth()->user()->getRoleNames() == '["Admin"]')
                     <div class="col-md-4">
                         <div class="form-group">
                             <strong>Affiliate:</strong>
@@ -109,6 +111,7 @@
                             </select>
                         </div>
                     </div>
+                    @endif
                     <div class="col-md-4">
                         <div class="form-group">
                             <strong>Customer:</strong>

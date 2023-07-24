@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
 use Illuminate\Support\Facades\DB;
-
+use Hash;
+use Illuminate\Support\Arr;  
 class HomeController extends Controller
 {
     /**
@@ -79,5 +80,35 @@ class HomeController extends Controller
         }
 
         
+    }
+
+    
+    public function profile($id)
+    {
+        $user = User::find($id);
+
+        return view('profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request,$id){
+        
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'password' => 'same:confirm-password',
+        ]);
+
+        $input = $request->all();
+        if(!empty($input['password'])){ 
+            $input['password'] = Hash::make($input['password']);
+        }else{
+            $input = Arr::except($input,array('password'));    
+        }
+
+        $user = User::find($id);
+        $user->update($input);
+    
+        return redirect()->route('home')
+                        ->with('success','User updated successfully');
     }
 }

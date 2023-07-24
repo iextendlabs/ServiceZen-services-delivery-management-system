@@ -26,6 +26,7 @@
                 </div>
             </div>
         </div>
+        @if(auth()->user()->getRoleNames() == '["Admin"]')
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">TOTAL AFFILIATE COMMISSION</div>
@@ -44,6 +45,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
     <div class="py-2"></div>
     <div class="row">

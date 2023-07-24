@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
-                <h2>Edit Supervisor</h2>
+                <h2>Edit User</h2>
             </div>
         </div>
     </div>
@@ -17,21 +17,20 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('supervisors.update',$supervisor->id) }}" method="POST">
+    <form action="{{ route('updateProfile',$user->id) }}" method="POST">
         @csrf
-        @method('PUT')
         <input type="hidden" name="profile" value="1">
          <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $supervisor->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ $user->name }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $supervisor->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ $user->email }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">

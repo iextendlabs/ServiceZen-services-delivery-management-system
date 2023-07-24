@@ -167,11 +167,4 @@ class SupervisorController extends Controller
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
-    public function profile($id)
-    {
-        $supervisor = User::find($id);
-        $managers = User::all();
-
-        return view('supervisors.profile', compact('supervisor', 'managers'));
-    }
 }

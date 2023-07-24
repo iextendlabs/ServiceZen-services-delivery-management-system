@@ -117,7 +117,7 @@
                                 @endcan
                             </div>
                         </li>
-                        @if(auth()->user()->getRoleNames() != '["Supervisor"]')
+                        @if(auth()->user()->getRoleNames() == '["Admin"]' || auth()->user()->getRoleNames() == '["Manger"]')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 Users
@@ -152,8 +152,8 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @if(auth()->user()->getRoleNames() == '["Supervisor"]')
-                                    <a class="dropdown-item" href="{{ route('supervisorProfile', Auth::user()->id) }}">Profile</a>
+                                @if(auth()->user()->getRoleNames() == '["Supervisor"]' || auth()->user()->getRoleNames() == '["Staff"]')
+                                    <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
                                 @endif
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
                                 @can('user-list')

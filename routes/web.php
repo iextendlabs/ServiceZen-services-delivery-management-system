@@ -70,7 +70,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
 
-    Route::get('supervisorProfile/{id}', [SupervisorController::class, 'profile'])->name('supervisorProfile'); 
 
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
@@ -93,6 +92,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('cashCollection', CashCollectionController::class);
     Route::get('staffCashCollection',[CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
     Route::get('cashCollection/create/{order}',[CashCollectionController::class, 'create'])->name('cashCollection.create');
+
+    Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile'); 
+    Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile'); 
+
 });
 
 Route::get('/', [SiteController::class, 'index']);
