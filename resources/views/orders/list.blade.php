@@ -1,4 +1,4 @@
-<table class="table table-bordered table-responsive">
+<table class="table table-striped table-bordered table-responsive">
                 <tr>
                     <th>Order #</th>
                     <th>Staff</th>

@@ -42,7 +42,7 @@
         <div class="text-right mb-2">
             <button type="button" class="btn btn-danger float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i> Download PDF</button>
         </div>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2"><i class="fas fa-shopping-cart"></i> Order Details</td>
             <tr>
                 <td>
@@ -56,7 +56,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
             <tr>
                 <td>
@@ -71,7 +71,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="3">Address Details</td>
             <tr>
                 <td>
@@ -88,7 +88,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2">Customer Details</td>
             <tr>
                 <td>
@@ -106,7 +106,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="4"><i class="fas fa-spa"></i> Services Details</td>
             <tr>
                 <th>Service Name</th>

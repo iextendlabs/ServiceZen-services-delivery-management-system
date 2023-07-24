@@ -31,7 +31,7 @@
         @can('order-download')
             <button type="button" class="btn mb-2 btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
         @endcan
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2">Order Details</td>
             <tr>
                 <td>
@@ -45,7 +45,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
             <tr>
                 <td>
@@ -57,7 +57,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="3">Address Details</td>
             <tr>
                 <td>
@@ -74,7 +74,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2">Customer Details</td>
             <tr>
                 <td>
@@ -92,7 +92,7 @@
                 </td>
             </tr>
         </table>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="4">Services Details</td>
             <tr>
                 <th>Service Name</th>
@@ -132,7 +132,7 @@
         @if(isset($order->staff))
         <fieldset>
             <legend>Staff Commission</legend>
-            <table class="table table-bordered album bg-light">
+            <table class="table table-striped table-bordered album bg-light">
                 <tr>
                     <th>Order ID</th>
                     <th>Order Status</th>
@@ -169,7 +169,7 @@
         @if(isset($order->affiliate))
         <fieldset>
             <legend>Affiliate Commission</legend>
-            <table class="table table-bordered album bg-light">
+            <table class="table table-striped table-bordered album bg-light">
                 <tr>
                     <th>Order Id</th>
                     <th>Order Amount</th>

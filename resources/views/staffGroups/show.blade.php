@@ -23,7 +23,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Staff</strong><br><br>
-                <table class="table table-bordered">
+                <table class="table table-striped table-bordered">
                     <tr>
                         <th>Id</th>
                         <th>Name</th>

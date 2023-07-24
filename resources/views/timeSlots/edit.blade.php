@@ -80,7 +80,7 @@
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Staff of Group:</strong>
                 <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
-                <table class="table table-bordered">
+                <table class="table table-striped table-bordered">
                     <tr>
                         <th><input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);"></th>
                         <th>Name</th>

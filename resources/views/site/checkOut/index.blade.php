@@ -25,7 +25,7 @@ $total_amount = 0;
         @endif
     </div>
     @if(count($booked_services) != 0)
-    <table class="table table-bordered album bg-light">
+    <table class="table table-striped table-bordered album bg-light">
         <tr>
             <th>No</th>
             <th>image</th>
@@ -64,7 +64,7 @@ $total_amount = 0;
     </table>
     <div class="row">
         <div class="col-sm-4 offset-sm-8 ">
-            <table class="table table-bordered">
+            <table class="table table-striped table-bordered">
                 <tbody>
                     <tr>
                         <td class="text-right"><strong>Total Services:</strong></td>

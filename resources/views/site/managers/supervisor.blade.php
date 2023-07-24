@@ -19,7 +19,7 @@
             </div>
             @endif
             @if(count($supervisors) != 0)
-            <table class="table table-bordered album bg-light">
+            <table class="table table-striped table-bordered album bg-light">
                 <tr>
                     <th>No</th>
                     <th>Name</th>

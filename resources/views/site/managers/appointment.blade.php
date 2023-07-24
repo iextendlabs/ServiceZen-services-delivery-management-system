@@ -23,7 +23,7 @@
                 <a class="btn btn-primary float-end no-print" href="appointmentCSV"><i class="fa fa-download"></i>Export CSV</a>
             </div><br>
             @if(count($staffs) != 0)
-            <table class="table table-bordered album bg-light">
+            <table class="table table-striped table-bordered album bg-light">
                 <tr>
                     <th>No</th>
                     <th>Service</th>

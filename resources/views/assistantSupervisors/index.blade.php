@@ -21,7 +21,7 @@
     <hr>
     <div class="row">
         <div class="col-md-9">
-            <table class="table table-bordered">
+            <table class="table table-striped table-bordered">
                 <tr>
                     <th>No</th>
                     <th>Name</th>

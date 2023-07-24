@@ -22,7 +22,7 @@
         </div>
     @endif
     <hr>
-    <table class="table table-bordered">
+    <table class="table table-striped table-bordered">
         <tr>
             <th>No</th>
             <th>Title</th>

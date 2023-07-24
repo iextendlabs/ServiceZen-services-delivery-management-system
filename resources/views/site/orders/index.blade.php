@@ -49,7 +49,7 @@
     @endif
 
     <div class="album bg-light">
-        <table class="table table-bordered">
+        <table class="table table-striped table-bordered">
             <tr>
                 <th>Order #</th>
                 <th>Staff</th>
