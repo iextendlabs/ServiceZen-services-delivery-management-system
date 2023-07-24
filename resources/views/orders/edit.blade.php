@@ -46,7 +46,7 @@
                 <div class="col-md-12">
                     <div class="form-group" id="detail-container">
                         <strong>Selected Time Slot:</strong><span id="selected-time-slot">{{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}</span><br>
-                        <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff->user->name }}</span>
+                        <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff_name }}</span>
                     </div>
                 </div>
 

@@ -1,23 +1,19 @@
-@extends('site.layout.app')
-<base href="/public">
+@extends('layouts.app')
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 py-5 text-center">
-            <h2>Cash Collection</h2>
-        </div>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Cash Collection</h2>
     </div>
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <strong>Whoops!</strong> There were some problems with your input.<br><br>
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-    <div class="album bg-light">
+</div>
+@if ($message = Session::get('success'))
+<div class="alert alert-success">
+    <span>{{ $message }}</span>
+    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+<hr>
+<div class="row">
+    <div class="col-md-12">
         <table class="table table-bordered">
             <tr>
                 <th>Order #</th>
@@ -29,7 +25,6 @@
                 <th>Date Added</th>
                 <th>Collection Status</th>
             </tr>
-
             @foreach ($orders as $order)
             <tr>
                 <td>{{ ++$i }}</td>
@@ -41,7 +36,7 @@
                 <td>{{ $order->created_at }}</td>
                 <td>
                     @if(!$order->cashCollection)
-                    <a class="btn btn-info" href="{{ route('cashCollections.create',$order->id) }}">Create</a>
+                    <a class="btn btn-info" href="{{ route('cashCollection.create',$order->id) }}">Create</a>
                     @else
                     {{$order->cashCollection->status}} : 
                     @currency($order->cashCollection->amount)
@@ -57,7 +52,7 @@
             @endif
         </table>
         {!! $orders->links() !!}
-
     </div>
 </div>
+
 @endsection

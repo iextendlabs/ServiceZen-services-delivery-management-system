@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashCollection;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class CashCollectionController extends Controller
@@ -31,15 +33,23 @@ class CashCollectionController extends Controller
         return view('cashCollections.index',compact('cash_collections'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
+
+    public function staffCashCollection()
+    {
+        $orders = Order::where(['service_staff_id'=>Auth::id(),'status'=>'Complete'])->orderBy('id','DESC')->paginate(10);                
+                
+        return view('cashCollections.staffCashCollection',compact('orders'))
+            ->with('i', (request()->input('page', 1) - 1) * 10);      
+    }
     
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Order $order)
     {
-        //   
+        return view('cashCollections.create',compact('order'));   
     }
     
     /**
@@ -50,7 +60,19 @@ class CashCollectionController extends Controller
      */
     public function store(Request $request)
     {
-        // 
+        $this->validate($request, [
+            'description' => 'required',
+            'staff_id' => 'required',
+            'order_id' => 'required',
+        ]);
+
+        $input = $request->all();
+        $input['status'] = "Not Approved";
+
+        CashCollection::create($input);
+        
+        return redirect()->route('staffCashCollection')
+                        ->with('success','Cash Collection created successfully.');
     }
     
     /**

@@ -67,7 +67,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
-    Route::resource('cashCollection', CashCollectionController::class);
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
 
@@ -90,6 +89,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/holidays/crud-ajax', [HolidayController::class, 'store']);
     Route::get('time-slots', [TimeSlotController::class,'slots']);
     Route::get('staff-by-group', [TimeSlotController::class,'staff_group']);
+    
+    Route::resource('cashCollection', CashCollectionController::class);
+    Route::get('staffCashCollection',[CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
+    Route::get('cashCollection/create/{order}',[CashCollectionController::class, 'create'])->name('cashCollection.create');
 });
 
 Route::get('/', [SiteController::class, 'index']);
@@ -108,9 +111,6 @@ Route::get('order-update/{order}', [SiteOrdersController::class, 'updateOrderSta
 Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
-Route::resource('cashCollections',SiteCashCollectionController::class);
-Route::get('cashCollections/create/{order}',[SiteCashCollectionController::class, 'createCollection'])->name('cashCollections.create');
-
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('addressSession', [CheckOutController::class, 'addressSession']);

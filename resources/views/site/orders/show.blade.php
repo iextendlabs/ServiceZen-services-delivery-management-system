@@ -60,7 +60,7 @@
             <td class="text-left" colspan="2">Time Slot and Staff</td>
             <tr>
                 <td>
-                    <b>Staff:</b> {{ $order->staff->user->name }} <br><br>
+                    <b>Staff:</b> {{ $order->staff_name }} <br><br>
                     <b>Date:</b> {{ $order->date }}
                 </td>
                 <td>

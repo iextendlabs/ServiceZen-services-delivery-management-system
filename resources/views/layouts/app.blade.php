@@ -84,6 +84,9 @@
                                 @can('cash-collection-list')
                                 <a class="dropdown-item" href="{{ route('cashCollection.index') }}">Cash Collections</a>
                                 @endcan
+                                @if(auth()->user()->getRoleNames() == '["Staff"]')
+                                <a class="dropdown-item" href="{{ route('staffCashCollection') }}">Cash Collections</a>
+                                @endif
                             </div>
                         </li>
                         <li class="nav-item dropdown">
