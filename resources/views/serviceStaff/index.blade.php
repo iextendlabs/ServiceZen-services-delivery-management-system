@@ -24,7 +24,6 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($serviceStaff))
@@ -34,13 +33,6 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $staff->name }}</td>
                     <td>{{ $staff->email }}</td>
-                    <td>
-                        @if(!empty($staff->getRoleNames()))
-                            @foreach($staff->getRoleNames() as $v)
-                                <span class="badge rounded-pill bg-dark">{{ $v }}</span>
-                            @endforeach
-                        @endif
-                    </td>
                     <td>
                         <form action="{{ route('serviceStaff.destroy',$staff->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('serviceStaff.show',$staff->id) }}">Show</a>

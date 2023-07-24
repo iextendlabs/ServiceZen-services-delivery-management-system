@@ -26,7 +26,6 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($affiliates))
@@ -36,13 +35,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $affiliate->name }}</td>
                     <td>{{ $affiliate->email }}</td>
-                    <td>
-                        @if(!empty($affiliate->getRoleNames()))
-                            @foreach($affiliate->getRoleNames() as $v)
-                                <span class="badge rounded-pill bg-dark">{{ $v }}</span>
-                            @endforeach
-                        @endif
-                    </td>
+                  
                     <td>
                         <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('affiliates.show',$affiliate->id) }}">Show</a>

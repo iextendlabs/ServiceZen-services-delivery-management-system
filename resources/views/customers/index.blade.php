@@ -26,7 +26,6 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($customers))
@@ -36,13 +35,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->email }}</td>
-                    <td>
-                        @if(!empty($customer->getRoleNames()))
-                            @foreach($customer->getRoleNames() as $v)
-                                <span class="badge rounded-pill bg-dark">{{ $v }}</span>
-                            @endforeach
-                        @endif
-                    </td>
+                   
                     <td>
                         <form action="{{ route('customers.destroy',$customer->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}">Show</a>

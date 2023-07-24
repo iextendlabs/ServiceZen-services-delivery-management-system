@@ -26,7 +26,6 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($supervisors))
@@ -36,13 +35,6 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $supervisor->name }}</td>
                     <td>{{ $supervisor->email }}</td>
-                    <td>
-                        @if(!empty($supervisor->getRoleNames()))
-                            @foreach($supervisor->getRoleNames() as $v)
-                                <span class="badge rounded-pill bg-dark">{{ $v }}</span>
-                            @endforeach
-                        @endif
-                    </td>
                     <td>
                         <form action="{{ route('supervisors.destroy',$supervisor->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('supervisors.show',$supervisor->id) }}">Show</a>
