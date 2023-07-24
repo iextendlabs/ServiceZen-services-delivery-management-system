@@ -6,7 +6,7 @@
                 <h2>Orders</h2>
             </div>
             <div class="float-end">
-                
+
                 @can('order-download')
                 <button type="button" class="btn btn-success float-end no-print" id="csvButton"><i class="fa fa-download"></i> Excel</button>
                 <button type="button" class="btn btn-danger float-end no-print" id="printButton" style="margin-right: 10px;"><i class="fa fa-print"></i> PDF</button>
@@ -15,22 +15,22 @@
 
                 <!-- All Orders -->
                 <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;">
-                <i class="fas fa-list"></i> All Orders
+                    <i class="fas fa-list"></i> All Orders
                 </a>
 
                 <!-- Pending Order -->
                 <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">
-                <i class="fas fa-clock"></i> Pending Order
+                    <i class="fas fa-clock"></i> Pending Order
                 </a>
 
                 <!-- Complete Order -->
                 <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">
-                <i class="fas fa-check"></i> Complete Order
+                    <i class="fas fa-check"></i> Complete Order
                 </a>
 
                 <!-- Canceled Order -->
                 <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">
-                <i class="fas fa-times"></i> Canceled Order
+                    <i class="fas fa-times"></i> Canceled Order
                 </a>
 
             </div>
@@ -45,155 +45,168 @@
     <hr>
 
     <div class="row">
-    <!-- Second Column (Filter Form) -->
-    <div class="col-md-12">
-        <h3>Filter</h3>
-        <hr>
-        <form action="{{ route('orders.index') }}" method="GET" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <strong>Appointment Date:</strong>
-                        <input type="date" name="appointment_date" class="form-control" value="{{ $filter['appointment_date'] }}">
+        <!-- Second Column (Filter Form) -->
+        <div class="col-md-12">
+            <h3>Filter</h3>
+            <hr>
+            <form action="{{ route('orders.index') }}" method="GET" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Appointment Date:</strong>
+                            <input type="date" name="appointment_date" class="form-control" value="{{ $filter['appointment_date'] }}">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <strong>Staff:</strong>
-                        <select name="staff_id" class="form-control">
-                            <option value="">Select</option>
-                            @foreach ($users as $staff)
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Staff:</strong>
+                            <select name="staff_id" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($users as $staff)
                                 @if($staff->getRoleNames() == '["Staff"]')
-                                    @if($staff->id == $filter['staff'])
-                                        <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
-                                    @else
-                                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                                    @endif
+                                @if($staff->id == $filter['staff'])
+                                <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
+                                @else
+                                <option value="{{ $staff->id }}">{{ $staff->name }}</option>
                                 @endif
-                            @endforeach
-                        </select>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <strong>Status:</strong>
-                        <select name="status" class="form-control">
-                            <option value="">Select</option>
-                            @foreach ($statuses as $status)
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Status:</strong>
+                            <select name="status" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($statuses as $status)
                                 @if($status == $filter['status'])
-                                    <option value="{{ $status }}" selected>{{ $status }}</option>
+                                <option value="{{ $status }}" selected>{{ $status }}</option>
                                 @else
-                                    <option value="{{ $status }}">{{ $status }}</option>
+                                <option value="{{ $status }}">{{ $status }}</option>
                                 @endif
-                            @endforeach
-                        </select>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
+                    <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <strong>Affiliate:</strong>
-                        <select name="affiliate_id" class="form-control">
-                            <option value="">Select</option>
-                            @foreach ($users as $affiliate)
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Affiliate:</strong>
+                            <select name="affiliate_id" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($users as $affiliate)
                                 @if($affiliate->getRoleNames() == '["Affiliate"]')
-                                    @if($affiliate->id == $filter['affiliate'])
-                                        <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
-                                    @else
-                                        <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
-                                    @endif
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <strong>Customer:</strong>
-                        <select name="customer_id" class="form-control">
-                            <option value="">Select</option>
-                            @foreach ($users as $customer)
-                                @if($customer->getRoleNames() == '["Customer"]')
-                                    @if($customer->id == $filter['customer'])
-                                        <option value="{{ $customer->id }}" selected>{{ $customer->name }}</option>
-                                    @else
-                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                    @endif
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <strong>Payment Method:</strong>
-                        <select name="payment_method" class="form-control">
-                            <option value="">Select</option>
-                            @foreach ($payment_methods as $payment_method)
-                                @if($payment_method == $filter['payment_method'])
-                                    <option value="{{ $payment_method }}" selected>{{ $payment_method }}</option>
+                                @if($affiliate->id == $filter['affiliate'])
+                                <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
                                 @else
-                                    <option value="{{ $payment_method }}">{{ $payment_method }}</option>
+                                <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
                                 @endif
-                            @endforeach
-                        </select>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Customer:</strong>
+                            <select name="customer_id" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($users as $customer)
+                                @if($customer->getRoleNames() == '["Customer"]')
+                                @if($customer->id == $filter['customer'])
+                                <option value="{{ $customer->id }}" selected>{{ $customer->name }}</option>
+                                @else
+                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                @endif
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Payment Method:</strong>
+                            <select name="payment_method" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($payment_methods as $payment_method)
+                                @if($payment_method == $filter['payment_method'])
+                                <option value="{{ $payment_method }}" selected>{{ $payment_method }}</option>
+                                @else
+                                <option value="{{ $payment_method }}">{{ $payment_method }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
+
+                    <div class="offset-9 col-md-3 text-center">
+                        <button type="submit" class="btn btn-lg btn-block btn-primary">Submit</button>
                     </div>
                 </div>
-                <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
+            </form>
+        </div>
 
-                <div class="offset-9 col-md-3 text-center">
-                    <button type="submit" class="btn btn-lg btn-block btn-primary">Submit</button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- First Column (Table) -->
-    <div class="col-md-12 mt-3">
-    <table class="table table-bordered table-responsive">
+        <!-- First Column (Table) -->
+        <div class="col-md-12 mt-3">
+            <table class="table table-bordered table-responsive">
                 <tr>
                     <th>Order #</th>
-                    <th>Customer</th>
                     <th>Staff</th>
                     <th>Data \ Time Slot</th>
+                    @if(auth()->user()->getRoleNames() == '["Supervisor"]')
+                    <th>Landmark</th>
+                    <th>Area</th>
+                    <th>City</th>
+                    <th>Building name</th>
+                    @else
+                    <th>Customer</th>
                     <th>Total Amount</th>
                     <th>Payment Method</th>
-                    <th>Status</th>
                     <th>Comment</th>
+                    @endif
+                    <th>Status</th>
                     <th>Date Added</th>
                     <th style="min-width:160px">Action</th>
                 </tr>
                 @if(count($orders))
                 @foreach ($orders as $order)
                 <tr>
-                    <td>#{{ $order->id }}</td>
-
-                    <td>{{ $order->customer_name }}</td>
+                    <th>#{{ $order->id }}</th>
                     <td>{{ $order->staff_name }}</td>
                     <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
+                    @if(auth()->user()->getRoleNames() == '["Supervisor"]')
+                    <td>{{ $order->landmark }}</td>
+                    <td>{{ $order->area }}</td>
+                    <td>{{ $order->city }}</td>
+                    <td>{{ $order->buildingName }}</td>
+                    @else
+                    <td>{{ $order->customer_name }}</td>
                     <td>@currency($order->total_amount)</td>
                     <td>{{ $order->payment_method }}</td>
-                    <td>{{ $order->status }}</td>
                     <td>{{ $order->order_comment }}</td>
+                    @endif
+                    <td>{{ $order->status }}</td>
                     <td>{{ $order->created_at }}</td>
                     <td>
                         <form action="{{ route('orders.destroy',$order->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('orders.show',$order->id) }}">
-                            <i class="fas fa-eye"></i> 
+                                <i class="fas fa-eye"></i>
                             </a>
 
                             @can('order-edit')
                             <a class="btn btn-primary" href="{{ route('orders.edit',$order->id) }}">
-                            <i class="fas fa-edit"></i> 
+                                <i class="fas fa-edit"></i>
                             </a>
                             @endcan
                             @csrf
                             @method('DELETE')
                             @can('order-delete')
                             <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash"></i> 
+                                <i class="fas fa-trash"></i>
                             </button>
 
                             @endcan
@@ -208,8 +221,8 @@
                 @endif
             </table>
             {!! $orders->appends($existingParameters)->links() !!}
+        </div>
     </div>
-</div>
 
     <script>
         $(document).ready(function() {
