@@ -1,5 +1,5 @@
 <?php
-    
+
 namespace App\Http\Controllers;
 
 use App\Models\SupervisorToManager;
@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
-use Illuminate\Support\Arr;  
+use Illuminate\Support\Arr;
+
 class SupervisorController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -18,10 +19,10 @@ class SupervisorController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:supervisor-list|supervisor-create|supervisor-edit|supervisor-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:supervisor-create', ['only' => ['create','store']]);
-         $this->middleware('permission:supervisor-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:supervisor-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:supervisor-list|supervisor-create|supervisor-edit|supervisor-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:supervisor-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:supervisor-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:supervisor-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -32,10 +33,10 @@ class SupervisorController extends Controller
     {
         $supervisors = User::latest()->get();
 
-        return view('supervisors.index',compact('supervisors'))
+        return view('supervisors.index', compact('supervisors'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -45,9 +46,9 @@ class SupervisorController extends Controller
     {
         $managers = User::all();
 
-        return view('supervisors.create',compact('managers'));
+        return view('supervisors.create', compact('managers'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -68,17 +69,17 @@ class SupervisorController extends Controller
         $input['password'] = Hash::make($input['password']);
 
         $supervisor = User::create($input);
-        
+
         $supervisor->assignRole('Supervisor');
-        
+
         $input['supervisor_id'] = $supervisor->id;
 
         SupervisorToManager::create($input);
 
         return redirect()->route('supervisors.index')
-                        ->with('success','Supervisor created successfully.');
+            ->with('success', 'Supervisor created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -87,9 +88,9 @@ class SupervisorController extends Controller
      */
     public function show(User $supervisor)
     {
-        return view('supervisors.show',compact('supervisor'));
+        return view('supervisors.show', compact('supervisor'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -100,9 +101,9 @@ class SupervisorController extends Controller
     {
         $managers = User::all();
 
-        return view('supervisors.edit',compact('supervisor','managers'));
+        return view('supervisors.edit', compact('supervisor', 'managers'));
     }
-    
+
     /**
      * Update the specified resource in storage.
      *
@@ -114,32 +115,35 @@ class SupervisorController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'password' => 'same:confirm-password',
-            'manager_id' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'same:confirm-password'
         ]);
 
         $input = $request->all();
-        if(!empty($input['password'])){ 
+        if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
-        }else{
-            $input = Arr::except($input,array('password'));    
+        } else {
+            $input = Arr::except($input, array('password'));
         }
 
         $supervisor = User::find($id);
-       
-        $supervisor->update($input);
-        
-        $input['supervisor_id'] = $id;
-        
-        SupervisorToManager::where('supervisor_id',$id)->delete();
 
-        SupervisorToManager::create($input);
-        
-        return redirect()->route('supervisors.index')
-                        ->with('success','Supervisor updated successfully');
+        $supervisor->update($input);
+
+        $input['supervisor_id'] = $id;
+        if ($request->profile != 1) {
+            SupervisorToManager::where('supervisor_id', $id)->delete();
+
+            SupervisorToManager::create($input);
+        }
+        if ($request->profile == 1) {
+            return redirect()->route('home');
+        } else {
+            return redirect()->route('supervisors.index')
+                ->with('success', 'Supervisor updated successfully');
+        }
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -149,17 +153,25 @@ class SupervisorController extends Controller
     public function destroy(User $supervisor)
     {
         $supervisor->delete();
-        
+
         return redirect()->route('supervisors.index')
-                        ->with('success','Supervisor deleted successfully');
+            ->with('success', 'Supervisor deleted successfully');
     }
 
     public function filter(Request $request)
     {
         $name = $request->name;
-        $supervisors = User::where('name','like',$name.'%')->paginate(100);
+        $supervisors = User::where('name', 'like', $name . '%')->paginate(100);
 
-        return view('supervisors.index',compact('supervisors','name'))
+        return view('supervisors.index', compact('supervisors', 'name'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
+
+    public function profile($id)
+    {
+        $supervisor = User::find($id);
+        $managers = User::all();
+
+        return view('supervisors.profile', compact('supervisor', 'managers'));
     }
 }

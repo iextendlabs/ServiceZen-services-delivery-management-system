@@ -71,6 +71,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
 
+    Route::get('supervisorProfile/{id}', [SupervisorController::class, 'profile'])->name('supervisorProfile'); 
+
     Route::post('serviceFilter', [ServiceController::class, 'filter']);
     Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
     Route::post('customerFilter', [CustomerController::class, 'filter']); 

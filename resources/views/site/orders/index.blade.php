@@ -21,31 +21,31 @@
 
     <div class="text-right mb-2">
 
-      <!-- Pending Order -->
-                <a class="btn btn-primary float-end" href="/order?status=Pending" style="margin-right: 10px;">
-                <i class="fas fa-clock"></i> Pending Orders
-                </a>
+        <!-- Pending Order -->
+        <a class="btn btn-primary float-end" href="/order?status=Pending" style="margin-right: 10px;">
+            <i class="fas fa-clock"></i> Pending Orders
+        </a>
 
-                <!-- Complete Order -->
-                <a class="btn btn-success float-end" href="/order?status=Complete" style="margin-right: 10px;">
-                <i class="fas fa-check"></i> Complete Orders
-                </a>
+        <!-- Complete Order -->
+        <a class="btn btn-success float-end" href="/order?status=Complete" style="margin-right: 10px;">
+            <i class="fas fa-check"></i> Complete Orders
+        </a>
 
-                <a class="btn btn-success float-end" href="/order?status=Accepted" style="margin-right: 10px;">
-                <i class="fas fa-check"></i> Accepted Orders
-                </a>
+        <a class="btn btn-success float-end" href="/order?status=Accepted" style="margin-right: 10px;">
+            <i class="fas fa-check"></i> Accepted Orders
+        </a>
 
 
-                <!-- Canceled Order -->
-                <a class="btn btn-danger float-end" href="/order?status=Rejected" style="margin-right: 10px;">
-                <i class="fas fa-times"></i> Rejected Orders
-                </a>
+        <!-- Canceled Order -->
+        <a class="btn btn-danger float-end" href="/order?status=Rejected" style="margin-right: 10px;">
+            <i class="fas fa-times"></i> Rejected Orders
+        </a>
 
         <a class="btn btn-success text-right no-print" href="staffOrderCSV"><i class="fa fa-download"></i> Export Excel</a>
         <a class="btn btn-primary text-right no-print" href="cashCollections"><i class="fas fa-money-bill-wave"></i>
- Cash Collection</a>
+            Cash Collection</a>
     </div>
-    
+
     @endif
 
     <div class="album bg-light">
@@ -67,7 +67,7 @@
             <tr>
                 <td>{{ ++$i }}</td>
                 <td>{{ $order->customer->name }}</td>
-                
+
                 <td>{{ $order->staff_name }}</td>
                 <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
                 <td>{{ $order->area}}</td>
@@ -77,7 +77,7 @@
                 <td>{{ $order->created_at }}</td>
                 <td>
                     <a class="btn btn-sm btn-info" href="{{ route('order.show', $order->id) }}">
-  <i class="fas fa-eye"></i> </a>
+                        <i class="fas fa-eye"></i> </a>
 
                     @if(Auth::User()->getRoleNames() == '["Customer"]')
                     @if($order->status == "Pending")
@@ -88,12 +88,12 @@
                     @if($order->status == "Pending")
 
                     <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
-  <i class="fas fa-thumbs-up"></i> 
-</a>
+                        <i class="fas fa-thumbs-up"></i>
+                    </a>
 
-<a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">
-  <i class="fas fa-thumbs-down"></i> 
-</a>
+                    <a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">
+                        <i class="fas fa-thumbs-down"></i>
+                    </a>
 
                     @endif
                     @if($order->status == "Accepted")

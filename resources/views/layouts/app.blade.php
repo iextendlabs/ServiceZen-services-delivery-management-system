@@ -114,6 +114,7 @@
                                 @endcan
                             </div>
                         </li>
+                        @if(auth()->user()->getRoleNames() != '["Supervisor"]')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 Users
@@ -141,12 +142,16 @@
                                 @endcan
                             </div>
                         </li>
+                        @endif
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 {{ Auth::user()->name }}
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                @if(auth()->user()->getRoleNames() == '["Supervisor"]')
+                                    <a class="dropdown-item" href="{{ route('supervisorProfile', Auth::user()->id) }}">Profile</a>
+                                @endif
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
                                 @can('user-list')
                                 <a class="dropdown-item" href="{{ route('users.index') }}">Users</a>
