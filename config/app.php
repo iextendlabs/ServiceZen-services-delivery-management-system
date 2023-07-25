@@ -45,9 +45,9 @@ return [
     'debug' => (bool) env('APP_DEBUG', false),
 
 
-    'statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing']),
+    'statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 
-    
+    'staff_order_limit' => env('STAFF_ORDER_LIMIT','5'),
 
     /*
     |--------------------------------------------------------------------------

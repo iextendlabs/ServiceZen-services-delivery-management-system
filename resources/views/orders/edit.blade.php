@@ -28,6 +28,7 @@
             @csrf
             @method('PUT')
             <div class="row">
+            @if(auth()->user()->getRoleNames() != '["Staff"]')
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Date:</strong>
@@ -49,7 +50,7 @@
                         <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff_name }}</span>
                     </div>
                 </div>
-
+                @endif
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Status:</strong>

@@ -64,4 +64,12 @@ class Order extends Model
         return $this->hasOne(CashCollection::class,'order_id');
     }
     
+    public function comments(){
+        return $this->hasMany(OrderComment::class);
+    }
+    public function getCommentsTextAttribute(){
+        $comments =$this->comments->sortByDesc('created_at')->pluck('comment');
+        $comments->prepend($this->order_comment);
+        return $comments->toArray();
+    }
 }
