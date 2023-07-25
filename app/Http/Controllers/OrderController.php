@@ -168,9 +168,13 @@ class OrderController extends Controller
             [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
             $input['time_slot_id'] = $time_slot;
             $input['service_staff_id'] = $staff_id;
+            $time_slot = TimeSlot::find($time_slot);
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)).' -- '.date('h:i A', strtotime($time_slot->time_end));
         }
+        
         $order = Order::find($id);
         $order->update($input);
+
         if (isset($staff_id)) {
             $staff = User::find($staff_id);
             $order->staff_name = $staff->name;

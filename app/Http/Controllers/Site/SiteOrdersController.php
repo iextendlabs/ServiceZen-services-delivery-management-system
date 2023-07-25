@@ -97,15 +97,13 @@ class SiteOrdersController extends Controller
         $input['staff_name'] = $staff->name;
         $input['date'] = $staff_and_time['date'];
         $input['time_slot_id'] = $staff_and_time['time_slot'];
-        $input['time_slot_value'] = $staff_and_time['time_slot_value'];
         $input['latitude'] = $address['latitude'];
         $input['longitude'] = $address['longitude'];
 
-        $order = Order::create($input);
+        $time_slot = TimeSlot::find($staff_and_time['time_slot']);
+        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)).' -- '.date('h:i A', strtotime($time_slot->time_end));
 
-        $time_slot = $order->time_slot;
-        $time_slot->space_availability--;
-        $time_slot->save();
+        $order = Order::create($input);
 
         $input['order_id'] = $order->id;
 
