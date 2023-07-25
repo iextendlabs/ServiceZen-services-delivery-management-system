@@ -9,7 +9,11 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','time_start','time_end','type','date','group_id','space_availability'];
+    protected $fillable = ['name','time_start','time_end','type','date','group_id','status'];
+
+    public $space_availability;
+
+    public $booked_staff;
 
     public function group()
     {
@@ -30,7 +34,7 @@ class TimeSlot extends Model
     {
         return $this->belongsToMany(User::class, 'time_slot_to_staff', 'time_slot_id', 'staff_id');
     }
-    public function getActive()
+    public function isAvailable()
     {
         return (int)$this->space_availability > 0;
     }
@@ -69,12 +73,12 @@ class TimeSlot extends Model
                 else 
                 $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
                 $timeSlot->space_availability = $timeSlot->staffs->count();
+                $excluded_staff = [];
                 foreach($orders as $order){
                     $timeSlot->space_availability--;
-                    if ( !in_array($order->service_staff_id, $staff_ids)) {
-                        $staff_ids[]=$order->service_staff_id;
-                    }
+                    $excluded_staff[]=$order->service_staff_id;
                 }
+                $timeSlot->excluded_staff = $excluded_staff;
             }
         }
         return [$timeSlots, $staff_ids];

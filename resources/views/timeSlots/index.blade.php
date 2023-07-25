@@ -23,7 +23,7 @@
             <th>Name</th>
             <th>Time Start -- Time End</th>
             <th>Group</th>
-            <th>Active</th>
+            <th>Status</th>
             <th width="280px">Action</th>
         </tr>
         @if(count($time_slots))
@@ -33,10 +33,10 @@
             <td>{{ $time_slot->name }}</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
-            <td>@if(!$time_slot->space_availability > 0)
-                <span class="badge rounded-pill bg-danger">UnAvailable</span>
+            <td>@if($time_slot->status == 1)
+                    Enable
                 @else
-                <span class="badge rounded-pill bg-primary">Available</span>
+                    Disable
                 @endif
             </td>
             <td>

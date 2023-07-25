@@ -60,7 +60,7 @@ class TimeSlotController extends Controller
     {
         request()->validate([
             'name' => 'required',
-            'space_availability' => 'required',
+            'status' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General'])],
             'time_start' => 'required',
             'time_end' => 'required',
@@ -128,7 +128,7 @@ class TimeSlotController extends Controller
     public function update(Request $request, $id)
     {
         request()->validate([
-            'space_availability' => 'required',
+            'status' => 'required',
             'name' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General'])],
             'time_start' => 'required',

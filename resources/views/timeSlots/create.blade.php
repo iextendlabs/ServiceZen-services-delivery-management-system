@@ -53,8 +53,11 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Space Availability:</strong>
-                    <input type="text" name="space_availability" value="{{ old('space_availability') }}" class="form-control" placeholder="Space">
+                    <span style="color: red;">*</span><strong>Status:</strong>
+                    <select name="status" class="form-control">
+                        <option value="1">Enable</option>
+                        <option value="o">Disable</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group">

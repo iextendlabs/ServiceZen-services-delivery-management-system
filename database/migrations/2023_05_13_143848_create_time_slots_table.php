@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('date')->nullable();
             $table->string('type');
             $table->unsignedBigInteger('group_id')->nullable();
-            $table->integer('space_availability')->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
 
             $table->foreign('group_id')
