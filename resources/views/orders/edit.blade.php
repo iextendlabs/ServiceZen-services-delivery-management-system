@@ -34,7 +34,7 @@
                         <input type="date" name="date" id="date" value="{{ $order->date }}" class="form-control" placeholder="Date">
                     </div>
                 </div>
-                <div class="col-md-12 scroll-div">
+                <div class="col-md-12">
                     <strong>Time Slots</strong>
                     <input type="hidden" name="city" value="{{ $order->city }}">
                     <input type="hidden" name="area" value="{{ $order->area }}">

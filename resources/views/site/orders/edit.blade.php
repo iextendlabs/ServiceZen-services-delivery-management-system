@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <strong>Time Slots</strong>
+                    <strong>Time Slots : {{ $order->area }}</strong>
                     
                     <input type="hidden" name="city" value="{{ $order->city }}">
                     <input type="hidden" name="area" value="{{ $order->area }}">

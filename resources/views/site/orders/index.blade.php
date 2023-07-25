@@ -49,12 +49,12 @@
     @endif
 
     <div class="album bg-light">
-        <table class="table table-bordered">
+        <table class="table table-striped table-bordered">
             <tr>
                 <th>Order #</th>
-                <th>Customer</th>
                 <th>Staff</th>
-                <th>Data \ Time Slot</th>
+                <th><i class="fas fa-clock"></i> Appointment Date</th>
+                <th><i class="fas fa-clock"></i> Slots</th>
                 <th>Area</th>
                 <th>Total Amount</th>
                 <th>Payment Method</th>
@@ -65,11 +65,10 @@
 
             @foreach ($orders as $order)
             <tr>
-                <td>{{ ++$i }}</td>
-                <td>{{ $order->customer->name }}</td>
-
+                <td>{{ $order->id }}</td>
                 <td>{{ $order->staff_name }}</td>
-                <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
+                <td>{{ $order->date }}</td>
+                <td>{{ $order->time_slot_value }}</td>
                 <td>{{ $order->area}}</td>
                 <td>@currency( $order->total_amount )</td>
                 <td>{{ $order->payment_method }}</td>
@@ -79,28 +78,10 @@
                     <a class="btn btn-sm btn-info" href="{{ route('order.show', $order->id) }}">
                         <i class="fas fa-eye"></i> </a>
 
-                    @if(Auth::User()->getRoleNames() == '["Customer"]')
                     @if($order->status == "Pending")
                     <a class="btn btn-sm btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
                     @endif
-                    @endif
-                    @if($order->status !== "Complete" && Auth::User()->getRoleNames() == '["Staff"]')
-                    @if($order->status == "Pending")
-
-                    <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
-                        <i class="fas fa-thumbs-up"></i>
-                    </a>
-
-                    <a class="btn btn-sm btn-danger" href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">
-                        <i class="fas fa-thumbs-down"></i>
-                    </a>
-
-                    @endif
-                    @if($order->status == "Accepted")
-                    <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Complete">Complete</a>
-                    @endif
-
-                    @endif
+                   
                 </td>
             </tr>
             @endforeach

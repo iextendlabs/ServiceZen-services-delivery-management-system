@@ -14,7 +14,7 @@
 <hr>
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-bordered">
+        <table class="table table-striped table-bordered">
             <tr>
                 <th>Order #</th>
                 <th>Customer</th>

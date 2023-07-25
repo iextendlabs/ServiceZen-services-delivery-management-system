@@ -44,6 +44,11 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+
+    'statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing']),
+
+    
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

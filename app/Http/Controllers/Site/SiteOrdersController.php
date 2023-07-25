@@ -149,7 +149,7 @@ class SiteOrdersController extends Controller
         [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
 
-        $statuses = ['Complete', 'Canceled', 'Denied', 'Pending', 'Processing'];
+        $statuses = config('app.statuses');
 
         return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses'));
     }

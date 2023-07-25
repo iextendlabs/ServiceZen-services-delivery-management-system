@@ -21,12 +21,11 @@
     <hr>
     <div class="row">
         <div class="col-md-9">
-            <table class="table table-bordered">
+            <table class="table table-striped table-bordered">
                 <tr>
                     <th>No</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($assistant_supervisors))
@@ -36,13 +35,6 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $assistant_supervisor->name }}</td>
                     <td>{{ $assistant_supervisor->email }}</td>
-                    <td>
-                        @if(!empty($assistant_supervisor->getRoleNames()))
-                            @foreach($assistant_supervisor->getRoleNames() as $v)
-                                <span class="badge rounded-pill bg-dark">{{ $v }}</span>
-                            @endforeach
-                        @endif
-                    </td>
                     <td>
                         <form action="{{ route('assistantSupervisors.destroy',$assistant_supervisor->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('assistantSupervisors.show',$assistant_supervisor->id) }}">Show</a>

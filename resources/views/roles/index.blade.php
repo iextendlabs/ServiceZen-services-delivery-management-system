@@ -18,7 +18,7 @@
         <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
-<table class="table table-bordered">
+<table class="table table-striped table-bordered">
     <tr>
         <th>No</th>
         <th>Name</th>

@@ -81,7 +81,7 @@
                 <div class="form-group">
                     <strong>Package Services:</strong>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Search Services By Name And Price">
-                    <table class="table table-bordered services-table">
+                    <table class="table table-striped table-bordered services-table">
                         <tr>
                             <th></th>
                             <th>Name</th>
@@ -110,7 +110,7 @@
                 <div class="form-group">
                     <strong>Select User For Note:</strong>
                     <input type="text" name="search_user" id="search-user" class="form-control" placeholder="Search User By Name And Price">
-                    <table class="table table-bordered user-table">
+                    <table class="table table-striped table-bordered user-table">
                         <tr>
                             <th></th>
                             <th>Name</th>

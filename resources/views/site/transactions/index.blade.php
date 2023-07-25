@@ -29,7 +29,7 @@
         @endphp
         @endforeach
         <p>Your current balance is: <b>@currency( $total_balance )</b></p>
-        <table class="table table-bordered album bg-light">
+        <table class="table table-striped table-bordered album bg-light">
             <tr>
                 <th>No</th>
                 <th>Date Added</th>
