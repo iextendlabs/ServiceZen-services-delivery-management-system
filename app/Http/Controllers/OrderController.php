@@ -24,7 +24,7 @@ class OrderController extends Controller
      */
     function __construct()
     {
-        $this->middleware('permission:order-list|order-download|order-edit|order-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:order-list', ['only' => ['index']]);
         $this->middleware('permission:order-download', ['only' => ['downloadCSV', 'print']]);
         $this->middleware('permission:order-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:order-delete', ['only' => ['destroy']]);
@@ -192,5 +192,13 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')
             ->with('success', 'Order deleted successfully');
+    }
+
+    
+    public function updateOrderStatus(Order $order, Request $request)
+    {
+        $order->status = $request->status;
+        $order->save();
+        return redirect()->route('orders.index')->with('success', 'Order updated successfully');
     }
 }

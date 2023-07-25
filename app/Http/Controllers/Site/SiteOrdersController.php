@@ -170,12 +170,6 @@ class SiteOrdersController extends Controller
             ->with('success', 'Order updated successfully');
     }
 
-    public function updateOrderStatus(Order $order, Request $request)
-    {
-        $order->status = $request->status;
-        $order->save();
-        return redirect()->route('order.index')->with('success', 'Order updated successfully');
-    }
 
 
     public function destroy($id)
