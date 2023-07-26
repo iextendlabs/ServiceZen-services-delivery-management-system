@@ -15,6 +15,11 @@ class SupervisorToManager extends Model
 
     public function supervisor()
     {
-        return $this->hasMany(User::class,'id','supervisor_id');
+        return $this->belongsTo(User::class,'supervisor_id');
+    }
+
+    public function staffSupervisor()
+    {
+        return $this->hasMany(Staff::class,'supervisor_id','id');
     }
 }

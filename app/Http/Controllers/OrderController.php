@@ -46,8 +46,15 @@ class OrderController extends Controller
         ];
 
         $existingParameters = $request->except('page');
-
-        if (Auth::user()->hasRole('Supervisor')) {
+        if (Auth::user()->hasRole('Manager')) {
+            $manager = User::find(Auth::id());
+            $staffIds = [];
+            foreach ($manager->managerSupervisors as $managerSupervisor) {
+                $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisor->pluck('user_id')->toArray();
+                $staffIds = array_merge($staffIds, $supervisor_staffs);
+            }
+            $query = Order::whereIn('service_staff_id', $staffIds);
+        } elseif (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
@@ -169,9 +176,9 @@ class OrderController extends Controller
             $input['time_slot_id'] = $time_slot;
             $input['service_staff_id'] = $staff_id;
             $time_slot = TimeSlot::find($time_slot);
-            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)).' -- '.date('h:i A', strtotime($time_slot->time_end));
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
         }
-        
+
         $order = Order::find($id);
         $order->update($input);
 
@@ -194,7 +201,7 @@ class OrderController extends Controller
             ->with('success', 'Order deleted successfully');
     }
 
-    
+
     public function updateOrderStatus(Order $order, Request $request)
     {
         $order->status = $request->status;
