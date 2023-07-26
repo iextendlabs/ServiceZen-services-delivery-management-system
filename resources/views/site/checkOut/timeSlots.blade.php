@@ -1,4 +1,3 @@
-    
     @if(count($timeSlots))
     @foreach($timeSlots as $timeSlot)
     <div class="row">
@@ -16,6 +15,11 @@
             <div class="col">
                 <div class="d-flex flex-row">
                     @foreach($timeSlot->staffs as $staff)
+                    @auth
+                        @if((auth()->user()->getRoleNames() == '["Staff"]' && $staff->id != auth()->user()->id))
+                        @continue
+                        @endif
+                    @endauth
                     @if(!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff))
                     <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >
                     <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">

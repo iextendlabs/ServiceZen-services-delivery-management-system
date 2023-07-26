@@ -25,7 +25,19 @@ class SupervisorRoleSeeder extends Seeder
         
         $role = Role::create(['name' => 'Supervisor']);
 
-        $permissions = Permission::where('name', 'like', 'supervisor%')->pluck('id','id');
+        $permissionNames = [
+            'supervisor-list',
+            'supervisor-edit',
+            'supervisor-create',
+            'supervisor-delete',
+            'order-list',
+            'order-edit',
+            'order-download',
+            'order-delete',
+            'menu-sales'
+        ];
+        
+        $permissions = Permission::whereIn('name', $permissionNames)->pluck('id');
 
         $role->syncPermissions($permissions);
         

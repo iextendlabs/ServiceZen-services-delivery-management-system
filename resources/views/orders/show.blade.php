@@ -14,7 +14,7 @@
     @if ($message = Session::get('success'))
     <div class="alert alert-success">
         <span>{{ $message }}</span>
-        <button type="button" class="btn-close float-end"  data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
     <div>
@@ -29,7 +29,7 @@
         </div>
         @endif
         @can('order-download')
-            <button type="button" class="btn mb-2 btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
+        <button type="button" class="btn mb-2 btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
         @endcan
         <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="2">Order Details</td>
@@ -139,7 +139,10 @@
                     <th>Staff</th>
                     <th>Order Sub Total</th>
                     <th>Staff Commission Amount</th>
+                    @if(auth()->user()->getRoleNames() != '["Staff"]')
+
                     <th class="no-print">Action</th>
+                    @endif
                 </tr>
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
@@ -152,6 +155,7 @@
                         <td>{{ $order->staff_name }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
                         <td>@currency(($order->order_total->sub_total * $order->staff->commission) / 100)</td>
+                        @if(auth()->user()->getRoleNames() != '["Staff"]')
                         <td class="no-print">
                             @if(empty($order->transactions->status))
                             @can('order-edit')
@@ -161,11 +165,13 @@
                             <button type="submit" class="btn btn-primary" disabled>Approved</button>
                             @endif
                         </td>
+                        @endif
                     </tr>
                 </form>
             </table>
         </fieldset>
         @endif
+        @if(auth()->user()->getRoleNames() != '["Staff"]')
         @if(isset($order->affiliate))
         <fieldset>
             <legend>Affiliate Commission</legend>
@@ -201,11 +207,12 @@
             </table>
         </fieldset>
         @endif
+        @endif
     </div>
 </div>
 <script>
     function printDiv() {
         window.print();
     }
-    </script>
+</script>
 @endsection

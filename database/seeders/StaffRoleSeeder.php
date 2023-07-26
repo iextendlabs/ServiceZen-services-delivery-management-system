@@ -18,16 +18,23 @@ class StaffRoleSeeder extends Seeder
      */
     public function run()
     {
-        // Create a "Staff" role
         $role = Role::create(['name' => 'Staff']);
+        
+        $permissionNames = [
+            'service-staff-list',
+            'service-staff-edit',
+            'service-staff-create',
+            'service-staff-delete',
+            'order-list',
+            'order-edit',
+            'order-download',
+            'menu-sales'
+        ];
+        
+        $permissions = Permission::whereIn('name', $permissionNames)->pluck('id');
 
-        // Define the permissions that "Staff" role should have
-        $permissions = Permission::where('name', 'like', 'service-staff%')->pluck('id', 'id');
-
-        // Assign the permissions to the "Staff" role
         $role->syncPermissions($permissions);
 
-        // Create and assign four staff members
         for ($i = 1; $i <= 4; $i++) {
             $user = User::create([
                 'name' => 'Staff ' . $i,
@@ -41,7 +48,6 @@ class StaffRoleSeeder extends Seeder
                 'phone' => ' '
             ]);
 
-            // Assign the "Staff" role to the staff member
             $user->assignRole([$role->id]);
         }
     }

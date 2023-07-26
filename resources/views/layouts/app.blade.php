@@ -71,7 +71,7 @@
                         </li>
                         @endif
                         @else
-
+                        @can('menu-sales')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 Sales
@@ -89,6 +89,8 @@
                                 @endif
                             </div>
                         </li>
+                        @endcan
+                        @can('menu-store-config')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 Store Config
@@ -117,7 +119,8 @@
                                 @endcan
                             </div>
                         </li>
-                        @if(auth()->user()->getRoleNames() == '["Admin"]' || auth()->user()->getRoleNames() == '["Manger"]')
+                        @endcan
+                        @can('menu-user')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 Users
@@ -145,7 +148,7 @@
                                 @endcan
                             </div>
                         </li>
-                        @endif
+                        @endcan
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 {{ Auth::user()->name }}

@@ -28,7 +28,6 @@
             @csrf
             @method('PUT')
             <div class="row">
-            @if(auth()->user()->getRoleNames() != '["Staff"]')
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Date:</strong>
@@ -41,7 +40,7 @@
                     <input type="hidden" name="area" value="{{ $order->area }}">
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <div class="list-group" id="time-slots-container">
-                    @include('site.checkOut.timeSlots')
+                        @include('site.checkOut.timeSlots')
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -50,7 +49,7 @@
                         <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff_name }}</span>
                     </div>
                 </div>
-                @endif
+                @if(auth()->user()->getRoleNames() != '["Staff"]')
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Status:</strong>
@@ -65,6 +64,8 @@
                         </select>
                     </div>
                 </div>
+                @endif
+
                 <div class="col-md-12 text-right no-print">
                     @can('order-edit')
                     <button type="submit" class="btn btn-primary">Update</button>
