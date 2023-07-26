@@ -133,4 +133,6 @@ Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::get('appOrders', [AppController::class,'orders']);
 Route::get('appUser', [AppController::class,'user']);
 Route::get('appAddOrderComment/{order}', [AppController::class,'addComment']);
-Route::get('appRescheduleOrder/{order}', [AppController::class,'reschedule']);
+Route::get('appOrderStatusUpdate/{order}', [AppController::class,'orderStatusUpdate']);
+Route::get('appRescheduleOrder/{order}', [AppController::class,'rescheduleOrder']);
+Route::get('appTimeSlots', [AppController::class,'timeSlots']);
