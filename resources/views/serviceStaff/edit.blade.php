@@ -60,25 +60,6 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
-            <!-- <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Manager:</strong>
-                    <select name="manager_id" class="form-control">
-                        <option value=""></option>
-                        @if(count($users))
-                            @foreach($users as $user)
-                                @if($user->getRoleNames() == '["Manager"]')
-                                    @if($user->id == $serviceStaff->staff->manager_id)
-                                        <option value="{{ $user->id }}" selected>{{ $user->name }}</option>
-                                    @else
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                    @endif
-                                @endif
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
-            </div> -->
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Supervisor:</strong>

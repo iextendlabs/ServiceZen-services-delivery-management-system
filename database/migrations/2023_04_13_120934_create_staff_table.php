@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('commission');
-            $table->unsignedBigInteger('manager_id')->nullable();
             $table->unsignedBigInteger('supervisor_id')->nullable();
             $table->string('image')->nullable();
             $table->string('charges')->nullable();
@@ -28,11 +27,6 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('CASCADE');
-
-            $table->foreign('manager_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('SET NULL');
 
             $table->foreign('supervisor_id')
                 ->references('id')
