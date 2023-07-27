@@ -63,6 +63,22 @@ class User extends Authenticatable
         return $this->hasMany(AssistantSupervisorToSupervisor::class,'assistant_supervisor_id','id');
     }
 
+    public function getManagerStaffIds()
+    {
+        $staffIds = [];
+            foreach ($this->managerSupervisors as $managerSupervisor) {
+                $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisor->pluck('user_id')->toArray();
+                $staffIds = array_merge($staffIds, $supervisor_staffs);
+            }
+
+            return $staffIds;
+    }
+    
+    public function getSupervisorStaffIds()
+    {
+        return $this->staffSupervisor->pluck('user_id')->toArray();
+    }
+
     public function staffSupervisor()
     {
         return $this->hasMany(Staff::class,'supervisor_id','id');

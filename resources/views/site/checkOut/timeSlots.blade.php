@@ -19,6 +19,13 @@
                         @if((auth()->user()->getRoleNames() == '["Staff"]' && $staff->id != auth()->user()->id))
                         @continue
                         @endif
+                        @if(auth()->user()->getRoleNames() == '["Supervisor"]' && !in_array($staff->id, auth()->user()->getSupervisorStaffIds())) 
+                        @continue
+                        @endif
+                        @if(auth()->user()->getRoleNames() == '["Manager"]' && !in_array($staff->id, auth()->user()->getManagerStaffIds())) 
+                        @continue
+                        @endif
+                        
                     @endauth
                     @if(!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff))
                     <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >

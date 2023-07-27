@@ -33,31 +33,44 @@
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-striped table-bordered">
-                    <tr>
-                        <th>Order Id</th>
+                    <th>Order #</th>
+                    <th>Staff</th>
+                    <th><i class="fas fa-clock"></i> Appointment Date</th>
+                    <th><i class="fas fa-clock"></i> Slots</th>
+
+                    @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+                        <th>Landmark</th>
+                        <th>Area</th>
+                        <th>City</th>
+                        <th>Building name</th>
+                    @else
                         <th>Customer</th>
-                        <th>Staff</th>
-                        <th>Data \ Time Slot</th>
                         <th>Total Amount</th>
                         <th>Payment Method</th>
-                        <th>City</th>
-                        <th>Status</th>
                         <th>Comment</th>
                         <th>Date Added</th>
-                    </tr>
+                    @endif
+                    <th>Status</th>
                     @if(count($orders))
                     @foreach ($orders as $order)
                     <tr>
                         <td>#{{ $order->id }}</td>
-                        <td>@if($order->customer){{ $order->customer->name }}@endif</td>
-                        <td>@if($order->staff){{ $order->staff_name }}@endif</td>
-                        <td>{{ $order->date }} \ @if($order->time_slot) {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }} @endif</td>
-                        <td>{{ $order->total_amount }}</td>
-                        <td>{{ $order->payment_method }}</td>
-                        <td>{{ $order->city }}</td>
+                        <td>{{ $order->staff_name }}</td>
+                        <td>{{ $order->date }}</td>
+                        <td>{{ $order->time_slot_value }}</td>
+                        @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+                            <td>{{ $order->landmark }}</td>
+                            <td>{{ $order->area }}</td>
+                            <td>{{ $order->city }}</td>
+                            <td>{{ $order->buildingName }}</td>
+                        @else
+                            <td>{{ $order->customer_name }}</td>
+                            <td>@currency($order->total_amount)</td>
+                            <td>{{ $order->payment_method }}</td>
+                            <td>{{ $order->order_comment }}</td>
+                            <td>{{ $order->created_at }}</td>
+                        @endif
                         <td>{{ $order->status }}</td>
-                        <td>{{ $order->order_comment }}</td>
-                        <td>{{ $order->created_at }}</td>
                     </tr>
                     @endforeach
                     @else

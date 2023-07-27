@@ -44,29 +44,18 @@ class OrderController extends Controller
             'appointment_date' => $request->appointment_date,
             'created_at' => $request->created_at,
         ];
-
-        $existingParameters = $request->except('page');
-        if (Auth::user()->hasRole('Manager')) {
-            $manager = User::find(Auth::id());
-            $staffIds = [];
-            foreach ($manager->managerSupervisors as $managerSupervisor) {
-                $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisor->pluck('user_id')->toArray();
-                $staffIds = array_merge($staffIds, $supervisor_staffs);
-            }
+        $currentUser = Auth::user();
+        if ($currentUser->hasRole('Manager')) {
+            $staffIds = $currentUser->getManagerStaffIds();
             $query = Order::whereIn('service_staff_id', $staffIds);
-        } elseif (Auth::user()->hasRole('Supervisor')) {
-            $supervisor = User::find(Auth::id());
-
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
-
+        } elseif ($currentUser->hasRole('Supervisor')) {
+            $staffIds = $currentUser->getSupervisorStaffIds();
             $query = Order::whereIn('service_staff_id', $staffIds);
-        } elseif (Auth::user()->hasRole('Staff')) {
+        } elseif ($currentUser->hasRole('Staff')) {
             $query = Order::where('service_staff_id', Auth::id());
         } else {
             $query = Order::orderBy('id', 'DESC');
         }
-
-        // $query = Order::query();
 
         if ($request->status) {
             $query->where('status', 'like', $request->status . '%');
@@ -95,8 +84,11 @@ class OrderController extends Controller
         if ($request->created_at) {
             $query->where('created_at', 'like', $request->created_at . '%');
         }
-
-        $orders = $query->paginate(5)->appends($existingParameters);
+        if ($request->csv == 1 || $request->print == 1) {
+            $orders = $query->get();
+        } else {
+            $orders = $query->paginate(1);
+        }
 
         if ($request->csv == 1) {
             $headers = array(
@@ -107,20 +99,25 @@ class OrderController extends Controller
                 "Expires" => "0"
             );
 
-            // Define output stream for CSV file
             $output = fopen("php://output", "w");
+            if ($currentUser->hasRole('Supervisor')) {
+                fputcsv($output, array('Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services'));
+            } else {
+                fputcsv($output, array('Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services'));
+            }
 
-            // Write headers to output stream
-            fputcsv($output, array('Order ID', 'Amount', 'Status', 'Order Added Date', 'Customer', 'Staff', 'Appointment Date', 'Time', 'Services'));
 
-            // Loop through orders and write to output stream
             foreach ($orders as $row) {
                 $services = array();
                 foreach ($row->orderServices as $service) {
                     $services[] = $service->service_name;
                 }
 
-                fputcsv($output, array($row->id, '$' . $row->total_amount, $row->status, $row->created_at, $row->customer_name, $row->staff_name, $row->date, $row->time_slot_value, implode(",", $services)));
+                if ($currentUser->hasRole('Supervisor')) {
+                    fputcsv($output, array($row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services)));
+                } else {
+                    fputcsv($output, array($row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services)));
+                }
             }
 
             // Close output stream
@@ -129,9 +126,9 @@ class OrderController extends Controller
             // Return CSV file as download
             return Response::make('', 200, $headers);
         } else if ($request->print == 1) {
-            return view('orders.print', compact('orders', 'existingParameters'));
+            return view('orders.print', compact('orders'));
         } else {
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'existingParameters'))
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))
                 ->with('i', ($request->input('page', 1) - 1) * 10);
         }
     }
@@ -163,7 +160,6 @@ class OrderController extends Controller
         $statuses = config('app.statuses');
 
         [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
-
 
         return view('orders.edit', compact('order', 'timeSlots', 'statuses', 'staff_ids'));
     }
@@ -200,7 +196,6 @@ class OrderController extends Controller
         return redirect()->route('orders.index')
             ->with('success', 'Order deleted successfully');
     }
-
 
     public function updateOrderStatus(Order $order, Request $request)
     {

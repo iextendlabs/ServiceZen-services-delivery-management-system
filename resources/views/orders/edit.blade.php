@@ -49,7 +49,7 @@
                         <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff_name }}</span>
                     </div>
                 </div>
-                @if(auth()->user()->getRoleNames() != '["Staff"]')
+                @if(auth()->user()->getRoleNames() != '["Staff"]' && auth()->user()->getRoleNames() != '["Supervisor"]')
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Status:</strong>
