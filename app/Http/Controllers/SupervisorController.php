@@ -29,12 +29,19 @@ class SupervisorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $supervisors = User::latest()->get();
+        $filter_name = $request->name;
 
-        return view('supervisors.index', compact('supervisors'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+        $query = User::latest();
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name . '%');
+        }
+
+        $supervisors = $query->get();
+
+        return view('supervisors.index', compact('supervisors','filter_name'));
     }
 
     /**
@@ -156,15 +163,6 @@ class SupervisorController extends Controller
 
         return redirect()->route('supervisors.index')
             ->with('success', 'Supervisor deleted successfully');
-    }
-
-    public function filter(Request $request)
-    {
-        $name = $request->name;
-        $supervisors = User::where('name', 'like', $name . '%')->paginate(100);
-
-        return view('supervisors.index', compact('supervisors', 'name'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
 }

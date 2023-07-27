@@ -57,20 +57,18 @@
         </div>
         <div class="col-md-3">
             <h3>Filter</h3><hr>
-            <form action="serviceFilter" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('POST')
+            <form action="{{ route('services.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
-                            <input type="text" name="name" @if(isset($name)) value="{{$name}}"  @endif class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Price:</strong>
-                            <input type="number" name="price" @if(isset($price)) value="{{$price}}"  @endif class="form-control" placeholder="Price">
+                            <input type="number" name="price" value="{{ $filter['price'] }}" class="form-control" placeholder="Price">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -79,7 +77,7 @@
                             <select name="category_id" class="form-control">
                                 <option></option>
                                 @foreach($service_categories as $category)
-                                    @if($category->id == $category_id)
+                                    @if($category->id == $filter['category_id'])
                                         <option value="{{$category->id}}" selected>{{$category->title}}</option>
                                     @else
                                         <option value="{{$category->id}}">{{$category->title}}</option>

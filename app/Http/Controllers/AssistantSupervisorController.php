@@ -29,12 +29,19 @@ class AssistantSupervisorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $assistant_supervisors = User::latest()->get();
+        $filter_name = $request->name;
 
-        return view('assistantSupervisors.index',compact('assistant_supervisors'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+        $query = User::latest();
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name . '%');
+        }
+
+        $assistant_supervisors = $query->get();
+
+        return view('assistantSupervisors.index',compact('assistant_supervisors','filter_name'));
     }
     
     /**
@@ -160,12 +167,4 @@ class AssistantSupervisorController extends Controller
                         ->with('success','Assistant Supervisor deleted successfully');
     }
 
-    public function filter(Request $request)
-    {
-        $name = $request->name;
-        $assistant_supervisors = User::where('name','like',$name.'%')->paginate(100);
-
-        return view('assistantSupervisors.index',compact('assistant_supervisors','name'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
-    }
 }

@@ -31,19 +31,26 @@ class ServiceStaffController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filter_name = $request->name;
+
         if(Auth::user()->hasRole('Supervisor')){
-            $serviceStaff = User::join('staff', 'staff.user_id', '=', 'users.id')
-            ->select('users.id', 'users.name', 'users.email')
-            ->where('staff.supervisor_id',Auth::id())->get();
+            $staffIds = Auth::user()->getSupervisorStaffIds();
+            $query = User::whereIn('id', $staffIds);
         }elseif(Auth::user()->hasRole('Staff')){
-            $serviceStaff = User::where('id',Auth::id())->get();
+            $query = User::where('id',Auth::id());
         }else{
-            $serviceStaff = User::latest()->get();
+            $query = User::latest();
         }
-        return view('serviceStaff.index',compact('serviceStaff'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name . '%');
+        }
+
+        $serviceStaff = $query->get();
+
+        return view('serviceStaff.index',compact('serviceStaff','filter_name'));
     }
     
     /**
@@ -193,12 +200,4 @@ class ServiceStaffController extends Controller
                         ->with('success','Service Staff deleted successfully');
     }
 
-    public function filter(Request $request)
-    {
-        $name = $request->name;
-        $serviceStaff = User::where('name','like',$name.'%')->paginate(100);
-
-        return view('serviceStaff.index',compact('serviceStaff','name'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
-    }
 }

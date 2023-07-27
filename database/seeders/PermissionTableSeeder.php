@@ -21,6 +21,7 @@ class PermissionTableSeeder extends Seeder
             'menu-sales',
             'menu-store-config',
             'menu-user',
+            'role-list',
             'role-create',
             'role-edit',
             'role-delete',

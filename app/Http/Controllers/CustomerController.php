@@ -27,12 +27,19 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = User::latest()->get();
+        $filter_name = $request->name;
 
-        return view('customers.index',compact('customers'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+        $query = User::latest();
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name . '%');
+        }
+
+        $customers = $query->get(); 
+
+        return view('customers.index',compact('customers','filter_name'));
     }
     
     /**
@@ -136,12 +143,4 @@ class CustomerController extends Controller
                         ->with('success','Customer deleted successfully');
     }
 
-    public function filter(Request $request)
-    {
-        $name = $request->name;
-        $customers = User::where('name','like',$name.'%')->paginate(100);
-
-        return view('customers.index',compact('customers','name'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
-    }
 }

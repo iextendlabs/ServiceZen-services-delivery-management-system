@@ -31,10 +31,32 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $category_id = '';
-        $services = Service::latest()->paginate(10);
+        $filter = [
+            'name' => $request->name,
+            'price' => $request->price,
+            'category_id' => $request->category_id
+        ];
+
+        $query = Service::latest();
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name.'%');
+        }
+
+        // Filter by price
+        if ($request->price) {
+            $query->where('price', $request->price);
+        }
+
+        // Filter by category_id
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $services = $query->paginate(10);
+
         $service_categories = ServiceCategory::all();
-        return view('services.index',compact('services','service_categories','category_id'))
+        return view('services.index',compact('services','service_categories','filter'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
     
@@ -213,33 +235,4 @@ class ServiceController extends Controller
                         ->with('success','Service deleted successfully');
     }
 
-    public function filter(Request $request){
-
-        $name = $request->name;
-        $price = $request->price;
-        $category_id = $request->category_id;
-        $service_categories = ServiceCategory::all();
-
-        $query = Service::query();
-
-        // Filter by name
-        if ($request->name) {
-            $query->where('name', 'like', $request->name.'%');
-        }
-
-        // Filter by price
-        if ($request->price) {
-            $query->where('price', $request->price);
-        }
-
-        // Filter by category_id
-        if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        $services = $query->paginate(100);
-
-        return view('services.index',compact('services','name','price','category_id','service_categories'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
-    }
 }

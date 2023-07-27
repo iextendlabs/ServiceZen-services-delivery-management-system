@@ -17,6 +17,9 @@
         </div>
     @endif
     <hr>
+    @php
+        $i = 0;
+    @endphp
     <div class="row">
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
@@ -58,14 +61,12 @@
         </div>
         <div class="col-md-3">
             <h3>Filter</h3><hr>
-            <form action="serviceStaffFilter" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('POST')
+            <form action="{{ route('serviceStaff.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
-                            <input type="text" name="name" @if(isset($name)) value="{{$name}}"  @endif class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{$filter_name}}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">

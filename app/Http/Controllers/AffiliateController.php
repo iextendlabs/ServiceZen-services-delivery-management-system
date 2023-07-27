@@ -29,12 +29,19 @@ class AffiliateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $affiliates = User::latest()->get();
+        $filter_name = $request->name;
 
-        return view('affiliates.index',compact('affiliates'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+        $query = User::latest();
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name . '%');
+        }
+
+        $affiliates = $query->get();
+
+        return view('affiliates.index',compact('affiliates','filter_name'));
     }
     
     /**
@@ -149,12 +156,4 @@ class AffiliateController extends Controller
                         ->with('success','Affiliate deleted successfully');
     }
 
-    public function filter(Request $request)
-    {
-        $name = $request->name;
-        $affiliates = User::where('name','like',$name.'%')->paginate(100);
-
-        return view('affiliates.index',compact('affiliates','name'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
-    }
 }

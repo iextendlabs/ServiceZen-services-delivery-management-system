@@ -28,12 +28,19 @@ class ManagerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $managers = User::latest()->get();
+        $filter_name = $request->name;
 
-        return view('managers.index',compact('managers'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+        $query = User::latest();
+
+        if ($request->name) {
+            $query->where('name', 'like', $request->name . '%');
+        }
+
+        $managers = $query->get();
+
+        return view('managers.index',compact('managers','filter_name'));
     }
     
     /**
@@ -138,12 +145,4 @@ class ManagerController extends Controller
                         ->with('success','Manager deleted successfully');
     }
 
-    public function filter(Request $request)
-    {
-        $name = $request->name;
-        $managers = User::where('name','like',$name.'%')->paginate(100);
-
-        return view('managers.index',compact('managers','name'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
-    }
 }

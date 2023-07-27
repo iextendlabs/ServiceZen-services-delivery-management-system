@@ -70,18 +70,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
 
-
-    Route::post('serviceFilter', [ServiceController::class, 'filter']);
-    Route::post('serviceStaffFilter', [ServiceStaffController::class, 'filter']); 
-    Route::post('customerFilter', [CustomerController::class, 'filter']); 
-    Route::post('affiliateFilter', [AffiliateController::class, 'filter']); 
-    Route::post('userFilter', [UserController::class, 'filter']); 
-    Route::post('managerFilter', [ManagerController::class, 'filter']); 
-    Route::post('supervisorFilter', [SupervisorController::class, 'filter']);
-    Route::post('assistantSupervisorFilter', [AssistantSupervisorController::class, 'filter']);
-     
-    Route::get('serviceFilterCategory', [ServiceController::class, 'filter']); 
-
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
 
     Route::get('holidays', [HolidayController::class, 'index']);

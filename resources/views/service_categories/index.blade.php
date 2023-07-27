@@ -33,7 +33,7 @@
         @foreach ($service_categories as $service_category)
         <tr>
             <td>{{ ++$i }}</td>
-            <td><a href="/serviceFilterCategory?category_id={{$service_category->id}}">{{ $service_category->title }}</a></td>
+            <td><a href="{{ route('services.index', ['category_id' => $service_category->id]) }}">{{ $service_category->title }}</a></td>
             <td>{{ $service_category->description }}</td>
             <td>
                 <form action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">

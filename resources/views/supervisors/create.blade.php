@@ -46,7 +46,7 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Manager:</strong>
+                    <span style="color: red;">*</span><strong>Manager:</strong>
                     <select name="manager_id" class="form-control">
                         <option></option>
                         @foreach($managers as $manager)

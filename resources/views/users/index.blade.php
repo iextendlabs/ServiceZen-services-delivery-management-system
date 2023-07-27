@@ -32,7 +32,7 @@
             @if(count($data))
             @foreach ($data as $key => $user)
             <tr>
-                <td>{{ ++$i }}</td>
+                <td>{{ ++$key }}</td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
                 <td>
@@ -61,18 +61,15 @@
             </tr>
             @endif
         </table>
-        {!! $data->render() !!}
     </div>
     <div class="col-md-3">
             <h3>Filter</h3><hr>
-            <form action="userFilter" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('POST')
+            <form action="{{ route('users.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
-                            <input type="text" name="name" value="{{$filter_name}}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -81,7 +78,7 @@
                             <select name="role" class="form-control">
                                 <option></option>
                                 @foreach ($roles as $role)
-                                    @if($role->name == $filter_role)
+                                    @if($role->name == $filter['role'])
                                     <option value="{{ $role->name }}" selected>{{ $role->name }}</option>
                                     @else
                                     <option value="{{ $role->name }}">{{ $role->name }}</option>
