@@ -47,7 +47,7 @@ return [
 
     'statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 
-    'staff_order_limit' => env('STAFF_ORDER_LIMIT','5'),
+    'staff_order_limit' => env('STAFF_ORDER_LIMIT','20'),
 
     /*
     |--------------------------------------------------------------------------
