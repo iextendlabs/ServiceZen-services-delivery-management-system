@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashCollection;
 use App\Models\Order;
 use App\Models\OrderComment;
 use App\Models\TimeSlot;
@@ -14,7 +15,22 @@ class AppController extends Controller
 {
     public function orders(Request $request)
     {
-        $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->limit(config('app.staff_order_limit'))->get();
+
+        if ($request->status == 'Complete') {
+            $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
+            ->where(function ($query) {
+                // Filter orders with cash collection status not approved
+                $query->where('cash_collections.status', '!=', 'approved')
+                      // Filter orders without any associated cash collection
+                      ->orWhereNull('cash_collections.status');
+            })
+            ->where('orders.service_staff_id', $request->user_id)
+            ->where('orders.status', $request->status)
+            ->limit(config('app.staff_order_limit'))
+            ->get(['orders.*', 'cash_collections.status as cash_status']);
+        } else {
+            $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
+        }
 
         $orders_data->each->append('comments_text');
 
@@ -109,6 +125,32 @@ class AppController extends Controller
         $order->save();
 
         return response()->json(['success' => 'Order Update Successfully'])->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'POST')
+            ->header('Content-Type', 'application/json')
+            ->header('Access-Control-Allow-Headers', 'Content-Type');
+    }
+
+    public function cashCollection($order_id, Request $request){
+    
+        $cashCollection = CashCollection::where('order_id', $order_id)->first();
+
+        if(empty($cashCollection)){
+            $staff = User::find($request->user_id);
+            $input['order_id'] = $order_id;
+            $input['description'] = $request->description;
+            $input['amount'] = $request->amount;
+            $input['staff_name'] = $staff->name;
+            $input['staff_id'] = $request->user_id;
+            $input['status'] = 'Not Approved';
+
+            CashCollection::create($input);
+        }else{
+            $cashCollection->description = $request->description;
+            $cashCollection->amount = $request->amount;
+            $cashCollection->save();
+        }
+
+        return response()->json(['success' => 'Cash Collected Successfully'])->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', 'POST')
             ->header('Content-Type', 'application/json')
             ->header('Access-Control-Allow-Headers', 'Content-Type');

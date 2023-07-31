@@ -36,7 +36,17 @@ class CashCollectionController extends Controller
 
     public function staffCashCollection()
     {
-        $orders = Order::where(['service_staff_id'=>Auth::id(),'status'=>'Complete'])->orderBy('id','DESC')->paginate(10);                
+        // $orders = Order::where(['service_staff_id'=>Auth::id(),'status'=>'Complete'])->orderBy('id','DESC')->paginate(10);   
+        
+        $orders = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
+                ->where(function ($query) {
+                    // Filter orders with cash collection status not approved
+                    $query->where('cash_collections.status', '!=', 'approved')
+                        // Filter orders without any associated cash collection
+                        ->orWhereNull('cash_collections.status');
+                })
+                ->select('orders.*') // Select only the columns from the "orders" table
+                ->where('service_staff_id', Auth::id())->where('orders.status', 'Complete')->orderBy('id','DESC')->paginate(10);
                 
         return view('cashCollections.staffCashCollection',compact('orders'))
             ->with('i', (request()->input('page', 1) - 1) * 10);      

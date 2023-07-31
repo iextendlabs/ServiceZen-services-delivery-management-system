@@ -87,7 +87,7 @@ class OrderController extends Controller
         if ($request->csv == 1 || $request->print == 1) {
             $orders = $query->get();
         } else {
-            $orders = $query->paginate(1);
+            $orders = $query->paginate(config('app.paginate'));
         }
 
         if ($request->csv == 1) {
