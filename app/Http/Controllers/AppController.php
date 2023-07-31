@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderComment;
 use App\Models\TimeSlot;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ class AppController extends Controller
 {
     public function orders(Request $request)
     {
+
+        $currentDate = Carbon::today();
 
         if ($request->status == 'Complete') {
             $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
@@ -26,10 +29,11 @@ class AppController extends Controller
             })
             ->where('orders.service_staff_id', $request->user_id)
             ->where('orders.status', $request->status)
+            ->where('orders.date', '<=', $currentDate)
             ->limit(config('app.staff_order_limit'))
             ->get(['orders.*', 'cash_collections.status as cash_status']);
         } else {
-            $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
+            $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->where('date', '<=', $currentDate)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
         }
 
         $orders_data->each->append('comments_text');

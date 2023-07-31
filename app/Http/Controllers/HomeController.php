@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Affiliate;
 use App\Models\Order;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
@@ -31,26 +32,36 @@ class HomeController extends Controller
     public function index()
     {
 
+        $currentDate = Carbon::today();
+        $currentUser = Auth::user();
+
         if(Auth::check()){
-            if(Auth::user()->hasRole('Customer')){
+            if($currentUser->hasRole('Customer')){
                 Session::flush();
                 Auth::logout();
                 return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');
             }else{
-                if(Auth::user()->hasRole('Supervisor')){
-                    $supervisor = User::find(Auth::id());
-        
-                    $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
-        
-                    $orders = Order::whereIn('service_staff_id', $staffIds)
-                        ->take(10)->get();
-        
-                }elseif(Auth::user()->hasRole('Staff')){
-                    $orders = Order::where('service_staff_id',Auth::id())->take(10)->get();
-                    // dd($orders);
-                }else{
-                    $orders = Order::orderBy('id','DESC')->take(10)->get();
-                }
+        $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
+
+        switch ($userRole) {
+            case 'Manager':
+                $staffIds = $currentUser->getManagerStaffIds();
+                $orders = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC')->take(10)->get();
+                break;
+
+            case 'Supervisor':
+                $staffIds = $currentUser->getSupervisorStaffIds();
+                $orders = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC')->where('date', '<=', $currentDate)->take(10)->get();
+                break;
+
+            case 'Staff':
+                $orders = Order::where('service_staff_id', Auth::id())->orderBy('date', 'DESC')->where('date', '<=', $currentDate)->take(10)->get();
+                break;
+
+            default:
+                $orders = Order::orderBy('date', 'DESC')->take(10)->get();
+                break;
+        }
                 
                 $affiliate_commission = DB::table('affiliates')
                 ->select('affiliates.user_id', DB::raw('SUM(transactions.amount) as total_amount'))

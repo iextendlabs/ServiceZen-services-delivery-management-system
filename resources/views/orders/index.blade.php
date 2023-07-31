@@ -7,30 +7,47 @@
             </div>
             <div class="float-end">
 
-                @can('order-download')
-                <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end no-print"><i class="fa fa-download"></i> Excel</a>
-                <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end no-print" style="margin-right: 10px;"><i class="fa fa-print"></i> PDF</a>
+            @can('order-download')
+                <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
+                <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end no-print" style="margin-right: 10px;"><i class="fa fa-download"></i> Excel</a>
                 @endcan
                 <!-- Assuming you have Font Awesome properly linked in your HTML file -->
-
+                @if(auth()->user()->getRoleNames() == '["Admin"]')
                 <!-- All Orders -->
                 <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;">
-                    <i class="fas fa-list"></i> All Orders
-                </a>
-
-                <!-- Pending Order -->
-                <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">
-                    <i class="fas fa-clock"></i> Pending Order
-                </a>
-
-                <!-- Complete Order -->
-                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">
-                    <i class="fas fa-check"></i> Complete Order
+                    <i class="fas fa-list"></i> All
                 </a>
 
                 <!-- Canceled Order -->
                 <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">
-                    <i class="fas fa-times"></i> Canceled Order
+                    <i class="fas fa-times"></i> Canceled
+                </a>
+
+                @endif
+
+                <!-- Complete Order -->
+                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">
+                    <i class="fas fa-check"></i> Complete
+                </a>
+
+                <!-- Inprogress Order -->
+                <a class="btn btn-info float-end" href="/orders?status=Inprogress" style="margin-right: 10px;">
+                    <i class="fas fa-hourglass-split"></i> Inprogress
+                </a>
+
+                <!-- Rejected Order -->
+                <a class="btn btn-warning float-end" href="/orders?status=Rejected" style="margin-right: 10px;">
+                    <i class="fas fa-times"></i> Rejected
+                </a>
+
+                <!-- Accepted Order -->
+                <a class="btn btn-success float-end" href="/orders?status=Accepted" style="margin-right: 10px;">
+                    <i class="fas fa-check"></i> Accepted
+                </a>
+
+                <!-- Pending Order -->
+                <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">
+                    <i class="fas fa-clock"></i> Pending
                 </a>
 
             </div>
@@ -45,6 +62,7 @@
     <hr>
 
     <div class="row">
+        @if(auth()->user()->getRoleNames() != '["Staff"]')
         <!-- Second Column (Filter Form) -->
         <div class="col-md-12">
             <h3>Filter</h3>
@@ -152,7 +170,7 @@
                 </div>
             </form>
         </div>
-
+        @endif
         <!-- First Column (Table) -->
         <div class="col-md-12 mt-3">
             @include('orders.list')

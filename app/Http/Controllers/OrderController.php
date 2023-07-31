@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -32,6 +33,9 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
+
+        $currentDate = Carbon::today();
+
         $statuses = config('app.statuses');
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
@@ -45,17 +49,28 @@ class OrderController extends Controller
             'created_at' => $request->created_at,
         ];
         $currentUser = Auth::user();
-        if ($currentUser->hasRole('Manager')) {
-            $staffIds = $currentUser->getManagerStaffIds();
-            $query = Order::whereIn('service_staff_id', $staffIds);
-        } elseif ($currentUser->hasRole('Supervisor')) {
-            $staffIds = $currentUser->getSupervisorStaffIds();
-            $query = Order::whereIn('service_staff_id', $staffIds);
-        } elseif ($currentUser->hasRole('Staff')) {
-            $query = Order::where('service_staff_id', Auth::id());
-        } else {
-            $query = Order::orderBy('id', 'DESC');
+        $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
+
+        switch ($userRole) {
+            case 'Manager':
+                $staffIds = $currentUser->getManagerStaffIds();
+                $query = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC');
+                break;
+
+            case 'Supervisor':
+                $staffIds = $currentUser->getSupervisorStaffIds();
+                $query = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC');
+                break;
+
+            case 'Staff':
+                $query = Order::where('service_staff_id', Auth::id())->orderBy('date', 'DESC');
+                break;
+
+            default:
+                $query = Order::orderBy('date', 'DESC');
+                break;
         }
+
 
         if ($request->status) {
             $query->where('status', 'like', $request->status . '%');
@@ -79,6 +94,11 @@ class OrderController extends Controller
 
         if ($request->appointment_date) {
             $query->where('date', $request->appointment_date);
+        }
+        
+        if($userRole == "Staff" || $userRole == "Supervisor"){
+           
+            $query->where('date', '<=', $currentDate);
         }
 
         if ($request->created_at) {

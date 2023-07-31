@@ -27,7 +27,6 @@ class StaffRoleSeeder extends Seeder
             'service-staff-delete',
             'order-list',
             'order-edit',
-            'order-download',
             'menu-sales'
         ];
         
