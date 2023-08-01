@@ -34,7 +34,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
 
-        $currentDate = Carbon::today();
+        $currentDate = Carbon::today()->toDateString();
 
         $statuses = config('app.statuses');
         $payment_methods = ['Cash-On-Delivery'];
