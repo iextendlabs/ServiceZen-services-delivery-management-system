@@ -36,7 +36,7 @@ class OrderController extends Controller
 
         $currentDate = Carbon::today()->toDateString();
 
-        $statuses = config('app.statuses');
+        $statuses = config('app.order_statuses');
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $filter = [
@@ -168,7 +168,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::find($id);
-        $statuses = config('app.statuses');
+        $statuses = config('app.order_statuses');
         return view('orders.show', compact('order', 'statuses'));
     }
 
@@ -177,7 +177,7 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
 
-        $statuses = config('app.statuses');
+        $statuses = config('app.order_statuses');
 
         [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 

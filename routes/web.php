@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AffiliateController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\{
@@ -16,15 +15,19 @@ use App\Http\Controllers\{
     ManagerController,
     ServiceCategoryController,
     OrderController,
-    PartnerController,
     StaffGroupController,
     StaffHolidayController,
     StaffZoneController,
     SupervisorController,
     TimeSlotController,
     TransactionController,
-    AppController,
-    
+    DriverController,
+    AffiliateController,
+};
+
+use App\Http\Controllers\AppController\{
+    StaffAppController,
+    DriverAppController
 };
 
 use App\Http\Controllers\Site\{
@@ -58,6 +61,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('services', ServiceController::class);
     Route::resource('serviceStaff', ServiceStaffController::class);
     Route::resource('customers', CustomerController::class);
+    Route::resource('drivers', DriverController::class);
     Route::resource('serviceCategories', ServiceCategoryController::class);
     Route::resource('affiliates', AffiliateController::class);
     Route::resource('orders', OrderController::class);
@@ -118,10 +122,18 @@ Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 
 // app url
 
-Route::get('appOrders', [AppController::class,'orders']);
-Route::get('appUser', [AppController::class,'user']);
-Route::get('appAddOrderComment/{order}', [AppController::class,'addComment']);
-Route::get('appCashCollection/{order}', [AppController::class,'cashCollection']);
-Route::get('appOrderStatusUpdate/{order}', [AppController::class,'orderStatusUpdate']);
-Route::get('appRescheduleOrder/{order}', [AppController::class,'rescheduleOrder']);
-Route::get('appTimeSlots', [AppController::class,'timeSlots']);
+// Staff app
+
+Route::get('staffAppOrders', [StaffAppController::class,'orders']);
+Route::get('staffAppUser', [StaffAppController::class,'user']);
+Route::get('staffAppAddOrderComment/{order}', [StaffAppController::class,'addComment']);
+Route::get('staffAppCashCollection/{order}', [StaffAppController::class,'cashCollection']);
+Route::get('staffAppOrderStatusUpdate/{order}', [StaffAppController::class,'orderStatusUpdate']);
+Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class,'rescheduleOrder']);
+Route::get('staffAppTimeSlots', [StaffAppController::class,'timeSlots']);
+
+// Driver app
+
+Route::get('driverAppOrders', [DriverAppController::class,'orders']);
+Route::get('driverAppUser', [DriverAppController::class,'user']);
+Route::get('driverAppOrderStatusUpdate/{order}', [DriverAppController::class,'orderDriverStatusUpdate']);

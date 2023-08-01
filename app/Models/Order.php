@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['customer_id','customer_name','customer_email', 'total_amount','payment_method','status','affiliate_id','buildingName','area','landmark','flatVilla','street','city','number','whatsapp','service_staff_id','staff_name','date','time_slot_id','time_slot_value','latitude','longitude','order_comment'];
+    protected $fillable = ['customer_id','customer_name','customer_email', 'total_amount','payment_method','status','affiliate_id','buildingName','area','landmark','flatVilla','street','city','number','whatsapp','service_staff_id','staff_name','date','time_slot_id','time_slot_value','latitude','longitude','order_comment','driver_status'];
 
     protected $table = 'orders';
 
@@ -71,5 +71,10 @@ class Order extends Model
         $comments =$this->comments->sortByDesc('created_at')->pluck('comment');
         $comments->prepend($this->order_comment);
         return $comments->toArray();
+    }
+
+    public function driverOrder()
+    {
+        return $this->hasOne(DriverOrder::class);
     }
 }

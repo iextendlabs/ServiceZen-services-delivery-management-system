@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AppController;
 
 use App\Models\CashCollection;
 use App\Models\Order;
@@ -11,8 +11,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
-class AppController extends Controller
+class StaffAppController extends Controller
+
 {
     public function orders(Request $request)
     {

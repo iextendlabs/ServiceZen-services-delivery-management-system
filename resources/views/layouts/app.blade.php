@@ -146,6 +146,9 @@
                                 @can('assistant-supervisor-list')
                                 <a class="dropdown-item" href="{{ route('assistantSupervisors.index') }}">Assistant Supervisor</a>
                                 @endcan
+                                @can('driver-list')
+                                <a class="dropdown-item" href="{{ route('drivers.index') }}">Drivers</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan

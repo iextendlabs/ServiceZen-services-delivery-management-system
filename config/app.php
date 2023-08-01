@@ -45,7 +45,11 @@ return [
     'debug' => (bool) env('APP_DEBUG', false),
 
 
-    'statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
+    'driver_statuses' => env('DRIVER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
+
+    'order_driver_statuses' => env('ORDER_DRIVER_STATUSES', ['Pending', 'Accepted', 'Drive to pick', 'Picked', 'Drop','Waiting']),
+
+    'order_statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 
     'staff_order_limit' => env('STAFF_ORDER_LIMIT','20'),
     'paginate' => env('PAGINATE','10'),

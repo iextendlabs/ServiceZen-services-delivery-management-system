@@ -93,6 +93,7 @@ class SiteOrdersController extends Controller
         $input['number'] = $address['number'];
         $input['whatsapp'] = $address['whatsapp'];
         $input['status'] = "Pending";
+        $input['driver_status'] = "Pending";
         $input['service_staff_id'] = $staff_and_time['service_staff_id'];
         $input['staff_name'] = $staff->name;
         $input['date'] = $staff_and_time['date'];

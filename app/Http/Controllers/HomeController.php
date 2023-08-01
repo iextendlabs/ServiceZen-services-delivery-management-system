@@ -32,7 +32,7 @@ class HomeController extends Controller
     public function index()
     {
 
-        $currentDate = Carbon::today();
+        $currentDate = Carbon::today()->toDateString();
         $currentUser = Auth::user();
 
         if(Auth::check()){
