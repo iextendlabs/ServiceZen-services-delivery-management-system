@@ -192,7 +192,7 @@
     <div class="container">
     <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
       <p class="float-right">
-      {{ date('Y-m-d') }}:
+      {{ date('Y-m-d H:i:s') }}:
         © 2023 Saloon X UAE
       </p>
     </div>

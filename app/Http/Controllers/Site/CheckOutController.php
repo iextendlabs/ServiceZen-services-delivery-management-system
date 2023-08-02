@@ -82,10 +82,10 @@ class CheckOutController extends Controller
             'street' => 'required',
             'landmark' => 'required',
             'name' => 'required',
-            'number' => 'required',
+            'number' => 'required|digits:9',
             'email' => 'required|email',
             'name' => 'required',
-            'whatsapp' => 'required',
+            'whatsapp' => 'required|digits:9',
         ]);
 
         $address = [];
@@ -96,14 +96,14 @@ class CheckOutController extends Controller
         $address['street'] = $request->street;
         $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
-        $address['number'] = $request->number;
-        $address['whatsapp'] = $request->whatsapp;
+        $address['number'] = config('app.country_code').$request->number;
+        $address['whatsapp'] = config('app.country_code').$request->whatsapp;
         $address['email'] = $request->email;
         $address['name'] = $request->name;
         $address['latitude'] = $request->latitude;
         $address['longitude'] = $request->longitude;
         $address['searchField'] = $request->searchField;
-        
+
         if (session()->has('address')) {
             Session::forget('address');
             Session::put('address', $address);

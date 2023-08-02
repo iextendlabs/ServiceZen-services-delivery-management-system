@@ -131,13 +131,23 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Phone Number:</strong>
-                        <input type="number" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : $address['number']}}">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">{{ config('app.country_code') }}</span>
+                            </div>
+                            <input type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : str_replace('+971','',$address['number'])}}" pattern="[0-9]{9}">
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                        <input type="number" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : $address['whatsapp']}}">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">{{ config('app.country_code') }}</span>
+                            </div>
+                            <input type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971','',$address['whatsapp'])}}" pattern="[0-9]{9}">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,7 +161,7 @@
     </div>
 </div>
 <script>
-     function fillFormAddressFields(place) {
+    function fillFormAddressFields(place) {
         const buildingNameField = document.getElementById('buildingName');
         const landmarkField = document.getElementById('landmark');
         const areaField = document.getElementById('area');
@@ -185,9 +195,10 @@
             longitude.value = place.geometry.location.lng();
         }
         popup_searchField.value = address;
-    
+
     }
-    function initMap(){
+
+    function initMap() {
         $('.location-search-wrapper').show();
         initAutocompleteLocal();
     }
@@ -198,10 +209,11 @@
             var map = document.getElementById("map");
 
             map.style.display = "block";
-            
+
             showMap();
         });
     });
+
     function initAutocompleteLocal() {
         var autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchField'));
         autocomplete.addListener('place_changed', function() {
@@ -222,7 +234,6 @@
             fillFormAddressFields(place);
         });
     }
-
 </script>
 
 <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&callback=initMap"></script> -->
