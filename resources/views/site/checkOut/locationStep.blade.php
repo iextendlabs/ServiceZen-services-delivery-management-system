@@ -183,7 +183,7 @@
             } else if (types.includes('point_of_interest')) {
                 landmarkField.value = component.long_name;
             } else if (types.includes('neighborhood') || types.includes('sublocality')) {
-                areaField.value = component.long_name;
+                // areaField.value = component.long_name;
             } else if (types.includes('street_number')) {
                 flatVillaField.value = component.long_name;
             } else if (types.includes('route')) {
@@ -194,8 +194,6 @@
             latitudeField.value = place.geometry.location.lat();
             longitude.value = place.geometry.location.lng();
         }
-        popup_searchField.value = address;
-
     }
 
     function initMap() {
@@ -206,11 +204,6 @@
     $(document).ready(function() {
         $("#manualLocationButton").click(function() {
             $("#locationPopup").modal('show');
-            var map = document.getElementById("map");
-
-            map.style.display = "block";
-
-            showMap();
         });
     });
 
@@ -220,7 +213,6 @@
             var place = autocomplete.getPlace();
 
             if (!place.geometry) {
-                alert('No details available for input: ' + place.name);
                 return;
             }
 

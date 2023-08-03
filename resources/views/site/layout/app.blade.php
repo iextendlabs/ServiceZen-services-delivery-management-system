@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>{{ config('app.name', 'Services Delivery Management System') }}</title>
+  <title>{{ env('APP_NAME') }}</title>
 
   <!-- Bootstrap core CSS -->
   <link href="./css/bootstrap.min.css" rel="stylesheet">
@@ -31,7 +31,7 @@ $cart_product = 0;
 
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">Saloon X UAE</a>
+      <a class="navbar-brand" href="/">{{ env('APP_NAME') }}</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -106,7 +106,7 @@ $cart_product = 0;
   <footer class="text-muted">
     <div class="container">
       <p class="float-right">
-        © 2023 Saloon X UAE
+        © 2023 {{ env('APP_NAME') }}
 
       </p>
     </div>
