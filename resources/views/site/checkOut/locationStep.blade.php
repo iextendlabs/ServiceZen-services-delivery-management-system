@@ -135,7 +135,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">{{ config('app.country_code') }}</span>
                             </div>
-                            <input type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : str_replace('+971','',$address['number'])}}" pattern="[0-9]{9}">
+                            <input type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : str_replace('+971','',$address['number'])}}" pattern="[0-9]{7,9}">
                         </div>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">{{ config('app.country_code') }}</span>
                             </div>
-                            <input type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971','',$address['whatsapp'])}}" pattern="[0-9]{9}">
+                            <input type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971','',$address['whatsapp'])}}" pattern="[0-9]{7,9}">
                         </div>
                     </div>
                 </div>

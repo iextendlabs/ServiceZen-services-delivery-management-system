@@ -146,12 +146,12 @@
                         @endphp
                     </tr>
                     @endif
-                    @if($time_slot->staffGroup->staffZone->transport_charges)
+                    @if($staffZone->transport_charges)
                     <tr>
                         <td class="text-left"><strong>Transport Charges:</strong></td>
-                        <td>@currency($time_slot->staffGroup->staffZone->transport_charges)</td>
+                        <td>@currency($staffZone->transport_charges)</td>
                         @php
-                        $transport_charges = $time_slot->staffGroup->staffZone->transport_charges;
+                        $transport_charges = $staffZone->transport_charges;
                         $total_amount = $transport_charges +$total_amount;
                         @endphp
                     </tr>

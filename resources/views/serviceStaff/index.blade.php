@@ -47,6 +47,7 @@
                             @can('service-staff-delete')
                             <button type="submit" class="btn btn-danger">Delete</button>
                             @endcan
+                            <a class="btn btn-primary" href="{{ route('staffHolidays.create',['staff' => $staff->id]) }}"><i class="fas fa-calendar"></i></a>
                         </form>
                     </td>
                 </tr>

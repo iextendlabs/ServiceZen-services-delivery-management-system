@@ -29,7 +29,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Staff Zones:</strong>
-                    <input type="text" name="search-zone" id="search-zone" class="form-control" placeholder="Search Staff By Name And Email">
+                    <input type="text" name="search-zone" id="search-zone" class="form-control" placeholder="Search Staff Zone By Name And Email">
                     <table class="table table-striped table-bordered staff-zone-table">
                         <tr>
                             <th></th>

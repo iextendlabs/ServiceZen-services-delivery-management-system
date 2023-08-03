@@ -82,10 +82,10 @@ class CheckOutController extends Controller
             'street' => 'required',
             'landmark' => 'required',
             'name' => 'required',
-            'number' => 'required|digits:9',
+            'number' => 'required',
             'email' => 'required|email',
             'name' => 'required',
-            'whatsapp' => 'required|digits:9',
+            'whatsapp' => 'required',
         ]);
 
         $address = [];
@@ -193,11 +193,11 @@ class CheckOutController extends Controller
     public function confirmStep(Request $request)
     {
         if (Session::get('staff_and_time') && Session::get('address') && Session::get('serviceIds')) {
-
             $staff_and_time = Session::get('staff_and_time');
             $address = Session::get('address');
             $serviceIds = Session::get('serviceIds');
-
+            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($address['area']) . "%"])->first();
+            
             foreach ($serviceIds as $id) {
                 $services[] = Service::find($id);
             }
@@ -208,7 +208,7 @@ class CheckOutController extends Controller
 
             $i = 0;
 
-            return view('site.checkOut.confirmStep', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time'));
+            return view('site.checkOut.confirmStep', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time','staffZone'));
         } elseif (Session::get('serviceIds') && Session::get('address')) {
 
             return redirect('locationStep')->with('error', 'There is no Time Slots Data Saved.');

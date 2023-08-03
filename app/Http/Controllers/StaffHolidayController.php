@@ -43,6 +43,7 @@ class StaffHolidayController extends Controller
             $staffHolidays = StaffHoliday::latest()->paginate(10);
         }
 
+
         return view('staffHolidays.index',compact('staffHolidays'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
@@ -52,7 +53,7 @@ class StaffHolidayController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $i = 0;
         if (Auth::user()->hasRole('Supervisor')) {
@@ -67,8 +68,10 @@ class StaffHolidayController extends Controller
             $staffs = User::all();
         }
 
+        $staff_id = $request->staff;
+
         
-        return view('staffHolidays.create',compact('staffs','i'));
+        return view('staffHolidays.create',compact('staffs','i','staff_id'));
     }
     
     /**

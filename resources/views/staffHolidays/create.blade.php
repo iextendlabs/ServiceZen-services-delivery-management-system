@@ -19,10 +19,10 @@
     <form action="{{ route('staffHolidays.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
          <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-3">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>
-                    <input type="date" name="date" value="{{ old('date') }}" class="form-control" placeholder="Date">
+                    <input type="date" name="date" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Date">
                 </div>
             </div>
             <div class="col-md-12">
@@ -39,7 +39,11 @@
                         @if($staff->getRoleNames() == '["Staff"]')
                         <tr>
                             <td>
-                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                @if($staff->id == $staff_id)
+                                    <input type="checkbox" name="ids[{{ ++$i }}]" checked value="{{ $staff->id }}">
+                                @else
+                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                @endif
                             </td>
                             <td>{{ $staff->name }}</td>
                             <td>{{ $staff->email }}</td>
