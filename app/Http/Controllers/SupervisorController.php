@@ -123,7 +123,8 @@ class SupervisorController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'same:confirm-password'
+            'password' => 'same:confirm-password',
+            'manager_id' => 'required',
         ]);
 
         $input = $request->all();
