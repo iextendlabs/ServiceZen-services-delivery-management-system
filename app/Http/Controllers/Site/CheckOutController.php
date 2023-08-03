@@ -141,6 +141,8 @@ class CheckOutController extends Controller
     public function locationStep()
     {
         if (Session::get('serviceIds')) {
+            $staff_zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
+
             if (Auth::check()) {
                 $email = Auth::user()->email;
                 $name = Auth::user()->name;
@@ -168,7 +170,7 @@ class CheckOutController extends Controller
                 ];
             }
 
-            return view('site.checkOut.locationStep', compact('email', 'name', 'address'));
+            return view('site.checkOut.locationStep', compact('email', 'name', 'address', 'staff_zones'));
         } else {
             return redirect('/')->with('error', 'There is no Services in Your Cart.');
         }
