@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;600&family=Titillium+Web:wght@300&display=swap" rel="stylesheet">
   <link href="./css/site.css?v=3" rel="stylesheet">
 </head>
 @if(session()->has('serviceIds'))
@@ -27,11 +29,16 @@ $cart_product = 0;
 @endphp
 @endif
 
+<style>
+  .navbar-dark .navbar-nav .nav-link {
+    color: rgba(255,255,255,1) !important;
+}
+</style>
 <body>
 
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">{{ env('APP_NAME') }}</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
+      <a class="navbar-brand" style="font-weight:bold;font-family: 'Nunito', sans-serif;font-family: 'Titillium Web', sans-serif;" href="/">{{ env('APP_NAME') }}</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
