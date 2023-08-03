@@ -96,8 +96,8 @@ class CheckOutController extends Controller
         $address['street'] = $request->street;
         $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
-        $address['number'] = config('app.country_code').$request->number;
-        $address['whatsapp'] = config('app.country_code').$request->whatsapp;
+        $address['number'] = config('app.country_code') . $request->number;
+        $address['whatsapp'] = config('app.country_code') . $request->whatsapp;
         $address['email'] = $request->email;
         $address['name'] = $request->name;
         $address['latitude'] = $request->latitude;
@@ -167,14 +167,14 @@ class CheckOutController extends Controller
                     'searchField' => '',
                 ];
             }
-            
+
             return view('site.checkOut.locationStep', compact('email', 'name', 'address'));
         } else {
             return redirect('/')->with('error', 'There is no Services in Your Cart.');
         }
     }
 
-    
+
 
     public function bookingStep(Request $request)
     {
@@ -183,8 +183,8 @@ class CheckOutController extends Controller
             $address = Session::get('address');
             $area = $address['area'];
             $city = $address['city'];
-            [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($area, $date);
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids'));
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones'));
         } else {
             return redirect('/')->with('error', 'Please Set Location first.');
         }
@@ -224,9 +224,9 @@ class CheckOutController extends Controller
     public function slots(Request $request)
     {
         if ($request->has('order_id') && (int)$request->order_id)
-            [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($request->area,$request->date,$request->order_id);
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date, $request->order_id);
         else
-            [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($request->area,$request->date);
-        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids'));
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
+        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
     }
 }

@@ -24,6 +24,7 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Staffs</th>
+                    <th>Staff Zone</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($staffGroups))
@@ -34,6 +35,11 @@
                     <td>
                         @foreach($staffGroup->staffs as $staff)
                             {{ $staff->name }},
+                        @endforeach
+                    </td>
+                    <td>
+                        @foreach($staffGroup->staffZones as $staff_zone)
+                            {{ $staff_zone->name }},
                         @endforeach
                     </td>
                     <td>

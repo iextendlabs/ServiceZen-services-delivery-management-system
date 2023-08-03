@@ -9,7 +9,7 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','time_start','time_end','type','date','group_id','status'];
+    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status'];
 
     public $space_availability;
 
@@ -17,11 +17,12 @@ class TimeSlot extends Model
 
     public function group()
     {
-        return $this->hasOne(StaffGroup::class,'id','group_id');
+        return $this->hasOne(StaffGroup::class, 'id', 'group_id');
     }
 
-    public function appointment(){
-        return $this->hasMany(OrderService::class,'time_slot_id','id');
+    public function appointment()
+    {
+        return $this->hasMany(OrderService::class, 'time_slot_id', 'id');
     }
 
     public function staffGroup()
@@ -41,46 +42,44 @@ class TimeSlot extends Model
 
     public static function getTimeSlotsForArea($area, $date, $currentOrder = null)
     {
-        $staffZoneNames = [$area];
         $timeSlots = [];
-        $holiday = Holiday::where('date', $date)->get();
-        $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
+        $holiday = [];
+        $staff_ids = [];
+        $allZones = StaffZone::all();
+        $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
+        if ($staffZone) {
+            $holiday = Holiday::where('date', $date)->get();
+            $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
 
-        if (count($holiday) == 0) {
-            $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                $query->where(function ($query) use ($staffZoneNames) {
-                    foreach ($staffZoneNames as $staffZoneName) {
-                        $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
-                    }
-                });
-            })->where('date', '=', $date)->get();
+            if (count($holiday) == 0) {
+                $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                    $query->where('staff_zone_id', $staffZone->id);
+                })->where('date', '=', $date)->get();
 
-            if (count($timeSlots) == 0) {
-                $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                    $query->where(function ($query) use ($staffZoneNames) {
-                        foreach ($staffZoneNames as $staffZoneName) {
-                            $query->orWhereRaw('LOWER(name) LIKE ?', ["%" . strtolower($staffZoneName) . "%"]);
-                        }
-                    });
-                })->get();
-            }
-        }
-
-        if (count($timeSlots)) {
-            foreach($timeSlots as $timeSlot) {
-                if ($currentOrder) 
-                $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->get();
-                else 
-                $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
-                $timeSlot->space_availability = $timeSlot->staffs->count();
-                $excluded_staff = [];
-                foreach($orders as $order){
-                    $timeSlot->space_availability--;
-                    $excluded_staff[]=$order->service_staff_id;
+                if (count($timeSlots) == 0) {
+                    $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                        $query->where('staff_zone_id', $staffZone->id);
+                    })->get();
                 }
-                $timeSlot->excluded_staff = $excluded_staff;
+            }
+
+            if (count($timeSlots)) {
+                foreach ($timeSlots as $timeSlot) {
+                    if ($currentOrder)
+                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->get();
+                    else
+                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
+                    $timeSlot->space_availability = $timeSlot->staffs->count();
+                    $excluded_staff = [];
+                    foreach ($orders as $order) {
+                        $timeSlot->space_availability--;
+                        $excluded_staff[] = $order->service_staff_id;
+                    }
+                    $timeSlot->excluded_staff = $excluded_staff;
+                }
             }
         }
-        return [$timeSlots, $staff_ids];
+
+        return [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones];
     }
 }

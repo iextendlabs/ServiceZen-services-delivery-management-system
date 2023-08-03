@@ -27,20 +27,29 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Staff Zone:</strong>
-                    <select name="staff_zone_id" class="form-control">
-                        <option></option>
-                        @foreach($staff_zones as $staff_zone)
-                            <option value="{{ $staff_zone->id }}">{{ $staff_zone->name }}</option>
+                    <span style="color: red;">*</span><strong>Staff Zones:</strong>
+                    <input type="text" name="search-zone" id="search-zone" class="form-control" placeholder="Search Staff By Name And Email">
+                    <table class="table table-striped table-bordered staff-zone-table">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                        </tr>
+                        @foreach ($staff_zones as $staff_zone)
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="staff_zone_ids[{{ ++$i }}]" value="{{ $staff_zone->id }}">
+                            </td>
+                            <td>{{ $staff_zone->name }}</td>
+                        </tr>
                         @endforeach
-                    </select>
+                    </table>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Staffs:</strong>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
-                    <table class="table table-striped table-bordered">
+                    <input type="text" name="search-staff" id="search-staff" class="form-control" placeholder="Search Staff By Name And Email">
+                    <table class="table table-striped table-bordered staff-table">
                         <tr>
                             <th></th>
                             <th>Name</th>
@@ -67,12 +76,33 @@
     </form>
     <script>
 $(document).ready(function(){
-    $("#search").keyup(function(){
+    $("#search-staff").keyup(function(){
         var value = $(this).val().toLowerCase();
         
-        $("table tr").hide();
+        $(".staff-table tr").hide();
 
-        $("table tr").each(function() {
+        $(".staff-table tr").each(function() {
+
+            $row = $(this);
+
+            var name = $row.find("td:first").next().text().toLowerCase();
+
+            var email = $row.find("td:last").text().toLowerCase();
+
+            if (name.indexOf(value) != -1) {
+                $(this).show();
+            }else if(email.indexOf(value) != -1) {
+                $(this).show();
+            }
+        });
+    });
+
+    $("#search-zone").keyup(function(){
+        var value = $(this).val().toLowerCase();
+        
+        $(".staff-zone-table tr").hide();
+
+        $(".staff-zone-table tr").each(function() {
 
             $row = $(this);
 

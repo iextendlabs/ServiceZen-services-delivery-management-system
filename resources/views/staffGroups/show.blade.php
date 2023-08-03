@@ -16,8 +16,22 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong>Staff Zone:</strong>
-                {{ $staffGroup->staffZone->name }}
+                <strong>Staff Zone</strong><br><br>
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                    </tr>
+                    @if(isset($staffGroup->staffZones))
+                        @foreach($staffGroup->staffZones as $staff_zone) 
+                    <tr>
+                        <td>{{ $staff_zone->id }}</td>
+                        <td>{{ $staff_zone->name }}</td>
+                    </tr>
+                    @endforeach
+                    @endif
+
+                </table>
             </div>
         </div>
         <div class="col-md-12">
@@ -27,14 +41,12 @@
                     <tr>
                         <th>Id</th>
                         <th>Name</th>
-                        <th>Phone</th>
                     </tr>
                     @if(isset($staffGroup->staffs))
                         @foreach($staffGroup->staffs as $staff) 
                     <tr>
                         <td>{{ $staff->id }}</td>
                         <td>{{ $staff->name }}</td>
-                        <td>{{ $staff->staff->phone}}</td>
                     </tr>
                     @endforeach
                     @endif

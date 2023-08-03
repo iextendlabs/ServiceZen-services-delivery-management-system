@@ -15,4 +15,9 @@ class StaffZone extends Model
     {
         return $this->hasMany(User::class,'id','staff_ids');
     }
+
+    public function staffGroups()
+    {
+        return $this->belongsToMany(StaffGroup::class, 'staff_group_staff_zone', 'staff_zone_id', 'staff_group_id');
+    }
 }

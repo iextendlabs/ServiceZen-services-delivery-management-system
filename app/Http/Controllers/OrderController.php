@@ -95,9 +95,9 @@ class OrderController extends Controller
         if ($request->appointment_date) {
             $query->where('date', $request->appointment_date);
         }
-        
-        if($userRole == "Staff" || $userRole == "Supervisor"){
-           
+
+        if ($userRole == "Staff" || $userRole == "Supervisor") {
+
             $query->where('date', '<=', $currentDate);
         }
 
@@ -179,9 +179,9 @@ class OrderController extends Controller
 
         $statuses = config('app.order_statuses');
 
-        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
-        return view('orders.edit', compact('order', 'timeSlots', 'statuses', 'staff_ids'));
+        return view('orders.edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
     }
 
     public function update(Request $request, $id)

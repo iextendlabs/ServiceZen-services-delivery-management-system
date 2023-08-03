@@ -99,7 +99,7 @@ class StaffAppController extends Controller
     public function timeSlots(Request $request)
     {
 
-        [$timeSlots, $staff_ids]  = TimeSlot::getTimeSlotsForArea($request->area, $request->date, $request->order_id);
+        [$timeSlots]  = TimeSlot::getTimeSlotsForArea($request->area, $request->date, $request->order_id);
 
         $result = [];
 

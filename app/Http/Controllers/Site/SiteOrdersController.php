@@ -25,16 +25,16 @@ class SiteOrdersController extends Controller
     {
         if (Auth::check()) { // TODO use middleware instead of this
             if (Auth::user()->hasRole('Staff')) {
-                if ($request->has('status')){
-                    $orders = Order::where('service_staff_id', Auth::id())->where('status', '=',$request->status)->orderBy('id', 'DESC')->paginate(10);
+                if ($request->has('status')) {
+                    $orders = Order::where('service_staff_id', Auth::id())->where('status', '=', $request->status)->orderBy('id', 'DESC')->paginate(10);
                 } else {
-                    $orders = Order::where('service_staff_id', Auth::id())->where('status', '!=','Complete')->orderBy('id', 'DESC')->paginate(10);
+                    $orders = Order::where('service_staff_id', Auth::id())->where('status', '!=', 'Complete')->orderBy('id', 'DESC')->paginate(10);
                 }
             } else {
                 $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(10);
             }
             return view('site.orders.index', compact('orders'))
-                    ->with('i', ($request->input('page', 1) - 1) * 10);
+                ->with('i', ($request->input('page', 1) - 1) * 10);
         }
 
         // TODO add redirect to home with error
@@ -81,7 +81,7 @@ class SiteOrdersController extends Controller
             $customer->assignRole('Customer');
         }
         $staff = User::find($staff_and_time['service_staff_id']);
-        
+
         $input['customer_name'] = $address['name'];
         $input['customer_email'] = $address['email'];
         $input['buildingName'] = $address['buildingName'];
@@ -102,7 +102,7 @@ class SiteOrdersController extends Controller
         $input['longitude'] = $address['longitude'];
 
         $time_slot = TimeSlot::find($staff_and_time['time_slot']);
-        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)).' -- '.date('h:i A', strtotime($time_slot->time_end));
+        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
         $order = Order::create($input);
 
@@ -145,12 +145,12 @@ class SiteOrdersController extends Controller
     {
         $order = Order::find($id);
 
-        [$timeSlots, $staff_ids] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
 
         $statuses = config('app.statuses');
 
-        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses'));
+        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones'));
     }
 
 

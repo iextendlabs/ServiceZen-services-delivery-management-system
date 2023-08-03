@@ -28,24 +28,33 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Staff Zone:</strong>
-                    <select name="staff_zone_id" class="form-control">
-                        <option></option>
-                        @foreach($staff_zones as $staff_zone)
-                            @if($staff_zone->id == $staffGroup->staff_zone_id)
-                                <option value="{{ $staff_zone->id }}" selected>{{ $staff_zone->name }}</option>
-                            @else
-                                <option value="{{ $staff_zone->id }}">{{ $staff_zone->name }}</option>
-                            @endif
+                    <span style="color: red;">*</span><strong>Staff Zones:</strong>
+                    <input type="text" name="search-zone" id="search-zone" class="form-control" placeholder="Search Staff By Name And Email">
+                    <table class="table table-striped table-bordered staff-zone-table">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                        </tr>
+                        @foreach ($staff_zones as $staff_zone)
+                        <tr>
+                            <td>
+                                @if(in_array($staff_zone->id,$staff_zones_ids))
+                                    <input type="checkbox" name="staff_zone_ids[]" checked value="{{ $staff_zone->id }}">
+                                @else
+                                    <input type="checkbox" name="staff_zone_ids[]" value="{{ $staff_zone->id }}">
+                                @endif
+                            </td>
+                            <td>{{ $staff_zone->name }}</td>
+                        </tr>
                         @endforeach
-                    </select>
+                    </table>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Staffs:</strong>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
-                    <table class="table table-striped table-bordered">
+                    <input type="text" name="search-staff" id="search-staff" class="form-control" placeholder="Search Staff By Name And Email">
+                    <table class="table table-striped table-bordered staff-table">
                         <tr>
                             <th></th>
                             <th>Name</th>
@@ -56,9 +65,9 @@
                         <tr>
                             <td>
                                 @if(in_array($staff->id,$staff_ids))
-                                <input type="checkbox" checked name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                <input type="checkbox" checked name="ids[]" value="{{ $staff->id }}">
                                 @else
-                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                <input type="checkbox" name="ids[]" value="{{ $staff->id }}">
                                 @endif
                             </td>
                             <td>{{ $staff->name }}</td>
@@ -76,12 +85,12 @@
     </form>
     <script>
 $(document).ready(function(){
-    $("#search").keyup(function(){
+    $("#search-staff").keyup(function(){
         var value = $(this).val().toLowerCase();
         
-        $("table tr").hide();
+        $(".staff-table tr").hide();
 
-        $("table tr").each(function() {
+        $(".staff-table tr").each(function() {
 
             $row = $(this);
 

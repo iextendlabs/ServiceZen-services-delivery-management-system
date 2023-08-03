@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Staff;
 use App\Models\StaffGroup;
-use App\Models\StaffGroupToStaff;
 use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -60,21 +59,15 @@ class StaffGroupController extends Controller
         request()->validate([
             'name' => 'required',
             'ids' => 'required',
-            'staff_zone_id' => 'required',
+            'staff_zone_ids' => 'required',
         ]);
-
 
         $input = $request->all();
 
         $staffGroup = StaffGroup::create($input);
 
-        $input['staff_group_id'] = $staffGroup->id;
-
-        foreach ($request->ids as $id) {
-            $input['staff_id'] = $id;
-
-            StaffGroupToStaff::create($input);
-        }
+        $staffGroup->staffZones()->attach($request->staff_zone_ids);
+        $staffGroup->staffs()->attach($request->ids);
 
         return redirect()->route('staffGroups.index')
             ->with('success', 'Staff Group created successfully.');
@@ -99,11 +92,11 @@ class StaffGroupController extends Controller
      */
     public function edit(StaffGroup $staffGroup)
     {
-        $i = 0;
         $staff_zones = StaffZone::all();
+        $staff_zones_ids = $staffGroup->staffZones()->pluck('staff_zone_id')->toArray();
         $staffs = User::all();
-        $staff_ids = StaffGroupToStaff::where('staff_group_id',$staffGroup->id)->pluck('staff_id')->toArray();
-        return view('staffGroups.edit', compact('staffGroup', 'staffs', 'i', 'staff_zones','staff_ids'));
+        $staff_ids = $staffGroup->staffs()->pluck('staff_id')->toArray();
+        return view('staffGroups.edit', compact('staffGroup', 'staffs', 'staff_zones','staff_ids','staff_zones_ids'));
     }
 
     public function update(Request $request, $id)
@@ -111,25 +104,17 @@ class StaffGroupController extends Controller
         request()->validate([
             'name' => 'required',
             'ids' => 'required',
-            'staff_zone_id' => 'required',
+            'staff_zone_ids' => 'required',
         ]);
 
         $staffGroup = StaffGroup::find($id);
 
         $input = $request->all();
 
-        $input['staff_ids'] = serialize($request->ids);
-
         $staffGroup->update($input);
 
-        $input['staff_group_id'] = $id;
-
-        StaffGroupToStaff::where('staff_group_id', $id)->delete();
-
-        foreach ($request->ids as $staff_id) {
-            $input['staff_id'] = $staff_id;
-            StaffGroupToStaff::create($input);
-        }
+        $staffGroup->staffZones()->sync($request->staff_zone_ids);
+        $staffGroup->staffs()->sync($request->ids);
         
         return redirect()->route('staffGroups.index')
             ->with('success', 'Staff Group update successfully.');
