@@ -38,7 +38,7 @@ $cart_product = 0;
 
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
-      <a class="navbar-brand" style="font-weight:bold;font-family: 'Nunito', sans-serif;font-family: 'Titillium Web', sans-serif;" href="/">{{ env('APP_NAME') }}</a>
+      <a class="navbar-brand" style="font-size: 40px;font-weight:bold;font-family: 'Nunito', sans-serif;font-family: 'Titillium Web', sans-serif;" href="/">{{ env('APP_NAME') }}</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
