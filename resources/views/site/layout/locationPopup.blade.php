@@ -1,4 +1,3 @@
-
 <input type="hidden" name="session" id="session" @if(isset($address)) value="true" @else value="false" @endif>
 <div class="modal fade" id="locationPopup">
   <div class="modal-dialog">
@@ -12,6 +11,17 @@
 
       <!-- Popup Body -->
       <div class="modal-body">
+
+
+        <label for="zoneSelect">Select Zone:</label>
+        <select class="form-control" id="zoneSelect" onchange="window.location.href='/updateZone?zone='+this.value">
+          <option value="">-- Select Zone -- </option>
+          <!-- Loop through the $zones array to generate options -->
+          @foreach ($zones as $zone)
+          <option value="{{ $zone }}">{{ $zone }}</option>
+          @endforeach
+        </select>
+        OR
         <div class="input-group mb-3">
           @csrf
           <input type="hidden" name="buildingName" id="popup_buildingName">
@@ -26,21 +36,12 @@
           <div class="input-group-prepend" onclick="$('#popup_searchField').val('')">
             <span class="input-group-text">x</span>
           </div>
-          <input type="text" class="form-control" id="popup_searchField" value="{{ session('address') ? (session('address')['searchField'] ? session('address')['searchField'] : session('address')['area']) : '' }}" name="searchField" placeholder="Search on map">
+          <input type="text" class="form-control" id="popup_searchField" value="{{ session('address') ? (session('address')['searchField'] ? session('address')['searchField'] : session('address')['area']) : '' }}" name="searchField" placeholder="Search">
           <div class="input-group-append">
-            <button class="btn btn-primary" id="setLocation" type="button">Search on map</button>
+            <button class="btn btn-primary" id="setLocation" type="button">Search</button>
           </div>
         </div>
-        OR 
 
-        <label for="zoneSelect">Select Zone:</label>
-        <select class="form-control" id="zoneSelect" onchange="window.location.href='/updateZone?zone='+this.value">
-        <option value="">-- Select Zone -- </option>
-          <!-- Loop through the $zones array to generate options -->
-          @foreach ($zones as $zone)
-            <option value="{{ $zone }}">{{ $zone }}</option>
-          @endforeach
-        </select>
 
         <div id="mapContainer" style="height: 400px; margin-top: 20px; display:none"></div>
       </div>
