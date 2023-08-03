@@ -96,7 +96,7 @@ class SiteController extends Controller
 
             Session::put('address', $address);
 
-            return redirect('/');
+            return redirect()->back();
         }
     }
 }

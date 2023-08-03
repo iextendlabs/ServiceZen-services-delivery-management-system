@@ -64,7 +64,8 @@
 <h3>Available Zone</h3>
 <ul>
     @foreach($allZones as $zone)
-    <li>{{ $zone->name }}</li>
+    <li><a href="/updateZone?zone={{ $zone->name }}">{{ $zone->name }}</a></li>
+    
     @endforeach
 </ul>
 <div class="mt-3">
