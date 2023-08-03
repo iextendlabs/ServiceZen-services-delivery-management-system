@@ -88,7 +88,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Building Name:</strong>
-                            <input type="text" name="buildingName" id="buildingName" class="form-control"
+                            <input required type="text" name="buildingName" id="buildingName" class="form-control"
                                 placeholder="Building Name"
                                 value="{{ old('buildingName') ? old('buildingName') : $address['buildingName'] }}">
                         </div>
@@ -96,7 +96,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Flat / Villa:</strong>
-                            <input type="text" name="flatVilla" id="flatVilla" class="form-control"
+                            <input required type="text" name="flatVilla" id="flatVilla" class="form-control"
                                 placeholder="Flat / Villa"
                                 value="{{ old('flatVilla') ? old('flatVilla') : $address['flatVilla'] }}">
                         </div>
@@ -104,7 +104,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Street:</strong>
-                            <input type="text" name="street" id="street" class="form-control" placeholder="Street"
+                            <input required type="text" name="street" id="street" class="form-control" placeholder="Street"
                                 value="{{ old('street') ? old('street') : $address['street'] }}">
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Landmark:</strong>
-                            <input type="text" name="landmark" id="landmark" class="form-control"
+                            <input required type="text" name="landmark" id="landmark" class="form-control"
                                 placeholder="Landmark"
                                 value="{{ old('landmark') ? old('landmark') : $address['landmark'] }}">
                         </div>
@@ -134,7 +134,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>City:</strong>
-                            <input type="text" name="city" id="city" class="form-control" placeholder="City"
+                            <input required type="text" name="city" id="city" class="form-control" placeholder="City"
                                 value="{{ old('city') ? old('city') : $address['city'] }}">
                         </div>
                     </div>
@@ -153,14 +153,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name:</strong>
-                            <input type="text" name="name" id="name" class="form-control" placeholder="Name"
+                            <input required type="text" name="name" id="name" class="form-control" placeholder="Name"
                                 value="{{ $name }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Email:</strong>
-                            <input type="email" name="email" id="email" class="form-control"
+                            <input required type="email" name="email" id="email" class="form-control"
                                 placeholder="abc@gmail.com" value="{{ $email }}">
                         </div>
                     </div>
@@ -171,7 +171,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.country_code') }}</span>
                                 </div>
-                                <input type="text" name="number" id="number" class="form-control"
+                                <input required type="text" name="number" id="number" class="form-control"
                                     placeholder="Phone Number"
                                     value="{{ old('number') ? old('number') : str_replace('+971', '', $address['number']) }}"
                                     pattern="[0-9]{7,9}">
@@ -185,7 +185,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.country_code') }}</span>
                                 </div>
-                                <input type="text" name="whatsapp" id="whatsapp" class="form-control"
+                                <input required type="text" name="whatsapp" id="whatsapp" class="form-control"
                                     placeholder="Whatsapp Number"
                                     value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971', '', $address['whatsapp']) }}"
                                     pattern="[0-9]{7,9}">
