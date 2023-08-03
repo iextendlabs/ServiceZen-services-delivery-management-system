@@ -194,6 +194,7 @@
             latitudeField.value = place.geometry.location.lat();
             longitude.value = place.geometry.location.lng();
         }
+        searchField.value = place["formatted_address"];
     }
 
     function initMap() {

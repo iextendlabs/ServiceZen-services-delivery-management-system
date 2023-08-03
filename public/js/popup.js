@@ -1,10 +1,10 @@
-
 var map;
 var marker;
 var autocomplete;
 
 function fillAddressFields(place) {
-    const popup_buildingNameField = document.getElementById("popup_buildingName");
+    const popup_buildingNameField =
+        document.getElementById("popup_buildingName");
     const popup_landmarkField = document.getElementById("popup_landmark");
     const popup_areaField = document.getElementById("popup_area");
     const popup_flatVillaField = document.getElementById("popup_flatVilla");
@@ -22,7 +22,7 @@ function fillAddressFields(place) {
     popup_latitudeField.value = "";
     popup_longitudeField.value = "";
     popup_cityField.value = "";
-    
+
     const addressComponents = place.address_components;
 
     for (let i = 0; i < addressComponents.length; i++) {
@@ -47,22 +47,13 @@ function fillAddressFields(place) {
         }
         popup_latitudeField.value = place.geometry.location.lat();
         popup_longitude.value = place.geometry.location.lng();
-        
     }
 
-//     const address = place["formatted_address"];
+    popup_searchField.value = place["formatted_address"];
 
-//     popup_searchField.value = address;
-//     if(!popup_areaField.value){
-//     popup_searchField.value = "";
-    
-    
-// }
-
-if (typeof fillFormAddressFields === 'function') {
-    fillFormAddressFields(place);
-}
-
+    if (typeof fillFormAddressFields === "function") {
+        fillFormAddressFields(place);
+    }
 }
 function reverseGeocode(latitude, longitude) {
     var geocoder = new google.maps.Geocoder();
@@ -97,8 +88,7 @@ function initAutocomplete() {
         var place = autocomplete.getPlace();
 
         if (!place.geometry) {
-            if (showMapError)
-            return;
+            if (showMapError) return;
         }
 
         if (marker) {
@@ -122,7 +112,7 @@ function mapReady() {
             $("#locationPopup").modal("show");
         });
         initAutocomplete();
-        if($('.location-search-wrapper').length){
+        if ($(".location-search-wrapper").length) {
             initMap();
         }
     });
@@ -275,4 +265,3 @@ function placeMarker(location) {
 
     fillAddressFieldsFromMarker();
 }
-
