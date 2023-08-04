@@ -23,6 +23,7 @@ use App\Http\Controllers\{
     TransactionController,
     DriverController,
     AffiliateController,
+    StaffGeneralHolidayController,
 };
 
 use App\Http\Controllers\AppController\{
@@ -73,6 +74,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('timeSlots', TimeSlotController::class);
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
+    Route::resource('staffGeneralHolidays', StaffGeneralHolidayController::class);
 
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
 

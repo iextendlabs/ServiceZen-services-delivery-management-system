@@ -40,7 +40,7 @@
                     <td>{{ $order->customer_name }}</td>
                     <td>@currency($order->total_amount)</td>
                     <td>{{ $order->payment_method }}</td>
-                    <td>{{ $order->order_comment }}</td>
+                    <td>{{ substr($order->order_comment, 0, 50) }}...</td>
                 @endif
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>

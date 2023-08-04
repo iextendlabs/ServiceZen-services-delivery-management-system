@@ -129,6 +129,12 @@
                 <td class="text-right">@currency($order->total_amount)</td>
             </tr>
         </table>
+        <table class="table table-striped table-bordered album bg-light">
+            <th class="text-left" colspan="4">Order Comment</th>
+            <tr>
+                <td class="text-left">{!! nl2br($order->order_comment) !!}</td>
+            </tr>
+        </table>
         @if(isset($order->staff))
         <fieldset>
             <legend>Staff Commission</legend>
