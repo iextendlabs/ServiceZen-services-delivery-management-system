@@ -46,9 +46,28 @@
                 <td>{{ $order->created_at }}</td>
                 <td>
                     @can('order-edit')
-                        <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
+                        <!-- <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
                             <i class="fas fa-edit"></i>
-                        </a>
+                        </a> -->
+                        <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class=" btn btn-primary" href="#"  data-bs-toggle="dropdown">
+                                <i class="fas fa-bars"></i>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            @can('order-booking-edit')
+                                <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
+                                @endcan
+                                @can('order-status-edit')
+                                <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                                @endcan
+                                @can('order-detail-edit')
+                                <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
+                                @endcan
+                            </div>
+                        </li>
+                        </ul>
                     @endcan
                     <form action="{{ route('orders.destroy', $order->id) }}" method="POST">
                         @csrf

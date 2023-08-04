@@ -49,23 +49,7 @@
                         <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff_name }}</span>
                     </div>
                 </div>
-                @if(auth()->user()->getRoleNames() != '["Staff"]' && auth()->user()->getRoleNames() != '["Supervisor"]')
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Status:</strong>
-                        <select name="status" class="form-control">
-                            @foreach ($statuses as $status)
-                            @if($status == $order->status)
-                            <option value="{{ $status }}" selected>{{ $status }}</option>
-                            @else
-                            <option value="{{ $status }}">{{ $status }}</option>
-                            @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                @endif
-
+                
                 <div class="col-md-12 text-right no-print">
                     @can('order-edit')
                     <button type="submit" class="btn btn-primary">Update</button>

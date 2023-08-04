@@ -18,6 +18,9 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'order-booking-edit',
+            'order-status-edit',
+            'order-detail-edit',
             'menu-sales',
             'menu-store-config',
             'menu-user',

@@ -173,15 +173,20 @@ class OrderController extends Controller
     }
 
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $order = Order::find($id);
 
         $statuses = config('app.order_statuses');
 
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
-
-        return view('orders.edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+        if($request->edit == "status"){
+            return view('orders.status_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+        }elseif($request->edit == "booking"){
+            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+        }elseif($request->edit == "address"){
+            return view('orders.detail_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+        }
     }
 
     public function update(Request $request, $id)
@@ -196,6 +201,10 @@ class OrderController extends Controller
         }
 
         $order = Order::find($id);
+        
+        $order->order_total->transport_charges= $request->transport_charges;
+        $order->order_total->save();
+
         $order->update($input);
 
         if (isset($staff_id)) {
