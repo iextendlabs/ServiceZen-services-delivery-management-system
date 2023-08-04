@@ -37,13 +37,13 @@
       @foreach ($services as $service)
       <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
-          <p class="card-text text-center"><b>{{ $service->name }}</b></p>
+          <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
           <a href="/serviceDetail/{{ $service->id }}">
             <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
           </a>
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted">
+              <small class="text-muted service-box-price">
                 @if(isset($service->discount))<s>@endif
                   @currency($service->price)
                   @if(isset($service->discount))</s>@endif
@@ -52,10 +52,10 @@
                 @endif
               </small>
 
-              <small class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></small>
+              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $service->duration }}</small>
             </div>
 
-            <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Add to Cart</button></a>
+            <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
 
 
           </div>

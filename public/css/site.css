@@ -252,3 +252,19 @@ svg {
     display: none;
   }
 }
+
+.service-box-title {
+  font-size: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.service-box-price {
+  font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.service-box-time {
+  font-size: 19px;
+  font-weight: bold;
+}
