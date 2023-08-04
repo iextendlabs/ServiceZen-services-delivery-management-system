@@ -29,8 +29,17 @@ class CashCollectionController extends Controller
      */
     public function index(Request $request)
     {
-        $cash_collections = CashCollection::latest()->paginate(10);
-        return view('cashCollections.index',compact('cash_collections'))
+        $filter_status = $request->status;
+
+        $query = CashCollection::latest();
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $cash_collections = $query->paginate(10);
+        
+        return view('cashCollections.index',compact('cash_collections','filter_status'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
 
