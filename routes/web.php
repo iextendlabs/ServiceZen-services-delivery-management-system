@@ -92,7 +92,7 @@ Route::group(['middleware' => ['auth']], function() {
 
 });
 
-Route::get('/', [SiteController::class, 'index']);
+Route::get('/', [SiteController::class, 'index'])->name('storeHome');
 Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
 Route::get('updateZone', [SiteController::class, 'updateZone']);
 

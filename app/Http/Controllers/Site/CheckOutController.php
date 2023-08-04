@@ -28,15 +28,17 @@ class CheckOutController extends Controller
      */
     public function index()
     {
-        $services = Session::get('serviceIds');
-        if ($services) {
-            foreach ($services as $service) {
-                $booked_services[] = Service::find($service);
+        $booked_services = array();
+        $service_ids = Session::get('serviceIds');
+        if ($service_ids) {
+            foreach ($service_ids as $id) {
+                $service =  Service::find($id);
+                if ($service) {
+                    $booked_services[]=$service;
+                }
             }
-        } else {
-            $booked_services = array();
         }
-
+        //TODO : remove all with i and such page request stuff
         return view('site.checkOut.index', compact('booked_services'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }

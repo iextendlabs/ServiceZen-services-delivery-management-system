@@ -59,6 +59,10 @@ class SiteOrdersController extends Controller
         $address = Session::get('address');
         $serviceIds = Session::get('serviceIds');
 
+        if (!($staff_and_time && $address && $serviceIds)){
+            return redirect()->route('storeHome')->with('error', 'Order Already Placed! or empty cart! or booking slot Unavailable!');
+        }
+
         $input['email'] = $address['email'];
 
         $user = User::where('email', $address['email'])->get();
