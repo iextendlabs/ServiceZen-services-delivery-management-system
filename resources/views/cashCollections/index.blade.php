@@ -1,8 +1,25 @@
 @extends('layouts.app')
 @section('content')
 <div class="row">
-    <div class="col-md-6">
-        <h2>Cash Collection</h2>
+    <div class="col-md-12 margin-tb">
+        <div class="float-start">
+            <h2>Cash Collection</h2>
+        </div>
+        <div class="float-end">
+
+            <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
+            
+            <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end no-print" style="margin-right: 10px;"><i class="fa fa-download"></i> Excel</a>
+
+            <a class="btn btn-danger float-end" href="{{ route('cashCollection.index') }}?status=Not Approved"" style=" margin-right: 10px;">
+                <i class="fas fa-times"></i> Not Approved
+            </a>
+
+            <a class="btn btn-success ml-2 float-end" href="{{ route('cashCollection.index') }}?status=Approved"" style=" margin-right: 10px;">
+                <i class="fas fa-check"></i> Approved
+            </a>
+
+        </div>
     </div>
 </div>
 @if ($message = Session::get('success'))
@@ -13,7 +30,7 @@
 @endif
 <hr>
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-12">
         <table class="table table-striped table-bordered">
             <tr>
                 <th>Order #</th>
@@ -29,7 +46,7 @@
             @if(count($cash_collections))
             @foreach ($cash_collections as $cash_collection)
             <tr>
-                <td>{{ $cash_collection->order->id }}</td>
+                <td>{{ $cash_collection->order_id }}</td>
                 <td>{{ $cash_collection->staff_name }}</td>
                 <td>@currency($cash_collection->amount)</td>
                 <td>{{ $cash_collection->order->customer->name }}</td>
@@ -41,14 +58,21 @@
                 <td>{{ $cash_collection->status }}</td>
                 <td>
                     <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
-                        <!-- <a class="btn btn-info" href="{{ route('cashCollection.show',$cash_collection->id) }}">Show</a> -->
                         @can('cash-collection-edit')
-                        <a class="btn btn-primary" href="{{ route('cashCollection.edit',$cash_collection->id) }}">Edit</a>
+                        @if($cash_collection->status == 'Not Approved')
+                        <a class="btn btn-sm btn-success" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Approved">
+                            <i class="fas fa-thumbs-up"></i>
+                        </a>
+                        @endif
+                        <a class="btn btn-sm btn-danger" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Not Approved">
+                            <i class="fas fa-thumbs-down"></i>
+                        </a>
+
                         @endcan
                         @csrf
                         @method('DELETE')
                         @can('cash-collection-delete')
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
                         @endcan
                     </form>
                 </td>
@@ -61,36 +85,6 @@
             @endif
         </table>
         {!! $cash_collections->links() !!}
-    </div>
-    <div class="col-md-3">
-        <h3>Filter</h3>
-        <hr>
-        <form action="{{ route('cashCollection.index') }}" method="GET" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <strong>Status:</strong>
-                        <select name="status" class="form-control">
-                            @if($filter_status == "Not Approved")
-                                <option value="Not Approved" selected>Not Approved</option>
-                                <option value="Approved">Approved</option>
-                            @elseif($filter_status == "Approved")
-                                <option value="Not Approved">Not Approved</option>
-                                <option value="Approved" selected>Approved</option>
-                            @else
-                                <option value=""></option>
-                                <option value="Approved">Approved</option>
-                                <option value="Not Approved">Not Approved</option>
-                            @endif
-                        </select>
-                        <!-- <input type="text" name="name" value="{{}}" class="form-control" placeholder="Name"> -->
-                    </div>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
 

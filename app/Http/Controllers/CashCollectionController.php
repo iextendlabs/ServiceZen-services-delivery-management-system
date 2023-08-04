@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 
 class CashCollectionController extends Controller
 { 
@@ -39,8 +40,38 @@ class CashCollectionController extends Controller
 
         $cash_collections = $query->paginate(10);
         
-        return view('cashCollections.index',compact('cash_collections','filter_status'))
+        if ($request->csv == 1) {
+            $headers = array(
+                "Content-type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=CashCollection.csv",
+                "Pragma" => "no-cache",
+                "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+                "Expires" => "0"
+            );
+
+            $output = fopen("php://output", "w");
+
+            fputcsv($output, array('Order ID', 'Staff', 'Collected Amount', 'Customer', 'Order Total	', 'Description', 'Comment', 'Status', 'Date Added'));
+
+            foreach ($cash_collections as $row) {
+
+                    fputcsv($output, array($row->id, $row->staff_name, $row->amount, $row->order->customer->name, $row->order->total_amount, $row->description, $row->order->comment, $row->status, $row->created_at));
+            }
+
+            // Close output stream
+            fclose($output);
+
+            // Return CSV file as download
+            return Response::make('', 200, $headers);
+        } else if ($request->print == 1) {
+            return view('cashCollections.print', compact('cash_collections'));
+        } else {
+            return view('cashCollections.index',compact('cash_collections','filter_status'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
+        }
+
+
+        
     }
 
     public function staffCashCollection()
@@ -111,14 +142,8 @@ class CashCollectionController extends Controller
      * @param  \App\CashCollection  $cash_collection
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        $cash_collection = CashCollection::find($id);
 
-        return view('cashCollections.edit', compact('cash_collection'));
-    }
-
-    public function update(Request $request, $id)
+    public function cashCollectionUpdate(Request $request, $id)
     {
 
         $cash_collections = CashCollection::find($id);

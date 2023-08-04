@@ -33,24 +33,26 @@
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-striped table-bordered">
-                    <th>Order #</th>
-                    <th>Staff</th>
-                    <th><i class="fas fa-clock"></i> Appointment Date</th>
-                    <th><i class="fas fa-clock"></i> Slots</th>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Staff</th>
+                        <th><i class="fas fa-clock"></i> Appointment Date</th>
+                        <th><i class="fas fa-clock"></i> Slots</th>
 
-                    @if (auth()->user()->getRoleNames() == '["Supervisor"]')
-                        <th>Landmark</th>
-                        <th>Area</th>
-                        <th>City</th>
-                        <th>Building name</th>
-                    @else
-                        <th>Customer</th>
-                        <th>Total Amount</th>
-                        <th>Payment Method</th>
-                        <th>Comment</th>
-                        <th>Date Added</th>
-                    @endif
-                    <th>Status</th>
+                        @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+                            <th>Landmark</th>
+                            <th>Area</th>
+                            <th>City</th>
+                            <th>Building name</th>
+                        @else
+                            <th>Customer</th>
+                            <th>Total Amount</th>
+                            <th>Payment Method</th>
+                            <th>Comment</th>
+                            <th>Date Added</th>
+                        @endif
+                        <th>Status</th>
+                    </tr>
                     @if(count($orders))
                     @foreach ($orders as $order)
                     <tr>
