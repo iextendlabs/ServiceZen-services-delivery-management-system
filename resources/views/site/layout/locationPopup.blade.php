@@ -11,9 +11,6 @@
 
       <!-- Popup Body -->
       <div class="modal-body">
-
-
-        <label for="zoneSelect">Select Zone:</label>
         <select class="form-control" id="zoneSelect" onchange="window.location.href='/updateZone?zone='+this.value">
           <option value="">-- Select Zone -- </option>
           <!-- Loop through the $zones array to generate options -->
@@ -21,7 +18,8 @@
           <option value="{{ $zone }}">{{ $zone }}</option>
           @endforeach
         </select>
-        OR
+        <p>OR Add Address </p>
+
         <div class="input-group mb-3">
           @csrf
           <input type="hidden" name="buildingName" id="popup_buildingName">
@@ -41,8 +39,7 @@
             <button class="btn btn-primary" id="setLocation" type="button">Search</button>
           </div>
         </div>
-
-
+        <p>OR Click Map </p>
         <div id="mapContainer" style="height: 400px; margin-top: 20px; display:none"></div>
       </div>
 
