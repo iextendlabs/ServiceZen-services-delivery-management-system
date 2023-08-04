@@ -16,6 +16,9 @@
         @endif
         <div class="col">
             <div class="d-flex flex-row">
+                @php
+                $staff_counter = 0
+                @endphp
                 @foreach($timeSlot->staffs as $staff)
                 @auth
                 @if((auth()->user()->getRoleNames() == '["Staff"]' && $staff->id != auth()->user()->id))
@@ -30,6 +33,9 @@
 
                 @endauth
                 @if(!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff))
+                @php
+                $staff_counter ++
+                @endphp
                 <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >
                 <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                     <div class="p-2">
@@ -39,6 +45,15 @@
                 </label>
                 @endif
                 @endforeach
+                @if($staff_counter == 0)
+                <div class="alert alert-danger">
+                    @if( auth()->user() && (auth()->user()->getRoleNames() == '["Supervisor"]' || auth()->user()->getRoleNames() == '["Manager"]'))
+                        <strong>Whoops!</strong>All of Your Staff is Booked.
+                    @else
+                        <strong>Whoops!</strong>Staff is Booked Already for this slot.
+                    @endif
+                </div>
+                @endif
             </div>
             <hr>
         </div>
@@ -65,11 +80,10 @@
 <ul>
     @foreach($allZones as $zone)
     <li><a href="/updateZone?zone={{ $zone->name }}">{{ $zone->name }}</a></li>
-    
+
     @endforeach
 </ul>
 <div class="mt-3">
     <button type="button" class="btn btn-primary" onclick="$('#locationPopup').modal('show')">Change Zone</button>
 </div>
 @endif
-

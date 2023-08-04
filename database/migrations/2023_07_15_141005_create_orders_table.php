@@ -37,7 +37,7 @@ return new class extends Migration
             $table->string('time_slot_value')->nullable();
             $table->string('latitude');
             $table->string('longitude');
-            $table->string('order_comment')->nullable();
+            $table->text('order_comment')->nullable();
             $table->timestamps();
 
             $table->foreign('customer_id')
