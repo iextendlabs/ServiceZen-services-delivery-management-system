@@ -75,7 +75,7 @@ class TimeSlot extends Model
                             $excluded_staff[] = $order->service_staff_id;
                         }
                         $timeSlot->excluded_staff = $excluded_staff;
-                        $timeSlot->space_availability = $timeSlot->staffs->count() - count($excluded_staff) - count($staff_ids);
+                        $timeSlot->space_availability =$timeSlot->staffs->count() - count(array_unique(array_merge($excluded_staff,$staff_ids)));
                     }
             }
         }
