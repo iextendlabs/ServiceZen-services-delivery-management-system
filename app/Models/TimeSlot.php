@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,6 +51,10 @@ class TimeSlot extends Model
         if ($staffZone) {
             $holiday = Holiday::where('date', $date)->get();
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
+            $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
+            $dayName = $carbonDate->formatLocalized('%A');
+            $generalHolidayStaffIds = StaffGeneralHoliday::where('day', $dayName)->pluck('staff_id')->toArray();
+            $staff_ids = array_merge($staff_ids, $generalHolidayStaffIds);
 
             if (count($holiday) == 0) {
                 $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
