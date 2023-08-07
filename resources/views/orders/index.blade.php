@@ -164,8 +164,13 @@
                     </div>
                     <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
 
-                    <div class="offset-9 col-md-3 text-center">
-                        <button type="submit" class="btn btn-lg btn-block btn-primary">Submit</button>
+                    
+                    <div class="offset-6 col-md-3 text-center">
+                        <a href="{{ url()->current() }}
+" class="btn btn-lg btn-secondary">Reset</a>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
                     </div>
                 </div>
             </form>

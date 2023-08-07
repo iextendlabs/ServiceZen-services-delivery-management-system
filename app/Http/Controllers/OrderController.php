@@ -148,8 +148,10 @@ class OrderController extends Controller
         } else if ($request->print == 1) {
             return view('orders.print', compact('orders'));
         } else {
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))
-                ->with('i', ($request->input('page', 1) - 1) * 10);
+
+            $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer_id', 'payment_method']);
+            $orders->appends($filters);
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'));
         }
     }
 
