@@ -34,6 +34,7 @@
                 select: function (date) {
                         var date = $.fullCalendar.formatDate(date, "Y-MM-DD");
                         $.ajax({
+                            cache: false, 
                             url: SITEURL + "/holidays/crud-ajax",
                             data: {
                                 date: date,
@@ -54,6 +55,7 @@
                     var eventDelete = confirm("Are you sure to Delete?");
                     if (eventDelete) {
                         $.ajax({
+                            cache: false, 
                             type: "POST",
                             url: SITEURL + '/holidays/crud-ajax',
                             data: {

@@ -14,4 +14,6 @@ class StaffGeneralHoliday extends Model
     {
         return $this->hasOne(user::class,'id','staff_id');
     }
+
+    
 }

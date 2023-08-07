@@ -121,6 +121,7 @@ function mapReady() {
 $(document).ready(function () {
     $(".modal-footer .btn-primary").click(function () {
         $.ajax({
+            cache: false, 
             url: "/saveLocation", // Replace with your server endpoint URL
             method: "POST", // Use the appropriate HTTP method
             data: $("#locationPopup input"),

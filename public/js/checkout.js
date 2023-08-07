@@ -4,6 +4,7 @@ $(document).on("change","#date,#zone",function() {
     $.ajax({
         url: '/slots',
         method: 'GET',
+        cache: false, 
         data: {
             date: $('#date').val(),
             area: $('select[name="zone"]').val(),

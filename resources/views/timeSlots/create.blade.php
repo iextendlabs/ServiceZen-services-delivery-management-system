@@ -108,6 +108,7 @@
         $.ajax({
                 url: '/staff-by-group',
                 method: 'GET',
+                cache: false, 
                 data: {
                     group: group
                 },

@@ -41,7 +41,7 @@ class StaffGeneralHolidayController extends Controller
         } elseif (Auth::user()->hasRole('Staff')) {
             $staffGeneralHolidays = StaffGeneralHoliday::where('staff_id', Auth::id())->paginate(10);
         } else {
-            $staffGeneralHolidays = StaffGeneralHoliday::latest()->paginate(10);
+            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('staff_id', 'ASC')->paginate(10);
         }
 
 
@@ -96,8 +96,11 @@ class StaffGeneralHolidayController extends Controller
             foreach($request->ids as $staff_id){
 
                 $input['staff_id'] = $staff_id;
-
-                StaffGeneralHoliday::create($input);
+               
+                StaffGeneralHoliday::updateOrCreate([
+                    'staff_id' => $staff_id,
+                    'day' => $day,
+                ]);
             }
         }
         return redirect()->route('staffGeneralHolidays.index')
