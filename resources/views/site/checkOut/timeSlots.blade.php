@@ -44,7 +44,9 @@
                 <div class="col">
                     <div class="d-flex flex-row">
                         @php
-                        $staff_counter = 0
+                        $staff_counter = 0;
+                        $holiday_counter = 0;
+                        $booked_counter = 0;
                         @endphp
                         @foreach($timeSlot->staffs as $staff)
                         @auth
@@ -59,6 +61,23 @@
                         @endif
 
                         @endauth
+
+                        @if(!in_array($staff->id, $staff_ids))
+                        @php
+                        $holiday_counter ++
+                        @endphp
+                        
+                        @endif
+
+                        
+                        @if(!in_array($staff->id, $timeSlot->excluded_staff))
+                        @php
+                        $booked_counter ++
+                        @endphp
+                        
+                        @endif
+
+
                         @if(!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff))
                         @php
                         $staff_counter ++
@@ -79,6 +98,9 @@
                             @else
                             <strong>Whoops!</strong>Staff is Booked Already for this slot.
                             @endif
+                            ( On Holiday : {{$holiday_counter}}) 
+                            
+                            ( On Booking : {{$booked_counter}}) 
                         </div>
                         @endif
                     </div>
