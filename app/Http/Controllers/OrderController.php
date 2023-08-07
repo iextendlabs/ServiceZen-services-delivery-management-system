@@ -175,17 +175,18 @@ class OrderController extends Controller
 
     public function edit($id, Request $request)
     {
-        $order = Order::find($id);
-
+        $order = Order::findOrFail($id);
+        $area = $order->area;
+        $date = $order->date;
         $statuses = config('app.order_statuses');
 
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
         if($request->edit == "status"){
-            return view('orders.status_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+            return view('orders.status_edit', compact('order','statuses'));
         }elseif($request->edit == "booking"){
-            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones','date','area'));
         }elseif($request->edit == "address"){
-            return view('orders.detail_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+            return view('orders.detail_edit', compact('order'));
         }
     }
 

@@ -148,13 +148,15 @@ class SiteOrdersController extends Controller
     public function edit($id)
     {
         $order = Order::find($id);
+        $area = $order->area;
+        $date = $order->date;
 
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
 
         $statuses = config('app.statuses');
 
-        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones'));
+        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones','date','area'));
     }
 
 

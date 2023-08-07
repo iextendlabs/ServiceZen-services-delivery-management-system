@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
+use App\Models\Order;
 use App\Models\Service;
 use App\Models\Staff;
 use App\Models\StaffGroup;
@@ -227,10 +228,35 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
-        if ($request->has('order_id') && (int)$request->order_id)
-            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date, $request->order_id);
-        else
-            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
-        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones'));
+        if ($request->has('order_id') && (int)$request->order_id){
+            $order = Order::find($request->order_id);
+            $area = $order->area;
+            $date = $order->date;
+        }else{
+            
+        }
+        if($request->has('area')){
+            $area = $request->area;
+        }
+        if($request->has('date')){
+            $date = $request->date;
+        }
+
+
+        if(!isset($area)){  
+           
+            $address = Session::get('address');
+            $area = $address['area'];
+        }
+        
+        if ($request->has('order_id') && (int)$request->order_id){
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $request->order_id);
+
+            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones','order','date','area'));
+        }else{
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
+            
+            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones','area','date'));
+        }
     }
 }

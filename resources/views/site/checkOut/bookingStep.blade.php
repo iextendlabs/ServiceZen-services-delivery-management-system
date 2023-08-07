@@ -36,29 +36,9 @@
         <form action="timeSlotsSession" method="POST">
             @csrf
             <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Date:</strong>
-                        <input type="date" name="date" id="date" min="{{ date('Y-m-d'); }}" value="{{ date('Y-m-d'); }}" class="form-control" placeholder="Date">
-                    </div>
-                </div>
-                <div class="col-md-12 scroll-div">
-                    <strong>Time Slots</strong>
-                    <div id="loading" style="display: none;">Loading...</div>
-                    <div class="list-group" id="time-slots-container">
-                        <input type="hidden" name="city" value="{{ $city }}">
-                        <input type="hidden" name="area" value="{{ $area }}">
-                        @include('site.checkOut.timeSlots')
-                        
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <div class="form-group" id="detail-container">
-                        <strong>Selected Time Slot:</strong><span id="selected-time-slot"></span><br>
-                        <strong>Selected Staff:</strong><span id="selected-staff"></span>
-                    </div>
-                </div>
+            <div id="slots-container" class="col-md-12">
+                @include('site.checkOut.timeSlots')
+            </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
                     <a href="cart">

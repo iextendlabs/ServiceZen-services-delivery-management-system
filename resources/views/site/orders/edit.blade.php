@@ -30,28 +30,8 @@
             @csrf
             @method('PUT')
             <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Date:</strong>
-                        <input type="date" name="date" id="date" value="{{ $order->date }}" class="form-control" placeholder="Date">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <strong>Time Slots : {{ $order->area }}</strong>
-                    
-                    <input type="hidden" name="city" value="{{ $order->city }}">
-                    <input type="hidden" name="area" value="{{ $order->area }}">
-                    <input type="hidden" name="order_id" value="{{ $order->id }}">
-
-                    <div class="list-group" id="time-slots-container">
-                        @include('site.checkOut.timeSlots')
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group" id="detail-container">
-                        <strong>Selected Time Slot:</strong><span id="selected-time-slot">{{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}</span><br>
-                        <strong>Selected Staff:</strong><span id="selected-staff">{{ $order->staff_name }}</span>
-                    </div>
+                <div id="slots-container" class="col-md-12">
+                    @include('site.checkOut.timeSlots')
                 </div>
                 @if(Auth::user()->hasRole('Staff'))
                 <div class="col-md-12">

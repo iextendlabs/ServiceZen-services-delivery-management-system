@@ -1,15 +1,12 @@
-$('#date').change(function() {
-    // $('#detail-container').empty();
-    var selectedDate = $(this).val();
+$(document).on("change","#date,#zone",function() {
     
     // Make AJAX call to retrieve time slots for selected date
     $.ajax({
         url: '/slots',
         method: 'GET',
         data: {
-            date: selectedDate,
-            city: $('input[name="city"]').val(),
-            area: $('input[name="area"]').val(),
+            date: $('#date').val(),
+            area: $('select[name="zone"]').val(),
             order_id: $('input[name="order_id"]').length ? $('input[name="order_id"]').val() : '',
         },
         beforeSend: function() {
@@ -17,7 +14,8 @@ $('#date').change(function() {
         },
         success: function(response) {
             var timeSlots = response;
-            var timeSlotsContainer = $('#time-slots-container');
+            var timeSlotsContainer = $('#slots-container');
+            timeSlotsContainer.empty();
             timeSlotsContainer.html(response);
         },
         error: function() {
