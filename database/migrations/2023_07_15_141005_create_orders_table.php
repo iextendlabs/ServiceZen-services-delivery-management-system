@@ -35,8 +35,8 @@ return new class extends Migration
             $table->string('date');
             $table->unsignedBigInteger('time_slot_id')->nullable();
             $table->string('time_slot_value')->nullable();
-            $table->string('latitude');
-            $table->string('longitude');
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->text('order_comment')->nullable();
             $table->timestamps();
 

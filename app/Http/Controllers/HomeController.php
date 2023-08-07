@@ -37,9 +37,8 @@ class HomeController extends Controller
 
         if(Auth::check()){
             if($currentUser->hasRole('Customer')){
-                Session::flush();
-                Auth::logout();
-                return Redirect('/login')->with('error','Oppes! You have entered invalid credentials');
+                return redirect('/')
+                    ->with('success', 'You have Successfully loggedin');
             }else{
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
 
