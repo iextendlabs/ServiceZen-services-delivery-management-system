@@ -69,14 +69,14 @@ class TimeSlot extends Model
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->get();
                     else
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
-                    $timeSlot->space_availability = $timeSlot->staffs->count();
-                    $excluded_staff = [];
-                    foreach ($orders as $order) {
-                        $timeSlot->space_availability--;
-                        $excluded_staff[] = $order->service_staff_id;
+                        $excluded_staff = [];
+                        foreach ($orders as $order) {
+                            $timeSlot->space_availability--;
+                            $excluded_staff[] = $order->service_staff_id;
+                        }
+                        $timeSlot->excluded_staff = $excluded_staff;
+                        $timeSlot->space_availability = $timeSlot->staffs->count() - count($excluded_staff) - count($staff_ids);
                     }
-                    $timeSlot->excluded_staff = $excluded_staff;
-                }
             }
         }
 
