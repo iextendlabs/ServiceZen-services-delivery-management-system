@@ -20,6 +20,7 @@
         <div class="col-md-12 text-center">
             <h1>Dashboard</h1>
         </div>
+        @can('dashboard-report')
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">TOTAL SALES</div>
@@ -49,6 +50,7 @@
             </div>
         </div>
         @endif
+        @endcan
     </div>
     <div class="py-2"></div>
     <div class="row">
