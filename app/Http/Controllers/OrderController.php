@@ -109,7 +109,7 @@ class OrderController extends Controller
         } else {
             $orders = $query->paginate(config('app.paginate'));
         }
-
+        //TODO : show totals and current records info on all lists
         if ($request->csv == 1) {
             $headers = array(
                 "Content-type" => "text/csv",

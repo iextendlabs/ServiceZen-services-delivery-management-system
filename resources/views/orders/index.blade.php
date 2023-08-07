@@ -7,7 +7,7 @@
             </div>
             <div class="float-end">
 
-            @can('order-download')
+                @can('order-download')
                 <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
                 <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end no-print" style="margin-right: 10px;"><i class="fa fa-download"></i> Excel</a>
                 @endcan
@@ -164,7 +164,7 @@
                     </div>
                     <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
 
-                    
+
                     <div class="offset-6 col-md-3 text-center">
                         <a href="{{ url()->current() }}
 " class="btn btn-lg btn-secondary">Reset</a>
@@ -178,9 +178,14 @@
         @endif
         <!-- First Column (Table) -->
         <div class="col-md-12 mt-3">
+
+
             @include('orders.list')
             {!! $orders->links() !!}
-
+            <div class="row pagination-summary">
+                <div class="col-6">Total Records <i class="fas fa-chart-bar"></i> {{ $orders->total() }}</div>
+                <div class="col-6">Showing {{ $orders->firstItem() }} - {{ $orders->lastItem() }} of {{ $orders->total() }}</div>
+            </div>
         </div>
     </div>
 

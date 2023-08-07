@@ -54,10 +54,13 @@
     </div>
     <div class="py-2"></div>
     <div class="row">
-        <div class="col-md-12 margin-tb">
-            <div class="float-start">
+        <div class="col-md-12 margin-tb text-center">
+            <div>
                 <h2>Orders</h2>
             </div>
+        </div>
+        <div class="col-md-12 margin-tb mb-3">
+
             <div class="float-end">
                 @can('order-download')
                 <a href="/orders?print=1" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
