@@ -60,7 +60,11 @@
                                 <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
                                 @endcan
                                 @can('order-status-edit')
+                                @if(auth()->user()->getRoleNames() == '["Supervisor"]' && $order->status == 'Pending')
                                 <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                                @elseif(auth()->user()->getRoleNames() != '["Supervisor"]')
+                                <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                                @endif
                                 @endcan
                                 @can('order-detail-edit')
                                 <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
