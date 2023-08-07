@@ -1,6 +1,6 @@
 @extends('site.layout.app')
 <base href="/public">
-<link href="{{ asset('css/checkout.css') }}" rel="stylesheet">
+<link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 
 @section('content')
 
@@ -56,6 +56,6 @@
         </form>
     </div>
 </div>
-<script src="{{ asset('js/checkout.js') }}?v=1"></script>
+<script src="{{ asset('js/checkout.js') }}?v={{config('app.version')}}"></script>
 
 @endsection

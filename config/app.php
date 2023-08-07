@@ -43,6 +43,7 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
+    'version' => '1.0.1',
 
 
     'driver_statuses' => env('DRIVER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
