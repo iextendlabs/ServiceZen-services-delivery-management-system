@@ -24,9 +24,9 @@
         @foreach ($orders as $order)
             <tr>
                 <th>
-                    <a href="{{ route('orders.show', $order->id) }}">
+                    @can('order-view')<a href="{{ route('orders.show', $order->id) }}">@endcan
                         #{{ $order->id }}
-                    </a>
+                    @can('order-view')</a>@endcan
                 </th>
                 <td>{{ $order->staff_name }}</td>
                 <td>{{ $order->date }}</td>
