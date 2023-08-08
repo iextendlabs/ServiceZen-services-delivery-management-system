@@ -59,6 +59,9 @@ return [
     'country_code' => env('COUNTRY_CODE','+971'),
 
     'week_days' => env('WEEK_DAYS', ['Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday','Saturday', 'Sunday']),
+
+    'general_holiday' => env('GENERAL_HOLIDAY', ['Monday', 'Tuesday']),
+    
     /*
     |--------------------------------------------------------------------------
     | Application URL

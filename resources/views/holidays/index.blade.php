@@ -10,6 +10,15 @@
 @section('content')
     <div class="container" style="max-width: 700px">
         <h3 class="h3 text-center border-bottom pb-3">Holiday Calender</h3>
+        <div>
+            <h3>General Holidays</h3>
+            <ul>
+                @foreach(config('app.general_holiday') as $holiday)
+                <li>{{ $holiday }}</li>
+                
+                @endforeach
+            </ul>
+        </div>
         <div class="alert alert-success">
             <b>Note: </b><span>Click on date to add holiday and click on holiday date to delete.</span>
         </div>

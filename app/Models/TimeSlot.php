@@ -49,10 +49,16 @@ class TimeSlot extends Model
         $allZones = StaffZone::all();
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
         if ($staffZone) {
-            $holiday = Holiday::where('date', $date)->get();
+
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
             $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
             $dayName = $carbonDate->formatLocalized('%A');
+            $generalHolidays = config('app.general_holiday');
+            if (in_array($dayName, $generalHolidays)) {
+                $holiday[] = $date;
+            } else {
+                $holiday = Holiday::where('date', $date)->pluck('date')->toArray();
+            }
             $generalHolidayStaffIds = StaffGeneralHoliday::where('day', $dayName)->pluck('staff_id')->toArray();
             $staff_ids = array_merge($staff_ids, $generalHolidayStaffIds);
 
@@ -74,14 +80,14 @@ class TimeSlot extends Model
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->get();
                     else
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->get();
-                        $excluded_staff = [];
-                        foreach ($orders as $order) {
-                            $timeSlot->space_availability--;
-                            $excluded_staff[] = $order->service_staff_id;
-                        }
-                        $timeSlot->excluded_staff = $excluded_staff;
-                        $timeSlot->space_availability =count(array_diff($timeSlot->staffs()->pluck('staff_id')->toArray(),array_unique(array_merge($excluded_staff,$staff_ids))));
+                    $excluded_staff = [];
+                    foreach ($orders as $order) {
+                        $timeSlot->space_availability--;
+                        $excluded_staff[] = $order->service_staff_id;
                     }
+                    $timeSlot->excluded_staff = $excluded_staff;
+                    $timeSlot->space_availability = count(array_diff($timeSlot->staffs()->pluck('staff_id')->toArray(), array_unique(array_merge($excluded_staff, $staff_ids))));
+                }
             }
         }
 
