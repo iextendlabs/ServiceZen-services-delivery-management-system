@@ -60,7 +60,7 @@ return [
 
     'week_days' => env('WEEK_DAYS', ['Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday','Saturday', 'Sunday']),
 
-    'general_holiday' => env('GENERAL_HOLIDAY', ['Monday', 'Tuesday']),
+    'general_holiday' => env('GENERAL_HOLIDAY', ['Monday']),
     
     /*
     |--------------------------------------------------------------------------

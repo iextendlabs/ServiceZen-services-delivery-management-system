@@ -1,3 +1,5 @@
+<!-- TODO Change edit dropdown to icon -->
+
 <table class="table-striped table-bordered table-responsive table">
     <tr>
         <th>Order #</th>
