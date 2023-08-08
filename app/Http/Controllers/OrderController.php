@@ -215,7 +215,8 @@ class OrderController extends Controller
             $order->staff_name = $staff->name;
             $order->save();
         }
-        return redirect()->route('orders.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Order updated successfully');
     }
 

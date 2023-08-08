@@ -27,6 +27,7 @@
         <form action="{{ route('orders.update',$order->id) }}" method="POST">
             @csrf
             @method('PUT')
+            <input type="hidden" name="url" value="{{ url()->previous() }}">
             <div class="row">
                 <div id="slots-container" class="col-md-12">
                     @include('site.checkOut.timeSlots')
