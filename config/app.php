@@ -60,7 +60,9 @@ return [
 
     'week_days' => env('WEEK_DAYS', ['Monday', 'Tuesday', 'Wednesday','Thursday', 'Friday','Saturday', 'Sunday']),
 
-    'general_holiday' => env('GENERAL_HOLIDAY', ['Monday']),
+
+    'general_holiday' => env('GENERAL_HOLIDAY', []),
+
     
     /*
     |--------------------------------------------------------------------------
@@ -88,7 +90,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Dubai',
+    // 'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------

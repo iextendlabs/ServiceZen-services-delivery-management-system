@@ -10,6 +10,7 @@
 @section('content')
     <div class="container" style="max-width: 700px">
         <h3 class="h3 text-center border-bottom pb-3">Holiday Calender</h3>
+        @if(count(config('app.general_holiday')))
         <div>
             <h3>General Holidays</h3>
             <ul>
@@ -19,6 +20,7 @@
                 @endforeach
             </ul>
         </div>
+        @endif
         <div class="alert alert-success">
             <b>Note: </b><span>Click on date to add holiday and click on holiday date to delete.</span>
         </div>
