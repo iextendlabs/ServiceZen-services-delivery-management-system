@@ -221,13 +221,14 @@ class OrderController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
+
         $order = Order::find($id);
         $order->delete();
+        $previousUrl = url()->previous();
 
-        return redirect()->route('orders.index')
-            ->with('success', 'Order deleted successfully');
+        return redirect($previousUrl)->with('success', 'Order deleted successfully');
     }
 
     public function updateOrderStatus(Order $order, Request $request)
