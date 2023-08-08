@@ -31,7 +31,7 @@ class Service extends Model
 
     public function addONs()
     {
-        return $this->hasMany(ServicePackage::class);
+        return $this->hasMany(ServiceAddOn::class);
     }
     
 }
