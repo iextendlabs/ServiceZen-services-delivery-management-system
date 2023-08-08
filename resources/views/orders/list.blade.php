@@ -20,7 +20,7 @@
         @endif
         <th>Status</th>
         <th>Date Added</th>
-        <th style="min-width:160px">Action</th>
+        <th style="min-width:120px">Action</th>
     </tr>
     @if (count($orders))
         @foreach ($orders as $order)
@@ -44,7 +44,13 @@
                     <td>{{ $order->payment_method }}</td>
                     <td>{{ substr($order->order_comment, 0, 50) }}...</td>
                 @endif
-                <td>{{ $order->status }}</td>
+                <td style="min-width:150px">{{ $order->status }}
+                    @if(($order->cashCollection)) <br><br>
+                    <a href="{{ route('cashCollection.index') }}">
+                    <i class="fas fa-money-bill"></i> {{ $order->cashCollection->status }}
+                    </a>
+                    @endif
+                </td>
                 <td>{{ $order->created_at }}</td>
                 <td>
                     @can('order-edit')
