@@ -53,7 +53,9 @@
 
           <p class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></p>
           <a href="/addToCart/{{ $service->id }}" class="btn btn-block btn-primary">Add to Cart</a>
+          @if(count($service->addONs))
           <button class="btn btn-block btn-secondary" id="scroll">Add ONs</button>
+          @endif
           <!-- AddToAny BEGIN -->
           <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
             <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
