@@ -55,7 +55,7 @@ class CheckOutController extends Controller
             Session::put('serviceIds', $serviceIds);
         }
 
-        return redirect('/')->with('cart-success', 'Service Add to Cart Successfully.');
+        return redirect()->back()->with('cart-success', 'Service Add to Cart Successfully.');
     }
 
     public function removeToCart(Request $request, $id)

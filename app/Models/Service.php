@@ -23,9 +23,15 @@ class Service extends Model
     {
         return $this->hasOne(ServiceToUserNote::class);
     }
-    public function orderServices(){
+    
+    public function orderServices()
+    {
         return $this->hasMany(OrderService::class);
+    }
 
+    public function addONs()
+    {
+        return $this->hasMany(ServicePackage::class);
     }
     
 }

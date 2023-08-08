@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
     
 use App\Models\Service;
+use App\Models\ServiceAddOn;
 use App\Models\ServiceCategory;
 use App\Models\ServicePackage;
 use App\Models\ServiceToUserNote;
@@ -106,6 +107,14 @@ class ServiceController extends Controller
                 ServicePackage::create($input);
             }
         }
+
+        if(isset($request->addONsId)){
+            foreach($request->addONsId as $addONsId){
+                $input['service_id'] = $service_id;
+                $input['add_on_id'] = $addONsId;
+                ServiceAddOn::create($input);
+            }
+        }
         
         $input['user_ids'] = serialize($request->userIds);
         $input['service_id'] = $service->id;
@@ -150,10 +159,11 @@ class ServiceController extends Controller
         $userNote = $service->userNote;
         $i = 0;
         $package_services = ServicePackage::where('service_id',$service->id)->pluck('package_id')->toArray();
+        $add_on_services = ServiceAddOn::where('service_id',$service->id)->pluck('add_on_id')->toArray();
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.edit', compact('service','service_categories','all_services','i','package_services','users','userNote'));
+        return view('services.edit', compact('service','service_categories','all_services','i','package_services','users','userNote','add_on_services'));
     }
     
     public function update(Request $request, $id)
@@ -180,6 +190,7 @@ class ServiceController extends Controller
         }
 
         ServicePackage::where('service_id',$id)->delete();
+        ServiceAddOn::where('service_id',$id)->delete();
         
         $service_id = $id;
         
@@ -188,6 +199,14 @@ class ServiceController extends Controller
                 $input['service_id'] = $service_id;
                 $input['package_id'] = $packageId;
                 ServicePackage::create($input);
+            }
+        }
+
+        if(isset($request->addONsId)){
+            foreach($request->addONsId as $addONsId){
+                $input['service_id'] = $service_id;
+                $input['add_on_id'] = $addONsId;
+                ServiceAddOn::create($input);
             }
         }
         ServiceToUserNote::where('service_id',$id)->delete();

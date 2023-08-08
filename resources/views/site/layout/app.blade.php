@@ -2,22 +2,21 @@
 <html lang="en">
 
 <head>
+  <base href="{{ env('APP_URL') }}">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <title>{{ env('APP_NAME') }}</title>
 
   <!-- Bootstrap core CSS -->
-  <link href="./css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
 
-  <!-- Custom styles for this template -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap" rel="stylesheet">
-  <link href="./css/site.css?v=3" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap" rel="stylesheet">
+  <link href="{{ asset('css/site.css') }}?v=3" rel="stylesheet">
 </head>
 @if(session()->has('serviceIds'))
 @php
@@ -31,9 +30,10 @@ $cart_product = 0;
 
 <style>
   .navbar-dark .navbar-nav .nav-link {
-    color: rgba(255,255,255,1) !important;
-}
+    color: rgba(255, 255, 255, 1) !important;
+  }
 </style>
+
 <body>
 
   <header>

@@ -1,5 +1,4 @@
 @extends('site.layout.app')
-<base href="/public">
 <style>
   .box-shadow {
     background: none !important;
@@ -23,6 +22,13 @@
     <strong>{{ Session::get('success') }}</strong>
   </span>
   @endif
+  @if(Session::has('cart-success'))
+  <div class="alert alert-success" role="alert">
+    <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
+    <span>To add more service<a href="/"> Continue</a></span>
+  </div>
+  @endif
+
 </div>
 <div class="album py-5 bg-light">
   <div class="container">
@@ -46,7 +52,8 @@
           </p>
 
           <p class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></p>
-          <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary">Add to Cart</button></a>
+          <a href="/addToCart/{{ $service->id }}" class="btn btn-block btn-primary">Add to Cart</a>
+          <button class="btn btn-block btn-secondary" id="scroll">Add ONs</button>
           <!-- AddToAny BEGIN -->
           <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
             <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
@@ -63,19 +70,60 @@
     </div>
     <hr>
     @if(count($service->package))
-    <h2>Package</h2><br>
+    <h2>Package Services</h2><br>
     <div class="row">
       @foreach($service->package as $package)
-      <div class="col-md-md-4">
+      <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
-          <p class="card-text"><b>{{ $package->service->name }}</b></p>
+          <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
           <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
           <div class="card-body">
-            <p class="card-text">{{ $package->service->short_description }}</p>
             <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted"><b>Duration:{{ $package->service->duration }}</b></small>
-              <small class="text-muted"><b>Price:@currency( $package->service->price )</b></small>
+              <small class="text-muted service-box-price">
+                @if(isset($package->service->discount))<s>@endif
+                  @currency($package->service->price)
+                  @if(isset($package->service->discount))</s>@endif
+                @if(isset($package->service->discount))
+                <b class="discount"> @currency( $package->service->discount )</b>
+                @endif
+              </small>
+
+              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $package->service->duration }}</small>
             </div>
+          </div>
+        </div>
+      </div>
+      @endforeach
+    </div>
+    @endif
+
+    @if(count($service->addONs))
+    <h2>Add ONs</h2><br>
+    <div id="add-ons" class="row">
+      @foreach($service->addONs as $addONs)
+      <div class="col-md-4 service-box">
+        <div class="card mb-4 box-shadow">
+          <p class="card-text service-box-title text-center"><b>{{ $addONs->service->name }}</b></p>
+          <a href="/serviceDetail/{{ $addONs->service->id }}">
+            <img class="card-img-top" src="./service-images/{{ $addONs->service->image }}" alt="Card image cap">
+          </a>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted service-box-price">
+                @if(isset($addONs->service->discount))<s>@endif
+                  @currency($addONs->service->price)
+                  @if(isset($addONs->service->discount))</s>@endif
+                @if(isset($addONs->service->discount))
+                <b class="discount"> @currency( $addONs->service->discount )</b>
+                @endif
+              </small>
+
+              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $addONs->service->duration }}</small>
+            </div>
+
+            <a href="/addToCart/{{ $addONs->service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
+
+
           </div>
         </div>
       </div>
@@ -84,4 +132,11 @@
     @endif
   </div>
 </div>
+<script>
+  $('#scroll').click(()=>{
+    $('html, body').animate({
+      scrollTop: $('#add-ons').offset().top
+    }, 1000);
+  });
+</script>
 @endsection
