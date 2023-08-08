@@ -71,6 +71,7 @@
                         </li>
                         @endif
                         @else
+                        
                         @can('menu-sales')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -167,17 +168,19 @@
                                 @can('role-list')
                                 <a class="dropdown-item" href="{{ route('roles.index') }}">Role</a>
                                 @endcan
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
-                                </a>
+                                
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>
                             </div>
                         </li>
-                        @endguest
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
+                        </li>
+                        @endif
+                        
                     </ul>
                 </div>
 
