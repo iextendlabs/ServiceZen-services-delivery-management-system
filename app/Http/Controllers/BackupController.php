@@ -15,7 +15,8 @@ class BackupController extends Controller
     public function index()
     {
         $backups = Storage::files('backups');
-
+        $backups = str_replace(array('backups/'), '', $backups);
+        
         return view('backups.index', compact('backups'));
     }
 
