@@ -7,7 +7,7 @@
         <div class="mb-3 float-right">
             <a href="{{ route('backups.backup') }}" class="btn btn-primary">Create Backup</a> 
             <a href="{{ route('backups.clear') }}" class="btn btn-danger">Clear Backups</a>
-        </div>
+        </div><br><br>
         
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
