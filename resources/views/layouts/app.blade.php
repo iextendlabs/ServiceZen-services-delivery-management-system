@@ -162,6 +162,9 @@
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
+                                @if(auth()->user()->getRoleNames() == '["Admin"]')
+                                <a class="dropdown-item" href="{{ route('backups.index') }}">Database Backups</a>
+                                @endif
                                 @can('user-list')
                                 <a class="dropdown-item" href="{{ route('users.index') }}">Users</a>
                                 @endcan

@@ -24,6 +24,7 @@ use App\Http\Controllers\{
     DriverController,
     AffiliateController,
     StaffGeneralHolidayController,
+    BackupController,
 };
 
 use App\Http\Controllers\AppController\{
@@ -88,9 +89,14 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('cashCollection/create/{order}',[CashCollectionController::class, 'create'])->name('cashCollection.create');
 
     Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile'); 
-    Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile'); 
+    Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
 
 });
+
+// Backups
+Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
+Route::get('/backups/backup', [BackupController::class, 'backup'])->name('backups.backup');
+Route::get('/backups/download/{filename}', [BackupController::class, 'download'])->name('backups.download');
 
 Route::get('/', [SiteController::class, 'index'])->name('storeHome');
 Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
