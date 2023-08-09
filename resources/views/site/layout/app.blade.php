@@ -77,21 +77,32 @@ $cart_product = 0;
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               @foreach($categories as $category)
-                @if($category->parent_id == null)
-                <a class="dropdown-item parent-item" href="\?id={{$category->id}}">{{$category->title}}</a>
-                <div class="sub_category">
-                  @foreach($categories as $subcategory)
-                    @if($subcategory->parent_id == $category->id)
+                @if(count($category->childCategories))
+                  <p class="dropdown-item parent-item">{{$category->title}}</p>
+
+                  <div class="sub_category">
+                    @foreach($category->childCategories as $subcategory)
+                    
                     <a class="dropdown-item sub-item" href="\?id={{$subcategory->id}}">- {{$subcategory->title}}</a>
-                    @endif
-                  @endforeach
-                </div>
+                    
+                    @endforeach
+                    <hr>
+                    <a class="dropdown-item sub-item" href="\?id={{$category->id}}">Show All {{$category->title}}</a>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                @else
+                <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
                 <div class="dropdown-divider"></div>
+
                 @endif
-              @endforeach
+                @endforeach
+
               <a class="dropdown-item text-center" href="\"><b>All</b></a>
             </div>
           </li>
+
+
+          
           <li class="nav-item">
             <a href="{{ route('cart.index') }}" class="nav-link">View Cart({{$cart_product}})</a>
           </li>
