@@ -24,7 +24,7 @@ use App\Http\Controllers\{
     DriverController,
     AffiliateController,
     StaffGeneralHolidayController,
-    BackupController,
+    BackupController
 };
 
 use App\Http\Controllers\AppController\{
@@ -37,7 +37,7 @@ use App\Http\Controllers\Site\{
     CustomerAuthController,
     SiteController,
     SiteOrdersController,
-    SiteCashCollectionController,
+    SiteCashCollectionController
     
 };
 
@@ -97,6 +97,8 @@ Route::group(['middleware' => ['auth']], function() {
 Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
 Route::get('/backups/backup', [BackupController::class, 'backup'])->name('backups.backup');
 Route::get('/backups/download/{filename}', [BackupController::class, 'download'])->name('backups.download');
+Route::get('/backups/delete/{filename}', [BackupController::class, 'delete'])->name('backups.delete');
+Route::get('/backups/clear', [BackupController::class, 'clear'])->name('backups.clear');
 
 Route::get('/', [SiteController::class, 'index'])->name('storeHome');
 Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
