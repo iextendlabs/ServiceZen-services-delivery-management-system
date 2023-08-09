@@ -39,7 +39,8 @@ class ServiceCategoryController extends Controller
      */
     public function create()
     {
-        return view('service_categories.create');
+        $categories = ServiceCategory::all();
+        return view('service_categories.create',compact('categories'));
     }
     
     /**

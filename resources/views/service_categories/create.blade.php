@@ -38,6 +38,17 @@
                     <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{old('description')}}</textarea>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Parent Category:</strong>
+                    <select name="parent_id" class="form-control">
+                        <option></option>
+                        @foreach($categories as $category)
+                            <option value="{{$category->id}}">{{$category->title}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>

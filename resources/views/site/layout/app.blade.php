@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap" rel="stylesheet">
   <link href="{{ asset('css/site.css') }}?v=3" rel="stylesheet">
+
 </head>
 @if(session()->has('serviceIds'))
 @php
@@ -31,6 +32,17 @@ $cart_product = 0;
 <style>
   .navbar-dark .navbar-nav .nav-link {
     color: rgba(255, 255, 255, 1) !important;
+  }
+
+  .sub-item {
+    padding-left: 40px;
+    /* Add indentation for subcategories */
+    color: #888;
+    /* Apply different color to subcategories */
+  }
+
+  .sub_category {
+    display: none;
   }
 </style>
 
@@ -65,9 +77,18 @@ $cart_product = 0;
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               @foreach($categories as $category)
-              <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
+                @if($category->parent_id == null)
+                <a class="dropdown-item parent-item" href="\?id={{$category->id}}">{{$category->title}}</a>
+                <div class="sub_category">
+                  @foreach($categories as $subcategory)
+                    @if($subcategory->parent_id == $category->id)
+                    <a class="dropdown-item sub-item" href="\?id={{$subcategory->id}}">- {{$subcategory->title}}</a>
+                    @endif
+                  @endforeach
+                </div>
+                <div class="dropdown-divider"></div>
+                @endif
               @endforeach
-              <hr>
               <a class="dropdown-item text-center" href="\"><b>All</b></a>
             </div>
           </li>
@@ -121,12 +142,31 @@ $cart_product = 0;
 
   <!-- Bootstrap core JavaScript
     ================================================== -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
   <script src="./js/vendor/popper.min.js"></script>
   <script src="./js/bootstrap.min.js"></script>
   <script src="./js/vendor/holder.min.js"></script>
   <script src="{{ asset('js/popup.js') }}?v={{config('app.version')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address"></script>
+
+  <script>
+    // Your existing JavaScript code
+
+    // Add event listeners to parent items for hovering
+    const parentItems = document.querySelectorAll('.parent-item');
+
+    parentItems.forEach(item => {
+      const subCategory = item.nextElementSibling;
+
+      item.addEventListener('mouseenter', () => {
+        subCategory.style.display = 'block';
+      });
+
+      subCategory.addEventListener('mouseleave', () => {
+        subCategory.style.display = 'none';
+      });
+    });
+  </script>
 </body>
 
 </html>

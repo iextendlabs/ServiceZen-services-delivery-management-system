@@ -39,6 +39,21 @@
                     <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$service_category->description}}</textarea>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Parent Category:</strong>
+                    <select name="parent_id" class="form-control">
+                        <option></option>
+                        @foreach($categories as $category)
+                            @if($category->id == $service_category->parent_id)
+                                <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                            @else
+                                <option value="{{$category->id}}">{{$category->title}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
