@@ -138,13 +138,6 @@ class CheckOutController extends Controller
         if (Session::get('serviceIds') && Session::get('address')) {
             // $staff_zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
-            if (Auth::check()) {
-                $email = Auth::user()->email;
-                $name = Auth::user()->name;
-            } else {
-                $email = '';
-                $name = '';
-            }
             if (Session::get('address')) {
                 $address = Session::get('address');
             } else {
@@ -164,7 +157,14 @@ class CheckOutController extends Controller
                     'searchField' => '',
                 ];
             }
-
+            
+            if (Auth::check()) {
+                $email = Auth::user()->email;
+                $name = Auth::user()->name;
+            } else {
+                $email = $address['email'];
+                $name = $address['name'];
+            }
             $date = date('Y-m-d');
             $area = $address['area'];
             $city = $address['city'];

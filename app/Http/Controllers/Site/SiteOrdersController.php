@@ -49,6 +49,7 @@ class SiteOrdersController extends Controller
 
     public function store(Request $request)
     {
+        
         $this->validate($request, [
             'payment_method' => 'required'
         ]);

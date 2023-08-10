@@ -189,9 +189,13 @@
                         </div>
                         <div class="col-md-12 text-center">
                             <button type="submit" class="btn btn-primary">Confirm Order</button><br><br>
+                            <a href="/bookingStep">
+                                <button type="button" class="btn btn-secondary">Edit Order</button>
+                            </a>
                             <a href="/">
                                 <button type="button" class="btn btn-primary">Continue Shopping</button>
                             </a>
+
                         </div>
                     </div>
                 </form>
