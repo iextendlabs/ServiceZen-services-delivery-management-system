@@ -25,6 +25,7 @@
       @if(Session::has('cart-success'))
       <div class="alert alert-success" role="alert">
         <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
+        <span><a href="bookingStep">Book Now!</a></span><br>
         <span>To add more service<a href="/"> Continue</a></span>
       </div>
       @endif

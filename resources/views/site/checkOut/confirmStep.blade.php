@@ -176,7 +176,6 @@
                             <div class="form-group">
                                 <strong>Payment Method:</strong>
                                 <select name="payment_method" class="form-control">
-                                    <option></option>
                                     <option value="Cash-On-Delivery">Cash On Delivery</option>
                                 </select>
                             </div>
