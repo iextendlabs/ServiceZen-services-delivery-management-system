@@ -38,7 +38,7 @@ class ServiceController extends Controller
             'category_id' => $request->category_id
         ];
 
-        $query = Service::latest();
+        $query = Service::orderBy('name','ASC');
 
         if ($request->name) {
             $query->where('name', 'like', $request->name.'%');
@@ -54,7 +54,7 @@ class ServiceController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $services = $query->orderBy('name','ASC')->paginate(config('app.paginate'));
+        $services = $query->paginate(config('app.paginate'));
 
         $service_categories = ServiceCategory::all();
         return view('services.index',compact('services','service_categories','filter'))
