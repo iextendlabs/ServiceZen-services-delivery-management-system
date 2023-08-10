@@ -76,6 +76,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
     Route::resource('staffGeneralHolidays', StaffGeneralHolidayController::class);
+    Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('service.bulkDelete');
 
     Route::get('orderCSV', [OrderController::class,'downloadCSV']);
 

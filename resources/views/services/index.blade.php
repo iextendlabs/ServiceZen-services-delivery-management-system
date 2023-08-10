@@ -1,14 +1,18 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-md-6">
-            <h2>Services</h2>
-        </div>
-        <div class="col-md-6">
-            @can('service-create')
-            <a class="btn btn-success  float-end" href="{{ route('services.create') }}"> Create New Service</a>
-            @endcan
-        </div>
+    <div class="col-md-8">
+        <h2>Services</h2>
+    </div>
+    <div class="col-md-4 ">
+        @can('service-create')
+        <a class="btn btn-success  float-end" href="{{ route('services.create') }}"> Create New Service</a>
+        @endcan
+
+        @can('service-delete')
+        <button id="bulkDeleteBtn" class="btn btn-danger">Delete Selected</button>
+        @endcan
+    </div>
     </div>
     @if ($message = Session::get('success'))
         <div class="alert alert-success">
@@ -21,7 +25,7 @@
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
                 <tr>
-                    <th>No</th>
+                    <th></th>
                     <th>Name</th>
                     <th>Price</th>
                     <th width="280px">Action</th>
@@ -29,7 +33,9 @@
                 @if(count($services))
                 @foreach ($services as $service)
                 <tr>
-                    <td>{{ ++$i }}</td>
+                <td>
+                    <input type="checkbox" class="item-checkbox" value="{{ $service->id }}">
+                </td>
                     <td>{{ $service->name }}</td>
                     <td>@currency( $service->price )</td>
                     <td>
@@ -94,4 +100,39 @@
         </div>
     </div>
     
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('bulkDeleteBtn').addEventListener('click', function () {
+            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedItems.length > 0) {
+                if (confirm('Are you sure you want to delete the selected items?')) {
+                    deleteSelectedItems(selectedItems);
+                }
+            } else {
+                alert('Please select items to delete.');
+            }
+        });
+
+        function deleteSelectedItems(selectedItems) {
+            fetch('{{ route('service.bulkDelete') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ selectedItems })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    });
+</script>
 @endsection

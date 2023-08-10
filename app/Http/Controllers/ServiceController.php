@@ -254,4 +254,20 @@ class ServiceController extends Controller
                         ->with('success','Service deleted successfully');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $selectedItems = $request->input('selectedItems');
+        
+        if (!empty($selectedItems)) {
+            $services = Service::whereIn('id', $selectedItems)->get();
+            foreach($services as $service){
+                $this->destroy($service);
+            }
+
+            return response()->json(['message' => 'Selected items deleted successfully.']);
+        } else {
+            return response()->json(['message' => 'No items selected.']);
+        }
+    }
+
 }
