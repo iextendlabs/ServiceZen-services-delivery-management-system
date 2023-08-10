@@ -54,7 +54,7 @@ class ServiceController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $services = $query->paginate(10);
+        $services = $query->orderBy('name','ASC')->paginate(config('app.paginate'));
 
         $service_categories = ServiceCategory::all();
         return view('services.index',compact('services','service_categories','filter'))

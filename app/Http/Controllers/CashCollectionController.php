@@ -38,7 +38,7 @@ class CashCollectionController extends Controller
             $query->where('status', $request->status);
         }
 
-        $cash_collections = $query->paginate(10);
+        $cash_collections = $query->paginate(config('app.paginate'));
         
         if ($request->csv == 1) {
             $headers = array(
@@ -76,7 +76,7 @@ class CashCollectionController extends Controller
 
     public function staffCashCollection()
     {
-        // $orders = Order::where(['service_staff_id'=>Auth::id(),'status'=>'Complete'])->orderBy('id','DESC')->paginate(10);   
+        // $orders = Order::where(['service_staff_id'=>Auth::id(),'status'=>'Complete'])->orderBy('id','DESC')->paginate(config('app.paginate'));   
         
         $orders = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
                 ->where(function ($query) {
@@ -86,7 +86,7 @@ class CashCollectionController extends Controller
                         ->orWhereNull('cash_collections.status');
                 })
                 ->select('orders.*') // Select only the columns from the "orders" table
-                ->where('service_staff_id', Auth::id())->where('orders.status', 'Complete')->orderBy('id','DESC')->paginate(10);
+                ->where('service_staff_id', Auth::id())->where('orders.status', 'Complete')->orderBy('id','DESC')->paginate(config('app.paginate'));
                 
         return view('cashCollections.staffCashCollection',compact('orders'))
             ->with('i', (request()->input('page', 1) - 1) * 10);      

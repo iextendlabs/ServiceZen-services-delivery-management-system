@@ -36,11 +36,11 @@ class StaffHolidayController extends Controller
 
             $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
 
-            $staffHolidays = StaffHoliday::whereIn('staff_id', $staffIds)->paginate(10);
+            $staffHolidays = StaffHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $staffHolidays = StaffHoliday::where('staff_id', Auth::id())->paginate(10);
+            $staffHolidays = StaffHoliday::where('staff_id', Auth::id())->paginate(config('app.paginate'));
         } else {
-            $staffHolidays = StaffHoliday::latest()->paginate(10);
+            $staffHolidays = StaffHoliday::latest()->paginate(config('app.paginate'));
         }
 
 

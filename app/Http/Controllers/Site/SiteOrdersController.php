@@ -24,7 +24,7 @@ class SiteOrdersController extends Controller
     public function index(Request $request)
     {
         if (Auth::check()) { // TODO use middleware instead of this
-            $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(10);            
+            $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(config('app.paginate'));            
             return view('site.orders.index', compact('orders'))
                 ->with('i', ($request->input('page', 1) - 1) * 10);
         }else{

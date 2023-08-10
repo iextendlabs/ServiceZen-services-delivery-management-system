@@ -6,7 +6,7 @@
         <h2>Add New Service</h2>
     </div>
     <div class="col-md-6">
-        <button type="submit" form="services-form" class="btn btn-primary float-end">Submit</button>
+        <button type="submit" form="services-form" class="btn btn-primary float-end">Save</button>
     </div>
 </div>
 @if ($errors->any())
@@ -186,7 +186,10 @@
                     </table>
                 </div>
             </div> -->
-            
+
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-block btn-primary">Save</button>
         </div>
     </div>
 </form>

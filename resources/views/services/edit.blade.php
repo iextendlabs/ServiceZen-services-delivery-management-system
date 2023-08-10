@@ -6,8 +6,9 @@
         <h2>Update Service</h2>
     </div>
     <div class="col-md-6">
-        <button type="submit" form="services-form" class="btn btn-primary float-end">Submit</button>
+        <button type="submit" form="services-form" class="btn btn-primary float-end">Update</button>
     </div>
+    <!-- TODO Create and edit form in single form -->
 </div>
 @if ($errors->any())
 <div class="alert alert-danger">
@@ -202,6 +203,9 @@
                 </div>
             </div> -->
 
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-block btn-primary">Update</button>
         </div>
     </div>
 </form>
