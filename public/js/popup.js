@@ -38,6 +38,7 @@ function fillAddressFields(place) {
             types.includes("sublocality")
         ) {
             popup_areaField.value = component.long_name;
+            $('#zone').val(component.long_name);
         } else if (types.includes("popup_street_number")) {
             popup_flatVillaField.value = component.long_name;
         } else if (types.includes("route")) {
@@ -119,6 +120,11 @@ function mapReady() {
 }
 
 $(document).ready(function () {
+    if(window.location.pathname === "/bookingStep")
+    $('#zoneSelect').hide();
+    else
+    $('#zoneSelect').show();
+
     $(".modal-footer .btn-primary").click(function () {
         $.ajax({
             cache: false, 
@@ -126,7 +132,10 @@ $(document).ready(function () {
             method: "POST", // Use the appropriate HTTP method
             data: $("#locationPopup input"),
             success: function (response) {
+                if(window.location.pathname !== "/bookingStep")
                 location.reload(true);
+                else
+                $("#locationPopup").modal("hide");
             },
             error: function (xhr, status, error) {
                 console.log("Save Changes error:", error);
@@ -149,6 +158,7 @@ document.getElementById("setLocation").addEventListener("click", function () {
     showMapError = true;
     showMap();
 });
+
 
 function showMap() {
     var searchValue = document.getElementById("popup_searchField").value;
