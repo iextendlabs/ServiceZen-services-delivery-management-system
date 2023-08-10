@@ -119,11 +119,9 @@ Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@app
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
-Route::post('addressSession', [CheckOutController::class, 'addressSession']);
-Route::post('timeSlotsSession', [CheckOutController::class, 'timeSlotsSession']);
+Route::post('storeSession', [CheckOutController::class, 'storeSession']);
 Route::resource('cart', CheckOutController::class);
 Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
-Route::get('locationStep', [CheckOutController::class, 'locationStep']); 
 Route::get('confirmStep', [CheckOutController::class, 'confirmStep']); 
 //TODO :set no cache headers for all ajax calls 
 Route::middleware('no-cache')->get('slots', [CheckOutController::class,'slots']);

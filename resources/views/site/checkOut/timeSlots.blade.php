@@ -1,7 +1,7 @@
 <div class="col-md-12">
     <div class="form-group">
         <strong>Date:</strong>
-        <input type="date" name="date" id="date" min="{{ date('Y-m-d') }}" value="{{ isset($date) ? $date : date('Y-m-d') }}" class="form-control" placeholder="Date">
+        <input required type="date" name="date" id="date" min="{{ date('Y-m-d') }}" value="{{ isset($date) ? $date : date('Y-m-d') }}" class="form-control" placeholder="Date">
 
 
     </div>
@@ -82,7 +82,7 @@
                         @php
                         $staff_counter ++
                         @endphp
-                        <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >
+                        <input required style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >
                         <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                             <div class="p-2">
                                 <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100">
@@ -141,11 +141,12 @@
 <div class="col-md-12">
     <div class="form-group" id="detail-container">
         <strong>Selected Time Slot:</strong><span id="selected-time-slot">
-            @if(isset($order))
+        @if(isset($order))
             @if(isset($order->time_slot))
-            {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}</span>
+            {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}
+            @endif
         @endif
-        @endif
+        </span>
         <br>
         <strong>Selected Staff:</strong><span id="selected-staff">{{ isset($order) ? $order->staff_name : null }}</span>
     </div>

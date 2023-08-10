@@ -76,7 +76,7 @@ class CheckOutController extends Controller
         return redirect()->back()->with('success', 'Service Remove to Cart Successfully.');
     }
 
-    public function addressSession(Request $request)
+    public function storeSession(Request $request)
     {
         $this->validate($request, [
             'buildingName' => 'required',
@@ -89,6 +89,8 @@ class CheckOutController extends Controller
             'email' => 'required|email',
             'name' => 'required',
             'whatsapp' => 'required',
+            'date' => 'required',
+            'service_staff_id' => 'required',
         ]);
 
         $address = [];
@@ -106,6 +108,13 @@ class CheckOutController extends Controller
         $address['latitude'] = $request->latitude;
         $address['longitude'] = $request->longitude;
         $address['searchField'] = $request->searchField;
+        
+        $staff_and_time = [];
+        
+        $staff_and_time['date'] = $request->date;
+        [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
+        $staff_and_time['time_slot'] = $time_slot;
+        $staff_and_time['service_staff_id'] = $staff_id;
 
         if (session()->has('address')) {
             Session::forget('address');
@@ -114,23 +123,6 @@ class CheckOutController extends Controller
             Session::put('address', $address);
         }
 
-        return redirect('confirmStep');
-    }
-
-    public function timeSlotsSession(Request $request)
-    {
-        $this->validate($request, [
-            'date' => 'required',
-            'service_staff_id' => 'required',
-        ]);
-
-        $staff_and_time = [];
-
-        $staff_and_time['date'] = $request->date;
-        [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
-        $staff_and_time['time_slot'] = $time_slot;
-        $staff_and_time['service_staff_id'] = $staff_id;
-
         if (session()->has('staff_and_time')) {
             Session::forget('staff_and_time');
             Session::put('staff_and_time', $staff_and_time);
@@ -138,13 +130,13 @@ class CheckOutController extends Controller
             Session::put('staff_and_time', $staff_and_time);
         }
 
-        return redirect('locationStep');
+        return redirect('confirmStep');
     }
 
-    public function locationStep()
+    public function bookingStep(Request $request)
     {
         if (Session::get('serviceIds')) {
-            $staff_zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
+            // $staff_zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
             if (Auth::check()) {
                 $email = Auth::user()->email;
@@ -173,26 +165,15 @@ class CheckOutController extends Controller
                 ];
             }
 
-            return view('site.checkOut.locationStep', compact('email', 'name', 'address', 'staff_zones'));
-        } else {
-            return redirect('/')->with('error', 'There is no Services in Your Cart.');
-        }
-    }
-
-
-
-    public function bookingStep(Request $request)
-    {
-        if (Session::get('address')) {
             $date = date('Y-m-d');
-            $address = Session::get('address');
             $area = $address['area'];
             $city = $address['city'];
             [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones'));
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'address'));
         } else {
-            return redirect('/')->with('error', 'Please Set Location first.');
+            return redirect('/')->with('error', 'There is no Services in Your Cart.');
         }
+ 
     }
 
     public function confirmStep(Request $request)
