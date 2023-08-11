@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
+use App\Models\Affiliate;
 use App\Models\Order;
 use App\Models\OrderService;
 use App\Models\User;
@@ -81,6 +82,12 @@ class SiteOrdersController extends Controller
             $customer->assignRole('Customer');
         }
         $staff = User::find($staff_and_time['service_staff_id']);
+
+        $affiliate = Affiliate::where('code',$staff_and_time['affiliate_code'])->first();
+
+        if(isset($affiliate)){
+            $input['affiliate_id'] = $affiliate->user_id;
+        }
 
         $input['customer_name'] = $address['name'];
         $input['customer_email'] = $address['email'];

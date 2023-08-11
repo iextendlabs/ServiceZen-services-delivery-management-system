@@ -91,6 +91,7 @@ class CheckOutController extends Controller
             'whatsapp' => 'required',
             'date' => 'required',
             'service_staff_id' => 'required',
+            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);
 
         $address = [];
@@ -115,6 +116,7 @@ class CheckOutController extends Controller
         [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
         $staff_and_time['time_slot'] = $time_slot;
         $staff_and_time['service_staff_id'] = $staff_id;
+        $staff_and_time['affiliate_code'] = $request->affiliate_code;
 
         if (session()->has('address')) {
             Session::forget('address');
@@ -157,6 +159,13 @@ class CheckOutController extends Controller
                     'searchField' => '',
                 ];
             }
+
+            if (session()->has('staff_and_time')) {
+                $staff_and_time = Session::get('staff_and_time');
+                $affiliate_code = $staff_and_time['affiliate_code'];
+            } else {
+                $affiliate_code = '';
+            }
             
             if (Auth::check()) {
                 $email = Auth::user()->email;
@@ -169,7 +178,7 @@ class CheckOutController extends Controller
             $area = $address['area'];
             $city = $address['city'];
             [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'address'));
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'address','affiliate_code'));
         } else {
             if(empty(Session::get('address'))){
                 $msg = 'Please Set Location first.';

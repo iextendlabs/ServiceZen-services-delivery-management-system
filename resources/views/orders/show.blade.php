@@ -163,7 +163,7 @@
                         <td>@currency(($order->order_total->sub_total * $order->staff->commission) / 100)</td>
                         @if(auth()->user()->getRoleNames() != '["Staff"]')
                         <td class="no-print">
-                            @if(empty($order->transactions->status))
+                            @if(empty($order->getStaffTransactionStatus()))
                             @can('order-edit')
                             <button type="submit" class="btn btn-primary">Approve</button>
                             @endcan
@@ -178,7 +178,7 @@
         </fieldset>
         @endif
         @if(auth()->user()->getRoleNames() != '["Staff"]')
-        @if(isset($order->affiliate))
+        @if(isset($order->affiliate->affiliate))
         <fieldset>
             <legend>Affiliate Commission</legend>
             <table class="table table-striped table-bordered album bg-light">
@@ -200,7 +200,7 @@
                         <td>{{ $order->affiliate->name }}</td>
                         <td>@currency(($order->total_amount * $order->affiliate->affiliate->commission) / 100)</td>
                         <td class="no-print">
-                            @if(empty($order->transaction()[0]->status))
+                            @if(empty($order->getAffiliateTransactionStatus()))
                             @can('order-edit')
                             <button type="submit" class="btn btn-primary">Approve</button>
                             @endcan

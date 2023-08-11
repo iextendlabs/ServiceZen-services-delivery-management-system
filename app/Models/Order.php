@@ -77,4 +77,14 @@ class Order extends Model
     {
         return $this->hasOne(DriverOrder::class);
     }
+
+    public function getStaffTransactionStatus()
+    {
+        return Transaction::where('user_id',$this->staff->user_id)->value('status');
+    }
+    
+    public function getAffiliateTransactionStatus()
+    {
+        return Transaction::where('user_id',$this->affiliate->id)->value('status');
+    }
 }

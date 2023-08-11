@@ -91,4 +91,9 @@ class User extends Authenticatable
     public function staffGeneralHoliday(){
         return $this->hasMany(StaffGeneralHoliday::class,'staff_id','id');
     }
+
+    public function affiliates()
+    {
+        return $this->belongsToMany(Affiliate::class, 'user_affiliate', 'user_id', 'affiliate_id');
+    }
 }

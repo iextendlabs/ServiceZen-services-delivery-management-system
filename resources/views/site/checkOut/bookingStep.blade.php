@@ -136,13 +136,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name:</strong>
-                            <input required type="text" name="name" id="name" class="form-control" placeholder="Name" value="{{ $name }}">
+                            <input required type="text" name="name" id="name" class="form-control" placeholder="Name" value="{{  old('name') ? old('name') : $name }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Email:</strong>
-                            <input required type="email" name="email" id="email" class="form-control" placeholder="abc@gmail.com" value="{{ $email }}">
+                            <input required type="email" name="email" id="email" class="form-control" placeholder="abc@gmail.com" value="{{  old('email') ? old('email') : $email }}">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -167,7 +167,14 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <strong>Affiliate Code:</strong>
+                            <input type="text" name="affiliate_code" id="affiliate_code" class="form-control" affiliate_codeplaceholder="Affiliate Code" value="{{  old('affiliate_code') ? old('affiliate_code') : $affiliate_code }}">
+                        </div>
+                    </div>
                 </div>
+            
 
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>

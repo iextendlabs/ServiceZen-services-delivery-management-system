@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Session;
 use App\Http\Controllers\Controller;
+use App\Models\Affiliate;
 
 class CustomerAuthController extends Controller
 {
@@ -23,6 +24,7 @@ class CustomerAuthController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:password_confirmation',
+            'affiliate_code' => ['required', 'exists:affiliates,code'],
         ]);
 
         $input = $request->all();
@@ -33,6 +35,10 @@ class CustomerAuthController extends Controller
 
         $customer->assignRole('Customer');
         
+        $affiliate = Affiliate::where('code',$request->affiliate_code)->first();
+
+        $customer->affiliates()->attach($affiliate->user_id);
+
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             return redirect('/')
