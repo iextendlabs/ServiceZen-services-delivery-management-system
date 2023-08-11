@@ -24,7 +24,7 @@ class CustomerAuthController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:password_confirmation',
-            'affiliate_code' => ['required', 'exists:affiliates,code'],
+            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);
 
         $input = $request->all();

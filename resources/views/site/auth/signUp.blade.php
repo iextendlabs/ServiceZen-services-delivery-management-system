@@ -62,7 +62,7 @@
                             <label for="email" class="col-md-4 col-form-label text-md-end">Affiliate Code</label>
 
                             <div class="col-md-6">
-                                <input id="affiliate_code" type="text" class="form-control @error('affiliate_code') is-invalid @enderror" name="affiliate_code" value="{{ old('affiliate_code') }}" required autocomplete="affiliate_code">
+                                <input id="affiliate_code" type="text" class="form-control @error('affiliate_code') is-invalid @enderror" name="affiliate_code" value="{{ old('affiliate_code') }}" autocomplete="affiliate_code">
 
                                 @error('affiliate_code')
                                 <span class="invalid-feedback" role="alert">
