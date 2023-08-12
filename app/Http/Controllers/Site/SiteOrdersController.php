@@ -74,7 +74,7 @@ class SiteOrdersController extends Controller
 
             $input['email'] = $address['email'];
             // $password = $input['name'] . mt_rand(1000, 9999);
-            $password = $input['number'];
+            $password = $address['number'];
             $input['password'] = Hash::make($password);
 
             $customer = User::create($input);
