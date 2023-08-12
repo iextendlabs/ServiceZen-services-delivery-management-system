@@ -79,7 +79,7 @@ $cart_product = 0;
               @if($category->id == 10 || $category->id == 11)
               @continue
               @endif
-              @if(count($category->childCategories) == 0 )
+              @if(count($category->childCategories) == 0 && !$category->parentCategory)
                 <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
               @else
                 <a class="dropdown-item dropdown-toggle" href="#" id="subDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
