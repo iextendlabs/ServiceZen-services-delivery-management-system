@@ -43,7 +43,10 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
-    'version' => '1.0.2',
+    'version' => '1.0.3',
+    // TODO add option in category to hide / show in menu 
+    'packageUrl' => '/?id=11',
+    'addOnUrl' => '/?id=10',
 
 
     'driver_statuses' => env('DRIVER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),

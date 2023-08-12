@@ -76,6 +76,9 @@ $cart_product = 0;
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               @foreach($categories as $category)
+              @if($category->id == 10 || $category->id == 11)
+              @continue
+              @endif
               @if(count($category->childCategories) == 0 )
                 <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
               @else
@@ -95,11 +98,16 @@ $cart_product = 0;
           <a class="dropdown-item text-center" href="\"><b>All</b></a>
         </div>
       </li>
-
+      <li class="nav-item">
+        <a href="{{ config('app.packageUrl') }}" class="nav-link">Package</a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-On</a>
+      </li>
 
 
       <li class="nav-item">
-        <a href="{{ route('cart.index') }}" class="nav-link">View Cart({{$cart_product}})</a>
+        <a href="{{ route('cart.index') }}" class="nav-link">Cart({{$cart_product}})</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

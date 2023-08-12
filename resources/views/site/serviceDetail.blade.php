@@ -44,7 +44,7 @@
   @endif
 
 </div>
-<div class="album py-5 bg-light">
+<div id="serviceDetailContainer" class="album py-5 bg-light">
   <div class="container">
 
     <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
