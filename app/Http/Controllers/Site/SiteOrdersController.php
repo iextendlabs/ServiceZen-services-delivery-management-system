@@ -45,6 +45,7 @@ class SiteOrdersController extends Controller
 
     public function store(Request $request)
     {
+        $password = NULL;
         
         $this->validate($request, [
             'payment_method' => 'required'
@@ -72,8 +73,8 @@ class SiteOrdersController extends Controller
             $input['name'] = $address['name'];
 
             $input['email'] = $address['email'];
-
-            $input['password'] = Hash::make($input['name'] . '1094');
+            $password = $input['name'] . mt_rand(1000, 9999);
+            $input['password'] = Hash::make($password);
 
             $customer = User::create($input);
 
@@ -138,7 +139,7 @@ class SiteOrdersController extends Controller
         Session::forget('staff_and_time');
         Session::forget('serviceIds');
 
-        return view('site.orders.success', compact('customer_type'));
+        return view('site.orders.success', compact('customer_type', 'password'));
     }
 
 
