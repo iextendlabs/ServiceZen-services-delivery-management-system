@@ -172,6 +172,11 @@ class SiteOrdersController extends Controller
         $input['time_slot_id'] = $time_slot;
         $input['service_staff_id'] = $staff_id;
         $order = Order::find($id);
+
+        
+        $time_slot = TimeSlot::find($time_slot);
+        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+
         $order->update($input);
 
         $staff = User::find($staff_id);
