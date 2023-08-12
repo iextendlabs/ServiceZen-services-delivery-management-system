@@ -277,6 +277,10 @@
                 fillFormAddressFields(place);
             });
         }
+        $('#zone').on('change', function(){
+            let val = $(this).val();
+            $('#area').val(val);
+        })
     </script>
 <script src="{{ asset('js/checkout.js') }}?v={{config('app.version')}}"></script>
 @endsection
