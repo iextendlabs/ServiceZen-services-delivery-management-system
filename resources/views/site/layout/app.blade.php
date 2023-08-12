@@ -99,10 +99,10 @@ $cart_product = 0;
         </div>
       </li>
       <li class="nav-item">
-        <a href="{{ config('app.packageUrl') }}" class="nav-link">Package</a>
+        <a href="{{ config('app.packageUrl') }}" class="nav-link">Packages</a>
       </li>
       <li class="nav-item">
-        <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-On</a>
+        <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-Ons</a>
       </li>
 
 
