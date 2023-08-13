@@ -67,7 +67,7 @@ class CashCollectionController extends Controller
             return view('cashCollections.print', compact('cash_collections'));
         } else {
             $filters = $request->only(['status']);
-            $orders->appends($filters);
+            $cash_collections->appends($filters);
             return view('cashCollections.index',compact('cash_collections','filter_status'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
         }
