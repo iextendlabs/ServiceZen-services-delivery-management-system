@@ -67,10 +67,11 @@ class User extends Authenticatable
     {
         $staffIds = [];
             foreach ($this->managerSupervisors as $managerSupervisor) {
-                $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisor->pluck('user_id')->toArray();
-                $staffIds = array_merge($staffIds, $supervisor_staffs);
+                if ($managerSupervisor->supervisor){
+                    $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisor->pluck('user_id')->toArray();
+                    $staffIds = array_merge($staffIds, $supervisor_staffs);
+                }
             }
-
             return $staffIds;
     }
     
