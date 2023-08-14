@@ -113,6 +113,9 @@ class SiteOrdersController extends Controller
         $time_slot = TimeSlot::find($staff_and_time['time_slot']);
         $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
+        $input['time_start'] = $time_slot->time_start;
+        $input['time_end'] = $time_slot->time_end;
+
         $order = Order::create($input);
 
         $input['order_id'] = $order->id;

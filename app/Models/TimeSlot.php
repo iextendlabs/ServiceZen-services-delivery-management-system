@@ -43,6 +43,10 @@ class TimeSlot extends Model
 
     public static function getTimeSlotsForArea($area, $date, $currentOrder = null)
     {
+        
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $currentDateTime = Carbon::now();
+        $twoHoursLater = $currentDateTime->addHours(2);
         $timeSlots = [];
         $holiday = [];
         $staff_ids = [];
@@ -63,25 +67,38 @@ class TimeSlot extends Model
             $staff_ids = array_merge($staff_ids, $generalHolidayStaffIds);
 
             if (count($holiday) == 0) {
-                $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
-                    $query->where('staff_zone_id', $staffZone->id);
-                })->where('date', '=', $date)->get();
-
-                if (count($timeSlots) == 0) {
+                if($date == $currentDate){
                     $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                         $query->where('staff_zone_id', $staffZone->id);
-                    })->get();
+                    })->where('date', '=', $date)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+    
+                    if (count($timeSlots) == 0) {
+                        $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                            $query->where('staff_zone_id', $staffZone->id);
+                        })->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                    }
+                }else{
+                    $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                        $query->where('staff_zone_id', $staffZone->id);
+                    })->where('date', '=', $date)->orderBy('time_start')->get();
+    
+                    if (count($timeSlots) == 0) {
+                        $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                            $query->where('staff_zone_id', $staffZone->id);
+                        })->orderBy('time_start')->get();
+                    }
                 }
+                
             }
 
             if (count($timeSlots)) {
                 foreach ($timeSlots as $timeSlot) {
                     if ($currentOrder)
-                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->where('status','!=','Canceled')->where('status','!=','Rejected')->get();
+                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
                     else
-                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('status','!=','Canceled')->where('status','!=','Rejected')->get();
+                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
                     $excluded_staff = [];
-                    foreach ($orders as $order) {   
+                    foreach ($orders as $order) {
                         $timeSlot->space_availability--;
                         $excluded_staff[] = $order->service_staff_id;
                     }
