@@ -46,16 +46,17 @@ class TimeSlot extends Model
         
         $currentDate = Carbon::now()->format('Y-m-d');
         $currentDateTime = Carbon::now();
+        $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
         $twoHoursLater = $currentDateTime->addHours(2);
         $timeSlots = [];
         $holiday = [];
         $staff_ids = [];
         $allZones = StaffZone::all();
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
-        if ($staffZone) {
 
+        if ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone) {
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
-            $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
+            
             $dayName = $carbonDate->formatLocalized('%A');
             $generalHolidays = config('app.general_holiday');
             if (in_array($dayName, $generalHolidays)) {
