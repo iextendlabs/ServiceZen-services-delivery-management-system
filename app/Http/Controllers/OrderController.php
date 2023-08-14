@@ -54,20 +54,20 @@ class OrderController extends Controller
         switch ($userRole) {
             case 'Manager':
                 $staffIds = $currentUser->getManagerStaffIds();
-                $query = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC');
+                $query = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'ASC')->orderBy('time_start');
                 break;
 
             case 'Supervisor':
                 $staffIds = $currentUser->getSupervisorStaffIds();
-                $query = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC');
+                $query = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'ASC')->orderBy('time_start');
                 break;
 
             case 'Staff':
-                $query = Order::where('service_staff_id', Auth::id())->orderBy('date', 'DESC');
+                $query = Order::where('service_staff_id', Auth::id())->orderBy('date', 'ASC')->orderBy('time_start');
                 break;
 
             default:
-                $query = Order::orderBy('date', 'DESC');
+                $query = Order::orderBy('date', 'ASC')->orderBy('time_start');
                 break;
         }
 
