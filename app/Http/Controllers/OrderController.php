@@ -73,23 +73,23 @@ class OrderController extends Controller
 
 
         if ($request->status) {
-            $query->where('status', 'like', $request->status . '%');
+            $query->where('status', '=', $request->status);
         }
 
         if ($request->affiliate_id) {
-            $query->where('affiliate_id', 'like', $request->affiliate_id . '%');
+            $query->where('affiliate_id', '=', $request->affiliate_id);
         }
 
         if ($request->customer_id) {
-            $query->where('customer_id', 'like', $request->customer_id . '%');
+            $query->where('customer_id', '=', $request->customer_id);
         }
 
         if ($request->staff_id) {
-            $query->where('service_staff_id', 'like', $request->staff_id . '%');
+            $query->where('service_staff_id', '=', $request->staff_id);
         }
 
         if ($request->payment_method) {
-            $query->where('payment_method', 'like', $request->payment_method . '%');
+            $query->where('payment_method', '=', $request->payment_method);
         }
 
         if ($request->appointment_date) {
@@ -102,7 +102,7 @@ class OrderController extends Controller
         }
 
         if ($request->created_at) {
-            $query->where('created_at', 'like', $request->created_at . '%');
+            $query->where('created_at', '=', $request->created_at);
         }
         if ($request->csv == 1 || $request->print == 1) {
             $orders = $query->get();
