@@ -137,9 +137,6 @@ class CheckOutController extends Controller
 
     public function bookingStep(Request $request)
     {
-        if (Session::get('serviceIds') && Session::get('address')) {
-            // $staff_zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
-
             if (Session::get('address')) {
                 $address = Session::get('address');
             } else {
@@ -178,18 +175,7 @@ class CheckOutController extends Controller
             $area = $address['area'];
             $city = $address['city'];
             [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'address','affiliate_code'));
-        } else {
-            if(empty(Session::get('address'))){
-                $msg = 'Please Set Location first.';
-            }elseif(empty(Session::get('serviceIds'))){
-                $msg = 'There is no Services in Your Cart.';
-            }
-
-            return redirect('/')->with('error', $msg);
-
-        }
- 
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'address','affiliate_code')); 
     }
 
     public function confirmStep(Request $request)
