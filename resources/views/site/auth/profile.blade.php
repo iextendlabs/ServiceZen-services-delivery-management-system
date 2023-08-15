@@ -36,37 +36,37 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Building Name:</strong>
-                            <input required type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ $user->customerProfile->buildingName }}">
+                            <input required type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ $user->customerProfile->buildingName ?? null }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Flat / Villa:</strong>
-                            <input required type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ $user->customerProfile->buildingName }}">
+                            <input required type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ $user->customerProfile->flatVilla ?? null }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Street:</strong>
-                            <input required type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ $user->customerProfile->street }}">
+                            <input required type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ $user->customerProfile->street ?? null }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Area:</strong>
-                            <input required type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ $user->customerProfile->area }}">
+                            <input required type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ $user->customerProfile->area ?? null }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Landmark:</strong>
-                            <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ $user->customerProfile->landmark }}">
+                            <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ $user->customerProfile->landmark ?? null }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>City:</strong>
-                            <input required type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ $user->customerProfile->city }}">
+                            <input required type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ $user->customerProfile->city ?? null }}">
                         </div>
                     </div>
                 </div>
@@ -106,7 +106,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.country_code') }}</span>
                                 </div>
-                                <input required type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ str_replace('+971', '', $user->customerProfile->number) }}" pattern="[0-9]{7,9}">
+                                <input required type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ str_replace('+971', '', $user->customerProfile->number ?? null) }}" pattern="[0-9]{7,9}">
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.country_code') }}</span>
                                 </div>
-                                <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ str_replace('+971', '', $user->customerProfile->whatsapp) }}" pattern="[0-9]{7,9}">
+                                <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ str_replace('+971', '', $user->customerProfile->whatsapp ?? null) }}" pattern="[0-9]{7,9}">
                             </div>
                         </div>
                     </div>
