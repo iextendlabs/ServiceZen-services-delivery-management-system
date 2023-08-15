@@ -151,7 +151,7 @@ class OrderController extends Controller
 
             $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer_id', 'payment_method']);
             $orders->appends($filters);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
@@ -183,11 +183,11 @@ class OrderController extends Controller
         $statuses = config('app.order_statuses');
 
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
-        if($request->edit == "status"){
-            return view('orders.status_edit', compact('order','statuses'));
-        }elseif($request->edit == "booking"){
-            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones','date','area'));
-        }elseif($request->edit == "address"){
+        if ($request->edit == "status") {
+            return view('orders.status_edit', compact('order', 'statuses'));
+        } elseif ($request->edit == "booking") {
+            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
+        } elseif ($request->edit == "address") {
             return view('orders.detail_edit', compact('order'));
         }
     }
@@ -204,8 +204,8 @@ class OrderController extends Controller
         }
 
         $order = Order::find($id);
-        
-        $order->order_total->transport_charges= $request->transport_charges;
+
+        $order->order_total->transport_charges = $request->transport_charges;
         $order->order_total->save();
 
         $order->update($input);
@@ -221,7 +221,7 @@ class OrderController extends Controller
     }
 
 
-    public function destroy($id,Request $request)
+    public function destroy($id, Request $request)
     {
 
         $order = Order::find($id);

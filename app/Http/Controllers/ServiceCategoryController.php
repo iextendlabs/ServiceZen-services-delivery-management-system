@@ -29,7 +29,7 @@ class ServiceCategoryController extends Controller
     {
         $service_categories = ServiceCategory::latest()->paginate(config('app.paginate'));
         return view('service_categories.index',compact('service_categories'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

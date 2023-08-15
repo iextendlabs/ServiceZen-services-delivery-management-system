@@ -32,7 +32,7 @@ class StaffGroupController extends Controller
     {
         $staffGroups = StaffGroup::latest()->paginate(config('app.paginate'));
         return view('staffGroups.index', compact('staffGroups'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

@@ -46,7 +46,7 @@ class StaffGeneralHolidayController extends Controller
 
 
         return view('staffGeneralHolidays.index',compact('staffGeneralHolidays'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

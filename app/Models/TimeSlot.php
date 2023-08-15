@@ -54,7 +54,7 @@ class TimeSlot extends Model
         $allZones = StaffZone::all();
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
 
-        if ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone) {
+        if (auth()->user()->hasRole('Admin') ? $staffZone : ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone)) {
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
             
             $dayName = $carbonDate->formatLocalized('%A');

@@ -2,6 +2,7 @@
 
 <table class="table-striped table-bordered table-responsive table">
     <tr>
+        <th>No #</th>
         <th>Order #</th>
         <th>Staff</th>
         <th><i class="fas fa-clock"></i> Appointment Date</th>
@@ -25,6 +26,7 @@
     @if (count($orders))
         @foreach ($orders as $order)
             <tr>
+                <td>{{ ++$i }}</td>
                 <th>
                     @can('order-view')<a href="{{ route('orders.show', $order->id) }}">@endcan
                         #{{ $order->id }}

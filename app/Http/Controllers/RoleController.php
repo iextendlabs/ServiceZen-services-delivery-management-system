@@ -31,7 +31,7 @@ class RoleController extends Controller
     {
         $roles = Role::orderBy('id','DESC')->paginate(config('app.paginate'));
         return view('roles.index',compact('roles'))
-            ->with('i', ($request->input('page', 1) - 1) * 10);
+            ->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

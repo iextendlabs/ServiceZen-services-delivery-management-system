@@ -33,7 +33,7 @@ class StaffZoneController extends Controller
     {
         $staffZones = StaffZone::latest()->paginate(config('app.paginate'));
         return view('staffZones.index',compact('staffZones'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

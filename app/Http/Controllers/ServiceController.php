@@ -58,7 +58,7 @@ class ServiceController extends Controller
 
         $service_categories = ServiceCategory::all();
         return view('services.index',compact('services','service_categories','filter'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

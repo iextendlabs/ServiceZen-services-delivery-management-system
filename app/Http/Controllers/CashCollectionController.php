@@ -69,7 +69,7 @@ class CashCollectionController extends Controller
             $filters = $request->only(['status']);
             $cash_collections->appends($filters);
             return view('cashCollections.index',compact('cash_collections','filter_status'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
 
@@ -91,7 +91,7 @@ class CashCollectionController extends Controller
                 ->where('service_staff_id', Auth::id())->where('orders.status', 'Complete')->orderBy('id','DESC')->paginate(config('app.paginate'));
                 
         return view('cashCollections.staffCashCollection',compact('orders'))
-            ->with('i', (request()->input('page', 1) - 1) * 10);      
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));      
     }
     
     /**
