@@ -38,7 +38,7 @@ function fillAddressFields(place) {
             types.includes("sublocality")
         ) {
             popup_areaField.value = component.long_name;
-            $('#zone').val(component.long_name);
+            $("#zone").val(component.long_name);
         } else if (types.includes("popup_street_number")) {
             popup_flatVillaField.value = component.long_name;
         } else if (types.includes("route")) {
@@ -103,39 +103,38 @@ function initAutocomplete() {
 var showMapError = false;
 function mapReady() {
     $(document).ready(function () {
-        var session = $('input[name="session"]').val();
-        if (session == "false") {
-            setTimeout(function () {
+        if (window.location.pathname !== "/customer-login" && window.location.pathname !== "/customer-registration") {
+            var session = $('input[name="session"]').val();
+            if (session == "false") {
+                setTimeout(function () {
+                    $("#locationPopup").modal("show");
+                }, 1000);
+            }
+            $("#change-address").click(function () {
                 $("#locationPopup").modal("show");
-            }, 1000);
-        }
-        $("#change-address").click(function () {
-            $("#locationPopup").modal("show");
-        });
-        initAutocomplete();
-        if ($(".location-search-wrapper").length) {
-            initMap();
+            });
+            initAutocomplete();
+            if ($(".location-search-wrapper").length) {
+                initMap();
+            }
         }
     });
 }
 
 $(document).ready(function () {
-    if(window.location.pathname === "/bookingStep")
-    $('#zoneSelect').hide();
-    else
-    $('#zoneSelect').show();
+    if (window.location.pathname === "/bookingStep") $("#zoneSelect").hide();
+    else $("#zoneSelect").show();
 
     $(".modal-footer .btn-primary").click(function () {
         $.ajax({
-            cache: false, 
+            cache: false,
             url: "/saveLocation", // Replace with your server endpoint URL
             method: "POST", // Use the appropriate HTTP method
             data: $("#locationPopup input"),
             success: function (response) {
-                if(window.location.pathname !== "/bookingStep")
-                location.reload(true);
-                else
-                $("#locationPopup").modal("hide");
+                if (window.location.pathname !== "/bookingStep")
+                    location.reload(true);
+                else $("#locationPopup").modal("hide");
             },
             error: function (xhr, status, error) {
                 console.log("Save Changes error:", error);
@@ -158,7 +157,6 @@ document.getElementById("setLocation").addEventListener("click", function () {
     showMapError = true;
     showMap();
 });
-
 
 function showMap() {
     var searchValue = document.getElementById("popup_searchField").value;

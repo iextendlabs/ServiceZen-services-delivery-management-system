@@ -35,6 +35,7 @@ use App\Http\Controllers\AppController\{
 use App\Http\Controllers\Site\{
     CheckOutController,
     CustomerAuthController,
+    CustomerProfileController,
     SiteController,
     SiteOrdersController,
     SiteCashCollectionController
@@ -110,6 +111,7 @@ Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin'])
 Route::get('customer-registration', [CustomerAuthController::class, 'registration']);
 Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']); 
 Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
+Route::resource('customerProfile', CustomerAuthController::class);
 
 
 Route::resource('order', SiteOrdersController::class);

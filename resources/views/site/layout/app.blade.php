@@ -125,6 +125,9 @@ $cart_product = 0;
           <a class="dropdown-item" href="{{ route('order.index') }}">My Orders</a>
           <a class="dropdown-item" href="/customer-logout">Logout</a>
           @else
+          
+          <a class="dropdown-item" href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>
+
           <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
           <a class="dropdown-item" href="/customer-logout">Logout</a>
           @endif

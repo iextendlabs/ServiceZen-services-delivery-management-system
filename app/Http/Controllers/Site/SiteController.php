@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Site;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\CustomerProfile;
 use App\Models\ServiceCategory;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -31,6 +33,34 @@ class SiteController extends Controller
     {
         $address = Session::get('address');
 
+        if (Auth::check()) {
+            $user = User::find(auth()->user()->id);
+            if (isset($user->customerProfile)) {
+                $address = [];
+
+                $address['buildingName'] = $user->customerProfile->buildingName;
+                $address['area'] = $user->customerProfile->area;
+                $address['flatVilla'] = $user->customerProfile->flatVilla;
+                $address['street'] = $user->customerProfile->street;
+                $address['landmark'] = $user->customerProfile->landmark;
+                $address['city'] = $user->customerProfile->city;
+                $address['number'] = $user->customerProfile->number;
+                $address['whatsapp'] = $user->customerProfile->whatsapp;
+                $address['email'] = $user->email;
+                $address['name'] = $user->name;
+                $address['latitude'] = $user->customerProfile->latitude;
+                $address['longitude'] = $user->customerProfile->longitude;
+                $address['searchField'] = $user->customerProfile->searchField;
+
+                if (session()->has('address')) {
+                    Session::forget('address');
+                    Session::put('address', $address);
+                } else {
+                    Session::put('address', $address);
+                }
+            }
+        }
+        
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->get();
             $category = ServiceCategory::find($request->id);
@@ -47,7 +77,8 @@ class SiteController extends Controller
         return view('site.serviceDetail', compact('service'));
     }
 
-    public function saveLocation(Request $request){
+    public function saveLocation(Request $request)
+    {
         if ($request->city) {
             $address = [];
 
@@ -76,7 +107,8 @@ class SiteController extends Controller
         }
     }
 
-    public function updateZone(Request $request){
+    public function updateZone(Request $request)
+    {
         if ($request->zone) {
             $address = [];
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\CustomerProfile;
 use App\Models\Holiday;
 use App\Models\Order;
 use App\Models\Service;
@@ -87,7 +88,6 @@ class CheckOutController extends Controller
             'name' => 'required',
             'number' => 'required',
             'email' => 'required|email',
-            'name' => 'required',
             'whatsapp' => 'required',
             'date' => 'required',
             'service_staff_id' => 'required',
@@ -109,6 +109,7 @@ class CheckOutController extends Controller
         $address['latitude'] = $request->latitude;
         $address['longitude'] = $request->longitude;
         $address['searchField'] = $request->searchField;
+        $address['update_profile'] = $request->update_profile;
         
         $staff_and_time = [];
         

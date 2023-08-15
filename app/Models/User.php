@@ -97,4 +97,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Affiliate::class, 'user_affiliate', 'user_id', 'affiliate_id');
     }
+
+    public function customerProfile()
+    {
+        return $this->hasOne(CustomerProfile::class);
+    }
 }

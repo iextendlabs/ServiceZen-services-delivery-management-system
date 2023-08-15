@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Models\Affiliate;
+use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\OrderService;
 use App\Models\User;
@@ -25,12 +26,12 @@ class SiteOrdersController extends Controller
     public function index(Request $request)
     {
         if (Auth::check()) { // TODO use middleware instead of this
-            $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(config('app.paginate'));            
+            $orders = Order::where('customer_id', Auth::id())->orderBy('id', 'DESC')->paginate(config('app.paginate'));
             return view('site.orders.index', compact('orders'))
                 ->with('i', ($request->input('page', 1) - 1) * 10);
-        }else{
+        } else {
             return redirect('/customer-login')
-                        ->with('error','Login to view order.');
+                ->with('error', 'Login to view order.');
         }
 
         // TODO add redirect to home with error
@@ -46,7 +47,7 @@ class SiteOrdersController extends Controller
     public function store(Request $request)
     {
         $password = NULL;
-        
+
         $this->validate($request, [
             'payment_method' => 'required'
         ]);
@@ -57,37 +58,15 @@ class SiteOrdersController extends Controller
         $address = Session::get('address');
         $serviceIds = Session::get('serviceIds');
 
-        if (!($staff_and_time && $address && $serviceIds)){
+        if (!($staff_and_time && $address && $serviceIds)) {
             return redirect()->route('storeHome')->with('error', 'Order Already Placed! or empty cart! or booking slot Unavailable!');
         }
 
-        $input['email'] = $address['email'];
-
-        $user = User::where('email', $address['email'])->get();
-        if (count($user)) {
-            $input['customer_id'] = $user['0']->id;
-            $customer_type = "Old";
-        } else {
-            $customer_type = "New";
-
-            $input['name'] = $address['name'];
-
-            $input['email'] = $address['email'];
-            // $password = $input['name'] . mt_rand(1000, 9999);
-            $password = $address['number'];
-            $input['password'] = Hash::make($password);
-
-            $customer = User::create($input);
-
-            $input['customer_id'] = $customer->id;
-
-            $customer->assignRole('Customer');
-        }
         $staff = User::find($staff_and_time['service_staff_id']);
 
-        $affiliate = Affiliate::where('code',$staff_and_time['affiliate_code'])->first();
+        $affiliate = Affiliate::where('code', $staff_and_time['affiliate_code'])->first();
 
-        if(isset($affiliate)){
+        if (isset($affiliate)) {
             $input['affiliate_id'] = $affiliate->user_id;
         }
 
@@ -110,6 +89,40 @@ class SiteOrdersController extends Controller
         $input['latitude'] = $address['latitude'];
         $input['longitude'] = $address['longitude'];
 
+        $input['email'] = $address['email'];
+
+        $user = User::where('email', $address['email'])->first();
+       
+        if (isset($user)) {
+            if(isset($user->customerProfile)){
+                if($address['update_profile'] == "on"){
+                    $user->customerProfile->update($input); 
+                }
+            }else{
+                $user->customerProfile()->create($input);
+            }
+            $input['customer_id'] = $user->id;
+            $customer_type = "Old";
+        } else {
+            $customer_type = "New";
+
+            $input['name'] = $address['name'];
+
+            $input['email'] = $address['email'];
+            // $password = $input['name'] . mt_rand(1000, 9999);
+            $password = $address['number'];
+
+            $input['password'] = Hash::make($password);
+
+            $user = User::create($input);
+
+            $user->customerProfile()->create($input);
+
+            $input['customer_id'] = $user->id;
+
+            $user->assignRole('Customer');
+        }
+        
         $time_slot = TimeSlot::find($staff_and_time['time_slot']);
         $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
@@ -164,7 +177,7 @@ class SiteOrdersController extends Controller
 
         $statuses = config('app.statuses');
 
-        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones','date','area'));
+        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
     }
 
 
@@ -177,7 +190,7 @@ class SiteOrdersController extends Controller
         $input['service_staff_id'] = $staff_id;
         $order = Order::find($id);
 
-        
+
         $time_slot = TimeSlot::find($time_slot);
         $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
