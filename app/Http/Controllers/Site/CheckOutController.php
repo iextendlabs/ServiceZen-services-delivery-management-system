@@ -138,9 +138,9 @@ class CheckOutController extends Controller
     public function bookingStep(Request $request)
     {
             if (Session::get('address')) {
-                $address = Session::get('address');
+                $addresses = Session::get('address');
             } else {
-                $address = [
+                $addresses = [
                     'buildingName' => '',
                     'area' => '',
                     'flatVilla' => '',
@@ -168,14 +168,14 @@ class CheckOutController extends Controller
                 $email = Auth::user()->email;
                 $name = Auth::user()->name;
             } else {
-                $email = $address['email'];
-                $name = $address['name'];
+                $email = $addresses['email'];
+                $name = $addresses['name'];
             }
             $date = date('Y-m-d');
-            $area = $address['area'];
-            $city = $address['city'];
+            $area = $addresses['area'];
+            $city = $addresses['city'];
             [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'address','affiliate_code')); 
+            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'addresses','affiliate_code')); 
     }
 
     public function confirmStep(Request $request)

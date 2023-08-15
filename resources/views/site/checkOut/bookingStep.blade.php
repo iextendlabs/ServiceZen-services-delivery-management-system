@@ -1,7 +1,10 @@
 @extends('site.layout.app')
 <link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 @section('content')
+<?php
 
+// var_dump($$addresses);die;
+?>
 <div class="album bg-light">
     <div class="container">
         <div class="row">
@@ -41,7 +44,7 @@
                                 </svg>
                             </div>
                             <div class="location-search-input-wrapper">
-                                <input id="searchField" disabled type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $address['searchField'] }}" class="location-search-input">
+                                <input id="searchField" disabled type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
                             </div>
                             <div class="location-search-right en">
                                 <div class="location-search-clear en" style="display:none;">
@@ -70,7 +73,7 @@
 
                 
 
-                <input id="searchField" type="hidden" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $address['searchField'] }}" class="location-search-input">
+                <input id="searchField" type="hidden" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <br>
@@ -80,19 +83,19 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Building Name:</strong>
-                            <input required type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ old('buildingName') ? old('buildingName') : $address['buildingName'] }}">
+                            <input required type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ old('buildingName') ? old('buildingName') : $addresses['buildingName'] }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Flat / Villa:</strong>
-                            <input required type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ old('flatVilla') ? old('flatVilla') : $address['flatVilla'] }}">
+                            <input required type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ old('flatVilla') ? old('flatVilla') : $addresses['flatVilla'] }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Street:</strong>
-                            <input required type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ old('street') ? old('street') : $address['street'] }}">
+                            <input required type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ old('street') ? old('street') : $addresses['street'] }}">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -103,7 +106,7 @@
                                 <option value="">-- Select Zone -- </option>
                                 <!-- Loop through the $zones array to generate options -->
                                 @foreach ($zones as $zone)
-                                <option @if (old('area')==$zone || $address['area']==$zone) selected @endif value="{{ $zone }}">
+                                <option @if (old('area')==$zone || $addresses['area']==$zone) selected @endif value="{{ $zone }}">
                                     {{ $zone }}
                                 </option>
                                 @endforeach
@@ -114,17 +117,17 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Landmark:</strong>
-                            <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('landmark') ? old('landmark') : $address['landmark'] }}">
+                            <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('landmark') ? old('landmark') : $addresses['landmark'] }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>City:</strong>
-                            <input required type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city') ? old('city') : $address['city'] }}">
+                            <input required type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city') ? old('city') : $addresses['city'] }}">
                         </div>
                     </div>
-                    <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') ? old('latitude') : $address['latitude'] }}">
-                    <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') ? old('longitude') : $address['longitude'] }}">
+                    <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') ? old('latitude') : $addresses['latitude'] }}">
+                    <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') ? old('longitude') : $addresses['longitude'] }}">
                 </div>
 
                 <div class="row">
@@ -152,7 +155,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.country_code') }}</span>
                                 </div>
-                                <input required type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : str_replace('+971', '', $address['number']) }}" pattern="[0-9]{7,9}">
+                                <input required type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : str_replace('+971', '', $addresses['number']) }}" pattern="[0-9]{7,9}">
                             </div>
                         </div>
                     </div>
@@ -163,7 +166,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.country_code') }}</span>
                                 </div>
-                                <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971', '', $address['whatsapp']) }}" pattern="[0-9]{7,9}">
+                                <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971', '', $addresses['whatsapp']) }}" pattern="[0-9]{7,9}">
                             </div>
                         </div>
                     </div>
