@@ -34,7 +34,7 @@ class TimeSlotController extends Controller
      */
     public function index()
     {
-        $time_slots = TimeSlot::latest()->orderBy('time_start')->paginate(config('app.paginate'));
+        $time_slots = TimeSlot::orderBy('time_start')->paginate(config('app.paginate'));
         return view('timeSlots.index', compact('time_slots'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
