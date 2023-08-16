@@ -86,7 +86,7 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <h3 class="text-center" style="font-family: 'Titillium Web', sans-serif;
+        <h3 class="text-center mt-3" style="font-family: 'Titillium Web', sans-serif;
     font-weight: bold;">Description</h3>
         {!! $service->description !!}
       </div>
