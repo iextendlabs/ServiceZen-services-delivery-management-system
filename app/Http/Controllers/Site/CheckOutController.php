@@ -200,10 +200,10 @@ class CheckOutController extends Controller
             return view('site.checkOut.confirmStep', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time','staffZone'));
         } elseif (Session::get('serviceIds') && Session::get('address')) {
 
-            return redirect('locationStep')->with('error', 'There is no Time Slots Data Saved.');
+            return redirect('/')->with('error', 'There is no Time Slots Data Saved.');
         } elseif (Session::get('serviceIds')) {
 
-            return redirect('bookingStep')->with('error', 'There is no Address Saved.');
+            return redirect('/')->with('error', 'There is no Address Saved.');
         } else {
 
             return redirect('/')->with('error', 'There is no Services in Your Cart.');

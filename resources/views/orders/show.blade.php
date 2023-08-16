@@ -65,7 +65,7 @@
                     <b>Area:</b> {{ $order->area }}
                 </td>
                 <td>
-                    <b>Flat / Villa:</b> {{ $order->total_amount }} <br><br>
+                    <b>Flat / Villa:</b> {{ $order->flatVilla}} <br><br>
                     <b>Land Mark:</b> {{ $order->landmark }}
                 </td>
                 <td>

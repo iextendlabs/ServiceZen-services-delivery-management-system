@@ -29,17 +29,9 @@
             </ul>
         </div>
         @endif
-        <!-- AddToAny BEGIN -->
-        <div class="a2a_kit a2a_kit_size_32 a2a_default_style" style="margin-bottom: 20px;">
-            <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
-            <a class="a2a_button_facebook"></a>
-            <a class="a2a_button_twitter"></a>
-            <a class="a2a_button_whatsapp"></a>
-            <a class="a2a_button_telegram"></a>
-        </div>
-        <script async src="https://static.addtoany.com/menu/page.js"></script>
-        <!-- AddToAny END -->
+
         <div class="text-right mb-2">
+            <a class="btn btn-primary float-end no-print" href="{{ route('order.edit',$order->id) }}">Edit</a>
             <button type="button" class="btn btn-danger float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i> Download PDF</button>
         </div>
         <table class="table table-striped table-bordered album bg-light">
@@ -60,11 +52,11 @@
             <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
             <tr>
                 <td>
-                    <b>Staff:</b> {{ $order->staff_name }} 
-                    
+                    <b>Staff:</b> {{ $order->staff_name }}
+
                 </td>
                 <td>
-                <b>Date:</b> {{ $order->date }}  
+                    <b>Date:</b> {{ $order->date }}
                 </td>
                 <td>
                     <b>Time:</b> {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}

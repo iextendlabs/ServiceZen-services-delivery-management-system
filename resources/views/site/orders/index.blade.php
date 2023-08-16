@@ -75,11 +75,10 @@
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>
                 <td>
-                    <a class="btn btn-sm btn-info" href="{{ route('order.show', $order->id) }}">
-                        <i class="fas fa-eye"></i> </a>
+                    <a class="btn btn-info" href="{{ route('order.show', $order->id) }}"><i class="fas fa-eye"></i> </a>
 
                     @if($order->status == "Pending")
-                    <a class="btn btn-sm btn-primary" href="{{ route('order.edit',$order->id) }}">Edit</a>
+                    <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}"><i class="fas fa-edit"></i> </a>
                     @endif
                    
                 </td>

@@ -12,7 +12,7 @@
         <select name="zone" id="zone" class="form-control">
             <option value=""></option>
             @foreach($allZones as $zone)
-            <option value="{{ $zone->name }}" {{  $area == $zone->name ? 'selected' : '' }}>
+            <option value="{{ $zone->name }}" data-transport-charges="{{ $staffZone->transport_charges }}" {{  $area == $zone->name ? 'selected' : '' }}>
                 {{ $zone->name }}
             </option>
             @endforeach
@@ -82,7 +82,7 @@
                         @php
                         $staff_counter ++
                         @endphp
-                        <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >
+                        <input style="display: none;" type="radio" id="staff-{{$staff->id}}-{{$timeSlot->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" data-slot="{{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }}" value="{{ $timeSlot->id }}:{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id && $order->time_slot_id == $timeSlot->id ) checked @endif >
                         <label class="staff-label" for="staff-{{$staff->id}}-{{$timeSlot->id}}">
                             <div class="p-2">
                                 <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100">

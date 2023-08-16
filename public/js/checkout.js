@@ -18,6 +18,8 @@ $(document).on("change","#date,#zone",function() {
             var timeSlotsContainer = $('#slots-container');
             timeSlotsContainer.empty();
             timeSlotsContainer.html(response);
+            if(typeof updateTotal === 'function')
+            updateTotal()
         },
         error: function() {
             alert('Error retrieving time slots.');
@@ -49,4 +51,6 @@ $(document).on('change', 'input[name="service_staff_id"]', function() {
 
     $('#selected-time-slot').html(slotName);
     $('#selected-staff').html(staffName);
+    if(typeof updateTotal === 'function')
+    updateTotal()
 });

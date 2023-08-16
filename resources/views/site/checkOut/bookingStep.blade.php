@@ -70,9 +70,6 @@
                 <div id="slots-container" class="col-md-12">
                     @include('site.checkOut.timeSlots')
                 </div>
-
-
-
                 <input id="searchField" type="hidden" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
                 <div class="row">
                     <div class="col-md-12 text-center">

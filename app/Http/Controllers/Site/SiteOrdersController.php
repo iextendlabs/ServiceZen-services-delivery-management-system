@@ -174,15 +174,22 @@ class SiteOrdersController extends Controller
 
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
 
-
         $statuses = config('app.statuses');
-
-        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
+        $services = Service::all();
+        $order_service = OrderService::where('order_id',$id)->pluck('service_id')->toArray();
+        
+        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area','services','order_service'));
     }
 
 
     public function update(Request $request, $id)
     {
+
+        $this->validate($request, [
+            'service_ids' => 'required',
+            'service_staff_id' => 'required'
+        ]);
+
         $input = $request->all();
 
         [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
@@ -190,11 +197,34 @@ class SiteOrdersController extends Controller
         $input['service_staff_id'] = $staff_id;
         $order = Order::find($id);
 
-
         $time_slot = TimeSlot::find($time_slot);
         $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
+        $input['number'] = config('app.country_code') . $request->number;
+        $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
+
         $order->update($input);
+        
+        $input['order_id'] = $id;
+        
+        OrderService::where('order_id',$id)->delete();
+        OrderTotal::where('order_id',$id)->delete();
+
+
+        OrderTotal::create($input);
+
+        foreach ($request->service_ids as $id) {
+            $services = Service::find($id);
+            $input['service_id'] = $id;
+            $input['service_name'] = $services->name;
+            $input['status'] = 'Open';
+            if ($services->discount) {
+                $input['price'] = $services->discount;
+            } else {
+                $input['price'] = $services->price;
+            }
+            OrderService::create($input);
+        }
 
         $staff = User::find($staff_id);
         $order->staff_name = $staff->name;
