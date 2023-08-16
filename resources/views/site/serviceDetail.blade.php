@@ -50,7 +50,6 @@
     <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
 
     <div class="row">
-
       <div class="col-md-8">
         <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
       </div>
@@ -80,8 +79,14 @@
           </div>
           <script async src="https://static.addtoany.com/menu/page.js"></script>
           <!-- AddToAny END -->
-          <p class="card-text">{!! $service->description !!}</p>
+          <p class="card-text">{!! $service->short_description !!}</p>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Description</h3>
+        {!! $service->description !!}
       </div>
     </div>
     <hr>
