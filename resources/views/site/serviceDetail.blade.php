@@ -14,9 +14,10 @@
     width: 100%;
   }
 
-  .carousel-control-next, .carousel-control-prev {
+  .carousel-control-next,
+  .carousel-control-prev {
     width: 5% !important;
-}
+  }
 </style>
 @section('content')
 <section class="jumbotron text-center">
@@ -85,7 +86,8 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <h3>Description</h3>
+        <h3 class="text-center" style="font-family: 'Titillium Web', sans-serif;
+    font-weight: bold;">Description</h3>
         {!! $service->description !!}
       </div>
     </div>
@@ -135,36 +137,36 @@
         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
           <div class="row">
             @foreach($addONsChunk as $addON)
-            
-            <div class="col-md-4 service-box">
-        <div class="card mb-4 box-shadow">
-          <p class="card-text service-box-title text-center"><b>{{ $addON->service->name }}</b></p>
-          <a href="/serviceDetail/{{ $addON->service->id }}">
-          <img src="./service-images/{{ $addON->service->image }}" class="d-block w-100 carousel-image" alt="Image {{ $key }}">
-          </a>
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted service-box-price">
-                @if(isset($addON->service->discount))<s>@endif
-                  @currency($addON->service->price)
-                  @if(isset($addON->service->discount))</s>@endif
-                @if(isset($addON->service->discount))
-                <b class="discount"> @currency( $addON->service->discount )</b>
-                @endif
-              </small>
 
-              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
+            <div class="col-md-4 service-box">
+              <div class="card mb-4 box-shadow">
+                <p class="card-text service-box-title text-center"><b>{{ $addON->service->name }}</b></p>
+                <a href="/serviceDetail/{{ $addON->service->id }}">
+                  <img src="./service-images/{{ $addON->service->image }}" class="d-block w-100 carousel-image" alt="Image {{ $key }}">
+                </a>
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted service-box-price">
+                      @if(isset($addON->service->discount))<s>@endif
+                        @currency($addON->service->price)
+                        @if(isset($addON->service->discount))</s>@endif
+                      @if(isset($addON->service->discount))
+                      <b class="discount"> @currency( $addON->service->discount )</b>
+                      @endif
+                    </small>
+
+                    <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
+                  </div>
+
+                  <a href="/addToCart/{{ $addON->service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
+
+
+                </div>
+              </div>
             </div>
 
-            <a href="/addToCart/{{ $addON->service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
 
 
-          </div>
-        </div>
-      </div>
-
-
-            
             @endforeach
           </div>
         </div>
