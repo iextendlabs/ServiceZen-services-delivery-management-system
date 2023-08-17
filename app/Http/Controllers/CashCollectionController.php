@@ -212,6 +212,13 @@ class CashCollectionController extends Controller
     public function destroy($id)
     {
         $cash_collection = CashCollection::find($id);
+
+        if(isset($cash_collection->image)){
+            if(file_exists(public_path('cash-collections-images').'/'.$cash_collection->image)) {
+                unlink(public_path('cash-collections-images').'/'.$cash_collection->image);
+            }
+        }
+
         $cash_collection->delete();
     
         return redirect()->route('cashCollection.index')
