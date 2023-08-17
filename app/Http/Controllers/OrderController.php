@@ -47,6 +47,7 @@ class OrderController extends Controller
             'payment_method' => $request->payment_method,
             'appointment_date' => $request->appointment_date,
             'created_at' => $request->created_at,
+            'order_id' => $request->order_id,
         ];
         $currentUser = Auth::user();
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
@@ -71,6 +72,9 @@ class OrderController extends Controller
                 break;
         }
 
+        if ($request->order_id) {
+            $query->where('id', '=', $request->order_id);
+        }
 
         if ($request->status) {
             $query->where('status', '=', $request->status);

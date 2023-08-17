@@ -71,6 +71,12 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
+                            <strong>Order Id:</strong>
+                            <input type="number" name="order_id" class="form-control" value="{{ $filter['order_id'] }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <strong>Appointment Date:</strong>
                             <input type="date" name="appointment_date" class="form-control" value="{{ $filter['appointment_date'] }}">
                         </div>
