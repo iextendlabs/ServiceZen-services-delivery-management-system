@@ -24,7 +24,7 @@
     <hr>
     <table class="table table-striped table-bordered">
         <tr>
-            <th>No</th>
+            <th>Sr#</th>
             <th>Title</th>
             <th>Description</th>
             <th width="280px">Action</th>

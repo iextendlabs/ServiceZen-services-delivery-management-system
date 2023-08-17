@@ -27,7 +27,7 @@ $total_amount = 0;
     @if(count($booked_services) != 0)
     <table class="table table-striped table-bordered album bg-light">
         <tr>
-            <th>No</th>
+            <th>Sr#</th>
             <th>image</th>
             <th>Service Name</th>
             <th>Price</th>

@@ -19,7 +19,7 @@
     <hr>
     <table class="table table-striped table-bordered">
         <tr>
-            <th>No</th>
+            <th>Sr#</th>
             <th>Name</th>
             <th>Time Start -- Time End</th>
             <th>Group</th>

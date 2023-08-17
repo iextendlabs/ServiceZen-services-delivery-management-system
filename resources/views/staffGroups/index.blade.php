@@ -21,7 +21,7 @@
         <div class="col-md-12">
             <table class="table table-striped table-bordered">
                 <tr>
-                    <th>No</th>
+                    <th>Sr#</th>
                     <th>Name</th>
                     <th>Staffs</th>
                     <th>Staff Zone</th>

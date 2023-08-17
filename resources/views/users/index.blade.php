@@ -23,7 +23,7 @@
     <div class="col-md-9">
         <table class="table table-striped table-bordered">
             <tr>
-                <th>No</th>
+                <th>Sr#</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Roles</th>

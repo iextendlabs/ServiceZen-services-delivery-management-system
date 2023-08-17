@@ -24,7 +24,8 @@ use App\Http\Controllers\{
     DriverController,
     AffiliateController,
     StaffGeneralHolidayController,
-    BackupController
+    BackupController,
+    CouponController
 };
 
 use App\Http\Controllers\AppController\{
@@ -97,6 +98,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile'); 
     Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
 
+    Route::resource('coupons', CouponController::class);
 });
 
 // Backups

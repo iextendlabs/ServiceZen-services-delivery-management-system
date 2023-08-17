@@ -31,7 +31,7 @@
         <p>Your current balance is: <b>@currency( $total_balance )</b></p>
         <table class="table table-striped table-bordered album bg-light">
             <tr>
-                <th>No</th>
+                <th>Sr#</th>
                 <th>Date Added</th>
                 <th>Description</th>
                 <th>Amount</th>

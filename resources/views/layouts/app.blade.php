@@ -119,6 +119,7 @@
                                 @can('time-slot-list')
                                 <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
                                 @endcan
+                                <a class="dropdown-item" href="{{ route('coupons.index') }}">Coupons</a>
                             </div>
                         </li>
                         @endcan

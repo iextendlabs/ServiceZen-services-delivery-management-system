@@ -25,7 +25,7 @@
             @if(count($staffs) != 0)
             <table class="table table-striped table-bordered album bg-light">
                 <tr>
-                    <th>No</th>
+                    <th>Sr#</th>
                     <th>Service</th>
                     <th>Price</th>
                     <th>Status</th>
