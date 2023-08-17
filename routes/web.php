@@ -89,6 +89,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('cashCollection', CashCollectionController::class);
     Route::get('staffCashCollection',[CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
     Route::get('cashCollection/create/{order}',[CashCollectionController::class, 'create'])->name('cashCollection.create');
+    Route::get('uploadImage/{id}', [CashCollectionController::class, 'uploadImageForm'])->name('cashCollection.uploadImage'); 
+
+    Route::put('/cash_collections/{id}', [CashCollectionController::class, 'updateImage'])->name('cash_collections.updateImage');
 
     Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile'); 
     Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');

@@ -38,6 +38,10 @@ class CashCollectionController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->order_id) {
+            $query->where('order_id', $request->order_id);
+        }
+
         $cash_collections = $query->paginate(config('app.paginate'));
         
         if ($request->csv == 1) {
@@ -66,7 +70,7 @@ class CashCollectionController extends Controller
         } else if ($request->print == 1) {
             return view('cashCollections.print', compact('cash_collections'));
         } else {
-            $filters = $request->only(['status']);
+            $filters = $request->only(['status','order_id']);
             $cash_collections->appends($filters);
             return view('cashCollections.index',compact('cash_collections','filter_status'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
@@ -147,12 +151,55 @@ class CashCollectionController extends Controller
 
     public function cashCollectionUpdate(Request $request, $id)
     {
-
+        request()->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
         $cash_collections = CashCollection::find($id);
-        $cash_collections->update($request->all());
-    
+        $input = $request->all();
+
+        if (isset($request->image)) {
+            if ($cash_collections->image && file_exists(public_path('cash-collections-images').'/'.$cash_collections->image)) {
+                unlink(public_path('cash-collections-images').'/'.$cash_collections->image);
+            }
+        
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            $request->image->move(public_path('cash-collections-images'), $filename);
+        
+            $input['image'] = $filename;
+        }
+        
+        $cash_collections->update($input);
+
         return redirect()->route('cashCollection.index')
                         ->with('success','Cash Collection updated successfully');
+    }
+
+    public function updateImage(Request $request, $id){
+
+        request()->validate([
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+        
+        $cash_collections = CashCollection::find($id);
+        $input = $request->all();
+
+        if (isset($request->image)) {
+            if ($cash_collections->image && file_exists(public_path('cash-collections-images').'/'.$cash_collections->image)) {
+                unlink(public_path('cash-collections-images').'/'.$cash_collections->image);
+            }
+        
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            $request->image->move(public_path('cash-collections-images'), $filename);
+        
+            $input['image'] = $filename;
+        }
+        
+        $cash_collections->update($input);
+
+        return redirect()->route('orders.index')
+                        ->with('success','Cash Collection image uploaded successfully');
     }
     
     
@@ -169,5 +216,12 @@ class CashCollectionController extends Controller
     
         return redirect()->route('cashCollection.index')
                         ->with('success','Cash Collection deleted successfully');
+    }
+
+    public function uploadImageForm($order_id){
+        
+        $cash_collection = CashCollection::where('order_id',$order_id)->first();
+        return view('cashCollections.uploadImage',compact('cash_collection'));
+    
     }
 }
