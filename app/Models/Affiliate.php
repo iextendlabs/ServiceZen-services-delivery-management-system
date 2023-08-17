@@ -20,4 +20,8 @@ class Affiliate extends Model
     {
         return $this->belongsToMany(User::class, 'user_affiliate', 'affiliate_id', 'user_id');
     }
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'user_id');
+    }
 }

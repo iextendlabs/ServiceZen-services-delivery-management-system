@@ -10,5 +10,12 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = ['user_id','amount','order_id','status'];
-
+    
+    public function affiliate() {
+        return $this->belongsTo(Affiliate::class, 'user_id');
+    }
+    
+    public function staff() {
+        return $this->belongsTo(Staff::class, 'user_id');
+    }
 }

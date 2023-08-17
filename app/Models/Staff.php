@@ -25,4 +25,8 @@ class Staff extends Model
     {
         return $this->hasMany(Order::class, 'service_staff_id','user_id');
     }
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'user_id');
+    }
 }
