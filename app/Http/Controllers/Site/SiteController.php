@@ -34,8 +34,9 @@ class SiteController extends Controller
         $address = Session::get('address');
 
         if (Auth::check()) {
+            
             $user = User::find(auth()->user()->id);
-            if (isset($user->customerProfile)) {
+            if (isset($user->customerProfile) && session()->has('address') == false) {
                 $address = [];
 
                 $address['buildingName'] = $user->customerProfile->buildingName;
@@ -51,13 +52,9 @@ class SiteController extends Controller
                 $address['latitude'] = $user->customerProfile->latitude;
                 $address['longitude'] = $user->customerProfile->longitude;
                 $address['searchField'] = $user->customerProfile->searchField;
-
-                if (session()->has('address')) {
-                    Session::forget('address');
-                    Session::put('address', $address);
-                } else {
-                    Session::put('address', $address);
-                }
+                
+                Session::put('address', $address);
+                
             }
         }
         

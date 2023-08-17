@@ -12,12 +12,11 @@
         <select name="zone" id="zone" class="form-control">
             <option value=""></option>
             @foreach($allZones as $zone)
-            <option value="{{ $zone->name }}" data-transport-charges="{{ $staffZone->transport_charges }}" {{  $area == $zone->name ? 'selected' : '' }}>
+            <option value="{{ $zone->name }}" data-transport-charges="{{ isset($staffZone) &&  $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}" {{  $area == $zone->name ? 'selected' : '' }}>
                 {{ $zone->name }}
             </option>
             @endforeach
         </select>
-
     </div>
 </div>
 <div class="col-md-12 scroll-div">
