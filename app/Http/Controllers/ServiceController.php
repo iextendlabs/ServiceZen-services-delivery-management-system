@@ -1,7 +1,7 @@
 <?php
-    
+
 namespace App\Http\Controllers;
-    
+
 use App\Models\Service;
 use App\Models\ServiceAddOn;
 use App\Models\ServiceCategory;
@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -20,10 +20,10 @@ class ServiceController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:service-list|service-create|service-edit|service-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:service-create', ['only' => ['create','store']]);
-         $this->middleware('permission:service-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:service-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:service-list|service-create|service-edit|service-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:service-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:service-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:service-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -38,10 +38,10 @@ class ServiceController extends Controller
             'category_id' => $request->category_id
         ];
 
-        $query = Service::orderBy('name','ASC');
+        $query = Service::orderBy('name', 'ASC');
 
         if ($request->name) {
-            $query->where('name', 'like', $request->name.'%');
+            $query->where('name', 'like', $request->name . '%');
         }
 
         // Filter by price
@@ -57,10 +57,10 @@ class ServiceController extends Controller
         $services = $query->paginate(config('app.paginate'));
 
         $service_categories = ServiceCategory::all();
-        return view('services.index',compact('services','service_categories','filter'))
+        return view('services.index', compact('services', 'service_categories', 'filter'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -73,9 +73,9 @@ class ServiceController extends Controller
         $all_services = Service::all();
         $users = User::all();
         $service_categories = ServiceCategory::all();
-        return view('services.create', compact('service_categories','all_services','i','package_services','users'));
+        return view('services.create', compact('service_categories', 'all_services', 'i', 'package_services', 'users'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -97,46 +97,46 @@ class ServiceController extends Controller
         $input = $request->all();
 
         $service = Service::create($input);
-        
+
         $service_id = $service->id;
-        
-        if(isset($request->packageId)){
-            foreach($request->packageId as $packageId){
+
+        if (isset($request->packageId)) {
+            foreach ($request->packageId as $packageId) {
                 $input['service_id'] = $service_id;
                 $input['package_id'] = $packageId;
                 ServicePackage::create($input);
             }
         }
 
-        if(isset($request->addONsId)){
-            foreach($request->addONsId as $addONsId){
+        if (isset($request->addONsId)) {
+            foreach ($request->addONsId as $addONsId) {
                 $input['service_id'] = $service_id;
                 $input['add_on_id'] = $addONsId;
                 ServiceAddOn::create($input);
             }
         }
-        
+
         $input['user_ids'] = serialize($request->userIds);
         $input['service_id'] = $service->id;
-        
-        if(isset($request->note) && isset($request->userIds)){
+
+        if (isset($request->note) && isset($request->userIds)) {
             ServiceToUserNote::create($input);
         }
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-        
+
             $request->image->move(public_path('service-images'), $filename);
-        
+
             $service->image = $filename;
             $service->save();
         }
 
 
         return redirect()->route('services.index')
-                        ->with('success','Service created successfully.');
+            ->with('success', 'Service created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -145,9 +145,9 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        return view('services.show',compact('service'));
+        return view('services.show', compact('service'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -158,14 +158,14 @@ class ServiceController extends Controller
     {
         $userNote = $service->userNote;
         $i = 0;
-        $package_services = ServicePackage::where('service_id',$service->id)->pluck('package_id')->toArray();
-        $add_on_services = ServiceAddOn::where('service_id',$service->id)->pluck('add_on_id')->toArray();
+        $package_services = ServicePackage::where('service_id', $service->id)->pluck('package_id')->toArray();
+        $add_on_services = ServiceAddOn::where('service_id', $service->id)->pluck('add_on_id')->toArray();
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.edit', compact('service','service_categories','all_services','i','package_services','users','userNote','add_on_services'));
+        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services'));
     }
-    
+
     public function update(Request $request, $id)
     {
         request()->validate([
@@ -181,56 +181,56 @@ class ServiceController extends Controller
         $input = $request->all();
 
         $service = Service::find($id);
-        
+
         $service->update($input);
         if (isset($request->image)) {
-            if ($service->image && file_exists(public_path('service-images').'/'.$service->image)) {
-                unlink(public_path('service-images').'/'.$service->image);
+            if ($service->image && file_exists(public_path('service-images') . '/' . $service->image)) {
+                unlink(public_path('service-images') . '/' . $service->image);
             }
         }
 
-        ServicePackage::where('service_id',$id)->delete();
-        ServiceAddOn::where('service_id',$id)->delete();
-        
+        ServicePackage::where('service_id', $id)->delete();
+        ServiceAddOn::where('service_id', $id)->delete();
+
         $service_id = $id;
-        
-        if(isset($request->packageId)){
-            foreach($request->packageId as $packageId){
+
+        if (isset($request->packageId)) {
+            foreach ($request->packageId as $packageId) {
                 $input['service_id'] = $service_id;
                 $input['package_id'] = $packageId;
                 ServicePackage::create($input);
             }
         }
 
-        if(isset($request->addONsId)){
-            foreach($request->addONsId as $addONsId){
+        if (isset($request->addONsId)) {
+            foreach ($request->addONsId as $addONsId) {
                 $input['service_id'] = $service_id;
                 $input['add_on_id'] = $addONsId;
                 ServiceAddOn::create($input);
             }
         }
-        ServiceToUserNote::where('service_id',$id)->delete();
+        ServiceToUserNote::where('service_id', $id)->delete();
 
-        if(isset($request->note) && isset($request->userIds)){
-        
+        if (isset($request->note) && isset($request->userIds)) {
+
             $input['service_id'] =  $id;
             $input['user_ids'] = serialize($request->userIds);
-            
+
             ServiceToUserNote::create($input);
         }
-    
+
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
 
             $request->image->move(public_path('service-images'), $filename);
-        
+
             $service->image = $filename;
             $service->save();
         }
 
 
         return redirect()->route('services.index')
-                        ->with('success','Service Update successfully.');
+            ->with('success', 'Service Update successfully.');
     }
     /**
      * Remove the specified resource from storage.
@@ -241,27 +241,34 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         //delete image for service 
-        if(isset($service->image)){
-            if(file_exists(public_path('service-images').'/'.$service->image)) {
-                unlink(public_path('service-images').'/'.$service->image);
+        if (isset($service->image)) {
+            if (file_exists(public_path('service-images') . '/' . $service->image)) {
+                unlink(public_path('service-images') . '/' . $service->image);
             }
         }
         $service->delete();
 
-        ServiceToUserNote::where('service_id',$service->id)->delete();
+        ServiceToUserNote::where('service_id', $service->id)->delete();
 
         return redirect()->route('services.index')
-                        ->with('success','Service deleted successfully');
+            ->with('success', 'Service deleted successfully');
     }
 
     public function bulkDelete(Request $request)
     {
         $selectedItems = $request->input('selectedItems');
-        
+
         if (!empty($selectedItems)) {
             $services = Service::whereIn('id', $selectedItems)->get();
-            foreach($services as $service){
-                $this->destroy($service);
+            foreach ($services as $service) {
+
+                if (!empty($service->image)) {
+                    if (file_exists(public_path('service-images') . '/' . $service->image)) {
+                        unlink(public_path('service-images') . '/' . $service->image);
+                    }
+                }
+
+                $service->delete();
             }
 
             return response()->json(['message' => 'Selected items deleted successfully.']);
@@ -270,4 +277,23 @@ class ServiceController extends Controller
         }
     }
 
+    public function bulkCopy(Request $request)
+    {
+        $selectedItems = $request->input('selectedItems');
+
+        if (!empty($selectedItems)) {
+
+            foreach ($selectedItems as $serviceId) {
+                $service = Service::findOrFail($serviceId);
+                $copiedService = $service->replicate();
+                $copiedService->name .= ' (Copy)';
+                $copiedService->image = '';
+                $copiedService->save();
+            }
+
+            return response()->json(['message' => 'Selected items Copy successfully.']);
+        } else {
+            return response()->json(['message' => 'No items selected.']);
+        }
+    }
 }
