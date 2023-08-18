@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Session;
 use App\Http\Controllers\Controller;
 use App\Models\Affiliate;
+use App\Models\CustomerProfile;
 
 class CustomerAuthController extends Controller
 {
@@ -62,7 +63,7 @@ class CustomerAuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
 
-            if (!Auth::user()->hasRole('Customer'))
+            if (!Auth::user()->hasRole('Customer') && !Auth::user()->hasRole('Affiliate'))
                 return redirect('/admin');
             return redirect('/')
                 ->with('success', 'You have Successfully loggedin');
@@ -110,11 +111,15 @@ class CustomerAuthController extends Controller
 
         $input['number'] = config('app.country_code') . $request->number;
         $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
+        $input['user_id'] = $id;
 
         $user = User::find($id);
         $user->update($input);
-
-        $user->customerProfile->update($input);
+        if($user->customerProfile){
+            $user->customerProfile->update($input);
+        }else{
+            CustomerProfile::create($input);
+        }
 
         return redirect()->back()
             ->with('success', 'Your Profile updated successfully');

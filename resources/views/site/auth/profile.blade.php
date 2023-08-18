@@ -70,7 +70,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <br>
@@ -121,6 +120,20 @@
                             </div>
                         </div>
                     </div>
+                    @if(auth()->user()->hasRole('Affiliate'))
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Code:</strong>
+                                <input disabled type="text" name="code" id="code" class="form-control" placeholder="Code" value="{{$user->affiliate->code ?? null }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Commission:</strong>
+                                <input disabled type="text" name="commission" id="commission" class="form-control" placeholder="Commission" value="{{$user->affiliate->commission ?? null }}">
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 <div class="col-md-12 text-right no-print">
                     <button type="submit" class="btn btn-primary">Update</button>

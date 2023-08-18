@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Models\Affiliate;
+use App\Models\Coupon;
 use App\Models\CouponHistory;
 use App\Models\CustomerProfile;
 use App\Models\Order;
@@ -137,8 +138,11 @@ class SiteOrdersController extends Controller
         $input['discount_amount'] = $request->discount;
 
         OrderTotal::create($input);
-        
-        CouponHistory::create($input);
+        if($code['coupon_code']){
+            $coupon = Coupon::where('code',$code['coupon_code'])->first();
+            $input['coupon_id'] = $coupon->id;
+            CouponHistory::create($input);
+        }
         
         foreach ($serviceIds as $id) {
             $services = Service::find($id);

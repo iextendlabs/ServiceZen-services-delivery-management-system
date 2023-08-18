@@ -38,7 +38,7 @@ class HomeController extends Controller
         $currentUser = Auth::user();
 
         if (Auth::check()) {
-            if ($currentUser->hasRole('Customer')) {
+            if ($currentUser->hasRole('Customer') || $currentUser->hasRole('Affiliate')) {
                 return redirect('/')
                     ->with('success', 'You have Successfully loggedin');
             } else {
