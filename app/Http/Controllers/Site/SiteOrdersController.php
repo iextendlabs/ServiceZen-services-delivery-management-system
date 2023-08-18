@@ -281,8 +281,8 @@ class SiteOrdersController extends Controller
         $to = env('MAIL_FROM_ADDRESS');
         Mail::to($to)->send(new OrderAdminEmail($order, $recipient_email));
 
-        foreach ($emails as $emails) {
-            Mail::to($emails)->send(new OrderAdminEmail($order, $recipient_email));
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new OrderAdminEmail($order, $recipient_email));
         }
         
         return redirect()->back();
