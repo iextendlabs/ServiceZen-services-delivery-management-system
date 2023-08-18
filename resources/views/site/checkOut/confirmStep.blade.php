@@ -145,7 +145,6 @@
                     <input type="hidden" name="staff_charges" value="{{ $staff_charges }}">
                     <input type="hidden" name="transport_charges" value="{{ $transport_charges }}">
                     <input type="hidden" name="discount" value="{{ $coupon_discount }}">
-                    <input type="hidden" name="coupon_id" value="{{ $coupon_id }}">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">

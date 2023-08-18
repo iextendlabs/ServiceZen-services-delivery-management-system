@@ -232,6 +232,8 @@ class CheckOutController extends Controller
             }else{
                 $coupon_discount = $coupon->discount;
             }
+        }else{
+            $coupon_discount = 0;   
         }
 
         $staff_charges = $staff->staff->charges ?? 0;
@@ -251,7 +253,6 @@ class CheckOutController extends Controller
             'transport_charges',
             'total_amount',
             'coupon_discount',
-            'coupon_id'
         ));
     }
 
