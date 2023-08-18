@@ -159,13 +159,17 @@ $transport_charges = 0;
                                 <tr>
                                     <td>
                                         @if(in_array($service->id,$order_service))
-                                        <input type="checkbox" class="service-checkbox" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ $service->price }}">
+                                        <input type="checkbox" class="service-checkbox" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                 $service->discount : $service->price }}">
                                         @else
-                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ $service->price }}">
+                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                 $service->discount : $service->price }}">
                                         @endif
                                     </td>
                                     <td>{{ $service->name }}</td>
-                                    <td>@currency($service->price)</td>
+
+                                    <td>{{ isset($service->discount) ? 
+                                 $service->discount : $service->price }}</td>
                                     <td>{{ $service->duration }}</td>
                                 </tr>
                                 @endforeach
@@ -187,17 +191,20 @@ $transport_charges = 0;
                             <td>{{ config('app.currency') }} <span id="sub_total">{{ $order->order_total->sub_total }}</span></td>
                             <input type="hidden" name="sub_total" value="{{ $order->order_total->sub_total }}">
                         </tr>
-
+                        <tr>
+                            <td class="text-left"><strong>Coupon Discount:</strong></td>
+                            <td>{{ config('app.currency') }} <span id="coupon-discount">{{ $order->order_total->discount ? '-'.$order->order_total->discount : 0 }}</span></td>
+                            <input type="hidden" name="discount" value="{{ $order->order_total->discount ? $order->order_total->discount : 0 }}">
+                        </tr>
                         <tr>
                             <td class="text-left"><strong>Staff Charges:</strong></td>
-                            <td>{{ config('app.currency') }} <span id="staff_charges">{!! $order->staff->charges ? $order->staff->charges : 0 !!}</span></td>
-                            <input type="hidden" name="staff_charges" value="{!! $order->staff->charges ? $order->staff->charges : 0 !!}">
-
+                            <td>{{ config('app.currency') }} <span id="staff_charges">{{ $order->staff->charges ? $order->staff->charges : 0 }}</span></td>
+                            <input type="hidden" name="staff_charges" value="{{ $order->staff->charges ? $order->staff->charges : 0 }}">
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Transport Charges:</strong></td>
-                            <td>{{ config('app.currency') }} <span id="transport_charges">{!! $staffZone->transport_charges ? $staffZone->transport_charges : 0 !!}</span></td>
-                            <input type="hidden" name="transport_charges" value="{!! $staffZone->transport_charges ? $staffZone->transport_charges : 0 !!}">
+                            <td>{{ config('app.currency') }} <span id="transport_charges">{{ $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}</span></td>
+                            <input type="hidden" name="transport_charges" value="{{ $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}">
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Total:</strong></td>
@@ -257,13 +264,15 @@ $transport_charges = 0;
 
         let staff_charges = parseFloat($('input[name="service_staff_id"]:checked').data('staff-charges'));
 
+        let coupon_discount = parseFloat($('#coupon-discount').text());
+
         $('input[name="staff_charges"]').val(staff_charges);
         $('#staff_charges').text(staff_charges);
 
         let total_amount = 0;
 
         let sub_total = parseFloat($('#sub_total').text());
-        total_amount = sub_total + staff_charges + transport_charges;
+        total_amount = sub_total + staff_charges + transport_charges + coupon_discount;
 
         $('input[name="total_amount"]').val(total_amount.toFixed(2));
         $('#total_amount').text(total_amount.toFixed(2));

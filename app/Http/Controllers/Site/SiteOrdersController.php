@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Models\Affiliate;
+use App\Models\CouponHistory;
 use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\OrderService;
@@ -57,6 +58,7 @@ class SiteOrdersController extends Controller
         $staff_and_time = Session::get('staff_and_time');
         $address = Session::get('address');
         $serviceIds = Session::get('serviceIds');
+        $code = Session::get('code');
 
         if (!($staff_and_time && $address && $serviceIds)) {
             return redirect()->route('storeHome')->with('error', 'Order Already Placed! or empty cart! or booking slot Unavailable!');
@@ -64,7 +66,7 @@ class SiteOrdersController extends Controller
 
         $staff = User::find($staff_and_time['service_staff_id']);
 
-        $affiliate = Affiliate::where('code', $staff_and_time['affiliate_code'])->first();
+        $affiliate = Affiliate::where('code', $code['affiliate_code'])->first();
 
         if (isset($affiliate)) {
             $input['affiliate_id'] = $affiliate->user_id;
@@ -132,9 +134,12 @@ class SiteOrdersController extends Controller
         $order = Order::create($input);
 
         $input['order_id'] = $order->id;
+        $input['discount_amount'] = $request->discount;
 
-        $order_total = OrderTotal::create($input);
-
+        OrderTotal::create($input);
+        
+        CouponHistory::create($input);
+        
         foreach ($serviceIds as $id) {
             $services = Service::find($id);
             $input['service_id'] = $id;
@@ -147,6 +152,7 @@ class SiteOrdersController extends Controller
             }
             OrderService::create($input);
         }
+
         try {
             $this->sendAdminEmail($input['order_id'], $input['email']);
             $this->sendCustomerEmail($input['customer_id'], $customer_type);
@@ -158,7 +164,6 @@ class SiteOrdersController extends Controller
 
         return view('site.orders.success', compact('customer_type', 'password'));
     }
-
 
     public function show($id)
     {
@@ -180,7 +185,6 @@ class SiteOrdersController extends Controller
         
         return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area','services','order_service'));
     }
-
 
     public function update(Request $request, $id)
     {
@@ -232,8 +236,6 @@ class SiteOrdersController extends Controller
         return redirect()->route('order.index')
             ->with('success', 'Order updated successfully');
     }
-
-
 
     public function destroy($id)
     {

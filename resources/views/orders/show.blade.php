@@ -112,18 +112,18 @@
                 <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
                 <td class="text-right">@currency($order->order_total->sub_total)</td>
             </tr>
-            @if($order->order_total->transport_charges != 0)
+            <tr>
+                <td colspan="3" class="text-right"><strong>Coupon Discount:</strong></td>
+                <td class="text-right">{{ config('app.currency') }}{{ $order->order_total->discount ? '-'.$order->order_total->discount : 0 }}</td>
+            </tr>
             <tr>
                 <td colspan="3" class="text-right"><strong>Staff Transport Charges:</strong></td>
-                <td class="text-right">@currency($order->order_total->transport_charges)</td>
+                <td class="text-right">{{ config('app.currency') }}{{ $order->order_total->transport_charges ? $order->order_total->transport_charges : 0 }}</td>
             </tr>
-            @endif
-            @if($order->order_total->staff_charges != 0)
             <tr>
                 <td colspan="3" class="text-right"><strong>Staff Charges:</strong></td>
-                <td class="text-right">@currency($order->order_total->staff_charges)</td>
+                <td class="text-right">{{ config('app.currency') }}{{ $order->order_total->staff_charges ? $order->order_total->staff_charges : 0 }}</td>
             </tr>
-            @endif
             <tr>
                 <td colspan="3" class="text-right"><strong>Total:</strong></td>
                 <td class="text-right">@currency($order->total_amount)</td>

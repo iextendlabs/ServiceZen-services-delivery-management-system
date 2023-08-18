@@ -138,7 +138,7 @@ Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 
-
+//TODO :Customer Delete
 // app url
 
 // Staff app
