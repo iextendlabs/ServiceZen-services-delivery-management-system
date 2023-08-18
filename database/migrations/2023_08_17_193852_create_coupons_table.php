@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('code');
             $table->string('type');
-            $table->decimal('discount', 15, 4);
+            $table->decimal('discount', 8, 2);
             $table->date('date_start');
             $table->date('date_end');
             $table->tinyInteger('status')->default(0);

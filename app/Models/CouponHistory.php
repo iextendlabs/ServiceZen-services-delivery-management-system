@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderTotal extends Model
+class CouponHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'sub_total','staff_charges','transport_charges','discount'];
+    protected $fillable = ['coupon_id','order_id','customer_id','discount_amount'];
 
 }

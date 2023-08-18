@@ -38,12 +38,6 @@
         </span>
         @endif
     </div>
-    @php
-    $sub_total = 0;
-    $total_amount = 0;
-    $staff_charges = 0;
-    $transport_charges = 0;
-    @endphp
     <div class="container">
         @if ($errors->any())
         <div class="alert alert-danger">
@@ -69,9 +63,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($services as $service)
+                        @foreach($services as $key=>$service)
                         <tr>
-                            <td>{{ ++$i }}</td>
+                            <td>{{ ++$key }}</td>
                             <td><img src="service-images/{{ $service->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"></td>
                             <td>{{ $service->name }}</td>
                             <td>{{ $service->duration }}</td>
@@ -81,15 +75,6 @@
                             <td>@currency( $service->price )</td>
                             @endif
                         </tr>
-                        @if(isset($service->discount))
-                        @php
-                        $sub_total += $service->discount;
-                        @endphp
-                        @else
-                        @php
-                        $sub_total += $service->price;
-                        @endphp
-                        @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -116,7 +101,6 @@
                     </div>
                     <div class="detail-item-value">
                         <div> <strong>Time Slot:</strong> {{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</div>
-                        <!-- <img src="staff-images/{{ $staff->staff->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"> -->
                         <div> <strong>Staff:</strong> {{ $staff->name }}</div>
                         <div> <strong>Date:</strong> {{ $staff_and_time['date'] }}</div>
                     </div>
@@ -132,30 +116,19 @@
                     <tr>
                         <td class="text-left"><strong> Service Total:</strong></td>
                         <td>@currency($sub_total)</td>
-                        @php
-                        $total_amount = $sub_total +$total_amount;
-                        @endphp
                     </tr>
-                    @if($staff->staff->charges)
+                    <tr>
+                        <td class="text-left"><strong> Coupon Discount:</strong></td>
+                        <td>@currency( '-'.$coupon_discount)</td>
+                    </tr>
                     <tr>
                         <td class="text-left"><strong>Staff Charges:</strong></td>
-                        <td>@currency($staff->staff->charges)</td>
-                        @php
-                        $staff_charges = $staff->staff->charges;
-                        $total_amount = $staff_charges +$total_amount;
-                        @endphp
+                        <td>@currency($staff_charges)</td>
                     </tr>
-                    @endif
-                    @if($staffZone->transport_charges)
                     <tr>
                         <td class="text-left"><strong>Transport Charges:</strong></td>
-                        <td>@currency($staffZone->transport_charges)</td>
-                        @php
-                        $transport_charges = $staffZone->transport_charges;
-                        $total_amount = $transport_charges +$total_amount;
-                        @endphp
+                        <td>@currency($transport_charges)</td>
                     </tr>
-                    @endif
                     <tr>
                         <td class="text-left"><strong>Total:</strong></td>
                         <td>@currency($total_amount)</td>
@@ -171,6 +144,8 @@
                     <input type="hidden" name="sub_total" value="{{ $sub_total }}">
                     <input type="hidden" name="staff_charges" value="{{ $staff_charges }}">
                     <input type="hidden" name="transport_charges" value="{{ $transport_charges }}">
+                    <input type="hidden" name="discount" value="{{ $coupon_discount }}">
+                    <input type="hidden" name="coupon_id" value="{{ $coupon_id }}">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">

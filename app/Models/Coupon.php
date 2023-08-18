@@ -12,4 +12,7 @@ class Coupon extends Model
 
     protected $fillable = ['name','code','type','discount','date_start','date_end','status'];
     
+    public function couponHistory(){
+        return $this->hasMany(CouponHistory::class);
+    }
 }

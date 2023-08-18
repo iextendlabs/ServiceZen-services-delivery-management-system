@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\CustomerProfile;
 use App\Models\Holiday;
 use App\Models\Order;
@@ -14,6 +15,7 @@ use App\Models\StaffHoliday;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
@@ -36,7 +38,7 @@ class CheckOutController extends Controller
             foreach ($service_ids as $id) {
                 $service =  Service::find($id);
                 if ($service) {
-                    $booked_services[]=$service;
+                    $booked_services[] = $service;
                 }
             }
         }
@@ -93,7 +95,13 @@ class CheckOutController extends Controller
             'service_staff_id' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);
+        if ($request->coupon_code) {
+            $coupon = $this->applyCoupon($request->coupon_code);
 
+            if (!$coupon) {
+                return redirect()->back()->with('error', 'Invalid coupon code.');
+            }
+        }
         $address = [];
 
         $address['buildingName'] = $request->buildingName;
@@ -110,14 +118,17 @@ class CheckOutController extends Controller
         $address['longitude'] = $request->longitude;
         $address['searchField'] = $request->searchField;
         $address['update_profile'] = $request->update_profile;
-        
+
         $staff_and_time = [];
-        
+
         $staff_and_time['date'] = $request->date;
         [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
         $staff_and_time['time_slot'] = $time_slot;
         $staff_and_time['service_staff_id'] = $staff_id;
-        $staff_and_time['affiliate_code'] = $request->affiliate_code;
+
+
+        $code['affiliate_code'] = $request->affiliate_code;
+        $code['coupon_code'] = $request->coupon_code;
 
         if (session()->has('address')) {
             Session::forget('address');
@@ -133,114 +144,160 @@ class CheckOutController extends Controller
             Session::put('staff_and_time', $staff_and_time);
         }
 
+        if (session()->has('code')) {
+            Session::forget('code');
+            Session::put('code', $code);
+        } else {
+            Session::put('code', $code);
+        }
+
         return redirect('confirmStep');
     }
 
     public function bookingStep(Request $request)
     {
-            if (Session::get('address')) {
-                $addresses = Session::get('address');
-            } else {
-                $addresses = [
-                    'buildingName' => '',
-                    'area' => '',
-                    'flatVilla' => '',
-                    'street' => '',
-                    'landmark' => '',
-                    'city' => '',
-                    'number' => '',
-                    'whatsapp' => '',
-                    'email' => '',
-                    'name' => '',
-                    'latitude' => '',
-                    'longitude' => '',
-                    'searchField' => '',
-                ];
-            }
+        if (Session::get('address')) {
+            $addresses = Session::get('address');
+        } else {
+            $addresses = [
+                'buildingName' => '',
+                'area' => '',
+                'flatVilla' => '',
+                'street' => '',
+                'landmark' => '',
+                'city' => '',
+                'number' => '',
+                'whatsapp' => '',
+                'email' => '',
+                'name' => '',
+                'latitude' => '',
+                'longitude' => '',
+                'searchField' => '',
+            ];
+        }
 
-            if (session()->has('staff_and_time')) {
-                $staff_and_time = Session::get('staff_and_time');
-                $affiliate_code = $staff_and_time['affiliate_code'];
-            } else {
-                $affiliate_code = '';
-            }
-            
-            if (Auth::check()) {
-                $email = Auth::user()->email;
-                $name = Auth::user()->name;
-            } else {
-                $email = $addresses['email'];
-                $name = $addresses['name'];
-            }
-            $date = date('Y-m-d');
-            $area = $addresses['area'];
-            $city = $addresses['city'];
-            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-            return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone','allZones','email', 'name', 'addresses','affiliate_code')); 
+        if (session()->has('code')) {
+            $code = Session::get('code');
+            $affiliate_code = $code['affiliate_code'];
+            $coupon_code = $code['coupon_code'];
+        } else {
+            $affiliate_code = '';
+            $coupon_code = '';
+        }
+
+        if (Auth::check()) {
+            $email = Auth::user()->email;
+            $name = Auth::user()->name;
+        } else {
+            $email = $addresses['email'];
+            $name = $addresses['name'];
+        }
+        $date = date('Y-m-d');
+        $area = $addresses['area'];
+        $city = $addresses['city'];
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code'));
     }
+
 
     public function confirmStep(Request $request)
     {
-        if (Session::get('staff_and_time') && Session::get('address') && Session::get('serviceIds')) {
-            $staff_and_time = Session::get('staff_and_time');
-            $address = Session::get('address');
-            $serviceIds = Session::get('serviceIds');
-            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($address['area']) . "%"])->first();
-            
-            foreach ($serviceIds as $id) {
-                $services[] = Service::find($id);
-            }
+        $requiredSessionKeys = ['staff_and_time', 'address', 'serviceIds'];
+        $missingKeys = array_diff($requiredSessionKeys, array_keys(Session::all()));
 
-            $time_slot = TimeSlot::find($staff_and_time['time_slot']);
-
-            $staff = User::find($staff_and_time['service_staff_id']);
-
-            $i = 0;
-
-            return view('site.checkOut.confirmStep', compact('services', 'time_slot', 'address', 'staff', 'i', 'staff_and_time','staffZone'));
-        } elseif (Session::get('serviceIds') && Session::get('address')) {
-
-            return redirect('/')->with('error', 'There is no Time Slots Data Saved.');
-        } elseif (Session::get('serviceIds')) {
-
-            return redirect('/')->with('error', 'There is no Address Saved.');
-        } else {
-
-            return redirect('/')->with('error', 'There is no Services in Your Cart.');
+        if (!empty($missingKeys)) {
+            $errorMessage = "There is no " . implode(", ", $missingKeys);
+            return redirect('/')->with('error', $errorMessage);
         }
+
+        $staff_and_time = Session::get('staff_and_time');
+        $address = Session::get('address');
+        $serviceIds = Session::get('serviceIds');
+        $code = Session::get('code');
+        $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($address['area']) . "%"])->first();
+
+        $services = Service::whereIn('id', $serviceIds)->get();
+        $time_slot = TimeSlot::find($staff_and_time['time_slot']);
+        $staff = User::find($staff_and_time['service_staff_id']);
+
+        $sub_total = $services->sum(function ($service) {
+            return isset($service->discount) ? $service->discount : $service->price;
+        });
+
+        if($code['coupon_code']){
+            $coupon = Coupon::where('code',$code['coupon_code'])->first();
+            $coupon_id = $coupon->id;
+            if($coupon->type == "Percentage"){
+                $coupon_discount = ($sub_total * $coupon->discount)/100;
+            }else{
+                $coupon_discount = $coupon->discount;
+            }
+        }
+
+        $staff_charges = $staff->staff->charges ?? 0;
+        $transport_charges = $staffZone->transport_charges ?? 0;
+        $total_amount = $sub_total + $staff_charges + $transport_charges - $coupon_discount;
+
+        return view('site.checkOut.confirmStep', compact(
+            'services',
+            'time_slot',
+            'address',
+            'staff',
+            'staff_and_time',
+            'staffZone',
+            'code',
+            'sub_total',
+            'staff_charges',
+            'transport_charges',
+            'total_amount',
+            'coupon_discount',
+            'coupon_id'
+        ));
     }
+
 
     public function slots(Request $request)
     {
-        if ($request->has('order_id') && (int)$request->order_id){
+        if ($request->has('order_id') && (int)$request->order_id) {
             $order = Order::find($request->order_id);
             $area = $order->area;
             $date = $order->date;
-        }else{
-            
+        } else {
         }
-        if($request->has('area')){
+        if ($request->has('area')) {
             $area = $request->area;
         }
-        if($request->has('date')){
+        if ($request->has('date')) {
             $date = $request->date;
         }
 
 
-        if(!isset($area)){  
-           
+        if (!isset($area)) {
+
             $address = Session::get('address');
             $area = $address['area'];
         }
-        
-        if ($request->has('order_id') && (int)$request->order_id){
+
+        if ($request->has('order_id') && (int)$request->order_id) {
             [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $request->order_id);
 
-            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones','order','date','area'));
-        }else{
+            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'order', 'date', 'area'));
+        } else {
             [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-            
-            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones','area','date'));
+
+            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
         }
+    }
+
+    public function applyCoupon($coupon_code)
+    {
+
+        $coupon = Coupon::where('code', $coupon_code)
+            ->where('status', 1) // Assuming 1 means active coupon
+            ->where('date_start', '<=', Carbon::now())
+            ->where('date_end', '>=', Carbon::now())
+            ->first();
+
+        return $coupon;
     }
 }
