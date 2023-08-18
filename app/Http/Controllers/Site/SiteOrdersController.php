@@ -275,7 +275,8 @@ class SiteOrdersController extends Controller
     public function sendAdminEmail($order_id, $recipient_email)
     {
         $emails = [
-            'miangdpp@gmail.com'
+            'Portugalschool@gmail.com',
+            'Aleezajbr@gmail.com'
         ];
         $order = Order::find($order_id);
         $to = env('MAIL_FROM_ADDRESS');
