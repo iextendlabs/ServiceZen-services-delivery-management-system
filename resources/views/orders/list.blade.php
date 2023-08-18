@@ -20,7 +20,7 @@
         <th>Comment</th>
         @endif
         <th>Status</th>
-        
+
         <th>Date Added</th>
         <th style="min-width:120px">Action</th>
     </tr>
@@ -48,20 +48,28 @@
         <td>{{ substr($order->order_comment, 0, 50) }}...</td>
         @endif
         <td style="min-width:150px">{{ $order->status }}
+            @can('cash-collection-edit')
             @if(($order->cashCollection)) <br><br>
             <a href="{{ route('cashCollection.index') }}?order_id={{$order->id}}">
                 <i class="fas fa-money-bill"></i> {{ $order->cashCollection->status }}
             </a>
             @endif
-            @if(empty($order->cashCollection->image) && auth()->user()->hasRole('Staff') && $order->status == 'Complete' && isset($order->cashCollection)) <br><br>
-            <a href="{{ route('cashCollection.uploadImage', $order->id) }}">
-                Upload Invoice
+            @endcan
+            @if(auth()->user()->hasRole('Staff') && $order->status == 'Complete') <br><br>
+            @if(!$order->cashCollection)
+            <a href="{{ route('cashCollection.create',$order->id) }}">
+                <i class="fas fa-money-bill"></i> Create
             </a>
+
             @endif
+            @endif
+
+
+
         </td>
         <td>{{ $order->created_at }}</td>
         <td>
-            
+
             @can('order-edit')
             <!-- <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
                             <i class="fas fa-edit"></i>

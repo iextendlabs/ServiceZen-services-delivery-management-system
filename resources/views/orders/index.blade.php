@@ -19,37 +19,43 @@
                 </a>
 
                 <!-- Canceled Order -->
-                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">
+                <a class="btn btn-danger float-end" href="{{route('orders.index')}}?status=Canceled" style="margin-right: 10px;">
                     <i class="fas fa-times"></i> Canceled
                 </a>
 
                 @endif
 
                 <!-- Complete Order -->
-                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">
+                <a class="btn btn-success float-end" href="{{route('orders.index')}}?status=Complete" style="margin-right: 10px;">
                     <i class="fas fa-check"></i> Complete
                 </a>
 
                 <!-- Inprogress Order -->
-                <a class="btn btn-info float-end" href="/orders?status=Inprogress" style="margin-right: 10px;">
+                <a class="btn btn-info float-end" href="{{route('orders.index')}}?status=Inprogress" style="margin-right: 10px;">
                     <i class="fas fa-hourglass-split"></i> Inprogress
                 </a>
 
                 <!-- Rejected Order -->
-                <a class="btn btn-warning float-end" href="/orders?status=Rejected" style="margin-right: 10px;">
+                <a class="btn btn-warning float-end" href="{{route('orders.index')}}?status=Rejected" style="margin-right: 10px;">
                     <i class="fas fa-times"></i> Rejected
                 </a>
 
                 <!-- Accepted Order -->
-                <a class="btn btn-success float-end" href="/orders?status=Accepted" style="margin-right: 10px;">
+                <a class="btn btn-success float-end" href="{{route('orders.index')}}?status=Accepted" style="margin-right: 10px;">
                     <i class="fas fa-check"></i> Accepted
                 </a>
 
                 <!-- Pending Order -->
-                <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">
+                <a class="btn btn-primary float-end" href="{{route('orders.index')}}?status=Pending" style="margin-right: 10px;">
                     <i class="fas fa-clock"></i> Pending
                 </a>
+                @if(auth()->user()->getRoleNames() == '["Staff"]')
 
+                <a class="btn btn-success float-end" href="{{ route('staffCashCollection') }}" style="margin-right: 10px;">
+                    <i class="fas fa-money-bill"></i> Cash Collection
+                </a>
+
+                @endif
             </div>
         </div>
     </div>

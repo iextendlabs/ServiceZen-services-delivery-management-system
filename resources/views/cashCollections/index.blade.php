@@ -42,9 +42,6 @@
                 <th>Description</th>
                 <th>Order Comment</th>
                 <th>Status</th>
-                @if (auth()->user()->hasRole('Admin'))
-                <th>Cash Collection Invoice</th>
-                @endif
                 <th>Action</th>
             </tr>
             @if(count($cash_collections))
@@ -57,17 +54,8 @@
                 <td>{{ $cash_collection->order->customer->name }}</td>
                 <td>@currency( $cash_collection->order->total_amount )</td>
                 <td>{{ $cash_collection->description }}</td>
-
                 <td> {{substr($cash_collection->order->order_comment, 0, 50)}}...</td>
-
                 <td>{{ $cash_collection->status }}</td>
-                @if (auth()->user()->hasRole('Admin'))
-                <td>
-                    @if(isset($cash_collection->image)) <br><br>
-                    <a href="/cash-collections-images/{{$cash_collection->image}}" target="_blank">click .. </a>
-                    @endif
-                </td>
-                @endif
                 <td>
                     <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
                         @can('cash-collection-edit')
@@ -79,12 +67,15 @@
                         <a class="btn btn-sm btn-danger" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Not Approved">
                             <i class="fas fa-thumbs-down"></i>
                         </a>
+                        @if(isset($cash_collection->image)) <br><br>
+                        <a class="btn btn-sm btn-warning" href="/cash-collections-images/{{$cash_collection->image}}" target="_blank"><i class="fa fa-eye"></i> </a>
+                        @endif
 
                         @endcan
                         @csrf
                         @method('DELETE')
                         @can('cash-collection-delete')
-                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                         @endcan
                     </form>
                 </td>

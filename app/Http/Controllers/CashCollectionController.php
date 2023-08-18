@@ -129,11 +129,20 @@ class CashCollectionController extends Controller
         $this->validate($request, [
             'description' => 'required',
             'staff_id' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'order_id' => 'required',
         ]);
 
         $input = $request->all();
         $input['status'] = "Not Approved";
+
+        if (isset($request->image)) {
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            $request->image->move(public_path('cash-collections-images'), $filename);
+        
+            $input['image'] = $filename;
+        }
 
         CashCollection::create($input);
         
@@ -185,34 +194,6 @@ class CashCollectionController extends Controller
                         ->with('success','Cash Collection updated successfully');
     }
 
-    public function updateImage(Request $request, $id){
-
-        request()->validate([
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-        
-        $cash_collections = CashCollection::find($id);
-        $input = $request->all();
-
-        if (isset($request->image)) {
-            if ($cash_collections->image && file_exists(public_path('cash-collections-images').'/'.$cash_collections->image)) {
-                unlink(public_path('cash-collections-images').'/'.$cash_collections->image);
-            }
-        
-            $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
-            $request->image->move(public_path('cash-collections-images'), $filename);
-        
-            $input['image'] = $filename;
-        }
-        
-        $cash_collections->update($input);
-
-        return redirect()->route('orders.index')
-                        ->with('success','Cash Collection image uploaded successfully');
-    }
-    
-    
     /**
      * Remove the specified resource from storage.
      *
@@ -235,10 +216,4 @@ class CashCollectionController extends Controller
                         ->with('success','Cash Collection deleted successfully');
     }
 
-    public function uploadImageForm($order_id){
-        
-        $cash_collection = CashCollection::where('order_id',$order_id)->first();
-        return view('cashCollections.uploadImage',compact('cash_collection'));
-    
-    }
 }
