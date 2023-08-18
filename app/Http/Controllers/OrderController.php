@@ -115,6 +115,7 @@ class OrderController extends Controller
         }
         //TODO : show totals and current records info on all lists
         if ($request->csv == 1) {
+            // Set the CSV response headers
             $headers = array(
                 "Content-type" => "text/csv",
                 "Content-Disposition" => "attachment; filename=Orders.csv",
@@ -122,33 +123,37 @@ class OrderController extends Controller
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             );
-
-            $output = fopen("php://output", "w");
-            if ($currentUser->hasRole('Supervisor')) {
-                fputcsv($output, array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services'));
-            } else {
-                fputcsv($output, array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services'));
-            }
-
-
-            foreach ($orders as $key => $row) {
-                $services = array();
-                foreach ($row->orderServices as $service) {
-                    $services[] = $service->service_name;
+    
+            // Create a callback function to generate CSV content
+            $callback = function () use ($orders, $currentUser) {
+                $output = fopen('php://output', 'w');
+                $header = $currentUser->hasRole('Supervisor')
+                    ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services')
+                    : array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services');
+    
+                // Write the header row
+                fputcsv($output, $header);
+    
+                foreach ($orders as $key => $row) {
+                    // Generate CSV data rows 
+                    $services = array();
+                    foreach ($row->orderServices as $service) {
+                        $services[] = $service->service_name;
+                    }
+    
+                    $csvRow = $currentUser->hasRole('Supervisor')
+                        ? array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services))
+                        : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services));
+    
+                    // Write the CSV data row
+                    fputcsv($output, $csvRow);
                 }
-
-                if ($currentUser->hasRole('Supervisor')) {
-                    fputcsv($output, array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services)));
-                } else {
-                    fputcsv($output, array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services)));
-                }
-            }
-
-            // Close output stream
-            fclose($output);
-
-            // Return CSV file as download
-            return Response::make('', 200, $headers);
+    
+                fclose($output);
+            };
+    
+            // Create a StreamedResponse to send the CSV content
+            return response()->stream($callback, 200, $headers);
         } else if ($request->print == 1) {
             return view('orders.print', compact('orders'));
         } else {
