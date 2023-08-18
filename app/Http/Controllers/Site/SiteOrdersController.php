@@ -95,13 +95,13 @@ class SiteOrdersController extends Controller
         $input['email'] = $address['email'];
 
         $user = User::where('email', $address['email'])->first();
-       
+
         if (isset($user)) {
-            if(isset($user->customerProfile)){
-                if($address['update_profile'] == "on"){
-                    $user->customerProfile->update($input); 
+            if (isset($user->customerProfile)) {
+                if ($address['update_profile'] == "on") {
+                    $user->customerProfile->update($input);
                 }
-            }else{
+            } else {
                 $user->customerProfile()->create($input);
             }
             $input['customer_id'] = $user->id;
@@ -125,7 +125,7 @@ class SiteOrdersController extends Controller
 
             $user->assignRole('Customer');
         }
-        
+
         $time_slot = TimeSlot::find($staff_and_time['time_slot']);
         $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
@@ -138,12 +138,12 @@ class SiteOrdersController extends Controller
         $input['discount_amount'] = $request->discount;
 
         OrderTotal::create($input);
-        if($code['coupon_code']){
-            $coupon = Coupon::where('code',$code['coupon_code'])->first();
+        if ($code['coupon_code']) {
+            $coupon = Coupon::where('code', $code['coupon_code'])->first();
             $input['coupon_id'] = $coupon->id;
             CouponHistory::create($input);
         }
-        
+
         foreach ($serviceIds as $id) {
             $services = Service::find($id);
             $input['service_id'] = $id;
@@ -185,9 +185,9 @@ class SiteOrdersController extends Controller
 
         $statuses = config('app.statuses');
         $services = Service::all();
-        $order_service = OrderService::where('order_id',$id)->pluck('service_id')->toArray();
-        
-        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area','services','order_service'));
+        $order_service = OrderService::where('order_id', $id)->pluck('service_id')->toArray();
+
+        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area', 'services', 'order_service'));
     }
 
     public function update(Request $request, $id)
@@ -212,11 +212,11 @@ class SiteOrdersController extends Controller
         $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
 
         $order->update($input);
-        
+
         $input['order_id'] = $id;
-        
-        OrderService::where('order_id',$id)->delete();
-        OrderTotal::where('order_id',$id)->delete();
+
+        OrderService::where('order_id', $id)->delete();
+        OrderTotal::where('order_id', $id)->delete();
 
 
         OrderTotal::create($input);
@@ -274,10 +274,18 @@ class SiteOrdersController extends Controller
 
     public function sendAdminEmail($order_id, $recipient_email)
     {
+        $emails = [
+            'Portugalschool@gmail.com',
+            'Aleezajbr@gmail.com'
+        ];
         $order = Order::find($order_id);
         $to = env('MAIL_FROM_ADDRESS');
         Mail::to($to)->send(new OrderAdminEmail($order, $recipient_email));
 
+        foreach ($emails as $emails) {
+            Mail::to($emails)->send(new OrderAdminEmail($order, $recipient_email));
+        }
+        
         return redirect()->back();
     }
 
