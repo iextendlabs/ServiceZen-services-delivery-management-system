@@ -8,7 +8,7 @@
         <div class="float-end">
 
             <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
-            
+
             <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end no-print" style="margin-right: 10px;"><i class="fa fa-download"></i> Excel</a>
 
             <a class="btn btn-danger float-end" href="{{ route('cashCollection.index') }}?status=Not Approved"" style=" margin-right: 10px;">
@@ -42,6 +42,9 @@
                 <th>Description</th>
                 <th>Order Comment</th>
                 <th>Status</th>
+                @if (auth()->user()->hasRole('Admin'))
+                <th>Cash Collection Invoice</th>
+                @endif
                 <th>Action</th>
             </tr>
             @if(count($cash_collections))
@@ -54,10 +57,17 @@
                 <td>{{ $cash_collection->order->customer->name }}</td>
                 <td>@currency( $cash_collection->order->total_amount )</td>
                 <td>{{ $cash_collection->description }}</td>
-                
+
                 <td> {{substr($cash_collection->order->order_comment, 0, 50)}}...</td>
 
                 <td>{{ $cash_collection->status }}</td>
+                @if (auth()->user()->hasRole('Admin'))
+                <td>
+                    @if(isset($cash_collection->image)) <br><br>
+                    <a href="/cash-collections-images/{{$cash_collection->image}}" target="_blank">click .. </a>
+                    @endif
+                </td>
+                @endif
                 <td>
                     <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
                         @can('cash-collection-edit')

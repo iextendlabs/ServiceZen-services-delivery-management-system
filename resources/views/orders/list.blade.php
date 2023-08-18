@@ -20,7 +20,7 @@
         <th>Comment</th>
         @endif
         <th>Status</th>
-        @if (auth()->user()->hasRole('Admin'))<th>Cash Collection Invoice</th>@endif
+        
         <th>Date Added</th>
         <th style="min-width:120px">Action</th>
     </tr>
@@ -59,15 +59,6 @@
             </a>
             @endif
         </td>
-        @if (auth()->user()->hasRole('Admin'))
-        <td>
-            @if(isset($order->cashCollection->image)) <br><br>
-            <a href="/cash-collections-images/{{$order->cashCollection->image}}" target="_blank">
-                click ..
-            </a>
-            @endif
-        </td>
-        @endif
         <td>{{ $order->created_at }}</td>
         <td>
             
