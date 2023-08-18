@@ -12,6 +12,9 @@
     <!-- Fonts -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
+        @page  {
+            margin: 0;
+        }
         .table td,
         .table th {
             vertical-align: middle;
@@ -21,7 +24,7 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
@@ -34,7 +37,8 @@
             <div class="col-md-12">
                 <table class="table table-striped table-bordered">
                     <tr>
-                        <th>Order #</th>
+                        <th>SR#</th>
+                        <th>Order#</th>
                         <th>Staff</th>
                         <th>Collected Amount</th>
                         <th>Customer</th>
@@ -44,8 +48,9 @@
                         <th>Status</th>
                     </tr>
                     @if(count($cash_collections))
-                    @foreach ($cash_collections as $cash_collection)
+                    @foreach ($cash_collections as $key => $cash_collection)
                     <tr>
+                        <td>{{ ++$key }}</td>
                         <td>{{ $cash_collection->order_id }}</td>
                         <td>{{ $cash_collection->staff_name }}</td>
                         <td>@currency($cash_collection->amount)</td>

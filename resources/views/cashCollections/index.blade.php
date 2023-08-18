@@ -33,7 +33,8 @@
     <div class="col-md-12">
         <table class="table table-striped table-bordered">
             <tr>
-                <th>Order #</th>
+                <th>SR#</th>
+                <th>Order#</th>
                 <th>Staff</th>
                 <th>Collected Amount</th>
                 <th>Customer</th>
@@ -41,11 +42,12 @@
                 <th>Description</th>
                 <th>Order Comment</th>
                 <th>Status</th>
-                <th width="280px">Action</th>
+                <th>Action</th>
             </tr>
             @if(count($cash_collections))
             @foreach ($cash_collections as $cash_collection)
             <tr>
+                <td>{{ ++$i }}</td>
                 <td>{{ $cash_collection->order_id }}</td>
                 <td>{{ $cash_collection->staff_name }}</td>
                 <td>@currency($cash_collection->amount)</td>

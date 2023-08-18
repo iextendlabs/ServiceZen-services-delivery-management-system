@@ -42,9 +42,14 @@ class CashCollectionController extends Controller
             $query->where('order_id', $request->order_id);
         }
 
-        $cash_collections = $query->paginate(config('app.paginate'));
+        if ($request->csv == 1 || $request->print == 1) {
+            $cash_collections = $query->get();
+        } else {
+            $cash_collections = $query->paginate(config('app.paginate'));
+        }
         
         if ($request->csv == 1) {
+            // Set the CSV response headers
             $headers = array(
                 "Content-type" => "text/csv",
                 "Content-Disposition" => "attachment; filename=CashCollection.csv",
@@ -52,28 +57,33 @@ class CashCollectionController extends Controller
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             );
+    
+            // Create a callback function to generate CSV content
+            $callback = function () use ($cash_collections) {
+                $output = fopen("php://output", "w");
+                $header =  array('SR#', 'Order ID', 'Staff', 'Collected Amount', 'Customer', 'Order Total', 'Description', 'Comment', 'Status', 'Date Added');
 
-            $output = fopen("php://output", "w");
-
-            fputcsv($output, array('Order ID', 'Staff', 'Collected Amount', 'Customer', 'Order Total	', 'Description', 'Comment', 'Status', 'Date Added'));
-
-            foreach ($cash_collections as $row) {
-
-                    fputcsv($output, array($row->id, $row->staff_name, $row->amount, $row->order->customer->name, $row->order->total_amount, $row->description, $row->order->comment, $row->status, $row->created_at));
-            }
-
-            // Close output stream
-            fclose($output);
-
-            // Return CSV file as download
-            return Response::make('', 200, $headers);
+                // Write the header row
+                fputcsv($output, $header);
+    
+                foreach ($cash_collections as $key => $row) {
+                    $csvRow = array(++$key, $row->id, $row->staff_name, $row->amount, $row->order->customer->name, $row->order->total_amount, $row->description, $row->order->comment, $row->status, $row->created_at);
+    
+                    // Write the CSV data row
+                    fputcsv($output, $csvRow);
+                }
+    
+                fclose($output);
+            };
+    
+            // Create a StreamedResponse to send the CSV content
+            return response()->stream($callback, 200, $headers);
         } else if ($request->print == 1) {
             return view('cashCollections.print', compact('cash_collections'));
         } else {
             $filters = $request->only(['status','order_id']);
             $cash_collections->appends($filters);
-            return view('cashCollections.index',compact('cash_collections','filter_status'))
-            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('cashCollections.index',compact('cash_collections','filter_status'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
 
