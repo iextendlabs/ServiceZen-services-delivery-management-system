@@ -125,22 +125,22 @@ class OrderController extends Controller
 
             $output = fopen("php://output", "w");
             if ($currentUser->hasRole('Supervisor')) {
-                fputcsv($output, array('Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services'));
+                fputcsv($output, array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services'));
             } else {
-                fputcsv($output, array('Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services'));
+                fputcsv($output, array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services'));
             }
 
 
-            foreach ($orders as $row) {
+            foreach ($orders as $key => $row) {
                 $services = array();
                 foreach ($row->orderServices as $service) {
                     $services[] = $service->service_name;
                 }
 
                 if ($currentUser->hasRole('Supervisor')) {
-                    fputcsv($output, array($row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services)));
+                    fputcsv($output, array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services)));
                 } else {
-                    fputcsv($output, array($row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services)));
+                    fputcsv($output, array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services)));
                 }
             }
 

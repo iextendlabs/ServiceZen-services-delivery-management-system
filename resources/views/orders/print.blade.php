@@ -12,6 +12,9 @@
     <!-- Fonts -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
+        @page  {
+            margin: 0;
+        }
         .table td,
         .table th {
             vertical-align: middle;
@@ -21,9 +24,9 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 margin-tb">
+            <div class="col-md-12">
                 <div class="float-start">
                     <h2>Orders</h2>
                 </div>
@@ -34,7 +37,8 @@
             <div class="col-md-12">
                 <table class="table table-striped table-bordered">
                     <tr>
-                        <th>Order #</th>
+                        <th>Sr#</th>
+                        <th>Order#</th>
                         <th>Staff</th>
                         <th><i class="fas fa-clock"></i> Appointment Date</th>
                         <th><i class="fas fa-clock"></i> Slots</th>
@@ -54,8 +58,9 @@
                         <th>Status</th>
                     </tr>
                     @if(count($orders))
-                    @foreach ($orders as $order)
+                    @foreach ($orders as $key => $order)
                     <tr>
+                        <td>{{ ++$key }}</td>
                         <td>#{{ $order->id }}</td>
                         <td>{{ $order->staff_name }}</td>
                         <td>{{ $order->date }}</td>

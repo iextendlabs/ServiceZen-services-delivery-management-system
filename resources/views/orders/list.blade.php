@@ -3,7 +3,7 @@
 <table class="table-striped table-bordered table-responsive table">
     <tr>
         <th>Sr#</th>
-        <th>Order #</th>
+        <th>Order#</th>
         <th>Staff</th>
         <th><i class="fas fa-clock"></i> Appointment Date</th>
         <th><i class="fas fa-clock"></i> Slots</th>
