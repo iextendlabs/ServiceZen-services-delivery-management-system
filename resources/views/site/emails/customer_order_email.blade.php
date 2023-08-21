@@ -4,8 +4,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-</head>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,6 +25,7 @@
             background-color: #f2f2f2;
         }
     </style>
+</head>  
 <body>
 
     <h4>Your Order Has Been Successfully Placed.</h4>
