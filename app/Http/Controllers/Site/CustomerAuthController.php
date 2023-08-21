@@ -11,12 +11,20 @@ use Session;
 use App\Http\Controllers\Controller;
 use App\Models\Affiliate;
 use App\Models\CustomerProfile;
+use GuzzleHttp\Psr7\Response;
 
 class CustomerAuthController extends Controller
 {
-    public function registration()
+    public function registration(Request $request)
     {
-        return view('site.auth.signUp');
+        if($request->cookie('affiliate_id')){
+            $affiliate = Affiliate::where('user_id',$request->cookie('affiliate_id'))->first();
+            $affiliate_code = $affiliate->code;
+
+        }else{
+            $affiliate_code = '';
+        }
+        return view('site.auth.signUp',compact('affiliate_code'));
     }
 
     public function postRegistration(Request $request)
@@ -123,5 +131,10 @@ class CustomerAuthController extends Controller
 
         return redirect()->back()
             ->with('success', 'Your Profile updated successfully');
+    }
+
+    public function affiliateUrl(Request $request){
+
+        return redirect('/')->withCookie('affiliate_id', $request->affiliate_id, 0) ;
     }
 }

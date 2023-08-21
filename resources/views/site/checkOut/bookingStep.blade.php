@@ -170,7 +170,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <strong>Affiliate Code:</strong>
-                            <input type="text" name="affiliate_code" id="affiliate_code" class="form-control" placeholder="Affiliate Code" value="{{  old('affiliate_code') ? old('affiliate_code') : $affiliate_code }}">
+                            <input type="text" name="affiliate_code" id="affiliate_code" class="form-control" placeholder="Affiliate Code" {{ $url_affiliate_code ? 'readonly': null}} value="{{ $url_affiliate_code ?? old('affiliate_code') ?? $affiliate_code }}">
                         </div>
                     </div>
                     <div class="col-md-6">

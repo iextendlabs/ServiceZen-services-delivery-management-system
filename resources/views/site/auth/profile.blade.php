@@ -133,6 +133,10 @@
                                 <input disabled type="text" name="commission" id="commission" class="form-control" placeholder="Commission" value="{{$user->affiliate->commission ?? null }}">
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}">My Affiliate URL</a>
+                        <p>{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}</p>
+                    </div>
                     @endif
                 </div>
                 <div class="col-md-12 text-right no-print">

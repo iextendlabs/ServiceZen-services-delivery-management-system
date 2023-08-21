@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CustomerProfile;
 use App\Models\Holiday;
@@ -176,6 +177,14 @@ class CheckOutController extends Controller
             ];
         }
 
+        if($request->cookie('affiliate_id')){
+            $affiliate = Affiliate::where('user_id',$request->cookie('affiliate_id'))->first();
+            $url_affiliate_code = $affiliate->code;
+
+        }else{
+            $url_affiliate_code = '';
+        }
+
         if (session()->has('code')) {
             $code = Session::get('code');
             $affiliate_code = $code['affiliate_code'];
@@ -196,7 +205,7 @@ class CheckOutController extends Controller
         $area = $addresses['area'];
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code','url_affiliate_code'));
     }
 
 
