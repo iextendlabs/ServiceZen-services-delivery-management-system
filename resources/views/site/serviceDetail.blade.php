@@ -31,6 +31,20 @@
     border-radius: 5px;
     border: 1px solid #ff00bc;
   }
+
+  .service-name {
+    font-size: 12px;
+    position: absolute;
+    top: 50%;
+    /* Adjust as needed */
+    left: 50%;
+    /* Adjust as needed */
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Adjust background color and opacity */
+    padding: 10px;
+    border-radius: 5px;
+  }
 </style>
 @section('content')
 <section class="jumbotron text-center">
@@ -161,9 +175,11 @@
 
           <div class="col-md-2 service-box">
             <div class="card mb-2 box-shadow">
-              <p class="card-text text-center"><b>{{ $addON->service->name }}</b></p>
               <a href="/serviceDetail/{{ $addON->service->id }}">
-                <img src="./service-images/{{ $addON->service->image }}" class="d-block carousel-image" alt="Image {{ $key }}">
+                <div class="position-relative">
+                  <img src="./service-images/{{ $addON->service->image }}" class="d-block carousel-image" alt="Image {{ $key }}">
+                  <p class="card-text text-center service-name">{{ $addON->service->name }}</p>
+                </div>
               </a>
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -175,16 +191,13 @@
                     <b class="discount"> @currency( $addON->service->discount )</b>
                     @endif
                   </small>
-
                   <small class="text-muted"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
                 </div>
-
                 <a href="/addToCart/{{ $service->id }}" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a>
-
-
               </div>
             </div>
           </div>
+
 
           @endforeach
         </div>
