@@ -80,64 +80,59 @@ $cart_product = 0;
               @continue
               @endif
               @if(count($category->childCategories) == 0)
-                @if(!$category->parentCategory)
-                  <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
-                @endif
+              @if(!$category->parentCategory)
+              <a class="dropdown-item" href="\?id={{$category->id}}">{{$category->title}}</a>
+              @endif
               @else
-                <a class="dropdown-item dropdown-toggle" href="#" id="subDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a class="dropdown-item dropdown-toggle" href="#" id="subDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{$category->title}}
-                </a>
-                <div class="dropdown-menu" aria-labelledby="subDropdown" style="position: relative;">
+              </a>
+              <div class="dropdown-menu" aria-labelledby="subDropdown" style="position: relative;">
                 @foreach($category->childCategories as $subcategory)
-                  <a class="dropdown-item" href="\?id={{$subcategory->id}}">- {{$subcategory->title}}</a>
+                <a class="dropdown-item" href="\?id={{$subcategory->id}}">- {{$subcategory->title}}</a>
                 @endforeach
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="\?id={{$category->id}}">Show All {{$category->title}}</a>
-                </div>
-                
+              </div>
+
               @endif
-            @endforeach
-          <a class="dropdown-item text-center" href="\"><b>All</b></a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a href="{{ config('app.packageUrl') }}" class="nav-link">Packages</a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-Ons</a>
-      </li>
+              @endforeach
+              <a class="dropdown-item text-center" href="\"><b>All</b></a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a href="{{ config('app.packageUrl') }}" class="nav-link">Packages</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-Ons</a>
+          </li>
 
 
-      <li class="nav-item">
-        <a href="{{ route('cart.index') }}" class="nav-link">Cart({{$cart_product}})</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Account
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          @guest
-          <a class="dropdown-item" href="/customer-login">Login</a>
-          <a class="dropdown-item" href="/customer-registration">Register</a>
-          @else
-          @if(Auth::user()->hasRole('Staff'))
-          <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
-          <a class="dropdown-item" href="{{ route('order.index') }}">My Orders</a>
-          <a class="dropdown-item" href="/customer-logout">Logout</a>
-          @else
-          
-          <a class="dropdown-item" href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>
-
-          <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
-          <a class="dropdown-item" href="/customer-logout">Logout</a>
-          @endif
-          @endguest
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Contact</a>
-      </li>
-      </ul>
+          <li class="nav-item">
+            <a href="{{ route('cart.index') }}" class="nav-link">Cart({{$cart_product}})</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Account
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              @guest
+              <a class="dropdown-item" href="/customer-login">Login</a>
+              <a class="dropdown-item" href="/customer-registration">Register</a>
+              @else
+              <a class="dropdown-item" href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>
+              @if(Auth::user()->hasRole('Affiliate'))
+              <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
+              @endif
+              <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
+              <a class="dropdown-item" href="/customer-logout">Logout</a>
+              @endguest
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>
+        </ul>
       </div>
     </nav>
     @include('site.layout.locationPopup')
@@ -167,24 +162,24 @@ $cart_product = 0;
   <script src="{{ asset('js/popup.js') }}?v={{config('app.version')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address"></script>
-<script>
-  var Dropdowns = function() {
-    var t = $(".dropdown")
-      , e = $(".dropdown-menu")
-      , r = $(".dropdown-menu .dropdown-menu");
-    $(".dropdown-menu .dropdown-toggle").on("click", function() {
-        var a;
-        return (a = $(this)).closest(t).siblings(t).find(e).removeClass("show"),
-        a.next(r).toggleClass("show"),
-        !1
-    }),
-    t.on("hide.bs.dropdown", function() {
-        var a, t;
-        a = $(this),
-        (t = a.find(r)).length && t.removeClass("show")
-    })
-}()
-</script>
+  <script>
+    var Dropdowns = function() {
+      var t = $(".dropdown"),
+        e = $(".dropdown-menu"),
+        r = $(".dropdown-menu .dropdown-menu");
+      $(".dropdown-menu .dropdown-toggle").on("click", function() {
+          var a;
+          return (a = $(this)).closest(t).siblings(t).find(e).removeClass("show"),
+            a.next(r).toggleClass("show"),
+            !1
+        }),
+        t.on("hide.bs.dropdown", function() {
+          var a, t;
+          a = $(this),
+            (t = a.find(r)).length && t.removeClass("show")
+        })
+    }()
+  </script>
 
 </body>
 
