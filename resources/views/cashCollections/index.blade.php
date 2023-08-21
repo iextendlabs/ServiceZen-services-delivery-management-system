@@ -31,64 +31,89 @@
 <hr>
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-striped table-bordered">
-            <tr>
-                <th>SR#</th>
-                <th>Order#</th>
-                <th>Staff</th>
-                <th>Collected Amount</th>
-                <th>Customer</th>
-                <th>Order Total</th>
-                <th>Description</th>
-                <th>Order Comment</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-            @if(count($cash_collections))
-            @foreach ($cash_collections as $cash_collection)
-            <tr>
-                <td>{{ ++$i }}</td>
-                <td>{{ $cash_collection->order_id }}</td>
-                <td>{{ $cash_collection->staff_name }}</td>
-                <td>@currency($cash_collection->amount)</td>
-                <td>{{ $cash_collection->order->customer->name }}</td>
-                <td>@currency( $cash_collection->order->total_amount )</td>
-                <td>{{ $cash_collection->description }}</td>
-                <td> {{substr($cash_collection->order->order_comment, 0, 50)}}...</td>
-                <td>{{ $cash_collection->status }}</td>
-                <td>
-                    <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
-                        @can('cash-collection-edit')
-                        @if($cash_collection->status == 'Not Approved')
-                        <a class="btn btn-sm btn-success" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Approved">
-                            <i class="fas fa-thumbs-up"></i>
-                        </a>
-                        @endif
-                        <a class="btn btn-sm btn-danger" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Not Approved">
-                            <i class="fas fa-thumbs-down"></i>
-                        </a>
-                        @if(isset($cash_collection->image)) <br><br>
-                        <a class="btn btn-sm btn-warning" href="/cash-collections-images/{{$cash_collection->image}}" target="_blank"><i class="fa fa-eye"></i> </a>
-                        @endif
+        <h3>Filter</h3>
+        <hr>
+        <form action="{{ route('cashCollection.index') }}" method="GET" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span style="color: red;">*</span><strong>Order ID:</strong>
+                        <div class="input-group mb-3">
+                            <input type="number" name="order_id" class="form-control" value="{{ $filter_order_id }}">
 
-                        @endcan
-                        @csrf
-                        @method('DELETE')
-                        @can('cash-collection-delete')
-                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                        @endcan
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-            @else
-            <tr>
-                <td colspan="8" class="text-center">There is no Cash Collection.</td>
-            </tr>
-            @endif
-        </table>
-        {!! $cash_collections->links() !!}
+                        </div>
+                        <div class="float-right">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                            <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+
     </div>
+    </form>
+</div>
+<div class="col-md-12">
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>SR#</th>
+            <th>Order#</th>
+            <th>Staff</th>
+            <th>Collected Amount</th>
+            <th>Customer</th>
+            <th>Order Total</th>
+            <th>Description</th>
+            <th>Order Comment</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        @if(count($cash_collections))
+        @foreach ($cash_collections as $cash_collection)
+        <tr>
+            <td>{{ ++$i }}</td>
+            <td>{{ $cash_collection->order_id }}</td>
+            <td>{{ $cash_collection->staff_name }}</td>
+            <td>@currency($cash_collection->amount)</td>
+            <td>{{ $cash_collection->order->customer->name }}</td>
+            <td>@currency( $cash_collection->order->total_amount )</td>
+            <td>{{ $cash_collection->description }}</td>
+            <td> {{substr($cash_collection->order->order_comment, 0, 50)}}...</td>
+            <td>{{ $cash_collection->status }}</td>
+            <td>
+                <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
+                    @can('cash-collection-edit')
+                    @if($cash_collection->status == 'Not Approved')
+                    <a class="btn btn-sm btn-success" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Approved">
+                        <i class="fas fa-thumbs-up"></i>
+                    </a>
+                    @endif
+                    <a class="btn btn-sm btn-danger" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Not Approved">
+                        <i class="fas fa-thumbs-down"></i>
+                    </a>
+                    @if(isset($cash_collection->image)) <br><br>
+                    <a class="btn btn-sm btn-warning" href="/cash-collections-images/{{$cash_collection->image}}" target="_blank"><i class="fa fa-eye"></i> </a>
+                    @endif
+
+                    @endcan
+                    @csrf
+                    @method('DELETE')
+                    @can('cash-collection-delete')
+                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                    @endcan
+                </form>
+            </td>
+        </tr>
+        @endforeach
+        @else
+        <tr>
+            <td colspan="8" class="text-center">There is no Cash Collection.</td>
+        </tr>
+        @endif
+    </table>
+    {!! $cash_collections->links() !!}
+</div>
 </div>
 
 @endsection

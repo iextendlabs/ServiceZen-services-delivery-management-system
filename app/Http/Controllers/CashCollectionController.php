@@ -31,6 +31,7 @@ class CashCollectionController extends Controller
     public function index(Request $request)
     {
         $filter_status = $request->status;
+        $filter_order_id = $request->order_id;
 
         $query = CashCollection::latest();
 
@@ -83,7 +84,7 @@ class CashCollectionController extends Controller
         } else {
             $filters = $request->only(['status','order_id']);
             $cash_collections->appends($filters);
-            return view('cashCollections.index',compact('cash_collections','filter_status'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('cashCollections.index',compact('cash_collections','filter_status','filter_order_id'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
 
@@ -176,7 +177,7 @@ class CashCollectionController extends Controller
         
         $cash_collections->update($input);
 
-        return redirect()->route('cashCollection.index')
+        return redirect()->back()
                         ->with('success','Cash Collection updated successfully');
     }
 
