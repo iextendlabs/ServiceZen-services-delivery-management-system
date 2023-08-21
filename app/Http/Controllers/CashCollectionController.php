@@ -170,23 +170,9 @@ class CashCollectionController extends Controller
 
     public function cashCollectionUpdate(Request $request, $id)
     {
-        request()->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
         $cash_collections = CashCollection::find($id);
+
         $input = $request->all();
-
-        if (isset($request->image)) {
-            if ($cash_collections->image && file_exists(public_path('cash-collections-images').'/'.$cash_collections->image)) {
-                unlink(public_path('cash-collections-images').'/'.$cash_collections->image);
-            }
-        
-            $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
-            $request->image->move(public_path('cash-collections-images'), $filename);
-        
-            $input['image'] = $filename;
-        }
         
         $cash_collections->update($input);
 
