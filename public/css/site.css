@@ -37,7 +37,7 @@ footer p {
 }
 
 .box-shadow {
-    padding: 50px 30px;
+    padding: 10px 10px;
     position: relative;
     overflow: hidden;
     background: #fff;
@@ -56,13 +56,13 @@ hr {
   margin-top: 1em;
 }
 
-.discount,.service-box i {
+/* .discount,.service-box i {
   color: #007bff;
-}
-
+} */
+/* 
 .service-box .card {
   padding: 1em !important;
-}
+} */
 
 .service-social-icon{
   margin-top: 1em;

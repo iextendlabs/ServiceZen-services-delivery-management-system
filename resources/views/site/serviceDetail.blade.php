@@ -5,11 +5,11 @@
   }
 
   .carousel-inner {
-    height: 550px !important;
+    height: 300px !important;
   }
 
   .carousel-image {
-    height: 300px;
+    height: 100px;
     object-fit: cover;
     width: 100%;
   }
@@ -17,6 +17,19 @@
   .carousel-control-next,
   .carousel-control-prev {
     width: 5% !important;
+  }
+
+  .carousel-control-next,
+  .carousel-control-prev,
+  .carousel-indicators {
+    filter: invert(100%);
+  }
+
+  .carousel-control-next-icon,
+  .carousel-control-prev-icon {
+
+    border-radius: 5px;
+    border: 1px solid #ff00bc;
   }
 </style>
 @section('content')
@@ -91,102 +104,108 @@
         {!! $service->description !!}
       </div>
     </div>
-    <hr>
-    @if(count($service->package))
-    <h2>Package Services</h2><br>
-    <div class="row">
-      @foreach($service->package as $package)
-      <div class="col-md-4 service-box">
-        <div class="card mb-4 box-shadow">
-          <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
-          <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted service-box-price">
-                @if(isset($package->service->discount))<s>@endif
-                  @currency($package->service->price)
-                  @if(isset($package->service->discount))</s>@endif
-                @if(isset($package->service->discount))
-                <b class="discount"> @currency( $package->service->discount )</b>
-                @endif
-              </small>
+  </div>
+</div>
+<hr>
+<div class="container">
 
-              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $package->service->duration }}</small>
+  @if(count($service->package))
+  <h2>Package Services</h2><br>
+  <div class="row">
+    @foreach($service->package as $package)
+    <div class="col-md-4 service-box">
+      <div class="card mb-4 box-shadow">
+        <p class="card-text service-box-title text-center"><b>{{ $package->name }}</b></p>
+        <a href="/serviceDetail/{{ $package->service->id }}">
+          <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
+        </a>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted service-box-price">
+              @if(isset($package->service->discount))<s>@endif
+                @currency($package->service->price)
+                @if(isset($package->service->discount))</s>@endif
+              @if(isset($package->service->discount))
+              <b class="discount"> @currency( $package->service->discount )</b>
+              @endif
+            </small>
+
+            <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $package->service->duration }}</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    @endforeach
+  </div>
+  @endif
+</div>
+<div class="container">
+
+  @if(count($service->addONs))
+  <h2>Add ONs</h2><br>
+  <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+      @foreach($service->addONs->chunk(6) as $key => $addONsChunk)
+      <li data-target="#myCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
+      @endforeach
+    </ol>
+
+    <!-- Slides -->
+    <div class="carousel-inner">
+      @foreach($service->addONs->chunk(6) as $key => $addONsChunk)
+      <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+        <div class="row">
+          @foreach($addONsChunk as $addON)
+
+          <div class="col-md-2 service-box">
+            <div class="card mb-2 box-shadow">
+              <p class="card-text text-center"><b>{{ $addON->service->name }}</b></p>
+              <a href="/serviceDetail/{{ $addON->service->id }}">
+                <img src="./service-images/{{ $addON->service->image }}" class="d-block carousel-image" alt="Image {{ $key }}">
+              </a>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-mutede">
+                    @if(isset($addON->service->discount))<s>@endif
+                      @currency($addON->service->price)
+                      @if(isset($addON->service->discount))</s>@endif
+                    @if(isset($addON->service->discount))
+                    <b class="discount"> @currency( $addON->service->discount )</b>
+                    @endif
+                  </small>
+
+                  <small class="text-muted"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
+                </div>
+
+                <a href="/addToCart/{{ $service->id }}" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a>
+
+
+              </div>
             </div>
           </div>
+
+          @endforeach
         </div>
       </div>
       @endforeach
     </div>
-    @endif
 
+    <!-- Controls -->
+    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+  @endif
+</div>
 
-    @if(count($service->addONs))
-    <h2>Add ONs</h2><br>
-    <div id="myCarousel" class="carousel slide" data-ride="carousel">
-      <!-- Indicators -->
-      <ol class="carousel-indicators">
-        @foreach($service->addONs->chunk(3) as $key => $addONsChunk)
-        <li data-target="#myCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
-        @endforeach
-      </ol>
-
-      <!-- Slides -->
-      <div class="carousel-inner">
-        @foreach($service->addONs->chunk(3) as $key => $addONsChunk)
-        <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-          <div class="row">
-            @foreach($addONsChunk as $addON)
-
-            <div class="col-md-4 service-box">
-              <div class="card mb-4 box-shadow">
-                <p class="card-text service-box-title text-center"><b>{{ $addON->service->name }}</b></p>
-                <a href="/serviceDetail/{{ $addON->service->id }}">
-                  <img src="./service-images/{{ $addON->service->image }}" class="d-block w-100 carousel-image" alt="Image {{ $key }}">
-                </a>
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted service-box-price">
-                      @if(isset($addON->service->discount))<s>@endif
-                        @currency($addON->service->price)
-                        @if(isset($addON->service->discount))</s>@endif
-                      @if(isset($addON->service->discount))
-                      <b class="discount"> @currency( $addON->service->discount )</b>
-                      @endif
-                    </small>
-
-                    <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
-                  </div>
-
-                  <a href="/addToCart/{{ $addON->service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
-
-
-                </div>
-              </div>
-            </div>
-
-
-
-            @endforeach
-          </div>
-        </div>
-        @endforeach
-      </div>
-
-      <!-- Controls -->
-      <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div>
-    @endif
-
-
-    <!-- @if(count($service->addONs))
+<!-- @if(count($service->addONs))
     <h2>Add ONs</h2><br>
     <div id="add-ons" class="row">
       @foreach($service->addONs as $addONs)
@@ -219,8 +238,7 @@
       @endforeach
     </div>
     @endif -->
-  </div>
-</div>
+
 <script>
   $('#scroll').click(() => {
     $('html, body').animate({
