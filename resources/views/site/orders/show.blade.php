@@ -49,7 +49,7 @@
             </tr>
         </table>
         <table class="table table-striped table-bordered album bg-light">
-            <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
+            <td class="text-left" colspan="3"><i class="fas fa-clock"></i> Appointment Details</td>
             <tr>
                 <td>
                     <b>Staff:</b> {{ $order->staff_name }}
@@ -114,6 +114,7 @@
                 <td class="text-right">@currency($orderService->price)</td>
             </tr>
             @endforeach
+            
             <tr>
                 <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
                 <td class="text-right">@currency($order->order_total->sub_total)</td>
@@ -135,6 +136,14 @@
                 <td class="text-right">@currency($order->total_amount)</td>
             </tr>
         </table>
+        @if($order->order_comment)
+        <table class="table table-striped table-bordered album bg-light">
+            <th class="text-left" colspan="4">Order Comment</th>
+            <tr>
+                <td class="text-left">{!! nl2br($order->order_comment) !!}</td>
+            </tr>
+        </table>
+        @endif
     </div>
 </div>
 <script>

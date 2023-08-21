@@ -159,7 +159,7 @@ class SiteOrdersController extends Controller
 
         try {
             $this->sendAdminEmail($input['order_id'], $input['email']);
-            $this->sendCustomerEmail($input['customer_id'], $customer_type);
+            $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
         } catch (\Throwable $th) {
             //TODO: log error or queue job later
         }
@@ -246,8 +246,9 @@ class SiteOrdersController extends Controller
         //
     }
 
-    public function sendCustomerEmail($customer_id, $type)
+    public function sendCustomerEmail($customer_id, $type, $order_id)
     {
+        $order = Order::find($order_id);
         if ($type == "Old") {
             $customer = User::find($customer_id);
 
@@ -255,6 +256,7 @@ class SiteOrdersController extends Controller
                 'name' => $customer->name,
                 'email' => $customer->email,
                 'password' => ' ',
+                'order'=> $order
             ];
         } elseif ($type == "New") {
             $customer = User::find($customer_id);
@@ -263,9 +265,9 @@ class SiteOrdersController extends Controller
                 'name' => $customer->name,
                 'email' => $customer->email,
                 'password' => $customer->name . '1094',
+                'order'=> $order
             ];
         }
-
 
         Mail::to($dataArray['email'])->send(new OrderCustomerEmail($dataArray));
 

@@ -63,7 +63,7 @@
 
                         @if(!in_array($staff->id, $staff_ids))
                         @php
-                        $holiday_counter ++
+                        $booked_counter ++
                         @endphp
                         
                         @endif
@@ -71,7 +71,7 @@
                         
                         @if(!in_array($staff->id, $timeSlot->excluded_staff))
                         @php
-                        $booked_counter ++
+                        $holiday_counter ++
                         @endphp
                         
                         @endif
