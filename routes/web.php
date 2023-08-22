@@ -25,7 +25,8 @@ use App\Http\Controllers\{
     AffiliateController,
     StaffGeneralHolidayController,
     BackupController,
-    CouponController
+    CouponController,
+    ShortHolidayController
 };
 
 use App\Http\Controllers\AppController\{
@@ -77,7 +78,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('timeSlots', TimeSlotController::class);
     Route::resource('assistantSupervisors', AssistantSupervisorController::class);
     Route::resource('staffHolidays', StaffHolidayController::class);
+    Route::resource('shortHolidays', ShortHolidayController::class);
     Route::resource('staffGeneralHolidays', StaffGeneralHolidayController::class);
+    Route::post('/shortHolidayBulkDelete', [ShortHolidayController::class, 'bulkDelete'])->name('shortHolidays.bulkDelete');
     Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('services.bulkDelete');
     Route::post('/services/bulkCopy', [ServiceController::class, 'bulkCopy'])->name('services.bulkCopy');
 
