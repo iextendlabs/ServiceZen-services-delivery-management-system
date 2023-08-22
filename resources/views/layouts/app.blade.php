@@ -103,6 +103,7 @@
                                 @can('service-category-list')
                                 <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
                                 @endcan
+                                <a class="dropdown-item" href="{{ route('FAQs.index') }}">FAQs</a>
                                 @can('holiday-list')
                                 <a class="dropdown-item" href="/holidays">Holidays</a>
                                 @endcan

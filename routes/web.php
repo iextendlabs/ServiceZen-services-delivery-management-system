@@ -26,6 +26,7 @@ use App\Http\Controllers\{
     StaffGeneralHolidayController,
     BackupController,
     CouponController,
+    FAQController,
     ShortHolidayController
 };
 
@@ -99,6 +100,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
 
     Route::resource('coupons', CouponController::class);
+    Route::resource('FAQs', FAQController::class);
 });
 
 // Backups
