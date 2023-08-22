@@ -44,7 +44,7 @@ class TimeSlot extends Model
 
     public static function getTimeSlotsForArea($area, $date, $currentOrder = null)
     {
-        
+
         $currentDate = Carbon::now()->format('Y-m-d');
         $currentDateTime = Carbon::now();
         $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
@@ -56,9 +56,9 @@ class TimeSlot extends Model
         $allZones = StaffZone::all();
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
 
-        if ( auth()->check() && auth()->user()->hasRole('Admin') ? $staffZone : ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone)) {
+        if (auth()->check() && auth()->user()->hasRole('Admin') ? $staffZone : ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone)) {
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
-            
+
             $dayName = $carbonDate->formatLocalized('%A');
             $generalHolidays = config('app.general_holiday');
             if (in_array($dayName, $generalHolidays)) {
@@ -70,34 +70,39 @@ class TimeSlot extends Model
             $staff_ids = array_merge($staff_ids, $generalHolidayStaffIds);
 
             if (count($holiday) == 0) {
-                if($date == $currentDate){
+                if ($date == $currentDate) {
                     $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                         $query->where('staff_zone_id', $staffZone->id);
                     })->where('date', '=', $date)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
-                    
+
                     if (count($timeSlots) == 0) {
                         $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                             $query->where('staff_zone_id', $staffZone->id);
                         })->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
                     }
-                }else{
+                } else {
                     $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                         $query->where('staff_zone_id', $staffZone->id);
                     })->where('date', '=', $date)->orderBy('time_start')->get();
-    
+
                     if (count($timeSlots) == 0) {
                         $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                             $query->where('staff_zone_id', $staffZone->id);
                         })->orderBy('time_start')->get();
                     }
                 }
-                
             }
 
             if (count($timeSlots)) {
+                $short_holiday = ShortHoliday::where('date', $date)->get();
+
                 foreach ($timeSlots as $timeSlot) {
-                    $short_holiday_staff_ids = ShortHoliday::where('date',$date)->where('time_start', '<=', $timeSlot->time_end)->where('time_end', '>=', $timeSlot->time_start)->pluck('staff_id')->toArray();
-                    
+                    if ($short_holiday) {
+                        $short_holiday_staff_ids = ShortHoliday::where('date', $date)->where('time_start', '<=', $timeSlot->time_end)->where('time_end', '>=', $timeSlot->time_start)->pluck('staff_id')->toArray();
+                    }else{
+                        $short_holiday_staff_ids = [];
+                    }
+
                     if ($currentOrder)
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
                     else
@@ -112,7 +117,6 @@ class TimeSlot extends Model
                     $timeSlot->excluded_staff = $excluded_staffs;
                     $available_staff_id =  $timeSlot->staffs()->pluck('staff_id')->toArray();
                     $timeSlot->space_availability = count(array_diff($available_staff_id, array_unique(array_merge($excluded_staffs, $staff_ids))));
-                    
                 }
             }
         }
