@@ -113,7 +113,7 @@
     <hr>
     @if(count($service->addONs))
     <h2>Add ONs</h2><br>
-    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <div id="myCarousel" class="carousel slide col-md-12" data-ride="carousel">
       <!-- Indicators -->
       <ol class="carousel-indicators">
         @foreach($service->addONs->chunk(6) as $key => $addONsChunk)
@@ -128,7 +128,7 @@
           <div class="row">
             @foreach($addONsChunk as $addON)
 
-            <div class="col-md-2 service-box">
+            <div class="col-md-2 col-12 service-box">
               <div class="card mb-2 box-shadow">
                 <a href="/serviceDetail/{{ $addON->service->id }}">
                   <div class="position-relative">

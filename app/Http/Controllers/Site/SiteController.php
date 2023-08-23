@@ -98,6 +98,7 @@ class SiteController extends Controller
             $address['latitude'] = $request->latitude;
             $address['longitude'] = $request->longitude;
             $address['searchField'] = $request->searchField;
+            $address['gender'] = $request->gender;
 
             if (session()->has('address')) {
                 Session::forget('address');
@@ -128,6 +129,7 @@ class SiteController extends Controller
             $address['latitude'] = '';
             $address['longitude'] = '';
             $address['searchField'] = '';
+            $address['gender'] = '';
 
             Session::put('address', $address);
 
