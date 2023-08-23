@@ -17,14 +17,13 @@ class CustomerAuthController extends Controller
 {
     public function registration(Request $request)
     {
-        if($request->cookie('affiliate_id')){
-            $affiliate = Affiliate::where('user_id',$request->cookie('affiliate_id'))->first();
+        if ($request->cookie('affiliate_id')) {
+            $affiliate = Affiliate::where('user_id', $request->cookie('affiliate_id'))->first();
             $affiliate_code = $affiliate->code;
-
-        }else{
+        } else {
             $affiliate_code = '';
         }
-        return view('site.auth.signUp',compact('affiliate_code'));
+        return view('site.auth.signUp', compact('affiliate_code'));
     }
 
     public function postRegistration(Request $request)
@@ -45,9 +44,9 @@ class CustomerAuthController extends Controller
 
         $customer->assignRole('Customer');
 
-        if($request->affiliate_code){
+        if ($request->affiliate_code) {
             $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
-    
+
             $customer->affiliates()->attach($affiliate->user_id);
         }
 
@@ -127,18 +126,43 @@ class CustomerAuthController extends Controller
 
         $user = User::find($id);
         $user->update($input);
-        if($user->customerProfile){
+        if ($user->customerProfile) {
             $user->customerProfile->update($input);
-        }else{
+        } else {
             CustomerProfile::create($input);
+        }
+
+        $address = [];
+
+        $address['buildingName'] = $request->buildingName;
+        $address['area'] = $request->area;
+        $address['flatVilla'] = $request->flatVilla;
+        $address['street'] = $request->street;
+        $address['landmark'] = $request->landmark;
+        $address['city'] = $request->city;
+        $address['number'] = config('app.country_code') . $request->number;
+        $address['whatsapp'] = config('app.country_code') . $request->whatsapp;
+        $address['email'] = $request->email;
+        $address['name'] = $request->name;
+        $address['latitude'] = $request->latitude;
+        $address['longitude'] = $request->longitude;
+        $address['searchField'] = $request->searchField;
+        $address['gender'] = $request->gender;
+
+        if (session()->has('address')) {
+            Session::forget('address');
+            Session::put('address', $address);
+        } else {
+            Session::put('address', $address);
         }
 
         return redirect()->back()
             ->with('success', 'Your Profile updated successfully');
     }
 
-    public function affiliateUrl(Request $request){
+    public function affiliateUrl(Request $request)
+    {
 
-        return redirect('/')->withCookie('affiliate_id', $request->affiliate_id, 0) ;
+        return redirect('/')->withCookie('affiliate_id', $request->affiliate_id, 0);
     }
 }
