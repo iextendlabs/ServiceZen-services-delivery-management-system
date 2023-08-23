@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FAQ;
+use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 
@@ -16,21 +17,29 @@ class FAQController extends Controller
     public function index()
     {
         $FAQs = FAQ::latest()->paginate(config('app.paginate'));
-        return view('FAQs.index',compact('FAQs'))
+        return view('FAQs.index', compact('FAQs'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+
+        $service_id = $request->service_id;
+        $category_id = $request->category_id;
+
+        $services = Service::all();
         $categories = ServiceCategory::all();
-        return view('FAQs.create',compact('categories'));
+
+
+        $categories = ServiceCategory::all();
+        return view('FAQs.create', compact('categories', 'services','service_id','category_id'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -47,9 +56,9 @@ class FAQController extends Controller
         FAQ::create($request->all());
 
         return redirect()->route('FAQs.index')
-                    ->with('success','FAQs created successfully.');
+            ->with('success', 'FAQs created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -60,9 +69,9 @@ class FAQController extends Controller
     {
         $FAQ = FAQ::find($id);
 
-        return view('FAQs.show',compact('FAQ'));
+        return view('FAQs.show', compact('FAQ'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -73,10 +82,11 @@ class FAQController extends Controller
     {
         $FAQ = FAQ::find($id);
         $categories = ServiceCategory::all();
+        $services = Service::all();
 
-        return view('FAQs.edit', compact('FAQ','categories'));
+        return view('FAQs.edit', compact('FAQ', 'categories','services'));
     }
-    
+
     public function update(Request $request, $id)
     {
         request()->validate([
@@ -89,9 +99,9 @@ class FAQController extends Controller
         $FAQ->update($request->all());
 
         return redirect()->route('FAQs.index')
-                    ->with('success','FAQs Update successfully.');
+            ->with('success', 'FAQs Update successfully.');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -102,8 +112,8 @@ class FAQController extends Controller
     {
         $FAQ = FAQ::find($id);
         $FAQ->delete();
-    
+
         return redirect()->route('FAQs.index')
-                    ->with('success','FAQs deleted successfully');
+            ->with('success', 'FAQs deleted successfully');
     }
 }

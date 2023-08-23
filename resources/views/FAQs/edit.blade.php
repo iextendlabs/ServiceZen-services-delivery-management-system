@@ -46,6 +46,21 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Service:</strong>
+                    <select name="service_id" class="form-control">
+                        <option></option>
+                        @foreach($services as $service)
+                            @if($service->id == $FAQ->service_id)
+                                <option value="{{$service->id}}" selected>{{$service->name}}</option>
+                            @else
+                                <option value="{{$service->id}}">{{$service->name}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Update</button>
             </div>

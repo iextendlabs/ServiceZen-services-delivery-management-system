@@ -272,3 +272,45 @@ svg {
   font-size: 19px;
   font-weight: bold;
 }
+
+.carousel-inner {
+  height: 220px !important;
+}
+
+.carousel-image {
+  height: 100px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+  width: 5% !important;
+}
+
+.carousel-control-next,
+.carousel-control-prev,
+.carousel-indicators {
+  filter: invert(100%);
+}
+
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+
+  border-radius: 5px;
+  border: 1px solid #ff00bc;
+}
+
+.service-name {
+  font-size: 12px;
+  position: absolute;
+  top: 50%;
+  /* Adjust as needed */
+  left: 50%;
+  /* Adjust as needed */
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  /* Adjust background color and opacity */
+  padding: 10px;
+  border-radius: 5px;
+}

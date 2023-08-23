@@ -167,6 +167,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Gender:</strong><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" {{ old('gender') == 'Male' || $addresses['gender'] == 'Male' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="genderMale">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female" {{ old('gender') == 'Female' || $addresses['gender'] == 'Female' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="genderFemale">Female</label>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <strong>Affiliate Code:</strong>

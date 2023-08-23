@@ -43,7 +43,7 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
-    'version' => '1.0.4',
+    'version' => '1.0.5',
     // TODO add option in category to hide / show in menu 
     'packageUrl' => '/?id=11',
     'addOnUrl' => '/?id=10',

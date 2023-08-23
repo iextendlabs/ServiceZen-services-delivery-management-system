@@ -28,5 +28,14 @@
             </div>
         </div>
         @endif
+
+        @if($FAQ->service)
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Service:</strong>
+                {{ $FAQ->service->name }}
+            </div>
+        </div>
+        @endif
     </div>
 @endsection

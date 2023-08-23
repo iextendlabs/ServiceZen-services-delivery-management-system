@@ -31,6 +31,7 @@ class CustomerAuthController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'gender' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:password_confirmation',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
@@ -44,9 +45,11 @@ class CustomerAuthController extends Controller
 
         $customer->assignRole('Customer');
 
-        $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
-
-        $customer->affiliates()->attach($affiliate->user_id);
+        if($request->affiliate_code){
+            $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
+    
+            $customer->affiliates()->attach($affiliate->user_id);
+        }
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
@@ -108,6 +111,7 @@ class CustomerAuthController extends Controller
             'landmark' => 'required',
             'number' => 'required',
             'whatsapp' => 'required',
+            'gender' => 'required',
         ]);
 
         $input = $request->all();

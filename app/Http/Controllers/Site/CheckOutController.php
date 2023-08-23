@@ -95,6 +95,7 @@ class CheckOutController extends Controller
             'date' => 'required',
             'service_staff_id' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'gender' => 'required',
         ]);
         if ($request->coupon_code) {
             $coupon = $this->applyCoupon($request->coupon_code);
@@ -119,6 +120,7 @@ class CheckOutController extends Controller
         $address['longitude'] = $request->longitude;
         $address['searchField'] = $request->searchField;
         $address['update_profile'] = $request->update_profile;
+        $address['gender'] = $request->gender;
 
         $staff_and_time = [];
 
@@ -174,6 +176,7 @@ class CheckOutController extends Controller
                 'latitude' => '',
                 'longitude' => '',
                 'searchField' => '',
+                'gender' => '',
             ];
         }
 

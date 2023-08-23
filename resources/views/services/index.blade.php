@@ -26,7 +26,48 @@
 @endif
 <hr>
 <div class="row">
-    <div class="col-md-9">
+<div class="col-md-12">
+        <h3>Filter</h3>
+        <hr>
+        <form action="{{ route('services.index') }}" method="GET" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <strong>Name:</strong>
+                        <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control" placeholder="Name">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <strong>Price:</strong>
+                        <input type="number" name="price" value="{{ $filter['price'] }}" class="form-control" placeholder="Price">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <strong>Category:</strong>
+                        <select name="category_id" class="form-control">
+                            <option></option>
+                            @foreach($service_categories as $category)
+                            @if($category->id == $filter['category_id'])
+                            <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                            @else
+                            <option value="{{$category->id}}">{{$category->title}}</option>
+                            @endif
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="offset-6 col-md-3 text-center">
+                        <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <button type="submit" class="btn btn-block btn-primary">Filter</button>
+                    </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-12">
         <table class="table table-striped table-bordered">
             <tr>
                 <th></th>
@@ -46,6 +87,7 @@
                 <td class="text-right">{{ $service->duration }}</td>
                 <td class="text-right">
                     <!-- <form action="{{ route('services.destroy',$service->id) }}" method="POST"> -->
+                        <a class="btn btn-primary" href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>
                         <a class="btn btn-warning" href="{{ route('services.show',$service->id) }}"><i class="fa fa-eye"></i></a>
                         @can('service-edit')
                         <a class="btn btn-primary" href="{{ route('services.edit',$service->id) }}"><i class="fa fa-edit"></i></a>
@@ -67,44 +109,7 @@
         </table>
         {!! $services->links() !!}
     </div>
-    <div class="col-md-3">
-        <h3>Filter</h3>
-        <hr>
-        <form action="{{ route('services.index') }}" method="GET" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Name:</strong>
-                        <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control" placeholder="Name">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Price:</strong>
-                        <input type="number" name="price" value="{{ $filter['price'] }}" class="form-control" placeholder="Price">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Category:</strong>
-                        <select name="category_id" class="form-control">
-                            <option></option>
-                            @foreach($service_categories as $category)
-                            @if($category->id == $filter['category_id'])
-                            <option value="{{$category->id}}" selected>{{$category->title}}</option>
-                            @else
-                            <option value="{{$category->id}}">{{$category->title}}</option>
-                            @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <button type="submit" class="btn btn-secondary  float-end">Filter</button>
-                </div>
-            </div>
-        </form>
-    </div>
+    
 </div>
 
 <script>

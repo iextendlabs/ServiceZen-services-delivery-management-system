@@ -85,7 +85,8 @@
             <tr>
                 <td>
                     <b>Name:</b> {{ $order->customer->name }} <br><br>
-                    <b>Email:</b> {{ $order->customer->email }}
+                    <b>Email:</b> {{ $order->customer->email }} <br><br>
+                    <b>Gender:</b> {{ $order->gender }}
                 </td>
                 <td>
                     <b>Phone Number:</b> {{ $order->number }} <br><br>

@@ -8,24 +8,30 @@
         body {
             font-family: Arial, sans-serif;
         }
+
         h4 {
             color: #333;
         }
+
         table {
             border-collapse: collapse;
             width: 100%;
             margin-top: 20px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
     </style>
-</head>  
+</head>
+
 <body>
 
     <h4>Your Order Has Been Successfully Placed.</h4>
@@ -80,8 +86,9 @@
         <td colspan="2">Customer Details</td>
         <tr>
             <td>
-                <b>Name:</b> {{ $data['order']->customer->name }} <br><br>
-                <b>Email:</b> {{ $data['order']->customer->email }}
+                <b>Name:</b> {{ $order->customer->name }} <br><br>
+                <b>Email:</b> {{ $order->customer->email }} <br><br>
+                <b>Gender:</b> {{ $order->gender }}
             </td>
             <td>
                 <b>Phone Number:</b> {{ $data['order']->number }} <br><br>

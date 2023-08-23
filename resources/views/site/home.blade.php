@@ -12,28 +12,28 @@
   </div>
 </section>
 <div class="text-center">
-      @if(Session::has('error'))
-      <span class="alert alert-danger" role="alert">
-        <strong>{{ Session::get('error') }}</strong>
-      </span>
-      @endif
-      @if(Session::has('success'))
-      <span class="alert alert-success" role="alert">
-        <strong>{{ Session::get('success') }}</strong>
-      </span>
-      @endif
-      @if(Session::has('cart-success'))
-      <div class="alert alert-success" role="alert">
-        <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
-        <span><a href="bookingStep">Book Now!</a></span><br>
-        <span>To add more service<a href="/"> Continue</a></span>
-      </div>
-      @endif
+  @if(Session::has('error'))
+  <span class="alert alert-danger" role="alert">
+    <strong>{{ Session::get('error') }}</strong>
+  </span>
+  @endif
+  @if(Session::has('success'))
+  <span class="alert alert-success" role="alert">
+    <strong>{{ Session::get('success') }}</strong>
+  </span>
+  @endif
+  @if(Session::has('cart-success'))
+  <div class="alert alert-success" role="alert">
+    <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
+    <span><a href="bookingStep">Book Now!</a></span><br>
+    <span>To add more service<a href="/"> Continue</a></span>
+  </div>
+  @endif
 
-    </div>
+</div>
 <div class="album py-5 bg-light">
   <div class="container">
-    
+
     <div class="row">
       @foreach ($services as $service)
       <div class="col-md-4 service-box">
@@ -64,6 +64,27 @@
       </div>
       @endforeach
     </div>
+    @if(count($FAQs)  )
+    <h1>Frequently Asked Questions</h1>
+    <div id="accordion">
+      @foreach ($FAQs as $FAQ)
+      <div class="card">
+        <div class="card-header" id="heading{{ $FAQ->id }}">
+          <h5 class="mb-0">
+            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ $FAQ->id }}" aria-expanded="true" aria-controls="collapse{{ $FAQ->id }}">
+              {{ $FAQ->question }}
+            </button>
+          </h5>
+        </div>
+        <div id="collapse{{ $FAQ->id }}" class="collapse" aria-labelledby="heading{{ $FAQ->id }}" data-parent="#accordion">
+          <div class="card-body">
+            {{ $FAQ->answer }}
+          </div>
+        </div>
+      </div>
+      @endforeach
+    </div>
+    @endif
   </div>
 </div>
 

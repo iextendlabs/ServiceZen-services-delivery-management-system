@@ -6,6 +6,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerProfile;
+use App\Models\FAQ;
 use App\Models\ServiceCategory;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,7 @@ class SiteController extends Controller
                 $address['latitude'] = $user->customerProfile->latitude;
                 $address['longitude'] = $user->customerProfile->longitude;
                 $address['searchField'] = $user->customerProfile->searchField;
+                $address['gender'] = $user->customerProfile->gender;
                 
                 Session::put('address', $address);
                 
@@ -61,17 +63,21 @@ class SiteController extends Controller
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->get();
             $category = ServiceCategory::find($request->id);
-            return view('site.home', compact('services', 'category', 'address'));
+            $FAQs = FAQ::where('category_id',$request->id)->get();
+            return view('site.home', compact('services', 'category', 'address','FAQs'));
         } else {
-            $services = Service::all();
-            return view('site.home', compact('services', 'address'));
+        $FAQs = FAQ::get();
+        $services = Service::all();
+            return view('site.home', compact('services', 'address','FAQs'));
         }
     }
 
     public function show($id)
     {
         $service = Service::find($id);
-        return view('site.serviceDetail', compact('service'));
+        $FAQs = FAQ::where('service_id',$id)->get();
+
+        return view('site.serviceDetail', compact('service','FAQs'));
     }
 
     public function saveLocation(Request $request)

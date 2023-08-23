@@ -120,6 +120,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Gender:</strong><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" {{ $user->customerProfile->gender == 'Male' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="genderMale">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female" {{ $user->customerProfile->gender == 'Female' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="genderFemale">Female</label>
+                            </div>
+                        </div>
+                    </div>
                     @if(auth()->user()->hasRole('Affiliate'))
                     <div class="col-md-6">
                         <div class="form-group">

@@ -91,6 +91,7 @@ class SiteOrdersController extends Controller
         $input['time_slot_id'] = $staff_and_time['time_slot'];
         $input['latitude'] = $address['latitude'];
         $input['longitude'] = $address['longitude'];
+        $input['gender'] = $address['gender'];
 
         $input['email'] = $address['email'];
 
