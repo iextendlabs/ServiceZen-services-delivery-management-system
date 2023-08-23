@@ -33,33 +33,43 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Category:</strong>
-                <select name="category_id" class="form-control" {{ $category_id ? 'disabled':null }}>
+                <select name="category_id" class="form-control">
                     <option></option>
+                    @if(isset($category_id))
                     @foreach($categories as $category)
-                        @if($category->id == $category_id)
-                            <option value="{{$category->id}}" selected>{{$category->title}}</option>
-                        @else
-                            <option value="{{$category->id}}">{{$category->title}}</option>
-                        @endif
+                    @if($category->id == $category_id)
+                    <option value="{{ $category->id }}" selected>{{ $category->title }}</option>
+                    @endif
                     @endforeach
+                    @else
+                    @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                    @endforeach
+                    @endif
                 </select>
             </div>
         </div>
+
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Service:</strong>
-                <select name="service_id" class="form-control" {{ $service_id ? 'disabled':null }}>
+                <select name="service_id" class="form-control">
                     <option></option>
+                    @if(isset($service_id))
                     @foreach($services as $service)
                     @if($service->id == $service_id)
-                    <option value="{{$service->id}}" selected>{{$service->name}}</option>
-                    @else
-                    <option value="{{$service->id}}">{{$service->name}}</option>
+                    <option value="{{ $service->id }}" selected>{{ $service->name }}</option>
                     @endif
                     @endforeach
+                    @else
+                    @foreach($services as $service)
+                    <option value="{{ $service->id }}">{{ $service->name }}</option>
+                    @endforeach
+                    @endif
                 </select>
             </div>
         </div>
+
         <div class="col-md-12 text-center">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
