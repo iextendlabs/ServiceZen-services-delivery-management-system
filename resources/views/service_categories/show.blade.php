@@ -20,11 +20,13 @@
                 {{ $service_category->description }}
             </div>
         </div>
+        @if($service_category->parentCategory)
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Parent Category:</strong>
                 {{ $service_category->parentCategory->title }}
             </div>
         </div>
+        @endif
     </div>
 @endsection
