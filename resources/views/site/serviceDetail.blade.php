@@ -77,13 +77,13 @@
         {!! $service->description !!}
       </div>
     </div>
-    <hr>
   </div>
 </div>
 
 <div class="album py-5 bg-light">
   <div class="container">
     @if(count($service->package))
+    <hr>
     <h2>Package Services</h2><br>
     <div class="row">
       @foreach($service->package as $package)
@@ -113,8 +113,9 @@
       @endforeach
     </div>
     @endif
-    <hr>
+    
     @if(count($service->addONs))
+    <hr>
     <h2>Add ONs</h2><br>
     <div id="myCarousel" class="carousel slide col-md-12" data-ride="carousel">
       <!-- Indicators -->
@@ -174,8 +175,9 @@
       </a>
     </div>
     @endif
-    <hr>
+    
     @if(count($FAQs))
+    <hr>
     <h1 id="faqs">Frequently Asked Questions</h1>
     <div id="accordion">
       @foreach ($FAQs as $FAQ)
