@@ -27,6 +27,7 @@ use App\Http\Controllers\{
     BackupController,
     CouponController,
     FAQController,
+    SettingController,
     ShortHolidayController
 };
 
@@ -101,6 +102,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::resource('coupons', CouponController::class);
     Route::resource('FAQs', FAQController::class);
+    Route::resource('settings', SettingController::class);
 });
 
 // Backups

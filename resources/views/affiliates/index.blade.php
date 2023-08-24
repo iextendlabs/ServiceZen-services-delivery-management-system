@@ -29,6 +29,9 @@
                     <th>Sr#</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Code</th>
+                    <th>Commission</th>
+                    <th>Salary</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($affiliates))
@@ -38,6 +41,9 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $affiliate->name }}</td>
                     <td>{{ $affiliate->email }}</td>
+                    <td>{{ $affiliate->affiliate->commission }}</td>
+                    <td>{{ $affiliate->affiliate->code }}</td>
+                    <td>{{ $affiliate->affiliate->fix_salary }}</td>
                   
                     <td>
                         <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
