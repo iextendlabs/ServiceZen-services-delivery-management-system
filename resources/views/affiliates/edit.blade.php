@@ -58,6 +58,12 @@
                     <input type="number" name="commission" value="{{ $affiliate->affiliate->commission }}" class="form-control" placeholder="Commission In %">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Fix Salary:</strong>
+                    <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary }}" class="form-control" placeholder="Fix Salary In %">
+                </div>
+            </div>
             <div class="col-md-12 text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
             </div>

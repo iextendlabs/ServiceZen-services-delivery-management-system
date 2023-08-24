@@ -34,6 +34,12 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Fix Salary:</strong>
+                {{ $affiliate->affiliate->fix_salary }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <strong>Roles:</strong>
                 @if(!empty($affiliate->getRoleNames()))
                     @foreach($affiliate->getRoleNames() as $v)

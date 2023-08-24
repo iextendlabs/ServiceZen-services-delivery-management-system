@@ -56,6 +56,12 @@
                     <input type="number" name="commission" class="form-control" value="{{ old('commission') }}" placeholder="Commission In %">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Fix Salary:</strong>
+                    <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Fix Salary">
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>

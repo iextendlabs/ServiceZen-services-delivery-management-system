@@ -9,7 +9,7 @@ class Affiliate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','code', 'commission'];
+    protected $fillable = ['user_id','code', 'commission','fix_salary'];
     
     public function affiliate()
     {
