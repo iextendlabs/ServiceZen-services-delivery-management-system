@@ -63,48 +63,42 @@
 
             <div class="float-end">
                 @can('order-download')
-                <a href="/orders?print=1" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
-                <a href="/orders?csv=1" class="btn btn-success float-end no-print" style="margin-right: 10px;"><i class="fa fa-download"></i> Excel</a>
+                <a class="btn btn-danger float-end" href="/orders?print=1"><i class="fa fa-print"></i> PDF</a>
+                <a href="/orders?csv=1" class="btn btn-success float-end mr-1"><i class="fa fa-download"></i> Excel</a>
                 @endcan
-                <!-- Assuming you have Font Awesome properly linked in your HTML file -->
                 @if(auth()->user()->getRoleNames() == '["Admin"]')
-                <!-- All Orders -->
-                <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;">
+                <a class="btn btn-secondary mr-1 float-end" href="/orders">
                     <i class="fas fa-list"></i> All
                 </a>
 
-                <!-- Canceled Order -->
-                <a class="btn btn-danger float-end" href="/orders?status=Canceled" style="margin-right: 10px;">
+                <a class="btn btn-danger float-end mr-1" href="/orders?status=Canceled">
                     <i class="fas fa-times"></i> Canceled
                 </a>
-
                 @endif
 
-                <!-- Complete Order -->
-                <a class="btn btn-success float-end" href="/orders?status=Complete" style="margin-right: 10px;">
+                <a class="btn btn-success float-end mr-1" href="/orders?status=Complete">
                     <i class="fas fa-check"></i> Complete
                 </a>
 
-                <!-- Inprogress Order -->
-                <a class="btn btn-info float-end" href="/orders?status=Inprogress" style="margin-right: 10px;">
+                <a class="btn btn-info float-end mr-1" href="/orders?status=Inprogress">
                     <i class="fas fa-hourglass-split"></i> Inprogress
                 </a>
 
-                <!-- Rejected Order -->
-                <a class="btn btn-warning float-end" href="/orders?status=Rejected" style="margin-right: 10px;">
+                <a class="btn btn-warning float-end mr-1" href="/orders?status=Rejected">
                     <i class="fas fa-times"></i> Rejected
                 </a>
 
-                <!-- Accepted Order -->
-                <a class="btn btn-success float-end" href="/orders?status=Accepted" style="margin-right: 10px;">
+                <a class="btn btn-success float-end mr-1" href="/orders?status=Accepted">
                     <i class="fas fa-check"></i> Accepted
                 </a>
 
-                <!-- Pending Order -->
-                <a class="btn btn-primary float-end" href="/orders?status=Pending" style="margin-right: 10px;">
+                <a class="btn btn-primary float-end mr-1" href="/orders?status=Pending">
                     <i class="fas fa-clock"></i> Pending
                 </a>
-
+                
+                <a class="btn btn-secondary float-end mr-1" href="{{route('orders.index')}}?appointment_date={{date('Y-m-d')}}">
+                    <i class="fas fa-calendar"></i>Todays Order
+                </a>
             </div>
         </div>
     </div>

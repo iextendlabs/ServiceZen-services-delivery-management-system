@@ -83,11 +83,11 @@ class Order extends Model
 
     public function getStaffTransactionStatus()
     {
-        return Transaction::where('user_id',$this->staff->user_id)->value('status');
+        return Transaction::where('user_id',$this->staff->user_id)->where('order_id',$this->id)->value('status');
     }
     
     public function getAffiliateTransactionStatus()
     {
-        return Transaction::where('user_id',$this->affiliate->id)->value('status');
+        return Transaction::where('user_id',$this->affiliate->id)->where('order_id',$this->id)->value('status');
     }
 }

@@ -8,54 +8,48 @@
             <div class="float-end">
 
                 @can('order-download')
-                <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end no-print"><i class="fa fa-print"></i> PDF</a>
-                <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end no-print" style="margin-right: 10px;"><i class="fa fa-download"></i> Excel</a>
+                <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger float-end"><i class="fa fa-print"></i> PDF</a>
+                <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success float-end mr-1"><i class="fa fa-download"></i> Excel</a>
                 @endcan
-                <!-- Assuming you have Font Awesome properly linked in your HTML file -->
+
                 @if(auth()->user()->getRoleNames() == '["Admin"]')
-                <!-- All Orders -->
-                <a class="btn btn-secondary ml-2 float-end" href="/orders" style="margin-right: 10px;">
+                <a class="btn btn-secondary float-end mr-1" href="/orders">
                     <i class="fas fa-list"></i> All
                 </a>
 
-                <!-- Canceled Order -->
-                <a class="btn btn-danger float-end" href="{{route('orders.index')}}?status=Canceled" style="margin-right: 10px;">
+                <a class="btn btn-danger float-end mr-1" href="{{route('orders.index')}}?status=Canceled">
                     <i class="fas fa-times"></i> Canceled
                 </a>
-
                 @endif
 
-                <!-- Complete Order -->
-                <a class="btn btn-success float-end" href="{{route('orders.index')}}?status=Complete" style="margin-right: 10px;">
+                <a class="btn btn-success float-end mr-1" href="{{route('orders.index')}}?status=Complete">
                     <i class="fas fa-check"></i> Complete
                 </a>
 
-                <!-- Inprogress Order -->
-                <a class="btn btn-info float-end" href="{{route('orders.index')}}?status=Inprogress" style="margin-right: 10px;">
+                <a class="btn btn-info float-end mr-1" href="{{route('orders.index')}}?status=Inprogress">
                     <i class="fas fa-hourglass-split"></i> Inprogress
                 </a>
 
-                <!-- Rejected Order -->
-                <a class="btn btn-warning float-end" href="{{route('orders.index')}}?status=Rejected" style="margin-right: 10px;">
+                <a class="btn btn-warning float-end mr-1" href="{{route('orders.index')}}?status=Rejected">
                     <i class="fas fa-times"></i> Rejected
                 </a>
 
-                <!-- Accepted Order -->
-                <a class="btn btn-success float-end" href="{{route('orders.index')}}?status=Accepted" style="margin-right: 10px;">
+                <a class="btn btn-success float-end mr-1" href="{{route('orders.index')}}?status=Accepted">
                     <i class="fas fa-check"></i> Accepted
                 </a>
 
-                <!-- Pending Order -->
-                <a class="btn btn-primary float-end" href="{{route('orders.index')}}?status=Pending" style="margin-right: 10px;">
+                <a class="btn btn-primary float-end mr-1" href="{{route('orders.index')}}?status=Pending">
                     <i class="fas fa-clock"></i> Pending
                 </a>
                 @if(auth()->user()->getRoleNames() == '["Staff"]')
-
-                <a class="btn btn-success float-end" href="{{ route('staffCashCollection') }}" style="margin-right: 10px;">
+                <a class="btn btn-success float-end mr-1" href="{{ route('staffCashCollection') }}">
                     <i class="fas fa-money-bill"></i> Cash Collection
                 </a>
-
                 @endif
+
+                <a class="btn btn-secondary float-end mr-1" href="{{route('orders.index')}}?appointment_date={{date('Y-m-d')}}">
+                    <i class="fas fa-calendar"></i>Todays Order
+                </a>
             </div>
         </div>
     </div>

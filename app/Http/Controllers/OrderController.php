@@ -8,6 +8,7 @@ use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\OrderService;
 use App\Models\TimeSlot;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -123,35 +124,35 @@ class OrderController extends Controller
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             );
-    
+
             // Create a callback function to generate CSV content
             $callback = function () use ($orders, $currentUser) {
                 $output = fopen('php://output', 'w');
                 $header = $currentUser->hasRole('Supervisor')
                     ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services')
                     : array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services');
-    
+
                 // Write the header row
                 fputcsv($output, $header);
-    
+
                 foreach ($orders as $key => $row) {
                     // Generate CSV data rows 
                     $services = array();
                     foreach ($row->orderServices as $service) {
                         $services[] = $service->service_name;
                     }
-    
+
                     $csvRow = $currentUser->hasRole('Supervisor')
                         ? array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services))
                         : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services));
-    
+
                     // Write the CSV data row
                     fputcsv($output, $csvRow);
                 }
-    
+
                 fclose($output);
             };
-    
+
             // Create a StreamedResponse to send the CSV content
             return response()->stream($callback, 200, $headers);
         } else if ($request->print == 1) {
@@ -214,6 +215,18 @@ class OrderController extends Controller
 
         $order = Order::find($id);
 
+        if (isset($order->affiliate)) {
+            $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+        }
+        
+        if ($request->status == "Complete" && isset($order->affiliate) && !isset($transaction)) {
+            $input['user_id'] = $order->affiliate->id;
+            $input['order_id'] = $order->id;
+            $input['amount'] = ($order->total_amount * $order->affiliate->affiliate->commission) / 100;
+            $input['status'] = 'Approved';
+            Transaction::create($input);
+        }
+
         $order->order_total->transport_charges = $request->transport_charges;
         $order->order_total->save();
 
@@ -243,6 +256,18 @@ class OrderController extends Controller
     public function updateOrderStatus(Order $order, Request $request)
     {
         $order->status = $request->status;
+        
+        if (isset($order->affiliate)) {
+            $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+        }
+
+        if ($order->status == "Complete" && isset($order->affiliate) && !isset($transaction)) {
+            $input['user_id'] = $order->affiliate->id;
+            $input['order_id'] = $order->id;
+            $input['amount'] = ($order->total_amount * $order->affiliate->affiliate->commission) / 100;
+            $input['status'] = 'Approved';
+            Transaction::create($input);
+        }
         $order->save();
         return redirect()->route('orders.index')->with('success', 'Order updated successfully');
     }
