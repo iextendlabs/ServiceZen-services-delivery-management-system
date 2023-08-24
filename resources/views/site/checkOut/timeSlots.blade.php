@@ -142,7 +142,7 @@
         <strong>Selected Time Slot:</strong><span id="selected-time-slot">
         @if(isset($order))
             @if(isset($order->time_slot))
-            {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}
+            {{ $order->time_slot_value }}
             @endif
         @endif
         </span>

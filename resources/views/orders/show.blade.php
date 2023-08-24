@@ -78,8 +78,8 @@
             <td class="text-left" colspan="2">Customer Details</td>
             <tr>
                 <td>
-                    <b>Name:</b> {{ $order->customer->name }} <br><br>
-                    <b>Email:</b> {{ $order->customer->email }} <br><br>
+                    <b>Name:</b> {{ $order->customer_name }} <br><br>
+                    <b>Email:</b> {{ $order->customer_email }} <br><br>
                     <b>Gender:</b> {{ $order->gender }}
                 </td>
                 <td>

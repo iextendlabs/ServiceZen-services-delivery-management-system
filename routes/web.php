@@ -39,11 +39,9 @@ use App\Http\Controllers\AppController\{
 use App\Http\Controllers\Site\{
     CheckOutController,
     CustomerAuthController,
-    CustomerProfileController,
     SiteController,
     SiteOrdersController,
-    SiteCashCollectionController
-    
+    AffiliateDashboardController,
 };
 
 /*
@@ -127,7 +125,7 @@ Route::resource('customerProfile', CustomerAuthController::class);
 Route::resource('order', SiteOrdersController::class);
 Route::get('order-update/{order}', [OrderController::class, 'updateOrderStatus'])->name('updateOrderStatus');
 Route::get('cashCollectionUpdate/{id}', [CashCollectionController::class, 'cashCollectionUpdate'])->name('cashCollectionUpdate');
-Route::resource('transactions', 'App\Http\Controllers\Site\TransactionController');
+Route::resource('affiliate_dashboard', AffiliateDashboardController::class);
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);

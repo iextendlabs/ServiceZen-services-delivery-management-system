@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Site;
 
 use App\Models\Transaction;
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TransactionController extends Controller
+class AffiliateDashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,22 +18,23 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        if(Auth::check()){
-            if(Auth::user()->hasRole('Staff')){
-                $transactions = Transaction::where('user_id',Auth::id())->latest()->get();
-                
-                return view('site.transactions.index',compact('transactions'))
-                ->with('i', (request()->input('page', 1) - 1) * 5);
-            }else{
-                $transactions = Transaction::where('user_id',Auth::id())->latest()->get();
-                
-                return view('site.transactions.index',compact('transactions'))
-                ->with('i', (request()->input('page', 1) - 1) * 5);
+        if (Auth::check()) {
+            $transactions = Transaction::where('user_id', Auth::id())->latest()->get();
+            $user = User::find(Auth::id());
+            $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+            $total_balance = 0;
+            foreach ($transactions as $transaction) {
+                $total_balance += $transaction->amount;
+                $transaction->formatted_amount = $transaction->amount * $pkrRateValue;
             }
-            
+
+            $total_balance *= $pkrRateValue;
+
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance'));
         }
 
-        return redirect("customer-login")->with('error','Oppes! You are not Login.');
+        return redirect("customer-login")->with('error', 'Oppes! You are not Login.');
     }
 
     /**
@@ -52,12 +55,6 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->all();
-        $input['status'] = "Approved";
-        Transaction::create($input);
-
-        return redirect()->back()
-                        ->with('success','Transaction successfully Approved.');
     }
 
     /**

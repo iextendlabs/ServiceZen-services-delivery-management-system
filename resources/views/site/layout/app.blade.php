@@ -125,7 +125,7 @@ $cart_product = 0;
               @else
               <a class="dropdown-item" href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>
               @if(Auth::user()->hasRole('Affiliate'))
-              <a class="dropdown-item" href="{{ route('transactions.index') }}">Transactions</a>
+              <a class="dropdown-item" href="{{ route('affiliate_dashboard.index') }}">Affiliate Dashboard</a>
               @endif
               <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
               <a class="dropdown-item" href="/customer-logout">Logout</a>

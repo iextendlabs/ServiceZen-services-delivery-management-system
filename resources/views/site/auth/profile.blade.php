@@ -133,39 +133,6 @@
                     </div>
                 </div>
             </div>
-            @if(auth()->user()->hasRole('Affiliate'))
-            
-            <div class="row">
-            <div class="col-md-12 text-center">
-                <br>
-                <h3><strong>Affiliate information</strong></h3>
-                <hr>
-            </div>
-            <div class="col-md-12">
-                    <a href="{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}">My Affiliate URL</a>
-                    <p>{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}</p>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <strong>Code:</strong>
-                        <input disabled type="text" name="code" id="code" class="form-control" placeholder="Code" value="{{$user->affiliate->code ?? null }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <strong>Commission:</strong>
-                        <input disabled type="text" name="commission" id="commission" class="form-control" placeholder="Commission" value="{{$user->affiliate->commission ?? null }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <strong>Fix Salary:</strong>
-                        <input disabled type="text" name="fix_salary" id="fix_salary" class="form-control" placeholder="Fix Salary" value="{{$user->affiliate->fix_salary ?? null }}">
-                    </div>
-                </div>
-                
-                @endif
-            </div>
             <span class="invalid-feedback text-right" id="gender-error" role="alert" style="display: none;">
                 <strong>Sorry, No Male Services Listed in Our Store.</strong>
             </span>

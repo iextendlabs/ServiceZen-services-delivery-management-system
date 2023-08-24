@@ -28,7 +28,7 @@
             @foreach ($orders as $order)
             <tr>
                 <td>{{ ++$i }}</td>
-                <td>{{ $order->customer->name }}</td>
+                <td>{{ $order->customer_name }}</td>
                 <td>@currency( $order->total_amount )</td>
                 <td>{{ $order->payment_method }}</td>
                 <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
