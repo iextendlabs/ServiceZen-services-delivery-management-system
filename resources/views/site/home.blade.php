@@ -65,7 +65,7 @@
       @endforeach
     </div>
     @if(count($FAQs)  )
-    <h1>Frequently Asked Questions</h1>
+    <h1 id="faqs">Frequently Asked Questions</h1>
     <div id="accordion">
       @foreach ($FAQs as $FAQ)
       <div class="card">

@@ -106,6 +106,9 @@ $cart_product = 0;
           <li class="nav-item">
             <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-Ons</a>
           </li>
+          <li class="nav-item">
+            <a href="#faqs" class="nav-link">FAQs</a>
+          </li>
 
 
           <li class="nav-item">

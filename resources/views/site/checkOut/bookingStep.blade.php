@@ -203,6 +203,10 @@
                         </label>
                     </div>
                 </div>
+                <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
+                    <strong >Sorry, No Male Services Listed in Our Store.</strong>
+                </span>
+
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
                     <a href="cart">

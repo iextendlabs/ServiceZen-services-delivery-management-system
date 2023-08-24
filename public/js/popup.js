@@ -1,3 +1,22 @@
+$(document).ready(function () {
+    // Event listener for gender radio buttons
+    $('input[name="gender"]').on("change", function () {
+        var selectedGender = $(this).val();
+        var $submitButton = $('button[type="submit"]');
+        var $genderError = $("#gender-error");
+
+        if (selectedGender === "Male") {
+            // Hide the registration button and show the error message
+            $submitButton.hide();
+            $genderError.show();
+        } else {
+            // Show the registration button and hide the error message
+            $submitButton.show();
+            $genderError.hide();
+        }
+    });
+});
+
 var map;
 var marker;
 var autocomplete;
@@ -103,7 +122,10 @@ function initAutocomplete() {
 var showMapError = false;
 function mapReady() {
     $(document).ready(function () {
-        if (window.location.pathname !== "/customer-login" && window.location.pathname !== "/customer-registration") {
+        if (
+            window.location.pathname !== "/customer-login" &&
+            window.location.pathname !== "/customer-registration"
+        ) {
             var session = $('input[name="session"]').val();
             if (session == "false") {
                 setTimeout(function () {

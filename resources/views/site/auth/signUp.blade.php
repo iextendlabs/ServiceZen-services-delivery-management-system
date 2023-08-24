@@ -87,7 +87,9 @@
                                         {{ __('Female') }}
                                     </label>
                                 </div>
-
+                                <span class="invalid-feedback" id="gender-error" role="alert" style="display: none;">
+                                    <strong>Sorry, No Male Services Listed in Our Store.</strong>
+                                </span>
                                 @error('gender')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>

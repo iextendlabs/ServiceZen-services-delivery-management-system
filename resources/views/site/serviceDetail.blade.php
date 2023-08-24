@@ -51,7 +51,10 @@
           <p class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></p>
           <a href="/addToCart/{{ $service->id }}" class="btn btn-block btn-primary">Add to Cart</a>
           @if(count($service->addONs))
-          <button class="btn btn-block btn-secondary" id="scroll">Add ONs</button>
+          <button class="btn btn-block btn-secondary" id="add-ons-scroll">Add ONs</button>
+          @endif
+          @if(count($FAQs))
+          <button class="btn btn-block btn-secondary" id="faqs-scroll">FAQs</button>
           @endif
           <!-- AddToAny BEGIN -->
           <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
@@ -173,7 +176,7 @@
     @endif
     <hr>
     @if(count($FAQs))
-    <h1>Frequently Asked Questions</h1>
+    <h1 id="faqs">Frequently Asked Questions</h1>
     <div id="accordion">
       @foreach ($FAQs as $FAQ)
       <div class="card">
@@ -196,44 +199,16 @@
   </div>
 </div>
 
-<!-- @if(count($service->addONs))
-    <h2>Add ONs</h2><br>
-    <div id="add-ons" class="row">
-      @foreach($service->addONs as $addONs)
-      <div class="col-md-4 service-box">
-        <div class="card mb-4 box-shadow">
-          <p class="card-text service-box-title text-center"><b>{{ $addONs->service->name }}</b></p>
-          <a href="/serviceDetail/{{ $addONs->service->id }}">
-            <img class="card-img-top" src="./service-images/{{ $addONs->service->image }}" alt="Card image cap">
-          </a>
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted service-box-price">
-                @if(isset($addONs->service->discount))<s>@endif
-                  @currency($addONs->service->price)
-                  @if(isset($addONs->service->discount))</s>@endif
-                @if(isset($addONs->service->discount))
-                <b class="discount"> @currency( $addONs->service->discount )</b>
-                @endif
-              </small>
-
-              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $addONs->service->duration }}</small>
-            </div>
-
-            <a href="/addToCart/{{ $addONs->service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
-
-
-          </div>
-        </div>
-      </div>
-      @endforeach
-    </div>
-    @endif -->
-
 <script>
-  $('#scroll').click(() => {
+  $('#add-ons-scroll').click(() => {
     $('html, body').animate({
-      scrollTop: $('#add-ons').offset().top
+      scrollTop: $('#myCarousel').offset().top
+    }, 1000);
+  });
+
+  $('#faqs-scroll').click(() => {
+    $('html, body').animate({
+      scrollTop: $('#faqs').offset().top
     }, 1000);
   });
 </script>
