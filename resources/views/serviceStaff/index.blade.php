@@ -1,13 +1,15 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
+        <div class="float-left">
             <h2>Service Staff</h2>
         </div>
-        <div class="col-md-6">
+        <div class="float-right">
             @can('service-staff-create')
-            <a class="btn btn-success float-end" href="{{ route('serviceStaff.create') }}"> Create New Staff</a>
+            <a class="btn btn-success float-end" href="{{ route('serviceStaff.create') }}"><i class="fa fa-plus"></i></a>
             @endcan
+        </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
@@ -27,6 +29,7 @@
                     <th>Sr#</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Status</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($serviceStaff))
@@ -36,18 +39,19 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $staff->name }}</td>
                     <td>{{ $staff->email }}</td>
+                    <td>@if($staff->staff->status == 1) Enabled @else Disabled @endif</td>
                     <td>
                         <form action="{{ route('serviceStaff.destroy',$staff->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('serviceStaff.show',$staff->id) }}">Show</a>
+                            <a class="btn btn-warning" href="{{ route('serviceStaff.show',$staff->id) }}"><i class="fa fa-eye"></i></a>
                             @can('service-staff-edit')
-                            <a class="btn btn-primary" href="{{ route('serviceStaff.edit',$staff->id) }}">Edit</a>
+                            <a class="btn btn-primary" href="{{ route('serviceStaff.edit',$staff->id) }}"><i class="fa fa-edit"></i></a>
                             @endcan
                             @csrf
                             @method('DELETE')
                             @can('service-staff-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                             @endcan
-                            <a class="btn btn-primary" href="{{ route('staffHolidays.create',['staff' => $staff->id]) }}"><i class="fas fa-calendar"></i></a>
+                            <a class="btn btn-primary" href="{{ route('staffHolidays.create',['staff' => $staff->id]) }}" title="Add Holiday"><i class="fas fa-calendar"></i></a>
                         </form>
                     </td>
                 </tr>

@@ -113,6 +113,15 @@ class TimeSlot extends Model
                         $excluded_staff[] = $order->service_staff_id;
                     }
 
+                    foreach($timeSlot->staffs as $staff){
+                        
+                        if($staff->staff->status == 0){
+                            $excluded_staff[] = $staff->staff->user_id;
+                            $timeSlot->space_availability--;
+                        }
+
+                    }
+
                     $excluded_staffs = array_unique(array_merge($excluded_staff, $short_holiday_staff_ids));
                     $timeSlot->excluded_staff = $excluded_staffs;
                     $available_staff_id =  $timeSlot->staffs()->pluck('staff_id')->toArray();
