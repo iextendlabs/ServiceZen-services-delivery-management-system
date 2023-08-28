@@ -36,17 +36,17 @@ class AffiliateController extends Controller
     {
         $filter_name = $request->name;
 
-        $query = User::latest();
+        $query = User::role('Affiliate')->latest();
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $affiliates = $query->get();
+        $affiliates = $query->paginate(config('app.paginate'));
 
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
 
-        return view('affiliates.index', compact('affiliates', 'filter_name', 'pkrRateValue'));
+        return view('affiliates.index', compact('affiliates', 'filter_name', 'pkrRateValue'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

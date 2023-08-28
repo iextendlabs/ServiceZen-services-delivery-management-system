@@ -19,9 +19,6 @@
         </div>
     @endif
     <hr>
-    @php
-        $i = 0;
-    @endphp
     <div class="row">
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
@@ -33,7 +30,6 @@
                 </tr>
                 @if(count($assistant_supervisors))
                 @foreach ($assistant_supervisors as $assistant_supervisor)
-                @if($assistant_supervisor->getRoleNames() == '["Assistant Supervisor"]')
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $assistant_supervisor->name }}</td>
@@ -52,7 +48,6 @@
                         </form>
                     </td>
                 </tr>
-                @endif
                 @endforeach
                 @else
                 <tr>
@@ -60,6 +55,7 @@
                 </tr>
                 @endif
             </table>
+        {!! $assistant_supervisors->links() !!}
         </div>
         <div class="col-md-3">
             <h3>Filter</h3><hr>

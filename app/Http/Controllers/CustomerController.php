@@ -31,15 +31,15 @@ class CustomerController extends Controller
     {
         $filter_name = $request->name;
 
-        $query = User::latest();
+        $query = User::role('Customer')->latest();
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $customers = $query->get(); 
+        $customers = $query->paginate(config('app.paginate'));
 
-        return view('customers.index',compact('customers','filter_name'));
+        return view('customers.index',compact('customers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

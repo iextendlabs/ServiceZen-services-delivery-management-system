@@ -31,15 +31,15 @@ class DriverController extends Controller
     {
         $filter_name = $request->name;
 
-        $query = User::latest();
+        $query = User::role('Driver')->latest();
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $drivers = $query->get(); 
+        $drivers = $query->paginate(config('app.paginate'));
 
-        return view('drivers.index',compact('drivers','filter_name'));
+        return view('drivers.index',compact('drivers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

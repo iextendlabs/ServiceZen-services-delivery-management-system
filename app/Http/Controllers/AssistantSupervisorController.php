@@ -33,15 +33,15 @@ class AssistantSupervisorController extends Controller
     {
         $filter_name = $request->name;
 
-        $query = User::latest();
+        $query = User::role('Assistant Supervisor')->latest();
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $assistant_supervisors = $query->get();
+        $assistant_supervisors = $query->paginate(config('app.paginate'));
 
-        return view('assistantSupervisors.index',compact('assistant_supervisors','filter_name'));
+        return view('assistantSupervisors.index',compact('assistant_supervisors','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

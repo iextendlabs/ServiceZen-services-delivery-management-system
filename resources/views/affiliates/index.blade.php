@@ -19,9 +19,6 @@
         </div>
     @endif
     <hr>
-    @php
-        $i = 0;
-    @endphp
     <div class="row">
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
@@ -36,7 +33,6 @@
                 </tr>
                 @if(count($affiliates))
                 @foreach ($affiliates as $affiliate)
-                @if($affiliate->getRoleNames() == '["Affiliate"]')
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $affiliate->name }}</td>
@@ -59,7 +55,6 @@
                         </form>
                     </td>
                 </tr>
-                @endif
                 @endforeach
                 @else
                 <tr>
@@ -67,6 +62,8 @@
                 </tr>
                 @endif
             </table>
+        {!! $affiliates->links() !!}
+
         </div>
         <div class="col-md-3">
             <h3>Filter</h3><hr>

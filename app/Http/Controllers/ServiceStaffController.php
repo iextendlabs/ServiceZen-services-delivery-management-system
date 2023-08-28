@@ -37,20 +37,20 @@ class ServiceStaffController extends Controller
 
         if(Auth::user()->hasRole('Supervisor')){
             $staffIds = Auth::user()->getSupervisorStaffIds();
-            $query = User::whereIn('id', $staffIds);
+            $query = User::role('Staff')->whereIn('id', $staffIds);
         }elseif(Auth::user()->hasRole('Staff')){
-            $query = User::where('id',Auth::id());
+            $query = User::role('Staff')->where('id',Auth::id());
         }else{
-            $query = User::latest();
+            $query = User::role('Staff')->latest();
         }
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $serviceStaff = $query->get();
+        $serviceStaff = $query->paginate(2);
 
-        return view('serviceStaff.index',compact('serviceStaff','filter_name'));
+        return view('serviceStaff.index',compact('serviceStaff','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

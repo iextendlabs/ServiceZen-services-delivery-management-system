@@ -33,15 +33,15 @@ class SupervisorController extends Controller
     {
         $filter_name = $request->name;
 
-        $query = User::latest();
+        $query = User::role('Supervisor')->latest();
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $supervisors = $query->get();
+        $supervisors = $query->paginate(config('app.paginate'));
 
-        return view('supervisors.index', compact('supervisors','filter_name'));
+        return view('supervisors.index', compact('supervisors','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

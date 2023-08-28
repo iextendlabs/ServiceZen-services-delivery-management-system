@@ -32,15 +32,15 @@ class ManagerController extends Controller
     {
         $filter_name = $request->name;
 
-        $query = User::latest();
+        $query = User::role('Manager')->latest();
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $managers = $query->get();
+        $managers = $query->paginate(config('app.paginate'));
 
-        return view('managers.index',compact('managers','filter_name'));
+        return view('managers.index',compact('managers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

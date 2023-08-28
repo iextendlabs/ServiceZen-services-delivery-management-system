@@ -57,7 +57,7 @@ return [
 
     'staff_order_limit' => env('STAFF_ORDER_LIMIT','20'),
 
-    'paginate' => env('PAGINATE','20'),
+    'paginate' => env('PAGINATE','1'),
 
     'country_code' => env('COUNTRY_CODE','+971'),
 
