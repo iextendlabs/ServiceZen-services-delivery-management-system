@@ -7,6 +7,12 @@
         </div>
     </div>
 </div>
+@if ($message = Session::get('success'))
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
@@ -35,7 +41,9 @@
     <div class="col-md-12">
         <div class="form-group">
             <strong>Fix Salary:</strong>
-            Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }}
+            @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})
+            <button type="submit" value="salary" name="type" form="pay-transactions" class="btn btn-primary">Pay Salary</button>
+
         </div>
     </div>
     <div class="col-md-12">
@@ -59,6 +67,7 @@
             <th>Date Added</th>
             <th>Description</th>
             <th>Amount</th>
+            <th>Action</th>
         </tr>
         @foreach ($transactions as $transaction)
         <tr>
@@ -66,6 +75,17 @@
             <td>{{ $transaction->created_at }}</td>
             <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else Paid Amount @endif </td>
             <td>@currency($transaction->amount) (Rs.{{ $transaction->formatted_amount }})</td>
+            <td>
+            <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                @can('order-delete')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                </button>
+                @endcan
+            </form>
+            </td>
         </tr>
         @endforeach
     </table>
@@ -79,8 +99,10 @@
 <hr>
 <div class="row">
     <h3>Pay</h3>
-    <form action="{{ route('transactions.store') }}" method="POST">
+    <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
+    <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
         @csrf
+        <input type="hidden" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary }}">
         <input type="hidden" name="user_id" value="{{ $affiliate->id }}">
         <input type="hidden" name="pay" value="1">
         <div class="row">
@@ -89,14 +111,14 @@
                     <span style="color: red;">*</span><strong>Amount:</strong>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text">AED</span>
+                            <span class="input-group-text">{{ config('app.currency') }}</span>
                         </div>
-                        <input type="number" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Amount">
+                        <input type="text" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Amount">
                     </div>
                 </div>
             </div>
             <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" value="transaction" name="type" class="btn btn-primary" form="pay-transactions">Add Transaction</button>
             </div>
         </div>
 

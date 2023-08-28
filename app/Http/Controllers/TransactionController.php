@@ -35,17 +35,22 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'amount' => 'required'
-        ]);
-
         $input = $request->all();
 
-        if ($request->pay == 1) {
-            $input['amount'] = '-' . $request->amount;
-        }
         $input['status'] = "Approved";
-        Transaction::create($input);
+
+        if ($request->input('type') == "transaction") {
+            $input['amount'] = '-'.$request->amount;
+            Transaction::create($input);
+        } elseif ($request->input('type') == "salary") {
+            $input['amount'] = $request->fix_salary;
+            Transaction::create($input);
+
+            $input['amount'] = '-'.$request->fix_salary;
+            Transaction::create($input);
+        } else {
+            Transaction::create($input);
+        }
 
         return redirect()->back()
             ->with('success', 'Transaction successfully Approved.');
@@ -93,6 +98,11 @@ class TransactionController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $transaction = Transaction::find($id);
+
+        $transaction->delete();
+
+        return redirect()->back()
+            ->with('success', 'Transaction deleted successfully');
     }
 }

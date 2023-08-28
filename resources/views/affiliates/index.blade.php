@@ -43,7 +43,7 @@
                     <td>{{ $affiliate->email }}</td>
                     <td>{{ $affiliate->affiliate->commission }}%</td>
                     <td>{{ $affiliate->affiliate->code }}</td>
-                    <td>Rs.{{$pkrRateValue * $affiliate->affiliate->fix_salary }}</td>
+                    <td> @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})</td>
                   
                     <td>
                         <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
