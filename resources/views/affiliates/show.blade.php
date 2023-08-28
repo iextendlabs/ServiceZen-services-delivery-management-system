@@ -8,11 +8,11 @@
     </div>
 </div>
 @if ($message = Session::get('success'))
-    <div class="alert alert-success">
-        <span>{{ $message }}</span>
-        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
+<div class="alert alert-success">
+    <span>{{ $message }}</span>
+    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
@@ -76,15 +76,15 @@
             <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else Paid Amount @endif </td>
             <td>@currency($transaction->amount) (Rs.{{ $transaction->formatted_amount }})</td>
             <td>
-            <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                @can('order-delete')
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-trash"></i>
-                </button>
-                @endcan
-            </form>
+                <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    @can('order-delete')
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    @endcan
+                </form>
             </td>
         </tr>
         @endforeach
@@ -98,13 +98,17 @@
 </div>
 <hr>
 <div class="row">
+    @if(count($transactions) != 0)
     <h3>Pay</h3>
     <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
+    @endif
     <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
         @csrf
         <input type="hidden" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary }}">
         <input type="hidden" name="user_id" value="{{ $affiliate->id }}">
         <input type="hidden" name="pay" value="1">
+        @if(count($transactions) != 0)
+
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
@@ -121,7 +125,7 @@
                 <button type="submit" value="transaction" name="type" class="btn btn-primary" form="pay-transactions">Add Transaction</button>
             </div>
         </div>
-
+        @endif
     </form>
 </div>
 @endsection
