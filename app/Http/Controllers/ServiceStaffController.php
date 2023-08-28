@@ -48,7 +48,7 @@ class ServiceStaffController extends Controller
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $serviceStaff = $query->paginate(2);
+        $serviceStaff = $query->paginate(config('app.paginate'));
 
         return view('serviceStaff.index',compact('serviceStaff','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
