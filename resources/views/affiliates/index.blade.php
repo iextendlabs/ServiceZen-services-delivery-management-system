@@ -7,7 +7,7 @@
             </div>
             <div class="float-end">
                 @can('affiliate-create')
-                    <a class="btn btn-success" href="{{ route('affiliates.create') }}"> Create New Affiliate</a>
+                    <a class="btn btn-success" href="{{ route('affiliates.create') }}"><i class="fa fa-plus"></i></a>
                 @endcan
             </div>
         </div>
@@ -29,10 +29,10 @@
                     <th>Sr#</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Code</th>
                     <th>Commission</th>
+                    <th>Code</th>
                     <th>Salary</th>
-                    <th width="280px">Action</th>
+                    <th>Action</th>
                 </tr>
                 @if(count($affiliates))
                 @foreach ($affiliates as $affiliate)
@@ -41,20 +41,20 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $affiliate->name }}</td>
                     <td>{{ $affiliate->email }}</td>
-                    <td>{{ $affiliate->affiliate->commission }}</td>
+                    <td>{{ $affiliate->affiliate->commission }}%</td>
                     <td>{{ $affiliate->affiliate->code }}</td>
-                    <td>{{ $affiliate->affiliate->fix_salary }}</td>
+                    <td>Rs.{{$pkrRateValue * $affiliate->affiliate->fix_salary }}</td>
                   
                     <td>
                         <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('affiliates.show',$affiliate->id) }}">Show</a>
+                            <a class="btn btn-warning" href="{{ route('affiliates.show',$affiliate->id) }}"><i class="fa fa-eye"></i></a>
                             @can('affiliate-edit')
-                            <a class="btn btn-primary" href="{{ route('affiliates.edit',$affiliate->id) }}">Edit</a>
+                            <a class="btn btn-primary" href="{{ route('affiliates.edit',$affiliate->id) }}"><i class="fa fa-edit"></i></a>
                             @endcan
                             @csrf
                             @method('DELETE')
                             @can('affiliate-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                             @endcan
                         </form>
                     </td>
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">Filter</button>
                     </div>
                 </div>
             </form>

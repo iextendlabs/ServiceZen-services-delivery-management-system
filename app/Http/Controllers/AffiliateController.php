@@ -1,17 +1,20 @@
 <?php
-    
+
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
+use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
-use Illuminate\Support\Arr;  
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+
 class AffiliateController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -19,10 +22,10 @@ class AffiliateController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:affiliate-list|affiliate-create|affiliate-edit|affiliate-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:affiliate-create', ['only' => ['create','store']]);
-         $this->middleware('permission:affiliate-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:affiliate-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:affiliate-list|affiliate-create|affiliate-edit|affiliate-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:affiliate-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:affiliate-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:affiliate-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -41,9 +44,11 @@ class AffiliateController extends Controller
 
         $affiliates = $query->get();
 
-        return view('affiliates.index',compact('affiliates','filter_name'));
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+        return view('affiliates.index', compact('affiliates', 'filter_name', 'pkrRateValue'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -53,7 +58,7 @@ class AffiliateController extends Controller
     {
         return view('affiliates.create');
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -83,9 +88,9 @@ class AffiliateController extends Controller
         Affiliate::create($input);
 
         return redirect()->route('affiliates.index')
-                        ->with('success','Affiliate created successfully.');
+            ->with('success', 'Affiliate created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -94,9 +99,21 @@ class AffiliateController extends Controller
      */
     public function show(User $affiliate)
     {
-        return view('affiliates.show',compact('affiliate'));
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+        $transactions = Transaction::where('user_id', $affiliate->id)->latest()->paginate(config('app.paginate'));
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+        foreach ($transactions as $transaction) {
+            $transaction->formatted_amount = round($transaction->amount * $pkrRateValue, 2);
+        }
+        $total_balance = 0;
+
+        $total_balance = Transaction::where('user_id', $affiliate->id)->sum('amount');
+        $total_balance_in_pkr = $total_balance * $pkrRateValue;
+
+        return view('affiliates.show', compact('affiliate', 'pkrRateValue','transactions','total_balance','total_balance_in_pkr'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -105,9 +122,9 @@ class AffiliateController extends Controller
      */
     public function edit(User $affiliate)
     {
-        return view('affiliates.edit',compact('affiliate'));
+        return view('affiliates.edit', compact('affiliate'));
     }
-    
+
     /**
      * Update the specified resource in storage.
      *
@@ -119,17 +136,17 @@ class AffiliateController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
             'code' => 'required',
             'commission' => 'required',
         ]);
 
         $input = $request->all();
-        if(!empty($input['password'])){ 
+        if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
-        }else{
-            $input = Arr::except($input,array('password'));    
+        } else {
+            $input = Arr::except($input, array('password'));
         }
 
         $affiliate = User::find($id);
@@ -139,9 +156,9 @@ class AffiliateController extends Controller
         $affiliate->update($input);
 
         return redirect()->route('affiliates.index')
-                        ->with('success','Affiliate updated successfully');
+            ->with('success', 'Affiliate updated successfully');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -153,7 +170,6 @@ class AffiliateController extends Controller
         $affiliate->delete();
 
         return redirect()->route('affiliates.index')
-                        ->with('success','Affiliate deleted successfully');
+            ->with('success', 'Affiliate deleted successfully');
     }
-
 }

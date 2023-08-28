@@ -52,15 +52,16 @@
                 <th>Description</th>
                 <th>Amount</th>
             </tr>
-            @foreach ($transactions as $key=>$transaction)
+            @foreach ($transactions as $transaction)
             <tr>
-                <td>{{ ++$key }}</td>
+                <td>{{ ++$i }}</td>
                 <td>{{ $transaction->created_at }}</td>
-                <td>Order ID: #{{ $transaction->id }}</td>
+                <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else Paid Amount @endif</td>
                 <td>Rs.{{ $transaction->formatted_amount }}</td>
             </tr>
             @endforeach
         </table>
+        {!! $transactions->links() !!}
         @else
         <div class="text-center">
             <h4>There are no transactions</h4>

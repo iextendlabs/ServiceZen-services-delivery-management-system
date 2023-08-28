@@ -35,12 +35,20 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'amount' => 'required'
+        ]);
+
         $input = $request->all();
+
+        if ($request->pay == 1) {
+            $input['amount'] = '-' . $request->amount;
+        }
         $input['status'] = "Approved";
         Transaction::create($input);
 
         return redirect()->back()
-                        ->with('success','Transaction successfully Approved.');
+            ->with('success', 'Transaction successfully Approved.');
     }
 
     /**

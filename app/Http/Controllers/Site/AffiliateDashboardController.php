@@ -19,19 +19,20 @@ class AffiliateDashboardController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            $transactions = Transaction::where('user_id', Auth::id())->latest()->get();
+            $transactions = Transaction::where('user_id', Auth::id())->latest()->paginate(config('app.paginate'));
             $user = User::find(Auth::id());
             $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
-
-            $total_balance = 0;
+            
             foreach ($transactions as $transaction) {
-                $total_balance += $transaction->amount;
-                $transaction->formatted_amount = $transaction->amount * $pkrRateValue;
+                $transaction->formatted_amount = round($transaction->amount * $pkrRateValue, 2);
             }
 
+            $total_balance = 0;
+
+            $total_balance = Transaction::where('user_id', Auth::id())->sum('amount');
             $total_balance *= $pkrRateValue;
 
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance'));
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect("customer-login")->with('error', 'Oppes! You are not Login.');
