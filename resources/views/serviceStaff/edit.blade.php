@@ -25,13 +25,13 @@
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Name:</strong>
-                <input type="text" name="name" value="{{ $serviceStaff->name }}" class="form-control" placeholder="Name">
+                <input disabled type="text" name="name" value="{{ $serviceStaff->name }}" class="form-control" placeholder="Name">
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Email:</strong>
-                <input type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
+                <input disabled type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
             </div>
         </div>
         <div class="col-md-12">
