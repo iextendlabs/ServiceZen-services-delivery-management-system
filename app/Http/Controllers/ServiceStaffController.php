@@ -144,9 +144,9 @@ class ServiceStaffController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            // 'name' => 'required',
+            'name' => 'required',
             'phone' => 'required',
-            // 'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,'.$id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
             'commission'=> 'required'
