@@ -222,7 +222,8 @@ class OrderController extends Controller
         if ($request->status == "Complete" && isset($order->affiliate) && !isset($transaction)) {
             $input['user_id'] = $order->affiliate->id;
             $input['order_id'] = $order->id;
-            $input['amount'] = ($order->order_total->sub_total * $order->affiliate->affiliate->commission) / 100;
+            $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
+            $input['amount'] = (($order->order_total->sub_total-$staff_commission) * $order->affiliate->affiliate->commission) / 100;
             $input['status'] = 'Approved';
             Transaction::create($input);
         }
@@ -264,7 +265,8 @@ class OrderController extends Controller
         if ($order->status == "Complete" && isset($order->affiliate) && !isset($transaction)) {
             $input['user_id'] = $order->affiliate->id;
             $input['order_id'] = $order->id;
-            $input['amount'] = ($order->order_total->sub_total * $order->affiliate->affiliate->commission) / 100;
+            $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
+            $input['amount'] = (($order->order_total->sub_total-$staff_commission) * $order->affiliate->affiliate->commission) / 100;
             $input['status'] = 'Approved';
             Transaction::create($input);
         }

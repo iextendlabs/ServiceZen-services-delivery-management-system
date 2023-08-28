@@ -158,6 +158,9 @@
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->service_staff_id }}">
                     <input type="hidden" name="amount" value="{{ ($order->order_total->sub_total * $order->staff->commission) / 100 }}">
+                    @php 
+                    $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
+                    @endphp
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>{{ $order->status }}</td>
@@ -196,12 +199,12 @@
                     @csrf
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
-                    <input type="hidden" name="amount" value="{{ ($order->order_total->sub_total * $order->affiliate->affiliate->commission) / 100 }}">
+                    <input type="hidden" name="amount" value="{{ ((($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100) }}">
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
                         <td>{{ $order->affiliate->name }}</td>
-                        <td>@currency(($order->order_total->sub_total * $order->affiliate->affiliate->commission) / 100)</td>
+                        <td>@currency((($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100)</td>
                         <td class="no-print">
                             @if(empty($order->getAffiliateTransactionStatus()))
                             @can('order-edit')
