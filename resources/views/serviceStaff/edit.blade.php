@@ -31,7 +31,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Email:</strong>
-                <input readonly type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
+                <input type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
             </div>
         </div>
         <div class="col-md-12">
