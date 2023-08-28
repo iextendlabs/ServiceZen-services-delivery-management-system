@@ -110,6 +110,7 @@
                                 @endcan
                                 @can('staff-holiday-list')
                                 <a class="dropdown-item" href="{{ route('staffHolidays.index') }}">Staff Holiday</a>
+                                <a class="dropdown-item" href="{{ route('longHolidays.index') }}">Long  Holiday</a>
                                 <a class="dropdown-item" href="{{ route('shortHolidays.index') }}">Short Holiday</a>
                                 <a class="dropdown-item" href="{{ route('staffGeneralHolidays.index') }}">Staff General Holiday</a>
                                 @endcan

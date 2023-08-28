@@ -1,0 +1,103 @@
+@extends('layouts.app')
+@section('content')
+<div class="row">
+    <div class="col-md-12">
+        <div class="float-start">
+            <h2>Long Holidays</h2>
+        </div>
+        <div class="float-end">
+            @can('staff-holiday-create')
+            <a class="btn btn-success  float-end" href="{{ route('longHolidays.create') }}" style="margin-left: 5px;"> <i class="fa fa-plus"></i></a>
+            @endcan
+            @can('staff-holiday-delete')
+            <button id="bulkDeleteBtn" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+            @endcan
+        </div>
+    </div>
+</div>
+@if ($message = Session::get('success'))
+<div class="alert alert-success">
+    <span>{{ $message }}</span>
+    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+<hr>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th></th>
+                <th>Sr#</th>
+                <th>Date Start</th>
+                <th>Date End</th>
+                <th>Staff Name</th>
+                <th>Action</th>
+            </tr>
+            @if(count($longHolidays))
+            @foreach ($longHolidays as $longHoliday)
+            <tr>
+                <td>
+                    <input type="checkbox" class="item-checkbox" value="{{ $longHoliday->id }}">
+                </td>
+                <td>{{ ++$i }}</td>
+                <td>{{ $longHoliday->date_start }}</td>
+                <td>{{ $longHoliday->date_end }}</td>
+                <td>{{ $longHoliday->staff->name }}</td>
+                <td>
+                    <form action="{{ route('longHolidays.destroy',$longHoliday->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        @can('staff-holiday-delete')
+                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                        @endcan
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+            @else
+            <tr>
+                <td colspan="6" class="text-center">There is no staff Holiday.</td>
+            </tr>
+            @endif
+        </table>
+        {!! $longHolidays->links() !!}
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
+            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedItems.length > 0) {
+                if (confirm('Are you sure you want to delete the selected items?')) {
+                    deleteSelectedItems(selectedItems);
+                }
+            } else {
+                alert('Please select items to delete.');
+            }
+        });
+
+        function deleteSelectedItems(selectedItems) {
+            fetch('{{ route('longHolidays.bulkDelete') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            selectedItems
+                        })
+                    })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+</script>
+@endsection

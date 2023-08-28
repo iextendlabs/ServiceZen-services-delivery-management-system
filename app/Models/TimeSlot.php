@@ -67,7 +67,12 @@ class TimeSlot extends Model
                 $holiday = Holiday::where('date', $date)->pluck('date')->toArray();
             }
             $generalHolidayStaffIds = StaffGeneralHoliday::where('day', $dayName)->pluck('staff_id')->toArray();
-            $staff_ids = array_merge($staff_ids, $generalHolidayStaffIds);
+
+            $longHolidaysStaffId = LongHoliday::where('date_start', '<=', $date)
+                ->where('date_end', '>=', $date)
+                ->pluck('staff_id')->toArray();
+            $staff_ids =array_unique([...$staff_ids, ...$generalHolidayStaffIds, ...$longHolidaysStaffId]);
+
 
             if (count($holiday) == 0) {
                 if ($date == $currentDate) {
@@ -99,7 +104,7 @@ class TimeSlot extends Model
                 foreach ($timeSlots as $timeSlot) {
                     if ($short_holiday) {
                         $short_holiday_staff_ids = ShortHoliday::where('date', $date)->where('time_start', '<=', $timeSlot->time_end)->where('time_end', '>=', $timeSlot->time_start)->pluck('staff_id')->toArray();
-                    }else{
+                    } else {
                         $short_holiday_staff_ids = [];
                     }
 
@@ -107,19 +112,18 @@ class TimeSlot extends Model
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
                     else
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
-                        $excluded_staff = [];
+                    $excluded_staff = [];
                     foreach ($orders as $order) {
                         $timeSlot->space_availability--;
                         $excluded_staff[] = $order->service_staff_id;
                     }
 
-                    foreach($timeSlot->staffs as $staff){
-                        
-                        if($staff->staff->status == 0){
+                    foreach ($timeSlot->staffs as $staff) {
+
+                        if ($staff->staff->status == 0) {
                             $excluded_staff[] = $staff->staff->user_id;
                             $timeSlot->space_availability--;
                         }
-
                     }
 
                     $excluded_staffs = array_unique(array_merge($excluded_staff, $short_holiday_staff_ids));
