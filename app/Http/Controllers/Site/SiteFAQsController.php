@@ -28,7 +28,7 @@ class SiteFAQsController extends Controller
 
         $servicesFAQ = Service::WhereIn('id',$FAQServiceIds)->get();
         // dd($categories);
-        $generalFAQ = FAQ::where('category_id','')->where('service_id','')->get();
+        $generalFAQ = FAQ::where('category_id',null)->where('service_id',null)->get();
 
         return view('site.FAQs.index', compact('categoriesFAQ','servicesFAQ','generalFAQ'));
     }
