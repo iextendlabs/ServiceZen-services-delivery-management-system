@@ -98,6 +98,7 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('settings.index') }}">Settings</a>
+                                <a class="dropdown-item" href="{{ route('reviews.index') }}">Reviews</a>
                                 @can('service-list')
                                 <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
                                 @endcan

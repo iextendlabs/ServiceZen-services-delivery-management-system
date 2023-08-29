@@ -56,6 +56,9 @@
           @if(count($FAQs))
           <button class="btn btn-block btn-secondary" id="faqs-scroll">FAQs</button>
           @endif
+          @if(auth()->check())
+          <button class="btn btn-block btn-primary" id="review">Write a review</button>
+          @endif
           <!-- AddToAny BEGIN -->
           <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
             <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
@@ -72,10 +75,42 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <h3 class="text-center mt-3" style="font-family: 'Titillium Web', sans-serif;
-    font-weight: bold;">Description</h3>
-        {!! $service->description !!}
+        <h3 class="text-center mt-3" style="font-family: 'Titillium Web', sans-serif;font-weight: bold;">Description</h3>
+        {!! $service->description !!} <hr>
       </div>
+      @if(auth()->check())
+      <div class="col-md-6" id="review-form" style="display: none;">
+        <h3>Write a review</h3>
+        <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+          @csrf
+          <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
+          <input type="hidden" name="service_id" value="{{ $service->id }}">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <span style="color: red;">*</span><strong>Review:</strong>
+                      <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{old('content')}}</textarea>
+                  </div>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <span style="color: red;">*</span><label for="rating">Rating</label><br>
+                      @for($i = 1; $i <= 5; $i++) 
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
+                          <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                      </div>
+                      @endfor
+                  </div>
+              </div>
+
+          <div class="col-md-12 text-right">
+              <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+      </div>
+      @endif
     </div>
   </div>
 </div>
@@ -211,6 +246,13 @@
   $('#faqs-scroll').click(() => {
     $('html, body').animate({
       scrollTop: $('#faqs').offset().top
+    }, 1000);
+  });
+
+  $(document).on('click','#review',function(){
+    $('#review-form').show();
+    $('html, body').animate({
+      scrollTop: $('#review-form').offset().top
     }, 1000);
   });
 </script>
