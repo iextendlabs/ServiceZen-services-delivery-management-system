@@ -158,14 +158,15 @@ class SiteOrdersController extends Controller
             OrderService::create($input);
         }
 
+        Session::forget('staff_and_time');
+        Session::forget('serviceIds');
+
         try {
             $this->sendAdminEmail($input['order_id'], $input['email']);
             $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
         } catch (\Throwable $th) {
             //TODO: log error or queue job later
         }
-        Session::forget('staff_and_time');
-        Session::forget('serviceIds');
 
         return view('site.orders.success', compact('customer_type', 'password'));
     }

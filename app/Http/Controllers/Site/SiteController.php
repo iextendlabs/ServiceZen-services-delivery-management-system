@@ -61,13 +61,15 @@ class SiteController extends Controller
         }
         
         if (isset($request->id)) {
-            $services = Service::where('category_id', $request->id)->get();
+            $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
             $category = ServiceCategory::find($request->id);
             $FAQs = FAQ::where('category_id',$request->id)->get();
+            $filters = $request->only(['id']);
+            $services->appends($filters);
             return view('site.home', compact('services', 'category', 'address','FAQs'));
         } else {
         $FAQs = FAQ::get();
-        $services = Service::all();
+        $services = Service::paginate(config('app.paginate'));
             return view('site.home', compact('services', 'address','FAQs'));
         }
     }

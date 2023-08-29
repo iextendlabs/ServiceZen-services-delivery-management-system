@@ -64,7 +64,12 @@
       </div>
       @endforeach
     </div>
-    @if(count($FAQs)  )
+    <div class="row">
+      <div class="col-md-12 text-center">
+        {!! $services->links() !!}
+      </div>
+    </div>
+    @if(count($FAQs) )
     <h1 id="faqs">Frequently Asked Questions</h1>
     <div id="accordion">
       @foreach ($FAQs as $FAQ)
