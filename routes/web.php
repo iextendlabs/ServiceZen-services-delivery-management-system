@@ -127,6 +127,7 @@ Route::resource('customerProfile', CustomerAuthController::class);
 
 Route::resource('order', SiteOrdersController::class);
 Route::get('order-update/{order}', [OrderController::class, 'updateOrderStatus'])->name('updateOrderStatus');
+Route::get('reOrder/{id}', [SiteOrdersController::class, 'reOrder'])->name('order.reOrder');
 Route::get('cashCollectionUpdate/{id}', [CashCollectionController::class, 'cashCollectionUpdate'])->name('cashCollectionUpdate');
 Route::resource('affiliate_dashboard', AffiliateDashboardController::class);
 Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');

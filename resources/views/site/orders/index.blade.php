@@ -80,6 +80,7 @@
                     @if($order->status == "Pending")
                     <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}"><i class="fas fa-edit"></i> </a>
                     @endif
+                    <a class="btn btn-primary" href="{{ route('order.reOrder',$order->id) }}">ReOrder </a>
                    
                 </td>
             </tr>

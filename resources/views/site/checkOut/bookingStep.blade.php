@@ -11,6 +11,11 @@
             <div class="col-md-12 py-5 text-center">
                 <h2>Booking Step</h2>
                 <h3>Your Current Area: {{ $area }}</h3>
+                @if($serviceName)
+                <h3>Services :
+                    {{ $serviceName }}
+                </h3>
+                @endif
             </div>
         </div>
         <div class="text-center" style="margin-bottom: 20px;">
@@ -204,7 +209,7 @@
                     </div>
                 </div>
                 <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
-                    <strong >Sorry, No Male Services Listed in Our Store.</strong>
+                    <strong>Sorry, No Male Services Listed in Our Store.</strong>
                 </span>
 
                 <div class="col-md-12 text-center">

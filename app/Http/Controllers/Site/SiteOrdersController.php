@@ -328,4 +328,22 @@ class SiteOrdersController extends Controller
         // Return CSV file as download
         return Response::make('', 200, $headers);
     }
+
+    public function reOrder($order_id){
+
+        $order = Order::find($order_id);
+
+        foreach($order->orderServices as $service){
+            $serviceIds[] = $service->service_id;
+
+        }
+        if (session()->has('serviceIds')) {
+            Session::forget('serviceIds');
+            Session::put('serviceIds', $serviceIds);
+        } else {
+            Session::put('serviceIds', $serviceIds);
+        }
+
+        return redirect('/bookingStep')->with('cart-success', 'Service Add to Cart Successfully.');
+    }
 }

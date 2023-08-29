@@ -180,11 +180,10 @@ class CheckOutController extends Controller
             ];
         }
 
-        if($request->cookie('affiliate_id')){
-            $affiliate = Affiliate::where('user_id',$request->cookie('affiliate_id'))->first();
+        if ($request->cookie('affiliate_id')) {
+            $affiliate = Affiliate::where('user_id', $request->cookie('affiliate_id'))->first();
             $url_affiliate_code = $affiliate->code;
-
-        }else{
+        } else {
             $url_affiliate_code = '';
         }
 
@@ -204,11 +203,21 @@ class CheckOutController extends Controller
             $email = $addresses['email'];
             $name = $addresses['name'];
         }
+
+        $services = [];
+
+        $serviceIds = Session::get('serviceIds');
+        foreach ($serviceIds as $id) {
+            $services[] = Service::where('id', $id)->value('name');
+        }
+        $serviceName = implode(',', $services);
+
+
         $date = date('Y-m-d');
         $area = $addresses['area'];
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code','url_affiliate_code'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'serviceName'));
     }
 
 
@@ -236,16 +245,16 @@ class CheckOutController extends Controller
             return isset($service->discount) ? $service->discount : $service->price;
         });
 
-        if($code['coupon_code']){
-            $coupon = Coupon::where('code',$code['coupon_code'])->first();
+        if ($code['coupon_code']) {
+            $coupon = Coupon::where('code', $code['coupon_code'])->first();
             $coupon_id = $coupon->id;
-            if($coupon->type == "Percentage"){
-                $coupon_discount = ($sub_total * $coupon->discount)/100;
-            }else{
+            if ($coupon->type == "Percentage") {
+                $coupon_discount = ($sub_total * $coupon->discount) / 100;
+            } else {
                 $coupon_discount = $coupon->discount;
             }
-        }else{
-            $coupon_discount = 0;   
+        } else {
+            $coupon_discount = 0;
         }
 
         $staff_charges = $staff->staff->charges ?? 0;
