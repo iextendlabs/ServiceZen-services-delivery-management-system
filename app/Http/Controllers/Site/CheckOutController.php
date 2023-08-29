@@ -204,13 +204,15 @@ class CheckOutController extends Controller
             $name = $addresses['name'];
         }
 
-        $services = [];
-
-        $serviceIds = Session::get('serviceIds');
-        foreach ($serviceIds as $id) {
-            $services[] = Service::where('id', $id)->value('name');
+        if (session()->has('serviceIds')) {
+            $serviceIds = Session::get('serviceIds');
+            foreach ($serviceIds as $id) {
+                $services[] = Service::where('id', $id)->value('name');
+            }
+            $serviceName = implode(',', $services);
+        }else{
+            $serviceName = '';
         }
-        $serviceName = implode(',', $services);
 
 
         $date = date('Y-m-d');
