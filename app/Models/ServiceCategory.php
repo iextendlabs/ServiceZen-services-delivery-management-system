@@ -23,4 +23,9 @@ class ServiceCategory extends Model
     {
         return $this->hasMany(ServiceCategory::class, 'parent_id');
     }
+
+    public function FAQs()
+    {
+        return $this->hasMany(FAQ::class,'category_id');
+    }
 }

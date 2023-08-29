@@ -43,6 +43,7 @@ use App\Http\Controllers\Site\{
     SiteController,
     SiteOrdersController,
     AffiliateDashboardController,
+    SiteFAQsController,
 };
 
 /*
@@ -143,7 +144,7 @@ Route::middleware('no-cache')->get('slots', [CheckOutController::class,'slots'])
 Route::get('staff-group', [CheckOutController::class,'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
-
+Route::resource('siteFAQs',SiteFAQsController::class);
 //TODO :Customer Delete
 // app url
 

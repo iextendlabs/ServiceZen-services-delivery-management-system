@@ -89,9 +89,13 @@
       </div>
       @endforeach
     </div>
+    <div class="row">
+      <div class="col-md-2 offset-md-5 mt-3">
+        <a href="{{ route('siteFAQs.index') }}"><button type="button" class="btn btn-block btn-primary">More..</button></a>
+      </div>
+
+    </div>
     @endif
   </div>
 </div>
-
-
 @endsection

@@ -35,7 +35,7 @@ class SiteController extends Controller
         $address = Session::get('address');
 
         if (Auth::check()) {
-            
+
             $user = User::find(auth()->user()->id);
             if (isset($user->customerProfile) && session()->has('address') == false) {
                 $address = [];
@@ -54,32 +54,32 @@ class SiteController extends Controller
                 $address['longitude'] = $user->customerProfile->longitude;
                 $address['searchField'] = $user->customerProfile->searchField;
                 $address['gender'] = $user->customerProfile->gender;
-                
+
                 Session::put('address', $address);
-                
             }
         }
-        
+
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
             $category = ServiceCategory::find($request->id);
-            $FAQs = FAQ::where('category_id',$request->id)->get();
+            $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address','FAQs'));
+            return view('site.home', compact('services', 'category', 'address', 'FAQs'));
         } else {
-        $FAQs = FAQ::get();
-        $services = Service::paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address','FAQs'));
+            $FAQs = FAQ::latest()->take(3)->get();
+
+            $services = Service::paginate(config('app.paginate'));
+            return view('site.home', compact('services', 'address', 'FAQs'));
         }
     }
 
     public function show($id)
     {
         $service = Service::find($id);
-        $FAQs = FAQ::where('service_id',$id)->get();
+        $FAQs = FAQ::where('service_id', $id)->get();
 
-        return view('site.serviceDetail', compact('service','FAQs'));
+        return view('site.serviceDetail', compact('service', 'FAQs'));
     }
 
     public function saveLocation(Request $request)

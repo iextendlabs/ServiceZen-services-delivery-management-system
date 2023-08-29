@@ -34,4 +34,8 @@ class Service extends Model
         return $this->hasMany(ServiceAddOn::class);
     }
     
+    public function FAQs()
+    {
+        return $this->hasMany(FAQ::class,'service_id');
+    }
 }
