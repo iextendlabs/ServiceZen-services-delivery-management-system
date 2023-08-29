@@ -51,9 +51,13 @@ class ReviewController extends Controller
         ]);
 
         Review::create($request->all());
-
-        return redirect()->back()
-            ->with('success', 'Review created successfully.');
+        if ($request->store) {
+            return redirect()->back()
+                ->with('success', 'Review created successfully.');
+        } else {
+            return redirect()->route('reviews.index')
+                ->with('success', 'REview created successfully.');
+        }
     }
 
     /**
@@ -64,7 +68,7 @@ class ReviewController extends Controller
      */
     public function show($id)
     {
-        $review =Review::find($id);
+        $review = Review::find($id);
 
         return view('reviews.show', compact('review'));
     }
@@ -80,7 +84,7 @@ class ReviewController extends Controller
         $review = Review::find($id);
         $services = Service::all();
 
-        return view('reviews.edit', compact('review','services'));
+        return view('reviews.edit', compact('review', 'services'));
     }
 
     /**

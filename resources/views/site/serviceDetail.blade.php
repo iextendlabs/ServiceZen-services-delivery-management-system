@@ -85,6 +85,7 @@
           @csrf
           <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
           <input type="hidden" name="service_id" value="{{ $service->id }}">
+          <input type="hidden" name="store" value="1">
           <div class="row">
               <div class="col-md-12">
                   <div class="form-group">
