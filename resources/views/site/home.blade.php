@@ -44,8 +44,8 @@
       @foreach ($services as $service)
       <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
+        <a href="/serviceDetail/{{ $service->id }}">
           <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-          <a href="/serviceDetail/{{ $service->id }}">
             <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
           </a>
           <div class="card-body">

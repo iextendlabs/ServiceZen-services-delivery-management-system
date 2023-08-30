@@ -6,11 +6,7 @@
         width: 300px;
     }
 
-    #categories a{
-        text-decoration: none;
-        color: inherit;
-        transition: color 0.2s;
-    }
+    
 
     
 </style>

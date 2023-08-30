@@ -161,7 +161,7 @@
                     </small>
                     <small class="text-muted"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
                   </div>
-                  <a href="/addToCart/{{ $service->id }}" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a>
+                  <a href="/addToCart/{{ $service->id }}" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a>
                 </div>
               </div>
             </div>
@@ -192,8 +192,8 @@
       @foreach($service->package as $package)
       <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
-          <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
           <a href="/serviceDetail/{{ $package->service->id }}">
+          <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
             <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
           </a>
           <div class="card-body">
