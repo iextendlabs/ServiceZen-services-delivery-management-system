@@ -60,7 +60,7 @@ class SiteController extends Controller
             }
         }
 
-        $reviews = Review::get();
+        $reviews = Review::latest()->take(6)->get();
 
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));

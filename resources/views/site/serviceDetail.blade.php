@@ -118,37 +118,6 @@
 
 <div class="album py-5 bg-light">
   <div class="container">
-    @if(count($service->package))
-    <hr>
-    <h2>Package Services</h2><br>
-    <div class="row">
-      @foreach($service->package as $package)
-      <div class="col-md-4 service-box">
-        <div class="card mb-4 box-shadow">
-          <p class="card-text service-box-title text-center"><b>{{ $package->name }}</b></p>
-          <a href="/serviceDetail/{{ $package->service->id }}">
-            <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
-          </a>
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted service-box-price">
-                @if(isset($package->service->discount))<s>@endif
-                  @currency($package->service->price)
-                  @if(isset($package->service->discount))</s>@endif
-                @if(isset($package->service->discount))
-                <b class="discount"> @currency( $package->service->discount )</b>
-                @endif
-              </small>
-
-              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $package->service->duration }}</small>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      @endforeach
-    </div>
-    @endif
     
     @if(count($service->addONs))
     <hr>
@@ -209,6 +178,38 @@
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
       </a>
+    </div>
+    @endif
+
+    @if(count($service->package))
+    <hr>
+    <h2>Package Services</h2><br>
+    <div class="row">
+      @foreach($service->package as $package)
+      <div class="col-md-4 service-box">
+        <div class="card mb-4 box-shadow">
+          <p class="card-text service-box-title text-center"><b>{{ $package->name }}</b></p>
+          <a href="/serviceDetail/{{ $package->service->id }}">
+            <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
+          </a>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted service-box-price">
+                @if(isset($package->service->discount))<s>@endif
+                  @currency($package->service->price)
+                  @if(isset($package->service->discount))</s>@endif
+                @if(isset($package->service->discount))
+                <b class="discount"> @currency( $package->service->discount )</b>
+                @endif
+              </small>
+
+              <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $package->service->duration }}</small>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      @endforeach
     </div>
     @endif
     
