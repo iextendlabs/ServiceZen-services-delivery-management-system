@@ -93,7 +93,54 @@
       <div class="col-md-2 offset-md-5 mt-3">
         <a href="{{ route('siteFAQs.index') }}"><button type="button" class="btn btn-block btn-primary">More..</button></a>
       </div>
-
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+      <h2>Customer Reviews</h2>
+    <div id="reviewsCarousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        @foreach($reviews->chunk(3) as $key => $chunk)
+        <li data-target="#reviewsCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
+        @endforeach
+      </ol>
+        <div class="carousel-inner">
+            @foreach($reviews->chunk(3) as $chunk)
+            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                <div class="row">
+                    @foreach($chunk as $review)
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body" style="height: 215px !important">
+                                <h5 class="card-title">{{ $review->user->name }}</h5>
+                                <p class="card-text">{{ $review->content }}</p>
+                                <p class="card-text">
+                                    Rating:
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $review->rating)
+                                            <span class="text-warning">&#9733;</span>
+                                        @else
+                                            <span class="text-muted">&#9734;</span>
+                                        @endif
+                                    @endfor
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endforeach
+        </div>
+        <a class="carousel-control-prev" href="#reviewsCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#reviewsCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+      </div>
     </div>
     @endif
   </div>
