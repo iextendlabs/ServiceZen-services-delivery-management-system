@@ -73,16 +73,40 @@ class SettingController extends Controller
      */
     public function update(Request $request, $id)
     {
-        request()->validate([
-            'value' => 'required',
-        ]);
-
         $setting = Setting::find($id);
 
-        $setting->update($request->all());
+        if ($setting->key !== 'Slider Image') {
+            request()->validate([
+                'value' => 'required',
+            ]);
+        }
+
+        if ($setting->key === 'Slider Image') {
+            if ($request->image) {
+                $images = $request->image;
+
+                $existingImage = $setting->value ?? ''; // Existing image
+
+                $imagePaths = [];
+
+                foreach ($images as $image) {
+                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                    $image->move(public_path('slider-images'), $filename);
+                    $imagePaths[] = $filename;
+                }
+
+                $newImagePaths = implode(',', $imagePaths);
+                $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+            }
+        } else {
+            $setting->value = $request->input('value');
+        }
+
+        $setting->save();
 
         return redirect()->route('settings.index')
-        ->with('success', 'Setting Update successfully.');
+            ->with('success', 'Setting Update successfully.');
     }
 
     /**
@@ -94,5 +118,33 @@ class SettingController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function removeSliderImage(Request $request)
+    {
+
+        $setting = Setting::find($request->id);
+
+        $fileValues = explode(',', $setting->value);
+
+        $deletefilename = $request->filename;
+
+        // Remove the desired value if it exists
+        if (($key = array_search($deletefilename, $fileValues)) !== false) {
+            unset($fileValues[$key]);
+
+            if ($deletefilename && file_exists(public_path('slider-images') . '/' . $deletefilename)) {
+                unlink(public_path('slider-images') . '/' . $deletefilename);
+            }
+        }
+
+        // Re-index the array after removing an element
+        $fileValues = array_values($fileValues);
+
+        // Update the value in the database
+        $setting->value = implode(',', $fileValues);
+        $setting->save();
+
+        return redirect()->back()->with('success', 'Image Remove successfully.');
     }
 }

@@ -4,9 +4,6 @@
     background: none !important;
   }
 
-  .carousel-inner {
-  height: 220px !important;
-}
 </style>
 @section('content')
 <section class="jumbotron text-center">

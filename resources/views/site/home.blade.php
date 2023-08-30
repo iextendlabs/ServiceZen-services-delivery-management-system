@@ -37,6 +37,39 @@
   @endif
 
 </div>
+<div class="container">
+  @if($setting->value)
+  <div class="row">
+    <div id="imageSlider" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators">
+        @foreach (explode(',', $setting->value) as $index => $imagePath)
+        <li data-target="#imageSlider" data-slide-to="{{ $index }}" @if($index===0) class="active" @endif></li>
+        @endforeach
+      </ol>
+      <div class="carousel-inner">
+        @foreach (explode(',', $setting->value) as $index => $imagePath)
+        <div class="carousel-item @if($index === 0) active @endif">
+          <img src="/slider-images/{{ $imagePath }}" alt="Slide {{ $index + 1 }}" class="d-block w-100">
+          <!-- <div class="carousel-caption d-none d-md-block">
+            <h5>Slide {{ $index + 1 }} label</h5>
+            <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+          </div> -->
+        </div>
+        @endforeach
+      </div>
+      <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  </div>
+  @endif
+</div>
+
 <div class="album py-5 bg-light">
   <div class="container">
 
@@ -44,8 +77,8 @@
       @foreach ($services as $service)
       <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
-        <a href="/serviceDetail/{{ $service->id }}">
-          <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
+          <a href="/serviceDetail/{{ $service->id }}">
+            <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
             <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
           </a>
           <div class="card-body">

@@ -161,6 +161,7 @@ Route::get('staffAppOrderStatusUpdate/{order}', [StaffAppController::class,'orde
 Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class,'rescheduleOrder']);
 Route::get('staffAppTimeSlots', [StaffAppController::class,'timeSlots']);
 Route::resource('staffProfile', StaffProfileController::class);
+Route::get('/removeSliderImage', [SettingController::class,'removeSliderImage']);
 
 // Driver app
 

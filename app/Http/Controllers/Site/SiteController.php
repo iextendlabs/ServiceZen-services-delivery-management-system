@@ -9,6 +9,7 @@ use App\Models\CustomerProfile;
 use App\Models\FAQ;
 use App\Models\Review;
 use App\Models\ServiceCategory;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -64,18 +65,20 @@ class SiteController extends Controller
 
         $staffs = User::role('Staff')->latest()->get();
 
+        $setting = Setting::where('key','Slider Image')->first();
+
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
             $category = ServiceCategory::find($request->id);
             $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews','staffs'));
+            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews','staffs','setting'));
         } else {
             $FAQs = FAQ::latest()->take(3)->get();
 
             $services = Service::paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs','reviews','staffs'));
+            return view('site.home', compact('services', 'address', 'FAQs','reviews','staffs','setting'));
         }
     }
 
