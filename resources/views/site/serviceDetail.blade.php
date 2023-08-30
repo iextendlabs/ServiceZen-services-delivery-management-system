@@ -3,6 +3,10 @@
   .box-shadow {
     background: none !important;
   }
+
+  .carousel-inner {
+  height: 220px !important;
+}
 </style>
 @section('content')
 <section class="jumbotron text-center">
@@ -188,7 +192,7 @@
       @foreach($service->package as $package)
       <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
-          <p class="card-text service-box-title text-center"><b>{{ $package->name }}</b></p>
+          <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
           <a href="/serviceDetail/{{ $package->service->id }}">
             <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
           </a>

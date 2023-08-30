@@ -273,10 +273,6 @@ svg {
   font-weight: bold;
 }
 
-.carousel-inner {
-  height: 220px !important;
-}
-
 .carousel-image {
   height: 100px;
   object-fit: cover;

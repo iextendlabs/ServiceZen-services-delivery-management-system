@@ -62,18 +62,20 @@ class SiteController extends Controller
 
         $reviews = Review::latest()->take(6)->get();
 
+        $staffs = User::role('Staff')->latest()->get();
+
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
             $category = ServiceCategory::find($request->id);
             $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews'));
+            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews','staffs'));
         } else {
             $FAQs = FAQ::latest()->take(3)->get();
 
             $services = Service::paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs','reviews'));
+            return view('site.home', compact('services', 'address', 'FAQs','reviews','staffs'));
         }
     }
 

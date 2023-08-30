@@ -45,6 +45,7 @@ use App\Http\Controllers\Site\{
     SiteOrdersController,
     AffiliateDashboardController,
     SiteFAQsController,
+    StaffProfileController,
 };
 
 /*
@@ -159,6 +160,7 @@ Route::get('staffAppCashCollection/{order}', [StaffAppController::class,'cashCol
 Route::get('staffAppOrderStatusUpdate/{order}', [StaffAppController::class,'orderStatusUpdate']);
 Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class,'rescheduleOrder']);
 Route::get('staffAppTimeSlots', [StaffAppController::class,'timeSlots']);
+Route::resource('staffProfile', StaffProfileController::class);
 
 // Driver app
 
