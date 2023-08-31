@@ -105,7 +105,7 @@
             <tr>
                 <td>{{ $orderService->service_name }}</td>
                 <td>{{ $orderService->status }}</td>
-                <td>{{ $orderService->duration }}</td>
+                <td>{{ $orderService->duration ?? $orderService->service->duration ?? '' }}</td>
                 <td class="text-right">@currency($orderService->price)</td>
             </tr>
             @endforeach

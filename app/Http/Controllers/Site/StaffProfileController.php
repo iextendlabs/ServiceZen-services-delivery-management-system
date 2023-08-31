@@ -49,11 +49,26 @@ class StaffProfileController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        
+
+        $socialMediaPlatforms = [
+            'instagram' => 'https://www.instagram.com/',
+            'facebook' => 'https://www.facebook.com/profile.php?id=',
+            'snapchat' => 'https://www.snapchat.com/add/',
+            'youtube' => 'https://www.youtube.com/',
+            'tiktok' => 'https://www.tiktok.com/@',
+        ];
+
+        foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
+            if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
+                $user->staff->$platform = $urlPrefix . $user->staff->$platform;
+            }
+        }
+
         $categories = ServiceCategory::get();
 
-        return view('site.staff.show',compact('user','categories'));
+        return view('site.staff.show', compact('user', 'categories'));
     }
+
 
     /**
      * Show the form for editing the specified resource.

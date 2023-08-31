@@ -5,10 +5,6 @@
         height: 300px !important;
         width: 300px;
     }
-
-    
-
-    
 </style>
 <div class="album py-5 bg-light">
     <div class="container">
@@ -20,6 +16,34 @@
             </div>
             <div class="col-md-12 text-center">
                 <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
+            </div>
+            <div class="col-md-12 text-center">
+                <h3>Social Links</h3>
+
+                <!-- Facebook -->
+                <a style="color: #3b5998;" href="{{$user->staff->facebook}}" target="_blank" class="btn btn-lg" role="button">
+                    <i class="fab fa-facebook-f fa-lg"></i>
+                </a>
+
+                <!-- Twitter -->
+                <a style="color: #fffc00;" href="{{$user->staff->snapchat}}" target="_blank" class="btn btn-lg" role="button">
+                    <i class="fab fa-snapchat fa-lg"></i>
+                </a>
+
+                <!-- Youtube -->
+                <a style="color: #ed302f;" href="{{$user->staff->youtube}}" target="_blank" class="btn btn-lg" role="button">
+                    <i class="fab fa-youtube fa-lg"></i>
+                </a>
+
+                <!-- Instagram -->
+                <a style="color: #ac2bac;" href="{{$user->staff->instagram}}" target="_blank" class="btn btn-lg" role="button">
+                    <i class="fab fa-instagram fa-lg"></i>
+                </a>
+
+                <!-- Tiktok -->
+                <a style="color: #1e3050;" href="{{$user->staff->tiktok}}" target="_blank" class="btn btn-lg" role="button">
+                    <i class="fab fa-tiktok"></i>
+                </a>
             </div>
         </div>
         <hr>

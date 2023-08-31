@@ -113,7 +113,12 @@ class HomeController extends Controller
         }
 
         $user = User::find($id);
+
         $user->update($input);
+
+        if (auth()->user()->hasRole('Staff')) {
+            $user->staff->update($input);
+        }
 
         return redirect()->route('home')
             ->with('success', 'User updated successfully');
