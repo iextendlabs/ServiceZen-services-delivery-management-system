@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('order_services', function (Blueprint $table) {
-            $table->integer('duration')->nullable();
+            $table->string('duration')->nullable();
         });
     }
 
