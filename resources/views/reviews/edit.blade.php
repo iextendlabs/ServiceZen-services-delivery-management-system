@@ -18,14 +18,19 @@
 <form action="{{ route('reviews.update',$review->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
-    <input type="hidden" name="user_id" value="{{ $review->user_id }}">
     <div class="row">
+    <div class="col-md-12">
+            <div class="form-group">
+                <span style="color: red;">*</span><strong>Your Name:</strong>
+                <input type="text" name="user_name" value="{{ $review->user_name }}" class="form-control">
+            </div>
+        </div>
         <div class="col-md-12">
             <div class="form-group">
-                <span style="color: red;">*</span><strong>Service:</strong>
+                <strong>Service:</strong>
                 <select name="service_id" class="form-control">
+                    <option></option>
                     @foreach($services as $service)
-
                     <option value="{{ $service->id }}" @if($service->id == $review->service_id) selected @endif>{{ $service->name }}</option>
                     @endforeach
                 </select>

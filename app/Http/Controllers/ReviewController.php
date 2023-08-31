@@ -44,8 +44,7 @@ class ReviewController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'user_id' => 'required',
-            'service_id' => 'required',
+            'user_name' => 'required',
             'content' => 'required',
             'rating' => 'required',
         ]);
@@ -97,8 +96,7 @@ class ReviewController extends Controller
     public function update(Request $request, $id)
     {
         request()->validate([
-            'user_id' => 'required',
-            'service_id' => 'required',
+            'user_name' => 'required',
             'content' => 'required',
             'rating' => 'required',
         ]);

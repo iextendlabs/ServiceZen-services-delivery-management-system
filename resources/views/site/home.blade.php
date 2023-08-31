@@ -125,7 +125,7 @@
                 <div class="col-md-4">
                   <div class="card mb-4 text-center">
                     <div class="card-body" style="height: 215px !important">
-                      <h5 class="card-title">{{ $review->user->name }}</h5>
+                      <h5 class="card-title">{{ $review->user_name }}</h5>
                       <p class="card-text">{{ $review->content }}</p>
                       <p class="card-text">
                         @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)

@@ -20,7 +20,6 @@
 <table class="table table-striped table-bordered">
     <tr>
         <th>Sr#</th>
-        <th class="text-left">Service</th>
         <th class="text-left">User</th>
         <th class="text-left">Rating</th>
         <th>Action</th>
@@ -29,8 +28,7 @@
     @foreach ($reviews as $review)
     <tr>
         <td>{{ ++$i }}</td>
-        <td class="text-left">{{ $review->service->name }}</td>
-        <td class="text-left">{{ $review->user->name }}</td>
+        <td class="text-left">{{ $review->user_name }}</td>
         <td class="text-left">
             @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
                 <span class="text-warning">&#9733;</span>

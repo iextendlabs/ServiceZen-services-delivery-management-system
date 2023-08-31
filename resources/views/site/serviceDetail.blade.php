@@ -29,6 +29,16 @@
     <span>To add more service<a href="/"> Continue</a></span>
   </div>
   @endif
+  @if ($errors->any())
+<div class="alert alert-danger">
+    <strong>Whoops!</strong> There were some problems with your input.<br><br>
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 </div>
 <div id="serviceDetailContainer" class="album py-5 bg-light">
   <div class="container">
@@ -84,10 +94,15 @@
         <h3>Write a review</h3>
         <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
-          <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
           <input type="hidden" name="service_id" value="{{ $service->id }}">
           <input type="hidden" name="store" value="1">
           <div class="row">
+          <div class="col-md-12">
+                  <div class="form-group">
+                      <span style="color: red;">*</span><strong>Your Name:</strong>
+                      <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
+                  </div>
+              </div>
               <div class="col-md-12">
                   <div class="form-group">
                       <span style="color: red;">*</span><strong>Review:</strong>

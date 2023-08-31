@@ -11,15 +11,25 @@
     <div class="col-md-12">
         <div class="form-group">
             <strong>User:</strong>
-            {{ $review->user->name }}
+            {{ $review->user_name }}
         </div>
     </div>
+    @if($review->service)
     <div class="col-md-12">
         <div class="form-group">
             <strong>Service:</strong>
             {{ $review->service->name }}
         </div>
     </div>
+    @endif
+    @if($review->user_id)
+    <div class="col-md-12">
+        <div class="form-group">
+            <strong>Staff:</strong>
+            {{ $review->user->name }}
+        </div>
+    </div>
+    @endif
     <div class="col-md-12">
         <div class="form-group">
             <strong>Review:</strong>
