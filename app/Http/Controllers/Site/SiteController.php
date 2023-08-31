@@ -65,7 +65,9 @@ class SiteController extends Controller
 
         $staffs = User::role('Staff')->latest()->get();
 
-        $setting = Setting::where('key','Slider Image')->first();
+        $slider_images = Setting::where('key','Slider Image')->first();
+
+        $review_char_limit = Setting::where('key','Character Limit Of Review On Home Page')->value('value');
 
         if (isset($request->id)) {
             $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
@@ -73,12 +75,12 @@ class SiteController extends Controller
             $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews','staffs','setting'));
+            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews','staffs','slider_images','review_char_limit'));
         } else {
             $FAQs = FAQ::latest()->take(3)->get();
 
             $services = Service::paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs','reviews','staffs','setting'));
+            return view('site.home', compact('services', 'address', 'FAQs','reviews','staffs','slider_images','review_char_limit'));
         }
     }
 

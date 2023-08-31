@@ -30,7 +30,7 @@
         <td>{{ ++$i }}</td>
         <td class="text-left">{{ $review->user_name }}</td>
         <td class="text-left">
-            @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
+            @for($a = 1; $a <= 5; $a++) @if($a <=$review->rating)
                 <span class="text-warning">&#9733;</span>
                 @else
                 <span class="text-muted">&#9734;</span>

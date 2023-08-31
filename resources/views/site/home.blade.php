@@ -38,16 +38,16 @@
 
 </div>
 <div class="container">
-  @if($setting->value)
+  @if($slider_images->value)
   <div class="row">
     <div id="imageSlider" class="carousel slide" data-ride="carousel">
       <ol class="carousel-indicators">
-        @foreach (explode(',', $setting->value) as $index => $imagePath)
+        @foreach (explode(',', $slider_images->value) as $index => $imagePath)
         <li data-target="#imageSlider" data-slide-to="{{ $index }}" @if($index===0) class="active" @endif></li>
         @endforeach
       </ol>
       <div class="carousel-inner">
-        @foreach (explode(',', $setting->value) as $index => $imagePath)
+        @foreach (explode(',', $slider_images->value) as $index => $imagePath)
         <div class="carousel-item @if($index === 0) active @endif">
           <img src="/slider-images/{{ $imagePath }}" alt="Slide {{ $index + 1 }}" class="d-block w-100">
           <!-- <div class="carousel-caption d-none d-md-block">
@@ -126,7 +126,7 @@
                   <div class="card mb-4 text-center">
                     <div class="card-body" style="height: 215px !important">
                       <h5 class="card-title">{{ $review->user_name }}</h5>
-                      <p class="card-text">{{ $review->content }}</p>
+                      <p class="card-text">{{ substr($review->content, 0, $review_char_limit) }}...</p>
                       <p class="card-text">
                         @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
                           <span class="text-warning">&#9733;</span>
@@ -153,6 +153,47 @@
           </a>
         </div>
       </div>
+      @if(auth()->check())
+      <div class="col-md-12 text-center">
+        <button class="btn btn-primary" id="review">Write a Review</button>
+      </div>
+      <div class="col-md-6" id="review-form" style="display: none;">
+        <h3>Write a Review</h3>
+        <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+          @csrf
+          <input type="hidden" name="store" value="1">
+          <div class="row">
+          <div class="col-md-12">
+                  <div class="form-group">
+                      <span style="color: red;">*</span><strong>Your Name:</strong>
+                      <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
+                  </div>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <span style="color: red;">*</span><strong>Review:</strong>
+                      <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{old('content')}}</textarea>
+                  </div>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <span style="color: red;">*</span><label for="rating">Rating</label><br>
+                      @for($i = 1; $i <= 5; $i++) 
+                      <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
+                          <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                      </div>
+                      @endfor
+                  </div>
+              </div>
+
+          <div class="col-md-12 text-right">
+              <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+      </div>
+      @endif
       <div class="col-md-12">
         <h2 class="text-center">Our Team</h2>
 
@@ -225,4 +266,12 @@
     @endif
   </div>
 </div>
+<script>
+  $(document).on('click','#review',function(){
+    $('#review-form').show();
+    $('html, body').animate({
+      scrollTop: $('#review-form').offset().top
+    }, 1000);
+  });
+</script>
 @endsection
