@@ -86,18 +86,18 @@
                 <td class="text-right">@currency( $service->price )</td>
                 <td class="text-right">{{ $service->duration }}</td>
                 <td class="text-right">
-                    <!-- <form action="{{ route('services.destroy',$service->id) }}" method="POST"> -->
+                    <form action="{{ route('services.destroy',$service->id) }}" method="POST">
                         <a class="btn btn-primary" href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>
                         <a class="btn btn-warning" href="{{ route('services.show',$service->id) }}"><i class="fa fa-eye"></i></a>
                         @can('service-edit')
                         <a class="btn btn-primary" href="{{ route('services.edit',$service->id) }}"><i class="fa fa-edit"></i></a>
                         @endcan
-                        <!-- @csrf
+                        @csrf
                         @method('DELETE')
                         @can('service-delete')
                         <button type="submit" class="btn btn-danger">Delete</button>
                         @endcan
-                    </form> -->
+                    </form>
                 </td>
             </tr>
             @endforeach

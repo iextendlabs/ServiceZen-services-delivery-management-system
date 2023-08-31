@@ -63,13 +63,9 @@
 
             @endif
             @endif
-
-
-
         </td>
         <td>{{ $order->created_at }}</td>
         <td>
-
             @can('order-edit')
             <!-- <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
                             <i class="fas fa-edit"></i>
@@ -107,7 +103,6 @@
                 </button>
                 @endcan
             </form>
-
             @if ($order->status !== 'Complete' && Auth::User()->getRoleNames() == '["Staff"]')
             @if ($order->status == 'Pending')
             <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
