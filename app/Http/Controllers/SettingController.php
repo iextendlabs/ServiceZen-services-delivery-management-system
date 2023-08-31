@@ -129,7 +129,6 @@ class SettingController extends Controller
 
         $deletefilename = $request->filename;
 
-        // Remove the desired value if it exists
         if (($key = array_search($deletefilename, $fileValues)) !== false) {
             unset($fileValues[$key]);
 
@@ -138,10 +137,8 @@ class SettingController extends Controller
             }
         }
 
-        // Re-index the array after removing an element
         $fileValues = array_values($fileValues);
 
-        // Update the value in the database
         $setting->value = implode(',', $fileValues);
         $setting->save();
 

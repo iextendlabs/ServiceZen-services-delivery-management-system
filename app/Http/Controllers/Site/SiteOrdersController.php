@@ -149,6 +149,7 @@ class SiteOrdersController extends Controller
             $services = Service::find($id);
             $input['service_id'] = $id;
             $input['service_name'] = $services->name;
+            $input['duration'] = $services->duration;
             $input['status'] = 'Open';
             if ($services->discount) {
                 $input['price'] = $services->discount;
@@ -224,14 +225,15 @@ class SiteOrdersController extends Controller
         OrderTotal::create($input);
 
         foreach ($request->service_ids as $id) {
-            $services = Service::find($id);
+            $service = Service::find($id);
             $input['service_id'] = $id;
-            $input['service_name'] = $services->name;
+            $input['service_name'] = $service->name;
+            $input['duration'] = $service->duration;
             $input['status'] = 'Open';
-            if ($services->discount) {
-                $input['price'] = $services->discount;
+            if ($service->discount) {
+                $input['price'] = $service->discount;
             } else {
-                $input['price'] = $services->price;
+                $input['price'] = $service->price;
             }
             OrderService::create($input);
         }
