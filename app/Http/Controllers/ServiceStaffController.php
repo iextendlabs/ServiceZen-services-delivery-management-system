@@ -1,7 +1,8 @@
 <?php
-    
+
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffHoliday;
 use App\Models\Transaction;
@@ -13,7 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class ServiceStaffController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -21,10 +22,10 @@ class ServiceStaffController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:service-staff-list|service-staff-create|service-staff-edit|service-staff-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:service-staff-create', ['only' => ['create','store']]);
-         $this->middleware('permission:service-staff-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:service-staff-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:service-staff-list|service-staff-create|service-staff-edit|service-staff-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:service-staff-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:service-staff-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:service-staff-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -35,12 +36,12 @@ class ServiceStaffController extends Controller
     {
         $filter_name = $request->name;
 
-        if(Auth::user()->hasRole('Supervisor')){
+        if (Auth::user()->hasRole('Supervisor')) {
             $staffIds = Auth::user()->getSupervisorStaffIds();
             $query = User::role('Staff')->whereIn('id', $staffIds);
-        }elseif(Auth::user()->hasRole('Staff')){
-            $query = User::role('Staff')->where('id',Auth::id());
-        }else{
+        } elseif (Auth::user()->hasRole('Staff')) {
+            $query = User::role('Staff')->where('id', Auth::id());
+        } else {
             $query = User::role('Staff')->latest();
         }
 
@@ -50,9 +51,9 @@ class ServiceStaffController extends Controller
 
         $serviceStaff = $query->paginate(config('app.paginate'));
 
-        return view('serviceStaff.index',compact('serviceStaff','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.index', compact('serviceStaff', 'filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -61,9 +62,10 @@ class ServiceStaffController extends Controller
     public function create()
     {
         $users = User::all();
-        return view('serviceStaff.create',compact('users'));
+        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
+        return view('serviceStaff.create', compact('users','socialLinks'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -80,7 +82,7 @@ class ServiceStaffController extends Controller
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
         ]);
-    
+
         $input = $request->all();
 
         $input['password'] = Hash::make($input['password']);
@@ -91,26 +93,41 @@ class ServiceStaffController extends Controller
         $input['user_id'] = $user_id;
 
         $ServiceStaff->assignRole('Staff');
-        
-        $staff = Staff::create($input);
+
+        if ($request->images) {
+            $images = $request->images;
+
+            $imagePaths = [];
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('staff-images'), $filename);
+                $imagePaths[] = $filename;
+            }
+
+            $newImagePaths = implode(',', $imagePaths);
+            $input['images'] = $newImagePaths;
+        }
 
         if ($request->image) {
             // create a unique filename for the image
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-        
+
             // move the uploaded file to the public/staff-images directory
             $request->image->move(public_path('staff-images'), $filename);
-        
+
             // save the filename to the gallery object and persist it to the database
-            
-            $staff->image = $filename;
-            $staff->save();
+
+            $input['image'] = $filename;
         }
-    
+
+        Staff::create($input);
+
         return redirect()->route('serviceStaff.index')
-                        ->with('success','Service Staff created successfully.');
+            ->with('success', 'Service Staff created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -119,9 +136,9 @@ class ServiceStaffController extends Controller
      */
     public function show(User $serviceStaff)
     {
-        return view('serviceStaff.show',compact('serviceStaff'));
+        return view('serviceStaff.show', compact('serviceStaff'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -131,9 +148,11 @@ class ServiceStaffController extends Controller
     public function edit(User $serviceStaff)
     {
         $users = User::all();
-        return view('serviceStaff.edit',compact('serviceStaff','users'));
+        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
+
+        return view('serviceStaff.edit', compact('serviceStaff', 'users','socialLinks'));
     }
-    
+
     /**
      * Update the specified resource in storage.
      *
@@ -146,46 +165,64 @@ class ServiceStaffController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'phone' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
-            'commission'=> 'required'
+            'commission' => 'required'
         ]);
 
         $input = $request->all();
-        if(!empty($input['password'])){ 
+        if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
-        }else{
-            $input = Arr::except($input,array('password'));    
+        } else {
+            $input = Arr::except($input, array('password'));
         }
 
         $serviceStaff = User::find($id);
         $serviceStaff->update($input);
 
         $staff = Staff::find($input['staff_id']);
-        $staff->update($input);
+
+        if ($request->images) {
+            $images = $request->images;
+
+            $existingImage = $staff->images ?? ''; // Existing image
+
+            $imagePaths = [];
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('staff-images'), $filename);
+                $imagePaths[] = $filename;
+            }
+            $newImagePaths = implode(',', $imagePaths);
+
+            $input['images'] = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+        }
 
         if (isset($request->image)) {
             //delete previous Image if new Image submitted
-            if ($staff->image && file_exists(public_path('staff-images').'/'.$staff->image)) {
-                unlink(public_path('staff-images').'/'.$staff->image);
+            if ($staff->image && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+                unlink(public_path('staff-images') . '/' . $staff->image);
             }
 
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-        
+
             // move the uploaded file to the public/staff-images directory
             $request->image->move(public_path('staff-images'), $filename);
-        
+
             // save the filename to the gallery object and persist it to the database
-            
-            $staff->image = $filename;
-            $staff->save();
+
+            $input['image'] = $filename;
         }
-        
+
+        $staff->update($input);
+
         return redirect()->route('serviceStaff.index')
-                        ->with('success','Service Staff updated successfully');
+            ->with('success', 'Service Staff updated successfully');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -194,10 +231,48 @@ class ServiceStaffController extends Controller
      */
     public function destroy(User $serviceStaff)
     {
+        if (isset($serviceStaff->staff->image) && file_exists(public_path('staff-images') . '/' . $serviceStaff->staff->image)) {
+            unlink(public_path('staff-images') . '/' . $serviceStaff->staff->image);
+        }
+
+        if ($serviceStaff->staff->images) {
+            $images = explode(',', $serviceStaff->staff->images);
+
+            foreach ($images as $image) {
+                if ($image && file_exists(public_path('staff-images') . '/' . $image)) {
+                    unlink(public_path('staff-images') . '/' . $image);
+                }
+            }
+        }
+
         $serviceStaff->delete();
-        
+
         return redirect()->route('serviceStaff.index')
-                        ->with('success','Service Staff deleted successfully');
+            ->with('success', 'Service Staff deleted successfully');
     }
 
+    public function removeImages(Request $request)
+    {
+
+        $staff = Staff::find($request->id);
+
+        $images = explode(',', $staff->images);
+
+        $deleteImage = $request->image;
+
+        if (($key = array_search($deleteImage, $images)) !== false) {
+            unset($images[$key]);
+
+            if ($deleteImage && file_exists(public_path('staff-images') . '/' . $deleteImage)) {
+                unlink(public_path('staff-images') . '/' . $deleteImage);
+            }
+        }
+
+        $images = array_values($images);
+
+        $staff->images = implode(',', $images);
+        $staff->save();
+
+        return redirect()->back()->with('success', 'Image Remove successfully.');
+    }
 }

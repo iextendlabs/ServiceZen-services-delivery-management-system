@@ -61,6 +61,12 @@
                     </tbody>
                 </table>
                 <button id="addImageBtn" type="button" class="btn btn-primary float-right">Add Image</button>
+                @elseif($setting->key === 'Social Links of Staff')
+                <select name="value" class="form-control">
+
+                    <option value="1" @if($setting->value == 1) selected @endif>Enable</option>
+                    <option value="0" @if($setting->value == 0) selected @endif>Disable</option>
+                </select>
                 @else
                 <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                 @endif

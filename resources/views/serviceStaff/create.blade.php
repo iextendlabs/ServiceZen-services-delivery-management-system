@@ -21,8 +21,13 @@
         <li class="nav-item">
             <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
         </li>
+        @if($socialLinks)
         <li class="nav-item">
             <a class="nav-link" id="social-links-tab" data-toggle="tab" href="#social-links" role="tab" aria-controls="social-links" aria-selected="false">Social Links</a>
+        </li>
+        @endif
+        <li class="nav-item">
+            <a class="nav-link" id="gallery-tab" data-toggle="tab" href="#gallery" role="tab" aria-controls="gallery" aria-selected="false">Gallery</a>
         </li>
     </ul>
     <div class="tab-content" id="myTabsContent">
@@ -58,9 +63,8 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong for="image">Upload Image</strong>
-                        <input type="file" name="image" id="image" class="form-control-file">
-                        <br>
-                        <img id="preview" src="" height="130px">
+                        <input type="file" name="image" class="form-control image-input" accept="image/*">
+                        <img class="image-preview" height="130px">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -104,51 +108,121 @@
                 </div>
             </div>
         </div>
+        @if($socialLinks)
         <div class="tab-pane fade" id="social-links" role="tabpanel" aria-labelledby="social-links-tab">
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <strong>Instagram <i class="fas fa-instagram"></i>:</strong>
+                        <strong>Instagram:</strong>
                         <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ old('instagram') }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Snapchat:</strong>
-                        <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ old('Snapchat') }}">
+                        <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ old('snapchat') }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Facebook:</strong>
-                        <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="facebook">
+                        <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ old('facebook') }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Youtube:</strong>
-                        <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="youtube">
+                        <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ old('youtube') }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Tiktok:</strong>
-                        <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="tiktok">
+                        <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ old('tiktok') }}">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-12 text-center">
+        @endif
+        <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Youtube Video:</strong>
+                        <input type="text" name="youtube_video" class="form-control" placeholder="Youtube Video" value="{{ old('youtube_video') }}">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Images:</strong>
+                        <table id="imageTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Images</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                        <button id="addImageBtn" type="button" class="btn btn-primary float-right">Add Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 text-center mt-3">
             <button type="submit" class="btn btn-block btn-primary">Save</button>
         </div>
     </div>
 
 </form>
-
 <script>
+    $(document).ready(function() {
+        $("#addImageBtn").click(function() {
+            // Append a new row to the table
+            $("#imageTable tbody").append(`
+                <tr>
+                    <td>
+                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <img class="image-preview" height="130px">
+                    </td>
+                </tr>
+            `);
+        });
+
+        $(document).on("click", ".remove-image", function() {
+            var row = $(this).closest("tr");
+            var imageFilename = row.data('image-filename');
+            var id = row.data('id');
+
+            // Make an AJAX call to remove the image from the database
+            $.ajax({
+                type: "GET",
+                url: "/removeSliderImage", // Replace with your route URL
+                data: {
+                    id: id,
+                    filename: imageFilename
+                },
+                success: function(response) {
+                    // On success, remove the row from the table
+                    row.remove();
+                },
+                error: function(xhr, status, error) {
+                    console.log(error); // Handle the error appropriately
+                }
+            });
+        });
+
+        $(document).on("change", ".image-input", function(e) {
+            var preview = $(this).siblings('.image-preview')[0];
+            preview.src = URL.createObjectURL(e.target.files[0]);
+        });
+    });
+</script>
+<!-- <script>
     document.getElementById('image').addEventListener('change', function(e) {
         var preview = document.getElementById('preview');
         preview.src = URL.createObjectURL(e.target.files[0]);
     });
-</script>
+</script> -->
 @endsection

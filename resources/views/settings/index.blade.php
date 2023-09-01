@@ -28,7 +28,7 @@
             <tr>
                 <td>{{ ++$i }}</td>
                 <td>{{ $setting->key }}</td>
-                <td>{{ substr($setting->value, 0, 50) }}...</td>
+                <td>{{ substr($setting->value, 0, 50) }}</td>
                 <td>
                     <a class="btn btn-primary" href="{{ route('settings.edit',$setting->id) }}">Edit</a>
                 </td>

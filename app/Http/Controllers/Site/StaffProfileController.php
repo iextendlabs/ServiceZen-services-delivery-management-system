@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\ServiceCategory;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -49,7 +50,7 @@ class StaffProfileController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-
+        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
         $socialMediaPlatforms = [
             'instagram' => 'https://www.instagram.com/',
             'facebook' => 'https://www.facebook.com/profile.php?id=',
@@ -66,7 +67,7 @@ class StaffProfileController extends Controller
 
         $categories = ServiceCategory::get();
 
-        return view('site.staff.show', compact('user', 'categories'));
+        return view('site.staff.show', compact('user', 'categories','socialLinks'));
     }
 
 

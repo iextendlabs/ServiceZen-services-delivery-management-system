@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\User;
 use Carbon\Carbon;
@@ -92,8 +93,8 @@ class HomeController extends Controller
     public function profile($id)
     {
         $user = User::find($id);
-
-        return view('profile', compact('user'));
+        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
+        return view('profile', compact('user','socialLinks'));
     }
 
     public function updateProfile(Request $request, $id)
@@ -117,6 +118,25 @@ class HomeController extends Controller
         $user->update($input);
 
         if (auth()->user()->hasRole('Staff')) {
+
+            if ($request->images) {
+                $images = $request->images;
+    
+                $existingImage = $user->staff->images ?? ''; // Existing image
+    
+                $imagePaths = [];
+    
+                foreach ($images as $image) {
+                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+    
+                    $image->move(public_path('staff-images'), $filename);
+                    $imagePaths[] = $filename;
+                }
+                $newImagePaths = implode(',', $imagePaths);
+    
+                $input['images'] = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+            }
+
             $user->staff->update($input);
         }
 

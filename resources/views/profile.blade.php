@@ -17,7 +17,7 @@
     </ul>
 </div>
 @endif
-<form action="{{ route('updateProfile',$user->id) }}" method="POST">
+<form action="{{ route('updateProfile',$user->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     <input type="hidden" name="profile" value="1">
 
@@ -26,8 +26,13 @@
             <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
         </li>
         @if($user->hasRole('Staff'))
+        @if($socialLinks)
         <li class="nav-item">
             <a class="nav-link" id="social-links-tab" data-toggle="tab" href="#social-links" role="tab" aria-controls="social-links" aria-selected="false">Social Links</a>
+        </li>
+        @endif
+        <li class="nav-item">
+            <a class="nav-link" id="gallery-tab" data-toggle="tab" href="#gallery" role="tab" aria-controls="gallery" aria-selected="false">Gallery</a>
         </li>
         @endif
     </ul>
@@ -61,6 +66,7 @@
             </div>
         </div>
         @if($user->hasRole('Staff'))
+        @if($socialLinks)
         <div class="tab-pane fade" id="social-links" role="tabpanel" aria-labelledby="social-links-tab">
             <div class="row">
                 <div class="col-md-12">
@@ -96,10 +102,92 @@
             </div>
         </div>
         @endif
-        <div class="col-md-12 text-center">
+        <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Youtube Video:</strong>
+                        <input type="text" name="youtube_video" class="form-control" placeholder="Youtube Video" value="{{ $user->staff->youtube_video }}">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Images:</strong>
+                        <table id="imageTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Previous Images</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if($user->staff->images)
+                                @foreach (explode(',', $user->staff->images) as $imagePath)
+                                <tr data-image-filename="{{ $imagePath }}" data-id="{{ $user->staff->id }}">
+                                    <td>
+                                        <img src="/staff-images/{{ $imagePath }}" height="200px" width="auto" alt="Image">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-image">Remove</button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                        <button id="addImageBtn" type="button" class="btn btn-primary float-right">Add Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        <div class="col-md-12 text-center mt-3">
             <button type="submit" class="btn btn-block btn-primary">Save</button>
         </div>
     </div>
-
 </form>
+
+<script>
+    $(document).ready(function() {
+        $("#addImageBtn").click(function() {
+            // Append a new row to the table
+            $("#imageTable tbody").append(`
+                <tr>
+                    <td>
+                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <img class="image-preview" height="130px">
+                    </td>
+                </tr>
+            `);
+        });
+
+        $(document).on("click", ".remove-image", function() {
+            var row = $(this).closest("tr");
+            var imageFilename = row.data('image-filename');
+            var id = row.data('id');
+
+            // Make an AJAX call to remove the image from the database
+            $.ajax({
+                type: "GET",
+                url: "/removeStaffImages", // Replace with your route URL
+                data: {
+                    id: id,
+                    image: imageFilename
+                },
+                success: function(response) {
+                    // On success, remove the row from the table
+                    row.remove();
+                },
+                error: function(xhr, status, error) {
+                    console.log(error); // Handle the error appropriately
+                }
+            });
+        });
+
+        $(document).on("change", ".image-input", function(e) {
+            var preview = $(this).siblings('.image-preview')[0];
+            preview.src = URL.createObjectURL(e.target.files[0]);
+        });
+    });
+</script>
 @endsection

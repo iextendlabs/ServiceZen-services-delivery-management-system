@@ -5,6 +5,7 @@
         height: 300px !important;
         width: 300px;
     }
+
 </style>
 <div class="album py-5 bg-light">
     <div class="container">
@@ -17,6 +18,7 @@
             <div class="col-md-12 text-center">
                 <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
             </div>
+            @if($socialLinks)
             <div class="col-md-12 text-center">
                 <h3>Social Links</h3>
 
@@ -45,8 +47,46 @@
                     <i class="fab fa-tiktok"></i>
                 </a>
             </div>
+            @endif
+            @if($user->staff->youtube_video)
+            <div class="col-md-12 text-center mt-3 mb-3">
+                <iframe width="592" height="333" src="https://www.youtube.com/embed/{{ $user->staff->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            @endif
+            @if($user->staff->images)
+            <div class="col-md-12 mt-2 mb-3">
+                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        @foreach(array_chunk(explode(',', $user->staff->images), 3) as $key => $chunk)
+                        <li data-target="#imageCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
+                        @endforeach
+                    </ol>
+                    <div class="carousel-inner">
+                        @foreach(array_chunk(explode(',', $user->staff->images), 3) as $chunk)
+                        <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                            <div class="row">
+                                @foreach($chunk as $image)
+                                <div class="col-md-4">
+                                    <img src="/staff-images./{{ $image }}" class="d-block w-100 card-img-top">
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+
+            </div>
+            @endif
         </div>
-        <hr>
         <h3 class="text-center">My Services</h3>
         <div class="row" id="categories">
             @foreach($categories as $category)

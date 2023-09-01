@@ -108,6 +108,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('FAQs', FAQController::class);
     Route::resource('settings', SettingController::class);
     Route::resource('reviews', ReviewController::class);
+
+    Route::get('/removeStaffImages', [ServiceStaffController::class,'removeImages']);
+
 });
 
 // Backups
