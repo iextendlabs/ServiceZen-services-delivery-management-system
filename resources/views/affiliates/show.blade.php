@@ -52,8 +52,9 @@
         <div class="form-group">
             <strong>Fix Salary:</strong>
             @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})
+            @if($affiliate->affiliate->fix_salary)
             <button type="submit" value="salary" name="type" form="pay-transactions" class="btn btn-primary">Pay Salary</button>
-
+            @endif
         </div>
     </div>
     <div class="col-md-12">

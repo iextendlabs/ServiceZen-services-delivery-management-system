@@ -106,6 +106,12 @@
                         <input type="number" name="charges" class="form-control" value="{{ old('charges') }}" placeholder="Additional Charges">
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Fix Salary:</strong>
+                        <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Fix Salary">
+                    </div>
+                </div>
             </div>
         </div>
         @if($socialLinks)

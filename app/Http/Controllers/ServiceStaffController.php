@@ -136,7 +136,10 @@ class ServiceStaffController extends Controller
      */
     public function show(User $serviceStaff)
     {
-        return view('serviceStaff.show', compact('serviceStaff'));
+        $transactions = Transaction::where('user_id', $serviceStaff->id)->latest()->paginate(config('app.paginate'));
+
+        $total_balance = Transaction::where('user_id', $serviceStaff->id)->sum('amount');
+        return view('serviceStaff.show', compact('serviceStaff','transactions','total_balance'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
