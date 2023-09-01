@@ -109,16 +109,13 @@
 <hr>
 <div class="row">
     <div class="col-md-6">
-        @if(count($transactions) != 0)
-        <h3>Transaction</h3>
+        <h3>Add Transaction</h3>
         <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
-        @endif
         <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
             @csrf
             <input type="hidden" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary }}">
             <input type="hidden" name="user_id" value="{{ $affiliate->id }}">
             <input type="hidden" name="pay" value="1">
-            @if(count($transactions) != 0)
 
             <div class="row">
                 <div class="col-md-6">
@@ -152,7 +149,6 @@
                     <button type="submit" value="transaction" name="type" class="btn btn-primary" form="pay-transactions">Add Transaction</button>
                 </div>
             </div>
-            @endif
         </form>
     </div>
 </div>
