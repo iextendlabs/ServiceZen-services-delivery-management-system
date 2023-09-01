@@ -67,7 +67,7 @@
                             <div class="row">
                                 @foreach($chunk as $image)
                                 <div class="col-md-4">
-                                    <img src="/staff-images./{{ $image }}" class="d-block w-100 card-img-top">
+                                    <img src="/staff-images/{{ $image }}" class="d-block w-100 card-img-top">
                                 </div>
                                 @endforeach
                             </div>
