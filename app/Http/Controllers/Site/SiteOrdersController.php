@@ -197,7 +197,6 @@ class SiteOrdersController extends Controller
     {
 
         $this->validate($request, [
-            'service_ids' => 'required',
             'service_staff_id' => 'required'
         ]);
 
@@ -218,24 +217,27 @@ class SiteOrdersController extends Controller
 
         $input['order_id'] = $id;
 
-        OrderService::where('order_id', $id)->delete();
-        OrderTotal::where('order_id', $id)->delete();
+        if (isset($request->service_ids)) {
 
+            OrderTotal::where('order_id', $id)->delete();
 
-        OrderTotal::create($input);
+            OrderTotal::create($input);
 
-        foreach ($request->service_ids as $id) {
-            $service = Service::find($id);
-            $input['service_id'] = $id;
-            $input['service_name'] = $service->name;
-            $input['duration'] = $service->duration;
-            $input['status'] = 'Open';
-            if ($service->discount) {
-                $input['price'] = $service->discount;
-            } else {
-                $input['price'] = $service->price;
+            OrderService::where('order_id', $id)->delete();
+
+            foreach ($request->service_ids as $id) {
+                $service = Service::find($id);
+                $input['service_id'] = $id;
+                $input['service_name'] = $service->name;
+                $input['duration'] = $service->duration;
+                $input['status'] = 'Open';
+                if ($service->discount) {
+                    $input['price'] = $service->discount;
+                } else {
+                    $input['price'] = $service->price;
+                }
+                OrderService::create($input);
             }
-            OrderService::create($input);
         }
 
         $staff = User::find($staff_id);
@@ -260,7 +262,7 @@ class SiteOrdersController extends Controller
                 'name' => $customer->name,
                 'email' => $customer->email,
                 'password' => ' ',
-                'order'=> $order
+                'order' => $order
             ];
         } elseif ($type == "New") {
             $customer = User::find($customer_id);
@@ -269,7 +271,7 @@ class SiteOrdersController extends Controller
                 'name' => $customer->name,
                 'email' => $customer->email,
                 'password' => $customer->name . '1094',
-                'order'=> $order
+                'order' => $order
             ];
         }
 
@@ -291,7 +293,7 @@ class SiteOrdersController extends Controller
         foreach ($emails as $email) {
             Mail::to($email)->send(new OrderAdminEmail($order, $recipient_email));
         }
-        
+
         return redirect()->back();
     }
 
@@ -332,13 +334,13 @@ class SiteOrdersController extends Controller
         return Response::make('', 200, $headers);
     }
 
-    public function reOrder($order_id){
+    public function reOrder($order_id)
+    {
 
         $order = Order::find($order_id);
 
-        foreach($order->orderServices as $service){
+        foreach ($order->orderServices as $service) {
             $serviceIds[] = $service->service_id;
-
         }
         if (session()->has('serviceIds')) {
             Session::forget('serviceIds');
