@@ -56,7 +56,6 @@
                     <th>Email</th>
                 </tr>
                 @foreach ($manager->managerSupervisors as $key=>$supervisor)
-                @if(count($supervisor->staffSupervisor))
                 @foreach ($supervisor->staffSupervisor as $key=>$staff)
                 <tr>
                     <td>{{ ++$key }}</td>
@@ -64,11 +63,7 @@
                     <td>{{ $staff->user->email }}</td>
                 </tr>
                 @endforeach
-                @else
-                <tr>
-                    <td colspan="3">There is no staff.</td>
-                </tr>
-                @endif
+                
                 @endforeach
             </table>
         </div>
