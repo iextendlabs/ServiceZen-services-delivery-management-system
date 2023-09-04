@@ -67,22 +67,28 @@ class SiteController extends Controller
             $query->where('status', 1);
         })->role('Staff')->latest()->get();
 
-        $slider_images = Setting::where('key','Slider Image')->first();
+        $slider_images = Setting::where('key', 'Slider Image')->first();
 
-        $review_char_limit = Setting::where('key','Character Limit Of Review On Home Page')->value('value');
+        $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
         if (isset($request->id)) {
-            $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
             $category = ServiceCategory::find($request->id);
+            if (isset($category->childCategories) && count($category->childCategories)) {
+                $child_categories =  $category->childCategories->pluck('id')->toArray();
+                $services = Service::whereIn('category_id', $child_categories)->paginate(config('app.paginate'));
+            } else {
+                $services = Service::where('category_id', $request->id)->paginate(config('app.paginate'));
+            }
+
             $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address', 'FAQs','reviews','staffs','slider_images','review_char_limit'));
+            return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
         } else {
             $FAQs = FAQ::latest()->take(3)->get();
 
             $services = Service::paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs','reviews','staffs','slider_images','review_char_limit'));
+            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
         }
     }
 
@@ -90,9 +96,9 @@ class SiteController extends Controller
     {
         $service = Service::find($id);
         $FAQs = FAQ::where('service_id', $id)->get();
-        $reviews = Review::where('service_id',$id)->get();
-        $averageRating = Review::where('service_id',$id)->avg('rating');
-        return view('site.serviceDetail', compact('service', 'FAQs','reviews','averageRating'));
+        $reviews = Review::where('service_id', $id)->get();
+        $averageRating = Review::where('service_id', $id)->avg('rating');
+        return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating'));
     }
 
     public function saveLocation(Request $request)
