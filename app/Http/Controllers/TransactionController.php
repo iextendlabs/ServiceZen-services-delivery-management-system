@@ -35,30 +35,33 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->input('type') == "transaction") {
-            request()->validate([
-                'amount' => 'required',
-                'description' => 'required',
-            ]);
-        }
+        request()->validate([
+            'amount' => 'required',
+        ]);
+
         $input = $request->all();
 
         $input['status'] = "Approved";
+        if ($request->input('submit_type') == "transaction") {
 
-        if ($request->input('type') == "transaction") {
-            if ($request->transaction_type == "credit") {
+            if ($request->type == "Credit") {
+
                 $input['amount'] = '-' . $request->amount;
-            } else {
-                $input['amount'] = $request->amount;
-            }
-            Transaction::create($input);
-        } elseif ($request->input('type') == "salary") {
-            $input['amount'] = $request->fix_salary;
-            Transaction::create($input);
+                Transaction::create($input);
+            } elseif ($request->type == "Pay Salary") {
 
-            $input['amount'] = '-' . $request->fix_salary;
-            Transaction::create($input);
+                $input['amount'] = $request->amount;
+                Transaction::create($input);
+
+                $input['amount'] = '-' . $request->amount;
+                Transaction::create($input);
+            } else {
+
+                $input['amount'] = $request->amount;
+                Transaction::create($input);
+            }
         } else {
+            $input['type'] = "Order Commission";
             Transaction::create($input);
         }
 

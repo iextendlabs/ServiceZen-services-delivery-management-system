@@ -14,15 +14,15 @@
 </div>
 @endif
 @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+<div class="alert alert-danger">
+    <strong>Whoops!</strong> There were some problems with your input.<br><br>
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
@@ -60,9 +60,6 @@
         <div class="form-group">
             <strong>Fix Salary:</strong>
             @currency($serviceStaff->staff->fix_salary)
-            @if($serviceStaff->staff->fix_salary)
-            <button type="submit" value="salary" name="type" form="pay-transactions" class="btn btn-primary">Pay Salary</button>
-            @endif
         </div>
     </div>
     <div class="col-md-12">
@@ -85,6 +82,7 @@
         <tr>
             <th>Sr#</th>
             <th>Date Added</th>
+            <th>Type</th>
             <th>Description</th>
             <th>Amount</th>
             <th>Action</th>
@@ -93,6 +91,7 @@
         <tr>
             <td>{{ ++$i }}</td>
             <td>{{ $transaction->created_at }}</td>
+            <td>{{ $transaction->type }}</td>
             <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else {{ $transaction->description }} @endif </td>
             <td>@currency($transaction->amount)</td>
             <td>
@@ -121,9 +120,9 @@
     <div class="col-md-6">
         <h3>Add Transaction</h3>
         <p>Current balance is: <b>@currency($total_balance)</b></p>
+        <p>Current balance with salary is: <b>{{config('app.currency')}} ({{$total_balance .'+'. $serviceStaff->staff->fix_salary}})</b></p>
         <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
             @csrf
-            <input type="hidden" name="fix_salary" value="{{ $serviceStaff->staff->fix_salary }}">
             <input type="hidden" name="user_id" value="{{ $serviceStaff->id }}">
             <input type="hidden" name="pay" value="1">
 
@@ -143,9 +142,12 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Type:</strong>
-                        <select name="transaction_type" class="form-control">
-                            <option value="credit">Credit</option>
-                            <option value="debit">Debit</option>
+                        <select name="type" class="form-control">
+                            <option value="Credit">Credit</option>
+                            <option value="Debit">Debit</option>
+                            <option value="Product Sale">Product Sale</option>
+                            <option value="Bonus">Bonus</option>
+                            <option value="Pay Salary">Pay Salary</option>
                         </select>
                     </div>
                 </div>
@@ -156,7 +158,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <button type="submit" value="transaction" name="type" class="btn btn-primary" form="pay-transactions">Add Transaction</button>
+                    <button type="submit" value="transaction" name="submit_type" class="btn btn-primary" form="pay-transactions">Add Transaction</button>
                 </div>
             </div>
         </form>
