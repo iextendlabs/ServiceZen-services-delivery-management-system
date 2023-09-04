@@ -63,7 +63,9 @@ class SiteController extends Controller
 
         $reviews = Review::latest()->take(6)->get();
 
-        $staffs = User::role('Staff')->latest()->get();
+        $staffs = User::whereHas('staff', function ($query) {
+            $query->where('status', 1);
+        })->role('Staff')->latest()->get();
 
         $slider_images = Setting::where('key','Slider Image')->first();
 
@@ -88,8 +90,8 @@ class SiteController extends Controller
     {
         $service = Service::find($id);
         $FAQs = FAQ::where('service_id', $id)->get();
-
-        return view('site.serviceDetail', compact('service', 'FAQs'));
+        $reviews = Review::where('service_id',$id)->get();
+        return view('site.serviceDetail', compact('service', 'FAQs','reviews'));
     }
 
     public function saveLocation(Request $request)

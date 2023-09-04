@@ -5,10 +5,26 @@
         height: 300px !important;
         width: 300px;
     }
-
 </style>
 <div class="album py-5 bg-light">
     <div class="container">
+        <div class="row">
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+            @if(Session::has('success'))
+            <span class="alert alert-success" role="alert">
+                <strong>{{ Session::get('success') }}</strong>
+            </span>
+            @endif
+        </div>
         <div class="row">
             <div class="col-md-12 text-center">
                 <h2>{{ $user->name }}</h2>
@@ -18,6 +34,8 @@
             <div class="col-md-12 text-center">
                 <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
             </div>
+
+            <!-- Social Links -->
             @if($socialLinks)
             <div class="col-md-12 text-center">
                 <h3>Social Links</h3>
@@ -48,6 +66,8 @@
                 </a>
             </div>
             @endif
+
+            <!-- Staff Gallery -->
             @if($user->staff->youtube_video)
             <div class="col-md-12 text-center mt-3 mb-3">
                 <iframe width="592" height="333" src="https://www.youtube.com/embed/{{ $user->staff->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -126,6 +146,79 @@
             @endif
             @endforeach
         </div>
+        <div class="row">
+            <div class="col-md-5 offset-md-4">
+                @if($reviews)
+                <h3 class="text-center">Reviews</h3>
+                @foreach($reviews as $review)
+                <div class="card m-2">
+                    <div class="card-body">
+                        <h5 class="card-title">{{$review->user_name}}</h5>
+                        <p class="card-text" style="height: 50px;">{{$review->content}}</p>
+                        <div class="star-rating">
+                            @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
+                                <span class="text-warning">&#9733;</span>
+                                @else
+                                <span class="text-muted">&#9734;</span>
+                                @endif
+                                @endfor
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+                @endif
+
+                @if(auth()->check())
+                <button class="btn btn-block btn-primary" id="review">Write a review</button>
+                @endif
+
+                <div id="review-form" style="display: none;">
+                    <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="staff_id" value="{{ $user->id }}">
+                        <input type="hidden" name="store" value="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><strong>Your Name:</strong>
+                                    <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><strong>Review:</strong>
+                                    <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{old('content')}}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><label for="rating">Rating</label><br>
+                                    @for($i = 1; $i <= 5; $i++) 
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                                    </div>
+                                    @endfor
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-right">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+</div>
+<script>
+    $(document).on('click', '#review', function() {
+        $('#review-form').show();
+        $('html, body').animate({
+            scrollTop: $('#review-form').offset().top
+        }, 1000);
+    });
+</script>
 @endsection

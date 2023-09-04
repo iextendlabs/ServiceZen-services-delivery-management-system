@@ -3,7 +3,6 @@
   .box-shadow {
     background: none !important;
   }
-
 </style>
 @section('content')
 <section class="jumbotron text-center">
@@ -30,15 +29,15 @@
   </div>
   @endif
   @if ($errors->any())
-<div class="alert alert-danger">
+  <div class="alert alert-danger">
     <strong>Whoops!</strong> There were some problems with your input.<br><br>
     <ul>
-        @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-        @endforeach
+      @foreach ($errors->all() as $error)
+      <li>{{ $error }}</li>
+      @endforeach
     </ul>
-</div>
-@endif
+  </div>
+  @endif
 </div>
 <div id="serviceDetailContainer" class="album py-5 bg-light">
   <div class="container">
@@ -67,9 +66,6 @@
           @if(count($FAQs))
           <button class="btn btn-block btn-secondary" id="faqs-scroll">FAQs</button>
           @endif
-          @if(auth()->check())
-          <button class="btn btn-block btn-primary" id="review">Write a review</button>
-          @endif
           <!-- AddToAny BEGIN -->
           <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
             <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
@@ -87,17 +83,44 @@
     <div class="row">
       <div class="col-md-12">
         <h3 class="text-center mt-3" style="font-family: 'Titillium Web', sans-serif;font-weight: bold;">Description</h3>
-        {!! $service->description !!} <hr>
+        {!! $service->description !!}
+        <hr>
       </div>
+    </div>
+    <div class="row">
       @if(auth()->check())
-      <div class="col-md-6" id="review-form" style="display: none;">
-        <h3>Write a review</h3>
-        <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+      <div class="col-md-5 offset-md-4">
+        @if($reviews)
+        <h3 class="text-center">Reviews</h3>
+        @foreach($reviews as $review)
+        <div class="card m-2">
+          <div class="card-body">
+            <h5 class="card-title">{{$review->user_name}}</h5>
+            <p class="card-text" style="height: 50px;">{{$review->content}}</p>
+            <div class="star-rating">
+              @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
+                <span class="text-warning">&#9733;</span>
+                @else
+                <span class="text-muted">&#9734;</span>
+                @endif
+                @endfor
+            </div>
+          </div>
+        </div>
+        @endforeach
+        @endif
+
+        @if(auth()->check())
+        <button class="btn btn-block btn-primary" id="review">Write a review</button>
+        @endif
+
+        <div id="review-form" style="display: none;">
+          <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
-          <input type="hidden" name="service_id" value="{{ $service->id }}">
-          <input type="hidden" name="store" value="1">
-          <div class="row">
-          <div class="col-md-12">
+            <input type="hidden" name="service_id" value="{{ $service->id }}">
+            <input type="hidden" name="store" value="1">
+            <div class="row">
+              <div class="col-md-12">
                   <div class="form-group">
                       <span style="color: red;">*</span><strong>Your Name:</strong>
                       <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
@@ -120,12 +143,12 @@
                       @endfor
                   </div>
               </div>
-
           <div class="col-md-12 text-right">
               <button type="submit" class="btn btn-primary">Submit</button>
           </div>
         </div>
       </form>
+        </div>
       </div>
       @endif
     </div>
@@ -134,7 +157,7 @@
 
 <div class="album py-5 bg-light">
   <div class="container">
-    
+
     @if(count($service->addONs))
     <hr>
     <h2>Add ONs</h2><br>
@@ -205,7 +228,7 @@
       <div class="col-md-4 service-box">
         <div class="card mb-4 box-shadow">
           <a href="/serviceDetail/{{ $package->service->id }}">
-          <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
+            <p class="card-text service-box-title text-center"><b>{{ $package->service->name }}</b></p>
             <img class="card-img-top" src="./service-images/{{ $package->service->image }}" alt="Card image cap">
           </a>
           <div class="card-body">
@@ -228,7 +251,7 @@
       @endforeach
     </div>
     @endif
-    
+
     @if(count($FAQs))
     <hr>
     <h1 id="faqs">Frequently Asked Questions</h1>
@@ -267,7 +290,7 @@
     }, 1000);
   });
 
-  $(document).on('click','#review',function(){
+  $(document).on('click', '#review', function() {
     $('#review-form').show();
     $('html, body').animate({
       scrollTop: $('#review-form').offset().top

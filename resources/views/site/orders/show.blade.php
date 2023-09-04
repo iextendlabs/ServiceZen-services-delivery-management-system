@@ -159,7 +159,8 @@
         <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
           @if($order->service_staff_id)
-          <input type="hidden" name="user_id" value="{{ $order->service_staff_id }}">
+          <input type="hidden" name="staff_id" value="{{ $order->service_staff_id }}">
+          <input type="hidden" name="order_id" value="{{ $order->id }}">
           @endif
           <input type="hidden" name="store" value="1">
           <div class="row">

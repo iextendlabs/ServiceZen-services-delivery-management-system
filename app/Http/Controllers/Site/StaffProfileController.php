@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\User;
@@ -66,8 +67,9 @@ class StaffProfileController extends Controller
         }
 
         $categories = ServiceCategory::get();
+        $reviews = Review::where('staff_id',$id)->get();
 
-        return view('site.staff.show', compact('user', 'categories','socialLinks'));
+        return view('site.staff.show', compact('user', 'categories','socialLinks','reviews'));
     }
 
 

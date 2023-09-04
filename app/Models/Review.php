@@ -10,12 +10,12 @@ class Review extends Model
     use HasFactory;
     
     protected $fillable = [
-        'user_id', 'service_id', 'content', 'rating','user_name'
+        'staff_id', 'service_id', 'content', 'rating','user_name','order_id'
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'staff_id');
     }
 
     public function service()

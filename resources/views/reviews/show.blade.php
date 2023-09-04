@@ -22,11 +22,20 @@
         </div>
     </div>
     @endif
-    @if($review->user_id)
+    @if($review->staff_id)
     <div class="col-md-12">
         <div class="form-group">
             <strong>Staff:</strong>
             {{ $review->user->name }}
+        </div>
+    </div>
+    @endif
+
+    @if($review->order_id)
+    <div class="col-md-12">
+        <div class="form-group">
+            <strong>Order Id:</strong>
+            #{{ $review->order_id }}
         </div>
     </div>
     @endif
