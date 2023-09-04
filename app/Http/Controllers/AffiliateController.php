@@ -6,6 +6,7 @@ use App\Models\Affiliate;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use DB;
@@ -99,6 +100,8 @@ class AffiliateController extends Controller
      */
     public function show(User $affiliate)
     {
+        $currentMonth = Carbon::now()->startOfMonth();
+
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
         $transactions = Transaction::where('user_id', $affiliate->id)->latest()->paginate(config('app.paginate'));
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
@@ -111,7 +114,17 @@ class AffiliateController extends Controller
         $total_balance = Transaction::where('user_id', $affiliate->id)->sum('amount');
         $total_balance_in_pkr = $total_balance * $pkrRateValue;
 
-        return view('affiliates.show', compact('affiliate', 'pkrRateValue','transactions','total_balance','total_balance_in_pkr'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $product_sales = Transaction::where('type', 'Product Sale')
+            ->where('created_at', '>=', $currentMonth)
+            ->where('user_id', $affiliate->id)
+            ->sum('amount');
+
+        $bonus = Transaction::where('type', 'Bonus')
+            ->where('created_at', '>=', $currentMonth)
+            ->where('user_id', $affiliate->id)
+            ->sum('amount');
+
+        return view('affiliates.show', compact('affiliate', 'pkrRateValue','transactions','total_balance','total_balance_in_pkr','product_sales','bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

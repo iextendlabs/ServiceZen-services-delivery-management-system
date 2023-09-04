@@ -7,6 +7,7 @@ use App\Models\Staff;
 use App\Models\StaffHoliday;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Storage;
@@ -62,8 +63,8 @@ class ServiceStaffController extends Controller
     public function create()
     {
         $users = User::all();
-        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
-        return view('serviceStaff.create', compact('users','socialLinks'));
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        return view('serviceStaff.create', compact('users', 'socialLinks'));
     }
 
     /**
@@ -136,10 +137,23 @@ class ServiceStaffController extends Controller
      */
     public function show(User $serviceStaff)
     {
+        $currentMonth = Carbon::now()->startOfMonth();
+
         $transactions = Transaction::where('user_id', $serviceStaff->id)->latest()->paginate(config('app.paginate'));
 
         $total_balance = Transaction::where('user_id', $serviceStaff->id)->sum('amount');
-        return view('serviceStaff.show', compact('serviceStaff','transactions','total_balance'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
+        $product_sales = Transaction::where('type', 'Product Sale')
+            ->where('created_at', '>=', $currentMonth)
+            ->where('user_id', $serviceStaff->id)
+            ->sum('amount');
+
+        $bonus = Transaction::where('type', 'Bonus')
+            ->where('created_at', '>=', $currentMonth)
+            ->where('user_id', $serviceStaff->id)
+            ->sum('amount');
+
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance','product_sales','bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -151,9 +165,9 @@ class ServiceStaffController extends Controller
     public function edit(User $serviceStaff)
     {
         $users = User::all();
-        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.edit', compact('serviceStaff', 'users','socialLinks'));
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks'));
     }
 
     /**

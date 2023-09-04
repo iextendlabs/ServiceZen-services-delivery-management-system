@@ -56,6 +56,18 @@
     </div>
     <div class="col-md-12">
         <div class="form-group">
+            <strong>Bonus of {{ now()->format('F') }}:</strong>
+            @currency($bonus) (Rs.{{ $pkrRateValue * $bonus }})
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
+            <strong>Product Sales of {{ now()->format('F') }}:</strong>
+            @currency($product_sales) (Rs.{{ $pkrRateValue * $product_sales }})
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
             <strong>Roles:</strong>
             @if(!empty($affiliate->getRoleNames()))
             @foreach($affiliate->getRoleNames() as $v)

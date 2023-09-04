@@ -64,6 +64,18 @@
     </div>
     <div class="col-md-12">
         <div class="form-group">
+            <strong>Bonus of {{ now()->format('F') }}:</strong>
+            @currency($bonus)
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
+            <strong>Product Sales of {{ now()->format('F') }}:</strong>
+            @currency($product_sales)
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
             <strong>Roles:</strong>
             @if(!empty($serviceStaff->getRoleNames()))
             @foreach($serviceStaff->getRoleNames() as $v)
