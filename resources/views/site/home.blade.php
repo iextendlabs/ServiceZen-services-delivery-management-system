@@ -40,7 +40,6 @@
 <div class="container">
 @if(isset($category))
   @if(count($category->childCategories))
-  <h2 class="text-center">Sub Categories</h2>
     <div class="row" id="categories">
       @foreach($category->childCategories as $category)
         <div class="col-md-4 service-box">
