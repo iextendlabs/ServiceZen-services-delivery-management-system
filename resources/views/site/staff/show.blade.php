@@ -170,6 +170,14 @@
 
                 @if(auth()->check())
                 <button class="btn btn-block btn-primary" id="review">Write a review</button>
+                @for($i = 1; $i <= 5; $i++) 
+                @if($i <=$averageRating)
+                    <span class="text-warning">&#9733;</span>
+                    @else
+                    <span class="text-muted">&#9734;</span>
+                @endif
+                @endfor
+                {{count($reviews)}} Reviews
                 @endif
 
                 <div id="review-form" style="display: none;">
@@ -209,7 +217,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 </div>

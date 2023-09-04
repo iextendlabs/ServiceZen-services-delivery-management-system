@@ -38,7 +38,6 @@
 
             <div class="float-right mb-2">
                 <a class="btn btn-primary float-end no-print" href="{{ route('order.edit',$order->id) }}">Edit</a>
-                <button class="btn btn-primary float-end no-print" id="review">Write a review</button>
 
                 <button type="button" class="btn btn-danger float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i> Download PDF</button>
             </div>
@@ -123,7 +122,7 @@
                     <td class="text-right">@currency($orderService->price)</td>
                 </tr>
                 @endforeach
-                
+
                 <tr>
                     <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
                     <td class="text-right">@currency($order->order_total->sub_total)</td>
@@ -154,46 +153,79 @@
             </table>
             @endif
         </div>
-        <div class="col-md-6" id="review-form" style="display: none;">
-        <h3>Write a review for staff</h3>
-        <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
-          @csrf
-          @if($order->service_staff_id)
-          <input type="hidden" name="staff_id" value="{{ $order->service_staff_id }}">
-          <input type="hidden" name="order_id" value="{{ $order->id }}">
-          @endif
-          <input type="hidden" name="store" value="1">
-          <div class="row">
-          <div class="col-md-12">
-                  <div class="form-group">
-                      <span style="color: red;">*</span><strong>Your Name:</strong>
-                      <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
-                  </div>
-              </div>
-              <div class="col-md-12">
-                  <div class="form-group">
-                      <span style="color: red;">*</span><strong>Review:</strong>
-                      <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{old('content')}}</textarea>
-                  </div>
-              </div>
-              <div class="col-md-12">
-                  <div class="form-group">
-                      <span style="color: red;">*</span><label for="rating">Rating</label><br>
-                      @for($i = 1; $i <= 5; $i++) 
-                      <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
-                          <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
-                      </div>
-                      @endfor
-                  </div>
-              </div>
 
-          <div class="col-md-12 text-right">
-              <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 offset-md-4">
+            @if($reviews)
+            <h3 class="text-center">Reviews</h3>
+            @foreach($reviews as $review)
+            <div class="card m-2">
+                <div class="card-body">
+                    <h5 class="card-title">{{$review->user_name}}</h5>
+                    <p class="card-text" style="height: 50px;">{{$review->content}}</p>
+                    <div class="star-rating">
+                        @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
+                            <span class="text-warning">&#9733;</span>
+                            @else
+                            <span class="text-muted">&#9734;</span>
+                            @endif
+                            @endfor
+                    </div>
+                </div>
+            </div>
+            @endforeach
+            @endif
+
+            @if(auth()->check())
+            <button class="btn btn-block btn-primary" id="review">Write a review</button>
+            @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
+                @else
+                <span class="text-muted">&#9734;</span>
+                @endif
+                @endfor
+                {{count($reviews)}} Reviews
+                @endif
+
+                <div id="review-form" style="display: none;">
+                    <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @if($order->service_staff_id)
+                        <input type="hidden" name="staff_id" value="{{ $order->service_staff_id }}">
+                        <input type="hidden" name="order_id" value="{{ $order->id }}">
+                        @endif
+                        <input type="hidden" name="store" value="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><strong>Your Name:</strong>
+                                    <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><strong>Review:</strong>
+                                    <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{old('content')}}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><label for="rating">Rating</label><br>
+                                    @for($i = 1; $i <= 5; $i++) 
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                                    </div>
+                                    @endfor
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-right">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
         </div>
-      </form>
-      </div>
     </div>
 </div>
 <script>
@@ -203,11 +235,11 @@
 </script>
 
 <script>
-  $(document).on('click','#review',function(){
-    $('#review-form').show();
-    $('html, body').animate({
-      scrollTop: $('#review-form').offset().top
-    }, 1000);
-  });
+    $(document).on('click', '#review', function() {
+        $('#review-form').show();
+        $('html, body').animate({
+            scrollTop: $('#review-form').offset().top
+        }, 1000);
+    });
 </script>
 @endsection

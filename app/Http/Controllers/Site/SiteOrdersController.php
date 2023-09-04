@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\OrderTotal;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Mail;
@@ -175,7 +176,10 @@ class SiteOrdersController extends Controller
     public function show($id)
     {
         $order = Order::find($id);
-        return view('site.orders.show', compact('order'));
+        $reviews = Review::where('order_id',$id)->get();
+        $averageRating = Review::where('order_id',$id)->avg('rating');
+
+        return view('site.orders.show', compact('order','reviews','averageRating'));
     }
 
     public function edit($id)

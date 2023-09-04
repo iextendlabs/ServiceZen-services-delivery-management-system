@@ -91,7 +91,8 @@ class SiteController extends Controller
         $service = Service::find($id);
         $FAQs = FAQ::where('service_id', $id)->get();
         $reviews = Review::where('service_id',$id)->get();
-        return view('site.serviceDetail', compact('service', 'FAQs','reviews'));
+        $averageRating = Review::where('service_id',$id)->avg('rating');
+        return view('site.serviceDetail', compact('service', 'FAQs','reviews','averageRating'));
     }
 
     public function saveLocation(Request $request)

@@ -68,8 +68,9 @@ class StaffProfileController extends Controller
 
         $categories = ServiceCategory::get();
         $reviews = Review::where('staff_id',$id)->get();
+        $averageRating = Review::where('staff_id',$id)->avg('rating');
 
-        return view('site.staff.show', compact('user', 'categories','socialLinks','reviews'));
+        return view('site.staff.show', compact('user', 'categories','socialLinks','reviews','averageRating'));
     }
 
 

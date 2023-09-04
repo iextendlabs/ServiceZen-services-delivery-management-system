@@ -77,6 +77,17 @@
           <script async src="https://static.addtoany.com/menu/page.js"></script>
           <!-- AddToAny END -->
           <p class="card-text">{!! $service->short_description !!}</p>
+          @if(auth()->check())
+          <button class="btn btn-block btn-primary" id="review">Write a review</button>
+          @endif
+            @for($i = 1; $i <= 5; $i++) 
+              @if($i <=$averageRating)
+                <span class="text-warning">&#9733;</span>
+                  @else
+                <span class="text-muted">&#9734;</span>
+              @endif
+            @endfor
+            {{count($reviews)}} Reviews
         </div>
       </div>
     </div>
@@ -87,7 +98,7 @@
         <hr>
       </div>
     </div>
-    <div class="row">
+    <div class="row" id="review-form" style="display: none;">
       @if(auth()->check())
       <div class="col-md-5 offset-md-4">
         @if($reviews)
@@ -109,12 +120,7 @@
         </div>
         @endforeach
         @endif
-
-        @if(auth()->check())
-        <button class="btn btn-block btn-primary" id="review">Write a review</button>
-        @endif
-
-        <div id="review-form" style="display: none;">
+        <h4>Write Review</h4>
           <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
           @csrf
             <input type="hidden" name="service_id" value="{{ $service->id }}">
@@ -148,7 +154,6 @@
           </div>
         </div>
       </form>
-        </div>
       </div>
       @endif
     </div>
