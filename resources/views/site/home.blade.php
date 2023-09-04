@@ -58,7 +58,7 @@
     </div>
   @endif
   @endif
-  @if($slider_images->value)
+  @if($slider_images->value && !isset($category))
   <div class="row">
     <div id="imageSlider" class="carousel slide" data-ride="carousel">
       <ol class="carousel-indicators">
