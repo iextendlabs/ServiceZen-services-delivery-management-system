@@ -55,7 +55,7 @@ class User extends Authenticatable
 
     public function SupervisorToManager()
     {
-        return $this->hasMany(SupervisorToManager::class,'supervisor_id','id');
+        return $this->hasOne(SupervisorToManager::class,'supervisor_id','id');
     }
 
     public function AssistantSupervisorToSupervisor()
