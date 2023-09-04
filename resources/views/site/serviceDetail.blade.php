@@ -45,7 +45,7 @@
 
     <div class="row">
       <div class="col-md-8">
-        <img class="card-img-top" src="./service-images/{{ $service->image }}" alt="Card image cap">
+        <img src="./service-images/{{ $service->image }}" alt="Card image cap" height="auto" width="100%">
       </div>
       <div class="col-md-4 box-shadow">
         <div class="card-body">
