@@ -26,7 +26,7 @@ class LongHolidayController extends Controller
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+            $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
             $longHolidays = LongHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
@@ -51,7 +51,7 @@ class LongHolidayController extends Controller
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+            $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
             $staffs = User::whereIn('id', $staffIds)->get();
         } elseif (Auth::user()->hasRole('Staff')) {

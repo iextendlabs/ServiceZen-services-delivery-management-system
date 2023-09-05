@@ -37,13 +37,13 @@
                     <th>Name</th>
                     <th>Email</th>
                 </tr>
-                @if(count($supervisor->SupervisorToManager->staffSupervisor))
+                @if(count($supervisor->staffSupervisors))
 
-                @foreach ($supervisor->SupervisorToManager->staffSupervisor as $key=>$staff)
+                @foreach ($supervisor->staffSupervisors as $key=>$staff)
                 <tr>
                     <td>{{ ++$key }}</td>
-                    <td>{{ $staff->user->name }}</td>
-                    <td>{{ $staff->user->email }}</td>
+                    <td>{{ $staff->name }}</td>
+                    <td>{{ $staff->email }}</td>
                 </tr>
                 @endforeach
                 @else

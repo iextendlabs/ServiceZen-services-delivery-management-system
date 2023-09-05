@@ -34,7 +34,7 @@ class StaffHolidayController extends Controller
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+            $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
             $staffHolidays = StaffHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
@@ -59,7 +59,7 @@ class StaffHolidayController extends Controller
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
-            $staffIds = $supervisor->staffSupervisor->pluck('user_id')->toArray();
+            $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
             $staffs = User::whereIn('id', $staffIds)->get();
         } elseif (Auth::user()->hasRole('Staff')) {

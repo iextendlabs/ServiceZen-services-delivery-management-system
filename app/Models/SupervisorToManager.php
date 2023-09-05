@@ -22,9 +22,4 @@ class SupervisorToManager extends Model
     {
         return $this->belongsTo(User::class,'manager_id');
     }
-
-    public function staffSupervisor()
-    {
-        return $this->hasMany(Staff::class,'supervisor_id','supervisor_id');
-    }
 }

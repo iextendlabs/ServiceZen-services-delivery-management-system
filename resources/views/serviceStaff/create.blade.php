@@ -82,16 +82,25 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Supervisor:</strong>
-                        <select name="supervisor_id" class="form-control">
-                            <option value=""></option>
-                            @if(count($users))
-                            @foreach($users as $user)
+                        <input type="text" name="search-supervisor" id="search-supervisor" class="form-control" placeholder="Search Supervisor By Name And Email">
+                        <table class="table table-striped table-bordered supervisor-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Email</th>
+                            </tr>
+                            @foreach ($users as $user)
                             @if($user->getRoleNames() == '["Supervisor"]')
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="ids[]" value="{{ $user->id }}">
+                                </td>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->email }}</td>
+                            </tr>
                             @endif
                             @endforeach
-                            @endif
-                        </select>
+                        </table>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -225,10 +234,28 @@
         });
     });
 </script>
-<!-- <script>
-    document.getElementById('image').addEventListener('change', function(e) {
-        var preview = document.getElementById('preview');
-        preview.src = URL.createObjectURL(e.target.files[0]);
+<script>
+    $(document).ready(function() {
+        $("#search-supervisor").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".supervisor-table tr").hide();
+
+            $(".supervisor-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+                var email = $row.find("td:last").text().toLowerCase();
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                } else if (email.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
     });
-</script> -->
+</script>
 @endsection

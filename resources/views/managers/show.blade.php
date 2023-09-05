@@ -22,53 +22,44 @@
     </div>
     <div class="col-md-12">
         <div class="form-group">
-            <strong>Supervisor:</strong>
+            <strong>Supervisor and Staff:</strong>
             <table class="table table-striped table-bordered album bg-light">
                 <tr>
                     <th>Sr#</th>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>Supervisor Name</th>
+                    <th>Sr#</th>
+                    <th>Staff Name</th>
                 </tr>
                 @if(count($manager->managerSupervisors))
                 @foreach ($manager->managerSupervisors as $key=>$supervisor)
                 <tr>
+                    <td rowspan="{{ count($supervisor->supervisor->staffSupervisors) + 1 }}">{{ ++$key }}</td>
+                    <td rowspan="{{ count($supervisor->supervisor->staffSupervisors) + 1 }}">{{ $supervisor->supervisor->name }}</td>
+                </tr>
+                @if(count($supervisor->supervisor->staffSupervisors))
+                @foreach ($supervisor->supervisor->staffSupervisors as $key=>$staff)
+                <tr>
                     <td>{{ ++$key }}</td>
-                    <td>{{ $supervisor->supervisor->name }}</td>
-                    <td>{{ $supervisor->supervisor->email }}</td>
+                    <td>{{ $staff->email }}</td>
                 </tr>
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="3">There is no Supervisor.</td>
+                    <td>{{ ++$key }}</td>
+                    <td colspan="3">No staff members.</td>
+                </tr>
+                @endif
+                @endforeach
+                @else
+                <tr>
+                    <td colspan="5">There are no supervisors.</td>
                 </tr>
                 @endif
             </table>
         </div>
     </div>
-    @if($manager->managerSupervisors)
-    <div class="col-md-12">
-        <div class="form-group">
-            <strong>Staff:</strong>
-            <table class="table table-striped table-bordered album bg-light">
-                <tr>
-                    <th>Sr#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                </tr>
-                @foreach ($manager->managerSupervisors as $key=>$supervisor)
-                @foreach ($supervisor->staffSupervisor as $key=>$staff)
-                <tr>
-                    <td>{{ ++$key }}</td>
-                    <td>{{ $staff->user->name }}</td>
-                    <td>{{ $staff->user->email }}</td>
-                </tr>
-                @endforeach
-                
-                @endforeach
-            </table>
-        </div>
-    </div>
-    @endif
+
+
     <div class="col-md-12">
         <div class="form-group">
             <strong>Roles:</strong>

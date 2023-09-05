@@ -124,7 +124,7 @@ class ServiceStaffController extends Controller
         }
 
         Staff::create($input);
-
+        $ServiceStaff->supervisors()->attach($request->ids);
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -153,7 +153,7 @@ class ServiceStaffController extends Controller
             ->where('user_id', $serviceStaff->id)
             ->sum('amount');
 
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance','product_sales','bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -166,8 +166,9 @@ class ServiceStaffController extends Controller
     {
         $users = User::all();
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        $supervisor_ids = $serviceStaff->supervisors()->pluck('supervisor_id')->toArray();
 
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks'));
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids'));
     }
 
     /**
@@ -235,6 +236,7 @@ class ServiceStaffController extends Controller
         }
 
         $staff->update($input);
+        $serviceStaff->supervisors()->sync($request->ids);
 
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff updated successfully');

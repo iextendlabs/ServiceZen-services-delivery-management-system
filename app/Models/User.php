@@ -68,7 +68,7 @@ class User extends Authenticatable
         $staffIds = [];
             foreach ($this->managerSupervisors as $managerSupervisor) {
                 if ($managerSupervisor->supervisor){
-                    $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisor->pluck('user_id')->toArray();
+                    $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisors->pluck('id')->toArray();
                     $staffIds = array_merge($staffIds, $supervisor_staffs);
                 }
             }
@@ -77,13 +77,9 @@ class User extends Authenticatable
     
     public function getSupervisorStaffIds()
     {
-        return $this->staffSupervisor->pluck('user_id')->toArray();
+        return $this->staffSupervisors->pluck('id')->toArray();
     }
 
-    public function staffSupervisor()
-    {
-        return $this->hasMany(Staff::class,'supervisor_id','id');
-    }
 
     public function managerSupervisors(){
         return $this->hasMany(SupervisorToManager::class,'manager_id','id');
@@ -101,5 +97,15 @@ class User extends Authenticatable
     public function customerProfile()
     {
         return $this->hasOne(CustomerProfile::class);
+    }
+
+    public function staffSupervisors()
+    {
+        return $this->belongsToMany(User::class, 'staff_supervisor', 'supervisor_id', 'staff_id');
+    }
+
+    public function supervisors()
+    {
+        return $this->belongsToMany(User::class, 'staff_supervisor', 'staff_id', 'supervisor_id');
     }
 }
