@@ -59,15 +59,16 @@
           </p>
 
           <p class="text-muted"><b><i class="fa fa-clock"> </i> <span id="duration">{{ $service->duration }}</span></b></p>
+          @if(count($service->variant))
           <strong>Service Variants</strong>
           <select name="variant" id="variant-select" class="form-control mb-2">
             <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-name="{{ $service->name }}" data-duration="{{ $service->duration }}" data-price="@currency(isset($service->discount) ? $service->discount : $service->price)">{{ $service->name }}</option>
-            @if($service->variant)
             @foreach($service->variant as $variant)
             <option value="{{ $variant->service->name }}" data-id="{{ $variant->service->id }}" data-name="{{ $variant->service->name }}" data-duration="{{ $variant->service->duration }}" data-price="@currency(isset($variant->service->discount) ? $variant->service->discount : $variant->service->price)">{{ $variant->service->name }}</option>
             @endforeach
-            @endif
           </select>
+          @endif
+
           <a href="/addToCart/{{ $service->id }}" id="add-to-cart" class="btn btn-block btn-primary">Add to Cart</a>
           @if(count($service->addONs))
           <button class="btn btn-block btn-secondary" id="add-ons-scroll">Add ONs</button>
