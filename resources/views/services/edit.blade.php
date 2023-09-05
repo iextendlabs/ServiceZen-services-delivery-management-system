@@ -167,6 +167,18 @@
         </div>
         <div class="tab-pane fade" id="variant" role="tabpanel" aria-labelledby="variant-tab">
             <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="new_variant"><strong>New Variant:</strong></label>
+                        <input type="hidden" name="id" value="{{ $service->id }}" class="form-control">
+                        <div class="input-group mb-3">
+                            <input type="text" id="new_variant" name="new_variant" class="form-control">
+                            <div class="input-group-append">
+                                <button id="bulkCopyBtn" class="btn btn-secondary" type="button">Add Variant</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Variant Services:</strong>
@@ -243,6 +255,46 @@
     </div>
 </form>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('bulkCopyBtn').addEventListener('click', function() {
+            const newVariant = document.querySelector('input[name="new_variant"]').value; // Get the new_variant value
+            const serviceId = document.querySelector('input[name="id"]').value; // Get the id value
+
+            if (newVariant && serviceId) {
+                if (confirm('Are you sure you want to create new variant?')) {
+                    copySelectedItems(newVariant, serviceId);
+                }
+            } else {
+                alert('Please Set New Variant Name.');
+            }
+        });
+
+        function copySelectedItems(newVariant, serviceId) {
+            fetch('{{ route('services.bulkCopy') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            newVariant,
+                            serviceId
+                        })
+                    })
+                .then(response => response.json())
+                .then(data => {
+                    var editUrl = "{{ route('services.edit', ['service' => ':id']) }}";
+                    editUrl = editUrl.replace(':id', data.service_id);
+
+                    window.location.href = editUrl;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+</script>
+<script>
     $(document).ready(function() {
         $("#search").keyup(function() {
             var value = $(this).val().toLowerCase();
@@ -286,8 +338,7 @@
         });
 
     });
-</script>
-<script>
+
     $(document).ready(function() {
         $("#search-user").keyup(function() {
             var value = $(this).val().toLowerCase();

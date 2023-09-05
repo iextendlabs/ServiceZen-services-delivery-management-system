@@ -27,6 +27,12 @@
             text-align: center;
         }
 
+        .scroll-div {
+            height: 330px;
+            overflow: hidden;
+            overflow-y: scroll;
+        }
+
         .badge {
             padding: 0em 1em;
             font-size: 85%;
@@ -71,7 +77,7 @@
                         </li>
                         @endif
                         @else
-                        
+
                         @can('menu-sales')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -111,7 +117,7 @@
                                 @endcan
                                 @can('staff-holiday-list')
                                 <a class="dropdown-item" href="{{ route('staffHolidays.index') }}">Staff Holiday</a>
-                                <a class="dropdown-item" href="{{ route('longHolidays.index') }}">Long  Holiday</a>
+                                <a class="dropdown-item" href="{{ route('longHolidays.index') }}">Long Holiday</a>
                                 <a class="dropdown-item" href="{{ route('shortHolidays.index') }}">Short Holiday</a>
                                 <a class="dropdown-item" href="{{ route('staffGeneralHolidays.index') }}">Staff General Holiday</a>
                                 @endcan
@@ -166,7 +172,7 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
+                                <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
                                 @if(auth()->user()->getRoleNames() == '["Admin"]')
                                 <a class="dropdown-item" href="{{ route('backups.index') }}">Database Backups</a>
@@ -177,7 +183,7 @@
                                 @can('role-list')
                                 <a class="dropdown-item" href="{{ route('roles.index') }}">Role</a>
                                 @endcan
-                                
+
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
@@ -189,7 +195,7 @@
                                                      document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
                         </li>
                         @endif
-                        
+
                     </ul>
                 </div>
 
@@ -202,29 +208,30 @@
         </main>
     </div>
     <footer class="text-muted">
-    <div class="container">
-    <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
-      <p class="float-right">
-      {{ date('Y-m-d H:i:s') }}
-        © 2023 {{ env('APP_NAME') }}
-      </p>
-    </div>
-  </footer>
+        <div class="container">
+            <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
+            <p class="float-right">
+                {{ date('Y-m-d H:i:s') }}
+                © 2023 {{ env('APP_NAME') }}
+            </p>
+        </div>
+    </footer>
 
-  
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script> -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script>
-      $(document).ready(function() {
-          $(".smsId").click(function() {
-              $('.btn-close').css('display', 'none')
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".smsId").click(function() {
+                $('.btn-close').css('display', 'none')
             });
         });
     </script>
 
 </body>
+
 </html>

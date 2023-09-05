@@ -260,7 +260,7 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         //delete image for service 
-        if (isset($service->image)) {
+        if ($service->image) {
             if (file_exists(public_path('service-images') . '/' . $service->image)) {
                 unlink(public_path('service-images') . '/' . $service->image);
             }
@@ -298,7 +298,10 @@ class ServiceController extends Controller
 
     public function bulkCopy(Request $request)
     {
+        
         $selectedItems = $request->input('selectedItems');
+        $new_variant = $request->input('newVariant');
+        $service_id = $request->input('serviceId');
 
         if (!empty($selectedItems)) {
 
@@ -311,7 +314,15 @@ class ServiceController extends Controller
             }
 
             return response()->json(['message' => 'Selected items Copy successfully.']);
-        } else {
+        }elseif($new_variant && $service_id){
+                $service = Service::findOrFail($service_id);
+                $copiedService = $service->replicate();
+                $copiedService->name = $new_variant;
+                $copiedService->image = '';
+                $copiedService->save();
+                
+                return response()->json(['service_id' => $copiedService->id]);
+        }else {
             return response()->json(['message' => 'No items selected.']);
         }
     }

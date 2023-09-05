@@ -101,7 +101,7 @@
         <div class="tab-pane fade" id="package-services" role="tabpanel" aria-labelledby="package-services-tab">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
+                    <div class="form-group scroll-div">
                         <strong>Package Services:</strong>
                         <input type="text" name="package-search" id="package-search" class="form-control" placeholder="Search Services By Name And Price">
                         <table class="table table-striped table-bordered services-table">
@@ -127,7 +127,7 @@
         <div class="tab-pane fade" id="add-ons" role="tabpanel" aria-labelledby="add-ons-tab">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
+                    <div class="form-group scroll-div">
                         <strong>Add ONs Services:</strong>
                         <input type="text" name="add-ons-search" id="add-ons-search" class="form-control" placeholder="Search Services By Name And Price">
                         <table class="table table-striped table-bordered add-ons-table">
@@ -153,8 +153,8 @@
         <div class="tab-pane fade" id="variant" role="tabpanel" aria-labelledby="variant-tab">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Add ONs Services:</strong>
+                    <div class="form-group scroll-div">
+                        <strong>Variant Services:</strong>
                         <input type="text" name="variant-search" id="variant-search" class="form-control" placeholder="Search Services By Name And Price">
                         <table class="table table-striped table-bordered variant-table">
                             <tr>
