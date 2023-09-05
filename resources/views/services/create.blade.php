@@ -31,6 +31,9 @@
         <li class="nav-item">
             <a class="nav-link" id="add-ons-tab" data-toggle="tab" href="#add-ons" role="tab" aria-controls="add-ons" aria-selected="false">Add ONs</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" id="variant-tab" data-toggle="tab" href="#variant" role="tab" aria-controls="variant" aria-selected="false">Variant Services</a>
+        </li>
     </ul>
     <div class="tab-content" id="myTabsContent">
         <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -147,6 +150,32 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane fade" id="variant" role="tabpanel" aria-labelledby="variant-tab">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Add ONs Services:</strong>
+                        <input type="text" name="variant-search" id="variant-search" class="form-control" placeholder="Search Services By Name And Price">
+                        <table class="table table-striped table-bordered variant-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Price</th>
+                            </tr>
+                            @foreach ($all_services as $service)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $service->id }}">
+                                </td>
+                                <td>{{ $service->name }}</td>
+                                <td>{{ $service->price }}</td>
+                            </tr>
+                            @endforeach
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <!-- <div class="col-md-12">
                 <div class="form-group">
@@ -232,6 +261,27 @@
                 if (name.indexOf(value) != -1) {
                     $(this).show();
                 } else if (email.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
+
+        $("#variant-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".variant-table tr").hide();
+
+            $(".variant-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+                var price = $row.find("td:last").text().toLowerCase();
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                } else if (price.indexOf(value) != -1) {
                     $(this).show();
                 }
             });

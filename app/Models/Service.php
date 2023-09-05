@@ -33,6 +33,11 @@ class Service extends Model
     {
         return $this->hasMany(ServiceAddOn::class);
     }
+
+    public function variant()
+    {
+        return $this->hasMany(ServiceVariant::class);
+    }
     
     public function FAQs()
     {

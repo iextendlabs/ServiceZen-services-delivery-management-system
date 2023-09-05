@@ -7,6 +7,7 @@ use App\Models\ServiceAddOn;
 use App\Models\ServiceCategory;
 use App\Models\ServicePackage;
 use App\Models\ServiceToUserNote;
+use App\Models\ServiceVariant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -108,6 +109,14 @@ class ServiceController extends Controller
             }
         }
 
+        if (isset($request->variantId)) {
+            foreach ($request->variantId as $variantId) {
+                $input['service_id'] = $service_id;
+                $input['variant_id'] = $variantId;
+                ServiceVariant::create($input);
+            }
+        }
+
         if (isset($request->addONsId)) {
             foreach ($request->addONsId as $addONsId) {
                 $input['service_id'] = $service_id;
@@ -160,10 +169,11 @@ class ServiceController extends Controller
         $i = 0;
         $package_services = ServicePackage::where('service_id', $service->id)->pluck('package_id')->toArray();
         $add_on_services = ServiceAddOn::where('service_id', $service->id)->pluck('add_on_id')->toArray();
+        $variant_services = ServiceVariant::where('service_id', $service->id)->pluck('variant_id')->toArray();
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services'));
+        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services','variant_services'));
     }
 
     public function update(Request $request, $id)
@@ -191,6 +201,7 @@ class ServiceController extends Controller
 
         ServicePackage::where('service_id', $id)->delete();
         ServiceAddOn::where('service_id', $id)->delete();
+        ServiceVariant::where('service_id', $id)->delete();
 
         $service_id = $id;
 
@@ -199,6 +210,14 @@ class ServiceController extends Controller
                 $input['service_id'] = $service_id;
                 $input['package_id'] = $packageId;
                 ServicePackage::create($input);
+            }
+        }
+
+        if (isset($request->variantId)) {
+            foreach ($request->variantId as $variantId) {
+                $input['service_id'] = $service_id;
+                $input['variant_id'] = $variantId;
+                ServiceVariant::create($input);
             }
         }
 

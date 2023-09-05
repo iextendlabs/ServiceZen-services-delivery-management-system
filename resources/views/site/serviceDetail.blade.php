@@ -49,17 +49,26 @@
       </div>
       <div class="col-md-4 box-shadow">
         <div class="card-body">
-          <p class="text-muted">
-            @if(isset($service->discount))<s>@endif
-              @currency($service->price)
-              @if(isset($service->discount))</s>@endif
-            @if(isset($service->discount))
-            <b class="discount"> @currency( $service->discount )</b>
-            @endif
+          <p id="price" class="text-muted">
+          @if(isset($service->discount))
+            <s>@currency($service->price)</s>
+            <b class="discount">@currency($service->discount)</b>
+          @else
+            @currency($service->price)
+          @endif
           </p>
 
-          <p class="text-muted"><b><i class="fa fa-clock"> </i> {{ $service->duration }}</b></p>
-          <a href="/addToCart/{{ $service->id }}" class="btn btn-block btn-primary">Add to Cart</a>
+          <p class="text-muted"><b><i class="fa fa-clock"> </i> <span id="duration">{{ $service->duration }}</span></b></p>
+          <strong>Service Variants</strong>
+          <select name="variant" id="variant-select" class="form-control mb-2">
+            <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-name="{{ $service->name }}" data-duration="{{ $service->duration }}" data-price="@currency(isset($service->discount) ? $service->discount : $service->price)">{{ $service->name }}</option>
+            @if($service->variant)
+            @foreach($service->variant as $variant)
+            <option value="{{ $variant->service->name }}" data-id="{{ $variant->service->id }}" data-name="{{ $variant->service->name }}" data-duration="{{ $variant->service->duration }}" data-price="@currency(isset($variant->service->discount) ? $variant->service->discount : $variant->service->price)">{{ $variant->service->name }}</option>
+            @endforeach
+            @endif
+          </select>
+          <a href="/addToCart/{{ $service->id }}" id="add-to-cart" class="btn btn-block btn-primary">Add to Cart</a>
           @if(count($service->addONs))
           <button class="btn btn-block btn-secondary" id="add-ons-scroll">Add ONs</button>
           @endif
@@ -281,7 +290,18 @@
     @endif
   </div>
 </div>
+<script>
+  $(document).on('change', '#variant-select', function(){
+    var selectedOption = $(this).find('option:selected');
+    var price = selectedOption.data('price');
+    var duration = selectedOption.data('duration');
+    var id = selectedOption.data('id');
 
+    $('#price').html(price);
+    $('#duration').html(duration);
+    $('#add-to-cart').attr('href', '/addToCart/' + id);
+  });
+</script>
 <script>
   $('#add-ons-scroll').click(() => {
     $('html, body').animate({
