@@ -66,120 +66,127 @@ class SiteOrdersController extends Controller
             return redirect()->route('storeHome')->with('error', 'Order Already Placed! or empty cart! or booking slot Unavailable!');
         }
 
-        $staff = User::find($staff_and_time['service_staff_id']);
+        $has_order = Order::where('service_staff_id', $staff_and_time['service_staff_id'])->where('date', $staff_and_time['date'])->where('time_slot_id', $staff_and_time['time_slot'])->get();
 
-        $affiliate = Affiliate::where('code', $code['affiliate_code'])->first();
+        if (count($has_order) == 0) {
+            $staff = User::find($staff_and_time['service_staff_id']);
 
-        if (isset($affiliate)) {
-            $input['affiliate_id'] = $affiliate->user_id;
-        }
+            $affiliate = Affiliate::where('code', $code['affiliate_code'])->first();
 
-        $input['customer_name'] = $address['name'];
-        $input['customer_email'] = $address['email'];
-        $input['buildingName'] = $address['buildingName'];
-        $input['area'] = $address['area'];
-        $input['flatVilla'] = $address['flatVilla'];
-        $input['street'] = $address['street'];
-        $input['city'] = $address['city'];
-        $input['landmark'] = $address['landmark'];
-        $input['number'] = $address['number'];
-        $input['whatsapp'] = $address['whatsapp'];
-        $input['status'] = "Pending";
-        $input['driver_status'] = "Pending";
-        $input['service_staff_id'] = $staff_and_time['service_staff_id'];
-        $input['staff_name'] = $staff->name;
-        $input['date'] = $staff_and_time['date'];
-        $input['time_slot_id'] = $staff_and_time['time_slot'];
-        $input['latitude'] = $address['latitude'];
-        $input['longitude'] = $address['longitude'];
-        $input['gender'] = $address['gender'];
-
-        $input['email'] = $address['email'];
-
-        $user = User::where('email', $address['email'])->first();
-
-        if (isset($user)) {
-            if (isset($user->customerProfile)) {
-                if ($address['update_profile'] == "on") {
-                    $user->customerProfile->update($input);
-                }
-            } else {
-                $user->customerProfile()->create($input);
+            if (isset($affiliate)) {
+                $input['affiliate_id'] = $affiliate->user_id;
             }
-            $input['customer_id'] = $user->id;
-            $customer_type = "Old";
-        } else {
-            $customer_type = "New";
 
-            $input['name'] = $address['name'];
+            $input['customer_name'] = $address['name'];
+            $input['customer_email'] = $address['email'];
+            $input['buildingName'] = $address['buildingName'];
+            $input['area'] = $address['area'];
+            $input['flatVilla'] = $address['flatVilla'];
+            $input['street'] = $address['street'];
+            $input['city'] = $address['city'];
+            $input['landmark'] = $address['landmark'];
+            $input['number'] = $address['number'];
+            $input['whatsapp'] = $address['whatsapp'];
+            $input['status'] = "Pending";
+            $input['driver_status'] = "Pending";
+            $input['service_staff_id'] = $staff_and_time['service_staff_id'];
+            $input['staff_name'] = $staff->name;
+            $input['date'] = $staff_and_time['date'];
+            $input['time_slot_id'] = $staff_and_time['time_slot'];
+            $input['latitude'] = $address['latitude'];
+            $input['longitude'] = $address['longitude'];
+            $input['gender'] = $address['gender'];
 
             $input['email'] = $address['email'];
-            // $password = $input['name'] . mt_rand(1000, 9999);
-            $password = $address['number'];
 
-            $input['password'] = Hash::make($password);
+            $user = User::where('email', $address['email'])->first();
 
-            $user = User::create($input);
-
-            $user->customerProfile()->create($input);
-
-            $input['customer_id'] = $user->id;
-
-            $user->assignRole('Customer');
-        }
-
-        $time_slot = TimeSlot::find($staff_and_time['time_slot']);
-        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
-
-        $input['time_start'] = $time_slot->time_start;
-        $input['time_end'] = $time_slot->time_end;
-
-        $order = Order::create($input);
-
-        $input['order_id'] = $order->id;
-        $input['discount_amount'] = $request->discount;
-
-        OrderTotal::create($input);
-        if ($code['coupon_code']) {
-            $coupon = Coupon::where('code', $code['coupon_code'])->first();
-            $input['coupon_id'] = $coupon->id;
-            CouponHistory::create($input);
-        }
-
-        foreach ($serviceIds as $id) {
-            $services = Service::find($id);
-            $input['service_id'] = $id;
-            $input['service_name'] = $services->name;
-            $input['duration'] = $services->duration;
-            $input['status'] = 'Open';
-            if ($services->discount) {
-                $input['price'] = $services->discount;
+            if (isset($user)) {
+                if (isset($user->customerProfile)) {
+                    if ($address['update_profile'] == "on") {
+                        $user->customerProfile->update($input);
+                    }
+                } else {
+                    $user->customerProfile()->create($input);
+                }
+                $input['customer_id'] = $user->id;
+                $customer_type = "Old";
             } else {
-                $input['price'] = $services->price;
+                $customer_type = "New";
+
+                $input['name'] = $address['name'];
+
+                $input['email'] = $address['email'];
+                // $password = $input['name'] . mt_rand(1000, 9999);
+                $password = $address['number'];
+
+                $input['password'] = Hash::make($password);
+
+                $user = User::create($input);
+
+                $user->customerProfile()->create($input);
+
+                $input['customer_id'] = $user->id;
+
+                $user->assignRole('Customer');
             }
-            OrderService::create($input);
+
+            $time_slot = TimeSlot::find($staff_and_time['time_slot']);
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+
+            $input['time_start'] = $time_slot->time_start;
+            $input['time_end'] = $time_slot->time_end;
+
+            $order = Order::create($input);
+
+            $input['order_id'] = $order->id;
+            $input['discount_amount'] = $request->discount;
+
+            OrderTotal::create($input);
+            if ($code['coupon_code']) {
+                $coupon = Coupon::where('code', $code['coupon_code'])->first();
+                $input['coupon_id'] = $coupon->id;
+                CouponHistory::create($input);
+            }
+
+            foreach ($serviceIds as $id) {
+                $services = Service::find($id);
+                $input['service_id'] = $id;
+                $input['service_name'] = $services->name;
+                $input['duration'] = $services->duration;
+                $input['status'] = 'Open';
+                if ($services->discount) {
+                    $input['price'] = $services->discount;
+                } else {
+                    $input['price'] = $services->price;
+                }
+                OrderService::create($input);
+            }
+
+            Session::forget('staff_and_time');
+            Session::forget('serviceIds');
+
+            try {
+                $this->sendAdminEmail($input['order_id'], $input['email']);
+                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
+
+            return view('site.orders.success', compact('customer_type', 'password'));
+        } else {
+            return redirect('/bookingStep')
+                ->with('error', 'Sorry! Unfortunately This slot was booked by someone else just now.');
         }
-
-        Session::forget('staff_and_time');
-        Session::forget('serviceIds');
-
-        try {
-            $this->sendAdminEmail($input['order_id'], $input['email']);
-            $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
-        } catch (\Throwable $th) {
-            //TODO: log error or queue job later
-        }
-
-        return view('site.orders.success', compact('customer_type', 'password'));
     }
 
     public function show($id)
     {
         $order = Order::find($id);
-        $reviews = Review::where('order_id',$id)->get();
-        $averageRating = Review::where('order_id',$id)->avg('rating');
+        $reviews = Review::where('order_id', $id)->get();
+        $averageRating = Review::where('order_id', $id)->avg('rating');
 
-        return view('site.orders.show', compact('order','reviews','averageRating'));
+        return view('site.orders.show', compact('order', 'reviews', 'averageRating'));
     }
 
     public function edit($id)

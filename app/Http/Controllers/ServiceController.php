@@ -56,9 +56,14 @@ class ServiceController extends Controller
         }
 
         $services = $query->paginate(config('app.paginate'));
+        
+        $variantIds = ServiceVariant::distinct()->pluck('variant_id')->toArray();
+        $variant_service = Service::whereIn('id',$variantIds)->get();
+
+        $master_services = Service::has('variant', '=', 0)->get();
 
         $service_categories = ServiceCategory::all();
-        return view('services.index', compact('services', 'service_categories', 'filter'))
+        return view('services.index', compact('services', 'service_categories', 'filter','variant_service','master_services'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

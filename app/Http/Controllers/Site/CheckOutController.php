@@ -222,7 +222,6 @@ class CheckOutController extends Controller
         return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'serviceName'));
     }
 
-
     public function confirmStep(Request $request)
     {
         $requiredSessionKeys = ['staff_and_time', 'address', 'serviceIds'];

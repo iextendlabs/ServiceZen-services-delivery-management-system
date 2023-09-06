@@ -63,8 +63,8 @@ use App\Http\Controllers\Site\{
 Auth::routes();
 
 Route::get('/admin', [HomeController::class, 'index'])->name('home');
-  
-Route::group(['middleware' => ['auth']], function() {
+
+Route::group(['middleware' => ['auth']], function () {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
     Route::resource('services', ServiceController::class);
@@ -90,18 +90,18 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('services.bulkDelete');
     Route::post('/services/bulkCopy', [ServiceController::class, 'bulkCopy'])->name('services.bulkCopy');
 
-    Route::get('orderCSV', [OrderController::class,'downloadCSV']);
+    Route::get('orderCSV', [OrderController::class, 'downloadCSV']);
 
     Route::get('holidays', [HolidayController::class, 'index']);
     Route::post('/holidays/crud-ajax', [HolidayController::class, 'store']);
-    Route::get('time-slots', [TimeSlotController::class,'slots']);
-    Route::get('staff-by-group', [TimeSlotController::class,'staff_group']);
-    
-    Route::resource('cashCollection', CashCollectionController::class);
-    Route::get('staffCashCollection',[CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
-    Route::get('cashCollection/create/{order}',[CashCollectionController::class, 'create'])->name('cashCollection.create');
+    Route::get('time-slots', [TimeSlotController::class, 'slots']);
+    Route::get('staff-by-group', [TimeSlotController::class, 'staff_group']);
 
-    Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile'); 
+    Route::resource('cashCollection', CashCollectionController::class);
+    Route::get('staffCashCollection', [CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
+    Route::get('cashCollection/create/{order}', [CashCollectionController::class, 'create'])->name('cashCollection.create');
+
+    Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile');
     Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
 
     Route::resource('coupons', CouponController::class);
@@ -109,8 +109,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('settings', SettingController::class);
     Route::resource('reviews', ReviewController::class);
 
-    Route::get('/removeStaffImages', [ServiceStaffController::class,'removeImages']);
-
+    Route::get('/removeStaffImages', [ServiceStaffController::class, 'removeImages']);
 });
 
 // Backups
@@ -125,9 +124,9 @@ Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
 Route::get('updateZone', [SiteController::class, 'updateZone']);
 
 Route::get('customer-login', [CustomerAuthController::class, 'index']);
-Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin']); 
+Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin']);
 Route::get('customer-registration', [CustomerAuthController::class, 'registration']);
-Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']); 
+Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']);
 Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::resource('customerProfile', CustomerAuthController::class);
 
@@ -144,32 +143,32 @@ Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('storeSession', [CheckOutController::class, 'storeSession']);
 Route::resource('cart', CheckOutController::class);
 Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
-Route::get('confirmStep', [CheckOutController::class, 'confirmStep']); 
+Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
 //TODO :set no cache headers for all ajax calls 
-Route::middleware('no-cache')->get('slots', [CheckOutController::class,'slots']);
-Route::get('staff-group', [CheckOutController::class,'staff_group']);
+Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
+Route::get('staff-group', [CheckOutController::class, 'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
-Route::resource('siteFAQs',SiteFAQsController::class);
+Route::resource('siteFAQs', SiteFAQsController::class);
 //TODO :Customer Delete
 // app url
 
 // Staff app
 
-Route::get('staffAppOrders', [StaffAppController::class,'orders']);
-Route::get('staffAppUser', [StaffAppController::class,'user']);
-Route::get('staffAppAddOrderComment/{order}', [StaffAppController::class,'addComment']);
-Route::get('staffAppCashCollection/{order}', [StaffAppController::class,'cashCollection']);
-Route::get('staffAppOrderStatusUpdate/{order}', [StaffAppController::class,'orderStatusUpdate']);
-Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class,'rescheduleOrder']);
-Route::get('staffAppTimeSlots', [StaffAppController::class,'timeSlots']);
+Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
+Route::get('staffAppUser', [StaffAppController::class, 'user']);
+Route::get('staffAppAddOrderComment/{order}', [StaffAppController::class, 'addComment']);
+Route::get('staffAppCashCollection/{order}', [StaffAppController::class, 'cashCollection']);
+Route::get('staffAppOrderStatusUpdate/{order}', [StaffAppController::class, 'orderStatusUpdate']);
+Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class, 'rescheduleOrder']);
+Route::get('staffAppTimeSlots', [StaffAppController::class, 'timeSlots']);
 Route::resource('staffProfile', StaffProfileController::class);
-Route::get('/removeSliderImage', [SettingController::class,'removeSliderImage']);
+Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
 
 // Driver app
 
-Route::get('driverAppOrders', [DriverAppController::class,'orders']);
-Route::get('driverAppUser', [DriverAppController::class,'user']);
-Route::get('driverAppOrderStatusUpdate/{order}', [DriverAppController::class,'orderDriverStatusUpdate']);
+Route::get('driverAppOrders', [DriverAppController::class, 'orders']);
+Route::get('driverAppUser', [DriverAppController::class, 'user']);
+Route::get('driverAppOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
 
-Route::get('/af',[CustomerAuthController::class,'affiliateUrl'])->name('affiliateUrl');
+Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
