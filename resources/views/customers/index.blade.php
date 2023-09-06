@@ -65,7 +65,19 @@
                     <div class="col-12">
                         <div class="form-group">
                             <strong>Name:</strong>
-                            <input type="text" name="name" value="{{$filter_name}}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{$filter['name']}}" class="form-control" placeholder="Name">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <strong>Email:</strong>
+                            <input type="email" name="email" value="{{$filter['email']}}" class="form-control" placeholder="abc@gmail.com">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <strong>Number:</strong>
+                            <input type="text" name="number" value="{{$filter['number']}}" class="form-control" placeholder="+971 xxxxxx">
                         </div>
                     </div>
                     <div class="col-12">

@@ -1,15 +1,16 @@
 <?php
-    
+
 namespace App\Http\Controllers;
-    
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
-use Illuminate\Support\Arr;  
+use Illuminate\Support\Arr;
+
 class CustomerController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -17,10 +18,10 @@ class CustomerController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:customer-list|customer-create|customer-edit|customer-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:customer-create', ['only' => ['create','store']]);
-         $this->middleware('permission:customer-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:customer-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:customer-list|customer-create|customer-edit|customer-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:customer-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:customer-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:customer-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -29,7 +30,11 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $filter_name = $request->name;
+        $filter = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'number' => $request->number,
+        ];
 
         $query = User::role('Customer')->latest();
 
@@ -37,11 +42,24 @@ class CustomerController extends Controller
             $query->where('name', 'like', $request->name . '%');
         }
 
-        $customers = $query->paginate(config('app.paginate'));
+        if ($request->email) {
+            $query->where('email', strtolower($request->email));
+        }
 
-        return view('customers.index',compact('customers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
+        if ($request->number) {
+            $query->whereHas('customerProfile', function ($subQuery) use ($request) {
+                $subQuery->where('number', $request->number);
+            });
+        }
+
+        $customers = $query->paginate(config('app.paginate'));
+        $filters = $request->only(['name', 'email', 'number']);
+        $customers->appends($filters);
+
+        return view('customers.index', compact('customers', 'filter'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -51,7 +69,7 @@ class CustomerController extends Controller
     {
         return view('customers.create');
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -73,11 +91,11 @@ class CustomerController extends Controller
         $customer = User::create($input);
 
         $customer->assignRole('Customer');
-        
+
         return redirect()->route('customers.index')
-                        ->with('success','Customer created successfully.');
+            ->with('success', 'Customer created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -86,9 +104,9 @@ class CustomerController extends Controller
      */
     public function show(User $customer)
     {
-        return view('customers.show',compact('customer'));
+        return view('customers.show', compact('customer'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -97,9 +115,9 @@ class CustomerController extends Controller
      */
     public function edit(User $customer)
     {
-        return view('customers.edit',compact('customer'));
+        return view('customers.edit', compact('customer'));
     }
-    
+
     /**
      * Update the specified resource in storage.
      *
@@ -111,24 +129,24 @@ class CustomerController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
         ]);
 
         $input = $request->all();
-        if(!empty($input['password'])){ 
+        if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
-        }else{
-            $input = Arr::except($input,array('password'));    
+        } else {
+            $input = Arr::except($input, array('password'));
         }
 
         $customer = User::find($id);
         $customer->update($input);
-    
+
         return redirect()->route('customers.index')
-                        ->with('success','Customer updated successfully');
+            ->with('success', 'Customer updated successfully');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -138,9 +156,8 @@ class CustomerController extends Controller
     public function destroy(User $customer)
     {
         $customer->delete();
-    
-        return redirect()->route('customers.index')
-                        ->with('success','Customer deleted successfully');
-    }
 
+        return redirect()->route('customers.index')
+            ->with('success', 'Customer deleted successfully');
+    }
 }
