@@ -58,7 +58,7 @@
     @endif
     <div class="col-md-12">
         <div class="form-group">
-            <strong>Fix Salary:</strong>
+            <strong>Commission Salary:</strong>
             @currency($serviceStaff->staff->fix_salary)
         </div>
     </div>

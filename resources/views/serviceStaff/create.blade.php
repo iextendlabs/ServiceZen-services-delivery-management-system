@@ -117,8 +117,8 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <strong>Fix Salary:</strong>
-                        <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Fix Salary">
+                        <strong>Commission Salary:</strong>
+                        <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Commission Salary">
                     </div>
                 </div>
             </div>
