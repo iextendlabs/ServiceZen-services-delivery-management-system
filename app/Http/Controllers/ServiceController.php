@@ -56,14 +56,16 @@ class ServiceController extends Controller
         }
 
         $services = $query->paginate(config('app.paginate'));
-        
+
         $variantIds = ServiceVariant::distinct()->pluck('variant_id')->toArray();
-        $variant_service = Service::whereIn('id',$variantIds)->get();
+        $variant_service = Service::whereIn('id', $variantIds)->get();
 
         $master_services = Service::has('variant', '=', 0)->get();
 
         $service_categories = ServiceCategory::all();
-        return view('services.index', compact('services', 'service_categories', 'filter','variant_service','master_services'))
+        $filters = $request->only(['name', 'price', 'category_id']);
+        $services->appends($filters);
+        return view('services.index', compact('services', 'service_categories', 'filter', 'variant_service', 'master_services'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -178,7 +180,7 @@ class ServiceController extends Controller
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services','variant_services'));
+        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services', 'variant_services'));
     }
 
     public function update(Request $request, $id)
@@ -303,7 +305,7 @@ class ServiceController extends Controller
 
     public function bulkCopy(Request $request)
     {
-        
+
         $selectedItems = $request->input('selectedItems');
         $new_variant = $request->input('newVariant');
         $service_id = $request->input('serviceId');
@@ -319,15 +321,15 @@ class ServiceController extends Controller
             }
 
             return response()->json(['message' => 'Selected items Copy successfully.']);
-        }elseif($new_variant && $service_id){
-                $service = Service::findOrFail($service_id);
-                $copiedService = $service->replicate();
-                $copiedService->name = $new_variant;
-                $copiedService->image = '';
-                $copiedService->save();
-                
-                return response()->json(['service_id' => $copiedService->id]);
-        }else {
+        } elseif ($new_variant && $service_id) {
+            $service = Service::findOrFail($service_id);
+            $copiedService = $service->replicate();
+            $copiedService->name = $new_variant;
+            $copiedService->image = '';
+            $copiedService->save();
+
+            return response()->json(['service_id' => $copiedService->id]);
+        } else {
             return response()->json(['message' => 'No items selected.']);
         }
     }
