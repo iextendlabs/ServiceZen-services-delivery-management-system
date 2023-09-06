@@ -54,6 +54,15 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>Status:</strong>
+                        <select name="status" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <span style="color: red;">*</span><strong>Description:</strong>
                         <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{old('description') }}</textarea>
                         <script>
