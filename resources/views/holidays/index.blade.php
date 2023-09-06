@@ -9,7 +9,7 @@
 </style>
 @section('content')
     <div class="container" style="max-width: 700px">
-        <h3 class="h3 text-center border-bottom pb-3">Holiday Calender</h3>
+        <h3 class="h3 text-center border-bottom pb-3">Holiday Calendar</h3>
         @if(count(config('app.general_holiday')))
         <div>
             <h3>General Holidays</h3>
