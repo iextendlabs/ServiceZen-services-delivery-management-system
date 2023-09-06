@@ -43,9 +43,9 @@ class StaffGroupController extends Controller
     public function create()
     {
         $i = 0;
-        $staffs = User::all();
+        $users = User::all();
         $staff_zones = StaffZone::all();
-        return view('staffGroups.create', compact('staffs', 'i', 'staff_zones'));
+        return view('staffGroups.create', compact('users', 'i', 'staff_zones'));
     }
 
     /**
@@ -58,7 +58,7 @@ class StaffGroupController extends Controller
     {
         request()->validate([
             'name' => 'required',
-            'ids' => 'required',
+            'staffIds' => 'required',
             'staff_zone_ids' => 'required',
         ]);
 
@@ -67,7 +67,8 @@ class StaffGroupController extends Controller
         $staffGroup = StaffGroup::create($input);
 
         $staffGroup->staffZones()->attach($request->staff_zone_ids);
-        $staffGroup->staffs()->attach($request->ids);
+        $staffGroup->staffs()->attach($request->staffIds);
+        $staffGroup->drivers()->attach($request->driverIds);
 
         return redirect()->route('staffGroups.index')
             ->with('success', 'Staff Group created successfully.');
@@ -94,16 +95,17 @@ class StaffGroupController extends Controller
     {
         $staff_zones = StaffZone::all();
         $staff_zones_ids = $staffGroup->staffZones()->pluck('staff_zone_id')->toArray();
-        $staffs = User::all();
+        $users = User::all();
         $staff_ids = $staffGroup->staffs()->pluck('staff_id')->toArray();
-        return view('staffGroups.edit', compact('staffGroup', 'staffs', 'staff_zones','staff_ids','staff_zones_ids'));
+        $driver_ids = $staffGroup->drivers()->pluck('driver_id')->toArray();
+        return view('staffGroups.edit', compact('staffGroup', 'users', 'staff_zones','staff_ids','staff_zones_ids','driver_ids'));
     }
 
     public function update(Request $request, $id)
     {
         request()->validate([
             'name' => 'required',
-            'ids' => 'required',
+            'staffIds' => 'required',
             'staff_zone_ids' => 'required',
         ]);
 
@@ -114,7 +116,8 @@ class StaffGroupController extends Controller
         $staffGroup->update($input);
 
         $staffGroup->staffZones()->sync($request->staff_zone_ids);
-        $staffGroup->staffs()->sync($request->ids);
+        $staffGroup->staffs()->sync($request->staffIds);
+        $staffGroup->drivers()->sync($request->driverIds);
         
         return redirect()->route('staffGroups.index')
             ->with('success', 'Staff Group update successfully.');

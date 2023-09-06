@@ -54,5 +54,25 @@
                 </table>
             </div>
         </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Driver</strong><br><br>
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                    </tr>
+                    @if(isset($staffGroup->drivers))
+                        @foreach($staffGroup->drivers as $driver) 
+                    <tr>
+                        <td>{{ $driver->id }}</td>
+                        <td>{{ $driver->name }}</td>
+                    </tr>
+                    @endforeach
+                    @endif
+
+                </table>
+            </div>
+        </div>
     </div>
 @endsection
