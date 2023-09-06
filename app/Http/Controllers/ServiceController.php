@@ -42,7 +42,7 @@ class ServiceController extends Controller
         $query = Service::orderBy('name', 'ASC');
 
         if ($request->name) {
-            $query->where('name', 'like', $request->name . '%');
+            $query->where('name', 'like', '%' . $request->name . '%');
         }
 
         // Filter by price
