@@ -98,7 +98,16 @@ class SiteController extends Controller
         $FAQs = FAQ::where('service_id', $id)->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');
-        return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating'));
+        if($service->status){
+            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating'));
+        }else{
+            if(empty($service->category_id)){
+                return redirect('/')->with('error', 'This Service is disabled by admin.');
+            }else{
+                return redirect('/?id=' . $service->category_id)->with('error', 'This Service is disabled by admin.');
+            }
+
+        }
     }
 
     public function saveLocation(Request $request)
