@@ -26,7 +26,7 @@
 @endif
 <hr>
 <div class="row">
-<div class="col-md-12">
+    <div class="col-md-12">
         <h3>Filter</h3>
         <hr>
         <form action="{{ route('services.index') }}" method="GET" enctype="multipart/form-data">
@@ -59,11 +59,11 @@
                     </div>
                 </div>
                 <div class="offset-6 col-md-3 text-center">
-                        <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <button type="submit" class="btn btn-block btn-primary">Filter</button>
-                    </div>
+                    <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
+                </div>
+                <div class="col-md-3 text-center">
+                    <button type="submit" class="btn btn-block btn-primary">Filter</button>
+                </div>
             </div>
         </form>
     </div>
@@ -89,7 +89,10 @@
                 <td class="text-right">@if($service->status) Enable @else Disable @endif</td>
                 <td class="text-right">
                     <form action="{{ route('services.destroy',$service->id) }}" method="POST">
+                        <a class="btn btn-warning" href="/serviceDetail/{{ $service->id }}">Store View</a>
+                        @can('FAQs-create')
                         <a class="btn btn-primary" href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>
+                        @endcan
                         <a class="btn btn-warning" href="{{ route('services.show',$service->id) }}"><i class="fa fa-eye"></i></a>
                         @can('service-edit')
                         <a class="btn btn-primary" href="{{ route('services.edit',$service->id) }}"><i class="fa fa-edit"></i></a>
@@ -111,7 +114,7 @@
         </table>
         {!! $services->links() !!}
     </div>
-    
+
 </div>
 
 <script>

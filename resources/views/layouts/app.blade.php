@@ -94,6 +94,9 @@
                                 @if(auth()->user()->getRoleNames() == '["Staff"]')
                                 <a class="dropdown-item" href="{{ route('staffCashCollection') }}">Cash Collections</a>
                                 @endif
+                                @can('coupon-list')
+                                <a class="dropdown-item" href="{{ route('coupons.index') }}">Coupons</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan
@@ -136,9 +139,6 @@
                                 @can('time-slot-list')
                                 <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
                                 @endcan
-                                @can('coupon-list')
-                                <a class="dropdown-item" href="{{ route('coupons.index') }}">Coupons</a>
-                                @endcan
                             </div>
                         </li>
                         @endcan
@@ -170,6 +170,7 @@
                                 @can('driver-list')
                                 <a class="dropdown-item" href="{{ route('drivers.index') }}">Drivers</a>
                                 @endcan
+                                <a class="dropdown-item" href="{{ route('users.index') }}?role=Driver">Data Entry User</a>
                             </div>
                         </li>
                         @endcan
@@ -190,8 +191,6 @@
                                 @can('role-list')
                                 <a class="dropdown-item" href="{{ route('roles.index') }}">Role</a>
                                 @endcan
-
-
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>

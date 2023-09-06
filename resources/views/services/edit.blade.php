@@ -2,11 +2,15 @@
 @section('content')
 <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
 <div class="row">
-    <div class="col-md-6 margin-tb">
+    <div class="col-md-12">
+    <div class="float-left">
         <h2>Update Service</h2>
     </div>
-    <div class="col-md-6">
+    <div class="float-right">
         <button type="submit" form="services-form" class="btn btn-primary float-end">Update</button>
+        <a class="btn btn-warning mr-2" href="/serviceDetail/{{ $service->id }}">Store View</a>
+
+    </div>
     </div>
     <!-- TODO Create and edit form in single form -->
 </div>

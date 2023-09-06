@@ -6,6 +6,38 @@
     width: 200px;
   }
 </style>
+<div class="container">
+@if($slider_images->value && !isset($category))
+  <div class="row">
+    <div id="imageSlider" class="carousel slide mt-3" data-ride="carousel">
+      <ol class="carousel-indicators">
+        @foreach (explode(',', $slider_images->value) as $index => $imagePath)
+        <li data-target="#imageSlider" data-slide-to="{{ $index }}" @if($index===0) class="active" @endif></li>
+        @endforeach
+      </ol>
+      <div class="carousel-inner">
+        @foreach (explode(',', $slider_images->value) as $index => $imagePath)
+        <div class="carousel-item @if($index === 0) active @endif">
+          <img src="/slider-images/{{ $imagePath }}" alt="Slide {{ $index + 1 }}" class="d-block w-100">
+          <!-- <div class="carousel-caption d-none d-md-block">
+            <h5>Slide {{ $index + 1 }} label</h5>
+            <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+          </div> -->
+        </div>
+        @endforeach
+      </div>
+      <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  </div>
+  @endif 
+</div>
 <section class="jumbotron text-center">
   <div class="container">
     @if(isset($category))
@@ -58,36 +90,7 @@
     </div>
   @endif
   @endif
-  @if($slider_images->value && !isset($category))
-  <div class="row">
-    <div id="imageSlider" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators">
-        @foreach (explode(',', $slider_images->value) as $index => $imagePath)
-        <li data-target="#imageSlider" data-slide-to="{{ $index }}" @if($index===0) class="active" @endif></li>
-        @endforeach
-      </ol>
-      <div class="carousel-inner">
-        @foreach (explode(',', $slider_images->value) as $index => $imagePath)
-        <div class="carousel-item @if($index === 0) active @endif">
-          <img src="/slider-images/{{ $imagePath }}" alt="Slide {{ $index + 1 }}" class="d-block w-100">
-          <!-- <div class="carousel-caption d-none d-md-block">
-            <h5>Slide {{ $index + 1 }} label</h5>
-            <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-          </div> -->
-        </div>
-        @endforeach
-      </div>
-      <a class="carousel-control-prev" href="#imageSlider" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#imageSlider" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div>
-  </div>
-  @endif
+  
 </div>
 
 <div class="album py-5 bg-light">
