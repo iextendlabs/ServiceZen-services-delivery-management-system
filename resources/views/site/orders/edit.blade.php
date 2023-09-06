@@ -144,7 +144,7 @@ $transport_charges = 0;
                     <hr>
                 </div>
                 <div class="col-md-12">
-                    <div class="form-group">
+                    <div class="form-group scroll-div">
                         <span style="color: red;">*</span><strong>Services:</strong>
                         <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
                         <div class="scroll-div">

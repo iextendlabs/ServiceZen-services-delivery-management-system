@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="form-group">
+                <div class="form-group scroll-div">
                     <span style="color: red;">*</span><strong>Staffs:</strong>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
                     <table class="table table-striped table-bordered">

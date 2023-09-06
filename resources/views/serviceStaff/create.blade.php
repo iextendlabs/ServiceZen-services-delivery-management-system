@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <div class="form-group">
+                    <div class="form-group scroll-div">
                         <strong>Supervisor:</strong>
                         <input type="text" name="search-supervisor" id="search-supervisor" class="form-control" placeholder="Search Supervisor By Name And Email">
                         <table class="table table-striped table-bordered supervisor-table">

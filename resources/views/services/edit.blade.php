@@ -117,7 +117,7 @@
         </div>
         <div class="tab-pane fade" id="package-services" role="tabpanel" aria-labelledby="package-services-tab">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12 scroll-div">
                     <div class="form-group">
                         <strong>Package Services:</strong>
                         <input type="text" name="search" id="search" class="form-control" placeholder="Search Services By Name And Price">

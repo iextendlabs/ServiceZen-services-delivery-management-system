@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="col-md-12">
-            <div class="form-group">
+            <div class="form-group scroll-div">
                 <span style="color: red;">*</span><strong>Staff Zones:</strong>
                 <input type="text" name="search-zone" id="search-zone" class="form-control" placeholder="Search Staff Zone By Name And Email">
                 <table class="table table-striped table-bordered staff-zone-table">
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="col-md-12">
-            <div class="form-group">
+            <div class="form-group scroll-div">
                 <span style="color: red;">*</span><strong>Staffs:</strong>
                 <input type="text" name="search-staff" id="search-staff" class="form-control" placeholder="Search Staff By Name And Email">
                 <table class="table table-striped table-bordered staff-table">
@@ -70,7 +70,7 @@
             </div>
         </div>
         <div class="col-md-12">
-            <div class="form-group">
+            <div class="form-group scroll-div">
                 <span style="color: red;">*</span><strong>Drivers:</strong>
                 <input type="text" name="search-driver" id="search-driver" class="form-control" placeholder="Search driver By Name And Email">
                 <table class="table table-striped table-bordered driver-table">
