@@ -6,7 +6,9 @@
             <h2>Review</h2>
         </div>
         <div class="float-right">
+            @can('review-create')
             <a class="btn btn-success  float-end" href="{{ route('reviews.create') }}"> <i class="fa fa-plus"></i></a>
+            @endcan
         </div>
     </div>
 </div>
@@ -39,10 +41,14 @@
         <td>
             <form action="{{ route('reviews.destroy',$review->id) }}" method="POST">
                 <a class="btn btn-warning" href="{{ route('reviews.show',$review->id) }}"><i class="fa fa-eye"></i></a>
+                @can('review-edit')
                 <a class="btn btn-primary" href="{{ route('reviews.edit',$review->id) }}"><i class="fa fa-edit"></i></a>
+                @endcan
                 @csrf
                 @method('DELETE')
+                @can('review-delete')
                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                @endcan
             </form>
         </td>
     </tr>

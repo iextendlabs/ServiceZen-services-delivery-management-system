@@ -103,15 +103,21 @@
                                 Store Config
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                @can('setting-list')
                                 <a class="dropdown-item" href="{{ route('settings.index') }}">Settings</a>
+                                @endcan
+                                @can('review-list')
                                 <a class="dropdown-item" href="{{ route('reviews.index') }}">Reviews</a>
+                                @endcan
                                 @can('service-list')
                                 <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
                                 @endcan
                                 @can('service-category-list')
                                 <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
                                 @endcan
+                                @can('FAQs-list')
                                 <a class="dropdown-item" href="{{ route('FAQs.index') }}">FAQs</a>
+                                @endcan
                                 @can('holiday-list')
                                 <a class="dropdown-item" href="/holidays">Holidays</a>
                                 @endcan
@@ -130,7 +136,9 @@
                                 @can('time-slot-list')
                                 <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
                                 @endcan
+                                @can('coupon-list')
                                 <a class="dropdown-item" href="{{ route('coupons.index') }}">Coupons</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan
@@ -144,7 +152,6 @@
                                 @can('service-staff-list')
                                 <a class="dropdown-item" href="{{ route('serviceStaff.index') }}">Staff</a>
                                 @endcan
-
                                 @can('customer-list')
                                 <a class="dropdown-item" href="{{ route('customers.index') }}">Customer</a>
                                 @endcan

@@ -18,6 +18,20 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'setting-list',
+            'setting-edit',
+            'review-list',
+            'review-create',
+            'review-edit',
+            'review-delete',
+            'FAQs-list',
+            'FAQs-create',
+            'FAQs-edit',
+            'FAQs-delete',
+            'coupon-list',
+            'coupon-create',
+            'coupon-edit',
+            'coupon-delete',
             'dashboard-report',
             'order-view',
             'order-booking-edit',

@@ -52,6 +52,7 @@
         @endif
         @endcan
     </div>
+    @can('order-list')
     <div class="py-2"></div>
     <div class="row">
         <div class="col-md-12 margin-tb text-center">
@@ -111,5 +112,6 @@
             </div>
         </div>
     </div>
+    @endcan
 </div>
 @endsection
