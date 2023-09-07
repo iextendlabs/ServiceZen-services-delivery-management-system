@@ -162,25 +162,8 @@
         <div class="tab-pane fade" id="variant" role="tabpanel" aria-labelledby="variant-tab">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group scroll-div">
-                        <strong>Variant Services:</strong>
-                        <input type="text" name="variant-search" id="variant-search" class="form-control" placeholder="Search Services By Name And Price">
-                        <table class="table table-striped table-bordered variant-table">
-                            <tr>
-                                <th></th>
-                                <th>Name</th>
-                                <th>Price</th>
-                            </tr>
-                            @foreach ($all_services as $service)
-                            <tr>
-                                <td>
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $service->id }}">
-                                </td>
-                                <td>{{ $service->name }}</td>
-                                <td>{{ $service->price }}</td>
-                            </tr>
-                            @endforeach
-                        </table>
+                    <div class="form-group">
+                        <strong>Note: Save the service before proceeding with variants.</strong>
                     </div>
                 </div>
             </div>
@@ -270,27 +253,6 @@
                 if (name.indexOf(value) != -1) {
                     $(this).show();
                 } else if (email.indexOf(value) != -1) {
-                    $(this).show();
-                }
-            });
-        });
-
-        $("#variant-search").keyup(function() {
-            var value = $(this).val().toLowerCase();
-
-            $(".variant-table tr").hide();
-
-            $(".variant-table tr").each(function() {
-
-                $row = $(this);
-
-                var name = $row.find("td:first").next().text().toLowerCase();
-
-                var price = $row.find("td:last").text().toLowerCase();
-
-                if (name.indexOf(value) != -1) {
-                    $(this).show();
-                } else if (price.indexOf(value) != -1) {
                     $(this).show();
                 }
             });

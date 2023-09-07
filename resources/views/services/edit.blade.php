@@ -3,14 +3,14 @@
 <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
 <div class="row">
     <div class="col-md-12">
-    <div class="float-left">
-        <h2>Update Service</h2>
-    </div>
-    <div class="float-right">
-        <button type="submit" form="services-form" class="btn btn-primary float-end">Update</button>
-        <a class="btn btn-warning mr-2" href="/serviceDetail/{{ $service->id }}">Store View</a>
+        <div class="float-left">
+            <h2>Update Service</h2>
+        </div>
+        <div class="float-right">
+            <button type="submit" form="services-form" class="btn btn-primary float-end">Update</button>
+            <a class="btn btn-warning mr-2" href="/serviceDetail/{{ $service->id }}">Store View</a>
 
-    </div>
+        </div>
     </div>
     <!-- TODO Create and edit form in single form -->
 </div>
@@ -142,6 +142,7 @@
                                 </td>
                                 <td>{{ $service->name }}</td>
                                 <td>{{ $service->price }}</td>
+
                             </tr>
                             @endforeach
                         </table>
@@ -181,20 +182,27 @@
         </div>
         <div class="tab-pane fade" id="variant" role="tabpanel" aria-labelledby="variant-tab">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="new_variant"><strong>New Variant:</strong></label>
-                        <input type="hidden" name="id" value="{{ $service->id }}" class="form-control">
-                        <div class="input-group mb-3">
-                            <input type="text" id="new_variant" name="new_variant" class="form-control">
-                            <div class="input-group-append">
-                                <button id="bulkCopyBtn" class="btn btn-secondary" type="button">Add Variant</button>
-                            </div>
+                <div class="col-md-8">
+                    <input type="hidden" name="id" value="{{ $service->id }}" class="form-control">
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>New Variant:</strong>
+                            <input type="text" name="new_variant" class="form-control" placeholder="New Variant">
                         </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Price:</strong>
+                            <input type="number" name="new_variant_price" class="form-control" placeholder="Price">
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <button type="button" id="bulkCopyBtn" class="btn btn-secondary">Add New Variant</button>
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <div class="form-group">
+                    <div class="form-group scroll-div">
                         <strong>Variant Services:</strong>
                         <input type="text" name="variant-search" id="variant-search" class="form-control" placeholder="Search Services By Name And Price">
                         <table class="table table-striped table-bordered variant-table">
@@ -202,18 +210,22 @@
                                 <th></th>
                                 <th>Name</th>
                                 <th>Price</th>
+                                <th>Action</th>
                             </tr>
-                            @foreach ($all_services as $service)
+                            @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($service->id,$variant_services))
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" checked value="{{ $service->id }}">
+                                    @if(in_array($single_service->id,$variant_services))
+                                    <input type="checkbox" name="variantId[{{ ++$i }}]" checked value="{{ $single_service->id }}">
                                     @else
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $service->id }}">
+                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $single_service->id }}">
                                     @endif
                                 </td>
-                                <td>{{ $service->name }}</td>
-                                <td>{{ $service->price }}</td>
+                                <td>{{ $single_service->name }}</td>
+                                <td>{{ $single_service->price }}</td>
+                                <td class="text-right">
+                                    <a href="{{ route('service.delete',$single_service->id) }}" class="btn btn-danger">Delete</a>
+                                </td>
                             </tr>
                             @endforeach
                         </table>
@@ -273,17 +285,18 @@
         document.getElementById('bulkCopyBtn').addEventListener('click', function() {
             const newVariant = document.querySelector('input[name="new_variant"]').value; // Get the new_variant value
             const serviceId = document.querySelector('input[name="id"]').value; // Get the id value
+            const price = document.querySelector('input[name="new_variant_price"]').value; // Get the id value
 
-            if (newVariant && serviceId) {
+            if (newVariant && serviceId && price) {
                 if (confirm('Are you sure you want to create new variant?')) {
-                    copySelectedItems(newVariant, serviceId);
+                    copySelectedItems(newVariant, serviceId, price);
                 }
             } else {
-                alert('Please Set New Variant Name.');
+                alert('Please Set New Variant Name and Price.');
             }
         });
 
-        function copySelectedItems(newVariant, serviceId) {
+        function copySelectedItems(newVariant, serviceId, price) {
             fetch('{{ route('services.bulkCopy') }}', {
                         method: 'POST',
                         headers: {
@@ -292,7 +305,8 @@
                         },
                         body: JSON.stringify({
                             newVariant,
-                            serviceId
+                            serviceId,
+                            price
                         })
                     })
                 .then(response => response.json())

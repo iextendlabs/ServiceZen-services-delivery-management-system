@@ -103,7 +103,9 @@ class ServiceController extends Controller
         ]);
 
         $input = $request->all();
-
+        if (isset($request->variantId)) {
+            $input['type'] = "Master"; 
+        }
         $service = Service::create($input);
 
         $service_id = $service->id;
@@ -117,6 +119,7 @@ class ServiceController extends Controller
         }
 
         if (isset($request->variantId)) {
+            Service::whereIn('id', $request->variantId)->update(['type' => 'Variant']);
             foreach ($request->variantId as $variantId) {
                 $input['service_id'] = $service_id;
                 $input['variant_id'] = $variantId;
@@ -149,7 +152,7 @@ class ServiceController extends Controller
         }
 
 
-        return redirect()->route('services.index')
+        return redirect()->route('services.edit',$service->id)
             ->with('success', 'Service created successfully.');
     }
 
@@ -198,6 +201,10 @@ class ServiceController extends Controller
         $input = $request->all();
 
         $service = Service::find($id);
+        
+        if (isset($request->variantId)) {
+            $input['type'] = "Master"; 
+        }
 
         $service->update($input);
         if (isset($request->image)) {
@@ -221,6 +228,7 @@ class ServiceController extends Controller
         }
 
         if (isset($request->variantId)) {
+            Service::whereIn('id', $request->variantId)->update(['type' => 'Variant']);
             foreach ($request->variantId as $variantId) {
                 $input['service_id'] = $service_id;
                 $input['variant_id'] = $variantId;
@@ -264,8 +272,9 @@ class ServiceController extends Controller
      * @param  \App\Service  $service
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Service $service)
+    public function destroy($id)
     {
+        $service = Service::find($id);
         //delete image for service 
         if ($service->image) {
             if (file_exists(public_path('service-images') . '/' . $service->image)) {
@@ -276,7 +285,7 @@ class ServiceController extends Controller
 
         ServiceToUserNote::where('service_id', $service->id)->delete();
 
-        return redirect()->route('services.index')
+        return redirect()->back()
             ->with('success', 'Service deleted successfully');
     }
 
@@ -309,6 +318,7 @@ class ServiceController extends Controller
         $selectedItems = $request->input('selectedItems');
         $new_variant = $request->input('newVariant');
         $service_id = $request->input('serviceId');
+        $price = $request->input('price');
 
         if (!empty($selectedItems)) {
 
@@ -325,7 +335,9 @@ class ServiceController extends Controller
             $service = Service::findOrFail($service_id);
             $copiedService = $service->replicate();
             $copiedService->name = $new_variant;
+            $copiedService->price = $price;
             $copiedService->image = '';
+            $copiedService->type = 'Variant';
             $copiedService->save();
 
             return response()->json(['service_id' => $copiedService->id]);

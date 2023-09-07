@@ -75,6 +75,7 @@
                 <th class="text-right">Price</th>
                 <th class="text-right">Duration</th>
                 <th class="text-right">Status</th>
+                <th class="text-left">Type</th>
                 <th class="text-right">Action</th>
             </tr>
             @if(count($services))
@@ -87,6 +88,7 @@
                 <td class="text-right">@currency( $service->price )</td>
                 <td class="text-right">{{ $service->duration }}</td>
                 <td class="text-right">@if($service->status) Enable @else Disable @endif</td>
+                <td class="text-left">{{ $service->type }}</td>
                 <td class="text-right">
                     <form action="{{ route('services.destroy',$service->id) }}" method="POST">
                         <a class="btn btn-warning" href="/serviceDetail/{{ $service->id }}">Store View</a>
