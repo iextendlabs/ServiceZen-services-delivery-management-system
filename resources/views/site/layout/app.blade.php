@@ -70,9 +70,7 @@ $cart_product = 0;
           <li class="nav-item">
             <a class="nav-link" href="/bookingStep">Booking</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ route('siteReviews.index') }}">Reviews</a>
-          </li>
+
 
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -110,9 +108,6 @@ $cart_product = 0;
           <li class="nav-item">
             <a href="{{ config('app.addOnUrl') }}" class="nav-link">Beauty Add-Ons</a>
           </li>
-          <li class="nav-item">
-            <a href="{{ route('siteFAQs.index')}}" class="nav-link">FAQs</a>
-          </li>
 
 
           <li class="nav-item">
@@ -135,6 +130,12 @@ $cart_product = 0;
               <a class="dropdown-item" href="/customer-logout">Logout</a>
               @endguest
             </div>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('siteFAQs.index')}}" class="nav-link">FAQs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('siteReviews.index') }}">Reviews</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Contact</a>
