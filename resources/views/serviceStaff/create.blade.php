@@ -62,6 +62,12 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>About:</strong>
+                        <textarea name="about" cols="20" rows="6" class="form-control">{{ old('about')}}</textarea>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <span style="color: red;">*</span><strong for="image">Upload Image</strong>
                         <input type="file" name="image" class="form-control image-input" accept="image/*">
                         <img class="image-preview" height="130px">
@@ -162,10 +168,11 @@
         <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Youtube Video:</strong>
-                        <input type="text" name="youtube_video" class="form-control" placeholder="Youtube Video" value="{{ old('youtube_video') }}">
+                    <strong>Youtube Video:</strong>
+
+                    <div class="form-group" id="video-div">
                     </div>
+                    <button id="addVideoBtn" type="button" class="btn btn-primary float-right">Add Youtube Video</button>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
@@ -202,6 +209,15 @@
                         <img class="image-preview" height="130px">
                     </td>
                 </tr>
+            `);
+        });
+
+        $("#addVideoBtn").click(function() {
+            // Append a new row to the table
+            $("#video-div").append(`
+                <div class="form-group">
+                    <input type="text" name="youtube_video[]" class="form-control" placeholder="Youtube Video">
+                </div>
             `);
         });
 

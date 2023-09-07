@@ -4,7 +4,6 @@
         margin-bottom: 0px !important;
     }
 </style>
-<base href="/public">
 @section('content')
 <div class="container">
     <div class="row">
@@ -177,53 +176,20 @@
             @endforeach
             @endif
 
-            @if(auth()->check())
-            <button class="btn btn-block btn-primary" id="review">Write a review</button>
             @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
                 @else
                 <span class="text-muted">&#9734;</span>
                 @endif
                 @endfor
                 {{count($reviews)}} Reviews
+
+                @if(auth()->check())
+                <button class="btn btn-block btn-primary" id="review">Write a review</button>
                 @endif
 
                 <div id="review-form" style="display: none;">
-                    <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @if($order->service_staff_id)
-                        <input type="hidden" name="staff_id" value="{{ $order->service_staff_id }}">
-                        <input type="hidden" name="order_id" value="{{ $order->id }}">
-                        @endif
-                        <input type="hidden" name="store" value="1">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <span style="color: red;">*</span><strong>Your Name:</strong>
-                                    <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <span style="color: red;">*</span><strong>Review:</strong>
-                                    <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{old('content')}}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <span style="color: red;">*</span><label for="rating">Rating</label><br>
-                                    @for($i = 1; $i <= 5; $i++) 
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
-                                    </div>
-                                    @endfor
-                                </div>
-                            </div>
-                            <div class="col-md-12 text-right">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
-                        </div>
-                    </form>
+                    @include('site.reviews.create')
+
                 </div>
         </div>
     </div>

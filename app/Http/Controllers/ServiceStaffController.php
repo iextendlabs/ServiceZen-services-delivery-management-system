@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffHoliday;
+use App\Models\StaffYoutubeVideo;
 use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
@@ -123,6 +124,17 @@ class ServiceStaffController extends Controller
             $input['image'] = $filename;
         }
 
+        if ($request->youtube_video) {
+            foreach ($request->youtube_video as $youtube_video) {
+                if ($youtube_video) {
+                    StaffYoutubeVideo::create([
+                        'youtube_video' => $youtube_video,
+                        'staff_id' => $user_id,
+                    ]);
+                }
+            }
+        }
+
         Staff::create($input);
         $ServiceStaff->supervisors()->attach($request->ids);
         return redirect()->route('serviceStaff.index')
@@ -235,6 +247,18 @@ class ServiceStaffController extends Controller
             $input['image'] = $filename;
         }
 
+        if ($request->youtube_video) {
+            StaffYoutubeVideo::where('staff_id', $id)->delete();
+            foreach ($request->youtube_video as $youtube_video) {
+                if ($youtube_video) {
+                    StaffYoutubeVideo::create([
+                        'youtube_video' => $youtube_video,
+                        'staff_id' => $id,
+                    ]);
+                }
+            }
+        }
+
         $staff->update($input);
         $serviceStaff->supervisors()->sync($request->ids);
 
@@ -254,7 +278,7 @@ class ServiceStaffController extends Controller
             unlink(public_path('staff-images') . '/' . $serviceStaff->staff->image);
         }
 
-        if ($serviceStaff->staff->images) {
+        if (isset($serviceStaff->staff->images)) {
             $images = explode(',', $serviceStaff->staff->images);
 
             foreach ($images as $image) {

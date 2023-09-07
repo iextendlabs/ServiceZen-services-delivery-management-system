@@ -19,7 +19,7 @@
     @csrf
     @method('PUT')
     <div class="row">
-    <div class="col-md-12">
+        <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Your Name:</strong>
                 <input type="text" name="user_name" value="{{ $review->user_name }}" class="form-control">
@@ -44,18 +44,31 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <label for="rating">Rating</label><br>
-                @for($i = 1; $i <= 5; $i++)
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ $review->rating == $i ? 'checked' : '' }}>
-                    <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
-                </div>
-                @endfor
+                <span style="color: red;">*</span><strong for="image">Upload Image</strong>
+                <input type="file" name="image" id="image" class="form-control-file ">
+                <br>
+                <img id="preview" src="/review-images/{{$review->image}}" height="130px">
             </div>
         </div>
-        <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-primary">Update</button>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="rating">Rating</label><br>
+                @for($i = 1; $i <= 5; $i++) <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ $review->rating == $i ? 'checked' : '' }}>
+                    <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+            </div>
+            @endfor
         </div>
     </div>
+    <div class="col-md-12 text-center">
+        <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+    </div>
 </form>
+<script>
+    document.getElementById('image').addEventListener('change', function(e) {
+        var preview = document.getElementById('preview');
+        preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
 @endsection

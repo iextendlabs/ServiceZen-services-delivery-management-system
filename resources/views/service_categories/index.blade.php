@@ -39,7 +39,9 @@
         <td>{{ $service_category->description }}</td>
         <td>
             <form action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">
+                @can('FAQs-create')
                 <a class="btn btn-primary" href="{{ route('FAQs.create', ['category_id' => $service_category->id]) }}">Add FAQs</a>
+                @endcan
                 <a class="btn btn-warning" href="{{ route('serviceCategories.show',$service_category->id) }}"><i class="fa fa-eye"></i></a>
                 @can('service-category-edit')
                 <a class="btn btn-primary" href="{{ route('serviceCategories.edit',$service_category->id) }}"><i class="fa fa-edit"></i></a>

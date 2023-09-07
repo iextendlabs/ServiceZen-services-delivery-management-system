@@ -17,7 +17,7 @@
     }
 </style>
 
-<base href="/public">
+
 @section('content')
 
 <div class="album bg-light">

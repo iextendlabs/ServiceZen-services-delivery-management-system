@@ -45,6 +45,7 @@ use App\Http\Controllers\Site\{
     SiteOrdersController,
     AffiliateDashboardController,
     SiteFAQsController,
+    SiteReviewsController,
     StaffProfileController,
 };
 
@@ -164,6 +165,9 @@ Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class, 'resch
 Route::get('staffAppTimeSlots', [StaffAppController::class, 'timeSlots']);
 Route::resource('staffProfile', StaffProfileController::class);
 Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
+
+Route::resource('siteReviews', SiteReviewsController::class);
+
 
 // Driver app
 

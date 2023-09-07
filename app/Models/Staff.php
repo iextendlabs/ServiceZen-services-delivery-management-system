@@ -9,7 +9,7 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission','supervisor_id','image','phone','charges','status','instagram','facebook','youtube','snapchat','tiktok','youtube_video','images','fix_salary'];
+    protected $fillable = ['user_id', 'commission','supervisor_id','image','phone','charges','status','instagram','facebook','youtube','snapchat','tiktok','about','images','fix_salary'];
 
     public function appointments()
     {

@@ -1,5 +1,5 @@
 @extends('site.layout.app')
-<base href="/public">
+
 @section('content')
 <div class="container">
     <div class="row">

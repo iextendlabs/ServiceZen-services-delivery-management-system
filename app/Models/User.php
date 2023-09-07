@@ -1,7 +1,7 @@
 <?php
-  
+
 namespace App\Models;
-  
+
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
-  
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,7 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
     ];
-  
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -33,7 +33,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-  
+
     /**
      * The attributes that should be cast.
      *
@@ -53,40 +53,47 @@ class User extends Authenticatable
         return $this->hasOne(Staff::class);
     }
 
+    public function staffYoutubeVideo()
+    {
+        return $this->hasMany(StaffYoutubeVideo::class, 'staff_id');
+    }
+
     public function SupervisorToManager()
     {
-        return $this->hasOne(SupervisorToManager::class,'supervisor_id','id');
+        return $this->hasOne(SupervisorToManager::class, 'supervisor_id', 'id');
     }
 
     public function AssistantSupervisorToSupervisor()
     {
-        return $this->hasMany(AssistantSupervisorToSupervisor::class,'assistant_supervisor_id','id');
+        return $this->hasMany(AssistantSupervisorToSupervisor::class, 'assistant_supervisor_id', 'id');
     }
 
     public function getManagerStaffIds()
     {
         $staffIds = [];
-            foreach ($this->managerSupervisors as $managerSupervisor) {
-                if ($managerSupervisor->supervisor){
-                    $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisors->pluck('id')->toArray();
-                    $staffIds = array_merge($staffIds, $supervisor_staffs);
-                }
+        foreach ($this->managerSupervisors as $managerSupervisor) {
+            if ($managerSupervisor->supervisor) {
+                $supervisor_staffs = $managerSupervisor->supervisor->staffSupervisors->pluck('id')->toArray();
+                $staffIds = array_merge($staffIds, $supervisor_staffs);
             }
-            return $staffIds;
+        }
+        return $staffIds;
     }
-    
+
     public function getSupervisorStaffIds()
     {
         return $this->staffSupervisors->pluck('id')->toArray();
     }
 
 
-    public function managerSupervisors(){
-        return $this->hasMany(SupervisorToManager::class,'manager_id','id');
+    public function managerSupervisors()
+    {
+        return $this->hasMany(SupervisorToManager::class, 'manager_id', 'id');
     }
 
-    public function staffGeneralHoliday(){
-        return $this->hasMany(StaffGeneralHoliday::class,'staff_id','id');
+    public function staffGeneralHoliday()
+    {
+        return $this->hasMany(StaffGeneralHoliday::class, 'staff_id', 'id');
     }
 
     public function affiliates()

@@ -1,5 +1,5 @@
 @extends('site.layout.app')
-<base href="/public">
+
 <link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 
 @section('content')

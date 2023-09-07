@@ -1,38 +1,28 @@
-@extends('layouts.app')
-@section('content')
-<div class="row">
-    <div class="col-md-12 margin-tb">
-        <h2>Add New Review</h2>
-    </div>
-</div>
-@if ($errors->any())
-<div class="alert alert-danger">
-    <strong>Whoops!</strong> There were some problems with your input.<br><br>
-    <ul>
-        @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
-<form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data">
+<h3>Write a Review</h3>
+<form action="{{ route('siteReviews.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
+    @if(!Request::is('/'))
+
+        @if(isset($service->id))
+            <input type="hidden" name="service_id" value="{{ $service->id }}">
+        @endif
+        @if(isset($user->id))
+            <input type="hidden" name="staff_id" value="{{ $user->id }}">
+        @endif
+
+        @if(isset($order->service_staff_id))
+            <input type="hidden" name="staff_id" value="{{ $order->service_staff_id }}">
+            <input type="hidden" name="order_id" value="{{ $order->id }}">
+        @endif
+
+
+    @endif
+
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Your Name:</strong>
-                <input type="text" name="user_name" value="{{ old('user_name') }}" class="form-control">
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Service:</strong>
-                <select name="service_id" class="form-control">
-                    <option></option>
-                    @foreach($services as $service)
-                    <option value="{{ $service->id }}">{{ $service->name }}</option>
-                    @endforeach
-                </select>
+                <input type="text" name="user_name" value="{{old('content')}}" class="form-control">
             </div>
         </div>
         <div class="col-md-12">
@@ -46,23 +36,23 @@
                 <strong for="image">Upload Image</strong>
                 <input type="file" name="image" id="image" class="form-control-file ">
                 <br>
-                <img id="preview" src="/review-images/" height="130px">
+                <img id="preview" src="./review-images/" height="130px">
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><label for="rating">Rating</label><br>
-                @for($i = 1; $i <= 5; $i++) <div class="form-check form-check-inline">
+                @for($i = 1; $i <= 5; $i++) 
+                <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
                     <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                </div>
+                @endfor
             </div>
-            @endfor
         </div>
-    </div>
-
-    <div class="col-md-12 text-center">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+        <div class="col-md-12 text-right">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </div>
 </form>
 <script>
@@ -71,4 +61,3 @@
         preview.src = URL.createObjectURL(e.target.files[0]);
     });
 </script>
-@endsection

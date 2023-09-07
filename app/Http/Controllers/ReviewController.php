@@ -56,14 +56,21 @@ class ReviewController extends Controller
             'rating' => 'required',
         ]);
 
-        Review::create($request->all());
-        if ($request->store) {
-            return redirect()->back()
-                ->with('success', 'Review created successfully.');
-        } else {
-            return redirect()->route('reviews.index')
-                ->with('success', 'REview created successfully.');
+        $input = $request->all();
+        if ($request->image) {
+            // create a unique filename for the image
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            // move the uploaded file to the public/staff-images directory
+            $request->image->move(public_path('review-images'), $filename);
+
+            // save the filename to the gallery object and persist it to the database
+
+            $input['image'] = $filename;
         }
+        Review::create($input);
+        return redirect()->route('reviews.index')
+            ->with('success', 'REview created successfully.');
     }
 
     /**
@@ -109,8 +116,24 @@ class ReviewController extends Controller
         ]);
 
         $review = Review::find($id);
+        $input = $request->all();
+        if (isset($request->image)) {
+            //delete previous Image if new Image submitted
+            if ($review->image && file_exists(public_path('review-images') . '/' . $review->image)) {
+                unlink(public_path('review-images') . '/' . $review->image);
+            }
 
-        $review->update($request->all());
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            // move the uploaded file to the public/review-images directory
+            $request->image->move(public_path('review-images'), $filename);
+
+            // save the filename to the gallery object and persist it to the database
+
+            $input['image'] = $filename;
+        }
+
+        $review->update($input);
 
         return redirect()->route('reviews.index')
             ->with('success', 'Review Update successfully.');

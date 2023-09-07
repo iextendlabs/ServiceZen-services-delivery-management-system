@@ -228,7 +228,11 @@ class CheckOutController extends Controller
         $missingKeys = array_diff($requiredSessionKeys, array_keys(Session::all()));
 
         if (!empty($missingKeys)) {
-            $errorMessage = "There is no " . implode(", ", $missingKeys);
+            if(!Session::has('serviceIds')){
+                $errorMessage = "You have not added any service to cart.";
+            }else{
+                $errorMessage = "There is no " . implode(", ", $missingKeys);
+            }
             return redirect('/')->with('error', $errorMessage);
         }
 
