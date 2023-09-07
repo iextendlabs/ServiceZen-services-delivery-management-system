@@ -153,14 +153,20 @@ class CheckOutController extends Controller
         } else {
             Session::put('code', $code);
         }
+        cookie()->queue('address', json_encode($address), 5256000);
+        cookie()->queue('staff_and_time', json_encode($staff_and_time), 5256000);
+        cookie()->queue('code', json_encode($code), 5256000);
 
         return redirect('confirmStep');
     }
 
     public function bookingStep(Request $request)
     {
-        if (Session::get('address')) {
-            $addresses = Session::get('address');
+
+        if ($request->cookie('address') !== null) {
+            $addresses = json_decode($request->cookie('address'), true);
+        // if (Session::get('address')) {
+        //     $addresses = Session::get('address');
         } else {
             $addresses = [
                 'buildingName' => '',
@@ -186,9 +192,10 @@ class CheckOutController extends Controller
         } else {
             $url_affiliate_code = '';
         }
-
-        if (session()->has('code')) {
-            $code = Session::get('code');
+        if ($request->cookie('code') !== null) {
+            $code = json_decode($request->cookie('code'), true);
+        // if (session()->has('code')) {
+        //     $code = Session::get('code');
             $affiliate_code = $code['affiliate_code'];
             $coupon_code = $code['coupon_code'];
         } else {
@@ -210,7 +217,7 @@ class CheckOutController extends Controller
                 $services[] = Service::where('id', $id)->value('name');
             }
             $serviceName = implode(',', $services);
-        }else{
+        } else {
             $serviceName = '';
         }
 
@@ -228,9 +235,9 @@ class CheckOutController extends Controller
         $missingKeys = array_diff($requiredSessionKeys, array_keys(Session::all()));
 
         if (!empty($missingKeys)) {
-            if(!Session::has('serviceIds')){
+            if (!Session::has('serviceIds')) {
                 $errorMessage = "You have not added any service to cart.";
-            }else{
+            } else {
                 $errorMessage = "There is no " . implode(", ", $missingKeys);
             }
             return redirect('/')->with('error', $errorMessage);
