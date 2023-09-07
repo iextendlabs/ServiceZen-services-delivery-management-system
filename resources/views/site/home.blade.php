@@ -7,7 +7,7 @@
   }
 </style>
 <div class="container">
-  <div class="text-center">
+  <div class="text-center mt-3">
     @if(Session::has('error'))
     <span class="alert alert-danger" role="alert">
       <strong>{{ Session::get('error') }}</strong>
@@ -70,9 +70,47 @@
   </div>
 </section>
 <div class="container">
-  @if(isset($category))
-  @if(count($category->childCategories))
   <div class="row" id="categories">
+    @foreach($categories as $single_category)
+    @if($single_category->id == 10 || $single_category->id == 11)
+    @continue
+    @endif
+    @if(count($single_category->childCategories) == 0)
+    @if(!$single_category->parentCategory)
+    <div class="col-md-4 service-box">
+      <div class="card mb-4 box-shadow">
+        <a href="\?id={{$single_category->id}}">
+          <p class="card-text service-box-title text-center"><b>{{ $single_category->title }}</b></p>
+          <div class="col-md-12 text-center">
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
+              <img class="card-img-top img-fluid" src="./service-category-images/{{ $single_category->image }}" alt="Card image cap">
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+    @endif
+    @else
+    <div class="col-md-4 service-box">
+      <div class="card mb-4 box-shadow">
+        <a href="\?id={{$single_category->id}}">
+          <p class="card-text service-box-title text-center"><b>{{ $single_category->title }}</b></p>
+          <div class="col-md-12 text-center">
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
+              <img class="card-img-top img-fluid" src="./service-category-images/{{ $single_category->image }}" alt="Card image cap">
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+    @endif
+    @endforeach
+  </div>
+
+  <div class="row" id="categories">
+    @if(isset($category))
+    @if(count($category->childCategories))
     @foreach($category->childCategories as $category)
     <div class="col-md-4 service-box">
       <div class="card mb-4 box-shadow">
@@ -87,12 +125,12 @@
       </div>
     </div>
     @endforeach
+    @endif
+    @endif
   </div>
-  @endif
-  @endif
 
 </div>
-
+<hr>
 <div class="album py-5 bg-light">
   <div class="container">
 
