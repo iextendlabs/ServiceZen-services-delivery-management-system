@@ -148,6 +148,11 @@ class ReviewController extends Controller
     public function destroy($id)
     {
         $review = Review::find($id);
+        if ($review->image) {
+            if (file_exists(public_path('review-images') . '/' . $review->image)) {
+                unlink(public_path('review-images') . '/' . $review->image);
+            }
+        }
         $review->delete();
 
         return redirect()->route('reviews.index')
