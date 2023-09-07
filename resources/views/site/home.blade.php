@@ -176,6 +176,9 @@
           </a>
         </div>
       </div>
+      <div class="col-md-12 text-center mb-2">
+        <a class="btn btn-primary" href="{{ route('siteReviews.index') }}">All Reviews</a>
+      </div>
       @if(auth()->check())
       <div class="col-md-12 text-center">
         <button class="btn btn-primary" id="review">Write a Review</button>
