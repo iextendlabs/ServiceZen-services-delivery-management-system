@@ -75,9 +75,20 @@ class SiteController extends Controller
             $category = ServiceCategory::find($request->id);
             if (isset($category->childCategories) && count($category->childCategories)) {
                 $child_categories =  $category->childCategories->pluck('id')->toArray();
-                $services = Service::where('status','1')->whereIn('category_id', $child_categories)->paginate(config('app.paginate'));
+                $child_categories[] = $request->id;
+                $services = Service::where(function ($query) {
+                    $query->where('type', 'master')
+                        ->orWhereNull('type');
+                })->where('status', '1')
+                ->whereIn('category_id', $child_categories)
+                ->paginate(config('app.paginate'));
             } else {
-                $services = Service::where('status','1')->where('category_id', $request->id)->paginate(config('app.paginate'));
+                $services = Service::where(function ($query) {
+                    $query->where('type', 'master')
+                        ->orWhereNull('type');
+                })->where('status', '1')
+                ->where('category_id', $request->id)
+                ->paginate(config('app.paginate'));
             }
 
             $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
@@ -85,10 +96,14 @@ class SiteController extends Controller
             $services->appends($filters);
             return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
         } else {
+            $categories = ServiceCategory::get();
             $FAQs = FAQ::latest()->take(3)->get();
-
-            $services = Service::where('status','1')->paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
+            $services = Service::where(function ($query) {
+                $query->where('type', 'master')
+                    ->orWhereNull('type');
+            })->where('status', '1')
+            ->paginate(config('app.paginate'));
+            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','categories'));
         }
     }
 
@@ -98,15 +113,14 @@ class SiteController extends Controller
         $FAQs = FAQ::where('service_id', $id)->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');
-        if($service->status){
+        if ($service->status) {
             return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating'));
-        }else{
-            if(empty($service->category_id)){
+        } else {
+            if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');
-            }else{
+            } else {
                 return redirect('/?id=' . $service->category_id)->with('error', 'This Service is disabled by admin.');
             }
-
         }
     }
 
