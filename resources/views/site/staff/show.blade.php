@@ -34,11 +34,12 @@
                 <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
                 <hr>
             </div>
-
+            @if($user->staff->about)
             <div class="col-md-10 offset-md-1">
                 <h3 class="text-center">About</h3>
                 {{ $user->staff->about }}
             </div>
+            @endif
 
             <!-- Social Links -->
             @if($socialLinks)
