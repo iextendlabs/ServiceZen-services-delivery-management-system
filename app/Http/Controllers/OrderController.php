@@ -77,9 +77,18 @@ class OrderController extends Controller
             $query->where('id', '=', $request->order_id);
         }
 
-        if ($request->status) {
-            $query->where('status', '=', $request->status);
+        if ($userRole == "Staff") {
+            if ($request->status) {
+                $query->where('status', '=', $request->status);
+            }else{
+                $query->where('status', '!=', "Rejected"); 
+            }
+        }else{
+            if ($request->status) {
+                $query->where('status', '=', $request->status);
+            }
         }
+        
 
         if ($request->affiliate_id) {
             $query->where('affiliate_id', '=', $request->affiliate_id);
@@ -102,8 +111,11 @@ class OrderController extends Controller
         }
 
         if ($userRole == "Staff" || $userRole == "Supervisor") {
-
-            $query->where('date', '<=', $currentDate);
+            if($request->status == "Rejected"){
+                $query->where('date', '=', $currentDate);
+            }else{
+                $query->where('date', '<=', $currentDate);
+            }
         }
 
         if ($request->created_at) {
