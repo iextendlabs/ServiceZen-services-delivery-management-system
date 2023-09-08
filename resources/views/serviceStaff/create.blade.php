@@ -208,6 +208,9 @@
                         <input type="file" name="gallery_images[]" class="form-control image-input" accept="image/*">
                         <img class="image-preview" height="130px">
                     </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-image">Remove</button>
+                    </td>
                 </tr>
             `);
         });
@@ -221,27 +224,10 @@
             `);
         });
 
-        $(document).on("click", ".remove-image", function() {
-            var row = $(this).closest("tr");
-            var imageFilename = row.data('image-filename');
-            var id = row.data('id');
 
-            // Make an AJAX call to remove the image from the database
-            $.ajax({
-                type: "GET",
-                url: "/removeSliderImage", // Replace with your route URL
-                data: {
-                    id: id,
-                    filename: imageFilename
-                },
-                success: function(response) {
-                    // On success, remove the row from the table
-                    row.remove();
-                },
-                error: function(xhr, status, error) {
-                    console.log(error); // Handle the error appropriately
-                }
-            });
+
+        $(document).on("click", ".remove-image", function() {
+            $(this).closest("tr").html('');
         });
 
         $(document).on("change", ".image-input", function(e) {

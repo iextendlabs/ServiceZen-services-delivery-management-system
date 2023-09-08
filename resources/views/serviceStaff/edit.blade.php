@@ -230,6 +230,9 @@
                         <input type="file" name="gallery_images[]" class="form-control image-input" accept="image/*">
                         <img class="image-preview" height="130px">
                     </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-image">Remove</button>
+                    </td>
                 </tr>
             `);
         });
@@ -264,6 +267,7 @@
                     console.log(error); // Handle the error appropriately
                 }
             });
+            row.html('');
         });
 
         $(document).on("change", ".image-input", function(e) {
