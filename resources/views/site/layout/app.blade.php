@@ -71,7 +71,6 @@ $cart_product = 0;
             <a class="nav-link" href="/bookingStep">Booking</a>
           </li>
 
-
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Services
@@ -99,7 +98,7 @@ $cart_product = 0;
 
               @endif
               @endforeach
-              <a class="dropdown-item text-center" href="\"><b>All</b></a>
+              <a class="dropdown-item text-center" href="{{ route('categories.index') }}"><b>All</b></a>
             </div>
           </li>
           <li class="nav-item">
