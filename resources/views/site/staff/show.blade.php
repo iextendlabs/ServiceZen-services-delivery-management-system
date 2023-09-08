@@ -80,21 +80,21 @@
                 @endforeach
             </div>
             @endif
-            @if($user->staff->images)
+            @if($user->staffImages)
             <div class="col-md-12 mt-2 mb-3">
                 <div id="imageCarousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
-                        @foreach(array_chunk(explode(',', $user->staff->images), 3) as $key => $chunk)
+                        @foreach($user->staffImages->chunk(3) as $key => $chunk)
                         <li data-target="#imageCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
                         @endforeach
                     </ol>
                     <div class="carousel-inner">
-                        @foreach(array_chunk(explode(',', $user->staff->images), 3) as $chunk)
+                        @foreach($user->staffImages->chunk(3) as $chunk)
                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                             <div class="row">
                                 @foreach($chunk as $image)
                                 <div class="col-md-4">
-                                    <img src="/staff-images/{{ $image }}" class="d-block w-100 card-img-top">
+                                    <img src="/staff-images/{{ $image->image }}" class="d-block w-100 card-img-top">
                                 </div>
                                 @endforeach
                             </div>
@@ -117,9 +117,6 @@
         <h3 class="text-center">My Services</h3>
         <div class="row" id="categories">
             @foreach($categories as $category)
-            @if($category->id == 10 || $category->id == 11)
-            @continue
-            @endif
             @if(count($category->childCategories) == 0)
             @if(!$category->parentCategory)
             <div class="col-md-4 service-box">

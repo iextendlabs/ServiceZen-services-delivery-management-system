@@ -58,6 +58,11 @@ class User extends Authenticatable
         return $this->hasMany(StaffYoutubeVideo::class, 'staff_id');
     }
 
+    public function staffImages()
+    {
+        return $this->hasMany(StaffImages::class, 'staff_id');
+    }
+
     public function SupervisorToManager()
     {
         return $this->hasOne(SupervisorToManager::class, 'supervisor_id', 'id');

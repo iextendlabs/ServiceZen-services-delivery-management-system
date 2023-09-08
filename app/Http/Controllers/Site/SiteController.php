@@ -96,14 +96,14 @@ class SiteController extends Controller
             $services->appends($filters);
             return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
         } else {
-            $categories = ServiceCategory::get();
+            $all_categories = ServiceCategory::get();
             $FAQs = FAQ::latest()->take(3)->get();
             $services = Service::where(function ($query) {
                 $query->where('type', 'master')
                     ->orWhereNull('type');
             })->where('status', '1')
             ->paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','categories'));
+            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','all_categories'));
         }
     }
 

@@ -196,11 +196,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if($serviceStaff->staff->images)
-                                @foreach (explode(',', $serviceStaff->staff->images) as $imagePath)
-                                <tr data-image-filename="{{ $imagePath }}" data-id="{{ $serviceStaff->staff->id }}">
+                                @if($serviceStaff->staffImages)
+                                @foreach ($serviceStaff->staffImages as $imagePath)
+                                <tr data-image-filename="{{ $imagePath->image }}" data-id="{{ $serviceStaff->id }}">
                                     <td>
-                                        <img src="/staff-images/{{ $imagePath }}" height="200px" width="auto" alt="Image">
+                                        <img src="/staff-images/{{ $imagePath->image }}" height="200px" width="auto" alt="Image">
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger remove-image">Remove</button>
@@ -224,10 +224,10 @@
     $(document).ready(function() {
         $("#addImageBtn").click(function() {
             // Append a new row to the table
-            $("#imageTable tbody").prepend(`
+            $("#imageTable tbody").append(`
                 <tr>
                     <td>
-                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <input type="file" name="gallery_images[]" class="form-control image-input" accept="image/*">
                         <img class="image-preview" height="130px">
                     </td>
                 </tr>

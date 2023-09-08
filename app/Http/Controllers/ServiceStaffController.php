@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffHoliday;
+use App\Models\StaffImages;
 use App\Models\StaffYoutubeVideo;
 use App\Models\Transaction;
 use App\Models\User;
@@ -96,20 +97,19 @@ class ServiceStaffController extends Controller
 
         $ServiceStaff->assignRole('Staff');
 
-        if ($request->images) {
-            $images = $request->images;
-
-            $imagePaths = [];
+        if ($request->gallery_images) {
+            $images = $request->gallery_images;
 
             foreach ($images as $image) {
                 $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
 
                 $image->move(public_path('staff-images'), $filename);
-                $imagePaths[] = $filename;
+                // dd($filename);
+                StaffImages::create([
+                    'image' => $filename,
+                    'staff_id' => $user_id,
+                ]);
             }
-
-            $newImagePaths = implode(',', $imagePaths);
-            $input['images'] = $newImagePaths;
         }
 
         if ($request->image) {
@@ -213,22 +213,18 @@ class ServiceStaffController extends Controller
 
         $staff = Staff::find($input['staff_id']);
 
-        if ($request->images) {
-            $images = $request->images;
-
-            $existingImage = $staff->images ?? ''; // Existing image
-
-            $imagePaths = [];
+        if ($request->gallery_images) {
+            $images = $request->gallery_images;
 
             foreach ($images as $image) {
                 $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
 
                 $image->move(public_path('staff-images'), $filename);
-                $imagePaths[] = $filename;
+                StaffImages::create([
+                    'image' => $filename,
+                    'staff_id' => $id,
+                ]);
             }
-            $newImagePaths = implode(',', $imagePaths);
-
-            $input['images'] = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
         }
 
         if (isset($request->image)) {
@@ -278,12 +274,11 @@ class ServiceStaffController extends Controller
             unlink(public_path('staff-images') . '/' . $serviceStaff->staff->image);
         }
 
-        if (isset($serviceStaff->staff->images)) {
-            $images = explode(',', $serviceStaff->staff->images);
+        if (isset($serviceStaff->staffImages)) {
 
-            foreach ($images as $image) {
-                if ($image && file_exists(public_path('staff-images') . '/' . $image)) {
-                    unlink(public_path('staff-images') . '/' . $image);
+            foreach ($serviceStaff->staffImages as $image) {
+                if ($image->image && file_exists(public_path('staff-images') . '/' . $image->image)) {
+                    unlink(public_path('staff-images') . '/' . $image->image);
                 }
             }
         }
@@ -296,25 +291,17 @@ class ServiceStaffController extends Controller
 
     public function removeImages(Request $request)
     {
-
-        $staff = Staff::find($request->id);
-
-        $images = explode(',', $staff->images);
+        $staff_images = StaffImages::where('staff_id', $request->id)->pluck('image')->toArray();
 
         $deleteImage = $request->image;
 
-        if (($key = array_search($deleteImage, $images)) !== false) {
-            unset($images[$key]);
-
+        if (($key = array_search($deleteImage, $staff_images)) !== false) {
             if ($deleteImage && file_exists(public_path('staff-images') . '/' . $deleteImage)) {
                 unlink(public_path('staff-images') . '/' . $deleteImage);
             }
         }
 
-        $images = array_values($images);
-
-        $staff->images = implode(',', $images);
-        $staff->save();
+        StaffImages::where('image',$request->image)->delete();
 
         return redirect()->back()->with('success', 'Image Remove successfully.');
     }

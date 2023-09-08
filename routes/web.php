@@ -168,7 +168,9 @@ Route::resource('staffProfile', StaffProfileController::class);
 Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
 
 Route::resource('siteReviews', SiteReviewsController::class);
-
+Route::get('/category', function () {
+    return view('site.categories.index');
+})->name('categories.index');
 
 // Driver app
 

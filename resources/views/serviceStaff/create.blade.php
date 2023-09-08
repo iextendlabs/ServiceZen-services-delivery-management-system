@@ -205,7 +205,7 @@
             $("#imageTable tbody").append(`
                 <tr>
                     <td>
-                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <input type="file" name="gallery_images[]" class="form-control image-input" accept="image/*">
                         <img class="image-preview" height="130px">
                     </td>
                 </tr>

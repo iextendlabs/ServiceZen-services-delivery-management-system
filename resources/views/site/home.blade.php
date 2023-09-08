@@ -71,65 +71,30 @@
 </section>
 <div class="container">
   <div class="row" id="categories">
-    @foreach($categories as $single_category)
-    @if($single_category->id == 10 || $single_category->id == 11)
-    @continue
+    @if(isset($all_categories))
+      @foreach($all_categories as $single_category)
+        @if(count($single_category->childCategories) == 0)
+          @if(!$single_category->parentCategory)
+            @include('site.categories.category_card', ['category' => $single_category])
+          @endif
+        @else
+          @include('site.categories.category_card', ['category' => $single_category])
+        @endif
+      @endforeach
     @endif
-    @if(count($single_category->childCategories) == 0)
-    @if(!$single_category->parentCategory)
-    <div class="col-md-4 service-box">
-      <div class="card mb-4 box-shadow">
-        <a href="\?id={{$single_category->id}}">
-          <p class="card-text service-box-title text-center"><b>{{ $single_category->title }}</b></p>
-          <div class="col-md-12 text-center">
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-              <img class="card-img-top img-fluid" src="./service-category-images/{{ $single_category->image }}" alt="Card image cap">
-            </div>
-          </div>
-        </a>
-
-      </div>
-    </div>
-    @endif
-    @else
-    <div class="col-md-4 service-box">
-      <div class="card mb-4 box-shadow">
-        <a href="\?id={{$single_category->id}}">
-          <p class="card-text service-box-title text-center"><b>{{ $single_category->title }}</b></p>
-          <div class="col-md-12 text-center">
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-              <img class="card-img-top img-fluid" src="./service-category-images/{{ $single_category->image }}" alt="Card image cap">
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-    @endif
-    @endforeach
   </div>
 
   <div class="row" id="categories">
     @if(isset($category))
-    @if(count($category->childCategories))
-    @foreach($category->childCategories as $category)
-    <div class="col-md-4 service-box">
-      <div class="card mb-4 box-shadow">
-        <a href="\?id={{$category->id}}">
-          <p class="card-text service-box-title text-center"><b>{{ $category->title }}</b></p>
-          <div class="col-md-12 text-center">
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-              <img class="card-img-top img-fluid" src="./service-category-images/{{ $category->image }}" alt="Card image cap">
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-    @endforeach
-    @endif
+      @if(count($category->childCategories))
+        @foreach($category->childCategories as $childCategory)
+          @include('site.categories.category_card', ['category' => $childCategory])
+        @endforeach
+      @endif
     @endif
   </div>
-
 </div>
+
 <hr>
 <div class="album py-5 bg-light">
   <div class="container">
