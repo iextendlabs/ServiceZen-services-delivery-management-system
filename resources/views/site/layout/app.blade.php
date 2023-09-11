@@ -77,6 +77,7 @@ $cart_product = 0;
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               @foreach($categories as $category)
+              @if($category->status == '1')
               @if($category->id == 10 || $category->id == 11)
               @continue
               @endif
@@ -90,12 +91,14 @@ $cart_product = 0;
               </a>
               <div class="dropdown-menu" aria-labelledby="subDropdown" style="position: relative;">
                 @foreach($category->childCategories as $subcategory)
+                @if($subcategory->status == '1')
                 <a class="dropdown-item" href="\?id={{$subcategory->id}}">- {{$subcategory->title}}</a>
+                @endif
                 @endforeach
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="\?id={{$category->id}}">Show All {{$category->title}}</a>
               </div>
-
+              @endif
               @endif
               @endforeach
               <a class="dropdown-item text-center" href="{{ route('categories.index') }}"><b>All</b></a>

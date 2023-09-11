@@ -73,12 +73,14 @@
   <div class="row" id="categories">
     @if(isset($all_categories))
     @foreach($all_categories as $single_category)
+    @if($single_category->status == "1")
     @if(count($single_category->childCategories) == 0)
     @if(!$single_category->parentCategory)
     @include('site.categories.category_card', ['category' => $single_category])
     @endif
     @else
     @include('site.categories.category_card', ['category' => $single_category])
+    @endif
     @endif
     @endforeach
     @endif
@@ -88,7 +90,9 @@
     @if(isset($category))
     @if(count($category->childCategories))
     @foreach($category->childCategories as $childCategory)
+    @if($childCategory->status == "1")
     @include('site.categories.category_card', ['category' => $childCategory])
+    @endif
     @endforeach
     @endif
     @endif

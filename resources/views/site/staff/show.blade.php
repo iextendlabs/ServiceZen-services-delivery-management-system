@@ -122,12 +122,14 @@
         <h3 class="text-center">My Services</h3>
         <div class="row" id="categories">
             @foreach($categories as $category)
+            @if($category->status == "1")
             @if(count($category->childCategories) == 0)
             @if(!$category->parentCategory)
             @include('site.categories.category_card', ['category' => $category])
             @endif
             @else
             @include('site.categories.category_card', ['category' => $category])
+            @endif
             @endif
             @endforeach
         </div>
