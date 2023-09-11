@@ -130,6 +130,7 @@
                 <td class="text-right">@currency($order->total_amount)</td>
             </tr>
         </table>
+        @can('order-history')
         @if(count($order->orderHistories))
         <table class="table table-striped table-bordered album bg-light">
             <td class="text-left" colspan="4">Order History</td>
@@ -149,6 +150,7 @@
             @endforeach
         </table>
         @endif
+        @endcan
         @if($order->order_comment)
         <table class="table table-striped table-bordered album bg-light">
             <th class="text-left" colspan="4">Order Comment</th>
