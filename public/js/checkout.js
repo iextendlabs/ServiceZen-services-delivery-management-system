@@ -1,4 +1,4 @@
-$(document).on("change","#date,#zone",function() {
+$(document).on("change","#date,#zone,#area",function() {
     
     // Make AJAX call to retrieve time slots for selected date
     $.ajax({

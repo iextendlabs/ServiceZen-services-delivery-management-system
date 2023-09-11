@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\OrderTotal;
 use App\Models\Review;
 use App\Models\Service;
+use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
@@ -69,13 +70,14 @@ class SiteOrdersController extends Controller
         $has_order = Order::where('service_staff_id', $staff_and_time['service_staff_id'])->where('date', $staff_and_time['date'])->where('time_slot_id', $staff_and_time['time_slot'])->get();
 
         if (count($has_order) == 0) {
-            $staff = User::find($staff_and_time['service_staff_id']);
 
             $affiliate = Affiliate::where('code', $code['affiliate_code'])->first();
 
             if (isset($affiliate)) {
                 $input['affiliate_id'] = $affiliate->user_id;
             }
+
+            $staff = User::find($staff_and_time['service_staff_id']);
 
             $input['customer_name'] = $address['name'];
             $input['customer_email'] = $address['email'];
@@ -131,6 +133,36 @@ class SiteOrdersController extends Controller
                 $user->assignRole('Customer');
             }
 
+            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($address['area']) . "%"])->first();
+
+            $services = Service::whereIn('id', $serviceIds)->get();
+
+            $sub_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+
+            if ($code['coupon_code']) {
+                $coupon = Coupon::where('code', $code['coupon_code'])->first();
+                $coupon_id = $coupon->id;
+                if ($coupon->type == "Percentage") {
+                    $discount = ($sub_total * $coupon->discount) / 100;
+                } else {
+                    $discount = $coupon->discount;
+                }
+            } else {
+                $discount = 0;
+            }
+
+            $staff_charges = $staff->staff->charges ?? 0;
+            $transport_charges = $staffZone->transport_charges ?? 0;
+            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+
+            $input['sub_total'] = (int)$sub_total;
+            $input['discount'] = (int)$discount;
+            $input['staff_charges'] = (int)$staff_charges;
+            $input['transport_charges'] = (int)$transport_charges;
+            $input['total_amount'] = (int)$total_amount;
+
             $time_slot = TimeSlot::find($staff_and_time['time_slot']);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
@@ -140,7 +172,7 @@ class SiteOrdersController extends Controller
             $order = Order::create($input);
 
             $input['order_id'] = $order->id;
-            $input['discount_amount'] = $request->discount;
+            $input['discount_amount'] = $input['discount'];
 
             OrderTotal::create($input);
             if ($code['coupon_code']) {
@@ -224,6 +256,27 @@ class SiteOrdersController extends Controller
         $input['number'] = config('app.country_code') . $request->number;
         $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
 
+        $staff = User::find($input['service_staff_id']);
+
+        $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($request->area) . "%"])->first();
+
+        $services = Service::whereIn('id', $request->service_ids)->get();
+
+        $sub_total = $services->sum(function ($service) {
+            return isset($service->discount) ? $service->discount : $service->price;
+        });
+
+        $discount = $order->order_total->discount;
+
+        $staff_charges = $staff->staff->charges ?? 0;
+        $transport_charges = $staffZone->transport_charges ?? 0;
+        $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+
+        $input['sub_total'] = (int)$sub_total;
+        $input['discount'] = (int)$discount;
+        $input['staff_charges'] = (int)$staff_charges;
+        $input['transport_charges'] = (int)$transport_charges;
+        $input['total_amount'] = (int)$total_amount;
         $order->update($input);
 
         $input['order_id'] = $id;

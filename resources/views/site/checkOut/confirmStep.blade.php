@@ -140,11 +140,6 @@
             <div class="col-md-6 offset-md-3">
                 <form action="{{ route('order.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="total_amount" value="{{ $total_amount }}">
-                    <input type="hidden" name="sub_total" value="{{ $sub_total }}">
-                    <input type="hidden" name="staff_charges" value="{{ $staff_charges }}">
-                    <input type="hidden" name="transport_charges" value="{{ $transport_charges }}">
-                    <input type="hidden" name="discount" value="{{ $coupon_discount }}">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
@@ -168,7 +163,6 @@
                             <a href="/">
                                 <button type="button" class="btn btn-primary">Continue Shopping</button>
                             </a>
-
                         </div>
                     </div>
                 </form>

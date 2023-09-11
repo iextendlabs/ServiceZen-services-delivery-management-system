@@ -189,27 +189,22 @@ $transport_charges = 0;
                         <tr>
                             <td class="text-left"><strong> Service Total:</strong></td>
                             <td>{{ config('app.currency') }} <span id="sub_total">{{ $order->order_total->sub_total }}</span></td>
-                            <input type="hidden" name="sub_total" value="{{ $order->order_total->sub_total }}">
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Coupon Discount:</strong></td>
                             <td>{{ config('app.currency') }} <span id="coupon-discount">{{ $order->order_total->discount ? '-'.$order->order_total->discount : 0 }}</span></td>
-                            <input type="hidden" name="discount" value="{{ $order->order_total->discount ? $order->order_total->discount : 0 }}">
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Staff Charges:</strong></td>
                             <td>{{ config('app.currency') }} <span id="staff_charges">{{ $order->staff->charges ? $order->staff->charges : 0 }}</span></td>
-                            <input type="hidden" name="staff_charges" value="{{ $order->staff->charges ? $order->staff->charges : 0 }}">
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Transport Charges:</strong></td>
                             <td>{{ config('app.currency') }} <span id="transport_charges">{{ $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}</span></td>
-                            <input type="hidden" name="transport_charges" value="{{ $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}">
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Total:</strong></td>
                             <td>{{ config('app.currency') }} <span id="total_amount">{{ $order->total_amount}}</span></td>
-                            <input type="hidden" name="total_amount" value="{{ $order->total_amount}}">
                         </tr>
                     </table>
                 </div>
@@ -254,19 +249,25 @@ $transport_charges = 0;
             updateTotal();
         });
     });
+
+    $(document).on('change', '#zone', function() {
+        $('#area').val($(this).val());
+    });
+
+    $(document).on('change', '#area', function() {
+        $('#zone').val($(this).val());
+    });
 </script>
 <script>
     function updateTotal() {
         let transport_charges = parseFloat($('#zone').find(':selected').data('transport-charges'));
 
-        $('input[name="transport_charges"]').val(transport_charges);
         $('#transport_charges').text(transport_charges);
 
         let staff_charges = parseFloat($('input[name="service_staff_id"]:checked').data('staff-charges'));
 
         let coupon_discount = parseFloat($('#coupon-discount').text());
 
-        $('input[name="staff_charges"]').val(staff_charges);
         $('#staff_charges').text(staff_charges);
 
         let total_amount = 0;
@@ -274,7 +275,6 @@ $transport_charges = 0;
         let sub_total = parseFloat($('#sub_total').text());
         total_amount = sub_total + staff_charges + transport_charges + coupon_discount;
 
-        $('input[name="total_amount"]').val(total_amount.toFixed(2));
         $('#total_amount').text(total_amount.toFixed(2));
     }
 </script>
