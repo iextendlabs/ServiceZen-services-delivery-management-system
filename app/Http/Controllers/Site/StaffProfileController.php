@@ -18,7 +18,9 @@ class StaffProfileController extends Controller
      */
     public function index()
     {
-        //
+        $staffs = User::role('Staff')->latest()->paginate(config('app.paginate'));
+
+        return view('site.staff.index', compact('staffs'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

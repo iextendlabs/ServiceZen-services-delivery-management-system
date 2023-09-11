@@ -196,7 +196,6 @@
       @endif
       <div class="col-md-12">
         <h2 class="text-center">Our Team</h2>
-
         <div id="staffCarousel" class="carousel slide" data-ride="carousel">
           <ol class="carousel-indicators">
             @foreach($staffs->chunk(4) as $key => $chunk)
@@ -241,6 +240,9 @@
             <span class="sr-only">Next</span>
           </a>
         </div>
+      </div>
+      <div class="col-md-12 text-center">
+        <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Team</a>
       </div>
     </div>
 
