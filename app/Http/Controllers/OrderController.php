@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderHistory;
 use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\OrderService;
@@ -80,15 +81,15 @@ class OrderController extends Controller
         if ($userRole == "Staff") {
             if ($request->status) {
                 $query->where('status', '=', $request->status);
-            }else{
-                $query->where('status', '!=', "Rejected"); 
+            } else {
+                $query->where('status', '!=', "Rejected");
             }
-        }else{
+        } else {
             if ($request->status) {
                 $query->where('status', '=', $request->status);
             }
         }
-        
+
 
         if ($request->affiliate_id) {
             $query->where('affiliate_id', '=', $request->affiliate_id);
@@ -111,9 +112,9 @@ class OrderController extends Controller
         }
 
         if ($userRole == "Staff" || $userRole == "Supervisor") {
-            if($request->status == "Rejected"){
+            if ($request->status == "Rejected") {
                 $query->where('date', '=', $currentDate);
-            }else{
+            } else {
                 $query->where('date', '<=', $currentDate);
             }
         }
@@ -142,7 +143,7 @@ class OrderController extends Controller
                 $output = fopen('php://output', 'w');
                 $header = $currentUser->hasRole('Supervisor')
                     ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services')
-                    : array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer','Number','Whatsapp','Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services');
+                    : array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Number', 'Whatsapp', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services');
 
                 // Write the header row
                 fputcsv($output, $header);
@@ -156,7 +157,7 @@ class OrderController extends Controller
 
                     $csvRow = $currentUser->hasRole('Supervisor')
                         ? array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services))
-                        : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name,$row->number,$row->whatsapp, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services));
+                        : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->number, $row->whatsapp, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services));
 
                     // Write the CSV data row
                     fputcsv($output, $csvRow);
@@ -230,12 +231,12 @@ class OrderController extends Controller
         if (isset($order->affiliate)) {
             $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
         }
-        
+
         if ($request->status == "Complete" && isset($order->affiliate) && !isset($transaction)) {
             $input['user_id'] = $order->affiliate->id;
             $input['order_id'] = $order->id;
             $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
-            $input['amount'] = (($order->order_total->sub_total-$staff_commission) * $order->affiliate->affiliate->commission) / 100;
+            $input['amount'] = (($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
             $input['status'] = 'Approved';
             Transaction::create($input);
         }
@@ -250,6 +251,13 @@ class OrderController extends Controller
             $order->staff_name = $staff->name;
             $order->save();
         }
+        if ($request->status) {
+            $input['order_id'] = $id;
+            $input['user'] = Auth::user()->name;
+
+            OrderHistory::create($input);
+        }
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Order updated successfully');
@@ -270,6 +278,12 @@ class OrderController extends Controller
     {
         $order->status = $request->status;
         
+        $input['order_id'] = $order->id;
+        $input['user'] = Auth::user()->name;
+        $input['status'] = $request->status;
+
+        OrderHistory::create($input);
+
         if (isset($order->affiliate)) {
             $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
         }
@@ -278,7 +292,7 @@ class OrderController extends Controller
             $input['user_id'] = $order->affiliate->id;
             $input['order_id'] = $order->id;
             $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
-            $input['amount'] = (($order->order_total->sub_total-$staff_commission) * $order->affiliate->affiliate->commission) / 100;
+            $input['amount'] = (($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
             $input['status'] = 'Approved';
             Transaction::create($input);
         }

@@ -44,6 +44,13 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Comment:</strong>
+                        <textarea name="comment" cols="30" rows="8" class="form-control">{{ old('comment') }}</textarea>
+                    </div>
+                </div>
                 
                 <div class="col-md-12 text-right no-print">
                     @can('order-edit')

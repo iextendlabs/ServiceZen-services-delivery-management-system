@@ -130,6 +130,25 @@
                 <td class="text-right">@currency($order->total_amount)</td>
             </tr>
         </table>
+        @if(count($order->orderHistories))
+        <table class="table table-striped table-bordered album bg-light">
+            <td class="text-left" colspan="4">Order History</td>
+            <tr>
+                <th>User</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th>Date Added</th>
+            </tr>
+            @foreach($order->orderHistories as $orderHistories)
+            <tr>
+                <td>{{ $orderHistories->user }}</td>
+                <td>{{ $orderHistories->status }}</td>
+                <td>{{ $orderHistories->comment }}</td>
+                <td>{{ $orderHistories->created_at }}</td>
+            </tr>
+            @endforeach
+        </table>
+        @endif
         @if($order->order_comment)
         <table class="table table-striped table-bordered album bg-light">
             <th class="text-left" colspan="4">Order Comment</th>

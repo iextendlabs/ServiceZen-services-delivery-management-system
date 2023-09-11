@@ -60,6 +60,10 @@ class Order extends Model
         return $this->hasOne(OrderTotal::class);
     }
 
+    public function orderHistories(){
+        return $this->hasMany(OrderHistory::class);
+    }
+
     public function cashCollection(){
         return $this->hasOne(CashCollection::class,'order_id');
     }
