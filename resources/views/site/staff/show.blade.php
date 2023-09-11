@@ -34,13 +34,18 @@
                 <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
                 <hr>
             </div>
-            @if($user->staff->about)
-            <div class="col-md-10 offset-md-1">
-                <h3 class="text-center">About</h3>
-                {{ $user->staff->about }}
-            </div>
-            @endif
 
+            <div class="col-md-10 offset-md-1">
+                @if($user->staff->about)
+                <h3 class="text-center">About</h3>
+                {!! $user->staff->about !!}
+                @endif
+
+                <hr>
+                <p class="text-center">
+                    <strong>Delivered Order: {{ count($user->orders) }}</strong>
+                </p>
+            </div>
             <!-- Social Links -->
             @if($socialLinks)
             <div class="col-md-12 text-center">
@@ -80,7 +85,7 @@
                 @endforeach
             </div>
             @endif
-            @if($user->staffImages)
+            @if(count($user->staffImages))
             <div class="col-md-12 mt-2 mb-3">
                 <div id="imageCarousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
@@ -117,13 +122,13 @@
         <h3 class="text-center">My Services</h3>
         <div class="row" id="categories">
             @foreach($categories as $category)
-                @if(count($category->childCategories) == 0)
-                    @if(!$category->parentCategory)
-                        @include('site.categories.category_card', ['category' => $category])
-                    @endif
-                @else
-                    @include('site.categories.category_card', ['category' => $category])
-                @endif
+            @if(count($category->childCategories) == 0)
+            @if(!$category->parentCategory)
+            @include('site.categories.category_card', ['category' => $category])
+            @endif
+            @else
+            @include('site.categories.category_card', ['category' => $category])
+            @endif
             @endforeach
         </div>
         <h3 class="text-center">Reviews</h3>

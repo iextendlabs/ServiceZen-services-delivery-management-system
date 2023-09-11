@@ -72,25 +72,25 @@
 <div class="container">
   <div class="row" id="categories">
     @if(isset($all_categories))
-      @foreach($all_categories as $single_category)
-        @if(count($single_category->childCategories) == 0)
-          @if(!$single_category->parentCategory)
-            @include('site.categories.category_card', ['category' => $single_category])
-          @endif
-        @else
-          @include('site.categories.category_card', ['category' => $single_category])
-        @endif
-      @endforeach
+    @foreach($all_categories as $single_category)
+    @if(count($single_category->childCategories) == 0)
+    @if(!$single_category->parentCategory)
+    @include('site.categories.category_card', ['category' => $single_category])
+    @endif
+    @else
+    @include('site.categories.category_card', ['category' => $single_category])
+    @endif
+    @endforeach
     @endif
   </div>
 
   <div class="row" id="categories">
     @if(isset($category))
-      @if(count($category->childCategories))
-        @foreach($category->childCategories as $childCategory)
-          @include('site.categories.category_card', ['category' => $childCategory])
-        @endforeach
-      @endif
+    @if(count($category->childCategories))
+    @foreach($category->childCategories as $childCategory)
+    @include('site.categories.category_card', ['category' => $childCategory])
+    @endforeach
+    @endif
     @endif
   </div>
 </div>
@@ -214,6 +214,12 @@
                     <div class="card-body text-center">
                       <h5 class="card-title">{{ $staff->name }}</h5>
                       <a href="{{ route('staffProfile.show',$staff->id) }}" class="btn btn-block btn-primary">View</a>
+                      @for($i = 1; $i <= 5; $i++) @if($i <=$staff->averageRating()) <span class="text-warning">&#9733;</span>
+                        @else
+                        <span class="text-muted">&#9734;</span>
+                        @endif
+                        @endfor
+                        ({{ count($staff->reviews)}} Reviews)
                     </div>
                   </div>
                 </div>

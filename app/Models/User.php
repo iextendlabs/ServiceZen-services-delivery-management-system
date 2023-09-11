@@ -53,6 +53,16 @@ class User extends Authenticatable
         return $this->hasOne(Staff::class);
     }
 
+    public function averageRating()
+    {
+        return Review::where('staff_id', $this->id)->avg('rating');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'staff_id');
+    }
+
     public function staffYoutubeVideo()
     {
         return $this->hasMany(StaffYoutubeVideo::class, 'staff_id');
@@ -90,7 +100,6 @@ class User extends Authenticatable
         return $this->staffSupervisors->pluck('id')->toArray();
     }
 
-
     public function managerSupervisors()
     {
         return $this->hasMany(SupervisorToManager::class, 'manager_id', 'id');
@@ -119,5 +128,9 @@ class User extends Authenticatable
     public function supervisors()
     {
         return $this->belongsToMany(User::class, 'staff_supervisor', 'staff_id', 'supervisor_id');
+    }
+
+    public function orders(){
+        return $this->hasMany(Order::class,'service_staff_id');
     }
 }

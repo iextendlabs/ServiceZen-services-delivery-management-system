@@ -69,6 +69,9 @@
                     <div class="form-group">
                         <strong>About:</strong>
                         <textarea name="about" cols="20" rows="6" class="form-control">{{ $serviceStaff->staff->about }}</textarea>
+                        <script>
+                            CKEDITOR.replace('about');
+                        </script>
                     </div>
                 </div>
                 <div class="col-md-12">

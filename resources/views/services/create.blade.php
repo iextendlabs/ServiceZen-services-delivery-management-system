@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
 <div class="row">
     <div class="col-md-6 margin-tb">
         <h2>Add New Service</h2>

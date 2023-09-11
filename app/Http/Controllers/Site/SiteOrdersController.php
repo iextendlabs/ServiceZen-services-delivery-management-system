@@ -67,7 +67,7 @@ class SiteOrdersController extends Controller
             return redirect()->route('storeHome')->with('error', 'Order Already Placed! or empty cart! or booking slot Unavailable!');
         }
 
-        $has_order = Order::where('service_staff_id', $staff_and_time['service_staff_id'])->where('date', $staff_and_time['date'])->where('time_slot_id', $staff_and_time['time_slot'])->get();
+        $has_order = Order::where('service_staff_id', $staff_and_time['service_staff_id'])->where('date', $staff_and_time['date'])->where('time_slot_id', $staff_and_time['time_slot'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
 
         if (count($has_order) == 0) {
 
