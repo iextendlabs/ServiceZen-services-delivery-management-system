@@ -55,7 +55,7 @@
             </a>
             @endif
             @endcan
-            @if(auth()->user()->hasRole('Staff') && $order->status == 'Complete') <br><br>
+            @if($order->status == 'Complete') <br><br>
             @if(!$order->cashCollection)
             <a href="{{ route('cashCollection.create',$order->id) }}">
                 <i class="fas fa-money-bill"></i> Create

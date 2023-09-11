@@ -147,7 +147,7 @@ class CashCollectionController extends Controller
 
         CashCollection::create($input);
         
-        return redirect()->route('staffCashCollection')
+        return redirect()->route('orders.index')
                         ->with('success','Cash Collection created successfully.');
     }
     
