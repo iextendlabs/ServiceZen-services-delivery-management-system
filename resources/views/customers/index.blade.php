@@ -37,14 +37,17 @@
                    
                     <td>
                         <form action="{{ route('customers.destroy',$customer->id) }}" method="POST">
-                            <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}">Show</a>
+                            <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}"><i class="fas fa-eye"></i></a>
                             @can('customer-edit')
-                            <a class="btn btn-primary" href="{{ route('customers.edit',$customer->id) }}">Edit</a>
+                            <a class="btn btn-primary" href="{{ route('customers.edit',$customer->id) }}"><i class="fas fa-edit"></i></a>
                             @endcan
                             @csrf
                             @method('DELETE')
                             @can('customer-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            @endcan
+                            @can('order-list')
+                            <a class="btn btn-info" href="{{ route('orders.index') }}?customer_id={{ $customer->id }}">Order History</a>
                             @endcan
                         </form>
                     </td>
