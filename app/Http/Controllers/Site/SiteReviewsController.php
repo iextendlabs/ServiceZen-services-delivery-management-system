@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Models\ReviewImage;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
@@ -45,21 +46,34 @@ class SiteReviewsController extends Controller
             'user_name' => 'required',
             'content' => 'required',
             'rating' => 'required',
+            'video' => 'mimetypes:video/*,video/*,application/octet-stream|max:50000',
         ]);
 
         $input = $request->all();
-        if ($request->image) {
-            // create a unique filename for the image
-            $filename = time() . '.' . $request->image->getClientOriginalExtension();
 
-            // move the uploaded file to the public/staff-images directory
-            $request->image->move(public_path('review-images'), $filename);
-
-            // save the filename to the gallery object and persist it to the database
-
-            $input['image'] = $filename;
+        if ($request->video) {
+            $video = $request->video;
+            $videoName = time() . '.' . $video->getClientOriginalExtension();
+            $video->move(public_path('review-videos'), $videoName);
+            $input['video'] = $videoName;
         }
-        Review::create($input);
+
+        $review = Review::create($input);
+
+        if ($request->images) {
+            $images = $request->images;
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('review-images'), $filename);
+                // dd($filename);
+                ReviewImage::create([
+                    'image' => $filename,
+                    'review_id' => $review->id,
+                ]);
+            }
+        }
         return redirect()->back()
             ->with('success', 'Review created successfully.');
     }

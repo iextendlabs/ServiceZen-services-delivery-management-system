@@ -6,6 +6,8 @@ use App\Models\Affiliate;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Staff;
+use App\Models\StaffImages;
+use App\Models\StaffYoutubeVideo;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -119,22 +121,30 @@ class HomeController extends Controller
 
         if (auth()->user()->hasRole('Staff')) {
 
-            if ($request->images) {
-                $images = $request->images;
-    
-                $existingImage = $user->staff->images ?? ''; // Existing image
-    
-                $imagePaths = [];
+            if ($request->gallery_images) {
+                $images = $request->gallery_images;
     
                 foreach ($images as $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
     
                     $image->move(public_path('staff-images'), $filename);
-                    $imagePaths[] = $filename;
+                    StaffImages::create([
+                        'image' => $filename,
+                        'staff_id' => $id,
+                    ]);
                 }
-                $newImagePaths = implode(',', $imagePaths);
-    
-                $input['images'] = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+            }
+
+            if ($request->youtube_video) {
+                StaffYoutubeVideo::where('staff_id', $id)->delete();
+                foreach ($request->youtube_video as $youtube_video) {
+                    if ($youtube_video) {
+                        StaffYoutubeVideo::create([
+                            'youtube_video' => $youtube_video,
+                            'staff_id' => $id,
+                        ]);
+                    }
+                }
             }
 
             $user->staff->update($input);

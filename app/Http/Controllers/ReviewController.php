@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Review;
+use App\Models\ReviewImage;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -54,21 +55,33 @@ class ReviewController extends Controller
             'user_name' => 'required',
             'content' => 'required',
             'rating' => 'required',
+            'video' => 'mimetypes:video/*,video/*,application/octet-stream|max:50000',
         ]);
 
         $input = $request->all();
-        if ($request->image) {
-            // create a unique filename for the image
-            $filename = time() . '.' . $request->image->getClientOriginalExtension();
 
-            // move the uploaded file to the public/staff-images directory
-            $request->image->move(public_path('review-images'), $filename);
-
-            // save the filename to the gallery object and persist it to the database
-
-            $input['image'] = $filename;
+        if ($request->video) {
+            $video = $request->video;
+            $videoName = time() . '.' . $video->getClientOriginalExtension();
+            $video->move(public_path('review-videos'), $videoName);
+            $input['video'] = $videoName;
         }
-        Review::create($input);
+        $review = Review::create($input);
+
+        if ($request->images) {
+            $images = $request->images;
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('review-images'), $filename);
+                // dd($filename);
+                ReviewImage::create([
+                    'image' => $filename,
+                    'review_id' => $review->id,
+                ]);
+            }
+        }
         return redirect()->route('reviews.index')
             ->with('success', 'REview created successfully.');
     }
@@ -116,24 +129,36 @@ class ReviewController extends Controller
         ]);
 
         $review = Review::find($id);
+
         $input = $request->all();
-        if (isset($request->image)) {
-            //delete previous Image if new Image submitted
-            if ($review->image && file_exists(public_path('review-images') . '/' . $review->image)) {
-                unlink(public_path('review-images') . '/' . $review->image);
+
+        if ($request->video) {
+
+            if ($review->video && file_exists(public_path('review-videos') . '/' . $review->video)) {
+                unlink(public_path('review-videos') . '/' . $review->video);
             }
 
-            $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
-            // move the uploaded file to the public/review-images directory
-            $request->image->move(public_path('review-images'), $filename);
-
-            // save the filename to the gallery object and persist it to the database
-
-            $input['image'] = $filename;
+            $video = $request->video;
+            $videoName = time() . '.' . $video->getClientOriginalExtension();
+            $video->move(public_path('review-videos'), $videoName);
+            $input['video'] = $videoName;
         }
 
         $review->update($input);
+
+        if ($request->images) {
+            $images = $request->images;
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('review-images'), $filename);
+                ReviewImage::create([
+                    'image' => $filename,
+                    'review_id' => $id,
+                ]);
+            }
+        }
 
         return redirect()->route('reviews.index')
             ->with('success', 'Review Update successfully.');
@@ -148,14 +173,53 @@ class ReviewController extends Controller
     public function destroy($id)
     {
         $review = Review::find($id);
-        if ($review->image) {
-            if (file_exists(public_path('review-images') . '/' . $review->image)) {
-                unlink(public_path('review-images') . '/' . $review->image);
+        if (isset($review->images)) {
+            foreach ($review->images as $image) {
+                if ($image->image && file_exists(public_path('review-images') . '/' . $image->image)) {
+                    unlink(public_path('review-images') . '/' . $image->image);
+                }
             }
         }
+
+        if ($review->video && file_exists(public_path('review-videos') . '/' . $review->video)) {
+            unlink(public_path('review-videos') . '/' . $review->video);
+        }
+
         $review->delete();
 
         return redirect()->route('reviews.index')
             ->with('success', 'Review deleted successfully');
+    }
+
+    public function removeImages(Request $request)
+    {
+        $review_images = ReviewImage::where('review_id', $request->id)->pluck('image')->toArray();
+
+        $deleteImage = $request->image;
+
+        if (($key = array_search($deleteImage, $review_images)) !== false) {
+            if ($deleteImage && file_exists(public_path('review-images') . '/' . $deleteImage)) {
+                unlink(public_path('review-images') . '/' . $deleteImage);
+            }
+        }
+
+        ReviewImage::where('image', $request->image)->delete();
+
+        return redirect()->back()->with('success', 'Image Remove successfully.');
+    }
+
+    public function removeVideo(Request $request)
+    {
+        $review = Review::find($request->id);
+
+        if ($review->video && file_exists(public_path('review-videos') . '/' . $review->video)) {
+            unlink(public_path('review-videos') . '/' . $review->video);
+        }
+
+        $review->video = '';
+
+        $review->save();
+
+        return redirect()->back()->with('success', 'Image Remove successfully.');
     }
 }

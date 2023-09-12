@@ -25,8 +25,10 @@
                 <div class="card-body">
 
                     <p class="card-text">{{$review->content}}</p>
-                    @if(isset($review->image))
-                    <img src="/review-images/{{ $review->image }}" height="auto" width="40%" alt="">
+                    @if(isset($review->images))
+                    @foreach($review->images as $image)
+                    <img src="/review-images/{{ $image->image }}" height="auto" width="30%" alt="">
+                    @endforeach
                     @endif
                 </div>
             </div>

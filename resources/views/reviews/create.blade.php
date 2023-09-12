@@ -43,10 +43,26 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <strong for="image">Upload Image</strong>
-                <input type="file" name="image" id="image" class="form-control-file ">
+                <strong>Images:</strong>
+                <table id="imageTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Images</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <button id="addImageBtn" type="button" class="btn btn-primary float-right">Add Image</button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong for="video">Upload video</strong>
+                <input type="file" name="video" id="video" class="form-control-file" accept="video/*">
                 <br>
-                <img id="preview" src="/review-images/" height="130px">
+                <video id="videoPreview" controls style="display:none; max-width:100%;"></video>
             </div>
         </div>
         <div class="col-md-12">
@@ -66,9 +82,44 @@
     </div>
 </form>
 <script>
-    document.getElementById('image').addEventListener('change', function(e) {
-        var preview = document.getElementById('preview');
-        preview.src = URL.createObjectURL(e.target.files[0]);
+    $(document).ready(function() {
+        $("#addImageBtn").click(function() {
+            // Append a new row to the table
+            $("#imageTable tbody").append(`
+                <tr>
+                    <td>
+                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <img class="image-preview" height="130px">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-image">Remove</button>
+                    </td>
+                </tr>
+            `);
+        });
+
+        $(document).on("click", ".remove-image", function() {
+            $(this).closest("tr").html('');
+        });
+
+        $(document).on("change", ".image-input", function(e) {
+            var preview = $(this).siblings('.image-preview')[0];
+            preview.src = URL.createObjectURL(e.target.files[0]);
+        });
+
+        $('#video').on('change', function() {
+            const videoPreview = $('#videoPreview')[0];
+            const video = this.files[0];
+
+            if (video) {
+                const videoURL = URL.createObjectURL(video);
+                videoPreview.src = videoURL;
+                videoPreview.style.display = 'block';
+            } else {
+                videoPreview.src = '';
+                videoPreview.style.display = 'none';
+            }
+        });
     });
 </script>
 @endsection

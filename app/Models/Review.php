@@ -10,7 +10,7 @@ class Review extends Model
     use HasFactory;
     
     protected $fillable = [
-        'staff_id', 'service_id', 'content', 'rating','user_name','order_id','image'
+        'staff_id', 'service_id', 'content', 'rating','user_name','order_id','video'
     ];
 
     public function user()
@@ -21,6 +21,11 @@ class Review extends Model
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ReviewImage::class);
     }
 
 }

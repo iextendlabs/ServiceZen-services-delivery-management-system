@@ -105,10 +105,17 @@
         <div class="tab-pane fade" id="gallery" role="tabpanel" aria-labelledby="gallery-tab">
             <div class="row">
                 <div class="col-md-12">
+                    <strong>Youtube Videos:</strong>
+                    @if(count($user->staffYoutubeVideo))
+                    @foreach($user->staffYoutubeVideo as $staffYoutubeVideo)
                     <div class="form-group">
-                        <strong>Youtube Video:</strong>
-                        <input type="text" name="youtube_video" class="form-control" placeholder="Youtube Video" value="{{ $user->staff->youtube_video }}">
+                        <input type="text" name="youtube_video[]" class="form-control" placeholder="Youtube Video" value="{{ $staffYoutubeVideo->youtube_video }}">
                     </div>
+                    @endforeach
+                    @endif
+                    <div class="form-group" id="video-div">
+                    </div>
+                    <button id="addVideoBtn" type="button" class="btn btn-primary float-right">Add Youtube Video</button>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
@@ -121,11 +128,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if($user->staff->images)
-                                @foreach (explode(',', $user->staff->images) as $imagePath)
-                                <tr data-image-filename="{{ $imagePath }}" data-id="{{ $user->staff->id }}">
+                                @if($user->staffImages)
+                                @foreach ($user->staffImages as $imagePath)
+                                <tr data-image-filename="{{ $imagePath->image }}" data-id="{{ $user->id }}">
                                     <td>
-                                        <img src="/staff-images/{{ $imagePath }}" height="200px" width="auto" alt="Image">
+                                        <img src="/staff-images/{{ $imagePath->image }}" height="200px" width="auto" alt="Image">
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger remove-image">Remove</button>
@@ -154,10 +161,22 @@
             $("#imageTable tbody").append(`
                 <tr>
                     <td>
-                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <input type="file" name="gallery_images[]" class="form-control image-input" accept="image/*">
                         <img class="image-preview" height="130px">
                     </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-image">Remove</button>
+                    </td>
                 </tr>
+            `);
+        });
+
+        $("#addVideoBtn").click(function() {
+            // Append a new row to the table
+            $("#video-div").append(`
+                <div class="form-group">
+                    <input type="text" name="youtube_video[]" class="form-control" placeholder="Youtube Video">
+                </div>
             `);
         });
 
@@ -182,6 +201,7 @@
                     console.log(error); // Handle the error appropriately
                 }
             });
+            row.html('');
         });
 
         $(document).on("change", ".image-input", function(e) {

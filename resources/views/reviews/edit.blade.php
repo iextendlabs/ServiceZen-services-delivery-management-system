@@ -44,10 +44,41 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
-                <span style="color: red;">*</span><strong for="image">Upload Image</strong>
-                <input type="file" name="image" id="image" class="form-control-file ">
+                <strong>Images:</strong>
+                <table id="imageTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Previous Images</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if($review->images)
+                        @foreach ($review->images as $imagePath)
+                        <tr data-image-filename="{{ $imagePath->image }}" data-id="{{ $review->id }}">
+                            <td>
+                                <img src="/review-images/{{ $imagePath->image }}" height="200px" width="auto" alt="Image">
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger remove-image">Remove</button>
+                            </td>
+                        </tr>
+                        @endforeach
+                        @endif
+                    </tbody>
+                </table>
+                <button id="addImageBtn" type="button" class="btn btn-primary float-right">Add Image</button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong for="video">Upload video</strong>
+                <input type="file" name="video" id="video" class="form-control-file" accept="video/*">
                 <br>
-                <img id="preview" src="/review-images/{{$review->image}}" height="130px">
+                <video id="videoPreview"  src="/review-videos/{{ $review->video }}" type="video/mp4" controls style="max-width:100%;"></video>
+                @if($review->video)
+                <button type="button" class="float-right mt-3 btn btn-danger remove-video" data-video="{{ $review->video }}" data-id="{{ $review->id }}">Remove</button>
+                @endif
             </div>
         </div>
         <div class="col-md-12">
@@ -66,9 +97,88 @@
     </div>
 </form>
 <script>
-    document.getElementById('image').addEventListener('change', function(e) {
-        var preview = document.getElementById('preview');
-        preview.src = URL.createObjectURL(e.target.files[0]);
+    $(document).ready(function() {
+        $("#addImageBtn").click(function() {
+            // Append a new row to the table
+            $("#imageTable tbody").append(`
+                <tr>
+                    <td>
+                        <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                        <img class="image-preview" height="130px">
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-image">Remove</button>
+                    </td>
+                </tr>
+            `);
+        });
+
+        $(document).on("click", ".remove-image", function() {
+            var row = $(this).closest("tr");
+            var imageFilename = row.data('image-filename');
+            var id = row.data('id');
+
+            // Make an AJAX call to remove the image from the database
+            $.ajax({
+                type: "GET",
+                url: "/removeReviewImages", // Replace with your route URL
+                data: {
+                    id: id,
+                    image: imageFilename
+                },
+                success: function(response) {
+                    // On success, remove the row from the table
+                    row.remove();
+                },
+                error: function(xhr, status, error) {
+                    console.log(error); // Handle the error appropriately
+                }
+            });
+            row.html('');
+        });
+
+        $(document).on("change", ".image-input", function(e) {
+            var preview = $(this).siblings('.image-preview')[0];
+            preview.src = URL.createObjectURL(e.target.files[0]);
+        });
+
+        $('#video').on('change', function() {
+            const videoPreview = $('#videoPreview')[0];
+            const video = this.files[0];
+
+            if (video) {
+                const videoURL = URL.createObjectURL(video);
+                videoPreview.src = videoURL;
+                videoPreview.style.display = 'block';
+            } else {
+                videoPreview.src = '';
+                videoPreview.style.display = 'none';
+            }
+        });
+
+        $(document).on("click", ".remove-video", function() {
+            var that = $(this);
+            var videoFilename = that.data('video');
+            var id = that.data('id');
+
+            // Make an AJAX call to remove the video from the database
+            $.ajax({
+                type: "GET",
+                url: "/removeReviewVideo", // Replace with your route URL
+                data: {
+                    id: id,
+                    video: videoFilename
+                },
+                success: function(response) {
+                    // On success, remove the that from the table
+                    that.remove();
+                },
+                error: function(xhr, status, error) {
+                    console.log(error); // Handle the error appropriately
+                }
+            });
+            location.reload()
+        });
     });
 </script>
 @endsection
