@@ -53,61 +53,13 @@
                     </select>
                 </div>
             </div>
-            <!-- <div class="col-md-12">
-                <div class="form-group">
-                    <span style="color: red;">*</span><strong>Staffs:</strong>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
-                    <table class="table table-striped table-bordered">
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Email</th>
-                        </tr>
-                        @foreach ($staffs as $staff)
-                        @if($staff->getRoleNames() == '["Staff"]')
-                        <tr>
-                            <td>
-                                @if($staff->id == $staff_id)
-                                    <input type="checkbox" name="ids[{{ ++$i }}]" checked value="{{ $staff->id }}">
-                                @else
-                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                @endif
-                            </td>
-                            <td>{{ $staff->name }}</td>
-                            <td>{{ $staff->email }}</td>
-                        </tr>
-                        @endif
-                        @endforeach
-                    </table>
-                </div>
-            </div> -->
+            <div class="col-md-12">
+                <p class="text-danger"><strong>Note: </strong>If holiday is not in same day it will split into two holiday.</p>
+            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
-    <script>
-$(document).ready(function(){
-    $("#search").keyup(function(){
-        var value = $(this).val().toLowerCase();
-        
-        $("table tr").hide();
 
-        $("table tr").each(function() {
-
-            $row = $(this);
-
-            var name = $row.find("td:first").next().text().toLowerCase();
-
-            var email = $row.find("td:last").text().toLowerCase();
-
-            if (name.indexOf(value) != -1) {
-                $(this).show();
-            }else if(email.indexOf(value) != -1) {
-                $(this).show();
-            }
-        });
-    });
-});
-</script>
 @endsection
