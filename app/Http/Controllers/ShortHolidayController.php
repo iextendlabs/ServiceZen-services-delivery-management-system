@@ -85,27 +85,19 @@ class ShortHolidayController extends Controller
 
         $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
         $timeEnd = Carbon::createFromFormat('H:i', $request->time_end);
+        
+        $carbonTimeStart = Carbon::parse($request->time_start);
+
+        $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
+
+        $carbonTimeEnd = Carbon::parse($request->time_end);
+
+        $input['end_time_to_sec'] = $carbonTimeEnd->hour * 3600 + $carbonTimeEnd->minute * 60 + $carbonTimeEnd->second;
+
 
         if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
-            $date = Carbon::createFromFormat('Y-m-d', $request->date);
-
-            $date->addDay();
-
-            $nextDate = $date->format('Y-m-d');
-
-            ShortHoliday::create([
-                'date' => $request->date, 
-                'time_start' => $request->time_start,
-                'time_end' => '23:59',
-                'staff_id' => $request->staff_id
-            ]);
-
-            ShortHoliday::create([
-                'date' => $nextDate, 
-                'time_start' => '00:00',
-                'time_end' => $request->time_end,
-                'staff_id' => $request->staff_id
-            ]);
+            $input['end_time_to_sec'] = $input['end_time_to_sec'] + 86400;
+            ShortHoliday::create($input);
         }else{
             ShortHoliday::create($input);
         }

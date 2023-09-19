@@ -9,6 +9,7 @@ use App\Models\StaffGroupToStaff;
 use App\Models\TimeSlot;
 use App\Models\TimeSlotToStaff;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -70,12 +71,24 @@ class TimeSlotController extends Controller
 
         $input = $request->all();
 
+        $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
+        $timeEnd = Carbon::createFromFormat('H:i', $request->time_end);
 
-        if ($request->ids != null) {
-            $input['available_staff'] = serialize($request->ids);
+        $carbonTimeStart = Carbon::parse($request->time_start);
+
+        $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
+
+        $carbonTimeEnd = Carbon::parse($request->time_end);
+
+        $input['end_time_to_sec'] = $carbonTimeEnd->hour * 3600 + $carbonTimeEnd->minute * 60 + $carbonTimeEnd->second;
+
+
+        if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
+            $input['end_time_to_sec'] = $input['end_time_to_sec'] + 86400;
+            $time_slot = TimeSlot::create($input);
+        } else {
+            $time_slot = TimeSlot::create($input);
         }
-
-        $time_slot = TimeSlot::create($input);
 
         $input['time_slot_id'] = $time_slot->id;
 
@@ -144,8 +157,26 @@ class TimeSlotController extends Controller
         if ($request->type == 'General') {
             $input['date'] = Null;
         }
+        
+        $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
+        $timeEnd = Carbon::createFromFormat('H:i', $request->time_end);
 
-        $time_slot->update($input);
+        $carbonTimeStart = Carbon::parse($request->time_start);
+
+        $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
+
+        $carbonTimeEnd = Carbon::parse($request->time_end);
+
+        $input['end_time_to_sec'] = $carbonTimeEnd->hour * 3600 + $carbonTimeEnd->minute * 60 + $carbonTimeEnd->second;
+
+
+        if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
+            $input['end_time_to_sec'] = $input['end_time_to_sec'] + 86400;
+            $time_slot->update($input);
+        } else {
+            $time_slot->update($input);
+        }
+
 
         $input['time_slot_id'] = $id;
 

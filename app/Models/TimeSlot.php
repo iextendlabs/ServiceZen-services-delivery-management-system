@@ -11,7 +11,7 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status'];
+    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status','start_time_to_sec','end_time_to_sec'];
 
     public $space_availability;
 
@@ -103,7 +103,7 @@ class TimeSlot extends Model
 
                 foreach ($timeSlots as $timeSlot) {
                     if ($short_holiday) {
-                        $short_holiday_staff_ids = ShortHoliday::where('date', $date)->where('time_start', '<=', $timeSlot->time_end)->where('time_end', '>=', $timeSlot->time_start)->pluck('staff_id')->toArray();
+                        $short_holiday_staff_ids = ShortHoliday::where('date', $date)->where('start_time_to_sec', '<=', $timeSlot->end_time_to_sec)->where('end_time_to_sec', '>=', $timeSlot->start_time_to_sec)->pluck('staff_id')->toArray();
                     } else {
                         $short_holiday_staff_ids = [];
                     }

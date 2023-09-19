@@ -53,9 +53,6 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-12">
-                <p class="text-danger"><strong>Note: </strong>If holiday is not in same day it will split into two holiday.</p>
-            </div>
             <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
             </div>
