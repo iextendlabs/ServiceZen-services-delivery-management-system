@@ -195,7 +195,7 @@
                             <button type="submit" class="btn btn-primary">Approve</button>
                             @endcan
                             @else
-                            <button type="submit" class="btn btn-primary" disabled>Approved</button>
+                            <a href="{{ route('transactions.Unapprove') }}?order_id={{$order->id}}&user_id={{ $order->service_staff_id }}" type="button" class="btn btn-primary">Un Approve</a>
                             @endif
                         </td>
                         @endif

@@ -118,4 +118,15 @@ class TransactionController extends Controller
         return redirect()->back()
             ->with('success', 'Transaction deleted successfully');
     }
+
+    public function Unapprove(Request $request)
+    {
+        
+        $transaction = Transaction::where('order_id',$request->order_id)->where('user_id',$request->user_id);
+
+        $transaction->delete();
+
+        return redirect()->back()
+            ->with('success', 'Transaction deleted successfully');
+    }
 }

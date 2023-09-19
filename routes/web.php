@@ -114,6 +114,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/removeReviewVideo', [ReviewController::class, 'removeVideo']);
 
     Route::get('/removeStaffImages', [ServiceStaffController::class, 'removeImages']);
+
+    Route::get('/transactionUnapprove', [TransactionController::class,'Unapprove'])->name('transactions.Unapprove');
+
 });
 
 // Backups
