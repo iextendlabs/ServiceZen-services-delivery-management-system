@@ -42,13 +42,13 @@
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Time Start:</strong>
-                <input type="time" name="time_start" value="{{$time_slot->time_start}}" class="form-control" placeholder="Time Start">
+                <input type="time" name="time_start" value="{{ \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_start)->format('H:i') }}" class="form-control" placeholder="Time Start">
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Time End:</strong>
-                <input type="time" name="time_end" value="{{$time_slot->time_end}}" class="form-control" placeholder="Time End">
+                <input type="time" name="time_end" value="{{ \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_end)->format('H:i') }}" class="form-control" placeholder="Time End">
             </div>
         </div>
         <div class="col-md-12" id="date" style="display: none;">
