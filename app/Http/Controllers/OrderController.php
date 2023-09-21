@@ -228,6 +228,15 @@ class OrderController extends Controller
 
         $order = Order::find($id);
 
+        $order->order_total->transport_charges = $request->transport_charges;
+        $order->order_total->save();
+
+        $order->update($input);
+
+        if (isset($order->staff->commission)) {
+            $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
+        }
+
         if (isset($order->affiliate)) {
             $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
         }
@@ -241,10 +250,13 @@ class OrderController extends Controller
             Transaction::create($input);
         }
 
-        $order->order_total->transport_charges = $request->transport_charges;
-        $order->order_total->save();
-
-        $order->update($input);
+        if ($order->status == "Complete" && isset($order->staff->commission) && !isset($staff_transaction)) {
+            $input['user_id'] = $order->service_staff_id;
+            $input['order_id'] = $order->id;
+            $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+            $input['status'] = 'Approved';
+            Transaction::create($input);
+        }
 
         if (isset($staff_id)) {
             $staff = User::find($staff_id);
@@ -282,13 +294,19 @@ class OrderController extends Controller
         $input['user'] = Auth::user()->name;
         $input['status'] = $request->status;
 
+        $order->save();
+
         OrderHistory::create($input);
 
         if (isset($order->affiliate)) {
-            $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+            $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
         }
 
-        if ($order->status == "Complete" && isset($order->affiliate) && !isset($transaction)) {
+        if (isset($order->staff->commission)) {
+            $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
+        }
+
+        if ($order->status == "Complete" && isset($order->affiliate) && !isset($affiliate_transaction)) {
             $input['user_id'] = $order->affiliate->id;
             $input['order_id'] = $order->id;
             $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
@@ -296,7 +314,15 @@ class OrderController extends Controller
             $input['status'] = 'Approved';
             Transaction::create($input);
         }
-        $order->save();
+
+        if ($order->status == "Complete" && isset($order->staff->commission) && !isset($staff_transaction)) {
+            $input['user_id'] = $order->service_staff_id;
+            $input['order_id'] = $order->id;
+            $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+            $input['status'] = 'Approved';
+            Transaction::create($input);
+        }
+
         return redirect()->route('orders.index')->with('success', 'Order updated successfully');
     }
 }
