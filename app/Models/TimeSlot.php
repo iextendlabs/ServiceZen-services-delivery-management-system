@@ -37,6 +37,7 @@ class TimeSlot extends Model
     {
         return $this->belongsToMany(User::class, 'time_slot_to_staff', 'time_slot_id', 'staff_id');
     }
+    
     public function isAvailable()
     {
         return (int)$this->space_availability > 0;

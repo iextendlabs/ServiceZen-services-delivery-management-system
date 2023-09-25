@@ -18,27 +18,66 @@
     </div>
     @endif
     <hr>
+    <div class="row">
+        @if(auth()->user()->getRoleNames() != '["Staff"]')
+        <!-- Second Column (Filter Form) -->
+        <div class="col-md-12">
+            <h3>Filter</h3>
+            <hr>
+            <form action="{{ route('timeSlots.index') }}" method="GET" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Staff:</strong>
+                            <select name="staff_id" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($staffs as $staff)
+                                @if($staff->id == $filter['staff_id'])
+                                <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
+                                @else
+                                <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="offset-6 col-md-3 text-center">
+                        <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        @endif
+
+    </div>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>
             <th>Name</th>
             <th>Time Start -- Time End</th>
             <th>Group</th>
-            <th>Status</th>
+            <th>Staff</th>
             <th width="280px">Action</th>
         </tr>
         @if(count($time_slots))
         @foreach ($time_slots as $time_slot)
         <tr>
             <td>{{ ++$i }}</td>
-            <td>{{ $time_slot->name }}</td>
+            <td>@if($time_slot->status == 1)
+                <span class="text-success">{{ $time_slot->name }}</span>
+                @else
+                <span class="text-danger">{{ $time_slot->name }}</span>
+                @endif</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
-            <td>@if($time_slot->status == 1)
-                Enable
-                @else
-                Disable
-                @endif
+            <td>
+                @foreach($time_slot->staffs as $staff)
+                    {{ $staff->name }}
+                @endforeach
             </td>
             <td>
                 <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">

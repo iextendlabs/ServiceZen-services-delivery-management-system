@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Holiday;
 use App\Models\Order;
+use App\Models\Staff;
 use App\Models\StaffGroup;
 use App\Models\StaffGroupToStaff;
 use App\Models\TimeSlot;
@@ -33,10 +34,26 @@ class TimeSlotController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $time_slots = TimeSlot::orderBy('time_start')->paginate(config('app.paginate'));
-        return view('timeSlots.index', compact('time_slots'))
+        $filter = [
+            'staff_id' => $request->staff_id
+        ];
+
+
+
+        $query = TimeSlot::orderBy('time_start');
+
+        if ($request->has('staff_id')) {
+            $staffId = $request->input('staff_id');
+            $query->whereHas('staffs', function ($q) use ($staffId) {
+                $q->where('staff_id', $staffId);
+            });
+        }
+
+        $time_slots = $query->paginate(config('app.paginate'));
+        $staffs = User::role('Staff')->get();
+        return view('timeSlots.index', compact('time_slots', 'staffs', 'filter'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -131,7 +148,7 @@ class TimeSlotController extends Controller
         $time_slot = TimeSlot::find($id);
 
         $staffGroup = StaffGroup::find($time_slot->group_id);
-        $staffs = $staffGroup->staffs;
+        $staffs = User::role('Staff')->get();
 
         $selected_staff = $time_slot->staffs->pluck('id')->toArray();
 
@@ -157,7 +174,7 @@ class TimeSlotController extends Controller
         if ($request->type == 'General') {
             $input['date'] = Null;
         }
-        
+
         $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
         $timeEnd = Carbon::createFromFormat('H:i', $request->time_end);
 
@@ -196,8 +213,14 @@ class TimeSlotController extends Controller
     {
         $staffGroup = StaffGroup::find($request->group);
         $staff = $staffGroup->staffs;
-        return response()->json($staff);
+        $allStaff = User::role('Staff')->get();
+
+        return response()->json([
+            'staff' => $staff,
+            'allStaff' => $allStaff
+        ]);
     }
+
 
 
     /**
