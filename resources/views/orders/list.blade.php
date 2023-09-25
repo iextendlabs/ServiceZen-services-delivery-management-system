@@ -90,6 +90,9 @@
                         @can('order-detail-edit')
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
                         @endcan
+                        @can('order-detail-edit')
+                        <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=affiliate">Affiliate Edit</a>
+                        @endcan
                     </div>
                 </li>
             </ul>

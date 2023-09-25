@@ -200,6 +200,7 @@ class OrderController extends Controller
 
     public function edit($id, Request $request)
     {
+        $affiliates = User::role('Affiliate')->get();
         $order = Order::findOrFail($id);
         $area = $order->area;
         $date = $order->date;
@@ -212,7 +213,10 @@ class OrderController extends Controller
             return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
         } elseif ($request->edit == "address") {
             return view('orders.detail_edit', compact('order'));
+        } elseif ($request->edit == "affiliate") {
+            return view('orders.affiliate_edit', compact('order','affiliates'));
         }
+        
     }
 
     public function update(Request $request, $id)
