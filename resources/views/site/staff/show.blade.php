@@ -30,21 +30,20 @@
                 <h2>{{ $user->name }}</h2>
                 <hr>
             </div>
-            <div class="col-md-12 text-center">
+            <div class="col-md-4 text-center">
                 <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
-                <hr>
             </div>
 
-            <div class="col-md-10 offset-md-1">
+            <div class="col-md-8">
                 @if($user->staff->about)
-                <h3 class="text-center">About</h3>
                 {!! $user->staff->about !!}
                 @endif
-
+            </div>
+            <div class="col-md-12 text-center">
                 <hr>
-                <p class="text-center">
+                <h5>
                     <strong>Delivered Order: {{ count($user->orders) }}</strong>
-                </p>
+                </h5>
             </div>
             <!-- Social Links -->
             @if($socialLinks)
@@ -77,6 +76,7 @@
                 </a>
             </div>
             @endif
+            <hr>
             <!-- Staff Gallery -->
             @if(count($user->staffYoutubeVideo))
             <div class="col-md-12 text-center mt-3 mb-3">
@@ -134,7 +134,7 @@
             @endforeach
         </div>
         <h3 class="text-center">Reviews</h3>
-        <div class="row">
+        <div class="row scroll-div">
             @if($reviews)
             @foreach($reviews as $review)
             <div class="col-md-5 offset-md-4">
@@ -155,7 +155,8 @@
             </div>
             @endforeach
             @endif
-
+            </div>
+            <div class="row">
             <div class="col-md-5 offset-md-4">
 
                 @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
@@ -171,6 +172,8 @@
                         @include('site.reviews.create')
                     </div>
             </div>
+            </div>
+
         </div>
     </div>
 </div>

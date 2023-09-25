@@ -316,3 +316,13 @@ svg {
   color: inherit;
   transition: color 0.2s;
 }
+
+
+.scroll-div {
+  height: 330px;
+  /* Set the desired height */
+  overflow: hidden;
+  /* Hide overflow */
+  overflow-y: scroll;
+  /* Enable vertical scrolling */
+}
