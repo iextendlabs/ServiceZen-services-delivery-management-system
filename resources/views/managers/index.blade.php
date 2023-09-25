@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -7,16 +8,16 @@
             </div>
             <div class="float-end">
                 @can('manager-create')
-                    <a class="btn btn-success" href="{{ route('managers.create') }}"> Create New Manager</a>
+                <a class="btn btn-success" href="{{ route('managers.create') }}"> Create New Manager</a>
                 @endcan
             </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <div class="row">
@@ -55,16 +56,17 @@
                 </tr>
                 @endif
             </table>
-        {!! $managers->links() !!}
+            {!! $managers->links() !!}
         </div>
         <div class="col-md-3">
-            <h3>Filter</h3><hr>
+            <h3>Filter</h3>
+            <hr>
             <form action="{{ route('managers.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Name:</strong>
-                            <input type="text" name="name"value="{{$filter_name}}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{$filter_name}}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -74,5 +76,5 @@
             </form>
         </div>
     </div>
-    
+</div>
 @endsection

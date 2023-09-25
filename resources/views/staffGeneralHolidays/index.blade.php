@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-6">
             <h2>Staff General Holidays</h2>
@@ -11,10 +12,10 @@
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <div class="row">
@@ -47,10 +48,11 @@
                 <tr>
                     <td colspan="4" class="text-center">There is no staff General Holiday.</td>
                 </tr>
-                @endif  
+                @endif
             </table>
             {!! $staffGeneralHolidays->links() !!}
         </div>
     </div>
-    
+</div>
+
 @endsection

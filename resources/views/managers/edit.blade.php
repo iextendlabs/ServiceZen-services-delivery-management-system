@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -8,19 +9,19 @@
         </div>
     </div>
     @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div class="alert alert-danger">
+        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
     <form action="{{ route('managers.update',$manager->id) }}" method="POST">
         @csrf
         @method('PUT')
-         <div class="row">
+        <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
@@ -46,8 +47,9 @@
                 </div>
             </div>
             <div class="col-md-12 text-center">
-              <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
+</div>
 @endsection

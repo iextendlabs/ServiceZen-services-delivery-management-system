@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+    <div class="container">
 <div class="row">
     <div class="col-md-12 margin-tb">
         <h2>Update Review</h2>
@@ -96,6 +97,7 @@
     </div>
     </div>
 </form>
+</div>
 <script>
     $(document).ready(function() {
         $("#addImageBtn").click(function() {

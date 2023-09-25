@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -8,18 +9,18 @@
         </div>
     </div>
     @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div class="alert alert-danger">
+        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
     <form action="{{ route('assistantSupervisors.store') }}" method="POST">
         @csrf
-         <div class="row">
+        <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
@@ -50,16 +51,17 @@
                     <select name="supervisor_id" class="form-control">
                         <option></option>
                         @foreach($supervisors as $supervisor)
-                            @if($supervisor->getRoleNames() == '["Supervisor"]')
-                                <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
-                            @endif
+                        @if($supervisor->getRoleNames() == '["Supervisor"]')
+                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
             </div>
             <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
+</div>
 @endsection

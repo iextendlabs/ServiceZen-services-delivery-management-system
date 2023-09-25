@@ -1,42 +1,44 @@
 @extends('layouts.app')
 @section('content')
-<div class="row">
-    <div class="col-md-12 margin-tb">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 margin-tb">
             <h2>Create New Role</h2>
+        </div>
     </div>
-</div>
-@if (count($errors) > 0)
+    @if (count($errors) > 0)
     <div class="alert alert-danger">
         <strong>Whoops!</strong> There were some problems with your input.<br><br>
         <ul>
-        @foreach ($errors->all() as $error)
+            @foreach ($errors->all() as $error)
             <li>{{ $error }}</li>
-        @endforeach
+            @endforeach
         </ul>
     </div>
-@endif
-{!! Form::open(array('route' => 'roles.store','method'=>'POST')) !!}
-<div class="row">
-    <div class="col-md-12">
-        <div class="form-group">
-            <strong>Name:</strong>
-            {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+    @endif
+    {!! Form::open(array('route' => 'roles.store','method'=>'POST')) !!}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Name:</strong>
+                {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+            </div>
         </div>
-    </div>
-    <div class="col-md-12">
-        <div class="form-group">
-            <strong>Permission:</strong>
-            <br/>
-            @foreach($permission as $value)
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Permission:</strong>
+                <br />
+                @foreach($permission as $value)
                 <label>{{ Form::checkbox('permission[]', $value->id, false, array('class' => 'name')) }}
-                {{ $value->name }}</label>
-            <br/>
-            @endforeach
+                    {{ $value->name }}</label>
+                <br />
+                @endforeach
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </div>
-    <div class="col-md-12 text-center">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+    {!! Form::close() !!}
 </div>
-{!! Form::close() !!}
 @endsection

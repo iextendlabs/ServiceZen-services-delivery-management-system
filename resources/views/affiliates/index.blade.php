@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -7,16 +8,16 @@
             </div>
             <div class="float-end">
                 @can('affiliate-create')
-                    <a class="btn btn-success" href="{{ route('affiliates.create') }}"><i class="fa fa-plus"></i></a>
+                <a class="btn btn-success" href="{{ route('affiliates.create') }}"><i class="fa fa-plus"></i></a>
                 @endcan
             </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <div class="row">
@@ -40,7 +41,7 @@
                     <td>{{ $affiliate->affiliate->commission }}%</td>
                     <td>{{ $affiliate->affiliate->code }}</td>
                     <td> @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})</td>
-                  
+
                     <td>
                         <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
                             <a class="btn btn-warning" href="{{ route('affiliates.show',$affiliate->id) }}"><i class="fa fa-eye"></i></a>
@@ -62,11 +63,12 @@
                 </tr>
                 @endif
             </table>
-        {!! $affiliates->links() !!}
+            {!! $affiliates->links() !!}
 
         </div>
         <div class="col-md-3">
-            <h3>Filter</h3><hr>
+            <h3>Filter</h3>
+            <hr>
             <form action="{{ route('affiliates.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-12">
@@ -82,5 +84,5 @@
             </form>
         </div>
     </div>
-    
+</div>
 @endsection

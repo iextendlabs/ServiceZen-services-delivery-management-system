@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
 <div class="row">
     <div class="col-md-12 margin-tb">
         <h2>Update Time Slot</h2>
@@ -117,6 +118,7 @@
         </div>
     </div>
 </form>
+</div>
 <script>
     $('select[name="type"]').on('change', function() {
         var type = $('select[name="type"]').val();

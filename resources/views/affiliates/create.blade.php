@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -8,18 +9,18 @@
         </div>
     </div>
     @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div class="alert alert-danger">
+        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
     <form action="{{ route('affiliates.store') }}" method="POST">
         @csrf
-         <div class="row">
+        <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
@@ -43,7 +44,8 @@
                     <span style="color: red;">*</span><strong>Confirm Password:</strong>
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
-            </div><hr>
+            </div>
+            <hr>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Code:</strong>
@@ -63,8 +65,9 @@
                 </div>
             </div>
             <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
+</div>
 @endsection

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="pull-left">
@@ -23,7 +24,7 @@
                         <th>Name</th>
                     </tr>
                     @if(isset($staffGroup->staffZones))
-                        @foreach($staffGroup->staffZones as $staff_zone) 
+                    @foreach($staffGroup->staffZones as $staff_zone)
                     <tr>
                         <td>{{ $staff_zone->id }}</td>
                         <td>{{ $staff_zone->name }}</td>
@@ -43,7 +44,7 @@
                         <th>Name</th>
                     </tr>
                     @if(isset($staffGroup->staffs))
-                        @foreach($staffGroup->staffs as $staff) 
+                    @foreach($staffGroup->staffs as $staff)
                     <tr>
                         <td>{{ $staff->id }}</td>
                         <td>{{ $staff->name }}</td>
@@ -63,7 +64,7 @@
                         <th>Name</th>
                     </tr>
                     @if(isset($staffGroup->drivers))
-                        @foreach($staffGroup->drivers as $driver) 
+                    @foreach($staffGroup->drivers as $driver)
                     <tr>
                         <td>{{ $driver->id }}</td>
                         <td>{{ $driver->name }}</td>
@@ -75,4 +76,5 @@
             </div>
         </div>
     </div>
+</div>
 @endsection

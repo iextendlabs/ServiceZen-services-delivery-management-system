@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-6">
             <h2>Staff Group</h2>
@@ -11,10 +12,10 @@
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <div class="row">
@@ -34,12 +35,12 @@
                     <td>{{ $staffGroup->name }}</td>
                     <td>
                         @foreach($staffGroup->staffs as $staff)
-                            {{ $staff->name }},
+                        {{ $staff->name }},
                         @endforeach
                     </td>
                     <td>
                         @foreach($staffGroup->staffZones as $staff_zone)
-                            {{ $staff_zone->name }},
+                        {{ $staff_zone->name }},
                         @endforeach
                     </td>
                     <td>
@@ -61,10 +62,11 @@
                 <tr>
                     <td colspan="4" class="text-center">There is no staff Group.</td>
                 </tr>
-                @endif  
+                @endif
             </table>
             {!! $staffGroups->links() !!}
         </div>
     </div>
-    
+
+</div>
 @endsection

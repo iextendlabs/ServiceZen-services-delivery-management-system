@@ -1,5 +1,6 @@
     @extends('layouts.app')
     @section('content')
+    <div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -172,8 +173,7 @@
 
 
                     <div class="offset-6 col-md-3 text-center">
-                        <a href="{{ url()->current() }}
-" class="btn btn-lg btn-secondary">Reset</a>
+                        <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
                     </div>
                     <div class="col-md-3 text-center">
                         <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
@@ -182,17 +182,22 @@
             </form>
         </div>
         @endif
-        <!-- First Column (Table) -->
-        <div class="col-md-12 mt-3">
+
+    </div>
+    </div>
+    <div class="fluid_container">
+        <div class="row">
+            <!-- First Column (Table) -->
+            <div class="col-md-12 mt-3">
 
 
-            @include('orders.list')
-            {!! $orders->links() !!}
-            <div class="row pagination-summary">
-                <div class="col-6">Total Records <i class="fas fa-chart-bar"></i> {{ $orders->total() }}</div>
-                <div class="col-6">Showing {{ $orders->firstItem() }} - {{ $orders->lastItem() }} of {{ $orders->total() }}</div>
+                @include('orders.list')
+                {!! $orders->links() !!}
+                <div class="row pagination-summary">
+                    <div class="col-6">Total Records <i class="fas fa-chart-bar"></i> {{ $orders->total() }}</div>
+                    <div class="col-6">Showing {{ $orders->firstItem() }} - {{ $orders->lastItem() }} of {{ $orders->total() }}</div>
+                </div>
             </div>
         </div>
     </div>
-
     @endsection

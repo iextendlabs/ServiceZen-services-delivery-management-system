@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -7,16 +8,16 @@
             </div>
             <div class="float-end">
                 @can('supervisor-create')
-                    <a class="btn btn-success" href="{{ route('supervisors.create') }}"> Create New Supervisor</a>
+                <a class="btn btn-success" href="{{ route('supervisors.create') }}"> Create New Supervisor</a>
                 @endcan
             </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <div class="row">
@@ -55,10 +56,11 @@
                 </tr>
                 @endif
             </table>
-        {!! $supervisors->links() !!}
+            {!! $supervisors->links() !!}
         </div>
         <div class="col-md-3">
-            <h3>Filter</h3><hr>
+            <h3>Filter</h3>
+            <hr>
             <form action="{{ route('supervisors.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-12">
@@ -74,5 +76,6 @@
             </form>
         </div>
     </div>
-    
+</div>
+
 @endsection

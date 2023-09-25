@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="pull-left">
@@ -30,9 +31,10 @@
             <div class="form-group">
                 <strong>Package Services:</strong>
                 @foreach($service->package as $package)
-                    {{ $package->service->name }}, 
+                {{ $package->service->name }},
                 @endforeach
             </div>
         </div>
     </div>
+</div>
 @endsection

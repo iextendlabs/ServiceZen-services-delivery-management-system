@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -24,11 +25,12 @@
             <div class="form-group">
                 <strong>Roles:</strong>
                 @if(!empty($driver->getRoleNames()))
-                    @foreach($driver->getRoleNames() as $v)
-                        <span class="badge rounded-pill bg-dark">{{ $v }}</span>
-                    @endforeach
+                @foreach($driver->getRoleNames() as $v)
+                <span class="badge rounded-pill bg-dark">{{ $v }}</span>
+                @endforeach
                 @endif
             </div>
         </div>
     </div>
+</div>
 @endsection

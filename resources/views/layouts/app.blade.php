@@ -101,6 +101,37 @@
                             </div>
                         </li>
                         @endcan
+                        @can('menu-catalog')
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Catalog
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+
+                                @can('time-slot-list')
+                                <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
+                                @endcan
+                                @can('service-list')
+                                <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
+                                @endcan
+                                @can('service-category-list')
+                                <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
+                                @endcan
+                                @can('staff-zone-list')
+                                <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
+                                @endcan
+                                @can('staff-group-list')
+                                <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
+                                @endcan
+                                @can('FAQs-list')
+                                <a class="dropdown-item" href="{{ route('FAQs.index') }}">FAQs</a>
+                                @endcan
+                                @can('review-list')
+                                <a class="dropdown-item" href="{{ route('reviews.index') }}">Reviews</a>
+                                @endcan
+                            </div>
+                        </li>
+                        @endcan
                         @can('menu-store-config')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -110,18 +141,6 @@
                                 @can('setting-list')
                                 <a class="dropdown-item" href="{{ route('settings.index') }}">Settings</a>
                                 @endcan
-                                @can('review-list')
-                                <a class="dropdown-item" href="{{ route('reviews.index') }}">Reviews</a>
-                                @endcan
-                                @can('service-list')
-                                <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
-                                @endcan
-                                @can('service-category-list')
-                                <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
-                                @endcan
-                                @can('FAQs-list')
-                                <a class="dropdown-item" href="{{ route('FAQs.index') }}">FAQs</a>
-                                @endcan
                                 @can('holiday-list')
                                 <a class="dropdown-item" href="/holidays">Holidays</a>
                                 @endcan
@@ -130,15 +149,6 @@
                                 <a class="dropdown-item" href="{{ route('longHolidays.index') }}">Long Holiday</a>
                                 <a class="dropdown-item" href="{{ route('shortHolidays.index') }}">Short Holiday</a>
                                 <a class="dropdown-item" href="{{ route('staffGeneralHolidays.index') }}">Staff General Holiday</a>
-                                @endcan
-                                @can('staff-zone-list')
-                                <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
-                                @endcan
-                                @can('staff-group-list')
-                                <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
-                                @endcan
-                                @can('time-slot-list')
-                                <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
                                 @endcan
                             </div>
                         </li>
@@ -209,9 +219,7 @@
             </div>
         </nav>
         <main class="py-4">
-            <div class="container">
                 @yield('content')
-            </div>
         </main>
     </div>
     <footer class="text-muted">
@@ -226,9 +234,9 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-6">
             <h2>Time Slots</h2>
@@ -11,10 +12,10 @@
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <table class="table table-striped table-bordered">
@@ -34,22 +35,22 @@
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
             <td>@if($time_slot->status == 1)
-                    Enable
+                Enable
                 @else
-                    Disable
+                Disable
                 @endif
             </td>
             <td>
                 <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>
-                        @can('time-slot-edit')
-                        <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
-                        @endcan
-                        @csrf
-                        @method('DELETE')
-                        @can('time-slot-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        @endcan
+                    @can('time-slot-edit')
+                    <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
+                    @endcan
+                    @csrf
+                    @method('DELETE')
+                    @can('time-slot-delete')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    @endcan
                 </form>
             </td>
         </tr>
@@ -61,4 +62,5 @@
         @endif
     </table>
     {!! $time_slots->links() !!}
+</div>
 @endsection

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -7,16 +8,16 @@
             </div>
             <div class="float-end">
                 @can('driver-create')
-                    <a class="btn btn-success" href="{{ route('drivers.create') }}"> Create New Driver</a>
+                <a class="btn btn-success" href="{{ route('drivers.create') }}"> Create New Driver</a>
                 @endcan
             </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <span>{{ $message }}</span>
-            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
     <hr>
     <div class="row">
@@ -34,7 +35,7 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $driver->name }}</td>
                     <td>{{ $driver->email }}</td>
-                   
+
                     <td>
                         <form action="{{ route('drivers.destroy',$driver->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('drivers.show',$driver->id) }}">Show</a>
@@ -56,10 +57,11 @@
                 </tr>
                 @endif
             </table>
-        {!! $drivers->links() !!}
+            {!! $drivers->links() !!}
         </div>
         <div class="col-md-3">
-            <h3>Filter</h3><hr>
+            <h3>Filter</h3>
+            <hr>
             <form action="{{ route('drivers.index') }}" method="GET" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-12">
@@ -75,5 +77,5 @@
             </form>
         </div>
     </div>
-    
+</div>
 @endsection
