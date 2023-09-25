@@ -215,6 +215,8 @@ class OrderController extends Controller
             return view('orders.detail_edit', compact('order'));
         } elseif ($request->edit == "affiliate") {
             return view('orders.affiliate_edit', compact('order','affiliates'));
+        } elseif ($request->edit == "comment") {
+            return view('orders.comment_edit', compact('order'));
         }
         
     }
