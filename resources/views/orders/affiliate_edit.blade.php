@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 py-5 text-center">
-            <h2>Edit Order</h2>
+            <h2>Edit Order Affiliate</h2>
         </div>
     </div>
     <div class="container">
