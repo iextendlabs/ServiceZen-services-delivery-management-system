@@ -217,6 +217,8 @@ class OrderController extends Controller
             return view('orders.affiliate_edit', compact('order','affiliates'));
         } elseif ($request->edit == "comment") {
             return view('orders.comment_edit', compact('order'));
+        } elseif ($request->edit == "custom_location") {
+            return view('orders.custom_location', compact('order'));
         }
         
     }
@@ -230,6 +232,12 @@ class OrderController extends Controller
             $input['service_staff_id'] = $staff_id;
             $time_slot = TimeSlot::find($time_slot);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+        }
+
+        if ($request->has('custom_location')) {
+            [$latitude, $longitude] = explode(",", $request->custom_location);
+            $input['latitude'] = $latitude;
+            $input['longitude'] = $longitude;
         }
 
         $order = Order::find($id);

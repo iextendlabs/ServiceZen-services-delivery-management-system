@@ -26,6 +26,15 @@
     color: white
 }
 
+.scroll-div {
+    height: 330px;
+    /* Set the desired height */
+    overflow: hidden;
+    /* Hide overflow */
+    overflow-y: scroll;
+    /* Enable vertical scrolling */
+}
+
 input[type=radio]:checked+.staff-label {
     border: 1px solid green;
 }
