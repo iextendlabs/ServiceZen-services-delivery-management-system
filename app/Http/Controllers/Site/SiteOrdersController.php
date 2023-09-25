@@ -221,7 +221,7 @@ class SiteOrdersController extends Controller
         return view('site.orders.show', compact('order', 'reviews', 'averageRating'));
     }
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $order = Order::find($id);
         $area = $order->area;
@@ -233,50 +233,69 @@ class SiteOrdersController extends Controller
         $services = Service::all();
         $order_service = OrderService::where('order_id', $id)->pluck('service_id')->toArray();
 
-        return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area', 'services', 'order_service'));
+        if ($request->edit == "custom_location") {
+            return view('site.orders.custom_location', compact('order'));
+        } else {
+            return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area', 'services', 'order_service'));
+        }
     }
 
     public function update(Request $request, $id)
     {
-
-        $this->validate($request, [
-            'service_staff_id' => 'required'
-        ]);
+        if ($request->has('custom_location') == '') {
+            $this->validate($request, [
+                'service_staff_id' => 'required'
+            ]);
+        }
 
         $input = $request->all();
 
-        [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
-        $input['time_slot_id'] = $time_slot;
-        $input['service_staff_id'] = $staff_id;
         $order = Order::find($id);
 
-        $time_slot = TimeSlot::find($time_slot);
-        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+        if ($request->service_staff_id) {
 
-        $input['number'] = config('app.country_code') . $request->number;
-        $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
+            [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
+            $input['time_slot_id'] = $time_slot;
+            $input['service_staff_id'] = $staff_id;
 
-        $staff = User::find($input['service_staff_id']);
+            $time_slot = TimeSlot::find($time_slot);
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
-        $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($request->area) . "%"])->first();
+            $input['number'] = config('app.country_code') . $request->number;
+            $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
 
-        $services = Service::whereIn('id', $request->service_ids)->get();
+            $staff = User::find($input['service_staff_id']);
 
-        $sub_total = $services->sum(function ($service) {
-            return isset($service->discount) ? $service->discount : $service->price;
-        });
+            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($request->area) . "%"])->first();
 
-        $discount = $order->order_total->discount;
+            $services = Service::whereIn('id', $request->service_ids)->get();
 
-        $staff_charges = $staff->staff->charges ?? 0;
-        $transport_charges = $staffZone->transport_charges ?? 0;
-        $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+            $sub_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
 
-        $input['sub_total'] = (int)$sub_total;
-        $input['discount'] = (int)$discount;
-        $input['staff_charges'] = (int)$staff_charges;
-        $input['transport_charges'] = (int)$transport_charges;
-        $input['total_amount'] = (int)$total_amount;
+            $discount = $order->order_total->discount;
+
+            $staff_charges = $staff->staff->charges ?? 0;
+            $transport_charges = $staffZone->transport_charges ?? 0;
+            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+
+            $input['sub_total'] = (int)$sub_total;
+            $input['discount'] = (int)$discount;
+            $input['staff_charges'] = (int)$staff_charges;
+            $input['transport_charges'] = (int)$transport_charges;
+            $input['total_amount'] = (int)$total_amount;
+
+            $staff = User::find($staff_id);
+            $order->staff_name = $staff->name;
+        }
+
+        if ($request->has('custom_location')) {
+            [$latitude, $longitude] = explode(",", $request->custom_location);
+            $input['latitude'] = $latitude;
+            $input['longitude'] = $longitude;
+        }
+
         $order->update($input);
 
         $input['order_id'] = $id;
@@ -304,8 +323,7 @@ class SiteOrdersController extends Controller
             }
         }
 
-        $staff = User::find($staff_id);
-        $order->staff_name = $staff->name;
+        
         $order->save();
         return redirect()->route('order.index')
             ->with('success', 'Order updated successfully');
