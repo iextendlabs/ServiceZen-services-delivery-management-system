@@ -260,6 +260,7 @@ class OrderController extends Controller
             $input['order_id'] = $order->id;
             $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
             $input['amount'] = (($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
+            $input['type'] = "Order Commission";
             $input['status'] = 'Approved';
             Transaction::create($input);
         }
@@ -268,6 +269,7 @@ class OrderController extends Controller
             $input['user_id'] = $order->service_staff_id;
             $input['order_id'] = $order->id;
             $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+            $input['type'] = "Order Commission";
             $input['status'] = 'Approved';
             Transaction::create($input);
         }
@@ -325,6 +327,7 @@ class OrderController extends Controller
             $input['order_id'] = $order->id;
             $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
             $input['amount'] = (($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
+            $input['type'] = "Order Commission";
             $input['status'] = 'Approved';
             Transaction::create($input);
         }
@@ -333,6 +336,7 @@ class OrderController extends Controller
             $input['user_id'] = $order->service_staff_id;
             $input['order_id'] = $order->id;
             $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+            $input['type'] = "Order Commission";
             $input['status'] = 'Approved';
             Transaction::create($input);
         }

@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffImages;
 use App\Models\StaffYoutubeVideo;
+use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -39,6 +40,7 @@ class HomeController extends Controller
 
         $currentDate = Carbon::today()->toDateString();
         $currentUser = Auth::user();
+        $currentMonth = Carbon::now()->startOfMonth();
 
         if (Auth::check()) {
             if ($currentUser->hasRole('Customer') || $currentUser->hasRole('Affiliate')) {
@@ -86,7 +88,25 @@ class HomeController extends Controller
                 }
 
                 $i = 0;
-                return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i'));
+
+                $staff_total_balance = Transaction::where('user_id', $currentUser->id)->sum('amount');
+
+                $staff_product_sales = Transaction::where('type', 'Product Sale')
+                    ->where('created_at', '>=', $currentMonth)
+                    ->where('user_id', $currentUser->id)
+                    ->sum('amount');
+
+                $staff_bonus = Transaction::where('type', 'Bonus')
+                    ->where('created_at', '>=', $currentMonth)
+                    ->where('user_id', $currentUser->id)
+                    ->sum('amount');
+
+                $staff_order_commission = Transaction::where('type', 'Order Commission')
+                    ->where('created_at', '>=', $currentMonth)
+                    ->where('user_id', $currentUser->id)
+                    ->sum('amount');
+
+                return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i','staff_total_balance','staff_product_sales','staff_bonus','staff_order_commission'));
             }
         }
     }
@@ -95,8 +115,8 @@ class HomeController extends Controller
     public function profile($id)
     {
         $user = User::find($id);
-        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
-        return view('profile', compact('user','socialLinks'));
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        return view('profile', compact('user', 'socialLinks'));
     }
 
     public function updateProfile(Request $request, $id)
@@ -123,10 +143,10 @@ class HomeController extends Controller
 
             if ($request->gallery_images) {
                 $images = $request->gallery_images;
-    
+
                 foreach ($images as $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-    
+
                     $image->move(public_path('staff-images'), $filename);
                     StaffImages::create([
                         'image' => $filename,
