@@ -96,7 +96,7 @@
                         @can('order-comment-edit')
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
                         @endcan
-                        <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Custom Location</a>
+                        <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
                     </div>
                 </li>
             </ul>

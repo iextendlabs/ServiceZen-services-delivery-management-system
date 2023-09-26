@@ -7,8 +7,36 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 py-5 text-center">
-            <h2>Order</h2>
+        <div class="col-md-12 margin-tb">
+            <div class="float-start">
+                <h2>Orders</h2>
+            </div>
+            <div class="float-end no-print">
+                @can('order-download')
+                <button type="button" class="btn ml-1 btn-primary float-end" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
+                @endcan
+                @can('order-booking-edit')
+                <a class="btn btn-success float-end" href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
+                @endcan
+                @can('order-status-edit')
+                @if(auth()->user()->getRoleNames() == '["Supervisor"]' && $order->status == 'Pending')
+                <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                @elseif(auth()->user()->getRoleNames() != '["Supervisor"]')
+                <a class="btn btn-info float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                @endif
+                @endcan
+                @can('order-detail-edit')
+                <a class="btn btn-warning float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
+                @endcan
+                @can('order-affiliate-edit')
+                <a class="btn btn-primary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=affiliate">Affiliate Edit</a>
+                @endcan
+                @can('order-comment-edit')
+                <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
+                @endcan
+                <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
+                
+            </div>
         </div>
     </div>
     <div class="container">
@@ -29,9 +57,7 @@
                 </ul>
             </div>
             @endif
-            @can('order-download')
-            <button type="button" class="btn mb-2 btn-primary float-end no-print" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
-            @endcan
+            
             <table class="table table-striped table-bordered album bg-light">
                 <td class="text-left" colspan="2">Order Details</td>
                 <tr>
@@ -90,7 +116,8 @@
                 </tr>
                 <tr>
                     <td colspan="3" class="text-left">
-                        <b>Location of customer:</b> <a href="https://maps.google.com/maps?q={{ $order->latitude }},+{{ $order->longitude }}" target="_blank">click</a>
+                        <b>Location of customer:</b> <a href="https://maps.google.com/maps?q={{ $order->latitude }},+{{ $order->longitude }}" target="_blank">click</a><br><br>
+                        <a class="btn btn-secondary mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
                     </td>
                 </tr>
             </table>
