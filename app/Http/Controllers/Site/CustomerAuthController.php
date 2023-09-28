@@ -73,10 +73,15 @@ class CustomerAuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
 
-            if (!Auth::user()->hasRole('Customer') && !Auth::user()->hasRole('Affiliate'))
+            if (!Auth::user()->hasRole('Customer') && !Auth::user()->hasRole('Affiliate')) {
                 return redirect('/admin');
-            return redirect('/')
-                ->with('success', 'You have Successfully loggedin');
+            } else {
+                if (Auth::user()->hasRole('Affiliate')) {
+                    return redirect('/affiliate_dashboard')->with('success', 'You have Successfully loggedin');
+                } else {
+                    return redirect('/')->with('success', 'You have Successfully loggedin');
+                }
+            }
         }
 
         return redirect("customer-login")->with('error', 'Oppes! You have entered invalid credentials');
