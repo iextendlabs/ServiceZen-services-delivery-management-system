@@ -116,12 +116,17 @@ class CheckOutController extends Controller
         $address['whatsapp'] = config('app.country_code') . $request->whatsapp;
         $address['email'] = $request->email;
         $address['name'] = $request->name;
-        $address['latitude'] = $request->latitude;
-        $address['longitude'] = $request->longitude;
         $address['searchField'] = $request->searchField;
         $address['update_profile'] = $request->update_profile;
         $address['gender'] = $request->gender;
-
+        if($request->custom_location){
+            [$latitude, $longitude] = explode(",", $request->custom_location);
+            $address['latitude'] = $latitude;
+            $address['longitude'] = $longitude;
+        }else{
+            $address['latitude'] = $request->latitude;
+            $address['longitude'] = $request->longitude;
+        }
         $staff_and_time = [];
 
         $staff_and_time['date'] = $request->date;
@@ -162,7 +167,6 @@ class CheckOutController extends Controller
 
     public function bookingStep(Request $request)
     {
-
         if ($request->cookie('address') !== null) {
             $addresses = json_decode($request->cookie('address'), true);
         // if (Session::get('address')) {
