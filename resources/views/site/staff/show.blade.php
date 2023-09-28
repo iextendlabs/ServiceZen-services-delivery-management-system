@@ -79,11 +79,40 @@
             <hr>
             <!-- Staff Gallery -->
             @if(count($user->staffYoutubeVideo))
-            <div class="col-md-12 text-center mt-3 mb-3">
-                @foreach($user->staffYoutubeVideo as $staffYoutubeVideo)
-                <iframe width="592" height="333" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                @endforeach
+            
+            <div class="col-md-12 mt-2 mb-3">
+                <div id="videoCarousel" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        @foreach($user->staffYoutubeVideo->chunk(2) as $key => $chunk)
+                        <li data-target="#videoCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
+                        @endforeach
+                    </ol>
+                    <div class="carousel-inner">
+                        @foreach($user->staffYoutubeVideo->chunk(2) as $chunk)
+                        <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                            <div class="row">
+                                @foreach($chunk as $staffYoutubeVideo)
+                                <div class="col-md-6">
+                                <iframe width="562" height="323" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <a class="carousel-control-prev" href="#videoCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#videoCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+
             </div>
+
+            
             @endif
             @if(count($user->staffImages))
             <div class="col-md-12 mt-2 mb-3">
@@ -133,49 +162,71 @@
             @endif
             @endforeach
         </div>
-        <h3 class="text-center">Reviews</h3>
-        <div class="row scroll-div">
-            @if($reviews)
-            @foreach($reviews as $review)
-            <div class="col-md-5 offset-md-4">
-                <div class="card m-2">
-                    <div class="card-body">
-                        <h5 class="card-title">{{$review->user_name}}</h5>
-                        <p class="card-text" style="height: 50px;">{{$review->content}}</p>
-                        <div class="star-rating">
-                            @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
-                                <span class="text-warning">&#9733;</span>
-                                @else
-                                <span class="text-muted">&#9734;</span>
-                                @endif
-                                @endfor
+        <div class="col-md-12">
+            <h2 class="text-center">Customer Reviews</h2>
+            <div id="reviewsCarousel" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    @foreach($reviews->chunk(3) as $key => $chunk)
+                    <li data-target="#reviewsCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
+                    @endforeach
+                </ol>
+                <div class="carousel-inner">
+                    @foreach($reviews->chunk(3) as $chunk)
+                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                        <div class="row">
+                            @foreach($chunk as $review)
+                            <div class="col-md-4">
+                                <div class="card mb-4 text-center">
+                                    <div class="card-body" style="height: 215px !important">
+                                        <h5 class="card-title">{{ $review->user_name }}</h5>
+                                        <p class="card-text">{{ $review->content }}</p>
+                                        <p class="card-text">
+                                            @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
+                                                <span class="text-warning">&#9733;</span>
+                                                @else
+                                                <span class="text-muted">&#9734;</span>
+                                                @endif
+                                                @endfor
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
                     </div>
+                    @endforeach
                 </div>
+                <a class="carousel-control-prev" href="#reviewsCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#reviewsCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
             </div>
-            @endforeach
-            @endif
-            </div>
-            <div class="row">
-            <div class="col-md-5 offset-md-4">
-
-                @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
-                    @else
-                    <span class="text-muted">&#9734;</span>
-                    @endif
-                    @endfor
-                    {{count($reviews)}} Reviews
-                    @if(auth()->check())
-                    <button class="btn btn-block btn-primary" id="review">Write a review</button>
-                    @endif
-                    <div id="review-form" style="display: none;">
-                        @include('site.reviews.create')
-                    </div>
-            </div>
-            </div>
-
         </div>
+        <div class="col-md-12 text-center mb-2">
+            @for($i = 1; $i <= 5; $i++)
+             @if($i <=$averageRating)
+              <span class="text-warning">&#9733;</span>
+                @else
+              <span class="text-muted">&#9734;</span>
+                @endif
+            @endfor
+            <span>{{count($reviews)}} Reviews</span><br>
+            <a class="btn btn-primary" href="{{ route('siteReviews.index') }}">All Reviews</a>
+        </div>
+        @if(auth()->check())
+        <div class="col-md-12 text-center">
+            <button class="btn btn-primary" id="review">Write a Review</button>
+        </div>
+        <div class="col-md-6" id="review-form" style="display: none;">
+            @include('site.reviews.create')
+        </div>
+        @endif
     </div>
+</div>
 </div>
 </div>
 <script>
