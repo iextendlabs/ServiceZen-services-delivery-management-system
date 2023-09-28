@@ -6,6 +6,60 @@
         <div class="col-md-12 py-5 text-center">
             <h2>Dashboard</h2>
         </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Salary</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-credit-card"></i>
+                    <span class="float-end">Rs.{{$user->affiliate->fix_salary * $pkrRateValue ?? null }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Total Balance</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-credit-card"></i>
+                    <span class="float-end">Rs.{{ $total_balance }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Product Sale of {{ now()->format('F') }}</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-pkr-sign"></i>
+                    <span class="float-end"><b>Rs.</b>{{ $product_sales }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Rs.Total Bonus of {{ now()->format('F') }}</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-pkr-sign"></i>
+                    <span class="float-end"><b>Rs.</b>{{ $bonus }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Total Order Commission of {{ now()->format('F') }}</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-pkr-sign"></i>
+                    <span class="float-end"><b>Rs.</b>{{ $order_commission }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Other Income of {{ now()->format('F') }}</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-pkr-sign"></i>
+                    <span class="float-end"><b>Rs.</b>{{ $other_income }}</span>
+                </div>
+            </div>
+        </div>
     </div>
     <div>
         @if ($errors->any())
@@ -18,7 +72,7 @@
             </ul>
         </div>
         @endif
-        
+
         <div class="row">
             <div class="col-md-12">
                 <a href="{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}">My Affiliate URL</a>

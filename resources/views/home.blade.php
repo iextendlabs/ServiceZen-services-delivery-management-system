@@ -51,7 +51,7 @@
         </div>
         @endif
         @if(auth()->user()->getRoleNames() == '["Staff"]')
-        <div class="col-md-4">
+        <div class="col-md-4 py-2">
             <div class="card">
                 <div class="card-header">Salary</div>
                 <div class="card-body analytic">
@@ -60,7 +60,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 py-2">
             <div class="card">
                 <div class="card-header">Total Balance</div>
                 <div class="card-body analytic">
@@ -69,7 +69,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 py-2">
             <div class="card">
                 <div class="card-header">Product Sale of {{ now()->format('F') }}</div>
                 <div class="card-body analytic">
@@ -78,7 +78,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 py-2">
             <div class="card">
                 <div class="card-header">Total Bonus of {{ now()->format('F') }}</div>
                 <div class="card-body analytic">
@@ -87,12 +87,21 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 py-2">
             <div class="card">
                 <div class="card-header">Total Order Commission of {{ now()->format('F') }}</div>
                 <div class="card-body analytic">
                     <i class="fa fa-dollar-sign"></i>
                     <span class="float-end">@currency($staff_order_commission)</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 py-2">
+            <div class="card">
+                <div class="card-header">Other Income of {{ now()->format('F') }}</div>
+                <div class="card-body analytic">
+                    <i class="fa fa-dollar-sign"></i>
+                    <span class="float-end">@currency($staff_other_income)</span>
                 </div>
             </div>
         </div>

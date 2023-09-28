@@ -106,7 +106,12 @@ class HomeController extends Controller
                     ->where('user_id', $currentUser->id)
                     ->sum('amount');
 
-                return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i','staff_total_balance','staff_product_sales','staff_bonus','staff_order_commission'));
+                $staff_other_income = Transaction::where('type', 'Debit')
+                    ->where('created_at', '>=', $currentMonth)
+                    ->where('user_id', $currentUser->id)
+                    ->sum('amount');
+
+                return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission','staff_other_income'));
             }
         }
     }
