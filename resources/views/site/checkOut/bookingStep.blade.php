@@ -131,7 +131,7 @@
                     <div class="col-md-12">
                     <div class="form-group">
                         <strong>Custom Location:</strong>
-                        <input type="text" name="custom_location" class="form-control" value="{{ old('custom_location') }}">
+                        <input type="text" name="custom_location" class="form-control" value="{{ old('custom_location') }}" placeholder="32.3335, 65.23223">
                     </div>
                 </div>
                     <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') ? old('latitude') : $addresses['latitude'] }}">

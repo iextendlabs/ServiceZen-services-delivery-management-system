@@ -112,7 +112,7 @@ class AffiliateController extends Controller
         $total_balance = 0;
 
         $total_balance = Transaction::where('user_id', $affiliate->id)->sum('amount');
-        $total_balance_in_pkr = $total_balance * $pkrRateValue;
+        $total_balance_in_pkr =number_format(($total_balance * $pkrRateValue), 2);
 
         $product_sales = Transaction::where('type', 'Product Sale')
             ->where('created_at', '>=', $currentMonth)

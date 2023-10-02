@@ -133,7 +133,7 @@
         <div class="col-md-6">
             <h3>Add Transaction</h3>
             <p>Current balance is: <b>@currency($total_balance)</b></p>
-            <p>Current balance with salary is: <b>{{config('app.currency')}} ({{$total_balance .'+'. $serviceStaff->staff->fix_salary}})</b></p>
+            <p>Current balance with salary is: <b>@currency($total_balance)+ @currency($serviceStaff->staff->fix_salary)</b></p>
             <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
                 @csrf
                 <input type="hidden" name="user_id" value="{{ $serviceStaff->id }}">

@@ -216,6 +216,7 @@
                     </div>
                     <div class="card-body text-center">
                       <h5 class="card-title">{{ $staff->name }}</h5>
+                      <p class="card-title">Extra Charges:<b>@currency($staff->staff->charges)</b></p>
                       <a href="{{ route('staffProfile.show',$staff->id) }}" class="btn btn-block btn-primary">View</a>
                       @for($i = 1; $i <= 5; $i++) @if($i <=$staff->averageRating()) <span class="text-warning">&#9733;</span>
                         @else

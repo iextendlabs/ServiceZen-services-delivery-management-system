@@ -124,7 +124,7 @@
         <div class="col-md-6">
             <h3>Add Transaction</h3>
             <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
-            <p>Current balance with salary is: <b>{{config('app.currency')}} ({{$total_balance .'+'. $affiliate->affiliate->fix_salary }}) Rs.({{ $total_balance_in_pkr .'+'. $pkrRateValue * $affiliate->affiliate->fix_salary }})</b></p>
+            <p>Current balance with salary is: <b>@currency($total_balance)+@currency($affiliate->affiliate->fix_salary) Rs.({{ $total_balance_in_pkr .'+'. $pkrRateValue * $affiliate->affiliate->fix_salary }})</b></p>
             <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
                 @csrf
                 <input type="hidden" name="user_id" value="{{ $affiliate->id }}">
