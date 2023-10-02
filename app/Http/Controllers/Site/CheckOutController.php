@@ -119,7 +119,7 @@ class CheckOutController extends Controller
         $address['searchField'] = $request->searchField;
         $address['update_profile'] = $request->update_profile;
         $address['gender'] = $request->gender;
-        if($request->custom_location){
+        if($request->custom_location && strpos($request->custom_location, ",") != FALSE){
             [$latitude, $longitude] = explode(",", $request->custom_location);
             $address['latitude'] = $latitude;
             $address['longitude'] = $longitude;

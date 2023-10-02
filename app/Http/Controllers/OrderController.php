@@ -234,7 +234,7 @@ class OrderController extends Controller
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
         }
 
-        if ($request->has('custom_location')) {
+        if ($request->has('custom_location') && strpos($request->custom_location, ",") != FALSE) {
             [$latitude, $longitude] = explode(",", $request->custom_location);
             $input['latitude'] = $latitude;
             $input['longitude'] = $longitude;

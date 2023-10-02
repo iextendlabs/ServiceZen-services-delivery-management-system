@@ -290,7 +290,7 @@ class SiteOrdersController extends Controller
             $order->staff_name = $staff->name;
         }
 
-        if ($request->has('custom_location')) {
+        if ($request->has('custom_location') && strpos($request->custom_location, ",") != FALSE) {
             [$latitude, $longitude] = explode(",", $request->custom_location);
             $input['latitude'] = $latitude;
             $input['longitude'] = $longitude;

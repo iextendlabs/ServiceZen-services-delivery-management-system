@@ -56,11 +56,13 @@
             @endif
             @endcan
             @if($order->status == 'Complete') <br><br>
+            @if(auth()->user()->getRoleNames() != '["Supervisor"]')
             @if(!$order->cashCollection)
             <a href="{{ route('cashCollection.create',$order->id) }}">
                 <i class="fas fa-money-bill"></i> Create
             </a>
 
+            @endif
             @endif
             @endif
         </td>
