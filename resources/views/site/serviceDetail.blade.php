@@ -44,9 +44,11 @@
     <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
 
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-1"></div>
+      <div class="col-md-6">
         <img src="./service-images/{{ $service->image }}" alt="Card image cap" height="auto" width="100%">
       </div>
+      <div class="col-md-1"></div>
       <div class="col-md-4 box-shadow">
         <div class="card-body">
           <p id="price" class="text-muted">

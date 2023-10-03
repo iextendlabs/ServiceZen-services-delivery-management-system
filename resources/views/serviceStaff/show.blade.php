@@ -105,7 +105,7 @@
                 <td>{{ ++$i }}</td>
                 <td>{{ $transaction->created_at }}</td>
                 <td>{{ $transaction->type }}</td>
-                <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else {{ $transaction->description }} @endif </td>
+                <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else {{ substr($transaction->description,0,70) }} @endif </td>
                 <td>@currency($transaction->amount)</td>
                 <td>
                     <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">

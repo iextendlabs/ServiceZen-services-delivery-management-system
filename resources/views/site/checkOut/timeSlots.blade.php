@@ -65,15 +65,15 @@
                         @php
                         $booked_counter ++
                         @endphp
-                        
+
                         @endif
 
-                        
+
                         @if(!in_array($staff->id, $timeSlot->excluded_staff))
                         @php
                         $holiday_counter ++
                         @endphp
-                        
+
                         @endif
 
 
@@ -86,6 +86,13 @@
                             <div class="p-2">
                                 <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100">
                                 <p class="text-center">{{ $staff->name }}</p>
+                                @for($i = 1; $i <= 5; $i++) @if($i <=$staff->averageRating()) <span class="text-warning">&#9733;</span>
+                                    @else
+                                    <span class="text-muted">&#9734;</span>
+                                    @endif
+                                    @endfor
+                                    <br>
+                                    ({{ count($staff->reviews)}} Reviews)
                             </div>
                         </label>
                         @endif
@@ -97,9 +104,9 @@
                             @else
                             <strong>Whoops!</strong>Staff is Booked Already for this slot.
                             @endif
-                            ( On Holiday : {{$holiday_counter}}) 
-                            
-                            ( On Booking : {{$booked_counter}}) 
+                            ( On Holiday : {{$holiday_counter}})
+
+                            ( On Booking : {{$booked_counter}})
                         </div>
                         @endif
                     </div>
@@ -140,11 +147,11 @@
 <div class="col-md-12">
     <div class="form-group" id="detail-container">
         <strong>Selected Time Slot:</strong><span id="selected-time-slot">
-        @if(isset($order))
+            @if(isset($order))
             @if(isset($order->time_slot))
             {{ $order->time_slot_value }}
             @endif
-        @endif
+            @endif
         </span>
         <br>
         <strong>Selected Staff:</strong><span id="selected-staff">{{ isset($order) ? $order->staff_name : null }}</span>
