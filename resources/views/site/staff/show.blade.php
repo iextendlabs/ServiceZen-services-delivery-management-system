@@ -28,6 +28,7 @@
         <div class="row">
             <div class="col-md-12 text-center">
                 <h2>{{ $user->name }}</h2>
+                <h2>{{ $user->staff->sub_title }}</h2>
                 <hr>
             </div>
             <div class="col-md-4 text-center">

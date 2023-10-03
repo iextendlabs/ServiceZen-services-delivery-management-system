@@ -46,6 +46,12 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Sub Title / Designation</strong>
+                            <input type="text" name="sub_title" class="form-control" value="{{ $serviceStaff->staff->sub_title }}" placeholder="Sub Title">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <span style="color: red;">*</span><strong>Email:</strong>
                             <input type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
                         </div>
