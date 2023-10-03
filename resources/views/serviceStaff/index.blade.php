@@ -28,6 +28,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Status</th>
+                    <th>Sub Title / Designation</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($serviceStaff))
@@ -37,6 +38,7 @@
                     <td>{{ $staff->name }}</td>
                     <td>{{ $staff->email }}</td>
                     <td>@if($staff->staff->status == 1) Enabled @else Disabled @endif</td>
+                    <td>{{ $staff->staff->sub_title }}</td>
                     <td>
                         <form action="{{ route('serviceStaff.destroy',$staff->id) }}" method="POST">
                             <a class="btn btn-warning" href="{{ route('serviceStaff.show',$staff->id) }}"><i class="fa fa-eye"></i></a>
