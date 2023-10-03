@@ -39,8 +39,9 @@ class ReviewController extends Controller
     {
         $services = Service::all();
         $user = User::find(Auth::user()->id);
+        $staffs = User::role('Staff')->get();
 
-        return view('reviews.create', compact('user', 'services'));
+        return view('reviews.create', compact('user', 'services','staffs'));
     }
 
     /**
@@ -109,8 +110,9 @@ class ReviewController extends Controller
     {
         $review = Review::find($id);
         $services = Service::all();
+        $staffs = User::role('Staff')->get();
 
-        return view('reviews.edit', compact('review', 'services'));
+        return view('reviews.edit', compact('review', 'services','staffs'));
     }
 
     /**

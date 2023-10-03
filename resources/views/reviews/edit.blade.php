@@ -39,6 +39,17 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Staff:</strong>
+                <select name="staff_id" class="form-control">
+                    <option></option>
+                    @foreach($staffs as $staff)
+                    <option value="{{ $staff->id }}" @if($staff->id == $review->staff_id) selected @endif>{{ $staff->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <span style="color: red;">*</span><strong>Review:</strong>
                 <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{ $review->content }}</textarea>
             </div>
