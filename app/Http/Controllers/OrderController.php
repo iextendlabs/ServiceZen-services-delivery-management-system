@@ -71,11 +71,8 @@ class OrderController extends Controller
                     ->orderBy('time_start')
                     ->where(function ($query) {
                         // Get orders with status 'complete' and no cashCollection
-                        $query->where('status', 'complete')
+                        $query->whereIn('status', ['Complete', 'Pending','Accepted'])
                             ->whereDoesntHave('cashCollection');
-                    })->orWhere(function ($query) {
-                        // Get orders with status other than 'complete'
-                        $query->where('status', '<>', 'complete');
                     });
                 break;
 
