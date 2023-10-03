@@ -61,7 +61,7 @@ class HomeController extends Controller
                         break;
 
                     case 'Staff':
-                        $orders = Order::where('service_staff_id', Auth::id())->where('status', '!=', "Rejected")->orderBy('date', 'DESC')->where('date', '<=', $currentDate)->take(10)->get();
+                        $orders = Order::where('service_staff_id', Auth::id())->where('status', '!=', "Rejected")->orderBy('date', 'DESC')->where('date', '<=', $currentDate)->where('status','Pending')->take(10)->get();
                         break;
 
                     default:

@@ -66,7 +66,17 @@ class OrderController extends Controller
                 break;
 
             case 'Staff':
-                $query = Order::where('service_staff_id', Auth::id())->orderBy('date', 'ASC')->orderBy('time_start');
+                $query = Order::where('service_staff_id', Auth::id())
+                    ->orderBy('date', 'ASC')
+                    ->orderBy('time_start')
+                    ->where(function ($query) {
+                        // Get orders with status 'complete' and no cashCollection
+                        $query->where('status', 'complete')
+                            ->whereDoesntHave('cashCollection');
+                    })->orWhere(function ($query) {
+                        // Get orders with status other than 'complete'
+                        $query->where('status', '<>', 'complete');
+                    });
                 break;
 
             default:
@@ -82,7 +92,7 @@ class OrderController extends Controller
             if ($request->status) {
                 $query->where('status', '=', $request->status);
             } else {
-                $query->where('status', '!=', "Rejected");
+                $query->whereNotIn('status', ['Rejected', 'Canceled']);
             }
         } else {
             if ($request->status) {
@@ -214,13 +224,12 @@ class OrderController extends Controller
         } elseif ($request->edit == "address") {
             return view('orders.detail_edit', compact('order'));
         } elseif ($request->edit == "affiliate") {
-            return view('orders.affiliate_edit', compact('order','affiliates'));
+            return view('orders.affiliate_edit', compact('order', 'affiliates'));
         } elseif ($request->edit == "comment") {
             return view('orders.comment_edit', compact('order'));
         } elseif ($request->edit == "custom_location") {
             return view('orders.custom_location', compact('order'));
         }
-        
     }
 
     public function update(Request $request, $id)
@@ -305,7 +314,7 @@ class OrderController extends Controller
     public function updateOrderStatus(Order $order, Request $request)
     {
         $order->status = $request->status;
-        
+
         $input['order_id'] = $order->id;
         $input['user'] = Auth::user()->name;
         $input['status'] = $request->status;
