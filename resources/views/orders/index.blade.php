@@ -192,13 +192,11 @@
 
 
                 @include('orders.list')
-                @if(auth()->user()->getRoleNames() != '["Staff"]')
                 {!! $orders->links() !!}
                 <div class="row pagination-summary">
                     <div class="col-6">Total Records <i class="fas fa-chart-bar"></i> {{ $orders->total() }}</div>
                     <div class="col-6">Showing {{ $orders->firstItem() }} - {{ $orders->lastItem() }} of {{ $orders->total() }}</div>
                 </div>
-                @endif
             </div>
         </div>
     </div>
