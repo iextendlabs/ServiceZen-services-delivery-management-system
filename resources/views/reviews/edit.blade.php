@@ -41,10 +41,14 @@
             <div class="form-group">
                 <strong>Staff:</strong>
                 <select name="staff_id" class="form-control">
+                    @if(auth()->user()->hasRole('Staff'))
+                        <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}</option>
+                    @else
                     <option></option>
                     @foreach($staffs as $staff)
                     <option value="{{ $staff->id }}" @if($staff->id == $review->staff_id) selected @endif>{{ $staff->name }}</option>
                     @endforeach
+                    @endif
                 </select>
             </div>
         </div>

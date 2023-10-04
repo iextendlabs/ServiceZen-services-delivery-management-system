@@ -25,7 +25,11 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        $reviews = Review::latest()->paginate(config('app.paginate'));
+        if(auth()->user()->hasRole('Staff')){
+            $reviews = Review::where('staff_id',auth()->user()->id)->latest()->paginate(config('app.paginate'));
+        }else{
+            $reviews = Review::latest()->paginate(config('app.paginate'));
+        }
         return view('reviews.index', compact('reviews'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
@@ -38,10 +42,9 @@ class ReviewController extends Controller
     public function create()
     {
         $services = Service::all();
-        $user = User::find(Auth::user()->id);
         $staffs = User::role('Staff')->get();
 
-        return view('reviews.create', compact('user', 'services','staffs'));
+        return view('reviews.create', compact('services','staffs'));
     }
 
     /**
