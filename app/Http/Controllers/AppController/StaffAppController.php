@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Transaction;
 
 class StaffAppController extends Controller
 
@@ -23,17 +24,17 @@ class StaffAppController extends Controller
 
         if ($request->status == 'Complete') {
             $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
-            ->where(function ($query) {
-                // Filter orders with cash collection status not approved
-                $query->where('cash_collections.status', '!=', 'approved')
-                      // Filter orders without any associated cash collection
-                      ->orWhereNull('cash_collections.status');
-            })
-            ->where('orders.service_staff_id', $request->user_id)
-            ->where('orders.status', $request->status)
-            ->where('orders.date', '<=', $currentDate)
-            ->limit(config('app.staff_order_limit'))
-            ->get(['orders.*', 'cash_collections.status as cash_status']);
+                ->where(function ($query) {
+                    // Filter orders with cash collection status not approved
+                    $query->where('cash_collections.status', '!=', 'approved')
+                        // Filter orders without any associated cash collection
+                        ->orWhereNull('cash_collections.status');
+                })
+                ->where('orders.service_staff_id', $request->user_id)
+                ->where('orders.status', $request->status)
+                ->where('orders.date', '<=', $currentDate)
+                ->limit(config('app.staff_order_limit'))
+                ->get(['orders.*', 'cash_collections.status as cash_status']);
         } else {
             $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->where('date', '<=', $currentDate)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
         }
@@ -86,6 +87,34 @@ class StaffAppController extends Controller
 
     public function orderStatusUpdate(Order $order, Request $request)
     {
+        if ($request->status == "Complete") {
+            if (isset($order->affiliate)) {
+                $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+            }
+
+            if (isset($order->staff->commission)) {
+                $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
+            }
+
+            if (isset($order->affiliate) && !isset($affiliate_transaction)) {
+                $input['user_id'] = $order->affiliate->id;
+                $input['order_id'] = $order->id;
+                $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
+                $input['amount'] = (($order->order_total->sub_total - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
+                $input['type'] = "Order Commission";
+                $input['status'] = 'Approved';
+                Transaction::create($input);
+            }
+
+            if (isset($order->staff->commission) && !isset($staff_transaction)) {
+                $input['user_id'] = $order->service_staff_id;
+                $input['order_id'] = $order->id;
+                $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+                $input['type'] = "Order Commission";
+                $input['status'] = 'Approved';
+                Transaction::create($input);
+            }
+        }
 
         $order->status = $request->status;
         $order->save();
@@ -136,11 +165,12 @@ class StaffAppController extends Controller
             ->header('Access-Control-Allow-Headers', 'Content-Type');
     }
 
-    public function cashCollection($order_id, Request $request){
-    
+    public function cashCollection($order_id, Request $request)
+    {
+
         $cashCollection = CashCollection::where('order_id', $order_id)->first();
 
-        if(empty($cashCollection)){
+        if (empty($cashCollection)) {
             $staff = User::find($request->user_id);
             $input['order_id'] = $order_id;
             $input['description'] = $request->description;
@@ -150,7 +180,7 @@ class StaffAppController extends Controller
             $input['status'] = 'Not Approved';
 
             CashCollection::create($input);
-        }else{
+        } else {
             $cashCollection->description = $request->description;
             $cashCollection->amount = $request->amount;
             $cashCollection->save();
