@@ -13,6 +13,8 @@ use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Storage;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
 
 class StaffAppController extends Controller
 
@@ -153,6 +155,7 @@ class StaffAppController extends Controller
     }
 
     public function cashCollection(Request $request){
+
         $cashCollection = CashCollection::where('order_id', $request->order_id)->first();
         
         if(empty($cashCollection)){
@@ -164,12 +167,14 @@ class StaffAppController extends Controller
             $input['staff_id'] = $request->user_id;
             $input['status'] = 'Not Approved';
             
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('cash-collections-images'), $imageName);
-                $input['image'] = $imageName;
-            }
+            $parts        = explode(";base64,", $request->image);
+            $imageparts   = explode("image/", @$parts[0]);
+            $imagetype    = $imageparts[1];
+            $imagebase64  = base64_decode($parts[1]);
+            $file         = $request->order_id . '.' . $imagetype;
+            Storage::disk('public')->put('cash-collections-images/'. $file, $imagebase64);
+            
+            $input['image'] = $file;
             
             CashCollection::create($input);
         }else{
