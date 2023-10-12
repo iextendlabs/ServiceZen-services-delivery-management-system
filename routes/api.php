@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController\{
-    StaffAppController,
+    StaffAppController2,
     DriverAppController
 };
 /*
@@ -22,16 +22,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::get('orders', [StaffAppController::class, 'orders']);
-Route::post('login', [StaffAppController::class, 'login']);
-Route::post('addOrderComment', [StaffAppController::class, 'addComment']);
-Route::post('cashCollection', [StaffAppController::class, 'cashCollection']);
-Route::post('orderStatusUpdate', [StaffAppController::class, 'orderStatusUpdate']);
-Route::post('rescheduleOrder', [StaffAppController::class, 'rescheduleOrder']);
-Route::get('timeSlots', [StaffAppController::class, 'timeSlots']);
+Route::get('orders', [StaffAppController2::class, 'orders']);
+Route::post('login', [StaffAppController2::class, 'login']);
+Route::post('addOrderComment', [StaffAppController2::class, 'addComment']);
+Route::post('cashCollection', [StaffAppController2::class, 'cashCollection']);
+Route::post('orderStatusUpdate', [StaffAppController2::class, 'orderStatusUpdate']);
+Route::post('rescheduleOrder', [StaffAppController2::class, 'rescheduleOrder']);
+Route::get('timeSlots', [StaffAppController2::class, 'timeSlots']);
 
 // Driver app       
 
-Route::get('driverAppOrders', [DriverAppController::class, 'orders']);
-Route::get('driverAppUser', [DriverAppController::class, 'user']);
-Route::get('driverAppOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
+Route::get('driverOrders', [DriverAppController::class, 'orders']);
+Route::post('driverLogin', [DriverAppController::class, 'login']);
+Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);

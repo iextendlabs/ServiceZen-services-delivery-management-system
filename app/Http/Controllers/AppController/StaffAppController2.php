@@ -13,8 +13,10 @@ use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Storage;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
 
-class StaffAppController extends Controller
+class StaffAppController2 extends Controller
 
 {
     public function orders(Request $request)
@@ -24,69 +26,61 @@ class StaffAppController extends Controller
 
         if ($request->status == 'Complete') {
             $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
-                ->where(function ($query) {
-                    // Filter orders with cash collection status not approved
-                    $query->where('cash_collections.status', '!=', 'approved')
-                        // Filter orders without any associated cash collection
-                        ->orWhereNull('cash_collections.status');
-                })
-                ->where('orders.service_staff_id', $request->user_id)
-                ->where('orders.status', $request->status)
-                ->where('orders.date', '<=', $currentDate)
-                ->limit(config('app.staff_order_limit'))
-                ->get(['orders.*', 'cash_collections.status as cash_status']);
+            ->where(function ($query) {
+                // Filter orders with cash collection status not approved
+                $query->where('cash_collections.status', '!=', 'approved')
+                      // Filter orders without any associated cash collection
+                      ->orWhereNull('cash_collections.status');
+            })
+            ->where('orders.service_staff_id', $request->user_id)
+            ->where('orders.status', $request->status)
+            ->where('orders.date', '<=', $currentDate)
+            ->limit(config('app.staff_order_limit'))
+            ->get(['orders.*', 'cash_collections.status as cash_status']);
         } else {
             $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->where('date', '<=', $currentDate)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
         }
 
         $orders_data->each->append('comments_text');
 
-        return response()->json($orders_data)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
-            ->header('Content-Type', 'application/json')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        return response()->json($orders_data);
     }
 
-    public function addComment($order_id, Request $request)
+    public function addComment(Request $request)
     {
 
-        $input['order_id'] = $order_id;
+        $input['order_id'] = $request->order_id;
         $input['comment'] = $request->comment;
         $input['user_id'] = $request->user_id;
 
         OrderComment::create($input);
 
-        return response()->json(['success' => 'Comment Save Successfully'])->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'POST')
-            ->header('Content-Type', 'application/json')
-            ->header('Access-Control-Allow-Headers', 'Content-Type');
+        return response()->json(['success' => 'Comment Save Successfully']);
     }
 
-    public function user(Request $request)
+    public function login(Request $request)
     {
-
         $credentials = [
             "email" => $request->username,
             "password" => $request->password
         ];
         if (Auth::attempt($credentials)) {
-            return response()->json(['status' => true, 'user' => Auth::user()])
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
-                ->header('Content-Type', 'application/json')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-        } else {
-            return response()->json(['status' => false])
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
-                ->header('Content-Type', 'application/json')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+            $user = Auth::user();
+            $token = $user->createToken('app-token')->plainTextToken;
+
+            return response()->json([
+                'user' => $user,
+                'access_token' => $token,
+            ], 200);
         }
+
+        return response()->json(['error' => 'These credentials do not match our records.'], 401);
     }
 
-    public function orderStatusUpdate(Order $order, Request $request)
+    public function orderStatusUpdate(Request $request)
     {
+        $order = Order::find($request->order_id);
+
         if ($request->status == "Complete") {
             if (isset($order->affiliate)) {
                 $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
@@ -119,10 +113,7 @@ class StaffAppController extends Controller
         $order->status = $request->status;
         $order->save();
 
-        return response()->json(['success' => 'Order Update Successfully'])->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'POST')
-            ->header('Content-Type', 'application/json')
-            ->header('Access-Control-Allow-Headers', 'Content-Type');
+        return response()->json(['success' => 'Order Update Successfully']);
     }
 
     public function timeSlots(Request $request)
@@ -149,8 +140,9 @@ class StaffAppController extends Controller
             ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     }
 
-    public function rescheduleOrder(Order $order, Request $request)
+    public function rescheduleOrder(Request $request)
     {
+        $order = Order::find($request->order_id);
         $time_slot = TimeSlot::find($request->time_slot_id);
         $time_slot_value = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
@@ -159,36 +151,38 @@ class StaffAppController extends Controller
         $order->time_slot_value = $time_slot_value;
         $order->save();
 
-        return response()->json(['success' => 'Order Update Successfully'])->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'POST')
-            ->header('Content-Type', 'application/json')
-            ->header('Access-Control-Allow-Headers', 'Content-Type');
+        return response()->json(['success' => 'Order Update Successfully']);
     }
 
-    public function cashCollection($order_id, Request $request)
-    {
+    public function cashCollection(Request $request){
 
-        $cashCollection = CashCollection::where('order_id', $order_id)->first();
-
-        if (empty($cashCollection)) {
+        $cashCollection = CashCollection::where('order_id', $request->order_id)->first();
+        
+        if(empty($cashCollection)){
             $staff = User::find($request->user_id);
-            $input['order_id'] = $order_id;
+            $input['order_id'] = $request->order_id;
             $input['description'] = $request->description;
             $input['amount'] = $request->amount;
             $input['staff_name'] = $staff->name;
             $input['staff_id'] = $request->user_id;
             $input['status'] = 'Not Approved';
-
+            
+            $parts        = explode(";base64,", $request->image);
+            $imageparts   = explode("image/", @$parts[0]);
+            $imagetype    = $imageparts[1];
+            $imagebase64  = base64_decode($parts[1]);
+            $file         = $request->order_id . '.' . $imagetype;
+            Storage::disk('public')->put('cash-collections-images/'. $file, $imagebase64);
+            
+            $input['image'] = $file;
+            
             CashCollection::create($input);
-        } else {
+        }else{
             $cashCollection->description = $request->description;
             $cashCollection->amount = $request->amount;
             $cashCollection->save();
         }
 
-        return response()->json(['success' => 'Cash Collected Successfully'])->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'POST')
-            ->header('Content-Type', 'application/json')
-            ->header('Access-Control-Allow-Headers', 'Content-Type');
+        return response()->json(['success' => 'Cash Collected Successfully']);
     }
 }
