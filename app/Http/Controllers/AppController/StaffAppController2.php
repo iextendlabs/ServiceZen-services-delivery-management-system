@@ -166,15 +166,11 @@ class StaffAppController2 extends Controller
             $input['staff_name'] = $staff->name;
             $input['staff_id'] = $request->user_id;
             $input['status'] = 'Not Approved';
-            
-            $parts        = explode(";base64,", $request->image);
-            $imageparts   = explode("image/", @$parts[0]);
-            $imagetype    = $imageparts[1];
-            $imagebase64  = base64_decode($parts[1]);
-            $file         = $request->order_id . '.' . $imagetype;
-            Storage::disk('public')->put('cash-collections-images/'. $file, $imagebase64);
-            
-            $input['image'] = $file;
+            if ($request->hasFile('image')) {
+                $filename = time() . '.' . $request->image->getClientOriginalExtension();
+                $request->image->move(public_path('cash-collections-images'), $filename);
+                $input['image'] = $filename;
+            }
             
             CashCollection::create($input);
         }else{
