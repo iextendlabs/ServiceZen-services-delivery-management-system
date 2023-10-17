@@ -22,6 +22,7 @@ use App\Models\Review;
 use App\Models\Service;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 
@@ -197,8 +198,9 @@ class SiteOrdersController extends Controller
 
             Session::forget('staff_and_time');
             Session::forget('serviceIds');
-            $response = Order::sendNotification($input['service_staff_id'],$input['order_id']);
-
+            if (Carbon::now() == $input['date']) {
+                $response = Order::sendNotification($input['service_staff_id'], $input['order_id']);
+            }
             try {
                 $this->sendAdminEmail($input['order_id'], $input['email']);
                 $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
@@ -324,7 +326,7 @@ class SiteOrdersController extends Controller
             }
         }
 
-        
+
         $order->save();
         return redirect()->route('order.index')
             ->with('success', 'Order updated successfully');
