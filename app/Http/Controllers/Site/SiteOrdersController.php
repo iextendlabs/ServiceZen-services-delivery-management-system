@@ -197,7 +197,9 @@ class SiteOrdersController extends Controller
 
             Session::forget('staff_and_time');
             Session::forget('serviceIds');
+            $response = Order::sendNotification($input['service_staff_id'],$input['order_id']);
 
+            dd($response);
             try {
                 $this->sendAdminEmail($input['order_id'], $input['email']);
                 $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
