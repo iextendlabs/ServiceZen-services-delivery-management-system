@@ -26,17 +26,17 @@ class StaffAppController2 extends Controller
 
         if ($request->status == 'Complete') {
             $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
-            ->where(function ($query) {
-                // Filter orders with cash collection status not approved
-                $query->where('cash_collections.status', '!=', 'approved')
-                      // Filter orders without any associated cash collection
-                      ->orWhereNull('cash_collections.status');
-            })
-            ->where('orders.service_staff_id', $request->user_id)
-            ->where('orders.status', $request->status)
-            ->where('orders.date', '<=', $currentDate)
-            ->limit(config('app.staff_order_limit'))
-            ->get(['orders.*', 'cash_collections.status as cash_status']);
+                ->where(function ($query) {
+                    // Filter orders with cash collection status not approved
+                    $query->where('cash_collections.status', '!=', 'approved')
+                        // Filter orders without any associated cash collection
+                        ->orWhereNull('cash_collections.status');
+                })
+                ->where('orders.service_staff_id', $request->user_id)
+                ->where('orders.status', $request->status)
+                ->where('orders.date', '<=', $currentDate)
+                ->limit(config('app.staff_order_limit'))
+                ->get(['orders.*', 'cash_collections.status as cash_status']);
         } else {
             $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->where('date', '<=', $currentDate)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
         }
@@ -64,15 +64,16 @@ class StaffAppController2 extends Controller
             "email" => $request->username,
             "password" => $request->password
         ];
-
-        $user = User::where('email',$request->username)->first();
-        if($user->device_token == null){
-            $user->device_token = $request->fcmToken;
-            $user->save();
-        }
         
+
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+            $user = User::where('email', $request->username)->first();
+
+            if ($request->has('fcmToken')) {
+                $user->device_token = $request->fcmToken;
+                $user->save();
+            }
+            
             $token = $user->createToken('app-token')->plainTextToken;
 
             return response()->json([
@@ -161,11 +162,12 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Order Update Successfully']);
     }
 
-    public function cashCollection(Request $request){
+    public function cashCollection(Request $request)
+    {
 
         $cashCollection = CashCollection::where('order_id', $request->order_id)->first();
-        
-        if(empty($cashCollection)){
+
+        if (empty($cashCollection)) {
             $staff = User::find($request->user_id);
             $input['order_id'] = $request->order_id;
             $input['description'] = $request->description;
@@ -178,9 +180,9 @@ class StaffAppController2 extends Controller
                 $request->image->move(public_path('cash-collections-images'), $filename);
                 $input['image'] = $filename;
             }
-            
+
             CashCollection::create($input);
-        }else{
+        } else {
             $cashCollection->description = $request->description;
             $cashCollection->amount = $request->amount;
             $cashCollection->save();
