@@ -64,6 +64,13 @@ class StaffAppController2 extends Controller
             "email" => $request->username,
             "password" => $request->password
         ];
+
+        $user = User::where('email',$request->username)->first();
+        if($user->device_token == null){
+            $user->device_token = $request->fcmToken;
+            $user->save();
+        }
+        
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = $user->createToken('app-token')->plainTextToken;
