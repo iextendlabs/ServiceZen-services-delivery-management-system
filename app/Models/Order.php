@@ -109,8 +109,8 @@ class Order extends Model
             $data = [
                 "to" => $user->device_token,
                 "notification" => [
-                    "body" => '$request->body',
-                    "title" => '$request->title',
+                    "body" => 'New Order Create.',
+                    "title" => 'Order',
                     "content_available" => true,
                     "priority" => "high"
                 ]

@@ -177,10 +177,4 @@ Route::get('/category', function () {
     return view('site.categories.index');
 })->name('categories.index');
 
-// Driver app
-
-Route::get('driverAppOrders', [DriverAppController::class, 'orders']);
-Route::get('driverAppUser', [DriverAppController::class, 'user']);
-Route::get('driverAppOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
-
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
