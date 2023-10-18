@@ -23,20 +23,31 @@ class SendTodayOrdersEmail extends Command
     {
         $today = Carbon::now()->toDateString();
         $orders = Order::whereDate('created_at', $today)->get();
+        $admin_email = env('MAIL_FROM_ADDRESS');
 
         $setting = Setting::where('key', 'Emails For Daily Alert')->first();
         if ($setting) {
 
             $emails = explode(',', $setting->value);
-            $admin_email = env('MAIL_FROM_ADDRESS');
             $emails[] = $admin_email;
             foreach ($emails as $email) {
-                // Send email with today's orders
-                Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) use ($email) {
-                    $message->to(trim($email))->subject('Today\'s Orders');
-                });
+                try {
+                    // Send email with today's orders
+                    Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) use ($email) {
+                        $message->to(trim($email))->subject('Today\'s Orders');
+                    });
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
             }
-            
+        } else {
+            try {
+                Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) use ($admin_email) {
+                    $message->to(trim($admin_email))->subject('Today\'s Orders');
+                });
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
         }
 
 
