@@ -109,7 +109,7 @@ class SiteController extends Controller
 
     public function show($id)
     {
-        $service = Service::find($id);
+        $service = Service::findOrFail($id);
         $FAQs = FAQ::where('service_id', $id)->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');

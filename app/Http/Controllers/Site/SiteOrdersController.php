@@ -198,7 +198,7 @@ class SiteOrdersController extends Controller
 
             Session::forget('staff_and_time');
             Session::forget('serviceIds');
-            if (Carbon::now() == $input['date']) {
+            if (Carbon::now()->toDateString() == $input['date']) {
                 $response = Order::sendNotification($input['service_staff_id'], $input['order_id']);
             }
             try {
