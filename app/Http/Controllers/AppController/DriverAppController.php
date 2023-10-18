@@ -18,7 +18,7 @@ class DriverAppController extends Controller
         $driver_id = $request->user_id;
         $currentDate = Carbon::today();
 
-        $orders_data = Order::where('date','<=', $currentDate)
+        $orders_data = Order::where('date', $currentDate)
             ->where('driver_status', 'Pending')
             ->orWhere(function ($query) use ($driver_id) {
                 $query->whereHas('driverOrder', function ($subquery) use ($driver_id) {
