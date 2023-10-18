@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Mail;
 
 class SendTodayOrdersEmail extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'orders:send-email';
     protected $description = 'Send email of today\'s orders';
 

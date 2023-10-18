@@ -199,7 +199,10 @@ class SiteOrdersController extends Controller
             Session::forget('staff_and_time');
             Session::forget('serviceIds');
             if (Carbon::now()->toDateString() == $input['date']) {
-                $response = Order::sendNotification($input['service_staff_id'], $input['order_id']);
+                $user = User::find($input['service_staff_id']);
+                if ($user->device_token) {
+                    $response = Order::sendNotification($user->device_token, $input['order_id']);
+                }
             }
             try {
                 $this->sendAdminEmail($input['order_id'], $input['email']);

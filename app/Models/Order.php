@@ -101,60 +101,58 @@ class Order extends Model
         return Transaction::where('user_id', $this->affiliate->id)->where('order_id', $this->id)->value('status');
     }
 
-    public static function sendNotification($user_id, $order_id)
+    public static function sendNotification($device_token, $order)
     {
-        $user = User::find($user_id);
-        if ($user->device_token) {
-            try {
-                $SERVER_API_KEY = env('FCM_SERVER_KEY');
-            
-                $data = [
-                    "to" => $user->device_token,
-                    "notification" => [
-                        "body" => 'New Order Create.',
-                        "title" => 'Order',
-                        "content_available" => true,
-                        "priority" => "high"
-                    ]
-                ];
-            
-                $dataString = json_encode($data);
-            
-                $headers = [
-                    'Authorization: key=' . $SERVER_API_KEY,
-                    'Content-Type: application/json',
-                ];
-            
-                $ch = curl_init();
-            
-                curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-            
-                $response = curl_exec($ch);
-            
-                if ($response === false) {
-                    throw new Exception(curl_error($ch));
-                }
-            
-                // Handle the response here if needed
-            
-                $msg = "Notification sent successfully.";
-                return $msg;
-            } catch (Exception $e) {
-                // Handle the exception, log it, or return an error message
-                $error_msg = "Error: " . $e->getMessage();
-                return $error_msg;
-            } finally {
-                // Close the cURL handle regardless of success or failure
-                curl_close($ch);
-            }  
-        }else{
-            $msg = "Device is not register.";
+        try {
+            $SERVER_API_KEY = env('FCM_SERVER_KEY');
+            if($order){
+                $body = $order."Orders of todays.";
+            }else{
+                $body = "New Order Generated.";
+            }
+            $data = [
+                "to" => $device_token,
+                "notification" => [
+                    "body" => $body,
+                    "title" => 'Order',
+                    "content_available" => true,
+                    "priority" => "high"
+                ]
+            ];
+
+            $dataString = json_encode($data);
+
+            $headers = [
+                'Authorization: key=' . $SERVER_API_KEY,
+                'Content-Type: application/json',
+            ];
+
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+            $response = curl_exec($ch);
+
+            if ($response === false) {
+                throw new Exception(curl_error($ch));
+            }
+
+            // Handle the response here if needed
+
+            $msg = "Notification sent successfully.";
             return $msg;
+        } catch (Exception $e) {
+            // Handle the exception, log it, or return an error message
+            $error_msg = "Error: " . $e->getMessage();
+            return $error_msg;
+        } finally {
+            // Close the cURL handle regardless of success or failure
+            curl_close($ch);
         }
     }
 }

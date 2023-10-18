@@ -17,7 +17,6 @@ use Session;
 use Illuminate\Support\Facades\DB;
 use Hash;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -42,7 +41,7 @@ class HomeController extends Controller
         $currentDate = Carbon::today()->toDateString();
         $currentUser = Auth::user();
         $currentMonth = Carbon::now()->startOfMonth();
-        
+
         if (Auth::check()) {
             if ($currentUser->hasRole('Customer') || $currentUser->hasRole('Affiliate')) {
                 return redirect('/')

@@ -17,11 +17,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $setting = Setting::where('key','Daily Order Summary Mail and Notification')->first();
+        $setting = Setting::where('key', 'Daily Order Summary Mail and Notification')->first();
 
         // $schedule->command('inspire')->hourly();
         $schedule->command('orders:send-email')
-             ->dailyAt($setting->value);
+            ->dailyAt($setting->value);
+        $schedule->command('orders:send-notification')
+            ->dailyAt($setting->value);
     }
 
     /**
@@ -31,7 +33,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
