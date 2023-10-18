@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\DriverOrder;
+use App\Models\User;
 
 class DriverAppController extends Controller
 
@@ -40,7 +41,13 @@ class DriverAppController extends Controller
             "password" => $request->password
         ];
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+            $user = User::where('email', $request->username)->first();
+
+            if ($request->has('fcmToken')) {
+                $user->device_token = $request->fcmToken;
+                $user->save();
+            }
+            
             $token = $user->createToken('app-token')->plainTextToken;
 
             return response()->json([
@@ -68,9 +75,6 @@ class DriverAppController extends Controller
             $order->save();
         }
 
-        return response()->json(['success' => 'Order Update Successfully'])->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'POST')
-            ->header('Content-Type', 'application/json')
-            ->header('Access-Control-Allow-Headers', 'Content-Type');
+        return response()->json(['success' => 'Order Update Successfully']);
     }
 }
