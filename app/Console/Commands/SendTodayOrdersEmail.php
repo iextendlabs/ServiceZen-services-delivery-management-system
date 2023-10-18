@@ -27,12 +27,11 @@ class SendTodayOrdersEmail extends Command
     {
         $today = Carbon::now()->toDateString();
         $orders = Order::whereDate('created_at', $today)->get();
-        Log::info(Carbon::now()->format('Y-m-d H:i:s'));
 
         // Send email with today's orders
-        // Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) {
-        //     $message->to('miangdpp@gmail.com')->subject('Today\'s Orders');
-        // });
+        Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) {
+            $message->to('miangdpp@gmail.com')->subject('Today\'s Orders');
+        });
 
         $this->info('Today\'s orders email sent successfully!');
     }

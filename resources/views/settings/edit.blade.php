@@ -68,6 +68,8 @@
                         <option value="1" @if($setting->value == 1) selected @endif>Enable</option>
                         <option value="0" @if($setting->value == 0) selected @endif>Disable</option>
                     </select>
+                    @elseif($setting->key === 'Daily Order Summary Mail and Notification')
+                    <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
                     @else
                     <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                     @endif
