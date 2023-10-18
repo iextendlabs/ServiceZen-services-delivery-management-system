@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\OrderTotal;
 use App\Models\Review;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use Carbon\Carbon;
@@ -203,6 +204,12 @@ class SiteOrdersController extends Controller
                 if ($user->device_token) {
                     $response = Order::sendNotification($user->device_token, $input['order_id']);
                 }
+
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
             }
             try {
                 $this->sendAdminEmail($input['order_id'], $input['email']);
@@ -370,13 +377,20 @@ class SiteOrdersController extends Controller
 
     public function sendAdminEmail($order_id, $recipient_email)
     {
-        $emails = [
-            'Portugalschool@gmail.com',
-            'Aleezajbr@gmail.com'
-        ];
         $order = Order::find($order_id);
         $to = env('MAIL_FROM_ADDRESS');
         Mail::to($to)->send(new OrderAdminEmail($order, $recipient_email));
+
+        return redirect()->back();
+    }
+
+    public function sendOrderEmail($order_id, $recipient_email)
+    {
+        $setting = Setting::where('key', 'Emails For Daily Alert')->first();
+
+        $emails = explode(',', $setting->value);
+
+        $order = Order::find($order_id);
 
         foreach ($emails as $email) {
             Mail::to($email)->send(new OrderAdminEmail($order, $recipient_email));

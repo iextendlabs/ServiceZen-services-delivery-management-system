@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Order;
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -23,10 +24,21 @@ class SendTodayOrdersEmail extends Command
         $today = Carbon::now()->toDateString();
         $orders = Order::whereDate('created_at', $today)->get();
 
-        // Send email with today's orders
-        Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) {
-            $message->to('miangdpp@gmail.com')->subject('Today\'s Orders');
-        });
+        $setting = Setting::where('key', 'Emails For Daily Alert')->first();
+        if ($setting) {
+
+            $emails = explode(',', $setting->value);
+            $admin_email = env('MAIL_FROM_ADDRESS');
+            $emails[] = $admin_email;
+            foreach ($emails as $email) {
+                // Send email with today's orders
+                Mail::send('site.emails.todays_order', ['orders' => $orders], function ($message) use ($email) {
+                    $message->to(trim($email))->subject('Today\'s Orders');
+                });
+            }
+            
+        }
+
 
         $this->info('Today\'s orders email sent successfully!');
     }

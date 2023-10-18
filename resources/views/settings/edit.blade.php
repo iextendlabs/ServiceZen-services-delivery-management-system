@@ -70,6 +70,9 @@
                     </select>
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
+                    @elseif($setting->key === 'Emails For Daily Alert')
+                    <span class="text-danger">Note: Add Email by comma separated.</span>
+                    <input type="text" name="value" class="form-control" value="{{ $setting->value }}">
                     @else
                     <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                     @endif
