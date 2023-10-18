@@ -106,7 +106,7 @@ class Order extends Model
         try {
             $SERVER_API_KEY = env('FCM_SERVER_KEY');
             if($order){
-                $body = $order."Orders of todays.";
+                $body = $order." Orders of todays.";
             }else{
                 $body = "New Order Generated.";
             }
