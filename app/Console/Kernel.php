@@ -17,8 +17,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $setting = Setting::where('key','	
-        Daily Order Summary Mail and Notification')->first();
+        $setting = Setting::where('key','Daily Order Summary Mail and Notification')->first();
+
         // $schedule->command('inspire')->hourly();
         $schedule->command('orders:send-email')
              ->dailyAt($setting->value);
