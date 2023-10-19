@@ -22,10 +22,18 @@ class SendTodayOrdersStaffNotification extends Command
     {
         $currentDate = Carbon::today()->toDateString();
 
-        $users = User::role('Staff')->whereNotNull('device_token')->get();
-        foreach ($users as $user) {
-            $orders = Order::where("service_staff_id", $user->id)->where('date', $currentDate)->count();
-                Order::sendNotification($user->device_token, $orders);
+        $staffs = User::role('Staff')->whereNotNull('device_token')->get();
+        foreach ($staffs as $staff) {
+            $order = Order::where("service_staff_id", $staff->id)->where('date', $currentDate)->count();
+            $body = $order . " Orders of todays.";
+            $staff->notifyOnMobile('Order', $body);
+        }
+
+        $drivers = User::role('Driver')->whereNotNull('device_token')->get();
+        foreach ($drivers as $driver) {
+            $order = Order::where("status", "Pending")->where('date', $currentDate)->count();
+            $body = $order . " Orders of todays.";
+            $driver->notifyOnMobile('Order', $body);
         }
 
         $this->info('Today\'s orders Notification sent successfully!');

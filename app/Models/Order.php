@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['customer_id', 'customer_name', 'customer_email', 'total_amount', 'payment_method', 'status', 'affiliate_id', 'buildingName', 'area', 'landmark', 'flatVilla', 'street', 'city', 'number', 'whatsapp', 'service_staff_id', 'staff_name', 'date', 'time_slot_id', 'time_slot_value', 'latitude', 'longitude', 'order_comment', 'driver_status', 'time_start', 'time_end', 'gender'];
+    protected $fillable = ['customer_id', 'customer_name', 'customer_email', 'total_amount', 'payment_method', 'status', 'affiliate_id', 'buildingName', 'area', 'landmark', 'flatVilla', 'street', 'city', 'number', 'whatsapp', 'service_staff_id', 'staff_name', 'date', 'time_slot_id', 'time_slot_value', 'latitude', 'longitude', 'order_comment', 'driver_status', 'time_start', 'time_end', 'gender','driver_id'];
 
     protected $table = 'orders';
 
@@ -86,11 +86,6 @@ class Order extends Model
         return $comments->toArray();
     }
 
-    public function driverOrder()
-    {
-        return $this->hasOne(DriverOrder::class);
-    }
-
     public function getStaffTransactionStatus()
     {
         return Transaction::where('user_id', $this->staff->user_id)->where('order_id', $this->id)->value('status');
@@ -101,58 +96,8 @@ class Order extends Model
         return Transaction::where('user_id', $this->affiliate->id)->where('order_id', $this->id)->value('status');
     }
 
-    public static function sendNotification($device_token, $order)
+    public function driver()
     {
-        try {
-            $SERVER_API_KEY = env('FCM_SERVER_KEY');
-            if($order){
-                $body = $order." Orders of todays.";
-            }else{
-                $body = "New Order Generated.";
-            }
-            $data = [
-                "to" => $device_token,
-                "notification" => [
-                    "body" => $body,
-                    "title" => 'Order',
-                    "content_available" => true,
-                    "priority" => "high"
-                ]
-            ];
-
-            $dataString = json_encode($data);
-
-            $headers = [
-                'Authorization: key=' . $SERVER_API_KEY,
-                'Content-Type: application/json',
-            ];
-
-            $ch = curl_init();
-
-            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-
-            $response = curl_exec($ch);
-
-            if ($response === false) {
-                throw new Exception(curl_error($ch));
-            }
-
-            // Handle the response here if needed
-
-            $msg = "Notification sent successfully.";
-            return $msg;
-        } catch (Exception $e) {
-            // Handle the exception, log it, or return an error message
-            $error_msg = "Error: " . $e->getMessage();
-            return $error_msg;
-        } finally {
-            // Close the cURL handle regardless of success or failure
-            curl_close($ch);
-        }
+        return $this->hasOne(User::class, 'id', 'driver_id');
     }
 }

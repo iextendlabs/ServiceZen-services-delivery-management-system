@@ -70,30 +70,7 @@
                     </table>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="form-group scroll-div">
-                    <span style="color: red;">*</span><strong>Drivers:</strong>
-                    <input type="text" name="search-driver" id="search-driver" class="form-control" placeholder="Search driver By Name And Email">
-                    <table class="table table-striped table-bordered driver-table">
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Email</th>
-                        </tr>
-                        @foreach ($users as $driver)
-                        @if($driver->getRoleNames() == '["Driver"]')
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="driverIds[{{ ++$i }}]" value="{{ $driver->id }}">
-                            </td>
-                            <td>{{ $driver->name }}</td>
-                            <td>{{ $driver->email }}</td>
-                        </tr>
-                        @endif
-                        @endforeach
-                    </table>
-                </div>
-            </div>
+            
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
@@ -108,27 +85,6 @@
             $(".staff-table tr").hide();
 
             $(".staff-table tr").each(function() {
-
-                $row = $(this);
-
-                var name = $row.find("td:first").next().text().toLowerCase();
-
-                var email = $row.find("td:last").text().toLowerCase();
-
-                if (name.indexOf(value) != -1) {
-                    $(this).show();
-                } else if (email.indexOf(value) != -1) {
-                    $(this).show();
-                }
-            });
-        });
-
-        $("#search-driver").keyup(function() {
-            var value = $(this).val().toLowerCase();
-
-            $(".driver-table tr").hide();
-
-            $(".driver-table tr").each(function() {
 
                 $row = $(this);
 

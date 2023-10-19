@@ -68,7 +68,6 @@ class StaffGroupController extends Controller
 
         $staffGroup->staffZones()->attach($request->staff_zone_ids);
         $staffGroup->staffs()->attach($request->staffIds);
-        $staffGroup->drivers()->attach($request->driverIds);
 
         return redirect()->route('staffGroups.index')
             ->with('success', 'Staff Group created successfully.');
@@ -97,8 +96,7 @@ class StaffGroupController extends Controller
         $staff_zones_ids = $staffGroup->staffZones()->pluck('staff_zone_id')->toArray();
         $users = User::all();
         $staff_ids = $staffGroup->staffs()->pluck('staff_id')->toArray();
-        $driver_ids = $staffGroup->drivers()->pluck('driver_id')->toArray();
-        return view('staffGroups.edit', compact('staffGroup', 'users', 'staff_zones','staff_ids','staff_zones_ids','driver_ids'));
+        return view('staffGroups.edit', compact('staffGroup', 'users', 'staff_zones','staff_ids','staff_zones_ids'));
     }
 
     public function update(Request $request, $id)
@@ -117,7 +115,6 @@ class StaffGroupController extends Controller
 
         $staffGroup->staffZones()->sync($request->staff_zone_ids);
         $staffGroup->staffs()->sync($request->staffIds);
-        $staffGroup->drivers()->sync($request->driverIds);
         
         return redirect()->route('staffGroups.index')
             ->with('success', 'Staff Group update successfully.');

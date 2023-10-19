@@ -100,6 +100,7 @@ class SiteOrdersController extends Controller
             $input['latitude'] = $address['latitude'];
             $input['longitude'] = $address['longitude'];
             $input['gender'] = $address['gender'];
+            $input['driver_id'] = $staff->driver_id;
 
             $input['email'] = $address['email'];
 
@@ -200,11 +201,10 @@ class SiteOrdersController extends Controller
             Session::forget('staff_and_time');
             Session::forget('serviceIds');
             if (Carbon::now()->toDateString() == $input['date']) {
-                $user = User::find($input['service_staff_id']);
-                if ($user->device_token) {
-                    $response = Order::sendNotification($user->device_token, $input['order_id']);
+                $staff->notifyOnMobile('Order', 'New Order Generated.');
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.');
                 }
-
                 try {
                     $this->sendOrderEmail($input['order_id'], $input['email']);
                 } catch (\Throwable $th) {

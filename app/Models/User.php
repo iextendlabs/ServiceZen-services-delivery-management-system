@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Exception;
 
 class User extends Authenticatable
 {
@@ -131,7 +132,61 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'staff_supervisor', 'staff_id', 'supervisor_id');
     }
 
-    public function orders(){
-        return $this->hasMany(Order::class,'service_staff_id');
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'service_staff_id');
+    }
+    //  TODO Use Quey to send notification
+    public function notifyOnMobile($title, $body)
+    {
+        if ($this->device_token) {
+            try {
+                $SERVER_API_KEY = env('FCM_SERVER_KEY');
+
+                $data = [
+                    "to" => $this->device_token,
+                    "notification" => [
+                        "body" => $body,
+                        "title" => $title,
+                        "content_available" => true,
+                        "priority" => "high"
+                    ]
+                ];
+
+                $dataString = json_encode($data);
+
+                $headers = [
+                    'Authorization: key=' . $SERVER_API_KEY,
+                    'Content-Type: application/json',
+                ];
+
+                $ch = curl_init();
+
+                curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+                $response = curl_exec($ch);
+
+                if ($response === false) {
+                    throw new Exception(curl_error($ch));
+                }
+
+                // Handle the response here if needed
+
+                $msg = "Notification sent successfully.";
+                return $msg;
+            } catch (Exception $e) {
+                // Handle the exception, log it, or return an error message
+                $error_msg = "Error: " . $e->getMessage();
+                return $error_msg;
+            } finally {
+                // Close the cURL handle regardless of success or failure
+                curl_close($ch);
+            }
+        }
     }
 }
