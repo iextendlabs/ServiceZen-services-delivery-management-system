@@ -100,8 +100,8 @@ class SiteOrdersController extends Controller
             $input['latitude'] = $address['latitude'];
             $input['longitude'] = $address['longitude'];
             $input['gender'] = $address['gender'];
-            $input['driver_id'] = $staff->driver_id;
-
+            $input['driver_id'] = $staff->staff->driver_id;
+            
             $input['email'] = $address['email'];
 
             $user = User::where('email', $address['email'])->first();
