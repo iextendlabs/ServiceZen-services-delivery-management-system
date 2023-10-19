@@ -50,6 +50,7 @@ class SendTodayOrdersEmail extends Command
             }
         }
 
+        Log::channel('crons')->info($orders->count());
 
         $this->info('Today\'s orders email sent successfully!');
     }
