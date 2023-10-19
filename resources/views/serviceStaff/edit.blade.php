@@ -107,7 +107,7 @@
                                 <option></option>
                                 @foreach ($users as $driver)
                                 @if($driver->getRoleNames() == '["Driver"]')
-                                <option value="{{ $driver->id }}" @if($serviceStaff->staff->driver) selected @endif>{{ $driver->name }}</option>
+                                <option value="{{ $driver->id }}" @if($serviceStaff->staff->driver_id == $driver->id) selected @endif>{{ $driver->name }}</option>
                                 @endif
                                 @endforeach
                             </select>
