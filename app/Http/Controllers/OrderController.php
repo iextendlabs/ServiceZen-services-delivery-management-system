@@ -207,6 +207,7 @@ class OrderController extends Controller
 
     public function edit($id, Request $request)
     {
+        $drivers = User::role('Driver')->get();
         $affiliates = User::role('Affiliate')->get();
         $order = Order::findOrFail($id);
         $area = $order->area;
@@ -226,6 +227,8 @@ class OrderController extends Controller
             return view('orders.comment_edit', compact('order'));
         } elseif ($request->edit == "custom_location") {
             return view('orders.custom_location', compact('order'));
+        }if ($request->edit == "driver") {
+            return view('orders.driver_edit', compact('order','drivers'));
         }
     }
 
@@ -249,8 +252,9 @@ class OrderController extends Controller
         $order = Order::find($id);
 
         $order->order_total->transport_charges = $request->transport_charges;
+        
         $order->order_total->save();
-
+        $input['driver_id'] = $request->driver_id;
         $order->update($input);
 
         if (isset($order->staff->commission)) {
