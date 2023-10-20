@@ -18,6 +18,8 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'order-driver-edit',
+            'order-driver-status-edit',
             'order-comment-edit',
             'order-affiliate-edit',
             'menu-catalog',

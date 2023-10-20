@@ -213,6 +213,7 @@ class OrderController extends Controller
         $area = $order->area;
         $date = $order->date;
         $statuses = config('app.order_statuses');
+        $driver_statuses = config('app.order_driver_statuses');
 
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
         if ($request->edit == "status") {
@@ -229,6 +230,8 @@ class OrderController extends Controller
             return view('orders.custom_location', compact('order'));
         }if ($request->edit == "driver") {
             return view('orders.driver_edit', compact('order','drivers'));
+        }if ($request->edit == "order_driver_status") {
+            return view('orders.driver_status_edit', compact('order','driver_statuses'));
         }
     }
 
@@ -254,7 +257,6 @@ class OrderController extends Controller
         $order->order_total->transport_charges = $request->transport_charges;
         
         $order->order_total->save();
-        $input['driver_id'] = $request->driver_id;
         $order->update($input);
 
         if (isset($order->staff->commission)) {

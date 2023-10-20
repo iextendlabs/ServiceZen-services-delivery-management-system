@@ -98,7 +98,12 @@
                         @can('order-comment-edit')
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
                         @endcan
+                        @can('order-driver-status-edit')
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=driver">Driver Edit</a>
+                        @endcan
+                        @can('order-driver-status-edit')
+                        <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver Status Edit</a>
+                        @endcan
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
                     </div>
                 </li>
