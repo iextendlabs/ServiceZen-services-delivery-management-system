@@ -15,7 +15,7 @@ class DriverAppController extends Controller
     public function orders(Request $request)
     {
         $driver_id = $request->user_id;
-        $currentDate = Carbon::today();
+        $currentDate = Carbon::today()->toDateString();
 
         $orders_data = Order::where('date', $currentDate)
             ->where('driver_id', $driver_id)
