@@ -37,6 +37,10 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Value:</strong>
+                    @if(in_array($setting->key, ['Emails For Daily Alert', 'Not Allowed Status for Staff App', 'Not Allowed Status for Driver App']))
+                    <span class="text-danger">Note: Add by comma separated.</span>
+                    @endif
+
                     @if ($setting->key === 'Slider Image')
                     <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions 1140 × 504px. Thank you!</p>
                     <table id="imageTable" class="table">
@@ -70,9 +74,6 @@
                     </select>
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
-                    @elseif($setting->key === 'Emails For Daily Alert')
-                    <span class="text-danger">Note: Add Email by comma separated.</span>
-                    <input type="text" name="value" class="form-control" value="{{ $setting->value }}">
                     @else
                     <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                     @endif

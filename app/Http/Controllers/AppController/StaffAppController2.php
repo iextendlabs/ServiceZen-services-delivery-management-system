@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Storage;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
@@ -21,6 +22,8 @@ class StaffAppController2 extends Controller
 {
     public function orders(Request $request)
     {
+        $setting = Setting::where('key', 'Not Allowed Order Status for Staff App')->first();
+        $status = explode(',', $setting->value);
 
         $currentDate = Carbon::today();
 
@@ -34,11 +37,17 @@ class StaffAppController2 extends Controller
                 })
                 ->where('orders.service_staff_id', $request->user_id)
                 ->where('orders.status', $request->status)
+                ->whereNotIn('orders.status', $status)
                 ->where('orders.date', '<=', $currentDate)
                 ->limit(config('app.staff_order_limit'))
                 ->get(['orders.*', 'cash_collections.status as cash_status']);
         } else {
-            $orders_data = Order::where('service_staff_id', $request->user_id)->where('status', $request->status)->where('date', '<=', $currentDate)->limit(config('app.staff_order_limit'))->with('cashCollection')->get();
+            $orders_data = Order::where('service_staff_id', $request->user_id)
+                ->where('status', $request->status)
+                ->whereNotIn('status', $status)
+                ->where('date', '<=', $currentDate)
+                ->limit(config('app.staff_order_limit'))
+                ->with('cashCollection')->get();
         }
 
         $orders_data->each->append('comments_text');
@@ -64,7 +73,7 @@ class StaffAppController2 extends Controller
             "email" => $request->username,
             "password" => $request->password
         ];
-        
+
 
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
@@ -73,7 +82,7 @@ class StaffAppController2 extends Controller
                 $user->device_token = $request->fcmToken;
                 $user->save();
             }
-            
+
             $token = $user->createToken('app-token')->plainTextToken;
 
             return response()->json([
