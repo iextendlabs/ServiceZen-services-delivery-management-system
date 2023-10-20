@@ -22,7 +22,7 @@ class SendTodayOrdersEmail extends Command
     public function handle()
     {
         $today = Carbon::now()->toDateString();
-        $orders = Order::whereDate('created_at', $today)->get();
+        $orders = Order::where('date', $today)->get();
         $admin_email = env('MAIL_FROM_ADDRESS');
 
         $setting = Setting::where('key', 'Emails For Daily Alert')->first();
