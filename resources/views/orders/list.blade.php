@@ -47,7 +47,8 @@
         <td>{{ $order->payment_method }}</td>
         <td>{{ substr($order->order_comment, 0, 50) }}...</td>
         @endif
-        <td style="min-width:150px">{{ $order->status }}
+        <td style="min-width:150px">{{ $order->status }} <br>
+            <i class="fas fa-car"></i>{{ $order->driver_status }}
             @can('cash-collection-edit')
             @if(($order->cashCollection)) <br><br>
             <a href="{{ route('cashCollection.index') }}?order_id={{$order->id}}">
