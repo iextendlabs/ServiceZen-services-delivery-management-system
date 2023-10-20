@@ -19,7 +19,7 @@ class DriverAppController extends Controller
         $order_status = explode(',', $order_status_setting->value);
         $driver_order_setting = Setting::where('key', 'Not Allowed Driver Order Status for Driver App')->first();
         $driver_order_status = explode(',', $driver_order_setting->value);
-        $driver_id = 16;
+        $driver_id = $request->user_id;
         $currentDate = Carbon::today()->toDateString();
 
         $orders_data = Order::where('date', $currentDate)
