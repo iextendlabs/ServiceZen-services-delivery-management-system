@@ -217,7 +217,7 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Cash Collected Successfully']);
     }
 
-    public function orderChat(Request $request)
+    public function addOrderChat(Request $request)
     {
         if($request->text){
             OrderChat::create([
@@ -226,7 +226,14 @@ class StaffAppController2 extends Controller
                 'text' => $request->text
             ]);
         }
-        
+
+        $order_chat = OrderChat::where('order_id', $request->order_id)->get();
+
+        return response()->json($order_chat);
+    }
+
+    public function orderChat(Request $request)
+    {
         $order_chat = OrderChat::where('order_id', $request->order_id)->get();
 
         return response()->json($order_chat);

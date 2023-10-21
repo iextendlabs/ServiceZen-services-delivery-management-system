@@ -31,6 +31,7 @@ Route::post('driverOrderStatusUpdate', [StaffAppController2::class, 'driverOrder
 Route::post('rescheduleOrder', [StaffAppController2::class, 'rescheduleOrder']);
 Route::get('timeSlots', [StaffAppController2::class, 'timeSlots']);
 Route::get('orderChat', [StaffAppController2::class, 'orderChat']);
+Route::post('addOrderChat', [StaffAppController2::class, 'addOrderChat']);
 
 // Driver app       
 
