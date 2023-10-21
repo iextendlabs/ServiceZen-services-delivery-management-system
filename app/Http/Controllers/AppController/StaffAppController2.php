@@ -142,7 +142,7 @@ class StaffAppController2 extends Controller
         $order->save();
 
         OrderChat::create([
-            'order_id' => $request->order_id, 
+            'order_id' => $request->order_id,
             'user_id' => $request->user_id,
             'text' => $request->text
         ]);
@@ -215,5 +215,20 @@ class StaffAppController2 extends Controller
         }
 
         return response()->json(['success' => 'Cash Collected Successfully']);
+    }
+
+    public function orderChat(Request $request)
+    {
+        if($request->text){
+            OrderChat::create([
+                'order_id' => $request->order_id,
+                'user_id' => $request->user_id,
+                'text' => $request->text
+            ]);
+        }
+        
+        $order_chat = OrderChat::where('order_id', $request->order_id)->get();
+
+        return response()->json($order_chat);
     }
 }
