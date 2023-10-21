@@ -27,6 +27,7 @@ Route::post('login', [StaffAppController2::class, 'login']);
 Route::post('addOrderComment', [StaffAppController2::class, 'addComment']);
 Route::post('cashCollection', [StaffAppController2::class, 'cashCollection']);
 Route::post('orderStatusUpdate', [StaffAppController2::class, 'orderStatusUpdate']);
+Route::post('driverOrderStatusUpdate', [StaffAppController2::class, 'driverOrderStatusUpdate']);
 Route::post('rescheduleOrder', [StaffAppController2::class, 'rescheduleOrder']);
 Route::get('timeSlots', [StaffAppController2::class, 'timeSlots']);
 

@@ -133,6 +133,16 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Order Update Successfully']);
     }
 
+    public function driverOrderStatusUpdate(Request $request)
+    {
+        $order = Order::find($request->order_id);
+
+        $order->driver_status = $request->status;
+        $order->save();
+
+        return response()->json(['success' => 'Order Update Successfully']);
+    }
+
     public function timeSlots(Request $request)
     {
 

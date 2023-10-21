@@ -30,6 +30,11 @@ class DriverAppController extends Controller
             ->limit(config('app.staff_order_limit'))
             ->get();
 
+        $orders_data->map(function ($order) {
+            $order->staff_number = $order->staff->phone;
+            return $order;
+        });
+
         return response()->json($orders_data);
     }
 
