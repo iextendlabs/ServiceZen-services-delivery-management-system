@@ -101,7 +101,7 @@ class SiteOrdersController extends Controller
             $input['longitude'] = $address['longitude'];
             $input['gender'] = $address['gender'];
             $input['driver_id'] = $staff->staff->driver_id;
-            
+
             $input['email'] = $address['email'];
 
             $user = User::where('email', $address['email'])->first();
@@ -307,6 +307,31 @@ class SiteOrdersController extends Controller
             [$latitude, $longitude] = explode(",", $request->custom_location);
             $input['latitude'] = $latitude;
             $input['longitude'] = $longitude;
+            $staff = User::find($order->service_staff_id);
+        }
+        if (isset($input['date']) && Carbon::now()->toDateString() == $input['date'] || !isset($input['date']) && Carbon::now()->toDateString() == $order->date) {
+            if (isset($request->service_staff_id) && $staff_id == $order->service_staff_id || $request->has('custom_location')) {
+                $msg = "Order #" . $id . " is Update by Customer";
+                $staff->notifyOnMobile('Order Update', $msg);
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order Update', $msg);
+                }
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
+            } else {
+                $staff->notifyOnMobile('Order', 'New Order Generated.');
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.');
+                }
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
+            }
         }
 
         $order->update($input);

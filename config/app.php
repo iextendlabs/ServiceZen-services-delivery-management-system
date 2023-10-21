@@ -51,7 +51,7 @@ return [
 
     'driver_statuses' => env('DRIVER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 
-    'order_driver_statuses' => env('ORDER_DRIVER_STATUSES', ['Pending', 'Accepted', 'Drive to pick', 'Picked', 'Drop','Waiting']),
+    'order_driver_statuses' => env('ORDER_DRIVER_STATUSES', ['Pending','Pick me', 'Accepted', 'Coming', 'Arrived for pick', 'Traveling','Dropped']),
 
     'order_statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 
