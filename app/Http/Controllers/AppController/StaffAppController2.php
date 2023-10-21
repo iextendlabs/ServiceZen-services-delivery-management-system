@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Storage;
@@ -139,6 +140,12 @@ class StaffAppController2 extends Controller
 
         $order->driver_status = $request->driver_status;
         $order->save();
+
+        OrderChat::create([
+            'order_id' => $request->order_id, 
+            'user_id' => $request->user_id,
+            'text' => $request->text
+        ]);
 
         return response()->json(['success' => 'Order Update Successfully']);
     }
