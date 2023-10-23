@@ -234,13 +234,15 @@ class StaffAppController2 extends Controller
             ]);
         }
 
-        $order_chat = OrderChat::where('order_id', $request->order_id)->get();
+        $order_chat = OrderChat::where('order_id', $request->order_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $order_chat->map(function ($chat) {
             $chat->role = $chat->user->getRoleNames();
             return $chat;
         });
-        
+
         return response()->json($order_chat);
     }
 
