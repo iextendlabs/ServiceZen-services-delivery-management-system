@@ -252,6 +252,10 @@ class StaffAppController2 extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $order_chat->map(function ($chat) {
+            $chat->role = $chat->user->getRoleNames();
+            return $chat;
+        });
         return response()->json($order_chat);
     }
 }
