@@ -248,7 +248,9 @@ class StaffAppController2 extends Controller
 
     public function orderChat(Request $request)
     {
-        $order_chat = OrderChat::where('order_id', $request->order_id)->get();
+        $order_chat = OrderChat::where('order_id', $request->order_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json($order_chat);
     }
