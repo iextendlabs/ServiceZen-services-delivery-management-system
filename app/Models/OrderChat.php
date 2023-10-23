@@ -11,4 +11,9 @@ class OrderChat extends Model
 
     protected $fillable = ['order_id', 'user_id', 'text'];
 
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
 }

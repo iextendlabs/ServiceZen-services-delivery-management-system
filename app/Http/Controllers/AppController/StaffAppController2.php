@@ -219,7 +219,14 @@ class StaffAppController2 extends Controller
 
     public function addOrderChat(Request $request)
     {
-        if($request->text){
+        if ($request->driver_status) {
+            $order = Order::find($request->order_id);
+
+            $order->driver_status = $request->driver_status;
+            $order->save();
+        }
+
+        if ($request->text) {
             OrderChat::create([
                 'order_id' => $request->order_id,
                 'user_id' => $request->user_id,
@@ -229,6 +236,11 @@ class StaffAppController2 extends Controller
 
         $order_chat = OrderChat::where('order_id', $request->order_id)->get();
 
+        $order_chat->map(function ($chat) {
+            $chat->role = $chat->user->getRoleNames();
+            return $chat;
+        });
+        
         return response()->json($order_chat);
     }
 
