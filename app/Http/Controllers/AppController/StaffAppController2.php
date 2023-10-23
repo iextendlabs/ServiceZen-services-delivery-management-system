@@ -219,13 +219,6 @@ class StaffAppController2 extends Controller
 
     public function addOrderChat(Request $request)
     {
-        if ($request->driver_status) {
-            $order = Order::find($request->order_id);
-
-            $order->driver_status = $request->driver_status;
-            $order->save();
-        }
-
         if ($request->text) {
             OrderChat::create([
                 'order_id' => $request->order_id,
