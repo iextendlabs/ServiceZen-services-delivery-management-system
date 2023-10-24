@@ -33,7 +33,8 @@
                 #{{ $order->id }}
                 @can('order-view')</a>@endcan
         </th>
-        <td>{{ $order->staff_name }}</td>
+        <td><i class="fas fa-user"></i> {{ $order->staff_name }}<br>
+            <i class="fas fa-car"></i> {{ $order->driver ? $order->driver->name : 'N/A' }}</td>
         <td>{{ $order->date }}</td>
         <td>{{ $order->time_slot_value }}</td>
         @if (auth()->user()->getRoleNames() == '["Supervisor"]')
