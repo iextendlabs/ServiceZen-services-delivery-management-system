@@ -53,8 +53,12 @@ class StaffAppController2 extends Controller
         }
 
         $orders_data->each->append('comments_text');
+        $response = [
+            'orders' => $orders_data,
+            'notification' => true
+        ];
 
-        return response()->json($orders_data);
+        return response()->json($response);
     }
 
     public function addComment(Request $request)
