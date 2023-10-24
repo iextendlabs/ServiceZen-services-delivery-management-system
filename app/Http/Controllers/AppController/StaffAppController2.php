@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
@@ -267,5 +268,14 @@ class StaffAppController2 extends Controller
             return $chat;
         });
         return response()->json($order_chat);
+    }
+
+    public function notification(Request $request)
+    {
+        $notifications = Notification::where('user_id', $request->user_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($notifications);
     }
 }
