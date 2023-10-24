@@ -35,7 +35,9 @@ class DriverAppController extends Controller
             return $order;
         });
 
-        return response()->json($orders_data);
+        $notification = true;
+        
+        return response()->json($orders_data,$notification);
     }
 
     public function login(Request $request)
