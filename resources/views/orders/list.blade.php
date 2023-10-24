@@ -106,6 +106,9 @@
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver Status Edit</a>
                         @endcan
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
+                        @can('order-chat')
+                        <a class="dropdown-item" href="{{ route('orders.chat', $order->id) }}">Chat</a>
+                        @endcan
                     </div>
                 </li>
             </ul>

@@ -137,7 +137,7 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'service_staff_id');
     }
     //  TODO Use Quey to send notification
-    public function notifyOnMobile($title, $body)
+    public function notifyOnMobile($title, $body, $order_id = null)
     {
         if ($this->device_token) {
             try {
@@ -176,6 +176,12 @@ class User extends Authenticatable
                 }
 
                 // Handle the response here if needed
+                Notification::create([
+                    'order_id' => $order_id,
+                    'user_id' => $this->id,
+                    'title' => $title,
+                    'body' =>  $body
+                ]);
 
                 $msg = "Notification sent successfully.";
                 return $msg;

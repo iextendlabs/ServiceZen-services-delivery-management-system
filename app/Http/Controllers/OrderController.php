@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderChat;
 use App\Models\OrderHistory;
 use App\Models\OrderTotal;
 use App\Models\Service;
@@ -71,7 +72,7 @@ class OrderController extends Controller
                     ->orderBy('time_start')
                     ->where(function ($query) {
                         // Get orders with status 'complete' and no cashCollection
-                        $query->whereIn('status', ['Complete', 'Pending','Accepted'])
+                        $query->whereIn('status', ['Complete', 'Pending', 'Accepted'])
                             ->whereDoesntHave('cashCollection');
                     });
                 break;
@@ -228,10 +229,12 @@ class OrderController extends Controller
             return view('orders.comment_edit', compact('order'));
         } elseif ($request->edit == "custom_location") {
             return view('orders.custom_location', compact('order'));
-        }if ($request->edit == "driver") {
-            return view('orders.driver_edit', compact('order','drivers'));
-        }if ($request->edit == "order_driver_status") {
-            return view('orders.driver_status_edit', compact('order','driver_statuses'));
+        }
+        if ($request->edit == "driver") {
+            return view('orders.driver_edit', compact('order', 'drivers'));
+        }
+        if ($request->edit == "order_driver_status") {
+            return view('orders.driver_status_edit', compact('order', 'driver_statuses'));
         }
     }
 
@@ -255,7 +258,7 @@ class OrderController extends Controller
         $order = Order::find($id);
 
         $order->order_total->transport_charges = $request->transport_charges;
-        
+
         $order->order_total->save();
         $order->update($input);
 
@@ -354,5 +357,41 @@ class OrderController extends Controller
         }
 
         return redirect()->route('orders.index')->with('success', 'Order updated successfully');
+    }
+
+    public function orderChat($id)
+    {
+
+        $chats = OrderChat::where('order_id', $id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return view('orders.chat', compact('chats', 'id'));
+    }
+
+    public function chatUpdate($order_id, Request $request)
+    {
+        $this->validate($request, [
+            'text' => 'required',
+        ]);
+
+        $order = Order::find($order_id);
+
+        OrderChat::create([
+            'order_id' => $order_id,
+            'user_id' => auth()->user()->id,
+            'text' => $request->text
+        ]);
+        $title = "Message on Order #" . $order_id . " by Admin.";
+
+        if ($request->staff == "on") {
+            $order->staff->user->notifyOnMobile($title, $request->text, $order_id);
+        }
+
+        if ($request->driver == "on") {
+            $order->driver->notifyOnMobile($title, $request->text, $order_id);
+        }
+
+        return redirect()->back();
     }
 }

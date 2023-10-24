@@ -117,6 +117,9 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/transactionUnapprove', [TransactionController::class,'Unapprove'])->name('transactions.Unapprove');
 
+    Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
+    Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
+
 });
 
 // Backups

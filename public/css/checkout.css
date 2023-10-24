@@ -55,3 +55,38 @@ input[type=radio]:checked+.staff-label {
 .staff-label {
     border: 1px solid transparent; /* Add your desired border properties */
 }
+
+.chat-container {
+    max-width: 400px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.chat-message {
+    margin-bottom: 10px;
+}
+.chat-role {
+    font-size: 12px;
+}
+
+.user-message {
+    background-color: #EAEAEA;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: right;
+}
+
+.no-message {
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.bot-message {
+    background-color: #DCF8C6;
+    padding: 10px;
+    border-radius: 10px;
+}

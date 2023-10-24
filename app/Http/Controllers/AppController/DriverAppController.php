@@ -68,6 +68,11 @@ class DriverAppController extends Controller
         $order->driver_status = $request->status;
         $order->save();
 
+        $title = "Message on Order #" . $order->id . " by Driver.";
+        $body = "Change order driver status to ".$request->status;
+
+        $order->staff->user->notifyOnMobile($title, $body, $order->id);
+
         return response()->json(['success' => 'Order Update Successfully']);
     }
 }

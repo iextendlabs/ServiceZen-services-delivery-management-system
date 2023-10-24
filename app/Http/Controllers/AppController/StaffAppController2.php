@@ -147,6 +147,10 @@ class StaffAppController2 extends Controller
             'text' => $request->text
         ]);
 
+        $title = "Message on Order #" . $order->id . " by Staff.";
+
+        $order->driver->notifyOnMobile($title, $request->text, $order->id);
+
         return response()->json(['success' => 'Order Update Successfully']);
     }
 
@@ -225,6 +229,19 @@ class StaffAppController2 extends Controller
                 'user_id' => $request->user_id,
                 'text' => $request->text
             ]);
+        }
+
+        $order = Order::find($request->order_id);
+
+
+        if ($order->service_staff_id === $request->user_id) {
+            
+            $title = "Message on Order #" . $order->id . " by Staff.";
+            $order->driver->notifyOnMobile($title, $request->text, $order->id);
+        } elseif ($order->driver_id === $request->user_id) {
+            
+            $title = "Message on Order #" . $order->id . " by Customer.";
+            $order->staff->user->notifyOnMobile($title, $request->text, $order->id);
         }
 
         $order_chat = OrderChat::where('order_id', $request->order_id)
