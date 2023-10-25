@@ -56,9 +56,9 @@ class StaffAppController2 extends Controller
 
         $orders_data->map(function ($order) {
             if(isset($order->driver)){
-                $order->driver = $order->driver->name;
+                $order->driver_name = $order->driver->name;
             }else{
-                $order->driver = "N/A";
+                $order->driver_name = "N/A";
             }
             return $order;
         });
