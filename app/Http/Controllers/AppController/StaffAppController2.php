@@ -73,7 +73,7 @@ class StaffAppController2 extends Controller
         } else {
             $notification_id = 0;
         }
-        
+
         $response = [
             'orders' => $orders_data,
             'notification_id' => $notification_id
@@ -285,7 +285,7 @@ class StaffAppController2 extends Controller
     public function orderChat(Request $request)
     {
         $order_chat = OrderChat::where('order_id', $request->order_id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         $order_chat->map(function ($chat) {
@@ -298,7 +298,7 @@ class StaffAppController2 extends Controller
     public function notification(Request $request)
     {
         $notifications = Notification::where('user_id', $request->user_id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         return response()->json($notifications);
