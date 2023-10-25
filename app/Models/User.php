@@ -140,6 +140,14 @@ class User extends Authenticatable
     public function notifyOnMobile($title, $body, $order_id = null)
     {
         if ($this->device_token) {
+
+            Notification::create([
+                'order_id' => $order_id,
+                'user_id' => $this->id,
+                'title' => $title,
+                'body' =>  $body
+            ]);
+            
             try {
                 $SERVER_API_KEY = env('FCM_SERVER_KEY');
 
@@ -176,12 +184,6 @@ class User extends Authenticatable
                 }
 
                 // Handle the response here if needed
-                Notification::create([
-                    'order_id' => $order_id,
-                    'user_id' => $this->id,
-                    'title' => $title,
-                    'body' =>  $body
-                ]);
 
                 $msg = "Notification sent successfully.";
                 return $msg;
