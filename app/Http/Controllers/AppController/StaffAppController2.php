@@ -64,7 +64,7 @@ class StaffAppController2 extends Controller
         });
 
         $notification = Notification::latest()->first();
-        if(count($notification)){
+        if(isset($notification)){
             $notification_id = $notification->id;
         }else{
             $notification_id = 0;
