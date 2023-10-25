@@ -53,6 +53,12 @@ class StaffAppController2 extends Controller
         }
 
         $orders_data->each->append('comments_text');
+
+        $orders_data->map(function ($order) {
+            $order->driver = $order->driver->name;
+            return $order;
+        });
+        
         $response = [
             'orders' => $orders_data,
             'notification' => true
