@@ -63,9 +63,15 @@ class StaffAppController2 extends Controller
             return $order;
         });
 
+        $notification = Notification::latest()->first();
+        if(count($notification)){
+            $notification_id = $notification->id;
+        }else{
+            $notification_id = 0;
+        }
         $response = [
             'orders' => $orders_data,
-            'notification' => true
+            'notification_id' => $notification_id
         ];
 
         return response()->json($response);
