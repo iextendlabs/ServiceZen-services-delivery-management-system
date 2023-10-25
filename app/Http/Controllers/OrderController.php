@@ -256,8 +256,9 @@ class OrderController extends Controller
         }
 
         $order = Order::find($id);
-
-        $order->order_total->transport_charges = $request->transport_charges;
+        if($request->transport_charges){
+            $order->order_total->transport_charges = $request->transport_charges;
+        }
 
         $order->order_total->save();
         $order->update($input);
