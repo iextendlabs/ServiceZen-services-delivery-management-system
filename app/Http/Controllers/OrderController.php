@@ -256,11 +256,11 @@ class OrderController extends Controller
         }
 
         $order = Order::find($id);
-        if($request->transport_charges){
+        if ($request->transport_charges) {
             $order->order_total->transport_charges = $request->transport_charges;
+            $order->order_total->save();
         }
 
-        $order->order_total->save();
         $order->update($input);
 
         if (isset($order->staff->commission)) {
@@ -364,8 +364,8 @@ class OrderController extends Controller
     {
 
         $chats = OrderChat::where('order_id', $id)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('orders.chat', compact('chats', 'id'));
     }
