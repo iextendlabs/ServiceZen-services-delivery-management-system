@@ -55,20 +55,25 @@ class StaffAppController2 extends Controller
         $orders_data->each->append('comments_text');
 
         $orders_data->map(function ($order) {
-            if(isset($order->driver)){
+            if (isset($order->driver)) {
                 $order->driver_name = $order->driver->name;
-            }else{
+            } else {
                 $order->driver_name = "N/A";
             }
             return $order;
         });
 
-        $notification = Notification::latest()->first();
-        if(isset($notification)){
+        $notification = Notification::where('user_id', $request->user_id)
+            ->latest()
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (isset($notification)) {
             $notification_id = $notification->id;
-        }else{
+        } else {
             $notification_id = 0;
         }
+        
         $response = [
             'orders' => $orders_data,
             'notification_id' => $notification_id
@@ -256,11 +261,11 @@ class StaffAppController2 extends Controller
 
 
         if ($order->service_staff_id === $request->user_id) {
-            
+
             $title = "Message on Order #" . $order->id . " by Staff.";
             $order->driver->notifyOnMobile($title, $request->text, $order->id);
         } elseif ($order->driver_id === $request->user_id) {
-            
+
             $title = "Message on Order #" . $order->id . " by Customer.";
             $order->staff->user->notifyOnMobile($title, $request->text, $order->id);
         }
