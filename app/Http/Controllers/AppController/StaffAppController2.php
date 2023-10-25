@@ -64,7 +64,6 @@ class StaffAppController2 extends Controller
         });
 
         $notification = Notification::where('user_id', $request->user_id)
-            ->latest()
             ->orderBy('id', 'desc')
             ->first();
 
