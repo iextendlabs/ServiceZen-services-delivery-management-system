@@ -101,22 +101,7 @@
                         </div>
                     </div>
                     @endif
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <strong>Status:</strong>
-                            <select name="status" class="form-control">
-                                <option value="">Select</option>
-                                @foreach ($statuses as $status)
-                                @if($status == $filter['status'])
-                                <option value="{{ $status }}" selected>{{ $status }}</option>
-                                @else
-                                <option value="{{ $status }}">{{ $status }}</option>
-                                @endif
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
+                    
                     <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
                     @if(auth()->user()->getRoleNames() == '["Admin"]')
                     <div class="col-md-4">
@@ -156,6 +141,54 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
+                            <strong>Driver:</strong>
+                            <select name="driver_id" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($users as $driver)
+                                @if($driver->getRoleNames() == '["Driver"]')
+                                @if($driver->id == $filter['driver'])
+                                <option value="{{ $driver->id }}" selected>{{ $driver->name }}</option>
+                                @else
+                                <option value="{{ $driver->id }}">{{ $driver->name }}</option>
+                                @endif
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Status:</strong>
+                            <select name="status" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($statuses as $status)
+                                @if($status == $filter['status'])
+                                <option value="{{ $status }}" selected>{{ $status }}</option>
+                                @else
+                                <option value="{{ $status }}">{{ $status }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <strong>Driver Status:</strong>
+                            <select name="driver_status" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($driver_statuses as $status)
+                                @if($status == $filter['driver_status'])
+                                <option value="{{ $status }}" selected>{{ $status }}</option>
+                                @else
+                                <option value="{{ $status }}">{{ $status }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <strong>Payment Method:</strong>
                             <select name="payment_method" class="form-control">
                                 <option value="">Select</option>
@@ -169,9 +202,6 @@
                             </select>
                         </div>
                     </div>
-                    <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
-
-
                     <div class="offset-6 col-md-3 text-center">
                         <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
                     </div>

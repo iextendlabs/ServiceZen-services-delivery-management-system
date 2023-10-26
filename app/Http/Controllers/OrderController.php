@@ -40,6 +40,7 @@ class OrderController extends Controller
         $currentDate = Carbon::today()->toDateString();
 
         $statuses = config('app.order_statuses');
+        $driver_statuses = config('app.order_driver_statuses');
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $filter = [
@@ -51,6 +52,8 @@ class OrderController extends Controller
             'appointment_date' => $request->appointment_date,
             'created_at' => $request->created_at,
             'order_id' => $request->order_id,
+            'driver_status' => $request->driver_status,
+            'driver' => $request->driver_id,
         ];
         $currentUser = Auth::user();
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
@@ -98,6 +101,10 @@ class OrderController extends Controller
             }
         }
 
+        if ($request->driver_status) {
+            $query->where('driver_status', '=', $request->driver_status);
+        }
+
 
         if ($request->affiliate_id) {
             $query->where('affiliate_id', '=', $request->affiliate_id);
@@ -109,6 +116,10 @@ class OrderController extends Controller
 
         if ($request->staff_id) {
             $query->where('service_staff_id', '=', $request->staff_id);
+        }
+
+        if ($request->driver_id) {
+            $query->where('driver_id', '=', $request->driver_id);
         }
 
         if ($request->payment_method) {
@@ -180,9 +191,9 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer_id', 'payment_method']);
+            $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer_id', 'payment_method','driver_status','driver_id']);
             $orders->appends($filters);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter','driver_statuses'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

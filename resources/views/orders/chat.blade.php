@@ -30,7 +30,7 @@
                     @if(count($chats))
                     <div class="scroll-div">
                         @foreach($chats as $chat)
-                        <div class="chat-message {{ $chat->user_id === auth()->user()->id ? 'bot-message' : 'user-message' }}">
+                        <div class="chat-message {{ $chat->user_id == auth()->user()->id ? 'bot-message' : 'user-message' }}">
                             {{ $chat->text }} <br>
                             @foreach($chat->user->getRoleNames() as $v)
                             <span class="chat-role">{{ $v }}</span>

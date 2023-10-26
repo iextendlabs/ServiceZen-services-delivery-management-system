@@ -23,7 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'device_token'
+        'device_token',
+        'last_notification_id'
     ];
 
     /**
