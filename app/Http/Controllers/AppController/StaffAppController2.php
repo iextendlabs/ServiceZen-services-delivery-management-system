@@ -251,7 +251,7 @@ class StaffAppController2 extends Controller
     public function notification(Request $request)
     {
         $user = User::find($request->user_id);
-        
+
         $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
         $notifications = Notification::where('user_id', $request->user_id)
@@ -260,8 +260,6 @@ class StaffAppController2 extends Controller
             ->get();
 
         if (!$notifications->isEmpty()) {
-            $user->last_notification_id = $notifications->first()->id;
-            $user->save();
 
             $notifications->map(function ($notification) use ($user) {
                 if ($notification->id > $user->last_notification_id) {
@@ -271,6 +269,9 @@ class StaffAppController2 extends Controller
                 }
                 return $notification;
             });
+
+            $user->last_notification_id = $notifications->first()->id;
+            $user->save();
         }
 
         return response()->json($notifications);
