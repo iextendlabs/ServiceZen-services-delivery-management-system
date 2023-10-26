@@ -63,19 +63,15 @@ class StaffAppController2 extends Controller
             return $order;
         });
 
+        $user = User::find($request->user_id);
+        
         $notification = Notification::where('user_id', $request->user_id)
-            ->orderBy('id', 'desc')
-            ->first();
-
-        if (isset($notification)) {
-            $notification_id = $notification->id;
-        } else {
-            $notification_id = 0;
-        }
+            ->where('id','>',$user->last_notification_id)
+            ->count();
 
         $response = [
             'orders' => $orders_data,
-            'notification_id' => $notification_id
+            'notification' => $notification
         ];
 
         return response()->json($response);
