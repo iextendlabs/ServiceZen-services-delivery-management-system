@@ -30,7 +30,7 @@ Route::post('orderStatusUpdate', [StaffAppController2::class, 'orderStatusUpdate
 Route::post('driverOrderStatusUpdate', [StaffAppController2::class, 'driverOrderStatusUpdate']);
 Route::post('rescheduleOrder', [StaffAppController2::class, 'rescheduleOrder']);
 Route::get('timeSlots', [StaffAppController2::class, 'timeSlots']);
-Route::get('orderChat', [StaffAppController2::class, 'orderChat']);
+Route::get('orderChat', [AppChatController::class, 'orderChat']);
 Route::post('addOrderChat', [StaffAppController2::class, 'addOrderChat']);
 Route::get('notification', [StaffAppController2::class, 'notification']);
 Route::get('driverOrders', [DriverAppController::class, 'orders']);

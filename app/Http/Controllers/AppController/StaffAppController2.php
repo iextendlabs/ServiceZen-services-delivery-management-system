@@ -247,53 +247,6 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Cash Collected Successfully']);
     }
 
-    public function addOrderChat(Request $request)
-    {
-        if ($request->text) {
-            OrderChat::create([
-                'order_id' => $request->order_id,
-                'user_id' => $request->user_id,
-                'text' => $request->text
-            ]);
-        }
-
-        $order = Order::find($request->order_id);
-
-
-        if ($order->service_staff_id === $request->user_id) {
-
-            $title = "Message on Order #" . $order->id . " by Staff.";
-            $order->driver->notifyOnMobile($title, $request->text, $order->id);
-        } elseif ($order->driver_id === $request->user_id) {
-
-            $title = "Message on Order #" . $order->id . " by Customer.";
-            $order->staff->user->notifyOnMobile($title, $request->text, $order->id);
-        }
-
-        $order_chat = OrderChat::where('order_id', $request->order_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $order_chat->map(function ($chat) {
-            $chat->role = $chat->user->getRoleNames();
-            return $chat;
-        });
-
-        return response()->json($order_chat);
-    }
-
-    public function orderChat(Request $request)
-    {
-        $order_chat = OrderChat::where('order_id', $request->order_id)
-            ->orderBy('id', 'desc')
-            ->get();
-
-        $order_chat->map(function ($chat) {
-            $chat->role = $chat->user->getRoleNames();
-            return $chat;
-        });
-        return response()->json($order_chat);
-    }
 
     public function notification(Request $request)
     {
