@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController\{
     StaffAppController2,
-    DriverAppController
+    DriverAppController,
+    ChatController
 };
 /*
 |--------------------------------------------------------------------------
@@ -30,8 +31,8 @@ Route::post('orderStatusUpdate', [StaffAppController2::class, 'orderStatusUpdate
 Route::post('driverOrderStatusUpdate', [StaffAppController2::class, 'driverOrderStatusUpdate']);
 Route::post('rescheduleOrder', [StaffAppController2::class, 'rescheduleOrder']);
 Route::get('timeSlots', [StaffAppController2::class, 'timeSlots']);
-Route::get('orderChat', [AppChatController::class, 'orderChat']);
-Route::post('addOrderChat', [StaffAppController2::class, 'addOrderChat']);
+Route::get('orderChat', [ChatController::class, 'orderChat']);
+Route::post('addOrderChat', [ChatController::class, 'addOrderChat']);
 Route::get('notification', [StaffAppController2::class, 'notification']);
 Route::get('driverOrders', [DriverAppController::class, 'orders']);
 Route::post('driverLogin', [DriverAppController::class, 'login']);
