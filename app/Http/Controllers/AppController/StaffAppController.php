@@ -36,7 +36,7 @@ class StaffAppController extends Controller
             ->with('cashCollection')->get();
 
         $orders_data->map(function ($order) {
-            if ($order->cashCollection) {
+            if (isset($order->cashCollection)) {
                 $order->cashCollection_status = true;
             } else {
                 $order->cashCollection_status = false;
