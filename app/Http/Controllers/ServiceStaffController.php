@@ -80,6 +80,7 @@ class ServiceStaffController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'phone' => 'required',
+            'whatsapp' => 'required',
             'email' => 'required|email|unique:users,email',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',

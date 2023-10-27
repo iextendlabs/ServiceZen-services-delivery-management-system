@@ -44,6 +44,18 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <span style="color: red;">*</span><strong>Phone Number:</strong>
+                    <input type="number" name="phone" value="{{ $driver->driver->phone }}" class="form-control" placeholder="Phone Number">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
+                    <input type="number" name="whatsapp" value="{{ $driver->driver->whatsapp }}" class="form-control" placeholder="Whatsapp Number">
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

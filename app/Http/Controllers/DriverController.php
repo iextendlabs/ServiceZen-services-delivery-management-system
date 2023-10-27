@@ -1,7 +1,8 @@
 <?php
     
 namespace App\Http\Controllers;
-    
+
+use App\Models\Driver;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -62,6 +63,8 @@ class DriverController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'phone' => 'required',
+            'whatsapp' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
         ]);
@@ -74,6 +77,9 @@ class DriverController extends Controller
 
         $driver->assignRole('Driver');
         
+        $input['user_id'] = $driver->id;
+        
+        Driver::create($input);
         return redirect()->route('drivers.index')
                         ->with('success','Driver created successfully.');
     }

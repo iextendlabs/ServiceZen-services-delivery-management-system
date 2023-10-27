@@ -56,6 +56,11 @@ class User extends Authenticatable
         return $this->hasOne(Staff::class);
     }
 
+    public function driver()
+    {
+        return $this->hasOne(Driver::class);
+    }
+
     public function averageRating()
     {
         return Review::where('staff_id', $this->id)->avg('rating');
