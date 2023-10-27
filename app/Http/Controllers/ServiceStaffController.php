@@ -195,6 +195,7 @@ class ServiceStaffController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'whatsapp' => 'required',
             'phone' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',

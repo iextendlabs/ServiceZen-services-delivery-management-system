@@ -117,10 +117,12 @@ class DriverController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'phone' => 'required',
+            'whatsapp' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'same:confirm-password',
         ]);
-
+        
         $input = $request->all();
         if(!empty($input['password'])){ 
             $input['password'] = Hash::make($input['password']);
@@ -128,9 +130,17 @@ class DriverController extends Controller
             $input = Arr::except($input,array('password'));    
         }
 
-        $driver = User::find($id);
-        $driver->update($input);
-    
+        $input['user_id'] = $id;
+
+        $serversDriver = User::find($id);
+        $serversDriver->update($input);
+
+        $driver = Driver::where('user_id',$id)->first();
+        if ($driver) {
+            $driver->update($input);
+        } else {
+            Driver::create($input);
+        }
         return redirect()->route('drivers.index')
                         ->with('success','Driver updated successfully');
     }
