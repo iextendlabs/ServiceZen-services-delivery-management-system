@@ -19,7 +19,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\Storage;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
 
-class StaffAppController2 extends Controller
+class StaffAppController extends Controller
 
 {
     public function orders(Request $request)
