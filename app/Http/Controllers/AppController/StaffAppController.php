@@ -27,7 +27,7 @@ class StaffAppController extends Controller
         $setting = Setting::where('key', 'Not Allowed Order Status for Staff App')->first();
         $status = explode(',', $setting->value);
 
-        $currentDate = Carbon::today();
+        $currentDate = Carbon::today()->toDateString();
        
         $orders_data = Order::where('service_staff_id', $request->user_id)
             ->whereNotIn('status', $status)
