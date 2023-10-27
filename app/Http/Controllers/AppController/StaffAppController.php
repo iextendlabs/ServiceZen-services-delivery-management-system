@@ -49,6 +49,10 @@ class StaffAppController extends Controller
         $orders_data->map(function ($order) {
             if (isset($order->driver)) {
                 $order->driver_name = $order->driver->name;
+                if(isset($order->driver->driver)){
+                    $order->driver_number = $order->driver->driver->phone;
+                    $order->driver_whatsapp = $order->driver->driver->whatsapp;
+                }
             } else {
                 $order->driver_name = "N/A";
             }
