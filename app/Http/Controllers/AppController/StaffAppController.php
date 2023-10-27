@@ -31,12 +31,12 @@ class StaffAppController extends Controller
        
         $orders_data = Order::where('service_staff_id', $request->user_id)
             ->whereNotIn('status', $status)
-            ->where('date', '<=', $currentDate)
+            ->where('date', '=', $currentDate)
             ->limit(config('app.staff_order_limit'))
             ->with('cashCollection')->get();
 
         $orders_data->map(function ($order) {
-            if (isset($order->cashCollection)) {
+            if ($order->cashCollection) {
                 $order->cashCollection_status = true;
             } else {
                 $order->cashCollection_status = false;
