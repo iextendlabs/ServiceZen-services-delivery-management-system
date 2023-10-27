@@ -32,6 +32,7 @@ class DriverAppController extends Controller
 
         $orders_data->map(function ($order) {
             $order->staff_number = $order->staff->phone;
+            $order->staff_whatsapp = $order->staff->whatsapp;
             return $order;
         });
 
