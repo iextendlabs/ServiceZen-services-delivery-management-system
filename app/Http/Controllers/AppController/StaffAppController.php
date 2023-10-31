@@ -125,7 +125,6 @@ class StaffAppController extends Controller
         $order = Order::find($request->order_id);
 
         if ($request->status == "Complete") {
-            $order->driver_status = "Pending";
             if (isset($order->affiliate)) {
                 $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
             }
