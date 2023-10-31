@@ -21,14 +21,22 @@ class DriverAppController extends Controller
         $driver_order_status = explode(',', $driver_order_setting->value);
         $driver_id = $request->user_id;
         $currentDate = Carbon::today()->toDateString();
-
-        $orders_data = Order::where('date', $currentDate)
+        
+        if($request->user_id == 867) {
+             $orders_data = Order::where('driver_id', $driver_id)
+            ->orderBy('updated_at', 'desc')
+            ->limit(config('app.staff_order_limit'))
+            ->get();
+        } else {
+             $orders_data = Order::where('date', $currentDate)
             ->whereNotIn('status', $order_status)
             ->whereNotIn('driver_status', $driver_order_status)
             ->where('driver_id', $driver_id)
             ->orderBy('updated_at', 'desc')
             ->limit(config('app.staff_order_limit'))
             ->get();
+        }
+
 
         $orders_data->map(function ($order) {
             $order->staff_number = $order->staff->phone;
@@ -53,7 +61,7 @@ class DriverAppController extends Controller
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
 
-            if ($request->has('fcmToken')) {
+            if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
                 $user->save();
             }

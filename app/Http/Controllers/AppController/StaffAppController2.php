@@ -100,7 +100,7 @@ class StaffAppController2 extends Controller
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
 
-            if ($request->has('fcmToken')) {
+            if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
                 $user->save();
             }

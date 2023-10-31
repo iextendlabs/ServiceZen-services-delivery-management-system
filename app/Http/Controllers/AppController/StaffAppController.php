@@ -1,3 +1,5 @@
+
+text/x-generic StaffAppController.php ( PHP script, ASCII text )
 <?php
 
 namespace App\Http\Controllers\AppController;
@@ -28,12 +30,18 @@ class StaffAppController extends Controller
         $status = explode(',', $setting->value);
 
         $currentDate = Carbon::today()->toDateString();
-       
+       if ($request->user_id == 862){
+            $orders_data = Order::where('service_staff_id', $request->user_id)
+            ->limit(config('app.staff_order_limit'))
+            ->with('cashCollection')->get();
+       } else {
+           
         $orders_data = Order::where('service_staff_id', $request->user_id)
             ->whereNotIn('status', $status)
             ->where('date', '=', $currentDate)
             ->limit(config('app.staff_order_limit'))
             ->with('cashCollection')->get();
+       }
 
         $orders_data->map(function ($order) {
             if (isset($order->cashCollection)) {
@@ -96,7 +104,7 @@ class StaffAppController extends Controller
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
 
-            if ($request->has('fcmToken')) {
+            if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
                 $user->save();
             }
