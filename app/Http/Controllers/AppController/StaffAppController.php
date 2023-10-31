@@ -1,5 +1,4 @@
 
-text/x-generic StaffAppController.php ( PHP script, ASCII text )
 <?php
 
 namespace App\Http\Controllers\AppController;
