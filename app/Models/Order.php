@@ -100,4 +100,13 @@ class Order extends Model
     {
         return $this->hasOne(User::class, 'id', 'driver_id');
     }
+    public function chats()
+    {
+        return $this->hasMany(OrderChat::class, 'order_id');
+    }
+    public function latestChat()
+    {
+        return $this->hasOne(OrderChat::class, 'order_id')->latest();
+    }
+
 }
