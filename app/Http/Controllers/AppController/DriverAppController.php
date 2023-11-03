@@ -15,7 +15,7 @@ class DriverAppController extends Controller
 {
     public function updateToken(Request $request){
         if($request->user_id && $request->device_token){
-            $user = User::where('user_id', $request->user_id)->first();
+            $user = User::where('id', $request->user_id)->first();
             $user->device_token = $request->device_token;
             $user->save();
         }
