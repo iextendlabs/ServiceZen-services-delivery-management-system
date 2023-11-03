@@ -13,6 +13,13 @@ use App\Models\User;
 class DriverAppController extends Controller
 
 {
+    public function updateToken(Request $request){
+        if($request->user_id && $request->device_token){
+            $user = User::where('user_id', $request->user_id)->first();
+            $user->device_token = $request->device_token;
+            $user->save();
+        }
+    }
     public function orders(Request $request)
     {
         $order_status_setting = Setting::where('key', 'Not Allowed Order Status for Driver App')->first();

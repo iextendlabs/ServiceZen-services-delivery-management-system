@@ -39,3 +39,4 @@ Route::get('notification', [StaffAppController2::class, 'notification']);
 Route::get('driverOrders', [DriverAppController::class, 'orders']);
 Route::post('driverLogin', [DriverAppController::class, 'login']);
 Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
+Route::post('updateToken', [DriverAppController::class, 'updateToken']);
