@@ -186,7 +186,7 @@ class ReviewController extends Controller
             }
         }
 
-        if ($review->video && file_exists(public_path('review-videos') . '/' . $review->video)) {
+        if ($review && $review->video && file_exists(public_path('review-videos') . '/' . $review->video)) {
             unlink(public_path('review-videos') . '/' . $review->video);
         }
 

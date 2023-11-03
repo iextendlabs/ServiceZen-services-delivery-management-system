@@ -313,7 +313,7 @@ class CheckOutController extends Controller
         if (!isset($area)) {
 
             $address = Session::get('address');
-            $area = $address['area'];
+            $area = $address ? $address['area']: '';
         }
 
         if ($request->has('order_id') && (int)$request->order_id) {
