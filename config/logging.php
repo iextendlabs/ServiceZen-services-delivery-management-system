@@ -51,6 +51,12 @@ return [
     */
 
     'channels' => [
+        'api' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/api.log'),
+            'level' => 'debug', // Adjust the log level as needed
+            'days' => 14, // Adjust the number of log files to retain
+        ],
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],

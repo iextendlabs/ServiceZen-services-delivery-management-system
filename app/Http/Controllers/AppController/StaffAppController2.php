@@ -22,6 +22,10 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
 class StaffAppController2 extends Controller
 
 {
+    public function __construct()
+    {
+        $this->middleware('log.api');
+    }
     public function orders(Request $request)
     {
         $setting = Setting::where('key', 'Not Allowed Order Status for Staff App')->first();

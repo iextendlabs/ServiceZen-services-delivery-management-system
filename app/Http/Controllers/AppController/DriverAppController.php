@@ -13,6 +13,10 @@ use App\Models\User;
 class DriverAppController extends Controller
 
 {
+    public function __construct()
+    {
+        $this->middleware('log.api');
+    }
     public function updateToken(Request $request){
         if($request->user_id){
             $user = User::where('id', $request->user_id)->first();
