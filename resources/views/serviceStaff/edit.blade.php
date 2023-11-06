@@ -65,7 +65,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                            <input type="number" name="whatsapp" value="{{ $serviceStaff->staff->whatsapp }}" class="form-control" placeholder="Whatsapp Number">
+                            <input type="text" name="whatsapp" value="{{ $serviceStaff->staff->whatsapp }}" class="form-control" placeholder="Whatsapp Number">
                         </div>
                     </div>
                     <div class="col-md-12">
