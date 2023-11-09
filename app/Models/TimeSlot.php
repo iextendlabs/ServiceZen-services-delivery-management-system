@@ -57,7 +57,9 @@ class TimeSlot extends Model
         $allZones = StaffZone::all();
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
 
-        if (auth()->check() && auth()->user()->hasRole('Admin') ? $staffZone : ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone)) {
+        $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
+
+        if ($isAdmin ? $staffZone : ($carbonDate->startOfDay() >= Carbon::now()->startOfDay() && $staffZone)) {
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
 
             $dayName = $carbonDate->formatLocalized('%A');
@@ -77,14 +79,26 @@ class TimeSlot extends Model
 
             if (count($holiday) == 0) {
                 if ($date == $currentDate) {
-                    $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
-                        $query->where('staff_zone_id', $staffZone->id);
-                    })->where('date', '=', $date)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
-
-                    if (count($timeSlots) == 0) {
+                    if($isAdmin){
                         $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                             $query->where('staff_zone_id', $staffZone->id);
-                        })->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                        })->where('date', '=', $date)->orderBy('time_start')->get();
+                    } else {
+                        $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                            $query->where('staff_zone_id', $staffZone->id);
+                        })->where('date', '=', $date)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                    }
+                    
+                    if (count($timeSlots) == 0) {
+                        if($isAdmin){
+                            $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                                $query->where('staff_zone_id', $staffZone->id);
+                            })->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                        } else {
+                            $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
+                                $query->where('staff_zone_id', $staffZone->id);
+                            })->orderBy('time_start')->get()
+                        }
                     }
                 } else {
                     $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
