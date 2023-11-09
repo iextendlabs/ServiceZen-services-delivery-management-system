@@ -97,7 +97,7 @@ class TimeSlot extends Model
                         } else {
                             $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                                 $query->where('staff_zone_id', $staffZone->id);
-                            })->orderBy('time_start')->get()
+                            })->orderBy('time_start')->get();
                         }
                     }
                 } else {
