@@ -79,11 +79,12 @@ class Order extends Model
     public function getCommentsTextAttribute()
     {
         $comments = $this->comments->sortByDesc('created_at')->pluck('comment');
-        $services = $this->orderServices->sortByDesc('service_name')->pluck('service_name')->toArray();
         $comments->prepend($this->order_comment);
-        $comments->prepend('Services [ ' . implode(',', $services) . '] , comments:');
-        // TODO add services to order response in appcontroller
         return $comments->toArray();
+    }
+    public function getServicesAttribute()
+    {
+        return $this->orderServices->sortByDesc('service_name')->pluck('service_name')->toArray();
     }
 
     public function getStaffTransactionStatus()

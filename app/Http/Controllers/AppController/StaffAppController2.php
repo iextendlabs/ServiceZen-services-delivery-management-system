@@ -57,6 +57,7 @@ class StaffAppController2 extends Controller
         }
 
         $orders_data->each->append('comments_text');
+        $orders_data->each->append('services');
 
         $orders_data->map(function ($order) {
             if (isset($order->driver)) {
