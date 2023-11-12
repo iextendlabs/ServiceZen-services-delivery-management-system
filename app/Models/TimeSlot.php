@@ -54,7 +54,7 @@ class TimeSlot extends Model
         $holiday = [];
         $staff_ids = [];
         $available_ids = [];
-        $allZones = StaffZone::all();
+        $allZones = StaffZone::orderBy("name")->get();
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($area) . "%"])->first();
 
         $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
