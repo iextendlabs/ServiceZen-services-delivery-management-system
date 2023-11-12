@@ -93,11 +93,11 @@ class TimeSlot extends Model
                         if($isAdmin){
                             $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                                 $query->where('staff_zone_id', $staffZone->id);
-                            })->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                            })->orderBy('time_start')->get();
                         } else {
                             $timeSlots = TimeSlot::whereHas('staffGroup.staffZones', function ($query) use ($staffZone) {
                                 $query->where('staff_zone_id', $staffZone->id);
-                            })->orderBy('time_start')->get();
+                            })->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
                         }
                     }
                 } else {
