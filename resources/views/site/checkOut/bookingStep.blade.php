@@ -108,7 +108,7 @@
                                 <option value="">-- Select Zone -- </option>
                                 <!-- Loop through the $zones array to generate options -->
                                 @foreach ($zones as $zone)
-                                <option @if (old('area')==$zone || $addresses['area']==$zone) selected @endif value="{{ $zone }}">
+                                <option  @if (old('area')==$zone || $addresses['area']==$zone || (session('address') && session('address')['area'] == $zone )) selected @endif value="{{ $zone }}">
                                     {{ $zone }}
                                 </option>
                                 @endforeach

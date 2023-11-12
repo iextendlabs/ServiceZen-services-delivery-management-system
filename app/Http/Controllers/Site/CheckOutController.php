@@ -130,7 +130,8 @@ class CheckOutController extends Controller
         $staff_and_time = [];
 
         $staff_and_time['date'] = $request->date;
-        [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
+        $staff_id = $request->service_staff_id;
+        $time_slot = $request->time_slot_id[$staff_id];
         $staff_and_time['time_slot'] = $time_slot;
         $staff_and_time['service_staff_id'] = $staff_id;
 
