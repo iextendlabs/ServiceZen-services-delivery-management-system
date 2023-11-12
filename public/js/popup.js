@@ -296,3 +296,4 @@ function placeMarker(location) {
 
     fillAddressFieldsFromMarker();
 }
+$('#zone').change(() => $('#area').val($('#zone').val()));

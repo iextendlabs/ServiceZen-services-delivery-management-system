@@ -104,11 +104,18 @@
                         @endif
                         @endforeach
                      @endforeach
-
+                     @if(count($staff_displayed ) == 0)
+                     <div class="alert alert-danger">
+                        No Staff Available
+                    </div>
+                     @endif
                     </div>
                     <hr>
                     <h3>Available Time Slot for Selected Staff</h3>
                     <div class="d-flex flex-row col-12" > 
+                        @if(count($staff_slots ) == 0)
+                        No Staff Selected Yet
+                        @endif
                         @foreach($staff_slots as $staff_id=>$staff_single_slot)
                         <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @else  style="display: none"  @endif class="col-6 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
                             <option value="">Select Slot</option>
