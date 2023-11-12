@@ -45,7 +45,7 @@ class TimeSlot extends Model
 
     public static function getTimeSlotsForArea($area, $date, $currentOrder = null)
     {
-
+        //TODO check area if empty 
         $timeSlots = [];
         $holiday = [];
         $staff_ids = [];
