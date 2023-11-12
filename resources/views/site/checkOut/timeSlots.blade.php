@@ -257,16 +257,3 @@
         @endif
     </div>
 </div>
-<div class="col-md-12">
-    <div class="form-group" id="detail-container">
-        <strong>Selected Time Slot:</strong><span id="selected-time-slot">
-            @if(isset($order))
-            @if(isset($order->time_slot))
-            {{ $order->time_slot_value }}
-            @endif
-            @endif
-        </span>
-        <br>
-        <strong>Selected Staff:</strong><span id="selected-staff">{{ isset($order) ? $order->staff_name : null }}</span>
-    </div>
-</div>
