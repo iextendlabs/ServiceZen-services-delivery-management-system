@@ -12,7 +12,7 @@
         <select name="zone" id="zone" class="form-control">
             <option value=""></option>
             @foreach($allZones as $zone)
-            <option value="{{ $zone->name }}" data-transport-charges="{{ isset($staffZone) &&  $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}" {{  session('address')  && session('address')['area'] && session('address')['area'] == $zone->name ? 'selected' : '' }}  @if(isset($order)&&$order->area == $zone->name) selected @endif>
+            <option value="{{ $zone->name }}" data-transport-charges="{{ isset($staffZone) &&  $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}" {{  session('address')  && session('address')['area'] && session('address')['area'] == $zone->name ? 'selected' : '' }}   @if(isset($area)&&$area == $zone->name) selected @endif @if(isset($order)&&$order->area == $zone->name) selected @endif>
                 {{ $zone->name }}
             </option>
             @endforeach
