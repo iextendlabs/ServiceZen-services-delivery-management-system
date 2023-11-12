@@ -144,10 +144,7 @@ function mapReady() {
 }
 
 $(document).ready(function () {
-    if (window.location.pathname === "/bookingStep") $("#zoneSelect").hide();
-    else $("#zoneSelect").show();
-
-    $(".modal-footer .btn-primary").click(function () {
+        $(".modal-footer .btn-primary").click(function () {
         $.ajax({
             cache: false,
             url: "/saveLocation", // Replace with your server endpoint URL
