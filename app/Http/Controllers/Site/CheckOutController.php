@@ -315,6 +315,7 @@ class CheckOutController extends Controller
         }
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
+        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
     }
 
     public function applyCoupon($coupon_code)
