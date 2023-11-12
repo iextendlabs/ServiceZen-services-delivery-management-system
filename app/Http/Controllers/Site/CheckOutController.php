@@ -309,23 +309,12 @@ class CheckOutController extends Controller
         if ($request->has('date')) {
             $date = $request->date;
         }
-
-
         if (!isset($area)) {
-
             $address = Session::get('address');
             $area = $address ? $address['area']: '';
         }
-
-        if ($request->has('order_id') && (int)$request->order_id) {
-            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $request->order_id);
-
-            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'order', 'date', 'area'));
-        } else {
-            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-
-            return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
-        }
+        $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
     }
 
     public function applyCoupon($coupon_code)
