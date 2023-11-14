@@ -104,7 +104,7 @@
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Area:</strong>
 
-                            <select required class="form-control" name="area" id="area">
+                            <select readonly required class="form-control" name="area" id="area">
                                 <option value="">-- Select Zone -- </option>
                                 <!-- Loop through the $zones array to generate options -->
                                 @foreach ($zones as $zone)

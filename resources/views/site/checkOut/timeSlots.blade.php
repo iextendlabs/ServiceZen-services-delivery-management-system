@@ -112,7 +112,7 @@
                     </div>
                     <hr>
                     <h3>Available Time Slot for Selected Staff</h3>
-                    <div class="row" > 
+                    <div class="row text-center" > 
                         @if(count($staff_slots ) == 0)
                         No Staff Availalbe for the Selected Date / Zone
                         @endif
@@ -131,7 +131,7 @@
 <br>
 <div class="row">
 <div class="col-12 text-center">
-    <h3 class="text-center">All Slot Details</h3>
+    <h3 class="text-center">All Slot Data</h3>
         <button onclick="$('#scheduleInfo,#showBtn').toggle()" id="showBtn" type="button" class="btn btn-outline-primary">Show</button>
 </div>
 </div>
