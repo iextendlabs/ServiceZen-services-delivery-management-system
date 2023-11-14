@@ -27,7 +27,7 @@
             </div>
             <div class="col-md-12 text-center">
                 <div class="col">
-                    <div class="d-flex flex-row">
+                    <div class="row">
                         @php
                         $staff_displayed = [];
                         $staff_slots = [];
@@ -112,12 +112,12 @@
                     </div>
                     <hr>
                     <h3>Available Time Slot for Selected Staff</h3>
-                    <div class="d-flex flex-row col-12" > 
+                    <div class="row" > 
                         @if(count($staff_slots ) == 0)
-                        No Staff Selected Yet
+                        No Staff Availalbe for the Selected Date / Zone
                         @endif
                         @foreach($staff_slots as $staff_id=>$staff_single_slot)
-                        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @else  style="display: none"  @endif class="col-6 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
+                        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @else  style="display: none"  @endif class="form-control col-sm-12 col-md-8 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
                             <option value="">Select Slot</option>
                             @foreach($staff_single_slot as $staff_single_values)
                             <option value="{{$staff_single_values[2]}}" @if(isset($order)  && $order->time_slot_id == $staff_single_values[2]) selected @endif>{{$staff_single_values[1]}}</option>
@@ -129,9 +129,15 @@
             </div>
         </div>
 <br>
-        <h3 class="text-center">Schedule Information Based On Date and Zone</h3>
-
-<div class="col-md-12 scroll-div">
+<div class="row">
+<div class="col-12 text-center">
+    <h3 class="text-center">All Slot Details</h3>
+        <button onclick="$('#scheduleInfo,#showBtn').toggle()" id="showBtn" type="button" class="btn btn-outline-primary">Show</button>
+</div>
+</div>
+        
+        
+<div class="col-md-12 scroll-div" id="scheduleInfo" style="display: none">
     <strong>Time Slots : {{ isset($order) ? $order->area : $area }}</strong>
     <!-- <input type="hidden" name="area" value="{{ isset($order) ? $order->area : $area }}"> -->
     <input type="hidden" name="order_id" value="{{ isset($order) ? $order->id : null }}">
@@ -257,3 +263,6 @@
         @endif
     </div>
 </div>
+<script>
+    $('[name=service_staff_id]:checked').length === 0 && $('[name=service_staff_id]').first().attr('checked', true).trigger('change');
+</script>
