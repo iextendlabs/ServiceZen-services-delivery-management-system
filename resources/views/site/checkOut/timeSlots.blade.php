@@ -221,7 +221,7 @@
                             @if( auth()->user() && (auth()->user()->getRoleNames() == '["Supervisor"]' || auth()->user()->getRoleNames() == '["Manager"]'))
                             <strong>Whoops!</strong>All of Your Staff is Booked.
                             @else
-                            <strong>Whoops!</strong>Staff is Booked Already for this slot.
+                            <strong>Whoops! </strong> No Staff Available! 
                             @endif
                             ( On Holiday : {{$holiday_counter}})
 
