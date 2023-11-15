@@ -125,7 +125,7 @@ svg {
   .location-search {
       position: relative;
       height: 48px;
-      min-width: 418px;
+      /* min-width: 418px; */
       border: 1px solid rgba(0, 0, 0, .12);
       border-radius: 24px;
       display: flex;
@@ -177,7 +177,7 @@ svg {
       justify-content: center;
       background: #d9f6ff;
       border-radius: 16px;
-      min-width: 32px;
+      /* min-width: 32px; */
       height: 32px;
       padding: 0 8px 2px;
       cursor: pointer;
@@ -188,7 +188,7 @@ svg {
       font-size: 14px;
       line-height: 18px;
       color: #00c3ff;
-      width: 105px;
+      /* width: 105px; */
       margin-left: 2px;
   }
 

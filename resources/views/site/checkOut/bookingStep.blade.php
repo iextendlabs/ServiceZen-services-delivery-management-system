@@ -58,7 +58,7 @@
                             </svg>
                         </div>
                         <div class="locate-me" id="manualLocationButton">
-                            <span>Update location</span>
+                            <span>Update </span>
                             <div class="locate-me-icon">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12.375 9C12.375 10.8633 10.8633 12.375 9 12.375C7.10508 12.375 5.625 10.8633 5.625 9C5.625 7.10508 7.10508 5.625 9 5.625C10.8633 5.625 12.375 7.10508 12.375 9ZM9 7.3125C8.06836 7.3125 7.3125 8.06836 7.3125 9C7.3125 9.93164 8.06836 10.6875 9 10.6875C9.93164 10.6875 10.6875 9.93164 10.6875 9C10.6875 8.06836 9.93164 7.3125 9 7.3125ZM9 0C9.46758 0 9.84375 0.37793 9.84375 0.84375V2.30238C12.8953 2.68313 15.3176 5.10469 15.6973 8.15625H17.1562C17.6238 8.15625 18 8.53242 18 9C18 9.46758 17.6238 9.84375 17.1562 9.84375H15.6973C15.3176 12.8953 12.8953 15.3176 9.84375 15.6973V17.1562C9.84375 17.6238 9.46758 18 9 18C8.53242 18 8.15625 17.6238 8.15625 17.1562V15.6973C5.10469 15.3176 2.68313 12.8953 2.30238 9.84375H0.84375C0.37793 9.84375 0 9.46758 0 9C0 8.53242 0.37793 8.15625 0.84375 8.15625H2.30238C2.68313 5.10469 5.10469 2.68313 8.15625 2.30238V0.84375C8.15625 0.37793 8.53242 0 9 0ZM3.9375 9C3.9375 11.7949 6.20508 14.0625 9 14.0625C11.7949 14.0625 14.0625 11.7949 14.0625 9C14.0625 6.20508 11.7949 3.9375 9 3.9375C6.20508 3.9375 3.9375 6.20508 3.9375 9Z" fill="#00C3FF"></path>
@@ -104,11 +104,11 @@
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Area:</strong>
 
-                            <select required class="form-control" name="area" id="area">
+                            <select readonly required class="form-control" name="area" id="area">
                                 <option value="">-- Select Zone -- </option>
                                 <!-- Loop through the $zones array to generate options -->
                                 @foreach ($zones as $zone)
-                                <option @if (old('area')==$zone || $addresses['area']==$zone) selected @endif value="{{ $zone }}">
+                                <option  @if (old('area')==$zone || $addresses['area']==$zone || (session('address') && session('address')['area'] == $zone )) selected @endif value="{{ $zone }}">
                                     {{ $zone }}
                                 </option>
                                 @endforeach

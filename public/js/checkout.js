@@ -20,6 +20,8 @@ $(document).on("change","#date,#zone,#area",function() {
             timeSlotsContainer.html(response);
             if(typeof updateTotal === 'function')
             updateTotal()
+            $('[name=service_staff_id]:checked').length === 0 && $('[name=service_staff_id]').first().attr('checked', true).trigger('change');
+
         },
         error: function() {
             alert('Error retrieving time slots.');
@@ -48,8 +50,6 @@ function convertTo12Hour(time) {
 $(document).on('change', 'input[name="service_staff_id"]', function() {
     var slotName = $(this).attr('data-slot');
     var staffName = $(this).attr('data-staff');
-
-    $('#selected-time-slot').html(slotName);
     $('#selected-staff').html(staffName);
     if(typeof updateTotal === 'function')
     updateTotal()
