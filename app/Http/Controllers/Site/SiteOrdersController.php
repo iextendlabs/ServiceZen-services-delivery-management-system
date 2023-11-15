@@ -267,7 +267,9 @@ class SiteOrdersController extends Controller
 
         if ($request->service_staff_id) {
 
-            [$time_slot, $staff_id] = explode(":", $request->service_staff_id);
+            $staff_id = $request->service_staff_id;
+            $time_slot = $request->time_slot_id[$staff_id];
+
             $input['time_slot_id'] = $time_slot;
             $input['service_staff_id'] = $staff_id;
 
@@ -310,7 +312,7 @@ class SiteOrdersController extends Controller
             $staff = User::find($order->service_staff_id);
         }
         if (isset($input['date']) && Carbon::now()->toDateString() == $input['date'] || !isset($input['date']) && Carbon::now()->toDateString() == $order->date) {
-            if (isset($request->service_staff_id) && $staff_id == $order->service_staff_id || $request->has('custom_location')) {
+            if (isset($staff_id) && $staff_id == $order->service_staff_id || $request->has('custom_location')) {
                 $msg = "Order #" . $id . " is Update by Customer";
                 $staff->notifyOnMobile('Order Update', $msg,$id);
                 if ($staff->staff->driver) {
