@@ -165,6 +165,8 @@ Route::resource('siteFAQs', SiteFAQsController::class);
 
 // Staff app
 
+// TODO: save and continue buttons , save and close buttons 
+
 Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
 Route::get('staffAppUser', [StaffAppController::class, 'user']);
 Route::get('staffAppAddOrderComment/{order}', [StaffAppController::class, 'addComment']);
