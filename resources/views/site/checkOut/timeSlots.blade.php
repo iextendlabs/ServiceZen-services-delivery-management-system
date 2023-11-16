@@ -83,7 +83,7 @@
                         @php 
                         $staff_displayed[] = $staff->id;
                         @endphp
-                       <input required style="display: none;" onchange="$('.staff-time-drop').hide();$('#staff-time-{{$staff->id}}').show()" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @endif >
+                       <input required style="display: none;" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @endif >
                         <label class="staff-label" for="staff-{{$staff->id}}">
                             
                             <div class="p-2">
