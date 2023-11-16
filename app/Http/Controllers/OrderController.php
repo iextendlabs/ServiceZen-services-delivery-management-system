@@ -254,7 +254,7 @@ class OrderController extends Controller
         $input = $request->all();
         if ($request->has('service_staff_id')) {
             $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
-            $input['service_staff_id'] = $request->service_staff_id;
+            $staff_id = $input['service_staff_id'] = $request->service_staff_id;
             $time_slot = TimeSlot::find($input['time_slot_id']);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
         }
