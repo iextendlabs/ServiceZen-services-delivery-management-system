@@ -79,7 +79,7 @@ class StaffZoneController extends Controller
      */
     public function show(StaffZone $staffZone)
     {
-        return view('staffZones.show',compact('staffZone','users'));
+        return view('staffZones.show',compact('staffZone'));
     }
     
     /**
