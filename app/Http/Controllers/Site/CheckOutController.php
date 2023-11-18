@@ -168,6 +168,7 @@ class CheckOutController extends Controller
 
     public function bookingStep(Request $request)
     {
+        // TODO check cookie if works 
         if ($request->cookie('address') !== null) {
             $addresses = json_decode($request->cookie('address'), true);
         // if (Session::get('address')) {
@@ -228,7 +229,13 @@ class CheckOutController extends Controller
 
 
         $date = date('Y-m-d');
-        $area = $addresses['area'];
+        if ($addresses['area']){
+            $area = $addresses['area'];
+        } else {
+            $area = session('address') ? session('address')['area'] : '';
+        }
+
+
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
         return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'serviceName'));
