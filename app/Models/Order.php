@@ -84,10 +84,10 @@ class Order extends Model
     }
     public function getServicesAttribute()
     {
-        return (Array)$this->orderServices->sortByDesc('service_name')->map(function ($orderService) {
+        return $this->orderServices->sortByDesc('service_name')->map(function ($orderService) {
             $serviceNameWithTimeAndPrice = $orderService->service_name . '-' . $orderService->duration . '-' . $orderService->price. ' AED';
             return $serviceNameWithTimeAndPrice;
-        })->toArray();
+        })->values()->toArray();
     }
 
     public function getStaffTransactionStatus()
