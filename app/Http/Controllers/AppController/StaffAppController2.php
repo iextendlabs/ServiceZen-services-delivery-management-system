@@ -164,7 +164,11 @@ class StaffAppController2 extends Controller
         $order->save();
         OrderHistory::create(['order_id'=>$order->id,'user'=>$order->staff->user->name, 'status'=>$request->status]);
 
-        return response()->json(['success' => 'Order Update Successfully']);
+        return response()->json(['success' => 'Order Update Successfully'],200)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     }
 
     public function driverOrderStatusUpdate(Request $request)
