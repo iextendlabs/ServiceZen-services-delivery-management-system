@@ -6,7 +6,8 @@
       <!-- Popup Header -->
       <div class="modal-header">
         <h5 class="modal-title">Set Location</h5>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <button type="button" class="close" data-dismiss="modal" onclick="$('#locationPopup').modal('hide')">&times;</button>
+
       </div>
 
       <!-- Popup Body -->

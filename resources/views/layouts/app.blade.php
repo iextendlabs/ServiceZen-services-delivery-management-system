@@ -218,6 +218,7 @@
 
             </div>
         </nav>
+        @include('site.layout.locationPopup')
         <main class="py-4">
                 @yield('content')
         </main>

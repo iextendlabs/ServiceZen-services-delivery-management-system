@@ -3,21 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Affiliate;
+use App\Models\Coupon;
+use App\Models\CouponHistory;
 use App\Models\Order;
 use App\Models\OrderChat;
 use App\Models\OrderHistory;
 use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\OrderService;
+use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -29,7 +32,7 @@ class OrderController extends Controller
     function __construct()
     {
         $this->middleware('permission:order-list', ['only' => ['index']]);
-        $this->middleware('permission:order-download', ['only' => ['downloadCSV', 'print']]);
+        $this->middleware('permission:order-download', ['only' => ['downloadCSV','print']]);
         $this->middleware('permission:order-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:order-delete', ['only' => ['destroy']]);
     }
@@ -197,15 +200,162 @@ class OrderController extends Controller
         }
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $date = date('Y-m-d');
+        $services = Service::all();
+        $area = '';
+        $city = '';
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
+        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones','services'));
     }
 
 
     public function store(Request $request)
     {
-        //    
+        $this->validate($request, [
+            'service_ids' => 'required',
+            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'coupon_code' => [
+                'nullable',
+                Rule::exists('coupons', 'code')->where(function ($query) {
+                    $query->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now());
+                }),
+            ],
+        ]);
+
+        $password = NULL;
+        $input = $request->all();
+        $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
+
+        if (count($has_order) == 0) {
+            $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
+
+            if (isset($affiliate)) {
+                $input['affiliate_id'] = $affiliate->user_id;
+            }
+
+            $staff = User::find($input['service_staff_id']);
+
+            $input['customer_name'] = $input['name'];
+            $input['customer_email'] = $input['email'];
+            $input['status'] = "Pending";
+            $input['driver_status'] = "Pending";
+            $input['staff_name'] = $staff->name;
+            $input['time_slot_id'] = $input['time_slot_id'][$input['service_staff_id']];
+            $input['driver_id'] = $staff->staff->driver_id;
+
+            $user = User::where('email', $input['email'])->first();
+
+            if (isset($user)) {
+
+                $user->customerProfile()->create($input);
+                $input['customer_id'] = $user->id;
+                $customer_type = "Old";
+
+            } else {
+                $customer_type = "New";
+
+                $password = $input['number'];
+
+                $input['password'] = Hash::make($password);
+
+                $user = User::create($input);
+
+                $user->customerProfile()->create($input);
+
+                $input['customer_id'] = $user->id;
+
+                $user->assignRole('Customer');
+            }
+
+            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
+
+            $services = Service::whereIn('id', $input['service_ids'])->get();
+
+            $sub_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+
+            if ($input['coupon_code']) {
+                $coupon = Coupon::where('code', $input['coupon_code'])->first();
+                if ($coupon->type == "Percentage") {
+                    $discount = ($sub_total * $coupon->discount) / 100;
+                } else {
+                    $discount = $coupon->discount;
+                }
+            } else {
+                $discount = 0;
+            }
+
+            $staff_charges = $staff->staff->charges ?? 0;
+            $transport_charges = $staffZone->transport_charges ?? 0;
+            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+
+            $input['sub_total'] = (int)$sub_total;
+            $input['discount'] = (int)$discount;
+            $input['staff_charges'] = (int)$staff_charges;
+            $input['transport_charges'] = (int)$transport_charges;
+            $input['total_amount'] = (int)$total_amount;
+
+            $time_slot = TimeSlot::find($input['time_slot_id']);
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+
+            $input['time_start'] = $time_slot->time_start;
+            $input['time_end'] = $time_slot->time_end;
+
+            $order = Order::create($input);
+
+            $input['order_id'] = $order->id;
+            $input['discount_amount'] = $input['discount'];
+
+            OrderTotal::create($input);
+            if ($input['coupon_code']) {
+                $coupon = Coupon::where('code', $input['coupon_code'])->first();
+                $input['coupon_id'] = $coupon->id;
+                CouponHistory::create($input);
+            }
+
+            foreach ($input['service_ids'] as $id) {
+                $services = Service::find($id);
+                $input['service_id'] = $id;
+                $input['service_name'] = $services->name;
+                $input['duration'] = $services->duration;
+                $input['status'] = 'Open';
+                if ($services->discount) {
+                    $input['price'] = $services->discount;
+                } else {
+                    $input['price'] = $services->price;
+                }
+                OrderService::create($input);
+            }
+
+            if (Carbon::now()->toDateString() == $input['date']) {
+                $staff->notifyOnMobile('Order', 'New Order Generated.',$input['order_id']);
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$input['order_id']);
+                }
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
+            }
+            try {
+                $this->sendAdminEmail($input['order_id'], $input['email']);
+                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
+
+            return redirect()->route('orders.index')
+                        ->with('success','Order created successfully.');
+        } else {
+            return redirect()->back()
+                ->with('error', 'Sorry! Unfortunately This slot was booked by someone else just now.');
+        }
     }
 
 

@@ -17,6 +17,7 @@ use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
@@ -96,14 +97,15 @@ class CheckOutController extends Controller
             'service_staff_id' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
             'gender' => 'required',
+            'coupon_code' => [
+                'nullable',
+                Rule::exists('coupons', 'code')->where(function ($query) {
+                    $query->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now());
+                }),
+            ],
         ]);
-        if ($request->coupon_code) {
-            $coupon = $this->applyCoupon($request->coupon_code);
-
-            if (!$coupon) {
-                return redirect()->back()->with('error', 'Invalid coupon code.');
-            }
-        }
         $address = [];
 
         $address['buildingName'] = $request->buildingName;
@@ -323,17 +325,5 @@ class CheckOutController extends Controller
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
-    }
-
-    public function applyCoupon($coupon_code)
-    {
-
-        $coupon = Coupon::where('code', $coupon_code)
-            ->where('status', 1) // Assuming 1 means active coupon
-            ->where('date_start', '<=', Carbon::now())
-            ->where('date_end', '>=', Carbon::now())
-            ->first();
-
-        return $coupon;
     }
 }

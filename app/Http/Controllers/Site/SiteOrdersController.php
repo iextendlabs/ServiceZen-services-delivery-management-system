@@ -269,7 +269,11 @@ class SiteOrdersController extends Controller
 
             $staff_id = $request->service_staff_id;
             $time_slot = $request->time_slot_id[$staff_id];
-
+            if($time_slot == null){
+                $this->validate($request, [
+                    'Time Slot' => 'required'
+                ]);
+            }
             $input['time_slot_id'] = $time_slot;
             $input['service_staff_id'] = $staff_id;
 
