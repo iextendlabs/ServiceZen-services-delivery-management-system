@@ -54,7 +54,7 @@ class DriverAppController extends Controller
             if($order->staff) {
                 $order->staff_number = $order->staff->phone;
                 $order->staff_whatsapp = $order->staff->whatsapp;
-                $order->last_chat = $order->latestChat;
+                $order->last_chat = $order->latestChat ? $order->latestChat : (object) ['text' => 'N/A'];
             } else {
                 $order->staff_number = 'N/A';
                 $order->staff_whatsapp = 'N/A';
