@@ -18,6 +18,7 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'order-create',
             'order-chat',
             'order-driver-edit',
             'order-driver-status-edit',

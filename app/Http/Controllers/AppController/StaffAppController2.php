@@ -152,6 +152,14 @@ class StaffAppController2 extends Controller
                 $input['status'] = 'Approved';
                 Transaction::create($input);
             }
+
+            if ($request->status == "Canceled" && isset($transaction)) {
+                $transaction->delete(); 
+            }
+    
+            if ($request->status == "Canceled" && isset($staff_transaction)) {
+                $staff_transaction->delete(); 
+            }
         }
 
         $order->status = $request->status;

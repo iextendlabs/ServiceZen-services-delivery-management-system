@@ -189,6 +189,9 @@ $transport_charges = 0;
                                 <label class="form-check-label" for="genderFemale">Female</label>
                             </div>
                         </div>
+                        <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
+                            <strong>Sorry, No Male Services Listed in Our Store.</strong>
+                        </span>
                         <hr>
                     </div>
                     <div class="col-md-6">
@@ -204,9 +207,6 @@ $transport_charges = 0;
                         </div>
                     </div>
                 </div>
-                <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
-                    <strong>Sorry, No Male Services Listed in Our Store.</strong>
-                </span>
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <br>

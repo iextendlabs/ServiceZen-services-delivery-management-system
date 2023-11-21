@@ -210,11 +210,14 @@
                     </div>
                 </div>
             </form>
+            @can('order-create')
+
             <div class="float-end">
                 <a class="btn btn-success float-end mr-1" href="{{route('orders.create')}}">
                     <i class="fas fa-plus"></i> Create Order
                 </a>
             </div>
+            @endcan
         </div>
         @endif
 

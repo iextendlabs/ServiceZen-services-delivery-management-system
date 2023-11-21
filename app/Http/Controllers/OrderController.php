@@ -33,6 +33,7 @@ class OrderController extends Controller
     {
         $this->middleware('permission:order-list', ['only' => ['index']]);
         $this->middleware('permission:order-download', ['only' => ['downloadCSV','print']]);
+        $this->middleware('permission:order-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:order-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:order-delete', ['only' => ['destroy']]);
     }
@@ -450,6 +451,14 @@ class OrderController extends Controller
             Transaction::create($input);
         }
 
+        if ($request->status == "Canceled" && isset($transaction)) {
+            $transaction->delete(); 
+        }
+
+        if ($request->status == "Canceled" && isset($staff_transaction)) {
+            $staff_transaction->delete(); 
+        }
+
         if (isset($staff_id)) {
             $staff = User::find($staff_id);
             $order->staff_name = $staff->name;
@@ -515,6 +524,14 @@ class OrderController extends Controller
             $input['type'] = "Order Commission";
             $input['status'] = 'Approved';
             Transaction::create($input);
+        }
+
+        if ($request->status == "Canceled" && isset($transaction)) {
+            $transaction->delete(); 
+        }
+
+        if ($request->status == "Canceled" && isset($staff_transaction)) {
+            $staff_transaction->delete(); 
         }
 
         return redirect()->route('orders.index')->with('success', 'Order updated successfully');
