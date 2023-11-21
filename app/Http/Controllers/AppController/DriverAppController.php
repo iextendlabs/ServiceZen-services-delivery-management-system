@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\OrderHistory;
 
 class DriverAppController extends Controller
 
@@ -98,6 +99,9 @@ class DriverAppController extends Controller
         $body = "Change order driver status to ".$request->status;
 
         $order->staff->user->notifyOnMobile($title, $body, $order->id);
+
+        OrderHistory::create(['order_id'=>$order->id,'user'=>$order->driver->name, 'status'=>$request->status]);
+
 
         return response()->json(['success' => 'Order Update Successfully']);
     }
