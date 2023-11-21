@@ -36,24 +36,23 @@ class CustomerController extends Controller
             'number' => $request->number,
         ];
 
-        $query = User::role('Customer')->latest();
+        $query = User::latest();
 
         if ($request->name) {
-            $query->where('name', 'like', $request->name . '%');
+            $query->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($request->name) . '%']);
         }
-
+        
         if ($request->email) {
-            $query->where('email', strtolower($request->email));
+            $query->whereRaw('LOWER(email) LIKE ?', ['%'.strtolower($request->email).'%']);
         }
-
-
+        
         if ($request->number) {
             $query->whereHas('customerProfile', function ($subQuery) use ($request) {
-                $subQuery->where('number', $request->number);
+                $subQuery->whereRaw('LOWER(number) LIKE ?', ['%'.strtolower($request->number).'%']);
             });
         }
 
-        $customers = $query->paginate(config('app.paginate'));
+        $customers = $query->orderBy('name')->paginate(config('app.paginate'));
         $filters = $request->only(['name', 'email', 'number']);
         $customers->appends($filters);
 
