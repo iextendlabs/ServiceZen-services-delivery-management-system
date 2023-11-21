@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\OrderChat;
+use App\Models\OrderHistory;
 use App\Models\Setting;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Storage;
@@ -166,7 +167,12 @@ class StaffAppController extends Controller
 
         $order->status = $request->status;
         $order->save();
+        
+        $input['order_id'] = $order->id;
+        $input['user'] = Auth::user()->name;
 
+        OrderHistory::create($input);
+        
         return response()->json(['success' => 'Order Update Successfully']);
     }
 

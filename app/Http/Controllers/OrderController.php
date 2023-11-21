@@ -498,7 +498,7 @@ class OrderController extends Controller
         $order->save();
 
         OrderHistory::create($input);
-
+        
         if (isset($order->affiliate)) {
             $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
         }

@@ -59,7 +59,7 @@
             @endif
             
             <table class="table table-striped table-bordered album bg-light">
-                <td class="text-left" colspan="2">Order Details</td>
+                <td class="text-left font-weight-bold" colspan="2">Order Details</td>
                 <tr>
                     <td>
                         <b>Order ID:</b> #{{ $order->id }} <br><br>
@@ -73,7 +73,7 @@
                 </tr>
             </table>
             <table class="table table-striped table-bordered album bg-light">
-                <td class="text-left" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
+                <td class="text-left font-weight-bold" colspan="2"><i class="fas fa-clock"></i> Appointment Details</td>
                 <tr>
                     <td>
                         <b>Staff:</b>{{ $order->staff_name }}<br><br>
@@ -85,7 +85,7 @@
                 </tr>
             </table>
             <table class="table table-striped table-bordered album bg-light">
-                <td class="text-left" colspan="3">Address Details</td>
+                <td class="text-left font-weight-bold" colspan="3">Address Details</td>
                 <tr>
                     <td>
                         <b>Building Name:</b> {{ $order->buildingName }} <br><br>
@@ -102,7 +102,7 @@
                 </tr>
             </table>
             <table class="table table-striped table-bordered album bg-light">
-                <td class="text-left" colspan="2">Customer Details</td>
+                <td class="text-left font-weight-bold" colspan="2">Customer Details</td>
                 <tr>
                     <td>
                         <b>Name:</b> {{ $order->customer_name }} <br><br>
@@ -122,7 +122,7 @@
                 </tr>
             </table>
             <table class="table table-striped table-bordered album bg-light">
-                <td class="text-left" colspan="4">Services Details</td>
+                <td class="text-left font-weight-bold" colspan="4">Services Details</td>
                 <tr>
                     <th>Service Name</th>
                     <th>Status</th>
@@ -161,7 +161,7 @@
             @can('order-history')
             @if(count($order->orderHistories))
             <table class="table table-striped table-bordered album bg-light">
-                <td class="text-left" colspan="4">Order History</td>
+                <td class="text-left font-weight-bold" colspan="4">Order History</td>
                 <tr>
                     <th>User</th>
                     <th>Status</th>
@@ -181,7 +181,7 @@
             @endcan
             @if($order->order_comment)
             <table class="table table-striped table-bordered album bg-light">
-                <th class="text-left" colspan="4">Order Comment</th>
+                <th class="text-left font-weight-bold" colspan="4">Order Comment</th>
                 <tr>
                     <td class="text-left">{!! nl2br($order->order_comment) !!}</td>
                 </tr>
