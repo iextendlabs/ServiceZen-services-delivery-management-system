@@ -173,6 +173,7 @@ class StaffAppController2 extends Controller
 
         $order->driver_status = $request->driver_status;
         $order->save();
+        OrderHistory::create(['order_id'=>$order->id,'user'=>$order->staff->user->name, 'status'=>'Drive:'.$request->driver_status]);
 
         OrderChat::create([
             'order_id' => $request->order_id,
