@@ -9,15 +9,13 @@ use App\Models\TimeSlot;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\Storage;
-use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
+use App\Models\OrderHistory;
 
 class StaffAppController2 extends Controller
 
@@ -164,6 +162,9 @@ class StaffAppController2 extends Controller
 
         $order->status = $request->status;
         $order->save();
+        if ($request->has('user_id') && $request->user_id){
+            OrderHistory::create(['order_id'=>$order->id,'user'=>$request->user_id, 'status'=>$request->status]);
+        }
 
         return response()->json(['success' => 'Order Update Successfully']);
     }
