@@ -162,9 +162,7 @@ class StaffAppController2 extends Controller
 
         $order->status = $request->status;
         $order->save();
-        if ($request->has('user_id') && $request->user_id){
-            OrderHistory::create(['order_id'=>$order->id,'user'=>$request->user_id, 'status'=>$request->status]);
-        }
+        OrderHistory::create(['order_id'=>$order->id,'user'=>$order->staff->name, 'status'=>$request->status]);
 
         return response()->json(['success' => 'Order Update Successfully']);
     }
