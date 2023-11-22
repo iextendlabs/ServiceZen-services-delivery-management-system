@@ -120,10 +120,10 @@
 
             <div class="float-end">
                 @if(auth()->user()->getRoleNames() != '["Supervisor"]')
-                    @can('order-download')
-                    <a class="btn btn-danger float-end" href="/orders?print=1"><i class="fa fa-print"></i> PDF</a>
-                    <a href="/orders?csv=1" class="btn btn-success float-end mr-1"><i class="fa fa-download"></i> Excel</a>
-                    @endcan
+                @can('order-download')
+                <a class="btn btn-danger float-end" href="/orders?print=1"><i class="fa fa-print"></i> PDF</a>
+                <a href="/orders?csv=1" class="btn btn-success float-end mr-1"><i class="fa fa-download"></i> Excel</a>
+                @endcan
                 @endif
 
                 @if(auth()->user()->getRoleNames() == '["Admin"]')
@@ -137,30 +137,38 @@
                 @endif
                 @if(auth()->user()->getRoleNames() != '["Supervisor"]')
 
-                    <a class="btn btn-success float-end mr-1" href="/orders?status=Complete">
-                        <i class="fas fa-check"></i> Complete
-                    </a>
+                <a class="btn btn-success float-end mr-1" href="/orders?status=Complete">
+                    <i class="fas fa-check"></i> Complete
+                </a>
 
-                    <a class="btn btn-info float-end mr-1" href="/orders?status=Inprogress">
-                        <i class="fas fa-hourglass-split"></i> Inprogress
-                    </a>
+                <a class="btn btn-info float-end mr-1" href="/orders?status=Inprogress">
+                    <i class="fas fa-hourglass-split"></i> Inprogress
+                </a>
 
-                    <a class="btn btn-warning float-end mr-1" href="/orders?status=Rejected">
-                        <i class="fas fa-times"></i> Rejected
-                    </a>
+                <a class="btn btn-warning float-end mr-1" href="/orders?status=Rejected">
+                    <i class="fas fa-times"></i> Rejected
+                </a>
 
-                    <a class="btn btn-success float-end mr-1" href="/orders?status=Accepted">
-                        <i class="fas fa-check"></i> Accepted
-                    </a>
+                <a class="btn btn-success float-end mr-1" href="/orders?status=Accepted">
+                    <i class="fas fa-check"></i> Accepted
+                </a>
 
-                    <a class="btn btn-primary float-end mr-1" href="/orders?status=Pending">
-                        <i class="fas fa-clock"></i> Pending
-                    </a>
+                <a class="btn btn-primary float-end mr-1" href="/orders?status=Pending">
+                    <i class="fas fa-clock"></i> Pending
+                </a>
                 @endif
-                
+
                 <a class="btn btn-secondary float-end mr-1" href="{{route('orders.index')}}?appointment_date={{date('Y-m-d')}}">
                     <i class="fas fa-calendar"></i>Todays Order
                 </a>
+
+                @can('order-create')
+                <div class="float-end">
+                    <a class="btn btn-success mt-2" href="{{route('orders.create')}}">
+                        <i class="fas fa-plus"></i> Create Order
+                    </a>
+                </div>
+                @endcan
             </div>
         </div>
     </div>

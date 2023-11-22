@@ -53,6 +53,15 @@
                 </a>
             </div>
         </div>
+        <div class="col-md-12 margin-tb">
+            @can('order-create')
+            <div class="float-end">
+                <a class="btn btn-success mt-2" href="{{route('orders.create')}}">
+                    <i class="fas fa-plus"></i> Create Order
+                </a>
+            </div>
+            @endcan
+        </div>
     </div>
     @if ($message = Session::get('success'))
     <div class="alert alert-success">
@@ -210,14 +219,6 @@
                     </div>
                 </div>
             </form>
-            @can('order-create')
-
-            <div class="float-end">
-                <a class="btn btn-success float-end mr-1" href="{{route('orders.create')}}">
-                    <i class="fas fa-plus"></i> Create Order
-                </a>
-            </div>
-            @endcan
         </div>
         @endif
 

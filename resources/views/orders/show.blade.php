@@ -35,7 +35,10 @@
                 <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
                 @endcan
                 <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
-                
+                @can('order-driver-status-edit')
+                <a class="btn btn-success float-end mt-2" href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver Status Edit</a>
+                <a class="btn btn-primary float-end mr-1 mt-2" href="{{ route('orders.edit', $order->id) }}?edit=driver">Order Driver Edit</a>
+                @endcan
             </div>
         </div>
     </div>
