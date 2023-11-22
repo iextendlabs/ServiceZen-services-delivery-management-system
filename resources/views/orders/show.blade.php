@@ -83,7 +83,7 @@
                         <b>Date:</b> {{ $order->date }}
                     </td>
                     <td>
-                        <b>Driver:</b>{{ $order->driver->name }}<br><br>
+                        <b>Driver:</b>{{ isset($order->driver->name) ? $order->driver->name : "N\A" }}<br><br>
                         <b>Time:</b>{{ $order->time_slot_value }}
                     </td>
                 </tr>
