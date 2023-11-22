@@ -44,6 +44,48 @@ class SettingsTableSeeder extends Seeder
                 'created_at' => '2023-09-02 02:54:56',
                 'updated_at' => '2023-09-04 12:10:20',
             ],
+            [
+                'id' => 5,
+                'key' => 'Daily Order Summary Mail and Notification',
+                'value' => '00:06',
+                'created_at' => '2023-09-01 14:03:35',
+                'updated_at' => '2023-10-18 12:07:10',
+            ],
+            [
+                'id' => 6,
+                'key' => 'Emails For Daily Alert',
+                'value' => 'miangdpp@gmail.com,tesrt@gmail.com',
+                'created_at' => '2023-09-01 14:03:35',
+                'updated_at' => '2023-09-04 11:09:55',
+            ],
+            [
+                'id' => 7,
+                'key' => 'Not Allowed Order Status for Staff App',
+                'value' => 'Canceled',
+                'created_at' => '2023-10-20 14:03:35',
+                'updated_at' => '2023-10-21 10:02:01',
+            ],
+            [
+                'id' => 8,
+                'key' => 'Not Allowed Order Status for Driver App',
+                'value' => 'Canceled',
+                'created_at' => '2023-10-20 14:03:35',
+                'updated_at' => '2023-10-21 10:02:08',
+            ],
+            [
+                'id' => 9,
+                'key' => 'Not Allowed Driver Order Status for Driver App',
+                'value' => 'Canceled',
+                'created_at' => '2023-10-20 14:03:35',
+                'updated_at' => '2023-10-21 10:02:15',
+            ],
+            [
+                'id' => 10,
+                'key' => 'Notification Limit for App',
+                'value' => '60',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
+            ]
         ];
 
         foreach ($settings as $setting) {
