@@ -84,7 +84,7 @@
                     </td>
                     <td>
                         <b>Driver:</b>{{ isset($order->driver->name) ? $order->driver->name : "N\A" }}<br><br>
-                        <b>Time:</b>{{ $order->time_slot_value }}
+                         <b>Time:</b>{{ $order->time_slot_value }}
                     </td>
                 </tr>
             </table>
