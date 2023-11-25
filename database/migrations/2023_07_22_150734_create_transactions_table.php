@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
+
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('order_id')->nullable();
+            // TODO : db work make sure the amount fields are correct not varchar 
             $table->decimal('amount', 10, 2);
             $table->string('status');
             $table->timestamps();
