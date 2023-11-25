@@ -18,20 +18,24 @@ class LogApiRequestsAndResponses
     {
         $Logger = Log::channel('api');
         // Log the incoming request
-        $Logger->debug('Incoming API Request', [
-            'method' => $request->method(),
-            'uri' => $request->fullUrl(),
-            'parameters' => $request->all(),
-        ]);
+        if (env('api_logs_enabled')) {
+
+            $Logger->debug('Incoming API Request', [
+                'method' => $request->method(),
+                'uri' => $request->fullUrl(),
+                'parameters' => $request->all(),
+            ]);
+        }
 
         // Handle the request and get the response
         $response = $next($request);
-
+        if (env('api_logs_enabled')) {
         // Log the outgoing response
-        $Logger->debug('Outgoing API Response', [
-            'status' => $response->status(),
-            'content' => $response->getContent(),
-        ]);
+            $Logger->debug('Outgoing API Response', [
+                'status' => $response->status(),
+                'content' => $response->getContent(),
+            ]);
+        }
 
         return $response;
     }

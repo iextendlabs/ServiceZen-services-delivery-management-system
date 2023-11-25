@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('order_id')->nullable();
-            $table->string('amount');
+            $table->decimal('amount', 10, 2);
             $table->string('status');
             $table->timestamps();
 
