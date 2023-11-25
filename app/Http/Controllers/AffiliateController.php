@@ -100,6 +100,8 @@ class AffiliateController extends Controller
      */
     public function show(User $affiliate)
     {
+
+        // TODO : filter in transactions required for type of transaxtions 
         $currentMonth = Carbon::now()->startOfMonth();
 
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
