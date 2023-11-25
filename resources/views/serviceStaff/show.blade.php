@@ -147,7 +147,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">{{ config('app.currency') }}</span>
                                 </div>
-                                <input type="text" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Amount">
+                                <input type="number" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Amount">
                             </div>
                         </div>
                     </div>
