@@ -230,7 +230,7 @@ class AffiliateController extends Controller
         // Add data to CSV
         foreach ($data as $row) {
             $row_data = $row->toArray(); 
-            $amount_in_pkr = number_format(($row->amount * $pkrRateValue), 2);
+            $amount_in_pkr = $row->amount ? number_format(($row->amount * (float)$pkrRateValue), 2) : 0;
             array_push($row_data, $amount_in_pkr);
             fputcsv($output, $row_data);
         }
