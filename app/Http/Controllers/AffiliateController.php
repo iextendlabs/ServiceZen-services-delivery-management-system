@@ -200,44 +200,37 @@ class AffiliateController extends Controller
         $csvFileName = 'export.csv';
 
         // Generate CSV data
-        $csvData = $this->generateCsvData($data);
 
         // Set response headers
-        $headers = array(
-            "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=$csvFileName",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0",
-        );
-
-        // Send the CSV file as response
-        return Response::make($csvData, 200, $headers);
-    }
-
-    private function generateCsvData($data)
-    {
-        // Open output stream
-        $output = fopen("php://output", "w");
-
-        // Add CSV headers
-        $headers = array_keys($data[0]->toArray());
-        array_push($headers,"PKR Amount");
-        fputcsv($output, $headers);
-        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $csvFileName . '"',
+        ];
 
         
-        // Add data to CSV
-        foreach ($data as $row) {
-            $row_data = $row->toArray(); 
-            $amount_in_pkr = $row->amount ? number_format(($row->amount * (float)$pkrRateValue), 2) : 0;
-            array_push($row_data, $amount_in_pkr);
-            fputcsv($output, $row_data);
-        }
 
-        // Close the output stream
-        fclose($output);
+        $callback = function() use($data) {
+            $output = fopen("php://output", "w");
+            // Add CSV headers
+            $headers = array_keys($data[0]->toArray());
+            array_push($headers, "PKR Amount");
+            fputcsv($output, $headers);
+            $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
 
-        return ob_get_clean();
+            // Add data to CSV
+            foreach ($data as $row) {
+                $row_data = $row->toArray();
+                $amount_in_pkr = $row->amount ? number_format(($row->amount * (float)$pkrRateValue), 2) : 0;
+                array_push($row_data, $amount_in_pkr);
+                fputcsv($output, $row_data);
+            }
+
+            // Close the output stream
+            fclose($output);
+        };
+
+        // Send the CSV file as response
+        return response()->stream($callback, 200, $headers);
     }
+
 }
