@@ -8,11 +8,10 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 class AffiliateController extends Controller
 {
@@ -104,7 +103,6 @@ class AffiliateController extends Controller
         // TODO : filter in transactions required for type of transaxtions 
         $currentMonth = Carbon::now()->startOfMonth();
 
-        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
         $transactions = Transaction::where('user_id', $affiliate->id)->latest()->paginate(config('app.paginate'));
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
 
@@ -114,7 +112,7 @@ class AffiliateController extends Controller
         $total_balance = 0;
 
         $total_balance = Transaction::where('user_id', $affiliate->id)->sum('amount');
-        $total_balance_in_pkr =number_format(($total_balance * $pkrRateValue), 2);
+        $total_balance_in_pkr = number_format(($total_balance * $pkrRateValue), 2);
 
         $product_sales = Transaction::where('type', 'Product Sale')
             ->where('created_at', '>=', $currentMonth)
@@ -126,7 +124,7 @@ class AffiliateController extends Controller
             ->where('user_id', $affiliate->id)
             ->sum('amount');
 
-        return view('affiliates.show', compact('affiliate', 'pkrRateValue','transactions','total_balance','total_balance_in_pkr','product_sales','bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('affiliates.show', compact('affiliate', 'pkrRateValue', 'transactions', 'total_balance', 'total_balance_in_pkr', 'product_sales', 'bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -186,5 +184,60 @@ class AffiliateController extends Controller
 
         return redirect()->route('affiliates.index')
             ->with('success', 'Affiliate deleted successfully');
+    }
+
+    /**
+     * Export the specified resource.
+     *
+     * @param  \App\User  $User
+     * @return \Illuminate\Http\Response
+     */
+    public function exportTransaction(User $User)
+    {
+        // Replace YourModel with the actual model you are using
+        $data = Transaction::where('user_id', $User->id)->get();
+
+        $csvFileName = 'export.csv';
+
+        // Generate CSV data
+        $csvData = $this->generateCsvData($data);
+
+        // Set response headers
+        $headers = array(
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$csvFileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
+        );
+
+        // Send the CSV file as response
+        return Response::make($csvData, 200, $headers);
+    }
+
+    private function generateCsvData($data)
+    {
+        // Open output stream
+        $output = fopen("php://output", "w");
+
+        // Add CSV headers
+        $headers = array_keys($data[0]->toArray());
+        array_push($headers,"PKR Amount");
+        fputcsv($output, $headers);
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+        
+        // Add data to CSV
+        foreach ($data as $row) {
+            $row_data = $row->toArray(); 
+            $amount_in_pkr = number_format(($row->amount * $pkrRateValue), 2);
+            array_push($row_data, $amount_in_pkr);
+            fputcsv($output, $row_data);
+        }
+
+        // Close the output stream
+        fclose($output);
+
+        return ob_get_clean();
     }
 }

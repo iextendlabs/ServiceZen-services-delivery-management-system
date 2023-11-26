@@ -79,6 +79,7 @@
         </div>
     </div>
     <hr>
+    <a href="{{ url('/affiliate/exportTransaction', ['User' => $affiliate->id]) }}" class="btn btn-primary">Export CSV</a>
     <div class="row">
         <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
         @if(count($transactions) != 0)

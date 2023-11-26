@@ -120,6 +120,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
     Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
 
+    // affiliate export
+    Route::get('/affiliate/exportTransaction/{User}', [AffiliateController::class, 'exportTransaction']);
+
 });
 
 // Backups
