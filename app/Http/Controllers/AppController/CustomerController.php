@@ -82,7 +82,7 @@ class CustomerController extends Controller
         $images = explode(",",$slider_images);
 
         $categories = ServiceCategory::get();
-        $services = Service::get();
+        $services = Service::take(10)->get();
 
         return response()->json([
             'images' => $images,
