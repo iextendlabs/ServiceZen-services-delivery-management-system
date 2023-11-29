@@ -108,13 +108,11 @@ class CheckOutController extends Controller
             ],
         ]);
 
-        if($request->selected_service_ids){
-            $serviceIds = Session::get('serviceIds', []);
+        if ($request->selected_service_ids) {
+            Session::forget('serviceIds');
             foreach ($request->selected_service_ids as $serviceId) {
-                if (!in_array($serviceId, $serviceIds)) {
-                    $serviceIds[] = $serviceId;
-                    Session::put('serviceIds', $serviceIds);
-                }
+                $serviceIds[] = $serviceId;
+                Session::put('serviceIds', $serviceIds);
             }
         }
 
@@ -233,14 +231,10 @@ class CheckOutController extends Controller
 
         if (session()->has('serviceIds')) {
             $serviceIds = Session::get('serviceIds');
-            foreach ($serviceIds as $id) {
-                $services[] = Service::where('id', $id)->value('name');
-            }
-            $serviceName = implode(',', $services);
+            $selectedServices = Service::whereIn('id', $serviceIds)->get();
         } else {
-            $serviceName = '';
+            $selectedServices = '';
         }
-
 
         $date = date('Y-m-d');
         if ($addresses['area']) {
@@ -250,10 +244,11 @@ class CheckOutController extends Controller
         }
 
         $categories = ServiceCategory::get();
+        $services = Service::get();
 
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'serviceName', 'categories'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'selectedServices', 'categories', 'services', 'serviceIds'));
     }
 
     public function confirmStep(Request $request)
@@ -338,14 +333,5 @@ class CheckOutController extends Controller
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
-    }
-
-    public function services(Request $request)
-    {
-        $services = Service::where('category_id', $request->category_id)->get();
-
-        return response()->json([
-            'services' => $services,
-        ]);
     }
 }

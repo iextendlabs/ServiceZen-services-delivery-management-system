@@ -11,13 +11,9 @@
             <div class="col-md-12 py-5 text-center">
                 <h2>Booking Step</h2>
                 <h3>Your Current Area: {{ $area }}</h3>
-                @if($serviceName)
-                <h3>Services :
-                    {{ $serviceName }}
-                </h3>
-                @endif
             </div>
         </div>
+
         <div class="text-center" style="margin-bottom: 20px;">
             @if(Session::has('error'))
             <span class="alert alert-danger" role="alert">
@@ -40,42 +36,118 @@
             </ul>
         </div>
         @endif
-        <div class="location-search-wrapper" style="display: none;">
-            <div class="location-container welcome-section">
-                <div id="navbar-location-button" class="location-search lg">
-                    <div class="location-search-left">
-                        <svg width="12" height="18" viewBox="0 0 12 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M0 6.2468C0 2.80246 2.69144 0 5.99974 0C9.30812 0 12 2.80246 12 6.2468C12 9.56227 6.55647 17.3084 6.32455 17.6364L6.10836 17.9429C6.0828 17.9789 6.04277 18 5.99974 18C5.95736 18 5.91707 17.9789 5.89177 17.9429L5.67545 17.6364C5.44367 17.3084 0 9.56227 0 6.2468ZM8.149 6.2468C8.149 5.01276 7.18511 4.00921 5.99974 4.00921C4.81502 4.00921 3.85047 5.01276 3.85047 6.2468C3.85047 7.48021 4.81506 8.4844 5.99974 8.4844C7.18507 8.4844 8.149 7.48021 8.149 6.2468Z" fill="black" fill-opacity="0.87"></path>
-                        </svg>
+        <form action="storeSession" method="POST">
+            <div class="row">
+
+                <div class="col-md-12 text-center">
+                    <br>
+                    <h3><strong>Add Services</strong></h3>
+                    <hr>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <strong>Category:</strong>
+                        <select class="form-control" name="category_id" id="category">
+                            <option value="0">-- All Services -- </option>
+                            @foreach ($categories as $category)
+                            <option @if (old('category')==$category->id) selected @endif value="{{ $category->id }}">
+                                {{ $category->title }}
+                            </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="location-search-input-wrapper">
-                        <input id="searchField" disabled type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group scroll-div">
+                        <strong>Services:</strong>
+                        <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
+                        <table class="table table-striped table-bordered services-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                            </tr>
+                            @foreach ($services as $service)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" @if(in_array($service->id,$serviceIds)) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                </td>
+                                <td>{{ $service->name }}</td>
+
+                                <td>AED<span class="price">{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}</span></td>
+                                <td>{{ $service->duration }}</td>
+                            </tr>
+                            @endforeach
+                        </table>
                     </div>
-                    <div class="location-search-right en">
-                        <div class="location-search-clear en" style="display:none;">
-                            <svg width="15" height="15" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3266 8.99984L16.2251 3.10128C16.5916 2.73512 16.5916 2.14101 16.2251 1.77485C15.8587 1.40838 15.2652 1.40838 14.8987 1.77485L9.00016 7.67342L3.10128 1.77485C2.73481 1.40838 2.14132 1.40838 1.77485 1.77485C1.40838 2.14101 1.40838 2.73512 1.77485 3.10128L7.67373 8.99984L1.77485 14.8984C1.40838 15.2646 1.40838 15.8587 1.77485 16.2248C1.95809 16.4078 2.19823 16.4994 2.43807 16.4994C2.6779 16.4994 2.91804 16.4078 3.10128 16.2245L9.00016 10.326L14.8987 16.2245C15.082 16.4078 15.3221 16.4994 15.5619 16.4994C15.8018 16.4994 16.0419 16.4078 16.2251 16.2245C16.5916 15.8584 16.5916 15.2643 16.2251 14.8981L10.3266 8.99984Z" fill="black" fill-opacity="0.87"></path>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="form-group scroll-div">
+                            <strong>Selected Services:</strong>
+                            <table class="table table-striped table-bordered selected-services-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                </tr>
+                                @foreach ($selectedServices as $service)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                    </td>
+                                    <td>{{ $service->name }}</td>
+
+                                    <td>AED<span class="price">{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}</span></td>
+                                    <td>{{ $service->duration }}</td>
+                                </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="location-search-wrapper" style="display: none;">
+                <div class="location-container welcome-section">
+                    <div id="navbar-location-button" class="location-search lg">
+                        <div class="location-search-left">
+                            <svg width="12" height="18" viewBox="0 0 12 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 6.2468C0 2.80246 2.69144 0 5.99974 0C9.30812 0 12 2.80246 12 6.2468C12 9.56227 6.55647 17.3084 6.32455 17.6364L6.10836 17.9429C6.0828 17.9789 6.04277 18 5.99974 18C5.95736 18 5.91707 17.9789 5.89177 17.9429L5.67545 17.6364C5.44367 17.3084 0 9.56227 0 6.2468ZM8.149 6.2468C8.149 5.01276 7.18511 4.00921 5.99974 4.00921C4.81502 4.00921 3.85047 5.01276 3.85047 6.2468C3.85047 7.48021 4.81506 8.4844 5.99974 8.4844C7.18507 8.4844 8.149 7.48021 8.149 6.2468Z" fill="black" fill-opacity="0.87"></path>
                             </svg>
                         </div>
-                        <div class="locate-me" id="manualLocationButton">
-                            <span>Update </span>
-                            <div class="locate-me-icon">
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12.375 9C12.375 10.8633 10.8633 12.375 9 12.375C7.10508 12.375 5.625 10.8633 5.625 9C5.625 7.10508 7.10508 5.625 9 5.625C10.8633 5.625 12.375 7.10508 12.375 9ZM9 7.3125C8.06836 7.3125 7.3125 8.06836 7.3125 9C7.3125 9.93164 8.06836 10.6875 9 10.6875C9.93164 10.6875 10.6875 9.93164 10.6875 9C10.6875 8.06836 9.93164 7.3125 9 7.3125ZM9 0C9.46758 0 9.84375 0.37793 9.84375 0.84375V2.30238C12.8953 2.68313 15.3176 5.10469 15.6973 8.15625H17.1562C17.6238 8.15625 18 8.53242 18 9C18 9.46758 17.6238 9.84375 17.1562 9.84375H15.6973C15.3176 12.8953 12.8953 15.3176 9.84375 15.6973V17.1562C9.84375 17.6238 9.46758 18 9 18C8.53242 18 8.15625 17.6238 8.15625 17.1562V15.6973C5.10469 15.3176 2.68313 12.8953 2.30238 9.84375H0.84375C0.37793 9.84375 0 9.46758 0 9C0 8.53242 0.37793 8.15625 0.84375 8.15625H2.30238C2.68313 5.10469 5.10469 2.68313 8.15625 2.30238V0.84375C8.15625 0.37793 8.53242 0 9 0ZM3.9375 9C3.9375 11.7949 6.20508 14.0625 9 14.0625C11.7949 14.0625 14.0625 11.7949 14.0625 9C14.0625 6.20508 11.7949 3.9375 9 3.9375C6.20508 3.9375 3.9375 6.20508 3.9375 9Z" fill="#00C3FF"></path>
+                        <div class="location-search-input-wrapper">
+                            <input id="searchField" disabled type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
+                        </div>
+                        <div class="location-search-right en">
+                            <div class="location-search-clear en" style="display:none;">
+                                <svg width="15" height="15" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3266 8.99984L16.2251 3.10128C16.5916 2.73512 16.5916 2.14101 16.2251 1.77485C15.8587 1.40838 15.2652 1.40838 14.8987 1.77485L9.00016 7.67342L3.10128 1.77485C2.73481 1.40838 2.14132 1.40838 1.77485 1.77485C1.40838 2.14101 1.40838 2.73512 1.77485 3.10128L7.67373 8.99984L1.77485 14.8984C1.40838 15.2646 1.40838 15.8587 1.77485 16.2248C1.95809 16.4078 2.19823 16.4994 2.43807 16.4994C2.6779 16.4994 2.91804 16.4078 3.10128 16.2245L9.00016 10.326L14.8987 16.2245C15.082 16.4078 15.3221 16.4994 15.5619 16.4994C15.8018 16.4994 16.0419 16.4078 16.2251 16.2245C16.5916 15.8584 16.5916 15.2643 16.2251 14.8981L10.3266 8.99984Z" fill="black" fill-opacity="0.87"></path>
                                 </svg>
+                            </div>
+                            <div class="locate-me" id="manualLocationButton">
+                                <span>Update </span>
+                                <div class="locate-me-icon">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12.375 9C12.375 10.8633 10.8633 12.375 9 12.375C7.10508 12.375 5.625 10.8633 5.625 9C5.625 7.10508 7.10508 5.625 9 5.625C10.8633 5.625 12.375 7.10508 12.375 9ZM9 7.3125C8.06836 7.3125 7.3125 8.06836 7.3125 9C7.3125 9.93164 8.06836 10.6875 9 10.6875C9.93164 10.6875 10.6875 9.93164 10.6875 9C10.6875 8.06836 9.93164 7.3125 9 7.3125ZM9 0C9.46758 0 9.84375 0.37793 9.84375 0.84375V2.30238C12.8953 2.68313 15.3176 5.10469 15.6973 8.15625H17.1562C17.6238 8.15625 18 8.53242 18 9C18 9.46758 17.6238 9.84375 17.1562 9.84375H15.6973C15.3176 12.8953 12.8953 15.3176 9.84375 15.6973V17.1562C9.84375 17.6238 9.46758 18 9 18C8.53242 18 8.15625 17.6238 8.15625 17.1562V15.6973C5.10469 15.3176 2.68313 12.8953 2.30238 9.84375H0.84375C0.37793 9.84375 0 9.46758 0 9C0 8.53242 0.37793 8.15625 0.84375 8.15625H2.30238C2.68313 5.10469 5.10469 2.68313 8.15625 2.30238V0.84375C8.15625 0.37793 8.53242 0 9 0ZM3.9375 9C3.9375 11.7949 6.20508 14.0625 9 14.0625C11.7949 14.0625 14.0625 11.7949 14.0625 9C14.0625 6.20508 11.7949 3.9375 9 3.9375C6.20508 3.9375 3.9375 6.20508 3.9375 9Z" fill="#00C3FF"></path>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <form action="storeSession" method="POST">
             @csrf
             <div class="row">
                 <div id="slots-container" class="col-md-12">
                     @include('site.checkOut.timeSlots')
                 </div>
-                <input id="searchField" type="hidden" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <br>
@@ -205,40 +277,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-12 text-center">
-                    <br>
-                    <h3><strong>Add Services</strong></h3>
-                    <hr>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <strong>Category:</strong>
-                        <select class="form-control" name="category_id" id="category">
-                            <option value="">-- Select Category -- </option>
-                            <!-- Loop through the $zones array to generate options -->
-                            @foreach ($categories as $category)
-                            <option @if (old('category')==$category->id) selected @endif value="{{ $category->id }}">
-                                {{ $category->title }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <div id="selected-services">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Services:</strong>
-                        <div id="services">
-                            <span class="text-danger"><strong>Note:</strong> Please select category!</span>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
@@ -264,116 +302,69 @@
 </div>
 <script>
     $(document).on("change", "#category", function() {
+        let value = $(this).val();
+        if (value == 0) {
+            $(".services-table tr").show();
 
-        // Make AJAX call to retrieve time slots for selected date
-        $.ajax({
-            url: '/services-by-category',
-            method: 'GET',
-            cache: false,
-            data: {
-                category_id: $('#category').val(),
-            },
-            success: function(response) {
-                console.log(response);
-                var services = response.services;
+        } else {
+            $(".services-table tr").hide();
 
-                $('#services').empty();
+            $(".services-table tr").each(function() {
+                let $row = $(this);
 
-                // Generate HTML for the services table
-                var tableHtml = '<div class="form-group scroll-div">';
-                tableHtml += '<input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">';
-                tableHtml += '<div class="scroll-div">';
-                tableHtml += '<table class="table table-striped table-bordered services-table">';
-                tableHtml += '<tr>';
-                tableHtml += '<th></th>';
-                tableHtml += '<th>Name</th>';
-                tableHtml += '<th>Price</th>';
-                tableHtml += '<th>Duration</th>';
-                tableHtml += '</tr>';
+                let category = $row.find(".service-checkbox").attr("data-category");
 
-                // Loop through services and append table rows
-                for (var i = 0; i < services.length; i++) {
-                    tableHtml += '<tr>';
-                    tableHtml += '<td>';
-                    tableHtml += '<input type="checkbox" class="service-checkbox" name="service_ids[]" value="' + services[i].id + '" data-price="' + (services[i].discount ? services[i].discount : services[i].price) + '">';
-                    tableHtml += '</td>';
-                    tableHtml += '<td>' + services[i].name + '</td>';
-                    tableHtml += '<td>' + (services[i].discount ? services[i].discount : services[i].price) + '</td>';
-                    tableHtml += '<td>' + services[i].duration + '</td>';
-                    tableHtml += '</tr>';
+                if (category === value) {
+                    $row.show();
                 }
+            });
+        }
 
-                tableHtml += '</table>';
-                tableHtml += '</div>';
-                tableHtml += '</div>';
-
-                // Append the generated HTML to the services div
-                $('#services').append(tableHtml);
-
-            },
-            error: function() {
-                alert('Error retrieving time slots.');
-            },
-            complete: function() {
-                $('#loading').hide(); // Hide the loading element after success or error
-            }
-        });
     });
 </script>
 
 <script>
-    var selectedServices = [];
-
-    function updateSelectedServices() {
-        $('#selected-services').empty();
-        var tableHtml = '<strong>Selected Services:</strong>';
-        tableHtml += '<div class="form-group">';
-        tableHtml += '<div>';
-        tableHtml += '<table class="table table-striped table-bordered selected-services-table">';
-        tableHtml += '<tr>';
-        tableHtml += '<th></th>';
-        tableHtml += '<th>Name</th>';
-        tableHtml += '</tr>';
-
-        for (var i = 0; i < selectedServices.length; i++) {
-            tableHtml += '<tr>';
-            tableHtml += '<td>';
-            tableHtml += '<input type="checkbox" checked class="service-checkbox" name="selected_service_ids[]" value="' + selectedServices[i].id + '" data-price="' + (selectedServices[i].discount ? selectedServices[i].discount : selectedServices[i].price) + '">';
-            tableHtml += '</td>';
-            tableHtml += '<td>' + selectedServices[i].name + '</td>';
-            tableHtml += '</tr>';
-        }
-
-        tableHtml += '</table>';
-        tableHtml += '</div>';
-        tableHtml += '</div>';
-
-        // Append the generated HTML to the services div
-        $('#selected-services').append(tableHtml);
-
-    }
-
     $(document).on("change", ".service-checkbox", function() {
-        var serviceId = $(this).val();
-        var serviceName = $(this).closest('tr').find('td:nth-child(2)').text();
+        let $row = $(this).closest('tr');
+        var id = $(this).val();
+        var name = $row.find('td:nth-child(2)').text();
+        var price = $row.find(".price").text();
+        var duration = $row.find("td:last").text();
 
-        // Check if the checkbox is checked or unchecked
         if ($(this).prop("checked")) {
-            // If checked, add the service to the selectedServices array
-            selectedServices.push({
-                id: serviceId,
-                name: serviceName
-            });
-        } else {
-            // If unchecked, remove the service from the selectedServices array
-            selectedServices = selectedServices.filter(service => service.id != serviceId);
-        }
+            tableHtml = '<tr>';
+            tableHtml += '<td>';
+            tableHtml += '<input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="' + id + '" data-price="' + price + '">';
+            tableHtml += '</td>';
+            tableHtml += '<td>' + name + '</td>';
+            tableHtml += '<td>AED' + price + '</td>';
+            tableHtml += '<td>' + duration + '</td>';
+            tableHtml += '</tr>';
 
-        // Update the selected services div
-        updateSelectedServices();
+            $('.selected-services-table').append(tableHtml);
+        } else {
+            $(".selected-services-table tr").each(function() {
+                let $row = $(this);
+
+                let selectedName = $row.find("td:nth-child(2)").text();
+                if (name === selectedName) {
+                    $row.remove();
+                }
+            });
+        }
     });
 </script>
+<script>
+    $(document).on("change", ".selected-service-checkbox", function() {
+        let $row = $(this).closest('tr');
+        var id = $(this).val();
+        var name = $row.find('td:nth-child(2)').text();
 
+        if ($(this).prop("checked") === false) {
+            $row.remove();
+        }
+    });
+</script>
 <script>
     $(document).on("keyup", "#search-services", function() {
         $("#search-services").keyup(function() {
@@ -385,10 +376,8 @@
                 let $row = $(this);
 
                 let name = $row.find("td:nth-child(2)").text().toLowerCase();
-                let price = $row.find("td:nth-child(3)").text().toLowerCase();
-                let duration = $row.find("td:last").text().toLowerCase();
 
-                if (name.indexOf(value) !== -1 || price.indexOf(value) !== -1 || duration.indexOf(value) !== -1) {
+                if (name.indexOf(value) !== -1) {
                     $row.show();
                 }
             });

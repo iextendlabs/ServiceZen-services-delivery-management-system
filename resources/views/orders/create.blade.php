@@ -217,7 +217,6 @@ $transport_charges = 0;
                         <div class="form-group scroll-div">
                             <span style="color: red;">*</span><strong>Services:</strong>
                             <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
-                            <div class="scroll-div">
                                 <table class="table table-striped table-bordered services-table">
                                     <tr>
                                         <th></th>
@@ -240,7 +239,6 @@ $transport_charges = 0;
                                     </tr>
                                     @endforeach
                                 </table>
-                            </div>
                         </div>
                     </div>
                 </div>

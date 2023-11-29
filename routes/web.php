@@ -157,9 +157,6 @@ Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
 //TODO :set no cache headers for all ajax calls 
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
 Route::get('staff-group', [CheckOutController::class, 'staff_group']);
-
-Route::get('services-by-category', [CheckOutController::class, 'services']);
-
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::resource('siteFAQs', SiteFAQsController::class);
