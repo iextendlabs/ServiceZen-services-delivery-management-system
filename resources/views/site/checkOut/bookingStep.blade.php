@@ -1,19 +1,14 @@
 @extends('site.layout.app')
 <link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 @section('content')
-<?php
-
-// var_dump($$addresses);die;
-?>
 <div class="album bg-light">
     <div class="container">
         <div class="row">
-            <div class="col-md-12 py-5 text-center">
-                <h2>Booking Step</h2>
-                <h3>Your Current Area: {{ $area }}</h3>
+            <div class="col-md-12 py-2 text-center">
+                <h2>Booking</h2>
             </div>
         </div>
-
+        @if(Session::has('error') || Session::has('success'))
         <div class="text-center" style="margin-bottom: 20px;">
             @if(Session::has('error'))
             <span class="alert alert-danger" role="alert">
@@ -26,6 +21,8 @@
             </span>
             @endif
         </div>
+        @endif
+
         @if ($errors->any())
         <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -38,9 +35,7 @@
         @endif
         <form action="storeSession" method="POST">
             <div class="row">
-
                 <div class="col-md-12 text-center">
-                    <br>
                     <h3><strong>Add Services</strong></h3>
                     <hr>
                 </div>
@@ -61,7 +56,7 @@
                 <div class="col-md-12">
                     <div class="form-group scroll-div">
                         <strong>Services:</strong>
-                        <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
+                        <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">
                         <table class="table table-striped table-bordered services-table">
                             <tr>
                                 <th></th>
@@ -87,8 +82,8 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <div class="form-group scroll-div">
-                            <strong>Selected Services:</strong>
+                        <div class="form-group" id="selected-services">
+                            <strong>Services:</strong>
                             <table class="table table-striped table-bordered selected-services-table">
                                 <tr>
                                     <th></th>
@@ -110,14 +105,20 @@
                                     <td>{{ $service->duration }}</td>
                                 </tr>
                                 @endforeach
-                                @else
-                                <tr>
-                                    <td colspan="4"><p class="text-center">No Selected Services.</p></td>
-                                </tr>
                                 @endif
+                                <tr id="no-services" style="display: none;">
+                                    <td colspan="4">
+                                        <p class="text-center">No Selected Services.</p>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 py-5 text-center">
+                    <h3>Your Current Area: {{ $area }}</h3>
                 </div>
             </div>
             <div class="location-search-wrapper" style="display: none;">
@@ -368,6 +369,38 @@
 
         if ($(this).prop("checked") === false) {
             $row.remove();
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        console.log($('.selected-services-table tr').length);
+        if ($('.selected-services-table tr').length > 2) {
+            $('#no-services').hide();
+        } else {
+            $('#no-services').show();
+        }
+
+        if ($('.selected-services-table tr').length > 5) {
+            $('#selected-services').addClass('scroll-div');
+        } else {
+            $('#selected-services').removeClass('scroll-div');
+        }
+    });
+</script>
+<script>
+    $(document).on("change", ".service-checkbox,.selected-service-checkbox", function() {
+        console.log($('.selected-services-table tr').length);
+        if ($('.selected-services-table tr').length > 2) {
+            $('#no-services').hide();
+        } else {
+            $('#no-services').show();
+        }
+
+        if ($('.selected-services-table tr').length > 5) {
+            $('#selected-services').addClass('scroll-div');
+        } else {
+            $('#selected-services').removeClass('scroll-div');
         }
     });
 </script>
