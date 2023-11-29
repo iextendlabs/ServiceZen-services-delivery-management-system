@@ -231,7 +231,7 @@ class CheckOutController extends Controller
 
         if (session()->has('serviceIds')) {
             $serviceIds = Session::get('serviceIds');
-            $selectedServices = Service::whereIn('id', $serviceIds)->get();
+            $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name','ASC')->get();
         } else {
             $selectedServices = [];
             $serviceIds = [];
@@ -244,8 +244,8 @@ class CheckOutController extends Controller
             $area = session('address') ? session('address')['area'] : '';
         }
 
-        $categories = ServiceCategory::get();
-        $services = Service::get();
+        $categories = ServiceCategory::orderBy('title','ASC')->get();
+        $services = Service::orderBy('name','ASC')->get();
 
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);

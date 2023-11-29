@@ -36,7 +36,7 @@
         <form action="storeSession" method="POST">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <h3><strong>Add Services</strong></h3>
+                    <h3><strong>Services</strong></h3>
                     <hr>
                 </div>
                 <div class="col-md-6">
