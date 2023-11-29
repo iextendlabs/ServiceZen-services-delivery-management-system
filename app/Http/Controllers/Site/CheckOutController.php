@@ -234,7 +234,7 @@ class CheckOutController extends Controller
             $selectedServices = Service::whereIn('id', $serviceIds)->get();
         } else {
             $selectedServices = '';
-            $serviceIds = '';
+            $serviceIds = [];
         }
 
         $date = date('Y-m-d');
