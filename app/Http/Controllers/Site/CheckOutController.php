@@ -10,6 +10,7 @@ use App\Models\CustomerProfile;
 use App\Models\Holiday;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\Staff;
 use App\Models\StaffGroup;
 use App\Models\StaffHoliday;
@@ -106,6 +107,17 @@ class CheckOutController extends Controller
                 }),
             ],
         ]);
+
+        if($request->selected_service_ids){
+            $serviceIds = Session::get('serviceIds', []);
+            foreach ($request->selected_service_ids as $serviceId) {
+                if (!in_array($serviceId, $serviceIds)) {
+                    $serviceIds[] = $serviceId;
+                    Session::put('serviceIds', $serviceIds);
+                }
+            }
+        }
+
         $address = [];
 
         $address['buildingName'] = $request->buildingName;
@@ -121,11 +133,11 @@ class CheckOutController extends Controller
         $address['searchField'] = $request->searchField;
         $address['update_profile'] = $request->update_profile;
         $address['gender'] = $request->gender;
-        if($request->custom_location && strpos($request->custom_location, ",") != FALSE){
+        if ($request->custom_location && strpos($request->custom_location, ",") != FALSE) {
             [$latitude, $longitude] = explode(",", $request->custom_location);
             $address['latitude'] = $latitude;
             $address['longitude'] = $longitude;
-        }else{
+        } else {
             $address['latitude'] = $request->latitude;
             $address['longitude'] = $request->longitude;
         }
@@ -173,8 +185,8 @@ class CheckOutController extends Controller
         // TODO check cookie if works 
         if ($request->cookie('address') !== null) {
             $addresses = json_decode($request->cookie('address'), true);
-        // if (Session::get('address')) {
-        //     $addresses = Session::get('address');
+            // if (Session::get('address')) {
+            //     $addresses = Session::get('address');
         } else {
             $addresses = [
                 'buildingName' => '',
@@ -202,8 +214,8 @@ class CheckOutController extends Controller
         }
         if ($request->cookie('code') !== null) {
             $code = json_decode($request->cookie('code'), true);
-        // if (session()->has('code')) {
-        //     $code = Session::get('code');
+            // if (session()->has('code')) {
+            //     $code = Session::get('code');
             $affiliate_code = $code['affiliate_code'];
             $coupon_code = $code['coupon_code'];
         } else {
@@ -231,16 +243,17 @@ class CheckOutController extends Controller
 
 
         $date = date('Y-m-d');
-        if ($addresses['area']){
+        if ($addresses['area']) {
             $area = $addresses['area'];
         } else {
             $area = session('address') ? session('address')['area'] : '';
         }
 
+        $categories = ServiceCategory::get();
 
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'serviceName'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'serviceName', 'categories'));
     }
 
     public function confirmStep(Request $request)
@@ -320,10 +333,19 @@ class CheckOutController extends Controller
         }
         if (!isset($area)) {
             $address = Session::get('address');
-            $area = $address ? $address['area']: '';
+            $area = $address ? $address['area'] : '';
         }
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
+    }
+
+    public function services(Request $request)
+    {
+        $services = Service::where('category_id', $request->category_id)->get();
+
+        return response()->json([
+            'services' => $services,
+        ]);
     }
 }

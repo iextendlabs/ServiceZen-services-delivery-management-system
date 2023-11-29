@@ -108,7 +108,7 @@
                                 <option value="">-- Select Zone -- </option>
                                 <!-- Loop through the $zones array to generate options -->
                                 @foreach ($zones as $zone)
-                                <option  @if (old('area')==$zone || $addresses['area']==$zone || (session('address') && session('address')['area'] == $zone )) selected @endif value="{{ $zone }}">
+                                <option @if (old('area')==$zone || $addresses['area']==$zone || (session('address') && session('address')['area']==$zone )) selected @endif value="{{ $zone }}">
                                     {{ $zone }}
                                 </option>
                                 @endforeach
@@ -129,11 +129,11 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Custom Location:</strong>
-                        <input type="text" name="custom_location" class="form-control" value="{{ old('custom_location') }}" placeholder="32.3335, 65.23223">
+                        <div class="form-group">
+                            <strong>Custom Location:</strong>
+                            <input type="text" name="custom_location" class="form-control" value="{{ old('custom_location') }}" placeholder="32.3335, 65.23223">
+                        </div>
                     </div>
-                </div>
                     <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') ? old('latitude') : $addresses['latitude'] }}">
                     <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') ? old('longitude') : $addresses['longitude'] }}">
                 </div>
@@ -205,29 +205,196 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <input class="form-check-input" type="checkbox" name="update_profile" id="update-profile" checked {{ old('update_profile') ? 'checked' : '' }}>
-
-                        <label class="form-check-label" for="update-profile">
-                            Save Data in Profile
-                        </label>
-                    </div>
-                </div>
-                <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
-                    <strong>Sorry, No Male Services Listed in Our Store.</strong>
-                </span>
 
                 <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
-                    <a href="cart">
-                        <button type="button" class="btn btn-block btn-secondary">Back</button>
-                    </a>
+                    <br>
+                    <h3><strong>Add Services</strong></h3>
+                    <hr>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <strong>Category:</strong>
+                        <select class="form-control" name="category_id" id="category">
+                            <option value="">-- Select Category -- </option>
+                            <!-- Loop through the $zones array to generate options -->
+                            @foreach ($categories as $category)
+                            <option @if (old('category')==$category->id) selected @endif value="{{ $category->id }}">
+                                {{ $category->title }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div id="selected-services">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Services:</strong>
+                        <div id="services">
+                            <span class="text-danger"><strong>Note:</strong> Please select category!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input class="form-check-input" type="checkbox" name="update_profile" id="update-profile" checked {{ old('update_profile') ? 'checked' : '' }}>
+
+                    <label class="form-check-label" for="update-profile">
+                        Save Data in Profile
+                    </label>
+                </div>
+            </div>
+            <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
+                <strong>Sorry, No Male Services Listed in Our Store.</strong>
+            </span>
+
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
+                <a href="cart">
+                    <button type="button" class="btn btn-block btn-secondary">Back</button>
+                </a>
             </div>
         </form>
     </div>
 </div>
+<script>
+    $(document).on("change", "#category", function() {
+
+        // Make AJAX call to retrieve time slots for selected date
+        $.ajax({
+            url: '/services-by-category',
+            method: 'GET',
+            cache: false,
+            data: {
+                category_id: $('#category').val(),
+            },
+            success: function(response) {
+                console.log(response);
+                var services = response.services;
+
+                $('#services').empty();
+
+                // Generate HTML for the services table
+                var tableHtml = '<div class="form-group scroll-div">';
+                tableHtml += '<input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">';
+                tableHtml += '<div class="scroll-div">';
+                tableHtml += '<table class="table table-striped table-bordered services-table">';
+                tableHtml += '<tr>';
+                tableHtml += '<th></th>';
+                tableHtml += '<th>Name</th>';
+                tableHtml += '<th>Price</th>';
+                tableHtml += '<th>Duration</th>';
+                tableHtml += '</tr>';
+
+                // Loop through services and append table rows
+                for (var i = 0; i < services.length; i++) {
+                    tableHtml += '<tr>';
+                    tableHtml += '<td>';
+                    tableHtml += '<input type="checkbox" class="service-checkbox" name="service_ids[]" value="' + services[i].id + '" data-price="' + (services[i].discount ? services[i].discount : services[i].price) + '">';
+                    tableHtml += '</td>';
+                    tableHtml += '<td>' + services[i].name + '</td>';
+                    tableHtml += '<td>' + (services[i].discount ? services[i].discount : services[i].price) + '</td>';
+                    tableHtml += '<td>' + services[i].duration + '</td>';
+                    tableHtml += '</tr>';
+                }
+
+                tableHtml += '</table>';
+                tableHtml += '</div>';
+                tableHtml += '</div>';
+
+                // Append the generated HTML to the services div
+                $('#services').append(tableHtml);
+
+            },
+            error: function() {
+                alert('Error retrieving time slots.');
+            },
+            complete: function() {
+                $('#loading').hide(); // Hide the loading element after success or error
+            }
+        });
+    });
+</script>
+
+<script>
+    var selectedServices = [];
+
+    function updateSelectedServices() {
+        $('#selected-services').empty();
+        var tableHtml = '<strong>Selected Services:</strong>';
+        tableHtml += '<div class="form-group">';
+        tableHtml += '<div>';
+        tableHtml += '<table class="table table-striped table-bordered selected-services-table">';
+        tableHtml += '<tr>';
+        tableHtml += '<th></th>';
+        tableHtml += '<th>Name</th>';
+        tableHtml += '</tr>';
+
+        for (var i = 0; i < selectedServices.length; i++) {
+            tableHtml += '<tr>';
+            tableHtml += '<td>';
+            tableHtml += '<input type="checkbox" checked class="service-checkbox" name="selected_service_ids[]" value="' + selectedServices[i].id + '" data-price="' + (selectedServices[i].discount ? selectedServices[i].discount : selectedServices[i].price) + '">';
+            tableHtml += '</td>';
+            tableHtml += '<td>' + selectedServices[i].name + '</td>';
+            tableHtml += '</tr>';
+        }
+
+        tableHtml += '</table>';
+        tableHtml += '</div>';
+        tableHtml += '</div>';
+
+        // Append the generated HTML to the services div
+        $('#selected-services').append(tableHtml);
+
+    }
+
+    $(document).on("change", ".service-checkbox", function() {
+        var serviceId = $(this).val();
+        var serviceName = $(this).closest('tr').find('td:nth-child(2)').text();
+
+        // Check if the checkbox is checked or unchecked
+        if ($(this).prop("checked")) {
+            // If checked, add the service to the selectedServices array
+            selectedServices.push({
+                id: serviceId,
+                name: serviceName
+            });
+        } else {
+            // If unchecked, remove the service from the selectedServices array
+            selectedServices = selectedServices.filter(service => service.id != serviceId);
+        }
+
+        // Update the selected services div
+        updateSelectedServices();
+    });
+</script>
+
+<script>
+    $(document).on("keyup", "#search-services", function() {
+        $("#search-services").keyup(function() {
+            let value = $(this).val().toLowerCase();
+
+            $(".services-table tr").hide();
+
+            $(".services-table tr").each(function() {
+                let $row = $(this);
+
+                let name = $row.find("td:nth-child(2)").text().toLowerCase();
+                let price = $row.find("td:nth-child(3)").text().toLowerCase();
+                let duration = $row.find("td:last").text().toLowerCase();
+
+                if (name.indexOf(value) !== -1 || price.indexOf(value) !== -1 || duration.indexOf(value) !== -1) {
+                    $row.show();
+                }
+            });
+        });
+    });
+</script>
 <script>
     function searchSelectOptions(selectElement, searchString) {
         // Convert the search string to lowercase for case-insensitive comparison
