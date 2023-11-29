@@ -5,16 +5,11 @@ namespace App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use App\Models\Holiday;
-use App\Models\LongHoliday;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
-use App\Models\Staff;
-use App\Models\StaffGeneralHoliday;
-use App\Models\StaffHoliday;
+use App\Models\TimeSlot;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -97,38 +92,50 @@ class CustomerController extends Controller
         ], 200);
     }
 
-    public function availableStaff(Request $request)
+    public function availableTimeSlot(Request $request)
     {
-        $carbonDate = Carbon::createFromFormat('Y-m-d', $request->date);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
+        $availableStaff = [];
+        $staff_displayed = [];
+        $staff_slots = [];
+        foreach ($timeSlots as $timeSlot) {
+            $staff_counter = 0;
+            $holiday_counter = 0;
+            $booked_counter = 0;
+            foreach ($timeSlot->staffs as $staff) {
+                if (!in_array($staff->id, $staff_ids)) {
+                    $booked_counter++;
+                }
+                if (!in_array($staff->id, $timeSlot->excluded_staff)) {
+                    $holiday_counter++;
+                }
+                if (!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff)) {
+                    $staff_counter++;
+                    $current_slot = [$timeSlot->id,  date('h:i A', strtotime($timeSlot->time_start)) . '-- ' . date('h:i A', strtotime($timeSlot->time_end)), $timeSlot->id];
 
-        $staff_ids = StaffHoliday::where('date', $request->date)->pluck('staff_id')->toArray();
-
-        $dayName = $carbonDate->formatLocalized('%A');
-        $generalHolidays = config('app.general_holiday');
-        if (in_array($dayName, $generalHolidays)) {
-            $holiday[] = $request->date;
-        } else {
-            $holiday = Holiday::where('date', $request->date)->pluck('date')->toArray();
+                    if (isset($staff_slots[$staff->id])) {
+                        array_push($staff_slots[$staff->id], $current_slot);
+                    } else {
+                        $staff_slots[$staff->id] = [$current_slot];
+                    }
+                    if (!in_array($staff->id, $staff_displayed)) {
+                        $staff_displayed[] = $staff->id;
+                        $availableStaff[] = $staff;
+                    }
+                }
+            }
         }
-        $generalHolidayStaffIds = StaffGeneralHoliday::where('day', $dayName)->pluck('staff_id')->toArray();
 
-        $longHolidaysStaffId = LongHoliday::where('date_start', '<=', $request->date)
-            ->where('date_end', '>=', $request->date)
-            ->pluck('staff_id')->toArray();
-        $on_holiday_staff_ids = array_unique([...$staff_ids, ...$generalHolidayStaffIds, ...$longHolidaysStaffId]);
-
-        if ($holiday) {
+        if (count($staff_displayed) == 0) {
             return response()->json([
-                'msg' => "Whoops! Holiday on selected date. Please choose another date by Click on Data.",
+                'msg' => "Whoops! No Staff Available",
             ], 201);
-        } else {
-            $availableStaff = User::with('staff')->whereHas('staff', function ($query) use ($on_holiday_staff_ids) {
-                $query->where('status', 1)->whereNotIn('user_id', $on_holiday_staff_ids);
-            })->get();
-
-            return response()->json([
-                'availableStaff' => $availableStaff
-            ], 200);
         }
+
+        return response()->json([
+            'availableStaff' => $availableStaff,
+            'slots' => $staff_slots,
+        ], 200);
     }
+
 }
