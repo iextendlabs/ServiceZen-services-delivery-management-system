@@ -233,7 +233,7 @@ class CheckOutController extends Controller
             $serviceIds = Session::get('serviceIds');
             $selectedServices = Service::whereIn('id', $serviceIds)->get();
         } else {
-            $selectedServices = '';
+            $selectedServices = [];
             $serviceIds = [];
         }
 
