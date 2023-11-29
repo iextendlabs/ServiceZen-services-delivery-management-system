@@ -96,6 +96,7 @@
                                     <th>Price</th>
                                     <th>Duration</th>
                                 </tr>
+                                @if(count($selectedServices))
                                 @foreach ($selectedServices as $service)
                                 <tr>
                                     <td>
@@ -109,6 +110,11 @@
                                     <td>{{ $service->duration }}</td>
                                 </tr>
                                 @endforeach
+                                @else
+                                <tr>
+                                    <td colspan="4"><p class="text-center">No Selected Services.</p></td>
+                                </tr>
+                                @endif
                             </table>
                         </div>
                     </div>
