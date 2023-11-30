@@ -9,7 +9,7 @@ class CategoryComposer
 {
     public function compose(View $view)
     {
-        $categories = ServiceCategory::all();
+        $categories = ServiceCategory::where('status',1)->get();
         $address = Session::get('address');
         $zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 

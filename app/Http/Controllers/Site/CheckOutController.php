@@ -244,12 +244,12 @@ class CheckOutController extends Controller
             $area = session('address') ? session('address')['area'] : '';
         }
 
-        $categories = ServiceCategory::orderBy('title','ASC')->get();
-        $services = Service::orderBy('name','ASC')->get();
+        $servicesCategories = ServiceCategory::where('status',1)->orderBy('title','ASC')->get();
+        $services = Service::where('status',1)->orderBy('name','ASC')->get();
 
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'selectedServices', 'categories', 'services', 'serviceIds'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds'));
     }
 
     public function confirmStep(Request $request)

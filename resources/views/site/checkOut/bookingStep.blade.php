@@ -44,7 +44,7 @@
                         <strong>Category:</strong>
                         <select class="form-control" name="category_id" id="category">
                             <option value="0">-- All Services -- </option>
-                            @foreach ($categories as $category)
+                            @foreach ($servicesCategories as $category)
                             <option @if (old('category')==$category->id) selected @endif value="{{ $category->id }}">
                                 {{ $category->title }}
                             </option>
