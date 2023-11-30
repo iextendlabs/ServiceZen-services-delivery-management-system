@@ -231,7 +231,7 @@ class CheckOutController extends Controller
 
         if (session()->has('serviceIds')) {
             $serviceIds = Session::get('serviceIds');
-            $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name','ASC')->get();
+            $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
         } else {
             $selectedServices = [];
             $serviceIds = [];
@@ -244,8 +244,8 @@ class CheckOutController extends Controller
             $area = session('address') ? session('address')['area'] : '';
         }
 
-        $servicesCategories = ServiceCategory::where('status',1)->orderBy('title','ASC')->get();
-        $services = Service::where('status',1)->orderBy('name','ASC')->get();
+        $servicesCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
@@ -263,6 +263,9 @@ class CheckOutController extends Controller
             } else {
                 $errorMessage = "There is no " . implode(", ", $missingKeys);
             }
+            return redirect('/')->with('error', $errorMessage);
+        } elseif (Session::has('serviceIds') && empty(Session::get('serviceIds'))) {
+            $errorMessage = "You have not added any service to cart.";
             return redirect('/')->with('error', $errorMessage);
         }
 
