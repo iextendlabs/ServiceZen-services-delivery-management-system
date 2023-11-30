@@ -1,23 +1,14 @@
 @extends('site.layout.app')
 <link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 @section('content')
-<?php
-
-// var_dump($$addresses);die;
-?>
 <div class="album bg-light">
     <div class="container">
         <div class="row">
-            <div class="col-md-12 py-5 text-center">
-                <h2>Booking Step</h2>
-                <h3>Your Current Area: {{ $area }}</h3>
-                @if($serviceName)
-                <h3>Services :
-                    {{ $serviceName }}
-                </h3>
-                @endif
+            <div class="col-md-12 py-2 text-center">
+                <h2>Booking</h2>
             </div>
         </div>
+        @if(Session::has('error') || Session::has('success'))
         <div class="text-center" style="margin-bottom: 20px;">
             @if(Session::has('error'))
             <span class="alert alert-danger" role="alert">
@@ -30,6 +21,8 @@
             </span>
             @endif
         </div>
+        @endif
+
         @if ($errors->any())
         <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -40,42 +33,128 @@
             </ul>
         </div>
         @endif
-        <div class="location-search-wrapper" style="display: none;">
-            <div class="location-container welcome-section">
-                <div id="navbar-location-button" class="location-search lg">
-                    <div class="location-search-left">
-                        <svg width="12" height="18" viewBox="0 0 12 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M0 6.2468C0 2.80246 2.69144 0 5.99974 0C9.30812 0 12 2.80246 12 6.2468C12 9.56227 6.55647 17.3084 6.32455 17.6364L6.10836 17.9429C6.0828 17.9789 6.04277 18 5.99974 18C5.95736 18 5.91707 17.9789 5.89177 17.9429L5.67545 17.6364C5.44367 17.3084 0 9.56227 0 6.2468ZM8.149 6.2468C8.149 5.01276 7.18511 4.00921 5.99974 4.00921C4.81502 4.00921 3.85047 5.01276 3.85047 6.2468C3.85047 7.48021 4.81506 8.4844 5.99974 8.4844C7.18507 8.4844 8.149 7.48021 8.149 6.2468Z" fill="black" fill-opacity="0.87"></path>
-                        </svg>
+        <form action="storeSession" method="POST">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h3><strong>Services</strong></h3>
+                    <hr>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <strong>Category:</strong>
+                        <select class="form-control" name="category_id" id="category">
+                            <option value="0">-- All Services -- </option>
+                            @foreach ($servicesCategories as $category)
+                            <option @if (old('category')==$category->id) selected @endif value="{{ $category->id }}">
+                                {{ $category->title }}
+                            </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="location-search-input-wrapper">
-                        <input id="searchField" disabled type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group scroll-div">
+                        <strong>Services:</strong>
+                        <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">
+                        <table class="table table-striped table-bordered services-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                            </tr>
+                            @foreach ($services as $service)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" @if(in_array($service->id,$serviceIds)) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                </td>
+                                <td>{{ $service->name }}</td>
+
+                                <td>AED<span class="price">{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}</span></td>
+                                <td>{{ $service->duration }}</td>
+                            </tr>
+                            @endforeach
+                        </table>
                     </div>
-                    <div class="location-search-right en">
-                        <div class="location-search-clear en" style="display:none;">
-                            <svg width="15" height="15" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3266 8.99984L16.2251 3.10128C16.5916 2.73512 16.5916 2.14101 16.2251 1.77485C15.8587 1.40838 15.2652 1.40838 14.8987 1.77485L9.00016 7.67342L3.10128 1.77485C2.73481 1.40838 2.14132 1.40838 1.77485 1.77485C1.40838 2.14101 1.40838 2.73512 1.77485 3.10128L7.67373 8.99984L1.77485 14.8984C1.40838 15.2646 1.40838 15.8587 1.77485 16.2248C1.95809 16.4078 2.19823 16.4994 2.43807 16.4994C2.6779 16.4994 2.91804 16.4078 3.10128 16.2245L9.00016 10.326L14.8987 16.2245C15.082 16.4078 15.3221 16.4994 15.5619 16.4994C15.8018 16.4994 16.0419 16.4078 16.2251 16.2245C16.5916 15.8584 16.5916 15.2643 16.2251 14.8981L10.3266 8.99984Z" fill="black" fill-opacity="0.87"></path>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="form-group" id="selected-services">
+                            <strong>Services:</strong>
+                            <table class="table table-striped table-bordered selected-services-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                </tr>
+                                @if(count($selectedServices))
+                                @foreach ($selectedServices as $service)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                    </td>
+                                    <td>{{ $service->name }}</td>
+
+                                    <td>AED<span class="price">{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}</span></td>
+                                    <td>{{ $service->duration }}</td>
+                                </tr>
+                                @endforeach
+                                @endif
+                                <tr id="no-services" style="display: none;">
+                                    <td colspan="4">
+                                        <p class="text-center">No Selected Services.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 py-5 text-center">
+                    <h3>Your Current Area: {{ $area }}</h3>
+                </div>
+            </div>
+            <div class="location-search-wrapper" style="display: none;">
+                <div class="location-container welcome-section">
+                    <div id="navbar-location-button" class="location-search lg">
+                        <div class="location-search-left">
+                            <svg width="12" height="18" viewBox="0 0 12 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 6.2468C0 2.80246 2.69144 0 5.99974 0C9.30812 0 12 2.80246 12 6.2468C12 9.56227 6.55647 17.3084 6.32455 17.6364L6.10836 17.9429C6.0828 17.9789 6.04277 18 5.99974 18C5.95736 18 5.91707 17.9789 5.89177 17.9429L5.67545 17.6364C5.44367 17.3084 0 9.56227 0 6.2468ZM8.149 6.2468C8.149 5.01276 7.18511 4.00921 5.99974 4.00921C4.81502 4.00921 3.85047 5.01276 3.85047 6.2468C3.85047 7.48021 4.81506 8.4844 5.99974 8.4844C7.18507 8.4844 8.149 7.48021 8.149 6.2468Z" fill="black" fill-opacity="0.87"></path>
                             </svg>
                         </div>
-                        <div class="locate-me" id="manualLocationButton">
-                            <span>Update </span>
-                            <div class="locate-me-icon">
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12.375 9C12.375 10.8633 10.8633 12.375 9 12.375C7.10508 12.375 5.625 10.8633 5.625 9C5.625 7.10508 7.10508 5.625 9 5.625C10.8633 5.625 12.375 7.10508 12.375 9ZM9 7.3125C8.06836 7.3125 7.3125 8.06836 7.3125 9C7.3125 9.93164 8.06836 10.6875 9 10.6875C9.93164 10.6875 10.6875 9.93164 10.6875 9C10.6875 8.06836 9.93164 7.3125 9 7.3125ZM9 0C9.46758 0 9.84375 0.37793 9.84375 0.84375V2.30238C12.8953 2.68313 15.3176 5.10469 15.6973 8.15625H17.1562C17.6238 8.15625 18 8.53242 18 9C18 9.46758 17.6238 9.84375 17.1562 9.84375H15.6973C15.3176 12.8953 12.8953 15.3176 9.84375 15.6973V17.1562C9.84375 17.6238 9.46758 18 9 18C8.53242 18 8.15625 17.6238 8.15625 17.1562V15.6973C5.10469 15.3176 2.68313 12.8953 2.30238 9.84375H0.84375C0.37793 9.84375 0 9.46758 0 9C0 8.53242 0.37793 8.15625 0.84375 8.15625H2.30238C2.68313 5.10469 5.10469 2.68313 8.15625 2.30238V0.84375C8.15625 0.37793 8.53242 0 9 0ZM3.9375 9C3.9375 11.7949 6.20508 14.0625 9 14.0625C11.7949 14.0625 14.0625 11.7949 14.0625 9C14.0625 6.20508 11.7949 3.9375 9 3.9375C6.20508 3.9375 3.9375 6.20508 3.9375 9Z" fill="#00C3FF"></path>
+                        <div class="location-search-input-wrapper">
+                            <input id="searchField" disabled type="text" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
+                        </div>
+                        <div class="location-search-right en">
+                            <div class="location-search-clear en" style="display:none;">
+                                <svg width="15" height="15" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3266 8.99984L16.2251 3.10128C16.5916 2.73512 16.5916 2.14101 16.2251 1.77485C15.8587 1.40838 15.2652 1.40838 14.8987 1.77485L9.00016 7.67342L3.10128 1.77485C2.73481 1.40838 2.14132 1.40838 1.77485 1.77485C1.40838 2.14101 1.40838 2.73512 1.77485 3.10128L7.67373 8.99984L1.77485 14.8984C1.40838 15.2646 1.40838 15.8587 1.77485 16.2248C1.95809 16.4078 2.19823 16.4994 2.43807 16.4994C2.6779 16.4994 2.91804 16.4078 3.10128 16.2245L9.00016 10.326L14.8987 16.2245C15.082 16.4078 15.3221 16.4994 15.5619 16.4994C15.8018 16.4994 16.0419 16.4078 16.2251 16.2245C16.5916 15.8584 16.5916 15.2643 16.2251 14.8981L10.3266 8.99984Z" fill="black" fill-opacity="0.87"></path>
                                 </svg>
+                            </div>
+                            <div class="locate-me" id="manualLocationButton">
+                                <span>Update </span>
+                                <div class="locate-me-icon">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12.375 9C12.375 10.8633 10.8633 12.375 9 12.375C7.10508 12.375 5.625 10.8633 5.625 9C5.625 7.10508 7.10508 5.625 9 5.625C10.8633 5.625 12.375 7.10508 12.375 9ZM9 7.3125C8.06836 7.3125 7.3125 8.06836 7.3125 9C7.3125 9.93164 8.06836 10.6875 9 10.6875C9.93164 10.6875 10.6875 9.93164 10.6875 9C10.6875 8.06836 9.93164 7.3125 9 7.3125ZM9 0C9.46758 0 9.84375 0.37793 9.84375 0.84375V2.30238C12.8953 2.68313 15.3176 5.10469 15.6973 8.15625H17.1562C17.6238 8.15625 18 8.53242 18 9C18 9.46758 17.6238 9.84375 17.1562 9.84375H15.6973C15.3176 12.8953 12.8953 15.3176 9.84375 15.6973V17.1562C9.84375 17.6238 9.46758 18 9 18C8.53242 18 8.15625 17.6238 8.15625 17.1562V15.6973C5.10469 15.3176 2.68313 12.8953 2.30238 9.84375H0.84375C0.37793 9.84375 0 9.46758 0 9C0 8.53242 0.37793 8.15625 0.84375 8.15625H2.30238C2.68313 5.10469 5.10469 2.68313 8.15625 2.30238V0.84375C8.15625 0.37793 8.53242 0 9 0ZM3.9375 9C3.9375 11.7949 6.20508 14.0625 9 14.0625C11.7949 14.0625 14.0625 11.7949 14.0625 9C14.0625 6.20508 11.7949 3.9375 9 3.9375C6.20508 3.9375 3.9375 6.20508 3.9375 9Z" fill="#00C3FF"></path>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <form action="storeSession" method="POST">
             @csrf
             <div class="row">
                 <div id="slots-container" class="col-md-12">
                     @include('site.checkOut.timeSlots')
                 </div>
-                <input id="searchField" type="hidden" name="searchField" placeholder="Search for area, street name, landmark..." autocomplete="on" value="{{ old('searchField') ? old('searchField') : $addresses['searchField'] }}" class="location-search-input">
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <br>
@@ -108,7 +187,7 @@
                                 <option value="">-- Select Zone -- </option>
                                 <!-- Loop through the $zones array to generate options -->
                                 @foreach ($zones as $zone)
-                                <option  @if (old('area')==$zone || $addresses['area']==$zone || (session('address') && session('address')['area'] == $zone )) selected @endif value="{{ $zone }}">
+                                <option @if (old('area')==$zone || $addresses['area']==$zone || (session('address') && session('address')['area']==$zone )) selected @endif value="{{ $zone }}">
                                     {{ $zone }}
                                 </option>
                                 @endforeach
@@ -129,11 +208,11 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Custom Location:</strong>
-                        <input type="text" name="custom_location" class="form-control" value="{{ old('custom_location') }}" placeholder="32.3335, 65.23223">
+                        <div class="form-group">
+                            <strong>Custom Location:</strong>
+                            <input type="text" name="custom_location" class="form-control" value="{{ old('custom_location') }}" placeholder="32.3335, 65.23223">
+                        </div>
                     </div>
-                </div>
                     <input type="hidden" name="latitude" id="latitude" class="form-control" placeholder="latitude" value="{{ old('latitude') ? old('latitude') : $addresses['latitude'] }}">
                     <input type="hidden" name="longitude" id="longitude" class="form-control" placeholder="longitude" value="{{ old('longitude') ? old('longitude') : $addresses['longitude'] }}">
                 </div>
@@ -205,29 +284,145 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <input class="form-check-input" type="checkbox" name="update_profile" id="update-profile" checked {{ old('update_profile') ? 'checked' : '' }}>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input class="form-check-input" type="checkbox" name="update_profile" id="update-profile" checked {{ old('update_profile') ? 'checked' : '' }}>
 
-                        <label class="form-check-label" for="update-profile">
-                            Save Data in Profile
-                        </label>
-                    </div>
+                    <label class="form-check-label" for="update-profile">
+                        Save Data in Profile
+                    </label>
                 </div>
-                <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
-                    <strong>Sorry, No Male Services Listed in Our Store.</strong>
-                </span>
+            </div>
+            <span class="invalid-feedback text-center" id="gender-error" role="alert" style="display: none; font-size: medium;">
+                <strong>Sorry, No Male Services Listed in Our Store.</strong>
+            </span>
 
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
-                    <a href="cart">
-                        <button type="button" class="btn btn-block btn-secondary">Back</button>
-                    </a>
-                </div>
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
+                <a href="cart">
+                    <button type="button" class="btn btn-block btn-secondary">Back</button>
+                </a>
             </div>
         </form>
     </div>
 </div>
+<script>
+    $(document).on("change", "#category", function() {
+        let value = $(this).val();
+        if (value == 0) {
+            $(".services-table tr").show();
+
+        } else {
+            $(".services-table tr").hide();
+
+            $(".services-table tr").each(function() {
+                let $row = $(this);
+
+                let category = $row.find(".service-checkbox").attr("data-category");
+
+                if (category === value) {
+                    $row.show();
+                }
+            });
+        }
+
+    });
+</script>
+
+<script>
+    $(document).on("change", ".service-checkbox", function() {
+        let $row = $(this).closest('tr');
+        var id = $(this).val();
+        var name = $row.find('td:nth-child(2)').text();
+        var price = $row.find(".price").text();
+        var duration = $row.find("td:last").text();
+
+        if ($(this).prop("checked")) {
+            tableHtml = '<tr>';
+            tableHtml += '<td>';
+            tableHtml += '<input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="' + id + '" data-price="' + price + '">';
+            tableHtml += '</td>';
+            tableHtml += '<td>' + name + '</td>';
+            tableHtml += '<td>AED' + price + '</td>';
+            tableHtml += '<td>' + duration + '</td>';
+            tableHtml += '</tr>';
+
+            $('.selected-services-table').append(tableHtml);
+        } else {
+            $(".selected-services-table tr").each(function() {
+                let $row = $(this);
+
+                let selectedName = $row.find("td:nth-child(2)").text();
+                if (name === selectedName) {
+                    $row.remove();
+                }
+            });
+        }
+    });
+</script>
+<script>
+    $(document).on("change", ".selected-service-checkbox", function() {
+        let $row = $(this).closest('tr');
+        var id = $(this).val();
+        var name = $row.find('td:nth-child(2)').text();
+
+        if ($(this).prop("checked") === false) {
+            $row.remove();
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        console.log($('.selected-services-table tr').length);
+        if ($('.selected-services-table tr').length > 2) {
+            $('#no-services').hide();
+        } else {
+            $('#no-services').show();
+        }
+
+        if ($('.selected-services-table tr').length > 5) {
+            $('#selected-services').addClass('scroll-div');
+        } else {
+            $('#selected-services').removeClass('scroll-div');
+        }
+    });
+</script>
+<script>
+    $(document).on("change", ".service-checkbox,.selected-service-checkbox", function() {
+        console.log($('.selected-services-table tr').length);
+        if ($('.selected-services-table tr').length > 2) {
+            $('#no-services').hide();
+        } else {
+            $('#no-services').show();
+        }
+
+        if ($('.selected-services-table tr').length > 5) {
+            $('#selected-services').addClass('scroll-div');
+        } else {
+            $('#selected-services').removeClass('scroll-div');
+        }
+    });
+</script>
+<script>
+    $(document).on("keyup", "#search-services", function() {
+        $("#search-services").keyup(function() {
+            let value = $(this).val().toLowerCase();
+
+            $(".services-table tr").hide();
+
+            $(".services-table tr").each(function() {
+                let $row = $(this);
+
+                let name = $row.find("td:nth-child(2)").text().toLowerCase();
+
+                if (name.indexOf(value) !== -1) {
+                    $row.show();
+                }
+            });
+        });
+    });
+</script>
 <script>
     function searchSelectOptions(selectElement, searchString) {
         // Convert the search string to lowercase for case-insensitive comparison

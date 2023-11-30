@@ -147,34 +147,32 @@ $transport_charges = 0;
                     <div class="form-group scroll-div">
                         <span style="color: red;">*</span><strong>Services:</strong>
                         <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
-                        <div class="scroll-div">
-                            <table class="table table-striped table-bordered services-table">
-                                <tr>
-                                    <th></th>
-                                    <th>Name</th>
-                                    <th>Price</th>
-                                    <th>Duration</th>
-                                </tr>
-                                @foreach ($services as $service)
-                                <tr>
-                                    <td>
-                                        @if(in_array($service->id,$order_service))
-                                        <input type="checkbox" class="service-checkbox" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                        <table class="table table-striped table-bordered services-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                            </tr>
+                            @foreach ($services as $service)
+                            <tr>
+                                <td>
+                                    @if(in_array($service->id,$order_service))
+                                    <input type="checkbox" class="service-checkbox" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
                                  $service->discount : $service->price }}">
-                                        @else
-                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    @else
+                                    <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
                                  $service->discount : $service->price }}">
-                                        @endif
-                                    </td>
-                                    <td>{{ $service->name }}</td>
+                                    @endif
+                                </td>
+                                <td>{{ $service->name }}</td>
 
-                                    <td>{{ isset($service->discount) ? 
+                                <td>{{ isset($service->discount) ? 
                                  $service->discount : $service->price }}</td>
-                                    <td>{{ $service->duration }}</td>
-                                </tr>
-                                @endforeach
-                            </table>
-                        </div>
+                                <td>{{ $service->duration }}</td>
+                            </tr>
+                            @endforeach
+                        </table>
                     </div>
                 </div>
                 <div class="col-md-6">

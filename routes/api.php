@@ -6,7 +6,8 @@ use App\Http\Controllers\AppController\{
     StaffAppController2,
     StaffAppController,
     DriverAppController,
-    ChatController
+    ChatController,
+    CustomerController
 };
 /*
 |--------------------------------------------------------------------------
@@ -40,3 +41,7 @@ Route::get('driverOrders', [DriverAppController::class, 'orders']);
 Route::post('driverLogin', [DriverAppController::class, 'login']);
 Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
 Route::post('updateToken', [DriverAppController::class, 'updateToken']);
+Route::post('customerLogin', [CustomerController::class, 'login']);
+Route::post('customerSignup', [CustomerController::class, 'signup']);
+Route::get('appIndex', [CustomerController::class, 'index']);
+Route::get('availableTimeSlot', [CustomerController::class, 'availableTimeSlot']);
