@@ -107,9 +107,9 @@ class CheckOutController extends Controller
                 }),
             ],
         ]);
-
+        
+        Session::forget('serviceIds');
         if ($request->selected_service_ids) {
-            Session::forget('serviceIds');
             foreach ($request->selected_service_ids as $serviceId) {
                 $serviceIds[] = $serviceId;
                 Session::put('serviceIds', $serviceIds);
