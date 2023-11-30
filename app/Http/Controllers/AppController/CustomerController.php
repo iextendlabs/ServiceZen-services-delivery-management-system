@@ -5,12 +5,16 @@ namespace App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderService;
+use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -95,7 +99,7 @@ class CustomerController extends Controller
 
     public function availableTimeSlot(Request $request)
     {
-        $transport_charges = StaffZone::where('name',$request->area)->value('transport_charges');
+        $transport_charges = StaffZone::where('name', $request->area)->value('transport_charges');
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
         $availableStaff = [];
         $staff_displayed = [];
@@ -135,10 +139,124 @@ class CustomerController extends Controller
         }
 
         return response()->json([
-            'transport_charges'=>$transport_charges,
+            'transport_charges' => $transport_charges,
             'availableStaff' => $availableStaff,
             'slots' => $staff_slots,
         ], 200);
     }
 
+    public function addOrder(Request $request)
+    {
+        $password = NULL;
+        $input = $request->all();
+        $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
+
+        if (count($has_order) == 0) {
+
+            $staff = User::find($input['service_staff_id']);
+
+            $input['status'] = "Pending";
+            $input['driver_status'] = "Pending";
+            $input['staff_name'] = $staff->name;
+            $input['time_slot_id'] = $input['time_slot_id'];
+            $input['driver_id'] = $staff->staff->driver_id;
+
+            $user = User::where('email', $input['email'])->first();
+
+            if (isset($user)) {
+
+                $user->customerProfile()->create($input);
+                $input['customer_id'] = $user->id;
+                $customer_type = "Old";
+            } else {
+                $customer_type = "New";
+
+                $password = $input['number'];
+
+                $input['password'] = Hash::make($password);
+
+                $user = User::create($input);
+
+                $user->customerProfile()->create($input);
+
+                $input['customer_id'] = $user->id;
+
+                $user->assignRole('Customer');
+            }
+
+            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
+
+            $services = Service::whereIn('id', $input['service_ids'])->get();
+
+            $sub_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+
+            $staff_charges = $staff->staff->charges ?? 0;
+            $transport_charges = $staffZone->transport_charges ?? 0;
+            $total_amount = $sub_total + $staff_charges + $transport_charges;
+
+            $input['sub_total'] = (int)$sub_total;
+            $input['discount'] = 0;
+            $input['staff_charges'] = (int)$staff_charges;
+            $input['transport_charges'] = (int)$transport_charges;
+            $input['total_amount'] = (int)$total_amount;
+
+            $time_slot = TimeSlot::find($input['time_slot_id']);
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+
+            $input['time_start'] = $time_slot->time_start;
+            $input['time_end'] = $time_slot->time_end;
+            $input['payment_method'] = "Cash-On-Delivery";
+            $input['customer_name'] = $input['name'];
+            $input['customer_email'] = $input['email'];
+
+            $order = Order::create($input);
+
+            $input['order_id'] = $order->id;
+            $input['discount_amount'] = $input['discount'];
+
+            OrderTotal::create($input);
+
+            foreach ($input['service_ids'] as $id) {
+                $services = Service::find($id);
+                $input['service_id'] = $id;
+                $input['service_name'] = $services->name;
+                $input['duration'] = $services->duration;
+                $input['status'] = 'Open';
+                if ($services->discount) {
+                    $input['price'] = $services->discount;
+                } else {
+                    $input['price'] = $services->price;
+                }
+                OrderService::create($input);
+            }
+
+            if (Carbon::now()->toDateString() == $input['date']) {
+                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                }
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
+            }
+            try {
+                $this->sendAdminEmail($input['order_id'], $input['email']);
+                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
+
+            return response()->json([
+                'msg' => "Order created successfully."
+            ], 200);
+        } else {
+            return response()->json([
+                'msg' => "Sorry! Unfortunately This slot was booked by someone else just now."
+            ], 201);
+        }
+    }
 }
