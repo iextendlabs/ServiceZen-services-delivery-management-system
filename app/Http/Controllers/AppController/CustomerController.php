@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
+use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -94,6 +95,7 @@ class CustomerController extends Controller
 
     public function availableTimeSlot(Request $request)
     {
+        $transport_charges = StaffZone::where('name',$request->area)->value('transport_charges');
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
         $availableStaff = [];
         $staff_displayed = [];
@@ -133,6 +135,7 @@ class CustomerController extends Controller
         }
 
         return response()->json([
+            'transport_charges'=>$transport_charges,
             'availableStaff' => $availableStaff,
             'slots' => $staff_slots,
         ], 200);
