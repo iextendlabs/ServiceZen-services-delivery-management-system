@@ -259,4 +259,13 @@ class CustomerController extends Controller
             ], 201);
         }
     }
+
+    public function getOrders(Request $request){
+        
+        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->get();
+
+        return response()->json([
+            'orders' => $orders
+        ], 200);
+    }
 }
