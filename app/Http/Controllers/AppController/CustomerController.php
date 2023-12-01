@@ -268,4 +268,13 @@ class CustomerController extends Controller
             'orders' => $orders
         ], 200);
     }
+
+    public function getZones(){
+        
+        $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
+
+        return response()->json([
+            'staffZones' => $staffZones
+        ], 200);
+    }
 }

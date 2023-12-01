@@ -47,3 +47,4 @@ Route::get('appIndex', [CustomerController::class, 'index']);
 Route::get('availableTimeSlot', [CustomerController::class, 'availableTimeSlot']);
 Route::post('addOrder', [CustomerController::class, 'addOrder']);
 Route::get('getOrders', [CustomerController::class, 'getOrders']);
+Route::get('getZones', [CustomerController::class, 'getZones']);
