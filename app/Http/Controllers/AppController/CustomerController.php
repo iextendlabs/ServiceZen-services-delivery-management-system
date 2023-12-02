@@ -88,7 +88,8 @@ class CustomerController extends Controller
         $images = explode(",", $slider_images);
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $services = Service::where('status', 1)->whereIn('category_id',$categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+
 
         return response()->json([
             'images' => $images,
