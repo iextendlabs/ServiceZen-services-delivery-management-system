@@ -102,6 +102,7 @@ class CustomerController extends Controller
                 'id' => $service->id,
                 'name' => $service->name,
                 'image' => $service->image,
+                'price' => $service->price,
                 'discount' => $service->discount,
                 'duration' => $service->duration,
                 'category_id' => $service->category_id
