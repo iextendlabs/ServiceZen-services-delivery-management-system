@@ -41,6 +41,7 @@ Route::get('driverOrders', [DriverAppController::class, 'orders']);
 Route::post('driverLogin', [DriverAppController::class, 'login']);
 Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
 Route::post('updateToken', [DriverAppController::class, 'updateToken']);
+// customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);
 Route::post('customerSignup', [CustomerController::class, 'signup']);
 Route::get('appIndex', [CustomerController::class, 'index']);
@@ -48,3 +49,5 @@ Route::get('availableTimeSlot', [CustomerController::class, 'availableTimeSlot']
 Route::post('addOrder', [CustomerController::class, 'addOrder']);
 Route::get('getOrders', [CustomerController::class, 'getOrders']);
 Route::get('getZones', [CustomerController::class, 'getZones']);
+Route::get('editOrder', [CustomerController::class, 'editOrder']);
+Route::get('filterServices', [CustomerController::class, 'filterServices']);
