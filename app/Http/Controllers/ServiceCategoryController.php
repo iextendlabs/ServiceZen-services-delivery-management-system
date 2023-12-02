@@ -31,7 +31,7 @@ class ServiceCategoryController extends Controller
         return view('service_categories.index',compact('service_categories'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -42,7 +42,7 @@ class ServiceCategoryController extends Controller
         $categories = ServiceCategory::all();
         return view('service_categories.create',compact('categories'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -55,16 +55,26 @@ class ServiceCategoryController extends Controller
             'title' => 'required',
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $service_category = ServiceCategory::create($request->all());
-        
+
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-        
+
             $request->image->move(public_path('service-category-images'), $filename);
-        
+
             $service_category->image = $filename;
+            $service_category->save();
+        }
+
+        if ($request->icon) {
+            $filename = time() . '.' . $request->icon->getClientOriginalExtension();
+
+            $request->icon->move(public_path('service-category-icons'), $filename);
+
+            $service_category->icon = $filename;
             $service_category->save();
         }
 
@@ -72,7 +82,7 @@ class ServiceCategoryController extends Controller
         return redirect()->route('serviceCategories.index')
                         ->with('success','Service Category created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -84,7 +94,7 @@ class ServiceCategoryController extends Controller
         $service_category = ServiceCategory::find($id);
         return view('service_categories.show',compact('service_category'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -102,6 +112,7 @@ class ServiceCategoryController extends Controller
             'title' => 'required',
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $service_category = ServiceCategory::find($id);
@@ -113,21 +124,35 @@ class ServiceCategoryController extends Controller
                 unlink(public_path('service-category-images').'/'.$service_category->image);
             }
         }
-        
+
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-        
+
             $request->image->move(public_path('service-category-images'), $filename);
-        
+
             $service_category->image = $filename;
             $service_category->save();
         }
 
+        if (isset($request->icon)) {
+            if ($service_category->icon && file_exists(public_path('service-category-icons').'/'.$service_category->icon)) {
+                unlink(public_path('service-category-icons').'/'.$service_category->icon);
+            }
+        }
+
+        if ($request->icon) {
+            $filename = time() . '.' . $request->icon->getClientOriginalExtension();
+
+            $request->icon->move(public_path('service-category-icons'), $filename);
+
+            $service_category->icon = $filename;
+            $service_category->save();
+        }
 
         return redirect()->route('serviceCategories.index')
                         ->with('success','Service Category Update successfully.');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -137,14 +162,14 @@ class ServiceCategoryController extends Controller
     public function destroy($id)
     {
         $service_category = ServiceCategory::find($id);
-        //delete image for service_category 
+        //delete image for service_category
         if(isset($service_category->image)){
             if(file_exists(public_path('service-category-images').'/'.$service_category->image)) {
                 unlink(public_path('service-category-images').'/'.$service_category->image);
             }
         }
         $service_category->delete();
-    
+
         return redirect()->route('serviceCategories.index')
                         ->with('success','Service Category deleted successfully');
     }
