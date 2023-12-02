@@ -89,6 +89,14 @@ class CustomerController extends Controller
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->whereIn('category_id',$categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        $categoriesArray = $services->map(function ($categories) {
+            return [
+                'id' => $categories->id,
+                'title' => $categories->title,
+                'image' => $categories->image
+            ];
+        })->toArray();
+
         $servicesArray = $services->map(function ($service) {
             return [
                 'id' => $service->id,
@@ -97,13 +105,12 @@ class CustomerController extends Controller
                 'discount' => $service->discount,
                 'duration' => $service->duration,
                 'category_id' => $service->category_id
-                // Add other attributes you want to include
             ];
         })->toArray();
 
         return response()->json([
             'images' => $images,
-            'categories' => $categories,
+            'categories' => $categoriesArray,
             'services' => $servicesArray,
         ], 200);
     }
