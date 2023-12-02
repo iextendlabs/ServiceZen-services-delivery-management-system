@@ -49,7 +49,7 @@
                 @endif
 
                 <a class="btn btn-secondary float-end mr-1" href="{{route('orders.index')}}?appointment_date={{date('Y-m-d')}}">
-                    <i class="fas fa-calendar"></i>Todays Order
+                    <i class="fas fa-calendar"></i> Todays Order
                 </a>
             </div>
         </div>
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                     @endif
-                    
+
                     <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
                     @if(auth()->user()->getRoleNames() == '["Admin"]')
                     <div class="col-md-4">
