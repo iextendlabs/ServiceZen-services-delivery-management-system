@@ -89,11 +89,11 @@ class CustomerController extends Controller
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->whereIn('category_id',$categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
-        $categoriesArray = $services->map(function ($categories) {
+        $categoriesArray = $categories->map(function ($category) {
             return [
-                'id' => $categories->id,
-                'title' => $categories->title,
-                'image' => $categories->image
+                'id' => $category->id,
+                'title' => $category->title,
+                'image' => $category->image
             ];
         })->toArray();
 
