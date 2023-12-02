@@ -89,12 +89,22 @@ class CustomerController extends Controller
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->whereIn('category_id',$categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
-
+        $servicesArray = $services->map(function ($service) {
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'image' => $service->image,
+                'discount' => $service->discount,
+                'duration' => $service->duration,
+                'category_id' => $service->category_id
+                // Add other attributes you want to include
+            ];
+        })->toArray();
 
         return response()->json([
             'images' => $images,
             'categories' => $categories,
-            'services' => $services,
+            'services' => $servicesArray,
         ], 200);
     }
 
