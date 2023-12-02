@@ -30,7 +30,8 @@ use App\Http\Controllers\{
     LongHolidayController,
     ReviewController,
     SettingController,
-    ShortHolidayController
+    ShortHolidayController,
+    RotaController
 };
 
 use App\Http\Controllers\AppController\{
@@ -154,7 +155,7 @@ Route::post('storeSession', [CheckOutController::class, 'storeSession']);
 Route::resource('cart', CheckOutController::class);
 Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
 Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
-//TODO :set no cache headers for all ajax calls 
+//TODO :set no cache headers for all ajax calls
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
 Route::get('staff-group', [CheckOutController::class, 'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
@@ -183,3 +184,6 @@ Route::get('/category', function () {
 })->name('categories.index');
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
+
+
+Route::get('/', [RotaController::class, 'index'])->name('rota');
