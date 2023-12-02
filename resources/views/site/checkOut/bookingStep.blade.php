@@ -64,7 +64,9 @@
                                 <th>Price</th>
                                 <th>Duration</th>
                             </tr>
-                            @foreach ($services as $service)
+                            @foreach ($servicesCategories as $category)
+                            @foreach ($category->service as $service)
+                            @if ($service->status)
                             <tr>
                                 <td>
                                     <input type="checkbox" @if(in_array($service->id,$serviceIds)) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
@@ -76,7 +78,10 @@
                                     $service->discount : $service->price }}</span></td>
                                 <td>{{ $service->duration }}</td>
                             </tr>
+                            @endif
                             @endforeach
+                            @endforeach
+
                         </table>
                     </div>
                 </div>
