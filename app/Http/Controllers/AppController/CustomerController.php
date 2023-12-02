@@ -130,6 +130,17 @@ class CustomerController extends Controller
         ], 200);
     }
 
+    public function getServiceDetails(Request $request)
+    {
+        if ($request->service_id) {
+            $services = Service::where('status', 1)->where('id', $request->service_id)->orderBy('name', 'ASC')->first();
+        }
+
+        return response()->json([
+            'services' => $services,
+        ], 200);
+    }
+
     public function availableTimeSlot(Request $request)
     {
         $transport_charges = StaffZone::where('name', $request->area)->value('transport_charges');
