@@ -51,3 +51,4 @@ Route::get('getOrders', [CustomerController::class, 'getOrders']);
 Route::get('getZones', [CustomerController::class, 'getZones']);
 Route::get('editOrder', [CustomerController::class, 'editOrder']);
 Route::get('filterServices', [CustomerController::class, 'filterServices']);
+Route::get('getServiceDetails', [CustomerController::class, 'getServiceDetails']);
