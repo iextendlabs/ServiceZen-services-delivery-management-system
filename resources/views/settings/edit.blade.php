@@ -74,6 +74,35 @@
                     </select>
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
+                    @elseif($setting->key === 'Featured Services')
+                    <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">
+                    <div class="scroll-div">
+                        <table class="table table-striped table-bordered services-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                            </tr>
+                            @foreach ($services as $service)
+                            @if ($service->status)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" @if(in_array($service->id,explode(',', $setting->value))) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                </td>
+                                <td>{{ $service->name }}</td>
+
+                                <td>AED<span class="price">{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}</span></td>
+                                <td>{{ $service->duration }}</td>
+                            </tr>
+                            @endif
+                            @endforeach
+
+                        </table>
+                    </div>
+
                     @else
                     <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                     @endif
@@ -128,5 +157,46 @@
         });
     });
 </script>
+<script>
+    $(document).ready(function() {
+        $("#search-services").keyup(function() {
+            let value = $(this).val().toLowerCase();
 
+            $(".services-table tr").hide();
+
+            $(".services-table tr").each(function() {
+                let $row = $(this);
+
+                let name = $row.find("td:nth-child(2)").text().toLowerCase();
+                let price = $row.find("td:nth-child(3)").text().toLowerCase();
+                let duration = $row.find("td:last").text().toLowerCase();
+
+                if (name.indexOf(value) !== -1 || price.indexOf(value) !== -1 || duration.indexOf(value) !== -1) {
+                    $row.show();
+                }
+            });
+        });
+
+        $('.service-checkbox').on('change', function() {
+
+            let sub_total = 0;
+
+            $('.service-checkbox:checked').each(function() {
+                let price = parseFloat($(this).data('price'));
+                sub_total += price;
+            });
+
+            $('#sub_total').text(sub_total.toFixed(2));
+            updateTotal();
+        });
+    });
+
+    $(document).on('change', '#zone', function() {
+        $('#area').val($(this).val());
+    });
+
+    $(document).on('change', '#area', function() {
+        $('#zone').val($(this).val());
+    });
+</script>
 @endsection

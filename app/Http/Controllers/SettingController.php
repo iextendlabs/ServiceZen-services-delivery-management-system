@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,7 @@ class SettingController extends Controller
      */
     public function index()
     {
-        $settings = Setting::latest()->paginate(config('app.paginate'));
+        $settings = Setting::orderBy('key', 'ASC')->paginate(config('app.paginate'));
 
         return view('settings.index', compact('settings'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
@@ -65,8 +66,9 @@ class SettingController extends Controller
      */
     public function edit($id)
     {
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $setting = Setting::find($id);
-        return view('settings.edit', compact('setting'));
+        return view('settings.edit', compact('setting', 'services'));
     }
 
     /**
@@ -79,8 +81,11 @@ class SettingController extends Controller
     public function update(Request $request, $id)
     {
         $setting = Setting::find($id);
-
-        if ($setting->key !== 'Slider Image') {
+        if ($setting->key === 'Featured Services') {
+            request()->validate([
+                'service_ids' => 'required',
+            ]);
+        }elseif ($setting->key !== 'Slider Image') {
             request()->validate([
                 'value' => 'required',
             ]);
@@ -104,6 +109,9 @@ class SettingController extends Controller
                 $newImagePaths = implode(',', $imagePaths);
                 $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
             }
+        } elseif ($request->service_ids) {
+            $services = implode(',', $request->service_ids);
+            $setting->value = $services;
         } else {
             $setting->value = $request->input('value');
         }

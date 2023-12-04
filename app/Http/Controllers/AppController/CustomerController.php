@@ -84,7 +84,9 @@ class CustomerController extends Controller
     {
 
         $slider_images = Setting::where('key', 'Slider Image')->value('value');
+        $featured_services = Setting::where('key', 'Featured Services')->value('value');
 
+        $featured_services = explode(",", $featured_services);
         $images = explode(",", $slider_images);
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
@@ -114,6 +116,7 @@ class CustomerController extends Controller
             'images' => $images,
             'categories' => $categoriesArray,
             'services' => $servicesArray,
+            'featured_services' => $featured_services,
         ], 200);
     }
 
