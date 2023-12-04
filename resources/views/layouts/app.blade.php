@@ -80,7 +80,7 @@
                         @else
 
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Rota</a>
+                            <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
 
                         @can('menu-sales')

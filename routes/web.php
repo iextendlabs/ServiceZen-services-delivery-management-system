@@ -121,6 +121,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
     Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
 
+    Route::get('/rota', [RotaController::class, 'index'])->name('rota');
 });
 
 // Backups
@@ -184,6 +185,3 @@ Route::get('/category', function () {
 })->name('categories.index');
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
-
-
-Route::get('/', [RotaController::class, 'index'])->name('rota');
