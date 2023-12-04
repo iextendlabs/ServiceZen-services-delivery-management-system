@@ -168,6 +168,12 @@ class ServiceCategoryController extends Controller
                 unlink(public_path('service-category-images').'/'.$service_category->image);
             }
         }
+
+        if(isset($service_category->icon)){
+            if(file_exists(public_path('service-category-icons').'/'.$service_category->icon)) {
+                unlink(public_path('service-category-icons').'/'.$service_category->icon);
+            }
+        }
         $service_category->delete();
 
         return redirect()->route('serviceCategories.index')

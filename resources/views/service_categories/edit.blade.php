@@ -39,7 +39,7 @@
                     <strong for="icon">Upload Icon</strong>
                     <input type="file" name="icon" id="icon" class="form-control-file">
                     <br>
-                    <img id="preview" src="/service-category-icons/{{$service_category->icon}}" height="130px">
+                    <img id="icon-preview" src="/service-category-icons/{{$service_category->icon}}" height="130px">
                 </div>
             </div>
             <div class="col-md-12">
@@ -82,6 +82,12 @@
 <script>
     document.getElementById('image').addEventListener('change', function(e) {
         var preview = document.getElementById('preview');
+        preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
+<script>
+    document.getElementById('icon').addEventListener('change', function(e) {
+        var preview = document.getElementById('icon-preview');
         preview.src = URL.createObjectURL(e.target.files[0]);
     });
 </script>
