@@ -88,7 +88,7 @@ class CustomerController extends Controller
         $images = explode(",", $slider_images);
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->whereIn('category_id',$categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
         $categoriesArray = $categories->map(function ($category) {
             return [
                 'id' => $category->id,
@@ -315,57 +315,81 @@ class CustomerController extends Controller
         ], 200);
     }
 
-    // public function editOrder(Request $request)
-    // {
+    public function editOrder(Request $request)
+    {
 
-    //     $order = Order::find($request->id);
-    //     $transport_charges = StaffZone::where('name', $order->area)->value('transport_charges');
+        $order = Order::find($request->id);
+        $orderTotal = OrderTotal::where('order_id', $request->id)->first();
+        $transport_charges = StaffZone::where('name', $order->area)->value('transport_charges');
 
-    //     [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $request->id);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $request->id);
 
-    //     $availableStaff = [];
-    //     $staff_displayed = [];
-    //     $staff_slots = [];
-    //     foreach ($timeSlots as $timeSlot) {
-    //         $staff_counter = 0;
-    //         $holiday_counter = 0;
-    //         $booked_counter = 0;
-    //         foreach ($timeSlot->staffs as $staff) {
-    //             if (!in_array($staff->id, $staff_ids)) {
-    //                 $booked_counter++;
-    //             }
-    //             if (!in_array($staff->id, $timeSlot->excluded_staff)) {
-    //                 $holiday_counter++;
-    //             }
-    //             if (!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff)) {
-    //                 $staff_counter++;
-    //                 $current_slot = [$timeSlot->id,  date('h:i A', strtotime($timeSlot->time_start)) . '-- ' . date('h:i A', strtotime($timeSlot->time_end)), $timeSlot->id];
+        $availableStaff = [];
+        $staff_displayed = [];
+        $staff_slots = [];
+        foreach ($timeSlots as $timeSlot) {
+            $staff_counter = 0;
+            $holiday_counter = 0;
+            $booked_counter = 0;
+            foreach ($timeSlot->staffs as $staff) {
+                if (!in_array($staff->id, $staff_ids)) {
+                    $booked_counter++;
+                }
+                if (!in_array($staff->id, $timeSlot->excluded_staff)) {
+                    $holiday_counter++;
+                }
+                if (!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff)) {
+                    $staff_counter++;
+                    $current_slot = [$timeSlot->id,  date('h:i A', strtotime($timeSlot->time_start)) . '-- ' . date('h:i A', strtotime($timeSlot->time_end)), $timeSlot->id];
 
-    //                 if (isset($staff_slots[$staff->id])) {
-    //                     array_push($staff_slots[$staff->id], $current_slot);
-    //                 } else {
-    //                     $staff_slots[$staff->id] = [$current_slot];
-    //                 }
-    //                 if (!in_array($staff->id, $staff_displayed)) {
-    //                     $staff_displayed[] = $staff->id;
-    //                     $availableStaff[] = $staff;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if (count($staff_displayed) == 0) {
-    //         return response()->json([
-    //             'msg' => "Whoops! No Staff Available",
-    //         ], 201);
-    //     }
+                    if (isset($staff_slots[$staff->id])) {
+                        array_push($staff_slots[$staff->id], $current_slot);
+                    } else {
+                        $staff_slots[$staff->id] = [$current_slot];
+                    }
+                    if (!in_array($staff->id, $staff_displayed)) {
+                        $staff_displayed[] = $staff->id;
+                        $availableStaff[] = $staff;
+                    }
+                }
+            }
+        }
+        if (count($staff_displayed) == 0) {
+            return response()->json([
+                'msg' => "Whoops! No Staff Available",
+            ], 201);
+        }
 
-    //     return response()->json([
-    //         'transport_charges' => $transport_charges,
-    //         'availableStaff' => $availableStaff,
-    //         'slots' => $staff_slots,
-    //         'order' => $order,
-    //     ], 200);
-    // }
+        return response()->json([
+            'transport_charges' => $transport_charges,
+            'availableStaff' => $availableStaff,
+            'orderTotal' => $orderTotal,
+            'slots' => $staff_slots,
+            'order' => $order,
+        ], 200);
+    }
+
+    public function updateOrder(Request $request)
+    {
+        $input = $request->all();
+        $time_slot = TimeSlot::find($request->time_slot_id);
+        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+        $user = User::find($request->service_staff_id);
+        $order = Order::find($request->id);
+        $input['staff_name'] = $user->name;
+
+        if ($user->staff->charges) {
+            $input['total_amount'] = ($order->total_amount - $order->order_total->staff_charges) + $user->staff->charges;
+            $order->order_total->staff_charges = $user->staff->charges;
+            $order->order_total->save();
+        }
+
+        $order->update($input);
+
+        return response()->json([
+            'msg' => "Order Updated Successfully!"
+        ], 200);
+    }
 
     public function getZones()
     {
