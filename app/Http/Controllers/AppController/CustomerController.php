@@ -93,7 +93,8 @@ class CustomerController extends Controller
             return [
                 'id' => $category->id,
                 'title' => $category->title,
-                'image' => $category->image
+                'image' => $category->image,
+                'icon' => $category->icon
             ];
         })->toArray();
 
