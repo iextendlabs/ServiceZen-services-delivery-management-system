@@ -194,11 +194,11 @@ $transport_charges = 0;
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Staff Charges:</strong></td>
-                            <td>{{ config('app.currency') }} <span id="staff_charges">{{ $order->staff->charges ? $order->staff->charges : 0 }}</span></td>
+                            <td>{{ config('app.currency') }} <span id="staff_charges">{{ isset($order->staff->charges) ? $order->staff->charges : 0 }}</span></td>
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Transport Charges:</strong></td>
-                            <td>{{ config('app.currency') }} <span id="transport_charges">{{ $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}</span></td>
+                            <td>{{ config('app.currency') }} <span id="transport_charges">{{ isset($staffZone->transport_charges) ? $staffZone->transport_charges : 0 }}</span></td>
                         </tr>
                         <tr>
                             <td class="text-left"><strong>Total:</strong></td>
