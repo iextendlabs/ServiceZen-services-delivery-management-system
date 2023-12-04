@@ -36,6 +36,14 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong for="icon">Upload Icon</strong>
+                    <input type="file" name="icon" id="icon" class="form-control-file">
+                    <br>
+                    <img id="preview" src="/service-category-icons/{{$service_category->icon}}" height="130px">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Status:</strong>
                     <select name="status" class="form-control">
 
