@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\OrderService;
 use App\Models\OrderTotal;
@@ -41,14 +42,24 @@ class CustomerController extends Controller
             }
 
             $token = $user->createToken('app-token')->plainTextToken;
+            $user_info = CustomerProfile::where('user_id', $user->id)->first();
 
             return response()->json([
                 'user' => $user,
+                'user_info' => $user_info,
                 'access_token' => $token,
             ], 200);
         }
 
         return response()->json(['error' => 'These credentials do not match our records.'], 401);
+    }
+
+    public function updateCustomerInfo(Request $request)
+    {
+        CustomerProfile::where('user_id', $request->user_id)->update($request->all());
+        return response()->json([
+            'msg' => "Updated Successfully!",
+        ], 200);
     }
 
     public function signup(Request $request)

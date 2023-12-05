@@ -53,3 +53,4 @@ Route::get('editOrder', [CustomerController::class, 'editOrder']);
 Route::get('filterServices', [CustomerController::class, 'filterServices']);
 Route::get('getServiceDetails', [CustomerController::class, 'getServiceDetails']);
 Route::post('updateOrder', [CustomerController::class, 'updateOrder']);
+Route::post('updateCustomerInfo', [CustomerController::class, 'updateCustomerInfo']);
