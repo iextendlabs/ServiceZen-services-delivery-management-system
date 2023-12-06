@@ -313,7 +313,8 @@ class CustomerController extends Controller
                 'msg' => "Order created successfully.",
                 'date'=>$order->date ,
                 'staff'=> $order->staff_name,
-                'slot' => $order->time_slot_value
+                'slot' => $order->time_slot_value,
+                'total_amount' => $order->time_slot_value,
             ], 200);
         } else {
             return response()->json([
