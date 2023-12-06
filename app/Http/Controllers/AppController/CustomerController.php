@@ -314,7 +314,7 @@ class CustomerController extends Controller
                 'date'=>$order->date ,
                 'staff'=> $order->staff_name,
                 'slot' => $order->time_slot_value,
-                'total_amount' => $order->time_slot_value,
+                'total_amount' => $order->total_amount,
             ], 200);
         } else {
             return response()->json([
