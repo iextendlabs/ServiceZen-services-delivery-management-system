@@ -9,6 +9,11 @@ class Service extends Model
 {
     protected $fillable = ['name','image', 'description', 'price','duration','category_id','short_description','discount','status','type'];
     
+    public function averageRating()
+    {
+        return Review::where('service_id', $this->id)->avg('rating');
+    }
+
     public function appointments()
     {
         return $this->hasMany(OrderService::class);

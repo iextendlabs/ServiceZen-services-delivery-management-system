@@ -120,16 +120,25 @@ class CustomerController extends Controller
                 'price' => $service->price,
                 'discount' => $service->discount,
                 'duration' => $service->duration,
-                'category_id' => $service->category_id
+                'category_id' => $service->category_id,
+                'rating' => $service->averageRating()
             ];
         })->toArray();
+
+        $staffs = User::role('Staff')
+            ->with(['staff' => function ($query) {
+                $query->where('status', 1);
+            }])
+            ->orderBy('name', 'ASC')
+            ->get();
 
         return response()->json([
             'images' => $images,
             'categories' => $categoriesArray,
             'services' => $servicesArray,
             'featured_services' => $featured_services,
-            'staffZones'=>$staffZones
+            'staffZones' => $staffZones,
+            'staffs' => $staffs
         ], 200);
     }
 
@@ -154,57 +163,71 @@ class CustomerController extends Controller
         }
 
         return response()->json([
-            'services' => $services,
+            'services' => $services
         ], 200);
     }
 
     public function availableTimeSlot(Request $request)
     {
-        $transport_charges = StaffZone::where('name', $request->area)->value('transport_charges');
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
-        $availableStaff = [];
-        $staff_displayed = [];
-        $staff_slots = [];
-        foreach ($timeSlots as $timeSlot) {
-            $staff_counter = 0;
-            $holiday_counter = 0;
-            $booked_counter = 0;
-            foreach ($timeSlot->staffs as $staff) {
-                if (!in_array($staff->id, $staff_ids)) {
-                    $booked_counter++;
-                }
-                if (!in_array($staff->id, $timeSlot->excluded_staff)) {
-                    $holiday_counter++;
-                }
-                if (!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff)) {
-                    $staff_counter++;
-                    $current_slot = [$timeSlot->id,  date('h:i A', strtotime($timeSlot->time_start)) . '-- ' . date('h:i A', strtotime($timeSlot->time_end)), $timeSlot->id];
+        try {
+            $transportCharges = StaffZone::where('name', $request->area)->value('transport_charges');
+            [$timeSlots, $staffIds, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date);
+            $availableStaff = [];
+            $staffDisplayed = [];
+            $staffSlots = [];
 
-                    if (isset($staff_slots[$staff->id])) {
-                        array_push($staff_slots[$staff->id], $current_slot);
-                    } else {
-                        $staff_slots[$staff->id] = [$current_slot];
+            foreach ($timeSlots as $timeSlot) {
+                $staffCounter = 0;
+                $holidayCounter = 0;
+                $bookedCounter = 0;
+
+                foreach ($timeSlot->staffs as $staff) {
+                    if (!in_array($staff->id, $staffIds)) {
+                        $bookedCounter++;
                     }
-                    if (!in_array($staff->id, $staff_displayed)) {
-                        $staff_displayed[] = $staff->id;
-                        $availableStaff[] = $staff;
+                    if (!in_array($staff->id, $timeSlot->excluded_staff)) {
+                        $holidayCounter++;
+                    }
+                    if (!in_array($staff->id, $staffIds) && !in_array($staff->id, $timeSlot->excluded_staff)) {
+                        $staffCounter++;
+                        $currentSlot = [$timeSlot->id, date('h:i A', strtotime($timeSlot->time_start)) . '-- ' . date('h:i A', strtotime($timeSlot->time_end)), $timeSlot->id];
+
+                        if (isset($staffSlots[$staff->id])) {
+                            array_push($staffSlots[$staff->id], $currentSlot);
+                        } else {
+                            $staffSlots[$staff->id] = [$currentSlot];
+                        }
+
+                        if (!in_array($staff->id, $staffDisplayed)) {
+                            $staffDisplayed[] = $staff->id;
+                            $availableStaff[] = $staff;
+                        }
                     }
                 }
             }
-        }
 
-        if (count($staff_displayed) == 0) {
+            if (count($staffDisplayed) == 0) {
+                return response()->json([
+                    'msg' => "Whoops! No Staff Available",
+                ], 201);
+            }
+
+            $availableStaff = collect($availableStaff)->map(function ($staff) {
+                $staff->rating = $staff->averageRating();
+                return $staff;
+            });
+
             return response()->json([
-                'msg' => "Whoops! No Staff Available",
-            ], 201);
+                'transport_charges' => $transportCharges,
+                'availableStaff' => $availableStaff,
+                'slots' => $staffSlots,
+            ], 200);
+        } catch (\Exception $e) {
+            // Handle exceptions (log or return an error response)
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        return response()->json([
-            'transport_charges' => $transport_charges,
-            'availableStaff' => $availableStaff,
-            'slots' => $staff_slots,
-        ], 200);
     }
+
 
     public function addOrder(Request $request)
     {
@@ -313,8 +336,8 @@ class CustomerController extends Controller
 
             return response()->json([
                 'msg' => "Order created successfully.",
-                'date'=>$order->date ,
-                'staff'=> $order->staff_name,
+                'date' => $order->date,
+                'staff' => $order->staff_name,
                 'slot' => $order->time_slot_value,
                 'total_amount' => $order->total_amount,
             ], 200);
