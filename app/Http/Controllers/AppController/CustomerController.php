@@ -93,6 +93,7 @@ class CustomerController extends Controller
 
     public function index()
     {
+        $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
         $slider_images = Setting::where('key', 'Slider Image')->value('value');
         $featured_services = Setting::where('key', 'Featured Services')->value('value');
@@ -128,6 +129,7 @@ class CustomerController extends Controller
             'categories' => $categoriesArray,
             'services' => $servicesArray,
             'featured_services' => $featured_services,
+            'staffZones'=>$staffZones
         ], 200);
     }
 
