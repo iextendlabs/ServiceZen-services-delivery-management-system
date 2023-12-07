@@ -126,11 +126,13 @@ class CustomerController extends Controller
         })->toArray();
 
         $staffs = User::role('Staff')
-            ->with(['staff' => function ($query) {
+            ->whereHas('staff', function ($query) {
                 $query->where('status', 1);
-            }])
+            })
             ->orderBy('name', 'ASC')
+            ->with('staff')
             ->get();
+
 
         return response()->json([
             'images' => $images,
