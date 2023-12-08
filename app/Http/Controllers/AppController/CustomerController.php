@@ -133,6 +133,10 @@ class CustomerController extends Controller
             ->with('staff')
             ->get();
 
+        $staffs->map(function ($staff) {
+            $staff->rating = $staff->averageRating();
+            return $staff;
+        });
 
         return response()->json([
             'images' => $images,
