@@ -48,6 +48,7 @@ use App\Http\Controllers\Site\{
     SiteFAQsController,
     SiteReviewsController,
     StaffProfileController,
+    TermsCondition,
 };
 
 /*
@@ -168,6 +169,7 @@ Route::resource('siteFAQs', SiteFAQsController::class);
 // Staff app
 
 // TODO: save and continue buttons , save and close buttons 
+Route::get('/termsCondition', [TermsCondition::class, 'index'])->name('TermsCondition');
 
 Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
 Route::get('staffAppUser', [StaffAppController::class, 'user']);

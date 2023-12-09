@@ -99,6 +99,8 @@ class CustomerController extends Controller
         $featured_services = Setting::where('key', 'Featured Services')->value('value');
 
         $featured_services = explode(",", $featured_services);
+
+        $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
         $images = explode(",", $slider_images);
 
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
@@ -144,7 +146,8 @@ class CustomerController extends Controller
             'services' => $servicesArray,
             'featured_services' => $featured_services,
             'staffZones' => $staffZones,
-            'staffs' => $staffs
+            'staffs' => $staffs,
+            'whatsapp_number'=> $whatsapp_number
         ], 200);
     }
 
