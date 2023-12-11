@@ -85,6 +85,27 @@ class SettingsTableSeeder extends Seeder
                 'value' => '60',
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',
+            ],
+            [
+                'id' => 11,
+                'key' => 'Featured Services',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
+            ],
+            [
+                'id' => 12,
+                'key' => 'WhatsApp Number For Customer App',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
+            ],
+            [
+                'id' => 13,
+                'key' => 'Terms & Condition',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
             ]
         ];
 

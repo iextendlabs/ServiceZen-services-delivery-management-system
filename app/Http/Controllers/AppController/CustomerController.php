@@ -5,6 +5,9 @@ namespace App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Affiliate;
+use App\Models\Coupon;
+use App\Models\CouponHistory;
 use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\OrderService;
@@ -18,6 +21,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
 
@@ -30,7 +34,7 @@ class CustomerController extends Controller
     public function login(Request $request)
     {
         $credentials = [
-            "email" => $request->username,
+            "email" => strtolower(trim($request->username)),
             "password" => $request->password
         ];
         if (Auth::attempt($credentials)) {
@@ -69,6 +73,7 @@ class CustomerController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
+            'affiliate' => ['nullable', 'exists:affiliates,code'],
         ]);
         // Check if validation fails
         if ($validator->fails()) {
@@ -82,6 +87,12 @@ class CustomerController extends Controller
 
         $user = User::create($input);
         $user->assignRole("Customer");
+
+        if ($request->affiliate) {
+            $affiliate = Affiliate::where('code', $request->affiliate)->first();
+
+            $user->affiliates()->attach($affiliate->user_id);
+        }
 
         $token = $user->createToken('app-token')->plainTextToken;
 
@@ -147,7 +158,7 @@ class CustomerController extends Controller
             'featured_services' => $featured_services,
             'staffZones' => $staffZones,
             'staffs' => $staffs,
-            'whatsapp_number'=> $whatsapp_number
+            'whatsapp_number' => $whatsapp_number
         ], 200);
     }
 
@@ -285,12 +296,24 @@ class CustomerController extends Controller
                 return isset($service->discount) ? $service->discount : $service->price;
             });
 
+            if ($request->coupon_id) {
+                $coupon = Coupon::find($request->coupon_id);
+                $input['coupon_id'] = $coupon->id;
+                if ($coupon->type == "Percentage") {
+                    $discount = ($sub_total * $coupon->discount) / 100;
+                } else {
+                    $discount = $coupon->discount;
+                }
+            } else {
+                $discount = 0;
+            }
+
             $staff_charges = $staff->staff->charges ?? 0;
             $transport_charges = $staffZone->transport_charges ?? 0;
-            $total_amount = $sub_total + $staff_charges + $transport_charges;
+            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
 
             $input['sub_total'] = (int)$sub_total;
-            $input['discount'] = 0;
+            $input['discount'] = (int)$discount;
             $input['staff_charges'] = (int)$staff_charges;
             $input['transport_charges'] = (int)$transport_charges;
             $input['total_amount'] = (int)$total_amount;
@@ -311,6 +334,10 @@ class CustomerController extends Controller
 
             OrderTotal::create($input);
 
+            if ($request->coupon_id) {
+                CouponHistory::create($input);
+            }
+            
             foreach ($input['service_ids'] as $id) {
                 $services = Service::find($id);
                 $input['service_id'] = $id;
@@ -450,6 +477,33 @@ class CustomerController extends Controller
 
         return response()->json([
             'staffZones' => $staffZones
+        ], 200);
+    }
+
+    public function applyCouponAffiliate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'coupon' => [
+                'nullable',
+                Rule::exists('coupons', 'code')->where(function ($query) {
+                    $query->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now());
+                }),
+            ],
+            'affiliate' => ['nullable', 'exists:affiliates,code'],
+        ]);
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 201);
+        } else {
+            $affiliate_id = Affiliate::where('code', $request->affiliate)->value('user_id');
+            $coupon = Coupon::where('code', $request->coupon)->first();
+        }
+
+        return response()->json([
+            'affiliate_id' => $affiliate_id,
+            'coupon' => $coupon,
         ], 200);
     }
 }
