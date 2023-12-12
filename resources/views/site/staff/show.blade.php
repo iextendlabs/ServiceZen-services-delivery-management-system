@@ -80,7 +80,7 @@
             <hr>
             <!-- Staff Gallery -->
             @if(count($user->staffYoutubeVideo))
-            
+
             <div class="col-md-12 mt-2 mb-3">
                 <div id="videoCarousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
@@ -94,7 +94,7 @@
                             <div class="row">
                                 @foreach($chunk as $staffYoutubeVideo)
                                 <div class="col-md-6">
-                                <iframe width="562" height="323" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                    <iframe width="562" height="323" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                                 </div>
                                 @endforeach
                             </div>
@@ -113,7 +113,7 @@
 
             </div>
 
-            
+
             @endif
             @if(count($user->staffImages))
             <div class="col-md-12 mt-2 mb-3">
@@ -208,17 +208,17 @@
             </div>
         </div>
         <div class="col-md-12 text-center mb-2">
-            @for($i = 1; $i <= 5; $i++)
-             @if($i <=$averageRating)
-              <span class="text-warning">&#9733;</span>
+            @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
                 @else
-              <span class="text-muted">&#9734;</span>
+                <span class="text-muted">&#9734;</span>
                 @endif
-            @endfor
-            <span>{{count($reviews)}} Reviews</span><br>
-            <a class="btn btn-primary" href="{{ route('siteReviews.index') }}">All Reviews</a>
+                @endfor
+                <span>{{count($reviews)}} Reviews</span><br>
+                @if($app_flag === false)
+                <a class="btn btn-primary" href="{{ route('siteReviews.index') }}">All Reviews</a>
+                @endif
         </div>
-        @if(auth()->check())
+        @if(auth()->check() && $app_flag === false)
         <div class="col-md-12 text-center">
             <button class="btn btn-primary" id="review">Write a Review</button>
         </div>
@@ -230,6 +230,14 @@
 </div>
 </div>
 </div>
+@if($app_flag === true)
+<script>
+    $(document).ready(function() {
+        $("header, footer").hide();
+        $("#categories a").attr("href", "javascript:void(0);");
+    });
+</script>
+@endif
 <script>
     $(document).on('click', '#review', function() {
         $('#review-form').show();
