@@ -514,11 +514,6 @@ class CustomerController extends Controller
 
         $pdf = app('dompdf.wrapper')->loadView('site.orders.pdf', compact('order'));
 
-        $pdfContent = $pdf->output();
-
-        return response()->json([
-            'order' => $order,
-            'pdf_content' => base64_encode($pdfContent),
-        ], 200);
+        return $pdf->download('order_' . $id . '.pdf');
     }
 }
