@@ -22,6 +22,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class CustomerController extends Controller
 
@@ -337,7 +338,7 @@ class CustomerController extends Controller
             if ($request->coupon_id) {
                 CouponHistory::create($input);
             }
-            
+
             foreach ($input['service_ids'] as $id) {
                 $services = Service::find($id);
                 $input['service_id'] = $id;
@@ -504,6 +505,20 @@ class CustomerController extends Controller
         return response()->json([
             'affiliate_id' => $affiliate_id,
             'coupon' => $coupon,
+        ], 200);
+    }
+
+    public function downloadPDF(Request $request, $id)
+    {
+        $order = Order::find($id);
+
+        $pdf = app('dompdf.wrapper')->loadView('site.orders.pdf', compact('order'));
+
+        $pdfContent = $pdf->output();
+
+        return response()->json([
+            'order' => $order,
+            'pdf_content' => base64_encode($pdfContent),
         ], 200);
     }
 }
