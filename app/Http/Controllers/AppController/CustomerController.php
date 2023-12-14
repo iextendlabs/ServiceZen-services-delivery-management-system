@@ -377,6 +377,7 @@ class CustomerController extends Controller
                 'staff' => $order->staff_name,
                 'slot' => $order->time_slot_value,
                 'total_amount' => $order->total_amount,
+                'order_id' => $order->id,
             ], 200);
         } else {
             return response()->json([
