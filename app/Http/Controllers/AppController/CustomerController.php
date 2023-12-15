@@ -12,6 +12,7 @@ use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\OrderService;
 use App\Models\OrderTotal;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
@@ -533,5 +534,14 @@ class CustomerController extends Controller
         $pdf = app('dompdf.wrapper')->loadView('site.orders.pdf', compact('order'));
 
         return $pdf->download('order_' . $id . '.pdf');
+    }
+
+    public function writeReview(Request $request)
+    {
+        Review::create($request->all());
+
+        return response()->json([
+            'msg' => "Review created successfully.",
+        ], 200);
     }
 }
