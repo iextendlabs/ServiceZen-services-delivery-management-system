@@ -407,7 +407,7 @@ class CustomerController extends Controller
     public function getOrders(Request $request)
     {
 
-        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->with('orderServices.service')->with('order_total')->get();
+        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->with('orderServices.service')->with('order_total')->with('review')->get();
 
         return response()->json([
             'orders' => $orders
