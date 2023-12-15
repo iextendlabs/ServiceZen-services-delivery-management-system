@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\Cache;
 
 class CustomerController extends Controller
 
@@ -105,6 +106,12 @@ class CustomerController extends Controller
 
     public function index()
     {
+        $cachedData = Cache::get('api_data');
+
+        if ($cachedData) {
+            return response()->json($cachedData, 200);
+        }
+
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
         $slider_images = Setting::where('key', 'Slider Image')->value('value');
@@ -151,6 +158,16 @@ class CustomerController extends Controller
             $staff->rating = $staff->averageRating();
             return $staff;
         });
+
+        Cache::put('api_data', [
+            'images' => $images,
+            'categories' => $categoriesArray,
+            'services' => $servicesArray,
+            'featured_services' => $featured_services,
+            'staffZones' => $staffZones,
+            'staffs' => $staffs,
+            'whatsapp_number' => $whatsapp_number
+        ], 60 * 10);
 
         return response()->json([
             'images' => $images,
