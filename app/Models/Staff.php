@@ -9,7 +9,7 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission','supervisor_id','image','phone','charges','status','instagram','facebook','youtube','snapchat','tiktok','about','images','fix_salary','sub_title','driver_id','whatsapp'];
+    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp'];
 
     public function appointments()
     {
@@ -23,10 +23,11 @@ class Staff extends Model
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'service_staff_id','user_id');
+        return $this->hasMany(Order::class, 'service_staff_id', 'user_id');
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class, 'user_id');
     }
 

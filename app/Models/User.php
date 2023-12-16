@@ -203,4 +203,14 @@ class User extends Authenticatable
             }
         }
     }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'staff_to_services', 'staff_id', 'service_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'staff_to_categories', 'staff_id', 'category_id');
+    }
 }

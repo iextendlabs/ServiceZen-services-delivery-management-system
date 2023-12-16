@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffHoliday;
@@ -66,7 +68,9 @@ class ServiceStaffController extends Controller
     {
         $users = User::all();
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
-        return view('serviceStaff.create', compact('users', 'socialLinks'));
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services'));
     }
 
     /**
@@ -136,7 +140,10 @@ class ServiceStaffController extends Controller
             }
         }
 
-        Staff::create($input);
+        $staff = Staff::create($input);
+        $ServiceStaff->services()->attach($request->service_ids);
+        $ServiceStaff->categories()->attach($request->category_ids);
+
         $ServiceStaff->supervisors()->attach($request->ids);
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
@@ -178,10 +185,13 @@ class ServiceStaffController extends Controller
     public function edit(User $serviceStaff)
     {
         $users = User::all();
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
         $supervisor_ids = $serviceStaff->supervisors()->pluck('supervisor_id')->toArray();
-
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids'));
+        $service_ids = $serviceStaff->services()->pluck('service_id')->toArray();
+        $category_ids = $serviceStaff->categories()->pluck('category_id')->toArray();
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services'));
     }
 
     /**
@@ -259,7 +269,8 @@ class ServiceStaffController extends Controller
 
         $staff->update($input);
         $serviceStaff->supervisors()->sync($request->ids);
-
+        $serviceStaff->services()->sync($request->service_ids);
+        $serviceStaff->categories()->sync($request->category_ids);
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff updated successfully');
     }
@@ -303,7 +314,7 @@ class ServiceStaffController extends Controller
             }
         }
 
-        StaffImages::where('image',$request->image)->delete();
+        StaffImages::where('image', $request->image)->delete();
 
         return redirect()->back()->with('success', 'Image Remove successfully.');
     }
