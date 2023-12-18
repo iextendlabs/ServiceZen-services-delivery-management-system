@@ -6,6 +6,18 @@
         width: 300px;
     }
 </style>
+@php
+if($app_flag === true){
+$videoCarousel_chunk = 1;
+$imageCarousel_chunk = 1;
+$reviewsCarousel_chunk = 1;
+}else{
+$videoCarousel_chunk = 2;
+$imageCarousel_chunk = 3;
+$reviewsCarousel_chunk = 3;
+}
+
+@endphp
 <div class="album py-5 bg-light">
     <div class="container">
         <div class="row">
@@ -84,16 +96,16 @@
             <div class="col-md-12 mt-2 mb-3">
                 <div id="videoCarousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
-                        @foreach($user->staffYoutubeVideo->chunk(2) as $key => $chunk)
+                        @foreach($user->staffYoutubeVideo->chunk($videoCarousel_chunk) as $key => $chunk)
                         <li data-target="#videoCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
                         @endforeach
                     </ol>
                     <div class="carousel-inner">
-                        @foreach($user->staffYoutubeVideo->chunk(2) as $chunk)
+                        @foreach($user->staffYoutubeVideo->chunk($videoCarousel_chunk) as $chunk)
                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                             <div class="row">
                                 @foreach($chunk as $staffYoutubeVideo)
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                     <iframe width="562" height="323" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                                 </div>
                                 @endforeach
@@ -119,16 +131,16 @@
             <div class="col-md-12 mt-2 mb-3">
                 <div id="imageCarousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
-                        @foreach($user->staffImages->chunk(3) as $key => $chunk)
+                        @foreach($user->staffImages->chunk($imageCarousel_chunk) as $key => $chunk)
                         <li data-target="#imageCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
                         @endforeach
                     </ol>
                     <div class="carousel-inner">
-                        @foreach($user->staffImages->chunk(3) as $chunk)
+                        @foreach($user->staffImages->chunk($imageCarousel_chunk) as $chunk)
                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                             <div class="row">
                                 @foreach($chunk as $image)
-                                <div class="col-md-4">
+                                <div class="col-md-4 col-xs-12">
                                     <img src="/staff-images/{{ $image->image }}" class="d-block w-100 card-img-top">
                                 </div>
                                 @endforeach
@@ -151,32 +163,24 @@
         </div>
         <h3 class="text-center">My Services</h3>
         <div class="row" id="categories">
-            @foreach($categories as $category)
-            @if($category->status == "1")
-            @if(count($category->childCategories) == 0)
-            @if(!$category->parentCategory)
+            @foreach($service_categories as $category)
             @include('site.categories.category_card', ['category' => $category])
-            @endif
-            @else
-            @include('site.categories.category_card', ['category' => $category])
-            @endif
-            @endif
             @endforeach
         </div>
         <div class="col-md-12">
             <h2 class="text-center">Customer Reviews</h2>
             <div id="reviewsCarousel" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
-                    @foreach($reviews->chunk(3) as $key => $chunk)
+                    @foreach($reviews->chunk($reviewsCarousel_chunk) as $key => $chunk)
                     <li data-target="#reviewsCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
                     @endforeach
                 </ol>
                 <div class="carousel-inner">
-                    @foreach($reviews->chunk(3) as $chunk)
+                    @foreach($reviews->chunk($reviewsCarousel_chunk) as $chunk)
                     <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                         <div class="row">
                             @foreach($chunk as $review)
-                            <div class="col-md-4">
+                            <div class="col-md-4 col-xs-12">
                                 <div class="card mb-4 text-center">
                                     <div class="card-body" style="height: 215px !important">
                                         <h5 class="card-title">{{ $review->user_name }}</h5>

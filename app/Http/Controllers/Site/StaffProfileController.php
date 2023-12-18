@@ -67,8 +67,8 @@ class StaffProfileController extends Controller
                 $user->staff->$platform = $urlPrefix . $user->staff->$platform;
             }
         }
-
-        $categories = ServiceCategory::get();
+        $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
         if ($request->app_flag) {
@@ -76,7 +76,7 @@ class StaffProfileController extends Controller
         } else {
             $app_flag = false;
         }
-        return view('site.staff.show', compact('user', 'categories', 'socialLinks', 'reviews', 'averageRating','app_flag'));
+        return view('site.staff.show', compact('user', 'service_categories', 'socialLinks', 'reviews', 'averageRating','app_flag'));
     }
 
 
