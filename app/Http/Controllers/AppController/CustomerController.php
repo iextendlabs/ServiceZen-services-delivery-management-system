@@ -538,7 +538,21 @@ class CustomerController extends Controller
 
     public function writeReview(Request $request)
     {
-        Review::create($request->all());
+        $input = $request->all();
+
+        // if ($request->hasFile('image')) {
+        //     $filename = time() . '.' . $request->image->getClientOriginalExtension();
+        //     $request->image->move(public_path('review-images'), $filename);
+        //     $input['image'] = $filename;
+        // }
+        
+        if ($request->hasFile('review_video')) {
+            $filename = time() . '.' . $request->review_video->getClientOriginalExtension();
+            $request->review_video->move(public_path('review-videos'), $filename);
+            $input['video'] = $filename;
+        }
+
+        Review::create($input);
 
         return response()->json([
             'msg' => "Review created successfully.",
