@@ -106,7 +106,9 @@ $reviewsCarousel_chunk = 3;
                             <div class="row">
                                 @foreach($chunk as $staffYoutubeVideo)
                                 <div class="col-md-6 col-xs-12">
-                                    <iframe width="562" height="323" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                    <div class="embed-responsive embed-responsive-16by9 ">
+                                        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ $staffYoutubeVideo->youtube_video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                    </div>
                                 </div>
                                 @endforeach
                             </div>
