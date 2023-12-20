@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
+use App\Models\ReviewImage;
 
 class CustomerController extends Controller
 
@@ -540,19 +541,28 @@ class CustomerController extends Controller
     {
         $input = $request->all();
 
-        // if ($request->hasFile('image')) {
-        //     $filename = time() . '.' . $request->image->getClientOriginalExtension();
-        //     $request->image->move(public_path('review-images'), $filename);
-        //     $input['image'] = $filename;
-        // }
-        
         if ($request->hasFile('review_video')) {
             $filename = time() . '.' . $request->review_video->getClientOriginalExtension();
             $request->review_video->move(public_path('review-videos'), $filename);
             $input['video'] = $filename;
         }
 
-        Review::create($input);
+        $review = Review::create($input);
+
+        if ($request->hasFile('image')) {
+            $images = $request->file('image');
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('review-images'), $filename);
+                $input['image'] = $filename;
+
+                ReviewImage::create([
+                    'image' => $filename,
+                    'review_id' => $review->id,
+                ]);
+            }
+        }
 
         return response()->json([
             'msg' => "Review created successfully.",
