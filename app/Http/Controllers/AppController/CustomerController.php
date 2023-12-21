@@ -9,6 +9,7 @@ use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CouponHistory;
 use App\Models\CustomerProfile;
+use App\Models\FAQ;
 use App\Models\Order;
 use App\Models\OrderService;
 use App\Models\OrderTotal;
@@ -200,10 +201,12 @@ class CustomerController extends Controller
     {
         if ($request->service_id) {
             $services = Service::where('status', 1)->where('id', $request->service_id)->orderBy('name', 'ASC')->first();
+            $FAQs = FAQ::where('service_id', $request->service_id)->get();
         }
 
         return response()->json([
-            'services' => $services
+            'services' => $services,
+            'faqs' => $FAQs
         ], 200);
     }
 
