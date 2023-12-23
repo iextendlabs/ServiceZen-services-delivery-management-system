@@ -36,7 +36,7 @@
                     <td>{{ $staffZone->description }}</td>
                     <td>{{ $staffZone->transport_charges }}</td>
                     <td>
-                        <form action="{{ route('staffZones.destroy',$staffZone->id) }}" method="POST">
+                        <form id="deleteForm{{ $staffZone->id }}" action="{{ route('staffZones.destroy',$staffZone->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('staffZones.show',$staffZone->id) }}">Show</a>
                             @can('staff-zone-edit')
                             <a class="btn btn-primary" href="{{ route('staffZones.edit',$staffZone->id) }}">Edit</a>
@@ -44,7 +44,7 @@
                             @csrf
                             @method('DELETE')
                             @can('staff-zone-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" onclick="confirmDelete('{{ $staffZone->id }}')" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
                     </td>
@@ -60,5 +60,12 @@
         </div>
     </div>
 </div>
-
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

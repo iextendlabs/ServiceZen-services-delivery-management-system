@@ -80,7 +80,7 @@
                 @endforeach
             </td>
             <td>
-                <form action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
+                <form id="deleteForm{{ $time_slot->id }}" action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>
                     @can('time-slot-edit')
                     <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
@@ -88,7 +88,7 @@
                     @csrf
                     @method('DELETE')
                     @can('time-slot-delete')
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn btn-danger">Delete</button>
                     @endcan
                 </form>
             </td>
@@ -102,4 +102,12 @@
     </table>
     {!! $time_slots->links() !!}
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

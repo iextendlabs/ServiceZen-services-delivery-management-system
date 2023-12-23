@@ -200,7 +200,7 @@ class CustomerController extends Controller
     public function getServiceDetails(Request $request)
     {
         if ($request->service_id) {
-            $services = Service::where('status', 1)->where('id', $request->service_id)->orderBy('name', 'ASC')->first();
+            $services = Service::where('status', 1)->where('id', $request->service_id)->where('status','1')->orderBy('name', 'ASC')->first();
             $FAQs = FAQ::where('service_id', $request->service_id)->get();
         }
 

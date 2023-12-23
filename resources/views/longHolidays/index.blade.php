@@ -45,11 +45,11 @@
                 <td>{{ $longHoliday->date_end }}</td>
                 <td>{{ $longHoliday->staff->name }}</td>
                 <td>
-                    <form action="{{ route('longHolidays.destroy',$longHoliday->id) }}" method="POST">
+                    <form id="deleteForm{{ $longHoliday->id }}" action="{{ route('longHolidays.destroy',$longHoliday->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         @can('staff-holiday-delete')
-                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                        <button type="button" onclick="confirmDelete('{{ $longHoliday->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                         @endcan
                     </form>
                 </td>
@@ -65,6 +65,14 @@
     </div>
 </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('bulkDeleteBtn').addEventListener('click', function() {

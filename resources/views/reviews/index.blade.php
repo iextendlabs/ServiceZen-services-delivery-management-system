@@ -40,7 +40,7 @@
                     @endif
                     @endfor</td>
             <td>
-                <form action="{{ route('reviews.destroy',$review->id) }}" method="POST">
+                <form id="deleteForm{{ $review->id }}" action="{{ route('reviews.destroy',$review->id) }}" method="POST">
                     <a class="btn btn-warning" href="{{ route('reviews.show',$review->id) }}"><i class="fa fa-eye"></i></a>
                     @can('review-edit')
                     <a class="btn btn-primary" href="{{ route('reviews.edit',$review->id) }}"><i class="fa fa-edit"></i></a>
@@ -48,7 +48,7 @@
                     @csrf
                     @method('DELETE')
                     @can('review-delete')
-                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                    <button type="button" onclick="confirmDelete('{{ $review->id }}')" class="btn btn-danger"><i class="fas fa-trash"></i></button>
                     @endcan
                 </form>
             </td>
@@ -62,4 +62,12 @@
     </table>
     {!! $reviews->links() !!}
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

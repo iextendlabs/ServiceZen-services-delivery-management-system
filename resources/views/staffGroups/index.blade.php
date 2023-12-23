@@ -44,7 +44,7 @@
                         @endforeach
                     </td>
                     <td>
-                        <form action="{{ route('staffGroups.destroy',$staffGroup->id) }}" method="POST">
+                        <form id="deleteForm{{ $staffGroup->id }}" action="{{ route('staffGroups.destroy',$staffGroup->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('staffGroups.show',$staffGroup->id) }}">Show</a>
                             @can('staff-group-edit')
                             <a class="btn btn-primary" href="{{ route('staffGroups.edit',$staffGroup->id) }}">Edit</a>
@@ -52,7 +52,7 @@
                             @csrf
                             @method('DELETE')
                             @can('staff-group-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" onclick="confirmDelete('{{ $staffGroup->id }}')" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
                     </td>
@@ -69,4 +69,12 @@
     </div>
 
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

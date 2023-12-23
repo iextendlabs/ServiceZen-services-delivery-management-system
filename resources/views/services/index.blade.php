@@ -1,24 +1,39 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-<div class="row">
-    <div class="col-md-12 margin-tb">
-        <div class="float-start">
-            <h2>Services</h2>
+        <div class="row">
+            <div class="col-md-12 margin-tb">
+                <div class="float-start">
+                    <h2>Services</h2>
+                </div>
+                <div class="float-end d-flex align-items-center">
+                    @can('service-edit')
+                    <div class="input-group me-2">
+                        <select name="bulk-status" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button id="bulkEditBtn" class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
+                        </div>
+                    </div>
+                    @endcan
+                
+                    @can('service-create')
+                    <a class="btn btn-primary me-2" href="{{ route('services.create') }}"><i class="fa fa-plus"></i></a>
+                    @endcan
+                
+                    <button id="bulkCopyBtn" class="btn btn-secondary me-2" type="button"><i class="fa fa-copy"></i></button>
+                
+                    @can('service-delete')
+                    <button id="bulkDeleteBtn" class="btn btn-danger" type="button"><i class="fa fa-trash"></i></button>
+                    @endcan
+                </div>
+                
+                
+            </div>
         </div>
-        <div class="float-end">
-            @can('service-create')
-            <a class="btn btn-primary " href="{{ route('services.create') }}"><i class="fa fa-plus"></i></a>
-            @endcan
-
-            <button id="bulkCopyBtn" class="btn btn-secondary"><i class="fa fa-copy"></i></button>
-
-            @can('service-delete')
-            <button id="bulkDeleteBtn" class="btn btn-danger"><i class="fa fa-trash"></i></button>
-            @endcan
-        </div>
-    </div>
-</div>
+        
 @if ($message = Session::get('success'))
 <div class="alert alert-success">
     <span>{{ $message }}</span>
@@ -91,7 +106,7 @@
                 <td class="text-right">@if($service->status) Enable @else Disable @endif</td>
                 <td class="text-left">{{ $service->type }}</td>
                 <td class="text-right">
-                    <form action="{{ route('services.destroy',$service->id) }}" method="POST">
+                    <form id="deleteForm{{ $service->id }}" action="{{ route('services.destroy',$service->id) }}" method="POST">
                         <a class="btn btn-warning" href="/serviceDetail/{{ $service->id }}">Store View</a>
                         @can('FAQs-create')
                         <a class="btn btn-primary" href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>
@@ -103,7 +118,7 @@
                         @csrf
                         @method('DELETE')
                         @can('service-delete')
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete('{{ $service->id }}')">Delete</button>
                         @endcan
                     </form>
                 </td>
@@ -120,75 +135,125 @@
 
 </div>
     </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
-            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
-                .map(checkbox => checkbox.value);
-
-            if (selectedItems.length > 0) {
-                if (confirm('Are you sure you want to delete the selected items?')) {
-                    deleteSelectedItems(selectedItems);
+    <script>
+            $('#bulkDeleteBtn').click(function() {
+                const selectedItems = $('.item-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+    
+                if (selectedItems.length > 0) {
+                    if (confirm('Are you sure you want to delete the selected items?')) {
+                        deleteSelectedItems(selectedItems);
+                    }
+                } else {
+                    alert('Please select items to delete.');
                 }
-            } else {
-                alert('Please select items to delete.');
-            }
-        });
-
-        document.getElementById('bulkCopyBtn').addEventListener('click', function() {
-            const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
-                .map(checkbox => checkbox.value);
-
-            if (selectedItems.length > 0) {
-                if (confirm('Are you sure you want to Copy the selected items?')) {
-                    copySelectedItems(selectedItems);
+            });
+    
+            $('#bulkCopyBtn').click(function() {
+                const selectedItems = $('.item-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+    
+                if (selectedItems.length > 0) {
+                    if (confirm('Are you sure you want to Copy the selected items?')) {
+                        copySelectedItems(selectedItems);
+                    }
+                } else {
+                    alert('Please select items to Copy.');
                 }
-            } else {
-                alert('Please select items to Copy.');
+            });
+    
+            $('#bulkEditBtn').click(function() {
+                const selectedItems = $('.item-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                const status_value = $('select[name="bulk-status"]').val();
+                const status_text = $('select[name="bulk-status"] option:selected').text();
+
+                if (selectedItems.length > 0) {
+                    if (confirm("Are you sure you want to Set " + status_text + " to selected items?")) {
+                        editSelectedItems(selectedItems, status_value);
+                    }
+                } else {
+                    alert('Please select items to Set Status.');
+                }
+            });
+
+    
+            function deleteSelectedItems(selectedItems) {
+                $.ajax({
+                    url: '{{ route('services.bulkDelete') }}',
+                    method: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        selectedItems
+                    }),
+                    success: function(data) {
+                        alert(data.message);
+                        window.location.reload();
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                    }
+                });
             }
-        });
-
-        function deleteSelectedItems(selectedItems) {
-            fetch('{{ route('services.bulkDelete') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            selectedItems
-                        })
-                    })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+    
+            function copySelectedItems(selectedItems) {
+                $.ajax({
+                    url: '{{ route('services.bulkCopy') }}',
+                    method: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        selectedItems
+                    }),
+                    success: function(data) {
+                        alert(data.message);
+                        window.location.reload();
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                    }
                 });
-        }
-
-        function copySelectedItems(selectedItems) {
-            fetch('{{ route('services.bulkCopy') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            selectedItems
-                        })
-                    })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+            }
+    
+            function editSelectedItems(selectedItems, status) {
+                $.ajax({
+                    url: '{{ route('services.bulkEdit') }}',
+                    method: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        selectedItems,
+                        status
+                    }),
+                    success: function(data) {
+                        alert(data.message);
+                        window.location.reload();
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                    }
                 });
-        }
-    });
-</script>
+            }
+
+            function confirmDelete(serviceId) {
+                var result = confirm("Are you sure you want to delete this service?");
+                if (result) {
+                    document.getElementById('deleteForm' + serviceId).submit();
+                }
+            }
+    </script>
+    
 @endsection

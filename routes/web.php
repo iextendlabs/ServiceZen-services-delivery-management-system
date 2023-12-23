@@ -92,6 +92,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/longHolidayBulkDelete', [longHolidayController::class, 'bulkDelete'])->name('longHolidays.bulkDelete');
     Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('services.bulkDelete');
     Route::post('/services/bulkCopy', [ServiceController::class, 'bulkCopy'])->name('services.bulkCopy');
+    Route::post('/services/bulkEdit', [ServiceController::class, 'bulkEdit'])->name('services.bulkEdit');
     Route::get('/serviceDelete/{id}', [ServiceController::class, 'destroy'])->name('service.delete');
 
     Route::get('orderCSV', [OrderController::class, 'downloadCSV']);

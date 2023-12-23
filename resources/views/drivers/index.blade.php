@@ -37,7 +37,7 @@
                     <td>{{ $driver->email }}</td>
 
                     <td>
-                        <form action="{{ route('drivers.destroy',$driver->id) }}" method="POST">
+                        <form id="deleteForm{{ $driver->id }}" action="{{ route('drivers.destroy',$driver->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('drivers.show',$driver->id) }}">Show</a>
                             @can('driver-edit')
                             <a class="btn btn-primary" href="{{ route('drivers.edit',$driver->id) }}">Edit</a>
@@ -45,7 +45,7 @@
                             @csrf
                             @method('DELETE')
                             @can('driver-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" onclick="confirmDelete('{{ $driver->id }}')" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
                     </td>
@@ -78,4 +78,12 @@
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

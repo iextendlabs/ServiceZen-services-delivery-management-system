@@ -41,7 +41,7 @@
             <td>{{ $service_category->description }}</td>
             <td>@if($service_category->status) Enable @else Disable @endif</td>
             <td>
-                <form action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">
+                <form id="deleteForm{{ $service_category->id }}" action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">
                     @can('FAQs-create')
                     <a class="btn btn-primary" href="{{ route('FAQs.create', ['category_id' => $service_category->id]) }}">Add FAQs</a>
                     @endcan
@@ -52,7 +52,7 @@
                     @csrf
                     @method('DELETE')
                     @can('service-category-delete')
-                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                    <button type="button" onclick="confirmDelete('{{ $service_category->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                     @endcan
                 </form>
             </td>
@@ -66,4 +66,12 @@
     </table>
     {!! $service_categories->links() !!}
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

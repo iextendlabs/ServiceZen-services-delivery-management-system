@@ -114,11 +114,11 @@
                 </li>
             </ul>
             @endcan
-            <form action="{{ route('orders.destroy', $order->id) }}" method="POST">
+            <form id="deleteForm{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 @can('order-delete')
-                <button type="submit" class="btn btn-danger">
+                <button type="button" onclick="confirmDelete('{{ $order->id }}')" class="btn btn-danger">
                     <i class="fas fa-trash"></i>
                 </button>
                 @endcan
@@ -147,3 +147,11 @@
     </tr>
     @endif
 </table>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>

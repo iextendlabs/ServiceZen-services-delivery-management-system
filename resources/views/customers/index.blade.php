@@ -37,7 +37,7 @@
                     <td>{{ $customer->email }}</td>
 
                     <td>
-                        <form action="{{ route('customers.destroy',$customer->id) }}" method="POST">
+                        <form id="deleteForm{{ $customer->id }}" action="{{ route('customers.destroy',$customer->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}"><i class="fas fa-eye"></i></a>
                             @can('customer-edit')
                             <a class="btn btn-primary" href="{{ route('customers.edit',$customer->id) }}"><i class="fas fa-edit"></i></a>
@@ -45,7 +45,7 @@
                             @csrf
                             @method('DELETE')
                             @can('customer-delete')
-                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            <button type="button" onclick="confirmDelete('{{ $customer->id }}')" class="btn btn-danger"><i class="fas fa-trash"></i></button>
                             @endcan
                             @can('order-list')
                             <a class="btn btn-info" href="{{ route('orders.index') }}?customer_id={{ $customer->id }}">Order History</a>
@@ -93,4 +93,12 @@
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

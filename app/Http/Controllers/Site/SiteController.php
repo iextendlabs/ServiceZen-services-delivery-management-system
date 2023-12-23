@@ -91,13 +91,13 @@ class SiteController extends Controller
                 ->paginate(config('app.paginate'));
             }
 
-            $FAQs = FAQ::where('category_id', $request->id)->latest()->take(3)->get();
+            $FAQs = FAQ::where('category_id', $request->id)->where('status','1')->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
             return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
         } else {
             $all_categories = ServiceCategory::get();
-            $FAQs = FAQ::latest()->take(3)->get();
+            $FAQs = FAQ::latest()->where('status','1')->take(3)->get();
             $services = Service::where(function ($query) {
                 $query->where('type', 'master')
                     ->orWhereNull('type');
@@ -110,7 +110,7 @@ class SiteController extends Controller
     public function show($id)
     {
         $service = Service::findOrFail($id);
-        $FAQs = FAQ::where('service_id', $id)->get();
+        $FAQs = FAQ::where('service_id', $id)->where('status','1')->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');
         if ($service->status) {

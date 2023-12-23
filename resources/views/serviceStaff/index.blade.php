@@ -40,7 +40,7 @@
                     <td>@if($staff->staff->status == 1) Enabled @else Disabled @endif</td>
                     <td>{{ $staff->staff->sub_title }}</td>
                     <td>
-                        <form action="{{ route('serviceStaff.destroy',$staff->id) }}" method="POST">
+                        <form id="deleteForm{{ $staff->id }}" action="{{ route('serviceStaff.destroy',$staff->id) }}" method="POST">
                             <a class="btn btn-warning" href="{{ route('serviceStaff.show',$staff->id) }}"><i class="fa fa-eye"></i></a>
                             @can('service-staff-edit')
                             <a class="btn btn-primary" href="{{ route('serviceStaff.edit',$staff->id) }}"><i class="fa fa-edit"></i></a>
@@ -48,7 +48,7 @@
                             @csrf
                             @method('DELETE')
                             @can('service-staff-delete')
-                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                            <button type="button" onclick="confirmDelete('{{ $staff->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                             @endcan
                             <a class="btn btn-primary" href="{{ route('staffHolidays.create',['staff' => $staff->id]) }}" title="Add Holiday"><i class="fas fa-calendar"></i></a>
                         </form>
@@ -83,4 +83,12 @@
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection
