@@ -50,6 +50,7 @@ class TimeSlot extends Model
         $holiday = [];
         $staff_ids = [];
         $available_ids = [];
+        $short_holiday_staff_ids = [];
         $currentDate = Carbon::now()->format('Y-m-d');
         $currentDateTime = Carbon::now();
         $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
@@ -130,11 +131,18 @@ class TimeSlot extends Model
             }
 
             if (count($timeSlots)) {
-                $short_holiday = ShortHoliday::where('date', $date)->get();
+                $short_holidays = ShortHoliday::where('date', $date)->get();
 
                 foreach ($timeSlots as $timeSlot) {
-                    if ($short_holiday) {
-                        $short_holiday_staff_ids = ShortHoliday::where('date', $date)->where('start_time_to_sec', '<=', $timeSlot->end_time_to_sec)->where('end_time_to_sec', '>=', $timeSlot->start_time_to_sec)->pluck('staff_id')->toArray();
+                    if (count($short_holidays) > 0) {
+                        foreach ($short_holidays as $short_holiday) {
+                            //ShortHoliday::where('date', $date)->where('start_time_to_sec', '<=', $timeSlot->end_time_to_sec)->where('end_time_to_sec', '>=', $timeSlot->start_time_to_sec)->pluck('staff_id')->toArray();
+                            $holiday_end_time = $short_holiday->start_time_to_sec + ($short_holiday->hours * 3600);
+                            $isHolidayTime = $short_holiday->start_time_to_sec <= $timeSlot->end_time_to_sec && $holiday_end_time >= $timeSlot->start_time_to_sec ;
+                            if ($isHolidayTime) {
+                                $short_holiday_staff_ids[] = $short_holiday->staff_id;
+                            }
+                        }
                     } else {
                         $short_holiday_staff_ids = [];
                     }

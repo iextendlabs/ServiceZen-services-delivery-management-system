@@ -31,7 +31,7 @@
                 <th>Sr#</th>
                 <th>Date</th>
                 <th>Time Start</th>
-                <th>Time End</th>
+                <th>Hours</th>
                 <th>Staff Name</th>
                 <th>Action</th>
             </tr>
@@ -44,7 +44,7 @@
                 <td>{{ ++$i }}</td>
                 <td>{{ $shortHoliday->date }}({{ \Carbon\Carbon::parse($shortHoliday->date)->format('l') }})</td>
                 <td>{{ date('h:i A', strtotime($shortHoliday->time_start)) }}</td>
-                <td>{{ date('h:i A', strtotime($shortHoliday->time_end)) }}</td>
+                <td>{{ $shortHoliday->hours }}</td>
                 <td>{{ $shortHoliday->staff->name }}</td>
                 <td>
                     <form id="deleteForm{{ $shortHoliday->id }}" action="{{ route('shortHolidays.destroy',$shortHoliday->id) }}" method="POST">

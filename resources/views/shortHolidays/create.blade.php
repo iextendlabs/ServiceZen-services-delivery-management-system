@@ -34,8 +34,8 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Time End:</strong>
-                    <input type="time" name="time_end" value="{{ date('Y-m-d') }}" class="form-control" placeholder="TIme End">
+                    <span style="color: red;">*</span><strong>Hours:</strong>
+                    <input type="number" name="hours" class="form-control" placeholder="Hours">
                 </div>
             </div>
             <div class="col-md-12">

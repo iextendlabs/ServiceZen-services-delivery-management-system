@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -66,9 +67,10 @@ class SettingController extends Controller
      */
     public function edit($id)
     {
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $setting = Setting::find($id);
-        return view('settings.edit', compact('setting', 'services'));
+        return view('settings.edit', compact('setting', 'services','categories'));
     }
 
     /**
@@ -94,18 +96,20 @@ class SettingController extends Controller
         if ($setting->key === 'Slider Image') {
             if ($request->image) {
                 $images = $request->image;
-
+                $linkTypes = $request->link_type;
+                $linkedItems = $request->linked_item;
+            
                 $existingImage = $setting->value ?? ''; // Existing image
-
+            
                 $imagePaths = [];
-
-                foreach ($images as $image) {
+            
+                foreach ($images as $key => $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-
+            
                     $image->move(public_path('slider-images'), $filename);
-                    $imagePaths[] = $filename;
+                    $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
                 }
-
+            
                 $newImagePaths = implode(',', $imagePaths);
                 $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
             }
@@ -135,24 +139,26 @@ class SettingController extends Controller
 
     public function removeSliderImage(Request $request)
     {
-
         $setting = Setting::find($request->id);
 
-        $fileValues = explode(',', $setting->value);
-
+        $values = explode(',', $setting->value);
+        
         $deletefilename = $request->filename;
 
-        if (($key = array_search($deletefilename, $fileValues)) !== false) {
-            unset($fileValues[$key]);
-
-            if ($deletefilename && file_exists(public_path('slider-images') . '/' . $deletefilename)) {
-                unlink(public_path('slider-images') . '/' . $deletefilename);
+        foreach($values as $key=>$value){
+            
+            $slider_detail = explode('_', $value);
+            if ($deletefilename == $slider_detail[2]) {
+                unset($values[$key]);
+                if ($deletefilename && file_exists(public_path('slider-images') . '/' . $deletefilename)) {
+                    unlink(public_path('slider-images') . '/' . $deletefilename);
+                }
             }
         }
+    
+        $values = array_values($values);
 
-        $fileValues = array_values($fileValues);
-
-        $setting->value = implode(',', $fileValues);
+        $setting->value = implode(',', $values);
         $setting->save();
 
         return redirect()->back()->with('success', 'Image Remove successfully.');
