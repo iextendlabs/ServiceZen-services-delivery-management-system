@@ -70,7 +70,11 @@ class OrderController extends Controller
 
             case 'Supervisor':
                 $staffIds = $currentUser->getSupervisorStaffIds();
-                $query = Order::whereIn('service_staff_id', $staffIds)->where('status', '!=', 'Complete')->orderBy('date', 'ASC')->orderBy('time_start');
+                $query = Order::whereIn('service_staff_id', $staffIds)
+                ->where(function ($query) {
+                    $query->whereDoesntHave('cashCollection');
+                })
+                ->orderBy('date', 'ASC')->orderBy('time_start');
                 break;
 
             case 'Staff':
