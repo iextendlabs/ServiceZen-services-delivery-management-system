@@ -50,7 +50,34 @@
                             @can('order-list')
                             <a class="btn btn-info" href="{{ route('orders.index') }}?customer_id={{ $customer->id }}">Order History</a>
                             @endcan
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#couponModal{{ $customer->id }}">
+                                <i class="fas fa-gift"></i> Apply Coupon
+                            </button>
                         </form>
+                        <div class="modal fade" id="couponModal{{ $customer->id }}" tabindex="-1" aria-labelledby="couponModalLabel{{ $customer->id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="couponModalLabel{{ $customer->id }}">Select Coupon for {{ $customer->name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ route('coupons.assign', $customer->id) }}" method="post">
+                                            @csrf
+                                            <div class="mb-3">
+                                                <label for="couponSelect{{ $customer->id }}" class="form-label">Select Coupon:</label>
+                                                <select class="form-select" id="couponSelect{{ $customer->id }}" name="coupon_id">
+                                                    @foreach($coupons as $coupon)
+                                                        <option value="{{ $coupon->id }}">{{ $coupon->name }} ({{ $coupon->code }})</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Save Coupon</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

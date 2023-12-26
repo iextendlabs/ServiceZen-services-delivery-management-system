@@ -122,6 +122,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
     Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
+    Route::post('/customers/{customerId}/assign-coupon', [CustomerController::class, 'assignCoupon'])->name('coupons.assign');
+    Route::post('/customers/{couponId}/destroy', [CustomerController::class, 'customerCoupon_destroy'])->name('customerCoupon.destroy');
 
     Route::get('/rota', [RotaController::class, 'index'])->name('rota');
 });

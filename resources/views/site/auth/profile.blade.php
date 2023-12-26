@@ -136,6 +136,31 @@
             <span class="invalid-feedback text-right" id="gender-error" role="alert" style="display: none;">
                 <strong>Sorry, No Male Services Listed in Our Store.</strong>
             </span>
+            <div class="row">
+                @if(isset($user->coupons))
+                <h3>Coupon List</h3>
+                <table class="table table-striped table-bordered album bg-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Discount</th>
+                    </tr>
+                    @if(count($user->coupons) != 0)
+                    @foreach ($user->coupons as $coupons)
+                    <tr>
+                        <td>{{ $coupons->name }}</td>
+                        <td>{{ $coupons->code }}</td>
+                        <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else AED {{ $coupons->discount }} @endif</td>
+                    </tr>
+                    @endforeach
+                    @else
+                    <tr class="text-center">
+                        <td colspan="3">There are no Coupon Assigned</td>
+                    </tr>
+                    @endif
+                </table>
+                @endif
+            </div>
             <div class="col-md-12 text-right">
                 <button type="submit" class="btn btn-primary">Update</button>
             </div>

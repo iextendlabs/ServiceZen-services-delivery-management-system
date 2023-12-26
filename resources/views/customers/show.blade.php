@@ -1,6 +1,12 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+    @if ($message = Session::get('success'))
+    <div class="alert alert-success">
+        <span>{{ $message }}</span>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
     <div class="row">
         <div class="col-md-12 margin-tb">
             <div class="float-start">
@@ -31,6 +37,42 @@
                 @endif
             </div>
         </div>
+    </div>
+    <hr>
+    <div class="row">
+        @if(isset($customer->coupons))
+        <h3>Customer Coupon</h3>
+        @if(count($customer->coupons) != 0)
+        <table class="table table-striped table-bordered album bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Discount</th>
+                <th>Action</th>
+            </tr>
+            @foreach ($customer->coupons as $coupons)
+            <tr>
+                <td>{{ $coupons->name }}</td>
+                <td>{{ $coupons->code }}</td>
+                <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else AED {{ $coupons->discount }} @endif</td>
+                <td>
+                    <form action="{{ route('customerCoupon.destroy', $coupons->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </table>
+        @else
+        <div class="text-center">
+            <p>There are no Coupon Assigned</p>
+        </div>
+        @endif
+        @endif
     </div>
 </div>
 @endsection
