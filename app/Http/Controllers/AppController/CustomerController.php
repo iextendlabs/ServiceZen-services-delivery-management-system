@@ -571,4 +571,14 @@ class CustomerController extends Controller
             'msg' => "Review created successfully.",
         ], 200);
     }
+
+    public function getCustomerCoupon(Request $request)
+    {
+        $user = User::find($request->user_id);
+        $coupons = $user->coupons;
+
+        return response()->json([
+            'coupons' => $coupons
+        ], 200);
+    }
 }

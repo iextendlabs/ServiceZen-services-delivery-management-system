@@ -216,6 +216,7 @@ class User extends Authenticatable
 
     public function coupons()
     {
-        return $this->belongsToMany(Coupon::class, 'customer_coupons', 'customer_id', 'coupon_id');
+        return $this->belongsToMany(Coupon::class, 'customer_coupons', 'customer_id', 'coupon_id')
+            ->where('status', 1);
     }
 }

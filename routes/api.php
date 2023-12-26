@@ -57,3 +57,4 @@ Route::post('updateCustomerInfo', [CustomerController::class, 'updateCustomerInf
 Route::post('applyCouponAffiliate', [CustomerController::class, 'applyCouponAffiliate']);
 Route::get('order-download-pdf/{id}', [CustomerController::class, 'downloadPDF'])->name('order.downloadPDF');
 Route::post('writeReview', [CustomerController::class, 'writeReview']);
+Route::get('getCustomerCoupon', [CustomerController::class, 'getCustomerCoupon']);
