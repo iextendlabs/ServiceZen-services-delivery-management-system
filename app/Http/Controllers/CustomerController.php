@@ -53,7 +53,7 @@ class CustomerController extends Controller
                 $subQuery->whereRaw('LOWER(number) LIKE ?', ['%'.strtolower($request->number).'%']);
             });
         }
-        $coupons = Coupon::get();
+        $coupons = Coupon::where('status','1')->get();
         $customers = $query->orderBy('name')->paginate(config('app.paginate'));
         $filters = $request->only(['name', 'email', 'number']);
         $customers->appends($filters);
