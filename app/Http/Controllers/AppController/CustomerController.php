@@ -109,15 +109,15 @@ class CustomerController extends Controller
 
     public function index()
     {
-        $cachedData = Cache::get('api_data');
+        // $cachedData = Cache::get('api_data');
 
-        if ($cachedData) {
-            return response()->json($cachedData, 200);
-        }
+        // if ($cachedData) {
+        //     return response()->json($cachedData, 200);
+        // }
 
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
-        $slider_images = Setting::where('key', 'Slider Image')->value('value');
+        $slider_images = Setting::where('key', 'Slider Image For App')->value('value');
         $featured_services = Setting::where('key', 'Featured Services')->value('value');
 
         $featured_services = explode(",", $featured_services);

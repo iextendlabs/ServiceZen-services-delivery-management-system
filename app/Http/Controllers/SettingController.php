@@ -81,50 +81,59 @@ class SettingController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        $setting = Setting::find($id);
-        if ($setting->key === 'Featured Services') {
+{
+    $setting = Setting::find($id);
+
+    switch ($setting->key) {
+        case 'Featured Services':
             request()->validate([
                 'service_ids' => 'required',
             ]);
-        }elseif ($setting->key !== 'Slider Image') {
-            request()->validate([
-                'value' => 'required',
-            ]);
-        }
+            break;
 
-        if ($setting->key === 'Slider Image') {
+        case 'Slider Image':
+        case 'Slider Image For App':
             if ($request->image) {
                 $images = $request->image;
                 $linkTypes = $request->link_type;
                 $linkedItems = $request->linked_item;
-            
+
                 $existingImage = $setting->value ?? ''; // Existing image
-            
+
                 $imagePaths = [];
-            
+
                 foreach ($images as $key => $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-            
+
                     $image->move(public_path('slider-images'), $filename);
                     $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
                 }
-            
+
                 $newImagePaths = implode(',', $imagePaths);
                 $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
             }
-        } elseif ($request->service_ids) {
-            $services = implode(',', $request->service_ids);
-            $setting->value = $services;
-        } else {
-            $setting->value = $request->input('value');
-        }
+            break;
 
-        $setting->save();
+        default:
+            request()->validate([
+                'value' => 'required',
+            ]);
 
-        return redirect()->route('settings.index')
-            ->with('success', 'Setting Update successfully.');
+            if ($request->service_ids) {
+                $services = implode(',', $request->service_ids);
+                $setting->value = $services;
+            } else {
+                $setting->value = $request->input('value');
+            }
+            break;
     }
+
+    $setting->save();
+
+    return redirect()->route('settings.index')
+        ->with('success', 'Setting Update successfully.');
+}
+
 
     /**
      * Remove the specified resource from storage.

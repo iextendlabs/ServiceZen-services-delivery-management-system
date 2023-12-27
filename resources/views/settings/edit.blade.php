@@ -41,7 +41,7 @@
                     <span class="text-danger">Note: Add by comma separated.</span>
                     @endif
 
-                    @if ($setting->key === 'Slider Image')
+                    @if ($setting->key === 'Slider Image' || $setting->key === 'Slider Image For App')
                     <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions 1140 × 504px. Thank you!</p>
                     <table id="imageTable" class="table table-bordered table-hover">
                         <thead>
