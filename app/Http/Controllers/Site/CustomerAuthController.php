@@ -96,10 +96,17 @@ class CustomerAuthController extends Controller
         return Redirect('customer-login');
     }
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $user = User::find($id);
-        return view('site.auth.profile', compact('user'));
+        if ($request->cookie('code') !== null) {
+            $code = json_decode($request->cookie('code'), true);
+            $coupon_code = $code['coupon_code'];
+        } else {
+            $coupon_code = "";
+        }
+        
+        return view('site.auth.profile', compact('user','coupon_code'));
     }
 
     public function update(Request $request, $id)

@@ -140,6 +140,11 @@
                 @if(isset($user->coupons))
                 <h3>Coupon List</h3>
                 <table class="table table-striped table-bordered album bg-light">
+                    @if($coupon_code)
+                    <tr>
+                        <th colspan="4">Your Selected Coupon code id {{ $coupon_code }}</th>
+                    </tr>
+                    @endif
                     <tr>
                         <th>Name</th>
                         <th>Code</th>
