@@ -42,7 +42,7 @@
                     @endif
 
                     @if ($setting->key === 'Slider Image' || $setting->key === 'Slider Image For App')
-                    <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions 1140 × 504px. Thank you!</p>
+                    <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions @if ($setting->key === 'Slider Image' ) 1140 × 504px. @else 325 x 200px. @endif Thank you!</p>
                     <table id="imageTable" class="table table-bordered table-hover">
                         <thead>
                             <tr>

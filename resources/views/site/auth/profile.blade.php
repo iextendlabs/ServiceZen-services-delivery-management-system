@@ -144,6 +144,7 @@
                         <th>Name</th>
                         <th>Code</th>
                         <th>Discount</th>
+                        <th>Action</th>
                     </tr>
                     @if(count($user->coupons) != 0)
                     @foreach ($user->coupons as $coupons)
@@ -151,6 +152,9 @@
                         <td>{{ $coupons->name }}</td>
                         <td>{{ $coupons->code }}</td>
                         <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else AED {{ $coupons->discount }} @endif</td>
+                        <td>
+                            <a class="btn btn-primary" href="/applyCoupon?coupon={{ $coupons->code }}"><i class="fas fa-gift"></i> Apply Coupon</a>
+                        </td>
                     </tr>
                     @endforeach
                     @else

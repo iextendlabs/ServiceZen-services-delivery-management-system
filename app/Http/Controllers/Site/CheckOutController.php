@@ -214,8 +214,16 @@ class CheckOutController extends Controller
             $code = json_decode($request->cookie('code'), true);
             // if (session()->has('code')) {
             //     $code = Session::get('code');
+            $isValid = Coupon::where('code',$code['coupon_code'])
+                ->where('status', 1)
+                ->where('date_start', '<=', now())
+                ->where('date_end', '>=', now())->get();
+            if(count($isValid)){
+                $coupon_code = $code['coupon_code'];
+            }else{
+                $coupon_code = "";
+            }
             $affiliate_code = $code['affiliate_code'];
-            $coupon_code = $code['coupon_code'];
         } else {
             $affiliate_code = '';
             $coupon_code = '';
