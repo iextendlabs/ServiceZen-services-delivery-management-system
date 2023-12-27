@@ -159,7 +159,7 @@
                     @endforeach
                     @else
                     <tr class="text-center">
-                        <td colspan="3">There are no Coupon Assigned</td>
+                        <td colspan="4">There are no Coupon Assigned</td>
                     </tr>
                     @endif
                 </table>
