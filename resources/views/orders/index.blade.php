@@ -23,24 +23,29 @@
                 </a>
                 @endif
 
-                <a class="btn btn-success float-end mr-1" href="{{route('orders.index')}}?status=Complete">
-                    <i class="fas fa-check"></i> Complete
-                </a>
-
-                <a class="btn btn-info float-end mr-1" href="{{route('orders.index')}}?status=Inprogress">
-                    <i class="fas fa-hourglass-split"></i> Inprogress
+                @if(auth()->user()->getRoleNames() != '["Staff"]')
+                <a class="btn btn-primary float-end mr-1" href="{{route('orders.index')}}?status=Pending">
+                    <i class="fas fa-clock"></i> Pending
                 </a>
 
                 <a class="btn btn-warning float-end mr-1" href="{{route('orders.index')}}?status=Rejected">
                     <i class="fas fa-times"></i> Rejected
+                </a>
+                
+                <a class="btn btn-info float-end mr-1" href="{{route('orders.index')}}?status=Inprogress">
+                    <i class="fas fa-hourglass-split"></i> Inprogress
+                </a>
+                @endif
+                <a class="btn btn-success float-end mr-1" href="{{route('orders.index')}}?status=Complete">
+                    <i class="fas fa-check"></i> Complete
                 </a>
 
                 <a class="btn btn-success float-end mr-1" href="{{route('orders.index')}}?status=Accepted">
                     <i class="fas fa-check"></i> Accepted
                 </a>
 
-                <a class="btn btn-primary float-end mr-1" href="{{route('orders.index')}}?status=Pending">
-                    <i class="fas fa-clock"></i> Pending
+                <a class="btn btn-info float-end mr-1" href="{{route('orders.index')}}?status=Confirm">
+                    <i class="fas fa-check"></i> Confirm
                 </a>
                 @if(auth()->user()->getRoleNames() == '["Staff"]')
                 <a class="btn btn-success float-end mr-1" href="{{ route('staffCashCollection') }}">

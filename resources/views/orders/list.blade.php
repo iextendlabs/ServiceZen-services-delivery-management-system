@@ -124,7 +124,7 @@
                 @endcan
             </form>
             @if ($order->status !== 'Complete' && Auth::User()->getRoleNames() == '["Staff"]')
-            @if ($order->status == 'Pending')
+            @if ($order->status == 'Confirm')
             <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
                 <i class="fas fa-thumbs-up"></i>
             </a>

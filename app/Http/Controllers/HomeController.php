@@ -71,7 +71,7 @@ class HomeController extends Controller
                             ->where('date', '<=', $currentDate)
                             ->orderBy('date', 'DESC')
                             ->where(function ($query) {
-                            $query->whereIn('status', ['Complete', 'Pending', 'Accepted'])
+                            $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
                                 ->whereDoesntHave('cashCollection');
                             })
                             ->take(10)->get();
