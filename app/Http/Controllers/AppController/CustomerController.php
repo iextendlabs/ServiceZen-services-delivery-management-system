@@ -89,7 +89,9 @@ class CustomerController extends Controller
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
         $input['email'] = strtolower(trim($input['email']));
-
+        if ($request->has('fcmToken') && $request->fcmToken) {
+            $input['device_token'] = $request->fcmToken;
+        }
         $user = User::create($input);
         $user->assignRole("Customer");
 
