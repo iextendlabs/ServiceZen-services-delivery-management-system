@@ -171,7 +171,11 @@ class CustomerController extends Controller
                 'coupon_id' => $request->coupon_id
             ]);
         }
-        //TODO : notify customer
+        $coupon = Coupon::find($request->coupon_id);
+        $customer = User::find($customerId);
+        $body = "There is new Voucher for You.\nAnd Coupon Code is" .$coupon->code;
+        $customer->notifyOnMobile('New Voucher', $body);
+
         $previousUrl = url()->previous();
         return redirect($previousUrl)->with('success', 'Coupon assigned successfully');
     }
