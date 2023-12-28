@@ -173,7 +173,12 @@ class CustomerController extends Controller
         }
         $coupon = Coupon::find($request->coupon_id);
         $customer = User::find($customerId);
-        $body = "There is new Voucher for You.\nAnd Coupon Code is" .$coupon->code;
+        if($coupon->type == "Percentage"){
+            $discount = $coupon->discount."%";
+        }else{
+            $discount = "AED ".$coupon->discount;
+        }
+        $body = "There is new Voucher for You.\nUse " .$coupon->code." Code To Get Discount of ".$discount;
         $customer->notifyOnMobile('New Voucher', $body);
 
         $previousUrl = url()->previous();
