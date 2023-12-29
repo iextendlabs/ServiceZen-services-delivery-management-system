@@ -606,9 +606,10 @@ class CustomerController extends Controller
                 }
                 return $notification;
             });
-
-            $user->last_notification_id = $notifications->first()->id;
-            $user->save();
+            if($request->update){
+                $user->last_notification_id = $notifications->first()->id;
+                $user->save();
+            }
         }
 
         return response()->json([
