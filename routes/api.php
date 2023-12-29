@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController\{
     StaffAppController2,
-    StaffAppController3,
     StaffAppController,
     DriverAppController,
     ChatController,
@@ -59,13 +58,4 @@ Route::post('applyCouponAffiliate', [CustomerController::class, 'applyCouponAffi
 Route::get('order-download-pdf/{id}', [CustomerController::class, 'downloadPDF'])->name('order.downloadPDF');
 Route::post('writeReview', [CustomerController::class, 'writeReview']);
 Route::get('getCustomerCoupon', [CustomerController::class, 'getCustomerCoupon']);
-// staff app v3
-Route::get('ordersV3', [StaffAppController3::class, 'orders']);
-Route::post('loginV3', [StaffAppController3::class, 'login']);
-Route::post('addOrderCommentV3', [StaffAppController3::class, 'addComment']);
-Route::post('cashCollectionV3', [StaffAppController3::class, 'cashCollection']);
-Route::post('orderStatusUpdateV3', [StaffAppController3::class, 'orderStatusUpdate']);
-Route::post('driverOrderStatusUpdateV3', [StaffAppController3::class, 'driverOrderStatusUpdate']);
-Route::post('rescheduleOrderV3', [StaffAppController3::class, 'rescheduleOrder']);
-Route::get('timeSlots', [StaffAppController3::class, 'timeSlots']);
-Route::get('notificationV3', [StaffAppController3::class, 'notification']);
+Route::get('customerNotification', [CustomerController::class, 'notification']);
