@@ -595,20 +595,25 @@ class CustomerController extends Controller
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
-
+        
         if (!$notifications->isEmpty()) {
-
-            $notifications->map(function ($notification) use ($user) {
-                if ($notification->id > $user->last_notification_id) {
-                    $notification->type = "New";
-                } else {
-                    $notification->type = "Old";
-                }
-                return $notification;
-            });
             if($request->update){
+                $notifications->map(function ($notification) use ($user) {
+                    $notification->type = "Old";
+                    return $notification;
+                });
+                
                 $user->last_notification_id = $notifications->first()->id;
                 $user->save();
+            }else{
+                $notifications->map(function ($notification) use ($user) {
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
+                    return $notification;
+                });
             }
         }
 
