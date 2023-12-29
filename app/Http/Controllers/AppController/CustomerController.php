@@ -53,11 +53,24 @@ class CustomerController extends Controller
 
             $token = $user->createToken('app-token')->plainTextToken;
             $user_info = CustomerProfile::where('user_id', $user->id)->first();
+            
+            $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
+
+            $notifications = Notification::where('user_id', $user->id)
+            ->orderBy('id', 'desc')
+            ->limit($notification_limit)
+            ->get();
+
+            $notifications->map(function ($notification) use ($user) {
+                $notification->type = "Old";
+                return $notification;
+            });
 
             return response()->json([
                 'user' => $user,
                 'user_info' => $user_info,
                 'access_token' => $token,
+                'notifications' => $notifications
             ], 200);
         }
 
