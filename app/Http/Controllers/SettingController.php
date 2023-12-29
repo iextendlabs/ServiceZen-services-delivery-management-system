@@ -89,6 +89,13 @@ class SettingController extends Controller
             request()->validate([
                 'service_ids' => 'required',
             ]);
+
+            if ($request->service_ids) {
+                $services = implode(',', $request->service_ids);
+                $setting->value = $services;
+            } else {
+                $setting->value = $request->input('value');
+            }
             break;
 
         case 'Slider Image':
@@ -119,12 +126,6 @@ class SettingController extends Controller
                 'value' => 'required',
             ]);
 
-            if ($request->service_ids) {
-                $services = implode(',', $request->service_ids);
-                $setting->value = $services;
-            } else {
-                $setting->value = $request->input('value');
-            }
             break;
     }
 

@@ -27,6 +27,7 @@ use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
+use App\Models\Notification;
 
 class CustomerController extends Controller
 
@@ -581,6 +582,37 @@ class CustomerController extends Controller
 
         return response()->json([
             'coupons' => $coupons
+        ], 200);
+    }
+
+    public function notification(Request $request)
+    {
+        $user = User::find($request->user_id);
+
+        $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
+
+        $notifications = Notification::where('user_id', $request->user_id)
+            ->orderBy('id', 'desc')
+            ->limit($notification_limit)
+            ->get();
+
+        if (!$notifications->isEmpty()) {
+
+            $notifications->map(function ($notification) use ($user) {
+                if ($notification->id > $user->last_notification_id) {
+                    $notification->type = "New";
+                } else {
+                    $notification->type = "Old";
+                }
+                return $notification;
+            });
+
+            $user->last_notification_id = $notifications->first()->id;
+            $user->save();
+        }
+
+        return response()->json([
+            'notifications' => $notifications
         ], 200);
     }
 }
