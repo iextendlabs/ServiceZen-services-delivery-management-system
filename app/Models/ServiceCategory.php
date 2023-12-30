@@ -26,6 +26,6 @@ class ServiceCategory extends Model
 
     public function FAQs()
     {
-        return $this->hasMany(FAQ::class,'category_id');
+        return $this->hasMany(FAQ::class,'category_id')->where('status', '=', 'your_desired_status');
     }
 }
