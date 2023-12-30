@@ -78,30 +78,18 @@ class ShortHolidayController extends Controller
         request()->validate([
             'date' => 'required',
             'time_start' => 'required',
-            'time_end' => 'required',
+            'hours' => 'required',
             'staff_id' => 'required'
         ]);
         $input = $request->all();
 
         $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
-        $timeEnd = Carbon::createFromFormat('H:i', $request->time_end);
         
         $carbonTimeStart = Carbon::parse($request->time_start);
 
         $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
 
-        $carbonTimeEnd = Carbon::parse($request->time_end);
-
-        $input['end_time_to_sec'] = $carbonTimeEnd->hour * 3600 + $carbonTimeEnd->minute * 60 + $carbonTimeEnd->second;
-
-
-        if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
-            $input['end_time_to_sec'] = $input['end_time_to_sec'] + 86400;
-            ShortHoliday::create($input);
-        }else{
-            ShortHoliday::create($input);
-        }
-
+        ShortHoliday::create($input);
 
         return redirect()->route('shortHolidays.index')
             ->with('success', 'Staff Short Holiday created successfully.');

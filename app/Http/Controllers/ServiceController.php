@@ -345,4 +345,23 @@ class ServiceController extends Controller
             return response()->json(['message' => 'No items selected.']);
         }
     }
+
+    public function bulkEdit(Request $request)
+    {
+        $selectedItems = $request->input('selectedItems');
+        $status = $request->input('status');
+
+        if (!empty($selectedItems)) {
+
+            foreach ($selectedItems as $serviceId) {
+                $service = Service::findOrFail($serviceId);
+                $service->status = $status;
+                $service->save();
+            }
+
+            return response()->json(['message' => 'Selected items Edit successfully.']);
+        } else {
+            return response()->json(['message' => 'No items selected.']);
+        }
+    }
 }

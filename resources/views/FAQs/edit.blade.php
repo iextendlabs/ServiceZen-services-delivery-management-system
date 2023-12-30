@@ -62,6 +62,15 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Status:</strong>
+                        <select name="status" class="form-control">
+                            <option value="1" @if($FAQ->status == 1) selected @endif>Enable</option>
+                            <option value="0" @if($FAQ->status == 0) selected @endif>Disable</option>
+                        </select>
+                    </div>
+                </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Update</button>
             </div>

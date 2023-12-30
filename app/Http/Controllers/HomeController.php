@@ -57,11 +57,24 @@ class HomeController extends Controller
 
                     case 'Supervisor':
                         $staffIds = $currentUser->getSupervisorStaffIds();
-                        $orders = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC')->where('date', '<=', $currentDate)->take(10)->get();
+                        $orders = Order::whereIn('service_staff_id', $staffIds)
+                            ->orderBy('date', 'DESC')
+                            ->where('date', '<=', $currentDate)
+                            ->where(function ($query) {
+                                $query->whereDoesntHave('cashCollection');
+                                })
+                            ->take(10)->get();
                         break;
 
                     case 'Staff':
-                        $orders = Order::where('service_staff_id', Auth::id())->where('status', '!=', "Rejected")->orderBy('date', 'DESC')->where('date', '<=', $currentDate)->where('status','Pending')->take(10)->get();
+                        $orders = Order::where('service_staff_id', Auth::id())
+                            ->where('date', '<=', $currentDate)
+                            ->orderBy('date', 'DESC')
+                            ->where(function ($query) {
+                            $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
+                                ->whereDoesntHave('cashCollection');
+                            })
+                            ->take(10)->get();
                         break;
 
                     default:

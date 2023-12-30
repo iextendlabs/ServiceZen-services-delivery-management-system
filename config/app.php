@@ -53,7 +53,7 @@ return [
 
     'order_driver_statuses' => env('ORDER_DRIVER_STATUSES', ['Pending','Pick me', 'Accepted', 'Coming', 'Arrived for pick', 'Traveling','Dropped']),
 
-    'order_statuses' => env('ORDER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
+    'order_statuses' => env('ORDER_STATUSES', ['Confirm','Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 
     'staff_order_limit' => env('STAFF_ORDER_LIMIT','20'),
 
@@ -206,7 +206,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-
+        Barryvdh\DomPDF\ServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -235,6 +235,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
     ])->toArray(),
 
 ];

@@ -30,7 +30,8 @@ use App\Http\Controllers\{
     LongHolidayController,
     ReviewController,
     SettingController,
-    ShortHolidayController
+    ShortHolidayController,
+    RotaController
 };
 
 use App\Http\Controllers\AppController\{
@@ -47,6 +48,7 @@ use App\Http\Controllers\Site\{
     SiteFAQsController,
     SiteReviewsController,
     StaffProfileController,
+    TermsCondition,
 };
 
 /*
@@ -90,6 +92,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/longHolidayBulkDelete', [longHolidayController::class, 'bulkDelete'])->name('longHolidays.bulkDelete');
     Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('services.bulkDelete');
     Route::post('/services/bulkCopy', [ServiceController::class, 'bulkCopy'])->name('services.bulkCopy');
+    Route::post('/services/bulkEdit', [ServiceController::class, 'bulkEdit'])->name('services.bulkEdit');
     Route::get('/serviceDelete/{id}', [ServiceController::class, 'destroy'])->name('service.delete');
 
     Route::get('orderCSV', [OrderController::class, 'downloadCSV']);
@@ -119,10 +122,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
     Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
+    Route::post('/customers/{customerId}/assign-coupon', [CustomerController::class, 'assignCoupon'])->name('coupons.assign');
+    Route::post('/customers/{couponId}/destroy', [CustomerController::class, 'customerCoupon_destroy'])->name('customerCoupon.destroy');
 
     // affiliate export
     Route::get('/affiliate/exportTransaction/{User}', [AffiliateController::class, 'exportTransaction']);
 
+    Route::get('/rota', [RotaController::class, 'index'])->name('rota');
 });
 
 // Backups
@@ -157,18 +163,21 @@ Route::post('storeSession', [CheckOutController::class, 'storeSession']);
 Route::resource('cart', CheckOutController::class);
 Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
 Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
-//TODO :set no cache headers for all ajax calls 
+//TODO :set no cache headers for all ajax calls
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
 Route::get('staff-group', [CheckOutController::class, 'staff_group']);
 Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::resource('siteFAQs', SiteFAQsController::class);
+Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
+
 //TODO :Customer Delete
 // app url
 
 // Staff app
 
 // TODO: save and continue buttons , save and close buttons 
+Route::get('/termsCondition', [TermsCondition::class, 'index'])->name('TermsCondition');
 
 Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
 Route::get('staffAppUser', [StaffAppController::class, 'user']);

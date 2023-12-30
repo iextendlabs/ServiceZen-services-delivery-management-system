@@ -36,7 +36,7 @@
                     <td>{{ $supervisor->name }}</td>
                     <td>{{ $supervisor->email }}</td>
                     <td>
-                        <form action="{{ route('supervisors.destroy',$supervisor->id) }}" method="POST">
+                        <form id="deleteForm{{ $supervisor->id }}" action="{{ route('supervisors.destroy',$supervisor->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('supervisors.show',$supervisor->id) }}">Show</a>
                             @can('supervisor-edit')
                             <a class="btn btn-primary" href="{{ route('supervisors.edit',$supervisor->id) }}">Edit</a>
@@ -44,7 +44,7 @@
                             @csrf
                             @method('DELETE')
                             @can('supervisor-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" onclick="confirmDelete('{{ $supervisor->id }}')" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
                     </td>
@@ -77,5 +77,12 @@
         </div>
     </div>
 </div>
-
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

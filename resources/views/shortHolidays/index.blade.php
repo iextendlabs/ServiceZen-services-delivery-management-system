@@ -31,7 +31,7 @@
                 <th>Sr#</th>
                 <th>Date</th>
                 <th>Time Start</th>
-                <th>Time End</th>
+                <th>Hours</th>
                 <th>Staff Name</th>
                 <th>Action</th>
             </tr>
@@ -44,14 +44,14 @@
                 <td>{{ ++$i }}</td>
                 <td>{{ $shortHoliday->date }}({{ \Carbon\Carbon::parse($shortHoliday->date)->format('l') }})</td>
                 <td>{{ date('h:i A', strtotime($shortHoliday->time_start)) }}</td>
-                <td>{{ date('h:i A', strtotime($shortHoliday->time_end)) }}</td>
+                <td>{{ $shortHoliday->hours }}</td>
                 <td>{{ $shortHoliday->staff->name }}</td>
                 <td>
-                    <form action="{{ route('shortHolidays.destroy',$shortHoliday->id) }}" method="POST">
+                    <form id="deleteForm{{ $shortHoliday->id }}" action="{{ route('shortHolidays.destroy',$shortHoliday->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         @can('staff-holiday-delete')
-                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                        <button type="button" onclick="confirmDelete('{{ $shortHoliday->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                         @endcan
                     </form>
                 </td>
@@ -67,6 +67,14 @@
     </div>
 </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('bulkDeleteBtn').addEventListener('click', function() {

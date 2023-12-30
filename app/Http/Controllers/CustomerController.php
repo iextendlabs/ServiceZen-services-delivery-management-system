@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Coupon;
+use App\Models\CustomerCoupon;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use DB;
@@ -51,12 +53,12 @@ class CustomerController extends Controller
                 $subQuery->whereRaw('LOWER(number) LIKE ?', ['%'.strtolower($request->number).'%']);
             });
         }
-
+        $coupons = Coupon::where('status','1')->get();
         $customers = $query->orderBy('name')->paginate(config('app.paginate'));
         $filters = $request->only(['name', 'email', 'number']);
         $customers->appends($filters);
 
-        return view('customers.index', compact('customers', 'filter'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('customers.index', compact('customers', 'filter','coupons'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -141,8 +143,8 @@ class CustomerController extends Controller
 
         $customer = User::find($id);
         $customer->update($input);
-
-        return redirect()->route('customers.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Customer updated successfully');
     }
 
@@ -155,8 +157,40 @@ class CustomerController extends Controller
     public function destroy(User $customer)
     {
         $customer->delete();
-
-        return redirect()->route('customers.index')
+        $previousUrl = url()->previous();
+        return redirect($previousUrl)
             ->with('success', 'Customer deleted successfully');
+    }
+
+    public function assignCoupon(Request $request, $customerId)
+    {
+        $customer_coupon = CustomerCoupon::where('customer_id',$customerId)->where('coupon_id',$request->coupon_id)->first();
+        if(!$customer_coupon){
+            CustomerCoupon::create([
+                'customer_id' => $customerId, 
+                'coupon_id' => $request->coupon_id
+            ]);
+
+            $coupon = Coupon::find($request->coupon_id);
+            $customer = User::find($customerId);
+            if($coupon->type == "Percentage"){
+                $discount = $coupon->discount."%";
+            }else{
+                $discount = "AED ".$coupon->discount;
+            }
+            $body = "There is new Voucher for You.\nUse " .$coupon->code." Code To Get Discount of ".$discount;
+            $customer->notifyOnMobile('New Voucher', $body);
+        }
+
+        $previousUrl = url()->previous();
+        return redirect($previousUrl)->with('success', 'Coupon assigned successfully');
+    }
+
+    public function customerCoupon_destroy(Request $request, $couponId)
+    {
+        CustomerCoupon::where('coupon_id',$couponId)->where('customer_id',$request->customer_id)->delete();
+        $previousUrl = url()->previous();
+        return redirect($previousUrl)
+            ->with('success', 'Customer Coupon deleted successfully');
     }
 }

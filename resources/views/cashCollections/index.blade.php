@@ -83,7 +83,7 @@
                 <td> {{substr($cash_collection->order->order_comment, 0, 50)}}...</td>
                 <td>{{ $cash_collection->status }}</td>
                 <td>
-                    <form action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
+                    <form id="deleteForm{{ $cash_collection->id }}" action="{{ route('cashCollection.destroy',$cash_collection->id) }}" method="POST">
                         @can('cash-collection-edit')
                         @if($cash_collection->status == 'Not Approved')
                         <a class="btn btn-sm btn-success" href="{{ route('cashCollectionUpdate',$cash_collection->id) }}?status=Approved">
@@ -101,7 +101,7 @@
                         @csrf
                         @method('DELETE')
                         @can('cash-collection-delete')
-                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        <button type="button" onclick="confirmDelete('{{ $cash_collection->id }}')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                         @endcan
                     </form>
                 </td>
@@ -117,4 +117,12 @@
     </div>
 </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

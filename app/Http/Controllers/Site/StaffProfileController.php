@@ -50,10 +50,10 @@ class StaffProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         $user = User::find($id);
-        $socialLinks = Setting::where('key','Social Links of Staff')->value('value');
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
         $socialMediaPlatforms = [
             'instagram' => 'https://www.instagram.com/',
             'facebook' => 'https://www.facebook.com/profile.php?id=',
@@ -67,12 +67,16 @@ class StaffProfileController extends Controller
                 $user->staff->$platform = $urlPrefix . $user->staff->$platform;
             }
         }
-
-        $categories = ServiceCategory::get();
-        $reviews = Review::where('staff_id',$id)->get();
-        $averageRating = Review::where('staff_id',$id)->avg('rating');
-
-        return view('site.staff.show', compact('user', 'categories','socialLinks','reviews','averageRating'));
+        $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
+        $reviews = Review::where('staff_id', $id)->get();
+        $averageRating = Review::where('staff_id', $id)->avg('rating');
+        if ($request->app_flag) {
+            $app_flag = true;
+        } else {
+            $app_flag = false;
+        }
+        return view('site.staff.show', compact('user', 'service_categories', 'socialLinks', 'reviews', 'averageRating','app_flag'));
     }
 
 

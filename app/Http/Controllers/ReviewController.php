@@ -87,7 +87,7 @@ class ReviewController extends Controller
             }
         }
         return redirect()->route('reviews.index')
-            ->with('success', 'REview created successfully.');
+            ->with('success', 'Review created successfully.');
     }
 
     /**

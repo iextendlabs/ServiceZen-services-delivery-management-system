@@ -22,8 +22,8 @@
     <div class="text-right mb-2">
 
         <!-- Pending Order -->
-        <a class="btn btn-primary float-end" href="/order?status=Pending" style="margin-right: 10px;">
-            <i class="fas fa-clock"></i> Pending Orders
+        <a class="btn btn-primary float-end" href="/order?status=Confirm" style="margin-right: 10px;">
+            <i class="fas fa-clock"></i> Confirm Orders
         </a>
 
         <!-- Complete Order -->

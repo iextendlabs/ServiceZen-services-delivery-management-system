@@ -62,6 +62,11 @@ class Order extends Model
         return $this->hasOne(OrderTotal::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
     public function orderHistories()
     {
         return $this->hasMany(OrderHistory::class);

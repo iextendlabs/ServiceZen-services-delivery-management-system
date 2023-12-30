@@ -37,7 +37,7 @@
                     <td>{{ $customer->email }}</td>
 
                     <td>
-                        <form action="{{ route('customers.destroy',$customer->id) }}" method="POST">
+                        <form id="deleteForm{{ $customer->id }}" action="{{ route('customers.destroy',$customer->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}"><i class="fas fa-eye"></i></a>
                             @can('customer-edit')
                             <a class="btn btn-primary" href="{{ route('customers.edit',$customer->id) }}"><i class="fas fa-edit"></i></a>
@@ -45,12 +45,39 @@
                             @csrf
                             @method('DELETE')
                             @can('customer-delete')
-                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            <button type="button" onclick="confirmDelete('{{ $customer->id }}')" class="btn btn-danger"><i class="fas fa-trash"></i></button>
                             @endcan
                             @can('order-list')
                             <a class="btn btn-info" href="{{ route('orders.index') }}?customer_id={{ $customer->id }}">Order History</a>
                             @endcan
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#couponModal{{ $customer->id }}">
+                                <i class="fas fa-gift"></i> Apply Coupon
+                            </button>
                         </form>
+                        <div class="modal fade" id="couponModal{{ $customer->id }}" tabindex="-1" aria-labelledby="couponModalLabel{{ $customer->id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="couponModalLabel{{ $customer->id }}">Select Coupon for {{ $customer->name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ route('coupons.assign', $customer->id) }}" method="post">
+                                            @csrf
+                                            <div class="mb-3">
+                                                <label for="couponSelect{{ $customer->id }}" class="form-label">Select Coupon:</label>
+                                                <select class="form-select" id="couponSelect{{ $customer->id }}" name="coupon_id">
+                                                    @foreach($coupons as $coupon)
+                                                        <option value="{{ $coupon->id }}">{{ $coupon->name }} ({{ $coupon->code }})</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Save Coupon</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -93,4 +120,12 @@
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

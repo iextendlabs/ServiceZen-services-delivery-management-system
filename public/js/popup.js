@@ -122,9 +122,12 @@ function initAutocomplete() {
 var showMapError = false;
 function mapReady() {
     $(document).ready(function () {
+        var currentPath = window.location.pathname;
+
         if (
-            window.location.pathname !== "/customer-login" &&
-            window.location.pathname !== "/customer-registration"
+            currentPath !== "/customer-login" &&
+            currentPath !== "/customer-registration" &&
+            !currentPath.startsWith("/staffProfile/")
         ) {
             var session = $('input[name="session"]').val();
             if (session == "false") {
@@ -142,6 +145,7 @@ function mapReady() {
         }
     });
 }
+
 
 $(document).ready(function () {
         $(".modal-footer .btn-primary").click(function () {

@@ -46,7 +46,7 @@
             <td class="text-left">
                 @if($coupon->status == 1)Enable @else Disable @endif</td>
             <td class="text-right">
-                <form action="{{ route('coupons.destroy',$coupon->id) }}" method="POST">
+                <form id="deleteForm{{ $coupon->id }}" action="{{ route('coupons.destroy',$coupon->id) }}" method="POST">
                     <a class="btn btn-warning" href="{{ route('coupons.show',$coupon->id) }}"><i class="fa fa-eye"></i></a>
                     @can('coupon-edit')
                     <a class="btn btn-primary" href="{{ route('coupons.edit',$coupon->id) }}"><i class="fa fa-edit"></i></a>
@@ -54,7 +54,7 @@
                     @csrf
                     @method('DELETE')
                     @can('coupon-delete')
-                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                    <button type="button" onclick="confirmDelete('{{ $coupon->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                     @endcan
                 </form>
             </td>
@@ -68,4 +68,12 @@
     </table>
     {!! $coupons->links() !!}
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

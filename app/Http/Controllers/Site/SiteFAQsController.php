@@ -17,7 +17,7 @@ class SiteFAQsController extends Controller
      */
     public function index()
     {
-        $FAQs = FAQ::latest()->get();
+        $FAQs = FAQ::where('status','1')->latest()->get();
 
         $FAQCategoryIds = $FAQs->pluck('category_id')->unique();
 
@@ -28,7 +28,7 @@ class SiteFAQsController extends Controller
 
         $servicesFAQ = Service::WhereIn('id',$FAQServiceIds)->get();
         // dd($categories);
-        $generalFAQ = FAQ::where('category_id',null)->where('service_id',null)->get();
+        $generalFAQ = FAQ::where('category_id',null)->where('status','1')->where('service_id',null)->get();
 
         return view('site.FAQs.index', compact('categoriesFAQ','servicesFAQ','generalFAQ'));
     }

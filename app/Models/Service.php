@@ -9,6 +9,11 @@ class Service extends Model
 {
     protected $fillable = ['name','image', 'description', 'price','duration','category_id','short_description','discount','status','type'];
     
+    public function averageRating()
+    {
+        return Review::where('service_id', $this->id)->avg('rating');
+    }
+
     public function appointments()
     {
         return $this->hasMany(OrderService::class);
@@ -42,5 +47,10 @@ class Service extends Model
     public function FAQs()
     {
         return $this->hasMany(FAQ::class,'service_id');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'staff_to_services', 'service_id', 'staff_id');
     }
 }

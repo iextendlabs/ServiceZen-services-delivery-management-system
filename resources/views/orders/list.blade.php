@@ -114,17 +114,17 @@
                 </li>
             </ul>
             @endcan
-            <form action="{{ route('orders.destroy', $order->id) }}" method="POST">
+            <form id="deleteForm{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 @can('order-delete')
-                <button type="submit" class="btn btn-danger">
+                <button type="button" onclick="confirmDelete('{{ $order->id }}')" class="btn btn-danger">
                     <i class="fas fa-trash"></i>
                 </button>
                 @endcan
             </form>
             @if ($order->status !== 'Complete' && Auth::User()->getRoleNames() == '["Staff"]')
-            @if ($order->status == 'Pending')
+            @if ($order->status == 'Confirm')
             <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
                 <i class="fas fa-thumbs-up"></i>
             </a>
@@ -147,3 +147,11 @@
     </tr>
     @endif
 </table>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>

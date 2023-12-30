@@ -79,6 +79,10 @@
                         @endif
                         @else
 
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/rota">Rota</a>
+                        </li>
+
                         @can('menu-sales')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

@@ -34,11 +34,11 @@
                     <td>{{ $staffGeneralHoliday->day }}</td>
                     <td>{{ $staffGeneralHoliday->staff->name }}</td>
                     <td>
-                        <form action="{{ route('staffGeneralHolidays.destroy',$staffGeneralHoliday->id) }}" method="POST">
+                        <form id="deleteForm{{ $staffGeneralHoliday->id }}" action="{{ route('staffGeneralHolidays.destroy',$staffGeneralHoliday->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             @can('staff-holiday-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" onclick="confirmDelete('{{ $staffGeneralHoliday->id }}')" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
                     </td>
@@ -54,5 +54,12 @@
         </div>
     </div>
 </div>
-
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

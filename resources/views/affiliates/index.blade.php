@@ -43,7 +43,7 @@
                     <td> @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})</td>
 
                     <td>
-                        <form action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
+                        <form id="deleteForm{{ $affiliate->id }}" action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">
                             <a class="btn btn-warning" href="{{ route('affiliates.show',$affiliate->id) }}"><i class="fa fa-eye"></i></a>
                             @can('affiliate-edit')
                             <a class="btn btn-primary" href="{{ route('affiliates.edit',$affiliate->id) }}"><i class="fa fa-edit"></i></a>
@@ -51,7 +51,7 @@
                             @csrf
                             @method('DELETE')
                             @can('affiliate-delete')
-                            <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                            <button type="button" class="btn btn-danger" onclick="confirmDelete('{{ $affiliate->id }}')"><i class="fa fa-trash"></i></button>
                             @endcan
                         </form>
                     </td>
@@ -85,4 +85,12 @@
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

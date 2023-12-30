@@ -34,6 +34,9 @@
             <li class="nav-item">
                 <a class="nav-link" id="gallery-tab" data-toggle="tab" href="#gallery" role="tab" aria-controls="gallery" aria-selected="false">Gallery</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="category-services-tab" data-toggle="tab" href="#category-services" role="tab" aria-controls="category-services" aria-selected="false">Categories & Services</a>
+            </li>
         </ul>
         <div class="tab-content" id="myTabsContent">
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -244,12 +247,134 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade" id="category-services" role="tabpanel" aria-labelledby="category-services-tab">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group scroll-div">
+                            <span style="color: red;">*</span><strong>Category:</strong>
+                            <input type="text" name="search-category" id="search-category" class="form-control" placeholder="Search category By Name, Price And Duration">
+                            <table class="table table-striped table-bordered category-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Title</th>
+                                </tr>
+                                <tr>
+                                    <td>
+
+                                        <input type="checkbox" class="category-checkbox" name="category" value="all">
+                                    </td>
+                                    <td>All</td>
+                                </tr>
+                                @foreach ($categories as $category)
+                                <tr>
+                                    <td>
+
+                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" @if(in_array($category->id,$category_ids)) checked @endif>
+                                    </td>
+                                    <td>{{ $category->title }}</td>
+                                </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group scroll-div">
+                            <span style="color: red;">*</span><strong>Services:</strong>
+                            <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
+                            <table class="table table-striped table-bordered services-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                </tr>
+                                @foreach ($services as $service)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" @if(in_array($service->id,$service_ids)) checked @endif>
+                                    </td>
+                                    <td>{{ $service->name }}</td>
+
+                                    <td>{{ isset($service->discount) ? 
+                                    $service->discount : $service->price }}</td>
+                                    <td>{{ $service->duration }}</td>
+                                </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-12 text-center mt-3">
                 <button type="submit" class="btn btn-block btn-primary">Save</button>
             </div>
         </div>
     </form>
 </div>
+<script>
+    $("#search-services").keyup(function() {
+        let value = $(this).val().toLowerCase();
+
+        $(".services-table tr").hide();
+
+        $(".services-table tr").each(function() {
+            let $row = $(this);
+
+            let name = $row.find("td:nth-child(2)").text().toLowerCase();
+
+            if (name.indexOf(value) !== -1) {
+                $row.show();
+            }
+        });
+    });
+    $("#search-category").keyup(function() {
+        let value = $(this).val().toLowerCase();
+
+        $(".category-table tr").hide();
+
+        $(".category-table tr").each(function() {
+            let $row = $(this);
+
+            let title = $row.find("td:nth-child(2)").text().toLowerCase();
+
+            if (title.indexOf(value) !== -1) {
+                $row.show();
+            }
+        });
+    });
+
+    $('.category-checkbox').click(function() {
+        var categoryId = $(this).val();
+
+        if (categoryId === 'all') {
+            var allCheckboxState = $(this).prop('checked');
+            $('.category-checkbox').prop('checked', allCheckboxState);
+
+            if (allCheckboxState) {
+                $('.service-checkbox').prop('checked', true);
+            } else {
+                $('.service-checkbox').prop('checked', false);
+            }
+
+            $('.service-checkbox').closest('tr').show();
+        } else {
+            var serviceCheckboxes = $('.service-checkbox[data-category="' + categoryId + '"]');
+            serviceCheckboxes.prop('checked', $(this).prop('checked'));
+
+            $('.service-checkbox').closest('tr').hide();
+            $('.service-checkbox[data-category="' + categoryId + '"]').closest('tr').toggle($(this).prop('checked'));
+        }
+    });
+
+    $('.service-checkbox').click(function() {
+        var categoryId = $(this).data('category');
+        var allServiceCheckboxes = $('.service-checkbox[data-category="' + categoryId + '"]');
+        var categoryCheckbox = $('.category-checkbox[value="' + categoryId + '"]');
+
+        categoryCheckbox.prop('checked', allServiceCheckboxes.length === allServiceCheckboxes.filter(':checked').length);
+    });
+</script>
 <script>
     $(document).ready(function() {
         $("#addImageBtn").click(function() {

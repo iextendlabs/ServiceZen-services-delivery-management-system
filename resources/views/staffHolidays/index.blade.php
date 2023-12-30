@@ -34,11 +34,11 @@
                     <td>{{ $staffHoliday->date }}({{ \Carbon\Carbon::parse($staffHoliday->date)->format('l') }})</td>
                     <td>{{ $staffHoliday->staff->name }}</td>
                     <td>
-                        <form action="{{ route('staffHolidays.destroy',$staffHoliday->id) }}" method="POST">
+                        <form id="deleteForm{{ $staffHoliday->id }}" action="{{ route('staffHolidays.destroy',$staffHoliday->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             @can('staff-holiday-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" onclick="confirmDelete('{{ $staffHoliday->id }}')" class="btn btn-danger">Delete</button>
                             @endcan
                         </form>
                     </td>
@@ -54,4 +54,12 @@
         </div>
     </div>
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

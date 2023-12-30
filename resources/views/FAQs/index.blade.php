@@ -30,6 +30,7 @@
             <th>Sr#</th>
             <th class="text-left">Question</th>
             <th class="text-left">Answer</th>
+            <th class="text-left">Status</th>
             <th>Action</th>
         </tr>
         @if(count($FAQs))
@@ -38,8 +39,9 @@
             <td>{{ ++$i }}</td>
             <td class="text-left">{{ substr($FAQ->question, 0, 50) }}...</td>
             <td class="text-left">{{ substr($FAQ->answer, 0, 50) }}...</td>
+            <td class="text-left">@if($FAQ->status == 1) Enable @else Disable @endif</td>
             <td>
-                <form action="{{ route('FAQs.destroy',$FAQ->id) }}" method="POST">
+                <form id="deleteForm{{ $FAQ->id }}" action="{{ route('FAQs.destroy',$FAQ->id) }}" method="POST">
                     <a class="btn btn-warning" href="{{ route('FAQs.show',$FAQ->id) }}"><i class="fa fa-eye"></i></a>
                     @can('FAQs-edit')
                     <a class="btn btn-primary" href="{{ route('FAQs.edit',$FAQ->id) }}"><i class="fa fa-edit"></i></a>
@@ -47,7 +49,7 @@
                     @csrf
                     @method('DELETE')
                     @can('FAQs-delete')
-                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                    <button type="button" onclick="confirmDelete('{{ $FAQ->id }}')" class="btn btn-danger"><i class="fas fa-trash"></i></button>
                     @endcan
                 </form>
             </td>
@@ -61,4 +63,12 @@
     </table>
     {!! $FAQs->links() !!}
 </div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

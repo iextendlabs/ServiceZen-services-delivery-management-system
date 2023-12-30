@@ -154,7 +154,7 @@
         </div>
 
     </div>
-    <div class="row">
+    <div class="row no-print">
         <div class="col-md-5 offset-md-4">
             @if($reviews)
             <h3 class="text-center">Reviews</h3>

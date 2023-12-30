@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Affiliate;
 use App\Models\CustomerProfile;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Validation\Rule;
 
 class CustomerAuthController extends Controller
 {
@@ -95,10 +96,17 @@ class CustomerAuthController extends Controller
         return Redirect('customer-login');
     }
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $user = User::find($id);
-        return view('site.auth.profile', compact('user'));
+        if ($request->cookie('code') !== null) {
+            $code = json_decode($request->cookie('code'), true);
+            $coupon_code = $code['coupon_code'];
+        } else {
+            $coupon_code = "";
+        }
+        
+        return view('site.auth.profile', compact('user','coupon_code'));
     }
 
     public function update(Request $request, $id)
@@ -169,5 +177,38 @@ class CustomerAuthController extends Controller
     {
 
         return redirect('/')->withCookie('affiliate_id', $request->affiliate_id, 0);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate([
+            'coupon' => [
+                'nullable',
+                Rule::exists('coupons', 'code')->where(function ($query) {
+                    $query->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now());
+                }),
+            ]
+        ]);
+
+        if ($request->cookie('code') !== null) {
+            $code = json_decode($request->cookie('code'), true);
+            $input['affiliate_code'] = $code['affiliate_code'];
+            $input['coupon_code'] = $request->coupon;
+        } else {
+            $input['affiliate_code'] = "";
+            $input['coupon_code'] = $request->coupon;
+        }
+
+        if (session()->has('code')) {
+            Session::forget('code');
+            Session::put('code', $input);
+        } else {
+            Session::put('code', $input);
+        }
+        cookie()->queue('code', json_encode($input), 5256000);
+
+        return redirect()->back()->with('success', 'Coupon Apply Successfuly.');
     }
 }

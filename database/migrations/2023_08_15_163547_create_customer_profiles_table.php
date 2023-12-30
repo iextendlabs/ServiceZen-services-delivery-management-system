@@ -16,14 +16,14 @@ return new class extends Migration
         Schema::create('customer_profiles', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('buildingName');
-            $table->string('area');
-            $table->string('landmark');
-            $table->string('flatVilla');
-            $table->string('street');
-            $table->string('city');
-            $table->string('number');
-            $table->string('whatsapp');
+            $table->string('buildingName')->nullable();
+            $table->string('area')->nullable();
+            $table->string('landmark')->nullable();
+            $table->string('flatVilla')->nullable();
+            $table->string('street')->nullable();
+            $table->string('city')->nullable();
+            $table->string('number')->nullable();
+            $table->string('whatsapp')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')
