@@ -134,6 +134,7 @@ class TimeSlot extends Model
                 $short_holidays = ShortHoliday::where('date', $date)->get();
 
                 foreach ($timeSlots as $timeSlot) {
+                    $short_holiday_staff_ids = [];
                     if (count($short_holidays) > 0) {
                         foreach ($short_holidays as $short_holiday) {
                             //ShortHoliday::where('date', $date)->where('start_time_to_sec', '<=', $timeSlot->end_time_to_sec)->where('end_time_to_sec', '>=', $timeSlot->start_time_to_sec)->pluck('staff_id')->toArray();

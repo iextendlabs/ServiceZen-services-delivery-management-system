@@ -46,7 +46,7 @@ class Service extends Model
     
     public function FAQs()
     {
-        return $this->hasMany(FAQ::class,'service_id');
+        return $this->hasMany(FAQ::class,'service_id')->where('status', '=', '1');;
     }
 
     public function users()

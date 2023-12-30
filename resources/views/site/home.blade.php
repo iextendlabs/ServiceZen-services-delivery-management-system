@@ -40,9 +40,15 @@
                       list($type, $id, $filename) = explode('_', $imagePath);
                   @endphp
                   <div class="carousel-item @if($loop->first) active @endif">
-                      <a @if($type === "category") href="?id={{ $id }}" @elseif($type === "service") href="/serviceDetail/{{ $id }}" @endif>
-                          <img src="/slider-images/{{ $filename }}" alt="Slide {{ $loop->iteration }}" class="d-block w-100">
-                      </a>
+                  <a
+                      @if($type === "category" && !empty($id))
+                          href="?id={{ $id }}"
+                      @elseif($type === "service" && !empty($id))
+                          href="/serviceDetail/{{ $id }}"
+                      @endif
+                  >
+                      <img src="/slider-images/{{ $filename }}" alt="Slide {{ $loop->iteration }}" class="d-block w-100">
+                  </a>
                   </div>
               @endforeach
           </div>
