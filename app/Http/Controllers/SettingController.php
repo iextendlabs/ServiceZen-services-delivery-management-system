@@ -125,7 +125,7 @@ class SettingController extends Controller
             request()->validate([
                 'value' => 'required',
             ]);
-
+            $setting->value = $request->value;
             break;
     }
 
