@@ -165,14 +165,14 @@ class ShortHolidayController extends Controller
         $shortHoliday->status = $request->status;
 
         $shortHoliday->save();
-
-        if($request->status = 1){
+        
+        if($request->status == "1"){
             $status = "Accepetd"; 
         }else{
             $status = "Rejected"; 
         }
-
-        $body = "Your Short Holiday ".$status." by Admin.\nDate ".$shortHoliday->date." Time Start ".$shortHoliday->time_start." to Next ".$shortHoliday->hours." Hours.";
+        
+        $body = "Your Short Holiday ".$status." by Admin.\nDate: ".$shortHoliday->date."\nTime Start: ".$shortHoliday->time_start.".\nHours: ".$shortHoliday->hours;
         $shortHoliday->staff->notifyOnMobile("Short Holiday",$body);
 
         return redirect()->route('shortHolidays.index')->with('success', 'Short Holiday updated successfully');
