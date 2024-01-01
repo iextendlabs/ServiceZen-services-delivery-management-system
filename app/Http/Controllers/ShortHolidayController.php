@@ -159,4 +159,13 @@ class ShortHolidayController extends Controller
             return response()->json(['message' => 'No items selected.']);
         }
     }
+
+    public function updateStatus(ShortHoliday $shortHoliday, Request $request)
+    {
+        $shortHoliday->status = $request->status;
+
+        $shortHoliday->save();
+
+        return redirect()->route('shortHolidays.index')->with('success', 'Short Holiday updated successfully');
+    }
 }

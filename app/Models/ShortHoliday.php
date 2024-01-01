@@ -9,7 +9,7 @@ class ShortHoliday extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['date', 'time_start', 'hours', 'staff_id','start_time_to_sec','end_time_to_sec'];
+    protected $fillable = ['date', 'time_start', 'hours', 'staff_id','start_time_to_sec','end_time_to_sec','status'];
 
     public function staff()
     {

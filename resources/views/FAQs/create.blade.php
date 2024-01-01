@@ -77,8 +77,8 @@
                             <option value="1">Enable</option>
                             <option value="0">Disable</option>
                         </select>
-                    </div>
                 </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
