@@ -217,6 +217,10 @@ class ServiceController extends Controller
             if ($service->image && file_exists(public_path('service-images') . '/' . $service->image)) {
                 unlink(public_path('service-images') . '/' . $service->image);
             }
+
+            if ($service->image && file_exists(public_path('service-images/resized') . '/' . $service->image)) {
+                unlink(public_path('service-images/resized') . '/' . $service->image);
+            }
         }
 
         ServicePackage::where('service_id', $id)->delete();
@@ -261,8 +265,14 @@ class ServiceController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
+            
             $request->image->move(public_path('service-images'), $filename);
+
+            $resizedImage = Image::make(public_path('service-images') . '/' . $filename)
+                ->resize(335, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save(public_path('service-images/resized') . '/' . $filename);
 
             $service->image = $filename;
             $service->save();
@@ -285,6 +295,10 @@ class ServiceController extends Controller
         if ($service->image) {
             if (file_exists(public_path('service-images') . '/' . $service->image)) {
                 unlink(public_path('service-images') . '/' . $service->image);
+            }
+
+            if ($service->image && file_exists(public_path('service-images/resized') . '/' . $service->image)) {
+                unlink(public_path('service-images/resized') . '/' . $service->image);
             }
         }
         $service->delete();
