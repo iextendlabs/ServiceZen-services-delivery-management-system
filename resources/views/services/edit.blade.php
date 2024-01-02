@@ -55,6 +55,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong for="image">Upload Image</strong>
+                        <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 1005 x 600px Thank you!</p>
                         <input type="file" name="image" id="image" class="form-control-file ">
                         <br>
                         <img id="preview" src="/service-images/{{$service->image}}" height="130px">

@@ -11,6 +11,7 @@ use App\Models\ServiceVariant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class ServiceController extends Controller
 {
@@ -97,7 +98,7 @@ class ServiceController extends Controller
             'description' => 'required',
             'short_description' => 'required|max:120',
             'price' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
             'category_id' => 'required',
         ]);
@@ -144,13 +145,18 @@ class ServiceController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
+            
             $request->image->move(public_path('service-images'), $filename);
+
+            $resizedImage = Image::make(public_path('service-images') . '/' . $filename)
+                ->resize(335, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save(public_path('service-images/resized') . '/' . $filename);
 
             $service->image = $filename;
             $service->save();
         }
-
 
         return redirect()->route('services.edit',$service->id)
             ->with('success', 'Service created successfully.');
@@ -193,7 +199,7 @@ class ServiceController extends Controller
             'description' => 'required',
             'short_description' => 'required|max:120',
             'price' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
             'category_id' => 'required',
         ]);
