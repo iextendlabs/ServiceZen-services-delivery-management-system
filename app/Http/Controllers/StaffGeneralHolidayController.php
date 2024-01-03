@@ -37,11 +37,11 @@ class StaffGeneralHolidayController extends Controller
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $staffGeneralHolidays = StaffGeneralHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
+            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('day', 'DESC')->whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $staffGeneralHolidays = StaffGeneralHoliday::where('staff_id', Auth::id())->paginate(config('app.paginate'));
+            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('day', 'DESC')->where('staff_id', Auth::id())->paginate(config('app.paginate'));
         } else {
-            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('staff_id', 'ASC')->paginate(config('app.paginate'));
+            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('day', 'DESC')->paginate(config('app.paginate'));
         }
 
 

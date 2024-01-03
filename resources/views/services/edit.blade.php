@@ -28,6 +28,7 @@
 <form action="{{ route('services.update',$service->id) }}" id="services-form" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
+    <input type="hidden" name="url" value="{{ url()->previous() }}">
 
     <ul class="nav nav-tabs" id="myTabs" role="tablist">
         <li class="nav-item">

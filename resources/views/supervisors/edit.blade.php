@@ -21,6 +21,7 @@
     <form action="{{ route('supervisors.update',$supervisor->id) }}" method="POST">
         @csrf
         @method('PUT')
+        <input type="hidden" name="url" value="{{ url()->previous() }}">
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">

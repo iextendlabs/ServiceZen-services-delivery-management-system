@@ -199,7 +199,9 @@ class CashCollectionController extends Controller
 
         $cash_collection->delete();
     
-        return redirect()->route('cashCollection.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
                         ->with('success','Cash Collection deleted successfully');
     }
 

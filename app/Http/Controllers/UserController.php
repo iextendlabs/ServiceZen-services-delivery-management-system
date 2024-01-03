@@ -144,8 +144,9 @@ class UserController extends Controller
     
         $user->assignRole($request->input('roles'));
     
-        return redirect()->route('users.index')
-                        ->with('success','User updated successfully');
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
+            ->with('success','User updated successfully');
     }
     
     /**
@@ -157,7 +158,9 @@ class UserController extends Controller
     public function destroy($id)
     {
         User::find($id)->delete();
-        return redirect()->route('users.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
                         ->with('success','User deleted successfully');
     }
 }

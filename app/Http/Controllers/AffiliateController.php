@@ -45,7 +45,8 @@ class AffiliateController extends Controller
         $affiliates = $query->paginate(config('app.paginate'));
 
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
-
+        $filters = $request->only(['name']);
+        $affiliates->appends($filters);
         return view('affiliates.index', compact('affiliates', 'filter_name', 'pkrRateValue'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -168,7 +169,8 @@ class AffiliateController extends Controller
         $affiliate = Affiliate::find($input['affiliate_id']);
         $affiliate->update($input);
 
-        return redirect()->route('affiliates.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Affiliate updated successfully');
     }
 
@@ -182,7 +184,9 @@ class AffiliateController extends Controller
     {
         $affiliate->delete();
 
-        return redirect()->route('affiliates.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
             ->with('success', 'Affiliate deleted successfully');
     }
 

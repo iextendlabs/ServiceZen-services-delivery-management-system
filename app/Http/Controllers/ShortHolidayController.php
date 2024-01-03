@@ -29,11 +29,11 @@ class ShortHolidayController extends Controller
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $shortHolidays = ShortHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
+            $shortHolidays = ShortHoliday::whereIn('staff_id', $staffIds)->orderBy('date')->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $shortHolidays = ShortHoliday::where('staff_id', Auth::id())->paginate(config('app.paginate'));
+            $shortHolidays = ShortHoliday::where('staff_id', Auth::id())->orderBy('date')->paginate(config('app.paginate'));
         } else {
-            $shortHolidays = ShortHoliday::latest()->paginate(config('app.paginate'));
+            $shortHolidays = ShortHoliday::orderBy('date')->paginate(config('app.paginate'));
         }
 
 

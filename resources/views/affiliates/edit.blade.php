@@ -20,6 +20,7 @@
     @endif
     <form action="{{ route('affiliates.update',$affiliate->id) }}" method="POST">
         <input type="hidden" value="{{ $affiliate->affiliate->id }}" name="affiliate_id">
+        <input type="hidden" name="url" value="{{ url()->previous() }}">
         @csrf
         @method('PUT')
         <div class="row">

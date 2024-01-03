@@ -279,7 +279,8 @@ class ServiceController extends Controller
         }
 
 
-        return redirect()->route('services.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Service Update successfully.');
     }
     /**
@@ -304,8 +305,9 @@ class ServiceController extends Controller
         $service->delete();
 
         ServiceToUserNote::where('service_id', $service->id)->delete();
+        $previousUrl = url()->previous();
 
-        return redirect()->back()
+        return redirect($previousUrl)
             ->with('success', 'Service deleted successfully');
     }
 

@@ -39,7 +39,8 @@ class ManagerController extends Controller
         }
 
         $managers = $query->paginate(config('app.paginate'));
-
+        $filters = $request->only(['name']);
+        $managers->appends($filters);
         return view('managers.index',compact('managers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
@@ -127,8 +128,9 @@ class ManagerController extends Controller
        
         $manager->update($input);
 
-        return redirect()->route('managers.index')
-                        ->with('success','Manager updated successfully');
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
+            ->with('success','Manager updated successfully');
     }
     
     /**
@@ -141,8 +143,10 @@ class ManagerController extends Controller
     {
         $manager->delete();
         
-        return redirect()->route('managers.index')
-                        ->with('success','Manager deleted successfully');
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
+            ->with('success','Manager deleted successfully');
     }
 
 }

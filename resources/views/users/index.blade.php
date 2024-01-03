@@ -44,15 +44,17 @@
                         @endif
                     </td>
                     <td>
-                        <a class="btn btn-info" href="{{ route('users.show',$user->id) }}">Show</a>
-                        @can('user-edit')
-                        <a class="btn btn-primary" href="{{ route('users.edit',$user->id) }}">Edit</a>
-                        @endcan
-                        @can('user-delete')
-                        {!! Form::open(['method' => 'DELETE','route' => ['users.destroy', $user->id],'style'=>'display:inline']) !!}
-                        {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
-                        {!! Form::close() !!}
-                        @endcan
+                        <form id="deleteForm{{ $user->id }}" action="{{ route('users.destroy',$user->id) }}" method="POST">
+                            <a class="btn btn-warning" href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye"></i></a>
+                            @can('user-edit')
+                            <a class="btn btn-primary" href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit"></i></a>
+                            @endcan
+                            @csrf
+                            @method('DELETE')
+                            @can('user-delete')
+                            <button type="button" onclick="confirmDelete('{{ $user->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                            @endcan
+                        </form>
                     </td>
                 </tr>
                 @endforeach
@@ -97,5 +99,12 @@
         </div>
     </div>
 </div>
-
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+</script>
 @endsection

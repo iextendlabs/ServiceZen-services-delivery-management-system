@@ -40,7 +40,8 @@ class SupervisorController extends Controller
         }
 
         $supervisors = $query->paginate(config('app.paginate'));
-
+        $filters = $request->only(['name']);
+        $supervisors->appends($filters);
         return view('supervisors.index', compact('supervisors','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -147,7 +148,8 @@ class SupervisorController extends Controller
         if ($request->profile == 1) {
             return redirect()->route('home');
         } else {
-            return redirect()->route('supervisors.index')
+            $previousUrl = $request->url;
+            return redirect($previousUrl)
                 ->with('success', 'Supervisor updated successfully');
         }
     }
@@ -162,7 +164,9 @@ class SupervisorController extends Controller
     {
         $supervisor->delete();
 
-        return redirect()->route('supervisors.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
             ->with('success', 'Supervisor deleted successfully');
     }
 

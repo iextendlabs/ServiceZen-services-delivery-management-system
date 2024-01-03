@@ -16,42 +16,47 @@
         </ul>
     </div>
     @endif
-    {!! Form::open(array('route' => 'users.store','method'=>'POST')) !!}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Name:</strong>
-                {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+    <form method="POST" action="{{ route('users.store') }}">
+        @csrf
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Name:</strong>
+                    <input type="text" name="name" placeholder="Name" class="form-control" value="{{ old('name') }}">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Email:</strong>
+                    <input type="email" name="email" placeholder="Email" class="form-control" value="{{ old('email') }}">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Password:</strong>
+                    <input type="password" name="password" placeholder="Password" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Confirm Password:</strong>
+                    <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Role:</strong>
+                    <select name="roles[]" class="form-control" multiple>
+                        @foreach($roles as $role)
+                            <option value="{{ $role }}">{{ $role }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Email:</strong>
-                {!! Form::text('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Password:</strong>
-                {!! Form::password('password', array('placeholder' => 'Password','class' => 'form-control')) !!}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Confirm Password:</strong>
-                {!! Form::password('confirm-password', array('placeholder' => 'Confirm Password','class' => 'form-control')) !!}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Role:</strong>
-                {!! Form::select('roles[]', $roles,[], array('class' => 'form-control','multiple')) !!}
-            </div>
-        </div>
-        <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-    </div>
-    {!! Form::close() !!}
+    </form>
 </div>
 @endsection

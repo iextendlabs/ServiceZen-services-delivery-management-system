@@ -22,7 +22,7 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::latest()->paginate(config('app.paginate'));
+        $coupons = Coupon::orderBy('name','ASC')->paginate(config('app.paginate'));
         return view('coupons.index', compact('coupons'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }

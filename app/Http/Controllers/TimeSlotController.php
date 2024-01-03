@@ -53,6 +53,8 @@ class TimeSlotController extends Controller
 
         $time_slots = $query->paginate(config('app.paginate'));
         $staffs = User::role('Staff')->get();
+        $filters = $request->only(['staff_id']);
+        $time_slots->appends($filters);
         return view('timeSlots.index', compact('time_slots', 'staffs', 'filter'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
@@ -204,7 +206,8 @@ class TimeSlotController extends Controller
             TimeSlotToStaff::create($input);
         }
 
-        return redirect()->route('timeSlots.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Time slot update successfully.');
     }
 
@@ -235,7 +238,9 @@ class TimeSlotController extends Controller
 
         $time_slot->delete();
 
-        return redirect()->route('timeSlots.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
             ->with('success', 'Time slot deleted successfully');
     }
 
