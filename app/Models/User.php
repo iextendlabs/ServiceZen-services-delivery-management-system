@@ -219,4 +219,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Coupon::class, 'customer_coupons', 'customer_id', 'coupon_id')
             ->where('status', 1);
     }
+
+    public function chat()
+    {
+        return $this->hasOne(Chat::class, 'user_id')->latest();
+    }
 }

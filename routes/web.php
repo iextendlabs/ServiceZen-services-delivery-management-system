@@ -31,7 +31,8 @@ use App\Http\Controllers\{
     ReviewController,
     SettingController,
     ShortHolidayController,
-    RotaController
+    RotaController,
+    ChatController
 };
 
 use App\Http\Controllers\AppController\{
@@ -130,6 +131,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/affiliate/exportTransaction/{User}', [AffiliateController::class, 'exportTransaction']);
 
     Route::get('/rota', [RotaController::class, 'index'])->name('rota');
+    Route::resource('chats', ChatController::class);
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+
 });
 
 // Backups

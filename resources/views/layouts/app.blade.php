@@ -82,7 +82,11 @@
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
-
+                        @can('chat-list')
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{ route('chats.index')}}">Customer Support</a>
+                        </li>
+                        @endcan
                         @can('menu-sales')
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
