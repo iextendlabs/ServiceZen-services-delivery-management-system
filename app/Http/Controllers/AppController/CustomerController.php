@@ -28,6 +28,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
 use App\Models\Notification;
+use App\Models\Chat;
 
 class CustomerController extends Controller
 
@@ -633,5 +634,35 @@ class CustomerController extends Controller
         return response()->json([
             'notifications' => $notifications
         ], 200);
+    }
+
+    public function getChat(Request $request)
+    {
+        $chats = Chat::where('user_id', $request->user_id)->get();
+
+        $chats->map(function ($chat) {
+            $chat->role = $chat->user->getRoleNames();
+            $chat->time = $this->formatTimestamp($chat->created_at);
+            return $chat;
+        });
+        
+        return response()->json([
+            ' chats' => $$chats
+        ], 200);
+    }
+
+    public function addChat(Request $request)
+    {
+        $input = $request->all();
+
+        $input['user_id'] = $request->user_id;
+        $input['status'] = "1";
+
+        Chat::create($input);
+
+        return response()->json([
+            'msg' => "Message sent successfully.",
+        ], 200);
+        
     }
 }

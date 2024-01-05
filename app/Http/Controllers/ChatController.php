@@ -104,12 +104,12 @@ class ChatController extends Controller
     }
     
     
-    public function destroy($id)
-    {
-        $staffHoliday = StaffHoliday::find($id);
-        $staffHoliday->delete();
+    // public function destroy($id)
+    // {
+    //     $staffHoliday = StaffHoliday::find($id);
+    //     $staffHoliday->delete();
     
-        return redirect()->route('staffHolidays.index')
-                        ->with('success','Staff Holiday deleted successfully');
-    }
+    //     return redirect()->route('staffHolidays.index')
+    //                     ->with('success','Staff Holiday deleted successfully');
+    // }
 }
