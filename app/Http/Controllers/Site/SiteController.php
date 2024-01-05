@@ -80,14 +80,18 @@ class SiteController extends Controller
                     $query->where('type', 'master')
                         ->orWhereNull('type');
                 })->where('status', '1')
-                ->whereIn('category_id', $child_categories)
+                ->whereHas('categories', function ($q) use ($child_categories) {
+                    $q->whereIn('category_id', $child_categories);
+                })
                 ->paginate(config('app.paginate'));
             } else {
                 $services = Service::where(function ($query) {
                     $query->where('type', 'master')
                         ->orWhereNull('type');
                 })->where('status', '1')
-                ->where('category_id', $request->id)
+                ->whereHas('categories', function ($q) use ($request) {
+                    $q->where('category_id', $request->id);
+                })
                 ->paginate(config('app.paginate'));
             }
 

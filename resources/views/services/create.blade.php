@@ -96,6 +96,26 @@
                         </div>
                     </div>
                     <div class="col-md-12">
+                        <div class="form-group scroll-div">
+                            <span style="color: red;">*</span><strong>Category:</strong>
+                            <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
+                            <table class="table table-striped table-bordered categories-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                </tr>
+                                @foreach ($service_categories as $category)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}">
+                                    </td>
+                                    <td>{{ $category->title }}</td>
+                                </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Category:</strong>
                             <select name="category_id" class="form-control">
@@ -105,7 +125,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="tab-pane fade" id="package-services" role="tabpanel" aria-labelledby="package-services-tab">
@@ -218,6 +238,24 @@
 </div>
 <script>
     $(document).ready(function() {
+        $("#categories-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".categories-table tr").hide();
+
+            $(".categories-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
+
         $("#package-search").keyup(function() {
             var value = $(this).val().toLowerCase();
 

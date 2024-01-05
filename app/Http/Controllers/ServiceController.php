@@ -53,7 +53,9 @@ class ServiceController extends Controller
 
         // Filter by category_id
         if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
         }
 
         $services = $query->paginate(config('app.paginate'));
@@ -100,7 +102,7 @@ class ServiceController extends Controller
             'price' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
-            'category_id' => 'required',
+            'categoriesId' => 'required',
         ]);
 
         $input = $request->all();
@@ -108,6 +110,8 @@ class ServiceController extends Controller
             $input['type'] = "Master"; 
         }
         $service = Service::create($input);
+        
+        $service->categories()->attach($request->categoriesId);
 
         $service_id = $service->id;
 
@@ -189,7 +193,8 @@ class ServiceController extends Controller
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services', 'variant_services'));
+        $category_ids = $service->categories()->pluck('category_id')->toArray();
+        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services', 'variant_services','category_ids'));
     }
 
     public function update(Request $request, $id)
@@ -201,12 +206,13 @@ class ServiceController extends Controller
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
-            'category_id' => 'required',
+            'categoriesId' => 'required',
         ]);
 
         $input = $request->all();
 
         $service = Service::find($id);
+        $service->categories()->sync($request->categoriesId);
         
         if (isset($request->variantId)) {
             $input['type'] = "Master"; 
