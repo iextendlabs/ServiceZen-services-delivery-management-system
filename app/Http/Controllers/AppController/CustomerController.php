@@ -647,7 +647,7 @@ class CustomerController extends Controller
         });
         
         return response()->json([
-            ' chats' => $$chats
+            'chats' => $chats
         ], 200);
     }
 
@@ -660,8 +660,16 @@ class CustomerController extends Controller
 
         Chat::create($input);
 
+        $chats = Chat::where('user_id', $request->user_id)->get();
+
+        $chats->map(function ($chat) {
+            $chat->role = $chat->user->getRoleNames();
+            $chat->time = $this->formatTimestamp($chat->created_at);
+            return $chat;
+        });
+
         return response()->json([
-            'msg' => "Message sent successfully.",
+            'chats' => $chats
         ], 200);
         
     }
