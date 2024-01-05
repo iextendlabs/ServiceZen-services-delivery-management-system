@@ -673,4 +673,22 @@ class CustomerController extends Controller
         ], 200);
         
     }
+
+    private function formatTimestamp($timestamp)
+    {
+        $now = Carbon::now();
+        $timestamp = Carbon::parse($timestamp);
+
+        $minutesDifference = $timestamp->diffInMinutes($now);
+
+        if ($minutesDifference < 1) {
+            return $timestamp->diffForHumans($now);
+        } elseif ($minutesDifference < 10) {
+            return $minutesDifference . ' minutes ago';
+        } elseif ($timestamp->isSameDay($now)) {
+            return $timestamp->format('h:i A');
+        } else {
+            return $timestamp->format('M j, h:i A');
+        }
+    }
 }
