@@ -82,7 +82,7 @@ class CustomerController extends Controller
     {   
         if (!empty($request->password)) {
             $user = User::find($request->user_id);
-            $user->password = Hash::make($input['password']);
+            $user->password = Hash::make($request->password);
             $user->save();
         }
         CustomerProfile::where('user_id', $request->user_id)->update($request->all());
