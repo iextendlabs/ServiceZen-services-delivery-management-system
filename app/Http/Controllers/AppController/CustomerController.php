@@ -715,6 +715,14 @@ class CustomerController extends Controller
 
             $user->password = Hash::make($password);
             $user->save();
+
+            return response()->json([
+                'msg' => "We have emailed your password on Your Email!"
+            ], 200);
+        }else{
+            return response()->json([
+                'msg' => "There is no user with this email!"
+            ], 201);
         }
     }
 }
