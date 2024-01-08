@@ -59,4 +59,3 @@ Route::get('order-download-pdf/{id}', [CustomerController::class, 'downloadPDF']
 Route::post('writeReview', [CustomerController::class, 'writeReview']);
 Route::get('getCustomerCoupon', [CustomerController::class, 'getCustomerCoupon']);
 Route::get('customerNotification', [CustomerController::class, 'notification']);
-Route::post('passwordReset', [CustomerController::class, 'passwordReset']);
