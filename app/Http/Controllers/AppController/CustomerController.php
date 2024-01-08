@@ -80,12 +80,14 @@ class CustomerController extends Controller
 
     public function updateCustomerInfo(Request $request)
     {   
-        if (!empty($request->password)) {
-            $user = User::find($request->user_id);
-            $user->password = Hash::make($request->password);
+        $input = $request->all();
+        if (!empty($input['password'])) {
+            $user = User::find($input['user_id']);
+            $user->password = Hash::make($input['password']);
             $user->save();
         }
-        CustomerProfile::where('user_id', $request->user_id)->update($request->all());
+        $customerProfile = CustomerProfile::where('user_id', $input['user_id'])->first();
+        $customerProfile->update($input);
         return response()->json([
             'msg' => "Updated Successfully!",
         ], 200);
