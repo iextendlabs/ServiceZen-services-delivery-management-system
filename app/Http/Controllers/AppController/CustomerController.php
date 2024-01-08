@@ -228,15 +228,11 @@ class CustomerController extends Controller
             $FAQs = FAQ::where('service_id', $request->service_id)->get();
         }
 
-        $services->map(function ($service) {
-            $service->addONs = $service->addONs;
-            $service->variant = $service->variant;
-            $service->package = $service->package;
-            return $chat;
-        });
-
         return response()->json([
             'services' => $services,
+            'addONs' => $services->addONs,
+            'variant' => $services->variant,
+            'package' => $services->package,
             'faqs' => $FAQs
         ], 200);
     }
