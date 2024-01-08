@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
 use App\Models\Notification;
 use App\Models\Chat;
+use App\Mail\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
 
@@ -699,6 +701,20 @@ class CustomerController extends Controller
             return $timestamp->format('h:i A');
         } else {
             return $timestamp->format('M j, h:i A');
+        }
+    }
+
+    public function passwordReset(Request $request){
+        $user = User::where('email',$request->email)->first();
+
+        if($user){
+            $password = $user->name.rand(1000, 9999);
+            
+            $to = env('MAIL_FROM_ADDRESS');
+            Mail::to($to)->send(new PasswordReset($password, $request->email));
+
+            $user->password = Hash::make($password);
+            $user->save();
         }
     }
 }
