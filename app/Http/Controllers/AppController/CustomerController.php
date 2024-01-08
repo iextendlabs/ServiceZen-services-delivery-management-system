@@ -28,6 +28,8 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
 use App\Models\Notification;
+use App\Mail\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
 
@@ -633,5 +635,27 @@ class CustomerController extends Controller
         return response()->json([
             'notifications' => $notifications
         ], 200);
+    }
+
+    public function passwordReset(Request $request){
+        $user = User::where('email',$request->email)->first();
+
+        if($user){
+            $password = $user->name.rand(1000, 9999);
+            
+            $to = env('MAIL_FROM_ADDRESS');
+            Mail::to($to)->send(new PasswordReset($password, $request->email));
+
+            $user->password = Hash::make($password);
+            $user->save();
+
+            return response()->json([
+                'msg' => "We have emailed your password on Your Email!"
+            ], 200);
+        }else{
+            return response()->json([
+                'msg' => "There is no user with this email!"
+            ], 201);
+        }
     }
 }
