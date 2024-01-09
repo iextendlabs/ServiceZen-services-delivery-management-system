@@ -98,6 +98,19 @@ class SettingController extends Controller
                 }
                 break;
 
+            case 'App Categories':
+                    request()->validate([
+                        'category_ids' => 'required',
+                    ]);
+    
+                    if ($request->category_ids) {
+                        $categories = implode(',', $request->category_ids);
+                        $setting->value = $categories;
+                    } else {
+                        $setting->value = $request->input('value');
+                    }
+                    break;
+
             case 'Slider Image':
                 if ($request->image) {
                     $images = $request->image;
