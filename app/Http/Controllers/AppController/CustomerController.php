@@ -725,4 +725,33 @@ class CustomerController extends Controller
             ], 201);
         }
     }
+
+    public function staff($id){
+        $user = User::find($id);
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        $socialMediaPlatforms = [
+            'instagram' => 'https://www.instagram.com/',
+            'facebook' => 'https://www.facebook.com/profile.php?id=',
+            'snapchat' => 'https://www.snapchat.com/add/',
+            'youtube' => 'https://www.youtube.com/',
+            'tiktok' => 'https://www.tiktok.com/@',
+        ];
+
+        foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
+            if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
+                $user->staff->$platform = $urlPrefix . $user->staff->$platform;
+            }
+        }
+        $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
+        $reviews = Review::where('staff_id', $id)->get();
+        $averageRating = Review::where('staff_id', $id)->avg('rating');
+        
+        return response()->json([
+            'user' => $user,
+            'service_categories' => $service_categories,
+            'socialLinks' => $socialLinks,
+            'averageRating' => $reviews,
+        ], 200);
+    }
 }
