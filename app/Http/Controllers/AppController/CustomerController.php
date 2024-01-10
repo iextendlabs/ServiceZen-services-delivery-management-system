@@ -150,8 +150,10 @@ class CustomerController extends Controller
 
         $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
         $images = explode(",", $slider_images);
-
-        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        
+        $app_categories = Setting::where('key', 'App Categories')->value('value');
+        $app_categories = explode(",", $app_categories);
+        $categories = ServiceCategory::whereIn('id',$app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
         $categoriesArray = $categories->map(function ($category) {
             return [
