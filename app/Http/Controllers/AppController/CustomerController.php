@@ -137,9 +137,9 @@ class CustomerController extends Controller
     {
         $cachedData = Cache::get('api_data');
 
-        if ($cachedData) {
-            return response()->json($cachedData, 200);
-        }
+        // if ($cachedData) {
+        //     return response()->json($cachedData, 200);
+        // }
 
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
@@ -154,7 +154,7 @@ class CustomerController extends Controller
         $app_categories = Setting::where('key', 'App Categories')->value('value');
         $app_categories = explode(",", $app_categories);
         $categories = ServiceCategory::whereIn('id',$app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $categoriesArray = $categories->map(function ($category) {
             return [
                 'id' => $category->id,
