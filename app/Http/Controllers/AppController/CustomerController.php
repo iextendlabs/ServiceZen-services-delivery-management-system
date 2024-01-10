@@ -746,12 +746,18 @@ class CustomerController extends Controller
         $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
-        
+        $orders = Order::where('service_staff_id',$id)->where('status','Complete')->count();
+        $images = $user->staffImages;
+        $videos = $user->staffYoutubeVideo;
         return response()->json([
             'user' => $user,
             'service_categories' => $service_categories,
             'socialLinks' => $socialLinks,
-            'averageRating' => $reviews,
+            'reviews' => $reviews,
+            'averageRating' => $averageRating,
+            'orders'=>$orders,
+            'images'=>$images,
+            'videos'=>$videos
         ], 200);
     }
 }
