@@ -55,7 +55,9 @@ class ServiceStaffController extends Controller
         }
 
         $serviceStaff = $query->paginate(config('app.paginate'));
-
+        
+        $filters = $request->only(['name']);
+        $serviceStaff->appends($filters);
         return view('serviceStaff.index', compact('serviceStaff', 'filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -271,7 +273,8 @@ class ServiceStaffController extends Controller
         $serviceStaff->supervisors()->sync($request->ids);
         $serviceStaff->services()->sync($request->service_ids);
         $serviceStaff->categories()->sync($request->category_ids);
-        return redirect()->route('serviceStaff.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Service Staff updated successfully');
     }
 
@@ -298,7 +301,9 @@ class ServiceStaffController extends Controller
 
         $serviceStaff->delete();
 
-        return redirect()->route('serviceStaff.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
             ->with('success', 'Service Staff deleted successfully');
     }
 

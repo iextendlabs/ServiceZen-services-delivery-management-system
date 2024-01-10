@@ -26,9 +26,9 @@ class ReviewController extends Controller
     public function index()
     {
         if(auth()->user()->hasRole('Staff')){
-            $reviews = Review::where('staff_id',auth()->user()->id)->latest()->paginate(config('app.paginate'));
+            $reviews = Review::where('staff_id',auth()->user()->id)->orderBy('id','DESC')->paginate(config('app.paginate'));
         }else{
-            $reviews = Review::latest()->paginate(config('app.paginate'));
+            $reviews = Review::orderBy('id','DESC')->paginate(config('app.paginate'));
         }
         return view('reviews.index', compact('reviews'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));

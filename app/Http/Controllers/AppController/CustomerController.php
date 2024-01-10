@@ -28,6 +28,9 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
 use App\Models\Notification;
+use App\Models\Chat;
+use App\Mail\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
 
@@ -78,8 +81,15 @@ class CustomerController extends Controller
     }
 
     public function updateCustomerInfo(Request $request)
-    {
-        CustomerProfile::where('user_id', $request->user_id)->update($request->all());
+    {   
+        $input = $request->all();
+        if (!empty($input['password'])) {
+            $user = User::find($input['user_id']);
+            $user->password = Hash::make($input['password']);
+            $user->save();
+        }
+        $customerProfile = CustomerProfile::where('user_id', $input['user_id'])->first();
+        $customerProfile->update($input);
         return response()->json([
             'msg' => "Updated Successfully!",
         ], 200);
@@ -127,9 +137,9 @@ class CustomerController extends Controller
     {
         $cachedData = Cache::get('api_data');
 
-        if ($cachedData) {
-            return response()->json($cachedData, 200);
-        }
+        // if ($cachedData) {
+        //     return response()->json($cachedData, 200);
+        // }
 
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
@@ -140,9 +150,11 @@ class CustomerController extends Controller
 
         $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
         $images = explode(",", $slider_images);
-
-        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        
+        $app_categories = Setting::where('key', 'App Categories')->value('value');
+        $app_categories = explode(",", $app_categories);
+        $categories = ServiceCategory::whereIn('id',$app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $categoriesArray = $categories->map(function ($category) {
             return [
                 'id' => $category->id,
@@ -222,6 +234,9 @@ class CustomerController extends Controller
 
         return response()->json([
             'services' => $services,
+            'addONs' => $services->addONs,
+            'variant' => $services->variant,
+            'package' => $services->package,
             'faqs' => $FAQs
         ], 200);
     }
@@ -632,6 +647,119 @@ class CustomerController extends Controller
 
         return response()->json([
             'notifications' => $notifications
+        ], 200);
+    }
+
+    public function getChat(Request $request)
+    {
+        $chats = Chat::where('user_id', $request->user_id)->get();
+
+        $chats->map(function ($chat) {
+            $chat->role = $chat->user->getRoleNames();
+            $chat->time = $this->formatTimestamp($chat->created_at);
+            return $chat;
+        });
+        
+        return response()->json([
+            'chats' => $chats
+        ], 200);
+    }
+
+    public function addChat(Request $request)
+    {
+        $input = $request->all();
+
+        $input['user_id'] = $request->user_id;
+        $input['status'] = "1";
+
+        Chat::create($input);
+
+        $chats = Chat::where('user_id', $request->user_id)->get();
+
+        $chats->map(function ($chat) {
+            $chat->role = $chat->user->getRoleNames();
+            $chat->time = $this->formatTimestamp($chat->created_at);
+            return $chat;
+        });
+
+        return response()->json([
+            'chats' => $chats
+        ], 200);
+        
+    }
+
+    private function formatTimestamp($timestamp)
+    {
+        $now = Carbon::now();
+        $timestamp = Carbon::parse($timestamp);
+
+        $minutesDifference = $timestamp->diffInMinutes($now);
+
+        if ($minutesDifference < 1) {
+            return $timestamp->diffForHumans($now);
+        } elseif ($minutesDifference < 10) {
+            return $minutesDifference . ' minutes ago';
+        } elseif ($timestamp->isSameDay($now)) {
+            return $timestamp->format('h:i A');
+        } else {
+            return $timestamp->format('M j, h:i A');
+        }
+    }
+
+    public function passwordReset(Request $request){
+        $user = User::where('email',$request->email)->first();
+
+        if($user){
+            $password = $user->name.rand(1000, 9999);
+            
+            $to = env('MAIL_FROM_ADDRESS');
+            Mail::to($to)->send(new PasswordReset($password, $request->email));
+
+            $user->password = Hash::make($password);
+            $user->save();
+
+            return response()->json([
+                'msg' => "We have emailed your password on Your Email!"
+            ], 200);
+        }else{
+            return response()->json([
+                'msg' => "There is no user with this email!"
+            ], 201);
+        }
+    }
+
+    public function staff($id){
+        $user = User::find($id);
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        $socialMediaPlatforms = [
+            'instagram' => 'https://www.instagram.com/',
+            'facebook' => 'https://www.facebook.com/profile.php?id=',
+            'snapchat' => 'https://www.snapchat.com/add/',
+            'youtube' => 'https://www.youtube.com/',
+            'tiktok' => 'https://www.tiktok.com/@',
+        ];
+
+        foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
+            if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
+                $user->staff->$platform = $urlPrefix . $user->staff->$platform;
+            }
+        }
+        $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
+        $reviews = Review::where('staff_id', $id)->get();
+        $averageRating = Review::where('staff_id', $id)->avg('rating');
+        $orders = Order::where('service_staff_id',$id)->where('status','Complete')->count();
+        $images = $user->staffImages;
+        $videos = $user->staffYoutubeVideo;
+        return response()->json([
+            'user' => $user,
+            'service_categories' => $service_categories,
+            'socialLinks' => $socialLinks,
+            'reviews' => $reviews,
+            'averageRating' => $averageRating,
+            'orders'=>$orders,
+            'images'=>$images,
+            'videos'=>$videos
         ], 200);
     }
 }

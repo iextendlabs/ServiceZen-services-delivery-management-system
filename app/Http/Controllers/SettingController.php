@@ -81,59 +81,101 @@ class SettingController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-{
-    $setting = Setting::find($id);
+    {
+        $setting = Setting::find($id);
 
-    switch ($setting->key) {
-        case 'Featured Services':
-            request()->validate([
-                'service_ids' => 'required',
-            ]);
+        switch ($setting->key) {
+            case 'Featured Services':
+                request()->validate([
+                    'service_ids' => 'required',
+                ]);
 
-            if ($request->service_ids) {
-                $services = implode(',', $request->service_ids);
-                $setting->value = $services;
-            } else {
-                $setting->value = $request->input('value');
-            }
-            break;
-
-        case 'Slider Image':
-        case 'Slider Image For App':
-            if ($request->image) {
-                $images = $request->image;
-                $linkTypes = $request->link_type;
-                $linkedItems = $request->linked_item;
-
-                $existingImage = $setting->value ?? ''; // Existing image
-
-                $imagePaths = [];
-
-                foreach ($images as $key => $image) {
-                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-
-                    $image->move(public_path('slider-images'), $filename);
-                    $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
+                if ($request->service_ids) {
+                    $services = implode(',', $request->service_ids);
+                    $setting->value = $services;
+                } else {
+                    $setting->value = $request->input('value');
                 }
+                break;
 
-                $newImagePaths = implode(',', $imagePaths);
-                $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
-            }
-            break;
+            case 'App Categories':
+                    request()->validate([
+                        'category_ids' => 'required',
+                    ]);
+    
+                    if ($request->category_ids) {
+                        $categories = implode(',', $request->category_ids);
+                        $setting->value = $categories;
+                    } else {
+                        $setting->value = $request->input('value');
+                    }
+                    break;
 
-        default:
-            request()->validate([
-                'value' => 'required',
-            ]);
-            $setting->value = $request->value;
-            break;
+            case 'Slider Image':
+                if ($request->image) {
+                    $images = $request->image;
+                    $linkTypes = $request->link_type;
+                    $linkedItems = $request->linked_item;
+
+                    $existingImage = $setting->value ?? ''; // Existing image
+
+                    $imagePaths = [];
+
+                    foreach ($images as $key => $image) {
+                        $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                        
+                        $request->validate([
+                            'image.' . $key => 'dimensions:width=1140,height=504',
+                        ]);
+                                
+                        $image->move(public_path('slider-images'), $filename);
+                        $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
+                    }
+
+                    $newImagePaths = implode(',', $imagePaths);
+                    $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+                }
+                break;
+
+            case 'Slider Image For App':
+                    if ($request->image) {
+                        $images = $request->image;
+                        $linkTypes = $request->link_type;
+                        $linkedItems = $request->linked_item;
+    
+                        $existingImage = $setting->value ?? ''; // Existing image
+    
+                        $imagePaths = [];
+    
+                        foreach ($images as $key => $image) {
+                            $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                            
+                            $request->validate([
+                                'image.' . $key => 'dimensions:width=325,height=200',
+                            ]);
+                            
+                            $image->move(public_path('slider-images'), $filename);
+                            $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
+                        }
+    
+                        $newImagePaths = implode(',', $imagePaths);
+                        $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+                    }
+                    break;
+
+            default:
+                request()->validate([
+                    'value' => 'required',
+                ]);
+                $setting->value = $request->value;
+                break;
+        }
+
+        $setting->save();
+
+        return redirect()->route('settings.index')
+            ->with('success', 'Setting Update successfully.');
     }
-
-    $setting->save();
-
-    return redirect()->route('settings.index')
-        ->with('success', 'Setting Update successfully.');
-}
 
 
     /**

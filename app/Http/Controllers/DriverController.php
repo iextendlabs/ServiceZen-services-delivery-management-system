@@ -39,7 +39,8 @@ class DriverController extends Controller
         }
 
         $drivers = $query->paginate(config('app.paginate'));
-
+        $filters = $request->only(['name']);
+        $drivers->appends($filters);
         return view('drivers.index',compact('drivers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
@@ -141,7 +142,8 @@ class DriverController extends Controller
         } else {
             Driver::create($input);
         }
-        return redirect()->route('drivers.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
                         ->with('success','Driver updated successfully');
     }
     
@@ -155,7 +157,9 @@ class DriverController extends Controller
     {
         $driver->delete();
     
-        return redirect()->route('drivers.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
                         ->with('success','Driver deleted successfully');
     }
 

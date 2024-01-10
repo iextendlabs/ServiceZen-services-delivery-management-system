@@ -131,7 +131,7 @@ class TimeSlot extends Model
             }
 
             if (count($timeSlots)) {
-                $short_holidays = ShortHoliday::where('date', $date)->get();
+                $short_holidays = ShortHoliday::where('date', $date)->where('status','1')->get();
 
                 foreach ($timeSlots as $timeSlot) {
                     $short_holiday_staff_ids = [];

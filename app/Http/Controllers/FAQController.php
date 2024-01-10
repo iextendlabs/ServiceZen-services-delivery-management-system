@@ -23,7 +23,7 @@ class FAQController extends Controller
      */
     public function index()
     {
-        $FAQs = FAQ::latest()->paginate(config('app.paginate'));
+        $FAQs = FAQ::orderBy('question')->paginate(config('app.paginate'));
         return view('FAQs.index', compact('FAQs'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }

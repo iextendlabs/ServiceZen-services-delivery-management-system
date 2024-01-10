@@ -29,11 +29,11 @@ class ShortHolidayController extends Controller
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $shortHolidays = ShortHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
+            $shortHolidays = ShortHoliday::whereIn('staff_id', $staffIds)->orderBy('date')->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $shortHolidays = ShortHoliday::where('staff_id', Auth::id())->paginate(config('app.paginate'));
+            $shortHolidays = ShortHoliday::where('staff_id', Auth::id())->orderBy('date')->paginate(config('app.paginate'));
         } else {
-            $shortHolidays = ShortHoliday::latest()->paginate(config('app.paginate'));
+            $shortHolidays = ShortHoliday::orderBy('date')->paginate(config('app.paginate'));
         }
 
 
@@ -158,5 +158,23 @@ class ShortHolidayController extends Controller
         } else {
             return response()->json(['message' => 'No items selected.']);
         }
+    }
+
+    public function updateStatus(ShortHoliday $shortHoliday, Request $request)
+    {
+        $shortHoliday->status = $request->status;
+
+        $shortHoliday->save();
+        
+        if($request->status == "1"){
+            $status = "Accepetd"; 
+        }else{
+            $status = "Rejected"; 
+        }
+        
+        $body = "Your Short Holiday ".$status." by Admin.\nDate: ".$shortHoliday->date."\nTime Start: ".$shortHoliday->time_start.".\nHours: ".$shortHoliday->hours;
+        $shortHoliday->staff->notifyOnMobile("Short Holiday",$body);
+
+        return redirect()->route('shortHolidays.index')->with('success', 'Short Holiday updated successfully');
     }
 }

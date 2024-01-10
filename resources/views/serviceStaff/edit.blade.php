@@ -22,6 +22,7 @@
         <input type="hidden" value="{{ $serviceStaff->staff->id }}" name="staff_id">
         @csrf
         @method('PUT')
+        <input type="hidden" name="url" value="{{ url()->previous() }}">
         <ul class="nav nav-tabs" id="myTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>

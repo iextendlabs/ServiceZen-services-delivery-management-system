@@ -32,21 +32,30 @@
                 <th>Date</th>
                 <th>Time Start</th>
                 <th>Hours</th>
+                <th>Status</th>
                 <th>Staff Name</th>
                 <th>Action</th>
             </tr>
             @if(count($shortHolidays))
             @foreach ($shortHolidays as $shortHoliday)
             <tr>
-            <td>
+                <td>
                     <input type="checkbox" class="item-checkbox" value="{{ $shortHoliday->id }}">
                 </td>
                 <td>{{ ++$i }}</td>
                 <td>{{ $shortHoliday->date }}({{ \Carbon\Carbon::parse($shortHoliday->date)->format('l') }})</td>
                 <td>{{ date('h:i A', strtotime($shortHoliday->time_start)) }}</td>
                 <td>{{ $shortHoliday->hours }}</td>
+                <td>@if($shortHoliday->status == 1) Enable @else Disable @endif</td>
                 <td>{{ $shortHoliday->staff->name }}</td>
                 <td>
+                <a class="btn btn-sm btn-success mb-2" href="{{ route('updateStatus', $shortHoliday->id) }}?status=1">
+                    <i class="fas fa-thumbs-up"></i>
+                </a>
+
+                <a class="btn btn-sm btn-danger mb-2" href="{{ route('updateStatus', $shortHoliday->id) }}?status=0">
+                    <i class="fas fa-thumbs-down"></i>
+                </a>
                     <form id="deleteForm{{ $shortHoliday->id }}" action="{{ route('shortHolidays.destroy',$shortHoliday->id) }}" method="POST">
                         @csrf
                         @method('DELETE')
@@ -59,7 +68,7 @@
             @endforeach
             @else
             <tr>
-                <td colspan="6" class="text-center">There is no staff Holiday.</td>
+                <td colspan="8" class="text-center">There is no staff Holiday.</td>
             </tr>
             @endif
         </table>

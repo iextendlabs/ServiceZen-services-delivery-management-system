@@ -16,29 +16,32 @@
         </ul>
     </div>
     @endif
-    {!! Form::open(array('route' => 'roles.store','method'=>'POST')) !!}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Name:</strong>
-                {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+    <form method="POST" action="{{ route('roles.store') }}">
+        @csrf
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Name:</strong>
+                    <input type="text" name="name" placeholder="Name" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Permission:</strong>
+                    <br />
+                    @foreach($permission as $value)
+                        <label>
+                            <input type="checkbox" name="permission[]" value="{{ $value->id }}" class="name">
+                            {{ $value->name }}
+                        </label>
+                        <br />
+                    @endforeach
+                </div>
+            </div>
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Permission:</strong>
-                <br />
-                @foreach($permission as $value)
-                <label>{{ Form::checkbox('permission[]', $value->id, false, array('class' => 'name')) }}
-                    {{ $value->name }}</label>
-                <br />
-                @endforeach
-            </div>
-        </div>
-        <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-    </div>
-    {!! Form::close() !!}
+    </form>
 </div>
 @endsection

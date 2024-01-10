@@ -28,11 +28,11 @@ class LongHolidayController extends Controller
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $longHolidays = LongHoliday::whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
+            $longHolidays = LongHoliday::whereIn('staff_id', $staffIds)->orderBy('date_start')->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $longHolidays = LongHoliday::where('staff_id', Auth::id())->paginate(config('app.paginate'));
+            $longHolidays = LongHoliday::where('staff_id', Auth::id())->orderBy('date_start')->paginate(config('app.paginate'));
         } else {
-            $longHolidays = LongHoliday::latest()->paginate(config('app.paginate'));
+            $longHolidays = LongHoliday::orderBy('date_start')->paginate(config('app.paginate'));
         }
 
 

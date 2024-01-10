@@ -16,6 +16,7 @@ use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\OrderHistory;
+use App\Models\ShortHoliday;
 
 class StaffAppController2 extends Controller
 
@@ -287,5 +288,21 @@ class StaffAppController2 extends Controller
         }
 
         return response()->json($notifications);
+    }
+
+    public function addShortHoliday(Request $request)
+    {
+
+        $input = $request->all();
+
+        $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
+        
+        $carbonTimeStart = Carbon::parse($request->time_start);
+
+        $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
+
+        ShortHoliday::create($input);
+
+        return response()->json(['success' => 'Your Short Holiday Request Send to Admin.']);
     }
 }

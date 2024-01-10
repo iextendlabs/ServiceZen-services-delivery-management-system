@@ -41,6 +41,8 @@ Route::get('driverOrders', [DriverAppController::class, 'orders']);
 Route::post('driverLogin', [DriverAppController::class, 'login']);
 Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
 Route::post('updateToken', [DriverAppController::class, 'updateToken']);
+Route::post('addShortHoliday', [StaffAppController2::class, 'addShortHoliday']);
+
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);
 Route::post('customerSignup', [CustomerController::class, 'signup']);
@@ -59,3 +61,7 @@ Route::get('order-download-pdf/{id}', [CustomerController::class, 'downloadPDF']
 Route::post('writeReview', [CustomerController::class, 'writeReview']);
 Route::get('getCustomerCoupon', [CustomerController::class, 'getCustomerCoupon']);
 Route::get('customerNotification', [CustomerController::class, 'notification']);
+Route::get('customerChat', [CustomerController::class, 'getChat']);
+Route::post('addCustomerChat', [CustomerController::class, 'addChat']);
+Route::post('passwordReset', [CustomerController::class, 'passwordReset']);
+Route::get('staff/{id}', [CustomerController::class, 'staff'])->name('staff');

@@ -11,6 +11,7 @@ use App\Models\ServiceVariant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class ServiceController extends Controller
 {
@@ -52,7 +53,9 @@ class ServiceController extends Controller
 
         // Filter by category_id
         if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
         }
 
         $services = $query->paginate(config('app.paginate'));
@@ -97,9 +100,9 @@ class ServiceController extends Controller
             'description' => 'required',
             'short_description' => 'required|max:120',
             'price' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
-            'category_id' => 'required',
+            'categoriesId' => 'required',
         ]);
 
         $input = $request->all();
@@ -107,6 +110,8 @@ class ServiceController extends Controller
             $input['type'] = "Master"; 
         }
         $service = Service::create($input);
+        
+        $service->categories()->attach($request->categoriesId);
 
         $service_id = $service->id;
 
@@ -144,13 +149,18 @@ class ServiceController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
+            
             $request->image->move(public_path('service-images'), $filename);
+
+            $resizedImage = Image::make(public_path('service-images') . '/' . $filename)
+                ->resize(335, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save(public_path('service-images/resized') . '/' . $filename);
 
             $service->image = $filename;
             $service->save();
         }
-
 
         return redirect()->route('services.edit',$service->id)
             ->with('success', 'Service created successfully.');
@@ -183,7 +193,8 @@ class ServiceController extends Controller
         $users = User::all();
         $all_services = Service::all();
         $service_categories = ServiceCategory::all();
-        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services', 'variant_services'));
+        $category_ids = $service->categories()->pluck('category_id')->toArray();
+        return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services', 'variant_services','category_ids'));
     }
 
     public function update(Request $request, $id)
@@ -193,14 +204,15 @@ class ServiceController extends Controller
             'description' => 'required',
             'short_description' => 'required|max:120',
             'price' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
-            'category_id' => 'required',
+            'categoriesId' => 'required',
         ]);
 
         $input = $request->all();
 
         $service = Service::find($id);
+        $service->categories()->sync($request->categoriesId);
         
         if (isset($request->variantId)) {
             $input['type'] = "Master"; 
@@ -210,6 +222,10 @@ class ServiceController extends Controller
         if (isset($request->image)) {
             if ($service->image && file_exists(public_path('service-images') . '/' . $service->image)) {
                 unlink(public_path('service-images') . '/' . $service->image);
+            }
+
+            if ($service->image && file_exists(public_path('service-images/resized') . '/' . $service->image)) {
+                unlink(public_path('service-images/resized') . '/' . $service->image);
             }
         }
 
@@ -255,15 +271,22 @@ class ServiceController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
+            
             $request->image->move(public_path('service-images'), $filename);
+
+            $resizedImage = Image::make(public_path('service-images') . '/' . $filename)
+                ->resize(335, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save(public_path('service-images/resized') . '/' . $filename);
 
             $service->image = $filename;
             $service->save();
         }
 
 
-        return redirect()->route('services.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'Service Update successfully.');
     }
     /**
@@ -280,12 +303,17 @@ class ServiceController extends Controller
             if (file_exists(public_path('service-images') . '/' . $service->image)) {
                 unlink(public_path('service-images') . '/' . $service->image);
             }
+
+            if ($service->image && file_exists(public_path('service-images/resized') . '/' . $service->image)) {
+                unlink(public_path('service-images/resized') . '/' . $service->image);
+            }
         }
         $service->delete();
 
         ServiceToUserNote::where('service_id', $service->id)->delete();
+        $previousUrl = url()->previous();
 
-        return redirect()->back()
+        return redirect($previousUrl)
             ->with('success', 'Service deleted successfully');
     }
 

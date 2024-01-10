@@ -40,6 +40,15 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Status:</strong>
+                        <select name="status" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <span style="color: red;">*</span><strong>Staff:</strong>
                     <select name="staff_id" class="form-control">
                         @foreach ($staffs as $staff)

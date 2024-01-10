@@ -31,7 +31,8 @@ use App\Http\Controllers\{
     ReviewController,
     SettingController,
     ShortHolidayController,
-    RotaController
+    RotaController,
+    ChatController
 };
 
 use App\Http\Controllers\AppController\{
@@ -94,6 +95,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/services/bulkCopy', [ServiceController::class, 'bulkCopy'])->name('services.bulkCopy');
     Route::post('/services/bulkEdit', [ServiceController::class, 'bulkEdit'])->name('services.bulkEdit');
     Route::get('/serviceDelete/{id}', [ServiceController::class, 'destroy'])->name('service.delete');
+    Route::get('shortHolidays-update/{shortHoliday}', [ShortHolidayController::class, 'updateStatus'])->name('updateStatus');
 
     Route::get('orderCSV', [OrderController::class, 'downloadCSV']);
 
@@ -129,6 +131,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/affiliate/exportTransaction/{User}', [AffiliateController::class, 'exportTransaction']);
 
     Route::get('/rota', [RotaController::class, 'index'])->name('rota');
+    Route::resource('chats', ChatController::class);
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+
 });
 
 // Backups
