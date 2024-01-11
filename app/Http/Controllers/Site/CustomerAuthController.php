@@ -13,6 +13,8 @@ use App\Models\Affiliate;
 use App\Models\CustomerProfile;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
+use App\Mail\DeleteAccount;
+use Illuminate\Support\Facades\Mail;
 
 class CustomerAuthController extends Controller
 {
@@ -210,5 +212,33 @@ class CustomerAuthController extends Controller
         cookie()->queue('code', json_encode($input), 5256000);
 
         return redirect()->back()->with('success', 'Coupon Apply Successfuly.');
+    }
+
+    public function account(){
+        return view('site.auth.accountDelete');
+    }
+
+    public function deleteAccountMail(Request $request){
+        $request->validate([
+            'email' => [
+                'required',
+                Rule::exists('users', 'email'),
+            ],
+        ]);
+        $user = User::where("email",$request->email)->first();
+        
+        $to = env('MAIL_FROM_ADDRESS');
+        Mail::to($to)->send(new DeleteAccount($user->id, $request->email));
+        
+        return redirect()->back()->with('success', 'Account Deletion Confirmation email sent. Please check your inbox for further instructions.');
+    }
+
+    public function deleteAccount(Request $request){
+        User::find($request->id)->delete();
+        
+        Session::flush();
+        Auth::logout();
+
+        return Redirect('customer-login');
     }
 }
