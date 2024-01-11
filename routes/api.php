@@ -65,3 +65,4 @@ Route::get('customerChat', [CustomerController::class, 'getChat']);
 Route::post('addCustomerChat', [CustomerController::class, 'addChat']);
 Route::post('passwordReset', [CustomerController::class, 'passwordReset']);
 Route::get('staff/{id}', [CustomerController::class, 'staff'])->name('staff');
+Route::get('deleteAccountMail', [CustomerController::class, 'deleteAccountMail']);

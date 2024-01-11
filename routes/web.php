@@ -153,6 +153,9 @@ Route::get('customer-registration', [CustomerAuthController::class, 'registratio
 Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']);
 Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::resource('customerProfile', CustomerAuthController::class);
+Route::get('deleteAccount', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccount');
+Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountMail'])->name('deleteAccountMail');
+Route::get('deleteAccountPage', [CustomerAuthController::class, 'account']);
 
 
 Route::resource('order', SiteOrdersController::class);
