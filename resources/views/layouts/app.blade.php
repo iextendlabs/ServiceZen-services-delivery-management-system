@@ -82,6 +82,11 @@
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
+                        @can('company-list')
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{ route('companies.index')}}">Companies</a>
+                        </li>
+                        @endcan
                         @can('chat-list')
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('chats.index')}}">Customer Support</a>
