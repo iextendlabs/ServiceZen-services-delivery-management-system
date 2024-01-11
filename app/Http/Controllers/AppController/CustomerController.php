@@ -30,6 +30,7 @@ use App\Models\ReviewImage;
 use App\Models\Notification;
 use App\Models\Chat;
 use App\Mail\PasswordReset;
+use App\Mail\DeleteAccount;
 use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
