@@ -45,7 +45,7 @@
 
             <div class="col-md-6">
                 <div class="form-group">
-                    <span style="color: red;">*</span><strong>Mesage:</strong>
+                    <span style="color: red;">*</span><strong>Message:</strong>
                     <textarea name="text" class="form-control" cols="30" rows="7"></textarea>
                 </div>
             </div>

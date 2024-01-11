@@ -32,7 +32,8 @@ use App\Http\Controllers\{
     SettingController,
     ShortHolidayController,
     RotaController,
-    ChatController
+    ChatController,
+    CompanyController
 };
 
 use App\Http\Controllers\AppController\{
@@ -133,6 +134,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/rota', [RotaController::class, 'index'])->name('rota');
     Route::resource('chats', ChatController::class);
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::resource('companies', CompanyController::class);
 
 });
 
