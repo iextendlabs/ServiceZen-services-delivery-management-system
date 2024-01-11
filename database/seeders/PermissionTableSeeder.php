@@ -18,6 +18,9 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'company-list',
+            'company-create',
+            'company-delete',
             'chat-list',
             'chat-create',
             'chat-delete',

@@ -32,7 +32,8 @@ use App\Http\Controllers\{
     SettingController,
     ShortHolidayController,
     RotaController,
-    ChatController
+    ChatController,
+    CompanyController
 };
 
 use App\Http\Controllers\AppController\{
@@ -133,6 +134,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/rota', [RotaController::class, 'index'])->name('rota');
     Route::resource('chats', ChatController::class);
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::resource('companies', CompanyController::class);
+    Route::get('clear', [CompanyController::class,"clear"])->name('companies.clear');
 
 });
 
@@ -153,9 +156,9 @@ Route::get('customer-registration', [CustomerAuthController::class, 'registratio
 Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']);
 Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
 Route::resource('customerProfile', CustomerAuthController::class);
-Route::get('deleteAccount', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccount');
+Route::get('deleteAccount', [CustomerAuthController::class, 'account']);
 Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountMail'])->name('deleteAccountMail');
-Route::get('deleteAccountPage', [CustomerAuthController::class, 'account']);
+Route::get('deleteAccountPage', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccountPage');
 
 
 Route::resource('order', SiteOrdersController::class);
