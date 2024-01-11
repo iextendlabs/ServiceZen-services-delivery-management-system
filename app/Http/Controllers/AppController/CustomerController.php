@@ -137,9 +137,9 @@ class CustomerController extends Controller
     {
         $cachedData = Cache::get('api_data');
 
-        // if ($cachedData) {
-        //     return response()->json($cachedData, 200);
-        // }
+        if ($cachedData) {
+            return response()->json($cachedData, 200);
+        }
 
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
@@ -761,5 +761,23 @@ class CustomerController extends Controller
             'images'=>$images,
             'videos'=>$videos
         ], 200);
+    }
+
+    public function deleteAccountMail(Request $request){
+        
+        $user = User::find($request->id);
+        if($user){
+            $to = env('MAIL_FROM_ADDRESS');
+            Mail::to($to)->send(new DeleteAccount($user->id, $request->email));
+
+            return response()->json([
+                'msg' => "Account Deletion Confirmation email sent. Please check your inbox for further instructions."
+            ], 200);
+        }else{
+            return response()->json([
+                'msg' => "User Not Found!"
+            ], 201);
+        }
+        
     }
 }
