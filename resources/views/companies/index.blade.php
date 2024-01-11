@@ -7,59 +7,63 @@
         </div>
         <div class="col-md-6">
             @can('company-create')
-            <a class="btn btn-success  float-end" href="{{ route('companies.create') }}"><i class="fa fa-plus"></i></a>
+            <a class="btn btn-success float-end" href="{{ route('companies.create') }}">Create</a>
+            @endcan
+            @can('company-delete')
+            <a class="btn btn-danger float-end mr-2" href="#" onclick="confirmClear()">Clear All</a>
+            <div id="clearConfirmation" class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;">
+                Are you sure you want to clear all companies?
+                <button type="button" class="btn btn-warning" onclick="clearAll()">Yes</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelClear()">No</button>
+            </div>
             @endcan
         </div>
     </div>
     @if ($message = Session::get('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible fade show">
         <span>{{ $message }}</span>
-        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <hr>
     <table class="table table-striped table-bordered">
-        <tr>
-            <th>Sr#</th>
-            <th class="text-left">Title</th>
-            <th class="text-left">Body</th>
-            <!-- <th class="text-right">Action</th> -->
-        </tr>
-        @if(count($companies))
-        @foreach ($companies as $company)
-        <tr>
-            <td>{{ ++$i }}</td>
-            <td class="text-left">{{ $company->title }}</td>
-            <td class="text-left">{{ $company->body }}</td>
-            <!-- <td class="text-right">
-                <form id="deleteForm{{ $company->id }}" action="{{ route('companies.destroy',$company->id) }}" method="POST">
-                    <a class="btn btn-warning" href="{{ route('companies.show',$company->id) }}"><i class="fa fa-eye"></i></a>
-                    @can('company-edit')
-                    <a class="btn btn-primary" href="{{ route('companies.edit',$company->id) }}"><i class="fa fa-edit"></i></a>
-                    @endcan
-                    @csrf
-                    @method('DELETE')
-                    @can('company-delete')
-                    <button type="button" onclick="confirmDelete('{{ $company->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
-                    @endcan
-                </form>
-            </td> -->
-        </tr>
-        @endforeach
-        @else
-        <tr>
-            <td colspan="8" class="text-center">There is no company.</td>
-        </tr>
-        @endif
+        <thead>
+            <tr>
+                <th>Sr#</th>
+                <th class="text-left">Title</th>
+                <th class="text-left">Body</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(count($companies))
+            @foreach ($companies as $company)
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td class="text-left">{{ $company->title }}</td>
+                <td class="text-left">{{ $company->body }}</td>
+            </tr>
+            @endforeach
+            @else
+            <tr>
+                <td colspan="3" class="text-center">There is no company.</td>
+            </tr>
+            @endif
+        </tbody>
     </table>
     {!! $companies->links() !!}
 </div>
-<!-- <script>
-    function confirmDelete(Id) {
-        var result = confirm("Are you sure you want to delete this Item?");
-            if (result) {
-                document.getElementById('deleteForm' + Id).submit();
-            }
-        }
-</script> -->
+<script>
+    function confirmClear() {
+        $('#clearConfirmation').fadeIn();
+    }
+
+    function clearAll() {
+        window.location.href = "{{ route('companies.clear') }}";
+    }
+
+    function cancelClear() {
+        $('#clearConfirmation').fadeOut();
+    }
+</script>
+
+
 @endsection

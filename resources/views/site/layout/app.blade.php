@@ -140,7 +140,7 @@ $cart_product = 0;
               @endif
               <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
               <a class="dropdown-item" href="/customer-logout">Logout</a>
-              <a class="dropdown-item" href="/deleteAccountPage">Delete Account</a>
+              <a class="dropdown-item" href="/deleteAccount">Delete Account</a>
               @endguest
             </div>
           </li>

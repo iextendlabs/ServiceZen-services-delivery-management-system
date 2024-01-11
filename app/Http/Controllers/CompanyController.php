@@ -127,12 +127,11 @@ class CompanyController extends Controller
     }
     
     
-    // public function destroy($id)
-    // {
-    //     $staffHoliday = StaffHoliday::find($id);
-    //     $staffHoliday->delete();
-    
-    //     return redirect()->route('staffHolidays.index')
-    //                     ->with('success','Staff Holiday deleted successfully');
-    // }
+    public function clear()
+    {
+        Companies::truncate();
+
+        return redirect()->route('companies.index')
+            ->with('success','Companies deleted successfully');
+    }
 }

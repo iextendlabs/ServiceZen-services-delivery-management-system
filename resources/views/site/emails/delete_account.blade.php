@@ -83,7 +83,7 @@
                 <p style="font-size: 16px; line-height: 1.5em; margin-top: 0; text-align: center;">
                     You are receiving this email because we received a delete Account request for your account.
                 </p>
-                <a href="{{ route('deleteAccount', ['id' => $id]) }}" class="button" target="_blank" rel="noopener">Delete Account</a>
+                <a href="{{ route('deleteAccountPage', ['id' => $id]) }}" class="button" target="_blank" rel="noopener">Delete Account</a>
                 <p style="font-size: 16px; line-height: 1.5em; margin-top: 0; text-align: center;">
                     If you did not request a password reset, no further action is required
                 </p>
