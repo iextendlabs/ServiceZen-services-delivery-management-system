@@ -61,7 +61,7 @@
                 <p style="font-size: 16px; line-height: 1.5em; margin-top: 0; text-align: center;">
                 You are receiving this email because we received a password reset request for your account.
                 </p>
-                <p style="font-size: 16px; line-height: 1.5em; margin-top: 0; text-align: left;">
+                <p style="font-size: 16px; line-height: 1.5em; margin-top: 0; text-align: center;">
                     Your New Password is {{ $password }}.
                 </p>
                 <p style="font-size: 16px; line-height: 1.5em; margin-top: 0; text-align: center;">
