@@ -174,6 +174,7 @@ class CustomerController extends Controller
                 'discount' => $service->discount,
                 'duration' => $service->duration,
                 'category_id' => $service->category_id,
+                'short_description' => $service->short_description,
                 'rating' => $service->averageRating()
             ];
         })->toArray();
