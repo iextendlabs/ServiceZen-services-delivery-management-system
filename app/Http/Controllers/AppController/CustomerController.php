@@ -136,11 +136,11 @@ class CustomerController extends Controller
 
     public function index()
     {
-        // $cachedData = Cache::get('api_data');
+        $cachedData = Cache::get('api_data');
 
-        // if ($cachedData) {
-        //     return response()->json($cachedData, 200);
-        // }
+        if ($cachedData) {
+            return response()->json($cachedData, 200);
+        }
 
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
