@@ -54,7 +54,7 @@
                         <option></option>
                         @foreach($managers as $manager)
                         @if($manager->getRoleNames() == '["Manager"]')
-                        @if($manager->id == $supervisor->SupervisorToManager->manager_id)
+                        @if($supervisor->SupervisorToManager && $manager->id == $supervisor->SupervisorToManager->manager_id)
                         <option value="{{ $manager->id }}" selected>{{ $manager->name }}</option>
                         @else
                         <option value="{{ $manager->id }}">{{ $manager->name }}</option>
