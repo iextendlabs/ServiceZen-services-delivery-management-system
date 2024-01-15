@@ -782,4 +782,14 @@ class CustomerController extends Controller
         }
         
     }
+
+    public function getSubCategories(Request $request)
+    {
+        $categories = ServiceCategory::find($request->id);
+
+        $sub_categories = $categories->childCategories;
+        return response()->json([
+            'sub_categories' => $sub_categories
+        ], 200);
+    }
 }
