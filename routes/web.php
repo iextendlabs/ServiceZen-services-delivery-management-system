@@ -189,6 +189,8 @@ Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
 
 // TODO: save and continue buttons , save and close buttons 
 Route::get('/termsCondition', [TermsCondition::class, 'index'])->name('TermsCondition');
+Route::get('/aboutUs', [TermsCondition::class, 'aboutUs'])->name('aboutUs');
+Route::get('/privacyPolicy', [TermsCondition::class, 'privacyPolicy'])->name('privacyPolicy');
 
 Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
 Route::get('staffAppUser', [StaffAppController::class, 'user']);
