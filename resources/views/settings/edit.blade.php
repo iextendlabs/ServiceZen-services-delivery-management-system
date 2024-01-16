@@ -107,11 +107,13 @@
                     </select>
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
-                    @elseif($setting->key === 'Terms & Condition')
+                    @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy')
                     <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
                     <script>
                         CKEDITOR.replace('value');
                     </script>
+                    @elseif($setting->key === 'Head Tag')
+                    <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
                     @elseif($setting->key === 'Featured Services')
                     <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">
                     <div class="scroll-div">

@@ -19,4 +19,20 @@ class TermsCondition extends Controller
         
     }
 
+    public function aboutUs(Request $request)
+    {
+        $aboutUs = Setting::where('key','About Us')->value('value');
+
+        return view('site.aboutUs', compact('aboutUs'));
+        
+    }
+
+    public function privacyPolicy(Request $request)
+    {
+        $privacyPolicy = Setting::where('key','Privacy Policy')->value('value');
+
+        return view('site.privacyPolicy', compact('privacyPolicy'));
+        
+    }
+
 }
