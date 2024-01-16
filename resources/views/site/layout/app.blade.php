@@ -28,7 +28,7 @@
 
     gtag('config', 'G-TEMW2WSQE1');
   </script>
-
+  {!! $head_tag !!}
 </head>
 @if(session()->has('serviceIds'))
 @php

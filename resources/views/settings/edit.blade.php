@@ -112,6 +112,8 @@
                     <script>
                         CKEDITOR.replace('value');
                     </script>
+                    @elseif($setting->key === 'Head Tag')
+                    <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
                     @elseif($setting->key === 'Featured Services')
                     <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">
                     <div class="scroll-div">
