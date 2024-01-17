@@ -400,8 +400,9 @@ class SiteOrdersController extends Controller
                 'order' => $order
             ];
         }
+        $recipient_email = env('MAIL_FROM_ADDRESS');
 
-        Mail::to($dataArray['email'])->send(new OrderCustomerEmail($dataArray));
+        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray,$recipient_email));
 
         return redirect()->back();
     }

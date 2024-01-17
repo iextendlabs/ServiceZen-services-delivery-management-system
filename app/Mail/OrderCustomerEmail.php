@@ -14,15 +14,17 @@ class OrderCustomerEmail extends Mailable
 
     
     public $dataArray;
+    public $recipient_email;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($dataArray)
+    public function __construct($dataArray,$recipient_email)
     {
         $this->dataArray = $dataArray;
+        $this->recipient_email = $recipient_email;
     }
 
     /**
@@ -32,7 +34,7 @@ class OrderCustomerEmail extends Mailable
      */
     public function build()
     {
-        $from = env('MAIL_FROM_ADDRESS');
+        $from = $this->recipient_email;
         return $this->from($from)
                     ->view('site.emails.customer_order_email')
                     ->subject('Order Place')
