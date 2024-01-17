@@ -166,14 +166,19 @@ $cart_product = 0;
 
   </main>
 
+  <div class="container">
   <footer class="text-muted">
-    <div class="container">
+      <div class="text-center p-3">
+        <a href="https://lipslay.com/privacyPolicy" class="text-dark">Privacy Policy</a> |
+        <a href="https://lipslay.com/termsCondition" class="text-dark">Terms and Conditions</a>
+      </div>
+
       <p class="float-right">
         © 2023 {{ env('APP_NAME') }}
 
       </p>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
   <!-- Bootstrap core JavaScript
     ================================================== -->
