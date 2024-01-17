@@ -714,8 +714,8 @@ class CustomerController extends Controller
         if($user){
             $password = $user->name.rand(1000, 9999);
             
-            $to = env('MAIL_FROM_ADDRESS');
-            Mail::to($to)->send(new PasswordReset($password, $request->email));
+            $from = env('MAIL_FROM_ADDRESS');
+            Mail::to($request->email)->send(new PasswordReset($password, $from));
 
             $user->password = Hash::make($password);
             $user->save();
