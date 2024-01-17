@@ -227,8 +227,8 @@ class CustomerAuthController extends Controller
         ]);
         $user = User::where("email",$request->email)->first();
         
-        $to = env('MAIL_FROM_ADDRESS');
-        Mail::to($to)->send(new DeleteAccount($user->id, $request->email));
+        $from = env('MAIL_FROM_ADDRESS');
+        Mail::to($request->email)->send(new DeleteAccount($user->id, $from));
         
         return redirect()->back()->with('success', 'Account Deletion Confirmation email sent. Please check your inbox for further instructions.');
     }
