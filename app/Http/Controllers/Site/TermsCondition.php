@@ -14,24 +14,26 @@ class TermsCondition extends Controller
     public function index(Request $request)
     {
         $termsCondition = Setting::where('key','Terms & Condition')->value('value');
-
-        return view('site.termsCondition', compact('termsCondition'));
+        $app = $request->app;
+        return view('site.termsCondition', compact('termsCondition','app'));
         
     }
 
     public function aboutUs(Request $request)
     {
         $aboutUs = Setting::where('key','About Us')->value('value');
+        $app = $request->app;
 
-        return view('site.aboutUs', compact('aboutUs'));
+        return view('site.aboutUs', compact('aboutUs','app'));
         
     }
 
     public function privacyPolicy(Request $request)
     {
         $privacyPolicy = Setting::where('key','Privacy Policy')->value('value');
+        $app = $request->app;
 
-        return view('site.privacyPolicy', compact('privacyPolicy'));
+        return view('site.privacyPolicy', compact('privacyPolicy','app'));
         
     }
 
