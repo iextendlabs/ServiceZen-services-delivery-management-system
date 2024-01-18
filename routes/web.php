@@ -50,7 +50,7 @@ use App\Http\Controllers\Site\{
     SiteFAQsController,
     SiteReviewsController,
     StaffProfileController,
-    TermsCondition,
+    InformationPageController,
 };
 
 /*
@@ -188,9 +188,10 @@ Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
 // Staff app
 
 // TODO: save and continue buttons , save and close buttons 
-Route::get('/termsCondition', [TermsCondition::class, 'index'])->name('TermsCondition');
-Route::get('/aboutUs', [TermsCondition::class, 'aboutUs'])->name('aboutUs');
-Route::get('/privacyPolicy', [TermsCondition::class, 'privacyPolicy'])->name('privacyPolicy');
+Route::get('/termsCondition', [InformationPageController::class, 'index'])->name('TermsCondition');
+Route::get('/aboutUs', [InformationPageController::class, 'aboutUs'])->name('aboutUs');
+Route::get('/privacyPolicy', [InformationPageController::class, 'privacyPolicy'])->name('privacyPolicy');
+Route::get('/contactUs', [InformationPageController::class, 'contactUs'])->name('contactUs');
 
 Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
 Route::get('staffAppUser', [StaffAppController::class, 'user']);

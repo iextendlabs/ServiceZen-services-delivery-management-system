@@ -8,7 +8,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Session;
 
 
-class TermsCondition extends Controller
+class InformationPageController extends Controller
 {
 
     public function index(Request $request)
@@ -34,6 +34,15 @@ class TermsCondition extends Controller
         $app = $request->app;
 
         return view('site.privacyPolicy', compact('privacyPolicy','app'));
+        
+    }
+
+    public function contactUs(Request $request)
+    {
+        $contactUs = Setting::where('key','Privacy Policy')->value('value');
+        $app = $request->app;
+
+        return view('site.contactUs', compact('contactUs','app'));
         
     }
 

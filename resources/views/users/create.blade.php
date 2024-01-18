@@ -18,6 +18,7 @@
     @endif
     <form method="POST" action="{{ route('users.store') }}">
         @csrf
+        <input type="hidden" name="url" value="{{ url()->previous() }}">
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">

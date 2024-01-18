@@ -107,7 +107,7 @@
                     </select>
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
-                    @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy')
+                    @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy' || $setting->key === 'Contact Us')
                     <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
                     <script>
                         CKEDITOR.replace('value');

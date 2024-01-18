@@ -48,7 +48,7 @@ class UserController extends Controller
         }
 
         $data = $query->get();
-
+        
         return view('users.index',compact('data','roles','filter'));
     }
     
@@ -84,7 +84,8 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
     
-        return redirect()->route('users.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
                         ->with('success','User created successfully');
     }
     
