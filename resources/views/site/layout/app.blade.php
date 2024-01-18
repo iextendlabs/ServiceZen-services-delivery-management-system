@@ -151,7 +151,7 @@ $cart_product = 0;
             <a class="nav-link" href="{{ route('siteReviews.index') }}">Reviews</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
+            <a class="nav-link" href="{{ route('contactUs') }}">Contact</a>
           </li>
         </ul>
       </div>
