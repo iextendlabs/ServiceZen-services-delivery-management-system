@@ -581,9 +581,9 @@ class CustomerController extends Controller
 
         $order = Order::find($request->order_id);
 
-        if ($request->hasFile('video')) {
-            $filename = '0'.time() . '.' . $request->video->getClientOriginalExtension();
-            $request->video->move(public_path('review-videos'), $filename);
+        if ($request->hasFile('review_video')) {
+            $filename = '0'.time() . '.' . $request->review_video->getClientOriginalExtension();
+            $request->review_video->move(public_path('review-videos'), $filename);
             $uploadedVideos[] = $filename;
 
             for ($i = 1; $i <= count($order->orderServices)- 1; $i++) {
