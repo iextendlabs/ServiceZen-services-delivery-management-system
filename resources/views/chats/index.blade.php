@@ -30,18 +30,21 @@
 </style>
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <h2>Chat</h2>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-9">
             @can('chat-create')
-            <a
-                class="btn btn-success float-end"
-                href="{{ route('chats.create') }}"
-            >
-                New Chat</a
-            >
+            <a class="btn btn-success float-end" href="{{ route('chats.create') }}">New Chat</a>
             @endcan
+            <button class="btn btn-primary float-end mx-2" id="showAllButton">Show All</button>
+            <button class="btn btn-warning float-end mx-2" id="unreadButton">Unread Chats</button>
+            <div class="float-end mx-2">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+                    <button class="btn btn-info" id="searchButton">Search</button>
+                </div>
+            </div>
         </div>
     </div>
     @if ($message = Session::get('success'))
@@ -61,9 +64,11 @@
             <ul class="list-group">
                 @foreach($users as $user) @if($user->chat)
                 <a href="{{ route('chat.show', $user) }}" class="no-decoration custom-list-item">
-                    <li class="list-group-item" @if($user->
-                        chat->status == "1")
-                        style="background-color:powderblue;" @endif>
+                    <li class="list-group-item" data-user-name="{{ $user->name }}" data-user-email="{{ $user->email }}" data-status="{{ $user->chat->status }}" 
+                        @if($user->chat->status == "1")
+                            style="background-color:powderblue;"
+                        @endif
+                    >
                         <p class="user-link">{{ $user->name }}</p>
 
                         <span
@@ -78,4 +83,44 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        // Function to filter chats based on search criteria
+        $("#searchButton").on("click", function () {
+            var searchText = $("#searchInput").val().toLowerCase();
+
+            $(".list-group-item").each(function () {
+                var userName = $(this).attr("data-user-name").toLowerCase();
+                var userEmail = $(this).attr("data-user-email").toLowerCase();
+
+                if (userName.includes(searchText) || userEmail.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        // Function to filter unread chats
+        $("#unreadButton").on("click", function () {
+            $(".list-group-item").each(function () {
+                var status = $(this).attr("data-status");
+
+                if (status === "1") {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            $("#searchInput").val("");
+
+        });
+
+        $("#showAllButton").on("click", function () {
+            $(".list-group-item").show();
+            $("#searchInput").val("");
+
+        });
+    });
+</script>
 @endsection
