@@ -575,19 +575,19 @@ class CustomerController extends Controller
 
     public function writeReview(Request $request)
     {
-        $input = $request->all();
-
-        if ($request->hasFile('review_video')) {
-            $filename = time() . '.' . $request->review_video->getClientOriginalExtension();
-            $request->review_video->move(public_path('review-videos'), $filename);
-            $input['video'] = $filename;
-        }
-        
         $order = Order::find($request->order_id);
-        $input['staff_id'] = $order->service_staff_id;
 
-        foreach ($order->orderServices as $orderServices) {
-            $input['service_id'] = $orderServices->service_id;
+        foreach ($order->orderServices as $orderService) {
+            $input = $request->all();
+
+            if ($request->hasFile('review_video')) {
+                $filename = mt_rand() . '.' . $request->review_video->getClientOriginalExtension();
+                $request->review_video->move(public_path('review-videos'), $filename);
+                $input['video'] = $filename;
+            }
+
+            $input['staff_id'] = $order->service_staff_id;
+            $input['service_id'] = $orderService->service_id;
 
             $review = Review::create($input);
 
@@ -597,7 +597,6 @@ class CustomerController extends Controller
                 foreach ($images as $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('review-images'), $filename);
-                    $input['image'] = $filename;
 
                     ReviewImage::create([
                         'image' => $filename,
