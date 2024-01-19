@@ -582,21 +582,28 @@ class CustomerController extends Controller
             $request->review_video->move(public_path('review-videos'), $filename);
             $input['video'] = $filename;
         }
+        
+        $order = Order::find($request->order_id);
+        $input['staff_id'] = $order->service_staff_id;
 
-        $review = Review::create($input);
+        foreach ($order->orderServices as $orderServices) {
+            $input['service_id'] = $orderServices->service_id;
 
-        if ($request->hasFile('image')) {
-            $images = $request->file('image');
+            $review = Review::create($input);
 
-            foreach ($images as $image) {
-                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('review-images'), $filename);
-                $input['image'] = $filename;
+            if ($request->hasFile('image')) {
+                $images = $request->file('image');
 
-                ReviewImage::create([
-                    'image' => $filename,
-                    'review_id' => $review->id,
-                ]);
+                foreach ($images as $image) {
+                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('review-images'), $filename);
+                    $input['image'] = $filename;
+
+                    ReviewImage::create([
+                        'image' => $filename,
+                        'review_id' => $review->id,
+                    ]);
+                }
             }
         }
 
