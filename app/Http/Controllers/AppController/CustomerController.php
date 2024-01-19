@@ -578,10 +578,10 @@ class CustomerController extends Controller
         $order = Order::find($request->order_id);
 
         foreach ($order->orderServices as $orderService) {
-            $input = $request->all();
+            $input = $request->except(['image', 'review_video']); 
 
             if ($request->hasFile('review_video')) {
-                $filename = mt_rand() . '.' . $request->review_video->getClientOriginalExtension();
+                $filename = time() . '.' . $request->review_video->getClientOriginalExtension();
                 $request->review_video->move(public_path('review-videos'), $filename);
                 $input['video'] = $filename;
             }
@@ -607,9 +607,10 @@ class CustomerController extends Controller
         }
 
         return response()->json([
-            'msg' => "Review created successfully.",
+            'msg' => "Review(s) created successfully.",
         ], 200);
     }
+
 
     public function getCustomerCoupon(Request $request)
     {
