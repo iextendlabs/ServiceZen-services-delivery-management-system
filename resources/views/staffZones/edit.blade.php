@@ -39,6 +39,24 @@
                     <input type="number" name="transport_charges" value="{{$staffZone->transport_charges}}" class="form-control" placeholder="Transport Charges">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Currency:</strong>
+                    <input type="text" name="currency" value="{{$staffZone->currency}}" class="form-control" placeholder="Currency">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Currency Rate:</strong>
+                    <input type="number" name="currency_rate" value="{{$staffZone->currency_rate}}" class="form-control" placeholder="Currency Rate">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Extra Charges:</strong>
+                    <input type="number" name="extra_charges" value="{{$staffZone->extra_charges}}" class="form-control" placeholder="Extra Charges">
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
