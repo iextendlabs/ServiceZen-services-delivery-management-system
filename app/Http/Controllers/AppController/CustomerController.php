@@ -575,29 +575,43 @@ class CustomerController extends Controller
 
     public function writeReview(Request $request)
     {
+        $uploadedVideos = [];
+        $uploadedImages = [];
+        $input = $request->all();
+
         $order = Order::find($request->order_id);
 
-        foreach ($order->orderServices as $orderService) {
-            $input = $request->except(['image', 'review_video']); 
+        if ($request->hasFile('video')) {
+            $filename = '0'.time() . '.' . $request->video->getClientOriginalExtension();
+            $request->video->move(public_path('review-videos'), $filename);
+            $uploadedVideos[] = $filename;
 
-            if ($request->hasFile('review_video')) {
-                $filename = time() . '.' . $request->review_video->getClientOriginalExtension();
-                $request->review_video->move(public_path('review-videos'), $filename);
-                $input['video'] = $filename;
+            for ($i = 1; $i <= count($order->orderServices)- 1; $i++) {
+                $copyFilename = $i . $filename;
+                $copyPath = public_path('review-videos') . '/' . $copyFilename;
+        
+                copy(public_path('review-videos') . '/' . $filename, $copyPath);
+        
+                $uploadedVideos[] = $copyFilename;
             }
+        }
 
-            $input['staff_id'] = $order->service_staff_id;
-            $input['service_id'] = $orderService->service_id;
+        
+        $input['staff_id'] = $order->service_staff_id;
+
+        foreach ($order->orderServices as $key => $orderServices) {
+            $input['video'] = $uploadedVideos[$key];
+            $input['service_id'] = $orderServices->service_id;
 
             $review = Review::create($input);
 
-            if ($request->hasFile('image')) {
-                $images = $request->file('image');
+            if ($request->hasFile('images')) {
+                $images = $request->images;
 
                 foreach ($images as $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('review-images'), $filename);
 
+                    $image->move(public_path('review-images'), $filename);
                     ReviewImage::create([
                         'image' => $filename,
                         'review_id' => $review->id,
@@ -607,10 +621,9 @@ class CustomerController extends Controller
         }
 
         return response()->json([
-            'msg' => "Review(s) created successfully.",
+            'msg' => "Review created successfully.",
         ], 200);
     }
-
 
     public function getCustomerCoupon(Request $request)
     {
