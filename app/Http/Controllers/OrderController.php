@@ -286,11 +286,8 @@ class OrderController extends Controller
 
             if ($input['coupon_code']) {
                 $coupon = Coupon::where('code', $input['coupon_code'])->first();
-                if ($coupon->type == "Percentage") {
-                    $discount = ($sub_total * $coupon->discount) / 100;
-                } else {
-                    $discount = $coupon->discount;
-                }
+                
+                $discount = $coupon->getDiscountForProducts($input['service_ids']);
             } else {
                 $discount = 0;
             }

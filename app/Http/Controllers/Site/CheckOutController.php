@@ -105,6 +105,25 @@ class CheckOutController extends Controller
                         ->where('date_start', '<=', now())
                         ->where('date_end', '>=', now());
                 }),
+                function ($attribute, $value, $fail) {
+                    $coupon = Coupon::where('code', $value)->first();
+        
+                    if ($coupon && $coupon->uses_total !== null) {
+                        if (!auth()->check()) {
+                            $fail('The ' . $attribute . ' requires Login for validation.');
+                            return;
+                        }
+                        
+                        $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
+                        $userOrdersCount = Order::where('customer_id', auth()->id())
+                            ->whereIn('id', $order_coupon)
+                            ->count();
+        
+                        if ($userOrdersCount >= $coupon->uses_total) {
+                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
+                        }
+                    }
+                },
             ],
         ]);
         
@@ -293,12 +312,8 @@ class CheckOutController extends Controller
 
         if ($code['coupon_code']) {
             $coupon = Coupon::where('code', $code['coupon_code'])->first();
-            $coupon_id = $coupon->id;
-            if ($coupon->type == "Percentage") {
-                $coupon_discount = ($sub_total * $coupon->discount) / 100;
-            } else {
-                $coupon_discount = $coupon->discount;
-            }
+            
+            $coupon_discount = $coupon->getDiscountForProducts($serviceIds);
         } else {
             $coupon_discount = 0;
         }

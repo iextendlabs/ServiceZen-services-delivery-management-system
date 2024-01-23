@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Coupon;
 use Illuminate\Http\Request;
+use App\Models\Service;
+use App\Models\ServiceCategory;
 
 class CouponController extends Controller
 {
@@ -34,8 +36,11 @@ class CouponController extends Controller
      */
     public function create()
     {
-        $coupons = Coupon::all();
-        return view('coupons.create',compact('coupons'));
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $i = 0;
+
+        return view('coupons.create',compact('services','categories','i'));
     }
     
     /**
@@ -57,6 +62,8 @@ class CouponController extends Controller
         ]);
 
         $coupon = Coupon::create($request->all());
+        $coupon->category()->attach($request->categoriesId);
+        $coupon->service()->attach($request->servicesId);
         
         return redirect()->route('coupons.index')
                         ->with('success','Coupon created successfully.');
@@ -83,7 +90,13 @@ class CouponController extends Controller
     public function edit($id)
     {
         $coupon = Coupon::find($id);
-        return view('coupons.edit', compact('coupon'));
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $i = 0;
+
+        $category_ids = $coupon->category()->pluck('category_id')->toArray();
+        $service_ids = $coupon->service()->pluck('service_id')->toArray();
+        return view('coupons.edit', compact('coupon','services','categories','category_ids','service_ids','i'));
     }
 
     public function update(Request $request, $id)
@@ -99,6 +112,8 @@ class CouponController extends Controller
         ]);
 
         $coupon = Coupon::find($id);
+        $coupon->category()->sync($request->categoriesId);
+        $coupon->service()->sync($request->servicesId);
 
         $coupon->update($request->all());
 
