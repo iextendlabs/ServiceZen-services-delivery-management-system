@@ -38,6 +38,24 @@
                     <input type="number" name="transport_charges" value="{{ old('transport_charges') }}" class="form-control" placeholder="Transport Charges">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Currency:</strong>
+                    <input type="text" name="currency" value="{{ old('currency') }}" class="form-control" placeholder="Currency">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Currency Rate:</strong>
+                    <input type="number" name="currency_rate" value="{{ old('currency_rate') }}" class="form-control" placeholder="Currency Rate">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Extra Charges:</strong>
+                    <input type="number" name="extra_charges" value="{{ old('extra_charges') }}" class="form-control" placeholder="Extra Charges">
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

@@ -74,8 +74,8 @@
                                 </td>
                                 <td>{{ $service->name }}</td>
 
-                                <td>AED<span class="price">{{ isset($service->discount) ? 
-                                    $service->discount : $service->price }}</span></td>
+                                <td><span class="price">@if(isset($service->discount)) 
+                                @currency($service->discount) @else @currency($service->price) @endif</span></td>
                                 <td>{{ $service->duration }}</td>
                             </tr>
                             @endif
@@ -105,8 +105,8 @@
                                     </td>
                                     <td>{{ $service->name }}</td>
 
-                                    <td>AED<span class="price">{{ isset($service->discount) ? 
-                                    $service->discount : $service->price }}</span></td>
+                                    <td><span class="price">@if(isset($service->discount)) 
+                                @currency($service->discount) @else @currency($service->price) @endif</span></td>
                                     <td>{{ $service->duration }}</td>
                                 </tr>
                                 @endforeach
@@ -349,7 +349,7 @@
             tableHtml += '<input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="' + id + '" data-price="' + price + '">';
             tableHtml += '</td>';
             tableHtml += '<td>' + name + '</td>';
-            tableHtml += '<td>AED' + price + '</td>';
+            tableHtml += '<td>' + price + '</td>';
             tableHtml += '<td>' + duration + '</td>';
             tableHtml += '</tr>';
 

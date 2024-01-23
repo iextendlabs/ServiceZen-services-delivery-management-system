@@ -76,6 +76,12 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Uses Per Coupon</strong>
+                            <input type="text" name="uses_total" value="{{ $coupon->uses_total }}" class="form-control" placeholder="Uses Per Coupon">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <span style="color: red;">*</span><strong>Status</strong>
                             <select name="status" class="form-control">
                                 @if($coupon->status == 1)
@@ -86,6 +92,48 @@
                                 <option value="0" selected>Disable</option>
                                 @endif
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group scroll-div">
+                            <span style="color: red;">*</span><strong>Category:</strong>
+                            <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
+                            <table class="table table-striped table-bordered categories-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                </tr>
+                                @foreach ($categories as $category)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if(in_array($category->id,$category_ids)) checked @endif>
+                                    </td>
+                                    <td>{{ $category->title }}</td>
+                                </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group scroll-div">
+                            <strong>Service:</strong>
+                            <input type="text" name="service-search" id="service-search" class="form-control" placeholder="Search Services By Name">
+                            <table class="table table-striped table-bordered service-table">
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                </tr>
+                                @foreach ($services as $service)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}" @if(in_array($service->id,$service_ids)) checked @endif>
+                                    </td>
+                                    <td>{{ $service->name }}</td>
+                                    <td>{{ $service->price }}</td>
+                                </tr>
+                                @endforeach
+                            </table>
                         </div>
                     </div>
                     <div class="col-md-12 text-center">
@@ -127,4 +175,47 @@
         </div>
     </form>
 </div>
+<script>
+    $(document).ready(function() {
+        $("#categories-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".categories-table tr").hide();
+
+            $(".categories-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
+
+        $("#service-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".service-table tr").hide();
+
+            $(".service-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+                var email = $row.find("td:last").text().toLowerCase();
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                } else if (email.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
+    });
+    
+</script>
 @endsection

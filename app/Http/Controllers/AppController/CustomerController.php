@@ -355,11 +355,7 @@ class CustomerController extends Controller
             if ($request->coupon_id) {
                 $coupon = Coupon::find($request->coupon_id);
                 $input['coupon_id'] = $coupon->id;
-                if ($coupon->type == "Percentage") {
-                    $discount = ($sub_total * $coupon->discount) / 100;
-                } else {
-                    $discount = $coupon->discount;
-                }
+                $discount = $coupon->getDiscountForProducts($input['service_ids']);
             } else {
                 $discount = 0;
             }
@@ -547,6 +543,25 @@ class CustomerController extends Controller
                         ->where('date_start', '<=', now())
                         ->where('date_end', '>=', now());
                 }),
+                function ($attribute, $value, $fail) {
+                    $coupon = Coupon::where('code', $value)->first();
+        
+                    if ($coupon && $coupon->uses_total !== null) {
+                        if (!auth()->check()) {
+                            $fail('The ' . $attribute . ' requires Login for validation.');
+                            return;
+                        }
+                        
+                        $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
+                        $userOrdersCount = Order::where('customer_id', auth()->id())
+                            ->whereIn('id', $order_coupon)
+                            ->count();
+        
+                        if ($userOrdersCount >= $coupon->uses_total) {
+                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
+                        }
+                    }
+                },
             ],
             'affiliate' => ['nullable', 'exists:affiliates,code'],
         ]);
@@ -575,36 +590,68 @@ class CustomerController extends Controller
 
     public function writeReview(Request $request)
     {
+        $uploadedVideos = [];
+        $uploadedImages = [];
         $input = $request->all();
 
-        if ($request->hasFile('review_video')) {
-            $filename = time() . '.' . $request->review_video->getClientOriginalExtension();
-            $request->review_video->move(public_path('review-videos'), $filename);
-            $input['video'] = $filename;
-        }
-        
         $order = Order::find($request->order_id);
+
+        if ($request->hasFile('review_video')) {
+            $filename = '0' . time() . '.' . $request->review_video->getClientOriginalExtension();
+            $request->review_video->move(public_path('review-videos'), $filename);
+            $uploadedVideos[] = $filename;
+
+            for ($i = 0; $i < count($order->orderServices); $i++) {
+                $copyFilename = $i . $filename;
+                $copyPath = public_path('review-videos') . '/' . $copyFilename;
+
+                copy(public_path('review-videos') . '/' . $filename, $copyPath);
+
+                $uploadedVideos[] = $copyFilename;
+            }
+        }
+
+        if ($request->hasFile('images')) {
+            $images = $request->images;
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('review-images'), $filename);
+                $uploadedImages[] = $filename;
+
+                for ($i = 0; $i < count($order->orderServices); $i++) {
+                    $copyFilename = $i . $filename;
+                    $copyPath = public_path('review-images') . '/' . $copyFilename;
+
+                    copy(public_path('review-images') . '/' . $filename, $copyPath);
+                }
+            }
+        }
+
         $input['staff_id'] = $order->service_staff_id;
 
-        foreach ($order->orderServices as $orderServices) {
+        foreach ($order->orderServices as $service_key => $orderServices) {
+            if(!empty($uploadedVideos)){
+                $input['video'] = $uploadedVideos[$service_key];
+            }
             $input['service_id'] = $orderServices->service_id;
 
             $review = Review::create($input);
-
-            if ($request->hasFile('image')) {
-                $images = $request->file('image');
-
-                foreach ($images as $image) {
-                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('review-images'), $filename);
-                    $input['image'] = $filename;
-
+            if(!empty($uploadedImages)){
+                foreach ($uploadedImages as $key =>$image) {
+                    if ($service_key == 0) {
+                        $image = $uploadedImages[$key];
+                    } else {
+                        $image = '1' . $uploadedImages[$key];
+                    }
                     ReviewImage::create([
-                        'image' => $filename,
+                        'image' => $image,
                         'review_id' => $review->id,
                     ]);
                 }
             }
+
         }
 
         return response()->json([

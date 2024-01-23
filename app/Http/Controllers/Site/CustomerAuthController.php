@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Site;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Coupon;
+use App\Models\Order;
 use Hash;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -191,7 +193,26 @@ class CustomerAuthController extends Controller
                         ->where('date_start', '<=', now())
                         ->where('date_end', '>=', now());
                 }),
-            ]
+                function ($attribute, $value, $fail) {
+                    $coupon = Coupon::where('code', $value)->first();
+        
+                    if ($coupon && $coupon->uses_total !== null) {
+                        if (!auth()->check()) {
+                            $fail('The ' . $attribute . ' requires Login for validation.');
+                            return;
+                        }
+                        
+                        $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
+                        $userOrdersCount = Order::where('customer_id', auth()->id())
+                            ->whereIn('id', $order_coupon)
+                            ->count();
+        
+                        if ($userOrdersCount >= $coupon->uses_total) {
+                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
+                        }
+                    }
+                },
+            ],
         ]);
 
         if ($request->cookie('code') !== null) {

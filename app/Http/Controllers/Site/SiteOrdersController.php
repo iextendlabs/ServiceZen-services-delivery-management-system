@@ -146,12 +146,8 @@ class SiteOrdersController extends Controller
 
             if ($code['coupon_code']) {
                 $coupon = Coupon::where('code', $code['coupon_code'])->first();
-                $coupon_id = $coupon->id;
-                if ($coupon->type == "Percentage") {
-                    $discount = ($sub_total * $coupon->discount) / 100;
-                } else {
-                    $discount = $coupon->discount;
-                }
+                $discount = $coupon->getDiscountForProducts($serviceIds);
+
             } else {
                 $discount = 0;
             }

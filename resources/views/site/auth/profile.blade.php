@@ -156,7 +156,7 @@
                     <tr>
                         <td>{{ $coupons->name }}</td>
                         <td>{{ $coupons->code }}</td>
-                        <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else AED {{ $coupons->discount }} @endif</td>
+                        <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else @currency( $coupons->discount ) @endif</td>
                         <td>
                             <a class="btn btn-primary" href="/applyCoupon?coupon={{ $coupons->code }}"><i class="fas fa-gift"></i> Apply Coupon</a>
                         </td>
