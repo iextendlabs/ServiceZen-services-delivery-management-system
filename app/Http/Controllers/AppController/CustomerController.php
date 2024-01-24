@@ -611,8 +611,8 @@ class CustomerController extends Controller
             }
         }
 
-        if ($request->hasFile('images')) {
-            $images = $request->images;
+        if ($request->hasFile('image')) {
+            $images = $request->file('image');
 
             foreach ($images as $image) {
                 $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
