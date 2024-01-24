@@ -538,25 +538,21 @@ class CustomerController extends Controller
         $validator = Validator::make($request->all(), [
             'coupon' => [
                 'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) {
+                Rule::exists('coupons', 'code')->where(function ($query) use ($request) {
                     $query->where('status', 1)
                         ->where('date_start', '<=', now())
                         ->where('date_end', '>=', now());
                 }),
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) use ($request) {
                     $coupon = Coupon::where('code', $value)->first();
-        
+            
                     if ($coupon && $coupon->uses_total !== null) {
-                        if (!auth()->check()) {
-                            $fail('The ' . $attribute . ' requires Login for validation.');
-                            return;
-                        }
                         
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
-                        $userOrdersCount = Order::where('customer_id', auth()->id())
+                        $userOrdersCount = Order::where('customer_id', $request->user_id)
                             ->whereIn('id', $order_coupon)
                             ->count();
-        
+            
                         if ($userOrdersCount >= $coupon->uses_total) {
                             $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
                         }
@@ -565,6 +561,7 @@ class CustomerController extends Controller
             ],
             'affiliate' => ['nullable', 'exists:affiliates,code'],
         ]);
+    
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
@@ -572,10 +569,16 @@ class CustomerController extends Controller
             $affiliate_id = Affiliate::where('code', $request->affiliate)->value('user_id');
             $coupon = Coupon::where('code', $request->coupon)->first();
         }
+        if($coupon && $request->service_ids){
+            $coupon_discount = $coupon->getDiscountForProducts($request->service_ids);
+        }else{
+            $coupon_discount = "0";
+        }
 
         return response()->json([
             'affiliate_id' => $affiliate_id,
             'coupon' => $coupon,
+            'coupon_discount'=>$coupon_discount
         ], 200);
     }
 
@@ -611,8 +614,8 @@ class CustomerController extends Controller
             }
         }
 
-        if ($request->hasFile('images')) {
-            $images = $request->images;
+        if ($request->hasFile('image')) {
+            $images = $request->file('image');
 
             foreach ($images as $image) {
                 $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
