@@ -40,13 +40,13 @@
         <td colspan="2">Order Details</td>
         <tr>
             <td>
-                <b>Order ID:</b> #{{ $data['order']->id }} <br><br>
-                <b>Date Added:</b> {{ $data['order']->created_at }} <br><br>
-                <b>Order Status:</b> {{ $data['order']->status }}
+                <b>Order ID:</b> #{{ $order->id }} <br><br>
+                <b>Date Added:</b> {{ $order->created_at }} <br><br>
+                <b>Order Status:</b> {{ $order->status }}
             </td>
             <td>
-                <b>Total Amount:</b> @currency( $data['order']->total_amount ) <br><br>
-                <b>Payment Method:</b> {{ $data['order']->payment_method }}
+                <b>Total Amount:</b> @currency( $order->total_amount ) <br><br>
+                <b>Payment Method:</b> {{ $order->payment_method }}
             </td>
         </tr>
     </table>
@@ -54,14 +54,14 @@
         <td colspan="3">Appointment Details</td>
         <tr>
             <td>
-                <b>Staff:</b> {{ $data['order']->staff_name }}
+                <b>Staff:</b> {{ $order->staff_name }}
 
             </td>
             <td>
-                <b>Date:</b> {{ $data['order']->date }}
+                <b>Date:</b> {{ $order->date }}
             </td>
             <td>
-                <b>Time:</b> {{ date('h:i A', strtotime($data['order']->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($data['order']->time_slot->time_end)) }}
+                <b>Time:</b> {{ date('h:i A', strtotime($order->time_slot->time_start)) }} -- {{ date('h:i A', strtotime($order->time_slot->time_end)) }}
             </td>
         </tr>
     </table>
@@ -69,16 +69,16 @@
         <td colspan="3">Address Details</td>
         <tr>
             <td>
-                <b>Building Name:</b> {{ $data['order']->buildingName }} <br><br>
-                <b>Area:</b> {{ $data['order']->area }}
+                <b>Building Name:</b> {{ $order->buildingName }} <br><br>
+                <b>Area:</b> {{ $order->area }}
             </td>
             <td>
-                <b>Flat / Villa:</b> {{ $data['order']->total_amount }} <br><br>
-                <b>Land Mark:</b> {{ $data['order']->landmark }}
+                <b>Flat / Villa:</b> {{ $order->total_amount }} <br><br>
+                <b>Land Mark:</b> {{ $order->landmark }}
             </td>
             <td>
-                <b>Street:</b> {{ $data['order']->street }} <br><br>
-                <b>City:</b> {{ $data['order']->city }}
+                <b>Street:</b> {{ $order->street }} <br><br>
+                <b>City:</b> {{ $order->city }}
             </td>
         </tr>
     </table>
@@ -91,8 +91,8 @@
                 <b>Gender:</b> {{ $order->gender }}
             </td>
             <td>
-                <b>Phone Number:</b> {{ $data['order']->number }} <br><br>
-                <b>Whatsapp Number:</b> {{ $data['order']->whatsapp }}
+                <b>Phone Number:</b> {{ $order->number }} <br><br>
+                <b>Whatsapp Number:</b> {{ $order->whatsapp }}
             </td>
         </tr>
     </table>
@@ -104,7 +104,7 @@
             <th>Duration</th>
             <th>Amount</th>
         </tr>
-        @foreach($data['order']->orderServices as $orderService)
+        @foreach($order->orderServices as $orderService)
         <tr>
             <td>{{ $orderService->service->name }}</td>
             <td>{{ $orderService->status }}</td>
@@ -115,30 +115,30 @@
 
         <tr>
             <td colspan="3"><strong>Sub Total:</strong></td>
-            <td>@currency($data['order']->order_total->sub_total)</td>
+            <td>@currency($order->order_total->sub_total)</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Coupon Discount:</strong></td>
-            <td>{{ config('app.currency') }}{{ $data['order']->order_total->discount ? '-'.$data['order']->order_total->discount : 0 }}</td>
+            <td>{{ config('app.currency') }}{{ $order->order_total->discount ? '-'.$order->order_total->discount : 0 }}</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Staff Transport Charges:</strong></td>
-            <td>{{ config('app.currency') }}{{ $data['order']->order_total->transport_charges ? $data['order']->order_total->transport_charges : 0 }}</td>
+            <td>{{ config('app.currency') }}{{ $order->order_total->transport_charges ? $order->order_total->transport_charges : 0 }}</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Staff Charges:</strong></td>
-            <td>{{ config('app.currency') }}{{ $data['order']->order_total->staff_charges ? $data['order']->order_total->staff_charges : 0 }}</td>
+            <td>{{ config('app.currency') }}{{ $order->order_total->staff_charges ? $order->order_total->staff_charges : 0 }}</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Total:</strong></td>
-            <td>@currency($data['order']->total_amount)</td>
+            <td>@currency($order->total_amount)</td>
         </tr>
     </table>
-    @if($data['order']->order_comment)
+    @if($order->order_comment)
     <table class="table">
         <th colspan="4">Order Comment</th>
         <tr>
-            <td>{!! nl2br($data['order']->order_comment) !!}</td>
+            <td>{!! nl2br($order->order_comment) !!}</td>
         </tr>
     </table>
     @endif
