@@ -547,10 +547,6 @@ class CustomerController extends Controller
                     $coupon = Coupon::where('code', $value)->first();
         
                     if ($coupon && $coupon->uses_total !== null) {
-                        if (!auth()->check()) {
-                            $fail('The ' . $attribute . ' requires Login for validation.');
-                            return;
-                        }
                         
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
                         $userOrdersCount = Order::where('customer_id', $request->user_id)
