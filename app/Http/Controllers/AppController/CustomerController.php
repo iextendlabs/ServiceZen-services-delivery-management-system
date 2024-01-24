@@ -538,21 +538,21 @@ class CustomerController extends Controller
         $validator = Validator::make($request->all(), [
             'coupon' => [
                 'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) {
+                Rule::exists('coupons', 'code')->where(function ($query) use ($request) {
                     $query->where('status', 1)
                         ->where('date_start', '<=', now())
                         ->where('date_end', '>=', now());
                 }),
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) use ($request) {
                     $coupon = Coupon::where('code', $value)->first();
-        
+            
                     if ($coupon && $coupon->uses_total !== null) {
                         
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
                         $userOrdersCount = Order::where('customer_id', $request->user_id)
                             ->whereIn('id', $order_coupon)
                             ->count();
-        
+            
                         if ($userOrdersCount >= $coupon->uses_total) {
                             $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
                         }
@@ -561,6 +561,7 @@ class CustomerController extends Controller
             ],
             'affiliate' => ['nullable', 'exists:affiliates,code'],
         ]);
+    
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
