@@ -553,7 +553,7 @@ class CustomerController extends Controller
                         }
                         
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
-                        $userOrdersCount = Order::where('customer_id', auth()->id())
+                        $userOrdersCount = Order::where('customer_id', $request->user_id)
                             ->whereIn('id', $order_coupon)
                             ->count();
         
@@ -572,10 +572,16 @@ class CustomerController extends Controller
             $affiliate_id = Affiliate::where('code', $request->affiliate)->value('user_id');
             $coupon = Coupon::where('code', $request->coupon)->first();
         }
+        if($coupon && $request->service_ids){
+            $coupon_discount = $coupon->getDiscountForProducts($request->service_ids);
+        }else{
+            $coupon_discount = "0";
+        }
 
         return response()->json([
             'affiliate_id' => $affiliate_id,
             'coupon' => $coupon,
+            'coupon_discount'=>$coupon_discount
         ], 200);
     }
 
