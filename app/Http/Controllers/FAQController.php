@@ -21,10 +21,37 @@ class FAQController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(request $request)
     {
-        $FAQs = FAQ::orderBy('question')->paginate(config('app.paginate'));
-        return view('FAQs.index', compact('FAQs'))
+
+        $filter = [
+            'question' => $request->question,
+            'service_id' => $request->service_id,
+            'category_id' => $request->category_id
+        ];
+
+        $query = FAQ::orderBy('question');
+
+        if ($request->question) {
+            $query->where('question', 'like', '%' . $request->question . '%');
+        }
+
+        if ($request->service_id) {
+            $query->where('service_id', $request->service_id);
+        }
+
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $FAQs = $query->paginate(config('app.paginate'));
+
+        $services = Service::all();
+        $categories = ServiceCategory::all();
+
+        $filters = $request->only(['question', 'service_id', 'category_id']);
+        $FAQs->appends($filters);
+        return view('FAQs.index', compact('FAQs','filter','services','categories'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -42,8 +69,6 @@ class FAQController extends Controller
         $services = Service::all();
         $categories = ServiceCategory::all();
 
-
-        $categories = ServiceCategory::all();
         return view('FAQs.create', compact('categories', 'services','service_id','category_id'));
     }
 
@@ -105,7 +130,8 @@ class FAQController extends Controller
 
         $FAQ->update($request->all());
 
-        return redirect()->route('FAQs.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
             ->with('success', 'FAQs Update successfully.');
     }
 
@@ -120,7 +146,9 @@ class FAQController extends Controller
         $FAQ = FAQ::find($id);
         $FAQ->delete();
 
-        return redirect()->route('FAQs.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
             ->with('success', 'FAQs deleted successfully');
     }
 }

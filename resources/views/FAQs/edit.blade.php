@@ -19,6 +19,7 @@
     <form action="{{ route('FAQs.update',$FAQ->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <input type="hidden" name="url" value="{{ url()->previous() }}">
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
