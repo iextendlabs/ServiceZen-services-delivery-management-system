@@ -33,7 +33,8 @@ use App\Http\Controllers\{
     ShortHolidayController,
     RotaController,
     ChatController,
-    CompanyController
+    CompanyController,
+    CkeditorController
 };
 
 use App\Http\Controllers\AppController\{
@@ -136,6 +137,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
     Route::resource('companies', CompanyController::class);
     Route::get('clear', [CompanyController::class,"clear"])->name('companies.clear');
+
+    Route::post('/ckeditor/upload', [CkeditorController::class,"upload"])->name('ckeditor.upload');
 
 });
 
