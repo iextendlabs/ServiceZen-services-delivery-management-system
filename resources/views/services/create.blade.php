@@ -65,15 +65,27 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Description:</strong>
-                            <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{old('description') }}</textarea>
+                            <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{ old('description') }}</textarea>
+                            <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
                             <script>
-                                CKEDITOR.replace('description');
+                                CKEDITOR.replace('description', {
+                                    filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
+                                    filebrowserUploadSuccess: function (file, response) {
+                                        var imageUrl = response.url;
+                                        var imageInfoUrl = response.image_info_url;
+
+                                        CKEDITOR.instances['description'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
+
+                                        window.location.href = imageInfoUrl;
+                                    }
+                                });
                             </script>
+
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <span style="color: red;">*</span><strong>Short Description:</strong>
+                            <strong>Short Description:</strong>
                             <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{old('short_description') }}</textarea>
                         </div>
                     </div>

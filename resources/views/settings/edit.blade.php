@@ -109,8 +109,19 @@
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
                     @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy' || $setting->key === 'Contact Us')
                     <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
+                    <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
                     <script>
-                        CKEDITOR.replace('value');
+                        CKEDITOR.replace('value', {
+                            filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
+                            filebrowserUploadSuccess: function (file, response) {
+                                var imageUrl = response.url;
+                                var imageInfoUrl = response.image_info_url;
+
+                                CKEDITOR.instances['value'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
+
+                                window.location.href = imageInfoUrl;
+                            }
+                        });
                     </script>
                     @elseif($setting->key === 'Head Tag')
                     <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>

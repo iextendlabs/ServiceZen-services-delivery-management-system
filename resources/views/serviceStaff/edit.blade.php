@@ -86,8 +86,19 @@
                         <div class="form-group">
                             <strong>About:</strong>
                             <textarea name="about" cols="20" rows="6" class="form-control">{{ $serviceStaff->staff->about }}</textarea>
+                            <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
                             <script>
-                                CKEDITOR.replace('about');
+                                CKEDITOR.replace('about', {
+                                    filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
+                                    filebrowserUploadSuccess: function (file, response) {
+                                        var imageUrl = response.url;
+                                        var imageInfoUrl = response.image_info_url;
+
+                                        CKEDITOR.instances['about'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
+
+                                        window.location.href = imageInfoUrl;
+                                    }
+                                });
                             </script>
                         </div>
                     </div>
