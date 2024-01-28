@@ -166,6 +166,7 @@ class CustomerController extends Controller
         })->toArray();
 
         $servicesArray = $services->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
             return [
                 'id' => $service->id,
                 'name' => $service->name,
@@ -173,7 +174,7 @@ class CustomerController extends Controller
                 'price' => $service->price,
                 'discount' => $service->discount,
                 'duration' => $service->duration,
-                'category_id' => $service->category_id,
+                'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
                 'rating' => $service->averageRating()
             ];
@@ -307,6 +308,22 @@ class CustomerController extends Controller
 
     public function addOrder(Request $request)
     {
+
+        $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
+        $request->merge(['orderTotal' => (float) $request->orderTotal]);
+
+        $validator = Validator::make($request->all(), [
+            'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
+        ], [
+            'orderTotal.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price,
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'msg' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price
+            ], 201);
+        }
+
         $password = NULL;
         $input = $request->all();
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
