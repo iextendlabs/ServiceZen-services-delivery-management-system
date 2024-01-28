@@ -54,9 +54,16 @@ class SiteOrdersController extends Controller
     {
         $password = NULL;
 
+        $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
+        $request->merge(['total_amount' => (float) $request->total_amount]);
+
         $this->validate($request, [
-            'payment_method' => 'required'
+            'payment_method' => 'required',
+            'total_amount' => 'required|numeric|min:' . $minimum_booking_price,
+        ], [
+            'total_amount.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price,
         ]);
+
 
         $input = $request->all();
 
