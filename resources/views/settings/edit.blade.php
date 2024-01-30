@@ -172,7 +172,48 @@
 
                         </table>
                     </div>
-
+                    @elseif($setting->key === 'App Offer Alert')
+                        @if($setting->value)
+                            @php
+                                list($type, $id, $filename) = explode('_', $setting->value);
+                            @endphp
+                            <hr>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <span style="color: red;">*</span><strong for="image">Image</strong>
+                                    <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 325 x 200px Thank you!</p>
+                                    <input type="file" name="image" id="image" class="form-control-file">
+                                    <br>
+                                    <img id="preview" src="/uploads/{{$filename}}" height="130px">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong class="float-start mb-2">Select Category or Service for Link</strong>
+                                    <select name="link_type" class="form-control col-12 link-type">
+                                        <option></option>
+                                        <option value="category" {{ $type === 'category' ? 'selected' : '' }}>Categories</option>
+                                        <option value="service" {{ $type === 'service' ? 'selected' : '' }}>Services</option>
+                                    </select>
+                                    <div class="category" style="display: {{ $type === 'category' ? 'block' : 'none' }};">
+                                        <select name="linked_item" class="form-control col-12 mt-2 linked-item category-option">
+                                            <option></option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" data-type="category" {{ ($type === 'category' && $id == $category->id) ? 'selected' : '' }}>{{ $category->title }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="service" style="display: {{ $type === 'service' ? 'block' : 'none' }};">
+                                        <select name="linked_item" class="form-control col-12 mt-2 linked-item service-option">
+                                            <option></option>
+                                            @foreach($services as $service)
+                                                <option value="{{ $service->id }}" data-type="service" {{ ($type === 'service' && $id == $service->id) ? 'selected' : '' }}>{{ $service->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @else
                     <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                     @endif
@@ -258,10 +299,34 @@
         }
     });
 
+    $('#image').on('change', function(e) {
+        var preview = $('#preview');
+        preview.attr('src', URL.createObjectURL(e.target.files[0]));
+    });
+
+    $(document).on('change', '.link-type', function() {
+        var selectedType = $(this).val();
+        var row = $(this).closest('.form-group'); // Updated selector to find the closest form-group container
+        row.find('.linked-item').val(null); // Clear previous selections
+
+        if (selectedType === "category") {
+            row.find('.service-option').prop('disabled', true); // Use prop instead of attr
+            row.find('.category-option').prop('disabled', false); // Use prop instead of attr
+            row.find('.category').show();
+            row.find('.service').hide();
+        } else if (selectedType === "service") {
+            row.find('.category-option').prop('disabled', true); // Use prop instead of attr
+            row.find('.service-option').prop('disabled', false); // Use prop instead of attr
+            row.find('.service').show();
+            row.find('.category').hide();
+        }
+    });
+
     $(document).on("change", ".image-input", function(e) {
         var preview = $(this).siblings('.image-preview')[0];
         preview.src = URL.createObjectURL(e.target.files[0]);
     });
+
     $(document).on('change', '.link-type', function() {
     var selectedType = $(this).val();
     var row = $(this).closest('tr');

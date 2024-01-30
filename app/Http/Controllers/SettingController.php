@@ -137,33 +137,58 @@ class SettingController extends Controller
                 }
                 break;
 
-            case 'Slider Image For App':
+            case 'App Offer Alert':
+                request()->validate([
+                    'image' => 'dimensions:width=325,height=200',
+                    'link_type' => 'required',
+                    'linked_item' => 'required'
+                ]);
+                    $linkTypes = $request->link_type;
+                    $linkedItems = $request->linked_item;
+                    list($type, $id, $filename) = explode('_', $setting->value);
                     if ($request->image) {
-                        $images = $request->image;
-                        $linkTypes = $request->link_type;
-                        $linkedItems = $request->linked_item;
-    
-                        $existingImage = $setting->value ?? ''; // Existing image
-    
-                        $imagePaths = [];
-    
-                        foreach ($images as $key => $image) {
-                            $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-                            
-                            $request->validate([
-                                'image.' . $key => 'dimensions:width=325,height=200',
-                            ]);
-                            
-                            $image->move(public_path('slider-images'), $filename);
-                            $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
+                        if (file_exists(public_path('uploads') . '/' . $filename)) {
+                            unlink(public_path('uploads') . '/' . $filename);
                         }
+                        
+                        $image = mt_rand() . '.' . $request->image->getClientOriginalExtension();
+                        $request->image->move(public_path('uploads'), $image);
+                        $image = $linkTypes . '_' . $linkedItems . '_' . $image;
     
-                        $newImagePaths = implode(',', $imagePaths);
-                        $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+                        $setting->value = $image;
+                    }else{
+                        $setting->value = $linkTypes . '_' . $linkedItems . '_' . $filename;
                     }
                     break;
 
-            default:
+                case 'Slider Image For App':
+                        if ($request->image) {
+                            $images = $request->image;
+                            $linkTypes = $request->link_type;
+                            $linkedItems = $request->linked_item;
+        
+                            $existingImage = $setting->value ?? ''; // Existing image
+        
+                            $imagePaths = [];
+        
+                            foreach ($images as $key => $image) {
+                                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                                
+                                $request->validate([
+                                    'image.' . $key => 'dimensions:width=325,height=200',
+                                ]);
+                                
+                                $image->move(public_path('slider-images'), $filename);
+                                $imagePaths[] = $linkTypes[$key] . '_' . $linkedItems[$key] . '_' . $filename;
+                            }
+        
+                            $newImagePaths = implode(',', $imagePaths);
+                            $setting->value = $existingImage !== '' ? $existingImage . ',' . $newImagePaths : $newImagePaths;
+                        }
+                        break;
+    
+                
+                default:
                 request()->validate([
                     'value' => 'required',
                 ]);
