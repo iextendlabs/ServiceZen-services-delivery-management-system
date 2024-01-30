@@ -344,7 +344,6 @@
         row.find('.category').hide();
     }
 });
-
 </script>
 <script>
     $("#search-services").keyup(function() {
@@ -379,6 +378,28 @@
                 $row.show();
             }
         });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        toggleLinkedItemSelect();
+
+        $('.link-type').on('change', function () {
+            toggleLinkedItemSelect();
+        });
+
+        function toggleLinkedItemSelect() {
+            var linkType = $('.link-type').val();
+
+            $('.linked-item').prop('disabled', true);
+
+            if (linkType === 'category') {
+                $('.category-option').prop('disabled', false);
+            } else if (linkType === 'service') {
+                $('.service-option').prop('disabled', false);
+            }
+        }
     });
 </script>
 @endsection
