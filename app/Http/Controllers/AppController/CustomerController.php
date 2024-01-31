@@ -873,9 +873,7 @@ class CustomerController extends Controller
 
         list($type, $id, $filename) = explode('_', $offer);
         return response()->json([
-            'type' => $type,
-            'id' => $id,
-            'filename' => $filename
+            'offer' => $offer
         ], 200);
     }
 }
