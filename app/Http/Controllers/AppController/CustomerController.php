@@ -866,4 +866,14 @@ class CustomerController extends Controller
             'sub_categories' => $sub_categories
         ], 200);
     }
+
+    public function getOffer()
+    {
+        $offer = Setting::where('key', 'App Offer Alert')->value('value');
+
+        list($type, $id, $filename) = explode('_', $offer);
+        return response()->json([
+            'offer' => $offer
+        ], 200);
+    }
 }
