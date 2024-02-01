@@ -141,11 +141,13 @@ class SettingController extends Controller
                 request()->validate([
                     'image' => 'dimensions:width=325,height=200',
                     'link_type' => 'required',
-                    'linked_item' => 'required'
+                    'linked_item' => 'required',
+                    'status' => 'required'
                 ]);
                     $linkTypes = $request->link_type;
                     $linkedItems = $request->linked_item;
-                    list($type, $id, $filename) = explode('_', $setting->value);
+                
+                    list($status, $type, $id, $filename) = explode('_', $setting->value);
                     if ($request->image) {
                         if (file_exists(public_path('uploads') . '/' . $filename)) {
                             unlink(public_path('uploads') . '/' . $filename);
@@ -153,11 +155,11 @@ class SettingController extends Controller
                         
                         $image = mt_rand() . '.' . $request->image->getClientOriginalExtension();
                         $request->image->move(public_path('uploads'), $image);
-                        $image = $linkTypes . '_' . $linkedItems . '_' . $image;
+                        $image = $request->status . '_' . $linkTypes . '_' . $linkedItems . '_' . $image;
     
                         $setting->value = $image;
                     }else{
-                        $setting->value = $linkTypes . '_' . $linkedItems . '_' . $filename;
+                        $setting->value = $request->status . '_' . $linkTypes . '_' . $linkedItems . '_' . $filename;
                     }
                     break;
 
