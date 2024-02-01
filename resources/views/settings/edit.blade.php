@@ -175,7 +175,7 @@
                     @elseif($setting->key === 'App Offer Alert')
                         @if($setting->value)
                             @php
-                                list($type, $id, $filename) = explode('_', $setting->value);
+                                list($status, $type, $id, $filename) = explode('_', $setting->value);
                             @endphp
                             <hr>
                             <div class="col-md-12">
@@ -211,6 +211,16 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Status:</strong>
+                                    <select name="status" class="form-control">
+
+                                        <option value="1" @if($status == 1) selected @endif>Enable</option>
+                                        <option value="0" @if($status == 0) selected @endif>Disable</option>
+                                    </select>
                                 </div>
                             </div>
                         @endif
