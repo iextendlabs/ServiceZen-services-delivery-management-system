@@ -17,6 +17,10 @@ use Session;
 use Illuminate\Support\Facades\DB;
 use Hash;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
+use App\Models\StaffZone;
+use App\Models\ServiceCategory;
+use App\Models\Service;
 
 class HomeController extends Controller
 {
@@ -190,5 +194,83 @@ class HomeController extends Controller
 
         return redirect()->route('home')
             ->with('success', 'User updated successfully');
+    }
+
+    public function appJsonData(){
+        $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
+
+        $slider_images = Setting::where('key', 'Slider Image For App')->value('value');
+        $featured_services = Setting::where('key', 'Featured Services')->value('value');
+
+        $featured_services = explode(",", $featured_services);
+
+        $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
+        $images = explode(",", $slider_images);
+        
+        $app_categories = Setting::where('key', 'App Categories')->value('value');
+        $app_categories = explode(",", $app_categories);
+        $categories = ServiceCategory::whereIn('id',$app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $categoriesArray = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'title' => $category->title,
+                'image' => $category->image,
+                'icon' => $category->icon
+            ];
+        })->toArray();
+
+        $servicesArray = $services->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'image' => $service->image,
+                'price' => $service->price,
+                'discount' => $service->discount,
+                'duration' => $service->duration,
+                'category_id' => $categoryIds,
+                'short_description' => $service->short_description,
+                'rating' => $service->averageRating()
+            ];
+        })->toArray();
+
+        $staffs = User::role('Staff')
+            ->whereHas('staff', function ($query) {
+                $query->where('status', 1);
+            })
+            ->orderBy('name', 'ASC')
+            ->with('staff')
+            ->get();
+
+        $staffs->map(function ($staff) {
+            $staff->rating = $staff->averageRating();
+            return $staff;
+        });
+
+        $jsonData = [
+            'images' => $images,
+            'categories' => $categoriesArray,
+            'services' => $servicesArray,
+            'featured_services' => $featured_services,
+            'staffZones' => $staffZones,
+            'staffs' => $staffs,
+            'whatsapp_number' => $whatsapp_number,
+        ];
+        
+        $filename = "AppData.json";
+
+        $filePath = public_path($filename);
+
+        if (File::exists($filePath)) {
+            $currentData = json_decode(File::get($filePath), true);
+            $updatedData = array_merge($currentData, $jsonData);
+            File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+        } else {
+            File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+        }
+
+        return redirect()->route('home')
+            ->with('success', 'App Data updated successfully');
     }
 }

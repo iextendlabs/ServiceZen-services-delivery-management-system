@@ -139,6 +139,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('clear', [CompanyController::class,"clear"])->name('companies.clear');
 
     Route::post('/ckeditor/upload', [CkeditorController::class,"upload"])->name('ckeditor.upload');
+    Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
 
 });
 
