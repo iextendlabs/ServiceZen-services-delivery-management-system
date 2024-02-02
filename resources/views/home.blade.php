@@ -17,9 +17,20 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 text-center">
-            <h1>Dashboard</h1>
+        <div class="col-md-6">
+            <h2>Dashboard</h2>
         </div>
+        <div class="col-md-6">
+            @can('staff-zone-create')
+            <a class="btn btn-success  float-end" href="{{ route('appData') }}"> Refresh App</a>
+            @endcan
+        </div>
+        @if ($message = Session::get('success'))
+        <div class="alert alert-success">
+            <span>{{ $message }}</span>
+            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
         @can('dashboard-report')
         @if(auth()->user()->getRoleNames() == '["Admin"]')
         <div class="col-md-4">
