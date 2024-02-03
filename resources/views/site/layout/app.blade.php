@@ -55,6 +55,33 @@ $cart_product = 0;
   .sub_category {
     display: none;
   }
+
+        #app-link-section {
+            background-color: #ff3366; /* Pink background */
+            color: #ffffff; /* White text */
+            padding: 20px;
+            text-align: center;
+        }
+
+        #app-link-section p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #app-link-section a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ffffff; /* White background for the button */
+            color: #ff3366; /* Pink text for the button */
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #app-link-section a:hover {
+            background-color: #ff4d80; /* Lighter pink on hover */
+        }
 </style>
 
 <body>
@@ -207,6 +234,17 @@ $cart_product = 0;
     }()
   </script>
 
+<script>
+    $(document).ready(function(){
+    if (navigator.userAgent.match(/Android/i)) {
+        var appLinkSection = '<section id="app-link-section">\
+                                <p>🚀 Elevate your experience with our Android App! 🚀</p>\
+                                <a href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp">Download Now</a>\
+                              </section>';
+        $('body').prepend(appLinkSection);
+    }
+    });
+</script>
 </body>
 
 </html>
