@@ -409,7 +409,7 @@
     });
 </script>
 
-<!-- <script>
+<script>
     $(document).ready(function () {
         toggleLinkedItemSelect();
 
@@ -422,12 +422,11 @@
 
             $('.linked-item').prop('disabled', true);
 
-            if (linkType === 'category') {
-                $('.category-option').prop('disabled', false);
-            } else if (linkType === 'service') {
-                $('.service-option').prop('disabled', false);
+            if (linkType === '') {
+                $('.category-option').prop('disabled', true);
+                $('.service-option').prop('disabled', true);
             }
         }
     });
-</script> -->
+</script>
 @endsection
