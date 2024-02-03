@@ -70,6 +70,7 @@
                                                         <option></option>
                                                         <option value="category" {{ $type === 'category' ? 'selected' : '' }}>Categories</option>
                                                         <option value="service" {{ $type === 'service' ? 'selected' : '' }}>Services</option>
+                                                        <option value="customLink" {{ $type === 'customLink' ? 'selected' : '' }}>Custom Link</option>
                                                     </select>
                                                     <div class="category" style="display: {{ $type === 'category' ? 'block' : 'none' }};">
                                                         <select name="linked_item[]" class="form-control col-9 mt-2 linked-item category-option" disabled>
@@ -86,6 +87,9 @@
                                                                 <option value="{{ $service->id }}" data-type="service" {{ ($type === 'service' && $id == $service->id) ? 'selected' : '' }}>{{ $service->name }}</option>
                                                             @endforeach
                                                         </select>
+                                                    </div>
+                                                    <div class="customLink" style="display: {{ $type === 'customLink' ? 'block' : 'none' }};">
+                                                        <input name="linked_item[]" type="text" class="form-control col-9 mt-2 linked-item customLink-option" value={{ $id }} disabled>
                                                     </div>
                                                 </div>
                                             </div>
@@ -255,6 +259,7 @@
                                     <option></option>
                                     <option value="category">Categories</option>
                                     <option value="service">Services</option>
+                                    <option value="customLink">Custom Link</option>
                                 </select>
                                 <div class="category" style="display:none">
                                     <select name="linked_item[]" class="form-control col-9 mt-2 linked-item category-option">
@@ -271,6 +276,9 @@
                                             <option value="{{ $service->id }}" data-type="service">{{ $service->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="customLink" style="display:none">
+                                    <input name="linked_item[]" type="text" class="form-control col-9 mt-2 linked-item customLink-option">
                                 </div>
                             </div>
                         </div>
@@ -321,13 +329,24 @@
 
         if (selectedType === "category") {
             row.find('.service-option').prop('disabled', true); // Use prop instead of attr
+            row.find('.customLink-option').prop('disabled', true); // Use prop instead of attr
             row.find('.category-option').prop('disabled', false); // Use prop instead of attr
             row.find('.category').show();
+            row.find('.customLink').hide();
             row.find('.service').hide();
         } else if (selectedType === "service") {
             row.find('.category-option').prop('disabled', true); // Use prop instead of attr
+            row.find('.customLink-option').prop('disabled', true); // Use prop instead of attr
             row.find('.service-option').prop('disabled', false); // Use prop instead of attr
             row.find('.service').show();
+            row.find('.customLink').hide();
+            row.find('.category').hide();
+        } else if (selectedType === "customLink") {
+            row.find('.category-option').prop('disabled', true); // Use prop instead of attr
+            row.find('.customLink-option').prop('disabled', false); // Use prop instead of attr
+            row.find('.service-option').prop('disabled', true); // Use prop instead of attr
+            row.find('.customLink').show();
+            row.find('.service').hide();
             row.find('.category').hide();
         }
     });

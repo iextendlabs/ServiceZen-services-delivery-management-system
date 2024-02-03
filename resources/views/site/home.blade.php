@@ -45,6 +45,8 @@
                           href="?id={{ $id }}"
                       @elseif($type === "service" && !empty($id))
                           href="/serviceDetail/{{ $id }}"
+                      @elseif($type === "customLink" && !empty($id))
+                          href="{{ $id }}"
                       @endif
                   >
                       <img src="/slider-images/{{ $filename }}" alt="Slide {{ $loop->iteration }}" class="d-block w-100">

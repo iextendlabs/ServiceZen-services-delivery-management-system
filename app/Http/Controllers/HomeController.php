@@ -258,17 +258,29 @@ class HomeController extends Controller
             'whatsapp_number' => $whatsapp_number,
         ];
         
-        $filename = "AppData.json";
+        try {
+            $filename = "AppData.json";
+            $filePath = public_path($filename);
 
-        $filePath = public_path($filename);
+            if (File::exists($filePath)) {
+                $backupFilename = "AppData_backup.json";
+                $backupFilePath = public_path($backupFilename);
 
-        if (File::exists($filePath)) {
-            $currentData = json_decode(File::get($filePath), true);
-            $updatedData = array_merge($currentData, $jsonData);
-            File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-        } else {
-            File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $jsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+                
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
         }
+
 
         return redirect()->route('home')
             ->with('success', 'App Data updated successfully');
