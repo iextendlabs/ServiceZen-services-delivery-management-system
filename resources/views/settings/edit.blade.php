@@ -239,7 +239,6 @@
         </div>
     </form>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $("#addImageBtn").click(function() {
         // Append a new row to the table
@@ -410,7 +409,7 @@
     });
 </script>
 
-<script>
+<!-- <script>
     $(document).ready(function () {
         toggleLinkedItemSelect();
 
@@ -430,5 +429,5 @@
             }
         }
     });
-</script>
+</script> -->
 @endsection
