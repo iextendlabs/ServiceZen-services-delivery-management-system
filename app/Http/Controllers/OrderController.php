@@ -47,6 +47,7 @@ class OrderController extends Controller
         $driver_statuses = config('app.order_driver_statuses');
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
+        $zones = StaffZone::pluck("name")->toArray();
         $filter = [
             'status' => $request->status,
             'affiliate' => $request->affiliate_id,
@@ -58,6 +59,7 @@ class OrderController extends Controller
             'order_id' => $request->order_id,
             'driver_status' => $request->driver_status,
             'driver' => $request->driver_id,
+            'zone' => $request->zone,
         ];
         $currentUser = Auth::user();
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
@@ -91,6 +93,10 @@ class OrderController extends Controller
             default:
                 $query = Order::orderBy('date', 'ASC')->orderBy('time_start');
                 break;
+        }
+
+        if ($request->zone) {
+            $query->where('area', 'like', '%' . $request->zone . '%');
         }
 
         if ($request->order_id) {
@@ -201,7 +207,7 @@ class OrderController extends Controller
 
             $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer_id', 'payment_method','driver_status','driver_id']);
             $orders->appends($filters);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter','driver_statuses'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter','driver_statuses','zones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
