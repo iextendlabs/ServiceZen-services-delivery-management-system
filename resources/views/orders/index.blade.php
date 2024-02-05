@@ -203,6 +203,21 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
+                            <strong>Zone:</strong>
+                            <select name="zone" class="form-control">
+                                <option value="">Select</option>
+                                @foreach ($zones as $zone)
+                                @if($zone == $filter['zone'])
+                                <option value="{{ $zone }}" selected>{{ $zone }}</option>
+                                @else
+                                <option value="{{ $zone }}">{{ $zone }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <strong>Payment Method:</strong>
                             <select name="payment_method" class="form-control">
                                 <option value="">Select</option>
