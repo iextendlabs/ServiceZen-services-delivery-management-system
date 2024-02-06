@@ -26,39 +26,48 @@ class Coupon extends Model
         return $this->belongsToMany(ServiceCategory::class, 'coupon_to_category', 'coupon_id', 'category_id');
     }
 
-    public function getDiscountForProducts(array $services)
+    public function getDiscountForProducts(array $serviceIds)
     {
         $service_ids = [];
 
         if ($this->category()->exists()) {
             $category_ids = $this->category->pluck('id')->toArray();
 
-            $service_ids = Service::whereIn('category_id', $category_ids)->pluck('id')->toArray();
-        }
+            $service_ids = ServiceToCategory::whereIn('category_id', $category_ids)->pluck('service_id')->toArray();
+        }   
 
         if ($this->service()->exists()) {
             $service_ids = array_merge($service_ids, $this->service->pluck('id')->toArray());
         }
 
-        $selected_services = array_intersect($services, $service_ids);
+        $selected_services = array_intersect($serviceIds, $service_ids);
 
-        if ($selected_services) {
-            $services = Service::whereIn('id', $selected_services)->get();
-        } else {
-            $services = Service::whereIn('id', $services)->get();
+        if($this->category()->exists() || $this->service()->exists()){
+            if ($selected_services) {
+                $services = Service::whereIn('id', $selected_services)->get();
+            }else{
+                $services = [];
+            }
+        }else{
+            $services = Service::whereIn('id', $serviceIds)->get();
         }
-
-        $services_total = $services->sum(function ($service) {
-            return isset($service->discount) ? $service->discount : $service->price;
-        });
-
-        if ($this->type == "Percentage") {
-            $coupon_discount = ($services_total * $this->discount) / 100;
-        } else {
-            $coupon_discount = $this->discount;
+        
+        if($services){
+            $services_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+    
+            if ($this->type == "Percentage") {
+                $coupon_discount = ($services_total * $this->discount) / 100;
+            } else {
+                $coupon_discount = $this->discount;
+            }
+    
+            return $coupon_discount;
+        }else {
+            return 0;
         }
-
-        return $coupon_discount;
+        
     }
 
 }
