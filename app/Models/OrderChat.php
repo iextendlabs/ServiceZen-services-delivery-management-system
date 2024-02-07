@@ -9,7 +9,7 @@ class OrderChat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'user_id', 'text'];
+    protected $fillable = ['order_id', 'user_id', 'text', 'type'];
 
     public function user()
     {
