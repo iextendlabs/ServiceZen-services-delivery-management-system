@@ -183,7 +183,8 @@ class StaffAppController2 extends Controller
         OrderChat::create([
             'order_id' => $request->order_id,
             'user_id' => $request->user_id,
-            'text' => $request->text
+            'text' => $request->text,
+            'type' => $request->type,
         ]);
 
         $title = "Message on Order #" . $order->id . " by Staff.";
