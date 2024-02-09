@@ -105,7 +105,7 @@ class Coupon extends Model
 
                     if ($userOrdersCount >= $this->uses_total) {
                         // Handle the case where maximum uses exceeded
-                        return 'Coupon already availed. Exceeded maximum uses.';
+                        return 'Coupon already used. Exceeded maximum uses.';
                     }
                 }
             }
