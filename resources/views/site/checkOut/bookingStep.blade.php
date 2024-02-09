@@ -355,7 +355,7 @@
             }
             setTimeout(function() {
                 $(".coupon-message").css('display', 'none');
-            }, 2000);
+            },6000);
 
         });
     });
