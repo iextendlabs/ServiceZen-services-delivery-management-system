@@ -99,10 +99,12 @@ class Coupon extends Model
                     return 'Coupon requires login for validation.';
                 } else {
                     $userOrdersCount = Order::where('customer_id', auth()->id())
-                    ->with('couponHistory')
-                    ->count();
-                
-                    if ($userOrdersCount >= $this->uses_total) {
+                        ->whereHas('couponHistory', function ($query) {
+                            $query->where('coupon_id', $this->id);
+                        })
+                        ->count();
+
+                        if ($userOrdersCount >= $this->uses_total) {
                         // Handle the case where maximum uses exceeded
                         return 'Coupon already used. Exceeded maximum uses.';
                     }
