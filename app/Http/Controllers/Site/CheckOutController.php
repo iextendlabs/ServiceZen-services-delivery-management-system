@@ -230,7 +230,7 @@ class CheckOutController extends Controller
 
         $code = json_decode($request->cookie('code'), true);
 
-        if ($code['coupon_code'] !== null && !empty($selectedServices)) {
+        if ($code && $code['coupon_code'] !== null && !empty($selectedServices)) {
 
             $coupon = Coupon::where('code', $code['coupon_code'])->first();
             if($coupon){
