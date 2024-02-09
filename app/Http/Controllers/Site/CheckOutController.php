@@ -104,12 +104,17 @@ class CheckOutController extends Controller
         if($request->coupon_code && $request->selected_service_ids){
             $coupon = Coupon::where("code",$request->coupon_code)->first();
             $services = Service::whereIn('id', $request->selected_service_ids)->get();
-
-            $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
-            if($isValid !== true){
+            if($coupon){
+                $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+                if($isValid !== true){
+                    return redirect()->back()
+                            ->with('error',$isValid);
+                }
+            }else{
                 return redirect()->back()
-                        ->with('error',$isValid);
+                        ->with('error',"Coupon is invalid!");
             }
+            
         }
 
         Session::forget('serviceIds');
@@ -228,14 +233,18 @@ class CheckOutController extends Controller
         if ($code['coupon_code'] !== null && !empty($selectedServices)) {
 
             $coupon = Coupon::where('code', $code['coupon_code'])->first();
-
-            $isValid = $coupon->isValidCoupon($code['coupon_code'],$selectedServices);
+            if($coupon){
+                $isValid = $coupon->isValidCoupon($code['coupon_code'],$selectedServices);
                 
-            if($isValid === true){
-                $coupon_code = $code['coupon_code'];
+                if($isValid === true){
+                    $coupon_code = $code['coupon_code'];
+                }else{
+                    $coupon_code = "";
+                }
             }else{
                 $coupon_code = "";
             }
+            
             $affiliate_code = $code['affiliate_code'];
         } else {
             $affiliate_code = '';
@@ -353,15 +362,16 @@ class CheckOutController extends Controller
         $couponCode = $request->input('coupon_code');
         $selectedServiceIds = $request->input('selected_service_ids');
 
-        if($request->coupon_code){
             $coupon = Coupon::where("code",$request->coupon_code)->first();
             $services = Service::whereIn('id', $request->selected_service_ids)->get();
-
-            $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
-            if($isValid !== true){
-                return response()->json(['error' => $isValid]);
+            if($coupon){
+                $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+                if($isValid !== true){
+                    return response()->json(['error' => $isValid]);
+                }
+            }else{
+                return response()->json(['error' => "Coupon is invalid!"]);
             }
-        }
 
         return response()->json(['message' => 'Coupon applied successfully']);
     }

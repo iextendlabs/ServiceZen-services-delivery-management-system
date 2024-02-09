@@ -328,6 +328,7 @@
             $(".selected-service-checkbox:checked").each(function() {
                 selectedServiceIds.push($(this).val());
             });
+
             if(selectedServiceIds.length > 0 && couponCode){
                 $.ajax({
                     type: "POST",
