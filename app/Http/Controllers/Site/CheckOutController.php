@@ -101,7 +101,7 @@ class CheckOutController extends Controller
             'gender' => 'required',
         ]);
 
-        if($request->coupon_code){
+        if($request->coupon_code && $request->selected_service_ids){
             $coupon = Coupon::where("code",$request->coupon_code)->first();
             $services = Service::whereIn('id', $request->selected_service_ids)->get();
 
@@ -222,8 +222,10 @@ class CheckOutController extends Controller
         } else {
             $url_affiliate_code = '';
         }
-        if ($request->cookie('code') !== null) {
-            $code = json_decode($request->cookie('code'), true);
+
+        $code = json_decode($request->cookie('code'), true);
+
+        if ($code['coupon_code'] !== null && !empty($selectedServices)) {
 
             $coupon = Coupon::where('code', $code['coupon_code'])->first();
 

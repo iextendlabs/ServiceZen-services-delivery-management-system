@@ -369,7 +369,7 @@ class CustomerController extends Controller
                 return isset($service->discount) ? $service->discount : $service->price;
             });
 
-            if ($request->coupon_id) {
+            if ($request->coupon_id && $input['service_ids']) {
                 $coupon = Coupon::find($request->coupon_id);
                 $input['coupon_id'] = $coupon->id;
                 $discount = $coupon->getDiscountForProducts($services,$sub_total);
