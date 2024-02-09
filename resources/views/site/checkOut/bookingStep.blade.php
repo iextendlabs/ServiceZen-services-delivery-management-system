@@ -285,7 +285,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <strong>Coupon Code:</strong>
-                            <input type="text" name="coupon_code" id="coupon_code" class="form-control" placeholder="Coupon Code" value="{{  old('coupon_code') ? old('coupon_code') : $coupon_code }}">
+                            <div class="input-group">
+                                <input type="text" name="coupon_code" id="coupon_code" class="form-control" placeholder="Coupon Code" value="{{  old('coupon_code') ? old('coupon_code') : $coupon_code }}">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
+                                </div>
+                            </div>
+                            <div id="responseMessage"></div>
                         </div>
                     </div>
                 </div>
@@ -312,6 +318,49 @@
         </form>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $("#applyCouponBtn").click(function() {
+            var couponCode = $("#coupon_code").val();
+            var selectedServiceIds = [];
+
+            $(".selected-service-checkbox:checked").each(function() {
+                selectedServiceIds.push($(this).val());
+            });
+            if(selectedServiceIds.length > 0 && couponCode){
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('apply.coupon') }}",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        coupon_code: couponCode,
+                        selected_service_ids: selectedServiceIds
+                    },
+                    success: function(response) {
+                        if(response.error){
+                            $("#coupon_code").val("");
+                            $("#responseMessage").append('<p class="coupon-message alert alert-danger">' + response.error + '</p>');
+                        }else{
+                            $("#responseMessage").append('<p class="coupon-message alert alert-success">' + response.message + '</p>');
+                        }
+                    },
+                    error: function(error) {
+                        console.log("Error:", error);
+                    }
+                });
+            }else{
+                $("#responseMessage").append('<p class="coupon-message alert alert-danger">There is error with services or coupon input.</p>');
+            }
+            setTimeout(function() {
+                $(".coupon-message").css('display', 'none');
+            }, 2000);
+
+        });
+    });
+</script>
+
+
 <script>
     $(document).on("change", "#category", function() {
         let value = $(this).val();

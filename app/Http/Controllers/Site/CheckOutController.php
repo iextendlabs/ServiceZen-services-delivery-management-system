@@ -17,6 +17,7 @@ use App\Models\StaffHoliday;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\User;
+use App\Models\ServiceToCategory;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Arr;
@@ -98,35 +99,19 @@ class CheckOutController extends Controller
             'service_staff_id' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
             'gender' => 'required',
-            'coupon_code' => [
-                'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) {
-                    $query->where('status', 1)
-                        ->where('date_start', '<=', now())
-                        ->where('date_end', '>=', now());
-                }),
-                function ($attribute, $value, $fail) {
-                    $coupon = Coupon::where('code', $value)->first();
-        
-                    if ($coupon && $coupon->uses_total !== null) {
-                        if (!auth()->check()) {
-                            $fail('The ' . $attribute . ' requires Login for validation.');
-                            return;
-                        }
-                        
-                        $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
-                        $userOrdersCount = Order::where('customer_id', auth()->id())
-                            ->whereIn('id', $order_coupon)
-                            ->count();
-        
-                        if ($userOrdersCount >= $coupon->uses_total) {
-                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
-                        }
-                    }
-                },
-            ],
         ]);
-        
+
+        if($request->coupon_code){
+            $coupon = Coupon::where("code",$request->coupon_code)->first();
+            $services = Service::whereIn('id', $request->selected_service_ids)->get();
+
+            $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+            if($isValid !== true){
+                return redirect()->back()
+                        ->with('error',$isValid);
+            }
+        }
+
         Session::forget('serviceIds');
         if ($request->selected_service_ids) {
             foreach ($request->selected_service_ids as $serviceId) {
@@ -223,6 +208,14 @@ class CheckOutController extends Controller
             ];
         }
 
+        if (session()->has('serviceIds')) {
+            $serviceIds = Session::get('serviceIds');
+            $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
+        } else {
+            $selectedServices = [];
+            $serviceIds = [];
+        }
+
         if ($request->cookie('affiliate_id')) {
             $affiliate = Affiliate::where('user_id', $request->cookie('affiliate_id'))->first();
             $url_affiliate_code = $affiliate->code;
@@ -231,13 +224,12 @@ class CheckOutController extends Controller
         }
         if ($request->cookie('code') !== null) {
             $code = json_decode($request->cookie('code'), true);
-            // if (session()->has('code')) {
-            //     $code = Session::get('code');
-            $isValid = Coupon::where('code',$code['coupon_code'])
-                ->where('status', 1)
-                ->where('date_start', '<=', now())
-                ->where('date_end', '>=', now())->get();
-            if(count($isValid)){
+
+            $coupon = Coupon::where('code', $code['coupon_code'])->first();
+
+            $isValid = $coupon->isValidCoupon($code['coupon_code'],$selectedServices);
+                
+            if($isValid === true){
                 $coupon_code = $code['coupon_code'];
             }else{
                 $coupon_code = "";
@@ -254,14 +246,6 @@ class CheckOutController extends Controller
         } else {
             $email = $addresses['email'];
             $name = $addresses['name'];
-        }
-
-        if (session()->has('serviceIds')) {
-            $serviceIds = Session::get('serviceIds');
-            $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
-        } else {
-            $selectedServices = [];
-            $serviceIds = [];
         }
 
         $date = date('Y-m-d');
@@ -313,7 +297,7 @@ class CheckOutController extends Controller
         if ($code['coupon_code']) {
             $coupon = Coupon::where('code', $code['coupon_code'])->first();
             
-            $coupon_discount = $coupon->getDiscountForProducts($serviceIds);
+            $coupon_discount = $coupon->getDiscountForProducts($services,$sub_total);
         } else {
             $coupon_discount = 0;
         }
@@ -360,5 +344,23 @@ class CheckOutController extends Controller
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $couponCode = $request->input('coupon_code');
+        $selectedServiceIds = $request->input('selected_service_ids');
+
+        if($request->coupon_code){
+            $coupon = Coupon::where("code",$request->coupon_code)->first();
+            $services = Service::whereIn('id', $request->selected_service_ids)->get();
+
+            $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+            if($isValid !== true){
+                return response()->json(['error' => $isValid]);
+            }
+        }
+
+        return response()->json(['message' => 'Coupon applied successfully']);
     }
 }

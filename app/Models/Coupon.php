@@ -26,48 +26,94 @@ class Coupon extends Model
         return $this->belongsToMany(ServiceCategory::class, 'coupon_to_category', 'coupon_id', 'category_id');
     }
 
-    public function getDiscountForProducts(array $serviceIds)
+    public function getDiscountForProducts($services, $services_total)
     {
-        $service_ids = [];
+        if (!$this->category()->exists() && !$this->service()->exists() && $services_total) {
+            return ($this->type == "Percentage") ? ($services_total * $this->discount) / 100 : $this->discount;
+        } else {
+            $matching_service_ids = [];
+            $category_service_ids = [];
+            $sub_total = 0;
 
-        if ($this->category()->exists()) {
-            $category_ids = $this->category->pluck('id')->toArray();
-
-            $service_ids = ServiceToCategory::whereIn('category_id', $category_ids)->pluck('service_id')->toArray();
-        }   
-
-        if ($this->service()->exists()) {
-            $service_ids = array_merge($service_ids, $this->service->pluck('id')->toArray());
-        }
-
-        $selected_services = array_intersect($serviceIds, $service_ids);
-
-        if($this->category()->exists() || $this->service()->exists()){
-            if ($selected_services) {
-                $services = Service::whereIn('id', $selected_services)->get();
-            }else{
-                $services = [];
+            if ($this->category()->exists()) {
+                $category_ids = $this->category->pluck('id')->toArray();
+                $category_service_ids = ServiceToCategory::whereIn('category_id', $category_ids)
+                    ->whereIn('service_id', $services->pluck('id')->toArray())
+                    ->pluck('service_id')->toArray();
             }
-        }else{
-            $services = Service::whereIn('id', $serviceIds)->get();
-        }
-        
-        if($services){
-            $services_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
-            });
-    
-            if ($this->type == "Percentage") {
-                $coupon_discount = ($services_total * $this->discount) / 100;
-            } else {
-                $coupon_discount = $this->discount;
+
+            if ($this->service()->exists()) {
+                $matching_service_ids = array_intersect($services->pluck('id')->toArray(), $this->service->pluck('id')->toArray());
             }
-    
-            return $coupon_discount;
-        }else {
-            return 0;
+
+            $applicable_services = array_unique(array_merge($matching_service_ids, $category_service_ids));
+
+            if($applicable_services){
+                foreach ($services as $service) {
+                    if (in_array($service->id, $applicable_services)) {
+                        $sub_total += isset($service->discount) ? $service->discount : $service->price;
+                    }
+                }
+                if($sub_total){
+                    return ($this->type == "Percentage") ? ($sub_total * $this->discount) / 100 : $this->discount;
+                }
+            }
+            
         }
+        return 0;
+    }
+
+    public function isValidCoupon($code, $services)
+    {
+        $isValid = self::where('code', $code)
+            ->where('status', 1)
+            ->where('date_start', '<=', now())
+            ->where('date_end', '>=', now())
+            ->exists();
         
+        if ($isValid) {
+
+            $matching_service_ids = [];
+            $category_service_ids = [];
+            $sub_total = 0;
+
+            if ($this->category()->exists()) {
+                $category_ids = $this->category->pluck('id')->toArray();
+                $category_service_ids = ServiceToCategory::whereIn('category_id', $category_ids)
+                    ->whereIn('service_id', $services->pluck('id')->toArray())
+                    ->pluck('service_id')->toArray();
+            }
+
+            if ($this->service()->exists()) {
+                $matching_service_ids = array_intersect($services->pluck('id')->toArray(), $this->service->pluck('id')->toArray());
+            }
+
+            $applicable_services = array_unique(array_merge($matching_service_ids, $category_service_ids));
+
+            if (empty($applicable_services) && ($this->category()->exists() || $this->service()->exists())) {
+                return 'Coupon is not valid for your selected service.';
+            }
+
+            if ($this->uses_total !== null) {
+                if (!auth()->check()) {
+                    return 'Coupon requires login for validation.';
+                } else {
+                    $order_coupon = $this->couponHistory()->pluck('order_id')->toArray();
+                    $userOrdersCount = Order::where('customer_id', auth()->id())
+                        ->whereIn('id', $order_coupon)
+                        ->count();
+
+                    if ($userOrdersCount >= $this->uses_total) {
+                        // Handle the case where maximum uses exceeded
+                        return 'Coupon is not valid. Exceeded maximum uses.';
+                    }
+                }
+            }
+        } else {
+            return "Coupon is either invalid or expired!";
+        }
+
+        return true;
     }
 
 }

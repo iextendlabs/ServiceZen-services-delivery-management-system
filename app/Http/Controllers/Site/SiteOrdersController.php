@@ -153,7 +153,7 @@ class SiteOrdersController extends Controller
 
             if ($code['coupon_code']) {
                 $coupon = Coupon::where('code', $code['coupon_code'])->first();
-                $discount = $coupon->getDiscountForProducts($serviceIds);
+                $discount = $coupon->getDiscountForProducts($services,$sub_total);
 
             } else {
                 $discount = 0;

@@ -372,7 +372,7 @@ class CustomerController extends Controller
             if ($request->coupon_id) {
                 $coupon = Coupon::find($request->coupon_id);
                 $input['coupon_id'] = $coupon->id;
-                $discount = $coupon->getDiscountForProducts($input['service_ids']);
+                $discount = $coupon->getDiscountForProducts($services,$sub_total);
             } else {
                 $discount = 0;
             }
@@ -587,7 +587,13 @@ class CustomerController extends Controller
             $coupon = Coupon::where('code', $request->coupon)->first();
         }
         if($coupon && $request->service_ids){
-            $coupon_discount = $coupon->getDiscountForProducts($request->service_ids);
+            $services = Service::whereIn('id', $request->service_ids)->get();
+
+            $sub_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+
+            $coupon_discount = $coupon->getDiscountForProducts($services,$sub_total);
         }else{
             $coupon_discount = "0";
         }

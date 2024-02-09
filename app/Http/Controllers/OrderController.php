@@ -237,6 +237,17 @@ class OrderController extends Controller
             ],
         ]);
 
+        if($request->coupon_code){
+            $coupon = Coupon::where("code",$request->coupon_code)->first();
+            $services = Service::whereIn('id', $request->service_ids)->get();
+
+            $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+            if($isValid !== true){
+                return redirect()->back()
+                        ->with('error',$isValid);
+            }
+        }
+
         $password = NULL;
         $input = $request->all();
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
@@ -293,7 +304,7 @@ class OrderController extends Controller
             if ($input['coupon_code']) {
                 $coupon = Coupon::where('code', $input['coupon_code'])->first();
                 
-                $discount = $coupon->getDiscountForProducts($input['service_ids']);
+                $discount = $coupon->getDiscountForProducts($services,$sub_total);
             } else {
                 $discount = 0;
             }
