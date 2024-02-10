@@ -226,16 +226,23 @@ class OrderController extends Controller
     {
         $this->validate($request, [
             'service_ids' => 'required',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
-            'coupon_code' => [
-                'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) {
-                    $query->where('status', 1)
-                        ->where('date_start', '<=', now())
-                        ->where('date_end', '>=', now());
-                }),
-            ],
+            'affiliate_code' => ['nullable', 'exists:affiliates,code']
         ]);
+
+        if($request->coupon_code){
+            $coupon = Coupon::where("code",$request->coupon_code)->first();
+            $services = Service::whereIn('id', $request->service_ids)->get();
+            if($coupon){
+                $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+                if($isValid !== true){
+                    return redirect()->back()
+                            ->with('error',$isValid);
+                }
+            }else{
+                return redirect()->back()
+                            ->with('error',"Coupon is invalid!");
+            }
+        }
 
         $password = NULL;
         $input = $request->all();
@@ -293,7 +300,7 @@ class OrderController extends Controller
             if ($input['coupon_code']) {
                 $coupon = Coupon::where('code', $input['coupon_code'])->first();
                 
-                $discount = $coupon->getDiscountForProducts($input['service_ids']);
+                $discount = $coupon->getDiscountForProducts($services,$sub_total);
             } else {
                 $discount = 0;
             }

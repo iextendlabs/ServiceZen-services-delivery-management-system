@@ -118,4 +118,7 @@ class Order extends Model
         return $this->hasOne(OrderChat::class, 'order_id')->latest();
     }
 
+    public function couponHistory(){
+        return $this->hasMany(CouponHistory::class);
+    }
 }

@@ -31,7 +31,12 @@
                     <div class="scroll-div">
                         @foreach($chats as $chat)
                         <div class="chat-message {{ $chat->user_id == auth()->user()->id ? 'bot-message' : 'user-message' }}">
+                            @if($chat->type == "Location")
+                            <button class="btn btn-primary show-map-btn" data-coordinates="{{ $chat->text }}">Show Location</button>
+                            <br>
+                            @else
                             {{ $chat->text }} <br>
+                            @endif
                             @foreach($chat->user->getRoleNames() as $v)
                             <span class="chat-role">{{ $v }}</span>
                             @endforeach
@@ -80,5 +85,17 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('.show-map-btn').on('click', function() {
+            var coordinates = $(this).data('coordinates');
+            var [latitude, longitude] = coordinates.split(',').map(coord => parseFloat(coord.trim()));
+
+            // Open a new window or redirect to a map URL with the coordinates
+            var mapUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
+            window.open(mapUrl, '_blank');
+        });
+    });
+</script>
 <script src="{{ asset('js/checkout.js') }}?v={{config('app.version')}}"></script>
 @endsection

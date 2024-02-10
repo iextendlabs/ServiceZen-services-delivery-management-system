@@ -213,3 +213,5 @@ Route::get('/category', function () {
 })->name('categories.index');
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
+
+Route::post('/apply-coupon', [CheckOutController::class,'applyCoupon'])->name('apply.coupon');
