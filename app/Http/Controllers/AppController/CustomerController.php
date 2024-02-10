@@ -553,29 +553,6 @@ class CustomerController extends Controller
     public function applyCouponAffiliate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'coupon' => [
-                'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) use ($request) {
-                    $query->where('status', 1)
-                        ->where('date_start', '<=', now())
-                        ->where('date_end', '>=', now());
-                }),
-                function ($attribute, $value, $fail) use ($request) {
-                    $coupon = Coupon::where('code', $value)->first();
-            
-                    if ($coupon && $coupon->uses_total !== null) {
-                        
-                        $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
-                        $userOrdersCount = Order::where('customer_id', $request->user_id)
-                            ->whereIn('id', $order_coupon)
-                            ->count();
-            
-                        if ($userOrdersCount >= $coupon->uses_total) {
-                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
-                        }
-                    }
-                },
-            ],
             'affiliate' => ['nullable', 'exists:affiliates,code'],
         ]);
     
@@ -583,7 +560,7 @@ class CustomerController extends Controller
             $coupon = Coupon::where("code",$request->coupon)->first();
             $services = Service::whereIn('id', $request->service_ids)->get();
             if($coupon){
-                $isValid = $coupon->isValidCoupon($request->coupon,$services);
+                $isValid = $coupon->isValidCoupon($request->coupon,$services,$request->user_id);
                 if($isValid !== true){
                     $errors = [
                         'coupon' => [$isValid],

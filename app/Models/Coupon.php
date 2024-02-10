@@ -63,7 +63,7 @@ class Coupon extends Model
         return 0;
     }
 
-    public function isValidCoupon($code, $services)
+    public function isValidCoupon($code, $services, $user_id = null)
     {
         $isValid = self::where('code', $code)
             ->where('status', 1)
@@ -98,7 +98,9 @@ class Coupon extends Model
                 if (!auth()->check()) {
                     return 'Coupon requires login for validation.';
                 } else {
-                    $userOrdersCount = Order::where('customer_id', auth()->id())
+                    $userIdToCheck = $user_id ?? auth()->id();
+
+                    $userOrdersCount = Order::where('customer_id', $userIdToCheck)
                         ->whereHas('couponHistory', function ($query) {
                             $query->where('coupon_id', $this->id);
                         })
