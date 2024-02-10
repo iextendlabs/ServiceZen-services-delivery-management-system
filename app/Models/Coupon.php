@@ -95,7 +95,7 @@ class Coupon extends Model
             }
 
             if ($this->uses_total !== null) {
-                if (!auth()->check()) {
+                if (!auth()->check() && $user_id == null) {
                     return 'Coupon requires login for validation.';
                 } else {
                     $userIdToCheck = $user_id ?? auth()->id();
