@@ -102,6 +102,7 @@ class Coupon extends Model
                         ->whereHas('couponHistory', function ($query) {
                             $query->where('coupon_id', $this->id);
                         })
+                        ->where('status', '!=', 'Canceled')
                         ->count();
 
                         if ($userOrdersCount >= $this->uses_total) {

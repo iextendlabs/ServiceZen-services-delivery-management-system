@@ -39,7 +39,7 @@ class InformationPageController extends Controller
 
     public function contactUs(Request $request)
     {
-        $contactUs = Setting::where('key','Privacy Policy')->value('value');
+        $contactUs = Setting::where('key','Contact Us')->value('value');
         $app = $request->app;
 
         return view('site.contactUs', compact('contactUs','app'));

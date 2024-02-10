@@ -579,6 +579,26 @@ class CustomerController extends Controller
             'affiliate' => ['nullable', 'exists:affiliates,code'],
         ]);
     
+        if($request->coupon && $request->service_ids){
+            $coupon = Coupon::where("code",$request->coupon)->first();
+            $services = Service::whereIn('id', $request->service_ids)->get();
+            if($coupon){
+                $isValid = $coupon->isValidCoupon($request->coupon,$services);
+                if($isValid !== true){
+                    $errors = [
+                        'coupon' => [$isValid],
+                    ];
+                    return response()->json(['errors' => $errors], 201);
+                }
+            }else{
+                $errors = [
+                    'coupon' => ['Coupon is invalid!'],
+                ];
+                return response()->json(['errors' => $errors], 201);
+            }
+            
+        }
+
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
