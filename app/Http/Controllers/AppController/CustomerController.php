@@ -312,7 +312,7 @@ class CustomerController extends Controller
         $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
         $request->merge(['orderTotal' => (float) $request->orderTotal]);
 
-        $services = Service::whereIn('id', $input['service_ids'])->get();
+        $services = Service::whereIn('id', $request->service_ids)->get();
 
         $validator = Validator::make($request->all(), [
             'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
