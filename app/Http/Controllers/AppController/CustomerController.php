@@ -34,6 +34,7 @@ use App\Mail\DeleteAccount;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
+use App\Mail\OrderIssueNotification;
 
 class CustomerController extends Controller
 
@@ -978,4 +979,20 @@ class CustomerController extends Controller
         return redirect()->back();
     }
 
+    public function orderIssueMail(Request $request)
+    {
+        $recipient_email = $request->email;
+        $to = env('MAIL_FROM_ADDRESS');
+        $name = $request->name;
+
+        try {
+            Mail::to($to)->send(new OrderIssueNotification($name, $recipient_email));
+            Mail::to("support@iextendlabs.com")->send(new OrderIssueNotification($name, $recipient_email));
+        } catch (\Throwable $th) {
+            //TODO: log error or queue job later
+        }
+        return response()->json([
+            'mailSend' => true
+        ], 201);
+    }
 }
