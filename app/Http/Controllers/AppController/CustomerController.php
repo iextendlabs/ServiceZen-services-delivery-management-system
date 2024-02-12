@@ -890,4 +890,20 @@ class CustomerController extends Controller
             'offer' => $offer
         ], 200);
     }
+
+    public function checkUser(Request $request)
+    {
+        $user = User::find($request->id);
+
+        if ($user) {
+            return response()->json([
+                'exists' => true
+            ], 200);
+        } else {
+            return response()->json([
+                'exists' => false
+            ], 200);
+        }
+    }
+
 }
