@@ -335,10 +335,6 @@ class CustomerController extends Controller
             ], 201);
         }
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 201);
-        }
-
         $password = NULL;
         $input = $request->all();
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
