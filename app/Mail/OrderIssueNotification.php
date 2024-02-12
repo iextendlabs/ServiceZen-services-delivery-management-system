@@ -11,7 +11,7 @@ class OrderIssueNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $name;
+    public $body;
     public $recipient_email;
 
     /**
@@ -20,9 +20,9 @@ class OrderIssueNotification extends Mailable
      * @param string $name
      * @param string $recipient_email
      */
-    public function __construct($name, $recipient_email)
+    public function __construct($request_body, $recipient_email)
     {
-        $this->name = $name;
+        $this->request_body = $request_body;
         $this->recipient_email = $recipient_email;
     }
 
@@ -37,6 +37,9 @@ class OrderIssueNotification extends Mailable
 
         return $this->from($from)
             ->subject('Order Replacement Issue Notification')
-            ->view('site.emails.order_issue_notification');
+            ->view('site.emails.order_issue_notification')
+            ->with([
+                'body' => $this->body
+            ]);;
     }
 }

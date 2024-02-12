@@ -981,13 +981,14 @@ class CustomerController extends Controller
 
     public function orderIssueMail(Request $request)
     {
+        $request_body = $request->all();
         $recipient_email = $request->email;
         $to = env('MAIL_FROM_ADDRESS');
         $name = $request->name;
 
         try {
-            Mail::to($to)->send(new OrderIssueNotification($name, $recipient_email));
-            Mail::to("support@iextendlabs.com")->send(new OrderIssueNotification($name, $recipient_email));
+            Mail::to($to)->send(new OrderIssueNotification($request_body, $recipient_email));
+            Mail::to("support@iextendlabs.com")->send(new OrderIssueNotification($request_body, $recipient_email));
         } catch (\Throwable $th) {
             //TODO: log error or queue job later
         }

@@ -69,4 +69,4 @@ Route::get('deleteAccountMail', [CustomerController::class, 'deleteAccountMail']
 Route::get('subCategories', [CustomerController::class, 'getSubCategories']);
 Route::get('appOffer', [CustomerController::class, 'getOffer']);
 Route::get('checkUser', [CustomerController::class, 'checkUser']);
-Route::get('orderIssueMail', [CustomerController::class, 'orderIssueMail']);
+Route::post('orderIssueMail', [CustomerController::class, 'orderIssueMail']);
