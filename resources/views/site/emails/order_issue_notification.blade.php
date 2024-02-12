@@ -6,14 +6,16 @@
 <body>
     <p>Hello,</p>
 
-    <p>The customer named {{ $body->name }} is facing an issue with replacing the order.</p>
+    <p>The customer named {{ $body['name'] }} is facing an issue with replacing the order.</p>
     <p>Customer details:</p>
     <ul>
-        <li>Name: {{ $body->name }}</li>
-        <li>Email: {{ $body->email }}</li>
-        <li>Number: {{ $body->number }}</li>
+        <li>Name: {{ $body['name'] }}</li>
+        <li>Email: {{ $body['email'] }}</li>
+        <li>Number: {{ $body['number'] }}</li>
     </ul>
-    <p>{{ $body }}</p>
+    <pre>
+        {{ json_encode($body, JSON_PRETTY_PRINT) }}
+    </pre>
     <p>Please address this issue promptly. Thank you.</p>
 </body>
 </html>

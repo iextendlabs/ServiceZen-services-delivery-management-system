@@ -13,16 +13,15 @@ class OrderIssueNotification extends Mailable
 
     public $body;
     public $recipient_email;
-
     /**
      * Create a new message instance.
      *
      * @param string $name
      * @param string $recipient_email
      */
-    public function __construct($request_body, $recipient_email)
+    public function __construct($body, $recipient_email)
     {
-        $this->request_body = $request_body;
+        $this->body = $body;
         $this->recipient_email = $recipient_email;
     }
 

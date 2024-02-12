@@ -984,7 +984,6 @@ class CustomerController extends Controller
         $request_body = $request->all();
         $recipient_email = $request->email;
         $to = env('MAIL_FROM_ADDRESS');
-        $name = $request->name;
 
         try {
             Mail::to($to)->send(new OrderIssueNotification($request_body, $recipient_email));
