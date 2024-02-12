@@ -318,9 +318,22 @@ class CustomerController extends Controller
             'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
             'service_ids.*' => 'exists:services,id',
         ], [
-            'orderTotal.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price,
-            'service_ids.*.exists' => 'Invalid service selected.',
+            'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
+            'service_ids.*.exists' => 'Invalid service selection(s).',
         ]);
+        
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $consolidatedErrors = [];
+        
+            if ($errors->has('service_ids')) {
+                $consolidatedErrors['service_ids'] = ['Invalid service selection(s).'];
+            }
+        
+            return response()->json([
+                'msg' => $consolidatedErrors ?: $errors->first()
+            ], 201);
+        }
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
