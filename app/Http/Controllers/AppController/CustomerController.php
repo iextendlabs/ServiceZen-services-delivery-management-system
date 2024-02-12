@@ -32,6 +32,8 @@ use App\Models\Chat;
 use App\Mail\PasswordReset;
 use App\Mail\DeleteAccount;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderAdminEmail;
+use App\Mail\OrderCustomerEmail;
 
 class CustomerController extends Controller
 
@@ -344,120 +346,138 @@ class CustomerController extends Controller
         if (count($has_order) == 0) {
 
             $staff = User::find($input['service_staff_id']);
+            if(isset($staff)){
+                $input['status'] = "Pending";
+                $input['driver_status'] = "Pending";
+                $input['staff_name'] = $staff->name;
+                $input['time_slot_id'] = $input['time_slot_id'];
+                $input['driver_id'] = $staff->staff->driver_id;
 
-            $input['status'] = "Pending";
-            $input['driver_status'] = "Pending";
-            $input['staff_name'] = $staff->name;
-            $input['time_slot_id'] = $input['time_slot_id'];
-            $input['driver_id'] = $staff->staff->driver_id;
+                $user = User::where('email', $input['email'])->first();
 
-            $user = User::where('email', $input['email'])->first();
+                if (isset($user)) {
 
-            if (isset($user)) {
-
-                $user->customerProfile()->create($input);
-                $input['customer_id'] = $user->id;
-                $customer_type = "Old";
-            } else {
-                $customer_type = "New";
-
-                $password = $input['number'];
-
-                $input['password'] = Hash::make($password);
-
-                $user = User::create($input);
-
-                $user->customerProfile()->create($input);
-
-                $input['customer_id'] = $user->id;
-
-                $user->assignRole('Customer');
-            }
-
-            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
-
-            $sub_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
-            });
-
-            if ($request->coupon_id && $input['service_ids']) {
-                $coupon = Coupon::find($request->coupon_id);
-                $input['coupon_id'] = $coupon->id;
-                $discount = $coupon->getDiscountForProducts($services,$sub_total);
-            } else {
-                $discount = 0;
-            }
-
-            $staff_charges = $staff->staff->charges ?? 0;
-            $transport_charges = $staffZone->transport_charges ?? 0;
-            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
-
-            $input['sub_total'] = (int)$sub_total;
-            $input['discount'] = (int)$discount;
-            $input['staff_charges'] = (int)$staff_charges;
-            $input['transport_charges'] = (int)$transport_charges;
-            $input['total_amount'] = (int)$total_amount;
-
-            $time_slot = TimeSlot::find($input['time_slot_id']);
-            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
-
-            $input['time_start'] = $time_slot->time_start;
-            $input['time_end'] = $time_slot->time_end;
-            $input['payment_method'] = "Cash-On-Delivery";
-            $input['customer_name'] = $input['name'];
-            $input['customer_email'] = $input['email'];
-
-            $order = Order::create($input);
-
-            $input['order_id'] = $order->id;
-            $input['discount_amount'] = $input['discount'];
-
-            OrderTotal::create($input);
-
-            if ($request->coupon_id) {
-                CouponHistory::create($input);
-            }
-
-            foreach ($input['service_ids'] as $id) {
-                $services = Service::find($id);
-                $input['service_id'] = $id;
-                $input['service_name'] = $services->name;
-                $input['duration'] = $services->duration;
-                $input['status'] = 'Open';
-                if ($services->discount) {
-                    $input['price'] = $services->discount;
+                    $user->customerProfile()->create($input);
+                    $input['customer_id'] = $user->id;
+                    $customer_type = "Old";
                 } else {
-                    $input['price'] = $services->price;
-                }
-                OrderService::create($input);
-            }
+                    $customer_type = "New";
 
-            if (Carbon::now()->toDateString() == $input['date']) {
-                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                }
-                try {
-                    $this->sendOrderEmail($input['order_id'], $input['email']);
-                } catch (\Throwable $th) {
-                    //TODO: log error or queue job later
-                }
-            }
-            try {
-                $this->sendAdminEmail($input['order_id'], $input['email']);
-                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
-            } catch (\Throwable $th) {
-                //TODO: log error or queue job later
-            }
+                    $password = $input['number'];
 
-            return response()->json([
-                'msg' => "Order created successfully.",
-                'date' => $order->date,
-                'staff' => $order->staff_name,
-                'slot' => $order->time_slot_value,
-                'total_amount' => $order->total_amount,
-                'order_id' => $order->id,
-            ], 200);
+                    $input['password'] = Hash::make($password);
+
+                    $user = User::create($input);
+
+                    $user->customerProfile()->create($input);
+
+                    $input['customer_id'] = $user->id;
+
+                    $user->assignRole('Customer');
+                }
+
+                $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
+                if(isset($staffZone)){
+                    $sub_total = $services->sum(function ($service) {
+                        return isset($service->discount) ? $service->discount : $service->price;
+                    });
+    
+                    if ($request->coupon_id && $input['service_ids']) {
+                        $coupon = Coupon::find($request->coupon_id);
+                        $input['coupon_id'] = $coupon->id;
+                        $discount = $coupon->getDiscountForProducts($services,$sub_total);
+                    } else {
+                        $discount = 0;
+                    }
+    
+                    $staff_charges = $staff->staff->charges ?? 0;
+                    $transport_charges = $staffZone->transport_charges ?? 0;
+                    $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+    
+                    $input['sub_total'] = (int)$sub_total;
+                    $input['discount'] = (int)$discount;
+                    $input['staff_charges'] = (int)$staff_charges;
+                    $input['transport_charges'] = (int)$transport_charges;
+                    $input['total_amount'] = (int)$total_amount;
+    
+                    $time_slot = TimeSlot::find($input['time_slot_id']);
+                    if(isset($time_slot)){
+                        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+    
+                        $input['time_start'] = $time_slot->time_start;
+                        $input['time_end'] = $time_slot->time_end;
+                        $input['payment_method'] = "Cash-On-Delivery";
+                        $input['customer_name'] = $input['name'];
+                        $input['customer_email'] = $input['email'];
+        
+                        $order = Order::create($input);
+        
+                        $input['order_id'] = $order->id;
+                        $input['discount_amount'] = $input['discount'];
+        
+                        OrderTotal::create($input);
+        
+                        if ($request->coupon_id) {
+                            CouponHistory::create($input);
+                        }
+        
+                        foreach ($input['service_ids'] as $id) {
+                            $services = Service::find($id);
+                            $input['service_id'] = $id;
+                            $input['service_name'] = $services->name;
+                            $input['duration'] = $services->duration;
+                            $input['status'] = 'Open';
+                            if ($services->discount) {
+                                $input['price'] = $services->discount;
+                            } else {
+                                $input['price'] = $services->price;
+                            }
+                            OrderService::create($input);
+                        }
+        
+                        if (Carbon::now()->toDateString() == $input['date']) {
+                            $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            if ($staff->staff->driver) {
+                                $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            }
+                            try {
+                                $this->sendOrderEmail($input['order_id'], $input['email']);
+                            } catch (\Throwable $th) {
+                                //TODO: log error or queue job later
+                            }
+                        }
+                        try {
+                            $this->sendAdminEmail($input['order_id'], $input['email']);
+                            $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+                        } catch (\Throwable $th) {
+                            //TODO: log error or queue job later
+                        }
+        
+                        return response()->json([
+                            'msg' => "Order created successfully.",
+                            'date' => $order->date,
+                            'staff' => $order->staff_name,
+                            'slot' => $order->time_slot_value,
+                            'total_amount' => $order->total_amount,
+                            'order_id' => $order->id,
+                        ], 200);
+                    }else{
+                        return response()->json([
+                            'msg' => "Please select timeslot again."
+                        ], 201);
+                    }
+                    
+                }else{
+                    return response()->json([
+                        'msg' => "Please select zone again."
+                    ], 201);
+                }
+                
+            }else{
+                return response()->json([
+                    'msg' => "Please select staff again."
+                ], 201);
+            }
         } else {
             return response()->json([
                 'msg' => "Sorry! Unfortunately This slot was booked by someone else just now."
@@ -904,6 +924,58 @@ class CustomerController extends Controller
                 'exists' => false
             ], 200);
         }
+    }
+
+    public function sendCustomerEmail($customer_id, $type, $order_id)
+    {
+        if ($type == "Old") {
+            $customer = User::find($customer_id);
+
+            $dataArray = [
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'password' => ' ',
+                'order_id' => $order_id
+            ];
+        } elseif ($type == "New") {
+            $customer = User::find($customer_id);
+
+            $dataArray = [
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'password' => $customer->name . '1094',
+                'order_id' => $order_id
+            ];
+        }
+        $recipient_email = env('MAIL_FROM_ADDRESS');
+
+        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray,$recipient_email));
+
+        return redirect()->back();
+    }
+
+    public function sendAdminEmail($order_id, $recipient_email)
+    {
+        $order = Order::find($order_id);
+        $to = env('MAIL_FROM_ADDRESS');
+        Mail::to($to)->send(new OrderAdminEmail($order, $recipient_email));
+
+        return redirect()->back();
+    }
+
+    public function sendOrderEmail($order_id, $recipient_email)
+    {
+        $setting = Setting::where('key', 'Emails For Daily Alert')->first();
+
+        $emails = explode(',', $setting->value);
+
+        $order = Order::find($order_id);
+
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new OrderAdminEmail($order, $recipient_email));
+        }
+
+        return redirect()->back();
     }
 
 }
