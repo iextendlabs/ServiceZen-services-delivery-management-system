@@ -312,10 +312,14 @@ class CustomerController extends Controller
         $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
         $request->merge(['orderTotal' => (float) $request->orderTotal]);
 
+        $services = Service::whereIn('id', $input['service_ids'])->get();
+
         $validator = Validator::make($request->all(), [
             'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
+            'service_ids.*' => 'exists:services,id',
         ], [
             'orderTotal.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price,
+            'service_ids.*.exists' => 'Invalid service selected.',
         ]);
 
         if ($validator->fails()) {
@@ -362,8 +366,6 @@ class CustomerController extends Controller
             }
 
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
-
-            $services = Service::whereIn('id', $input['service_ids'])->get();
 
             $sub_total = $services->sum(function ($service) {
                 return isset($service->discount) ? $service->discount : $service->price;
