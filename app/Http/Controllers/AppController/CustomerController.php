@@ -322,29 +322,18 @@ class CustomerController extends Controller
             'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
         ]);
         
+        $validator = Validator::make($request->all(), [
+            'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
+            'service_ids.*' => 'exists:services,id',
+        ], [
+            'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
+            'service_ids.*.exists' => 'Invalid service selection(s).',
+        ]);
+        
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $consolidatedErrors = [];
-        
-            // Append service names to the error messages for service_ids
-            if ($errors->has('service_ids')) {
-                $invalidServiceIds = $errors->get('service_ids');
-                $invalidServiceNames = [];
-        
-                foreach ($request->input('service_ids') as $key => $serviceId) {
-                    $service = Service::find($serviceId);
-                    if ($service) {
-                        $invalidServiceNames[] = $service->name;
-                    }
-                }
-        
-                $consolidatedErrors['service_ids'] = [
-                    'Invalid service selection(s) for: ' . implode(', ', $invalidServiceNames)
-                ];
-            }
-        
             return response()->json([
-                'msg' => $consolidatedErrors ?: $errors->first()
+                'msg' => $errors->first()
             ], 201);
         }
 
