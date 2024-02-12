@@ -323,9 +323,7 @@ class CustomerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'msg' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price
-            ], 201);
+            return response()->json(['errors' => $validator->errors()], 201);
         }
 
         $password = NULL;
