@@ -315,11 +315,11 @@ class CustomerController extends Controller
         $services = Service::whereIn('id', $request->service_ids)->get();
 
         $validator = Validator::make($request->all(), [
-            'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
             'service_ids.*' => 'exists:services,id',
+            'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
         ], [
-            'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
             'service_ids.*.exists' => 'Invalid service selection(s).',
+            'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
         ]);
         
         if ($validator->fails()) {
