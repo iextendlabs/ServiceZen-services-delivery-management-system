@@ -326,8 +326,21 @@ class CustomerController extends Controller
             $errors = $validator->errors();
             $consolidatedErrors = [];
         
+            // Append service names to the error messages for service_ids
             if ($errors->has('service_ids')) {
-                $consolidatedErrors['service_ids'] = ['Invalid service selection(s).'];
+                $invalidServiceIds = $errors->get('service_ids');
+                $invalidServiceNames = [];
+        
+                foreach ($request->input('service_ids') as $key => $serviceId) {
+                    $service = Service::find($serviceId);
+                    if ($service) {
+                        $invalidServiceNames[] = $service->name;
+                    }
+                }
+        
+                $consolidatedErrors['service_ids'] = [
+                    'Invalid service selection(s) for: ' . implode(', ', $invalidServiceNames)
+                ];
             }
         
             return response()->json([
