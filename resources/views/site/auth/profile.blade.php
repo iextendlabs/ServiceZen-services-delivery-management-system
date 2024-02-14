@@ -52,6 +52,12 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
+                        <span style="color: red;">*</span><strong>District:</strong>
+                        <input required type="text" name="district" id="district" class="form-control" placeholder="District" value="{{ $user->customerProfile->district ?? null }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
                         <span style="color: red;">*</span><strong>Area:</strong>
                         <input required type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ $user->customerProfile->area ?? null }}">
                     </div>

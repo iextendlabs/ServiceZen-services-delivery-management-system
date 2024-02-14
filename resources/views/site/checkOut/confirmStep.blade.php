@@ -89,6 +89,7 @@
                         <div> <strong>Building Name:</strong> {{ $address['buildingName'] }}</div>
                         <div> <strong>FlatVilla:</strong> {{ $address['flatVilla'] }}</div>
                         <div> <strong>Street:</strong> {{ $address['street'] }}</div>
+                        <div> <strong>District:</strong> {{ $address['district'] }}</div>
                         <div> <strong>Area:</strong> {{ $address['area'] }}</div>
                         <div> <strong>City:</strong> {{ $address['city'] }}</div>
                         <div> <strong>Number:</strong> {{ $address['number'] }}</div>

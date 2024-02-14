@@ -175,7 +175,7 @@ class OrderController extends Controller
             $callback = function () use ($orders, $currentUser) {
                 $output = fopen('php://output', 'w');
                 $header = $currentUser->hasRole('Supervisor')
-                    ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'Area', 'City', 'Building name', 'Status', 'Services')
+                    ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark','District','Area', 'City', 'Building name', 'Status', 'Services')
                     : array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Number', 'Whatsapp', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services');
 
                 // Write the header row
@@ -189,7 +189,7 @@ class OrderController extends Controller
                     }
 
                     $csvRow = $currentUser->hasRole('Supervisor')
-                        ? array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services))
+                        ? array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->district, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services))
                         : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->number, $row->whatsapp, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services));
 
                     // Write the CSV data row

@@ -93,6 +93,7 @@
                 <tr>
                     <td>
                         <b>Building Name:</b> {{ $order->buildingName }} <br><br>
+                        <b>District:</b> {{ $order->district }} <br><br>
                         <b>Area:</b> {{ $order->area }}
                     </td>
                     <td>

@@ -202,6 +202,12 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
+                            <span style="color: red;">*</span><strong>District:</strong>
+                            <input required type="text" name="district" id="district" class="form-control" placeholder="District" value="{{ old('district') ? old('district') : $addresses['district'] }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <span style="color: red;">*</span><strong>Landmark:</strong>
                             <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('landmark') ? old('landmark') : $addresses['landmark'] }}">
                         </div>
@@ -505,6 +511,7 @@
         const buildingNameField = document.getElementById('buildingName');
         const landmarkField = document.getElementById('landmark');
         const areaField = document.getElementById('area');
+        const districtField = document.getElementById('district');
         const flatVillaField = document.getElementById('flatVilla');
         const streetField = document.getElementById('street');
         const cityField = document.getElementById('city');
@@ -525,7 +532,8 @@
             } else if (types.includes('point_of_interest')) {
                 landmarkField.value = component.long_name;
             } else if (types.includes('neighborhood') || types.includes('sublocality')) {
-                // areaField.value = component.long_name;
+                areaField.value = component.long_name;
+                districtField.value = component.long_name;
             } else if (types.includes('street_number')) {
                 flatVillaField.value = component.long_name;
             } else if (types.includes('route')) {
@@ -569,10 +577,13 @@
             fillFormAddressFields(place);
         });
     }
-    $('#zone').on('change', function() {
-        let val = $(this).val();
-        $('#area').val(val);
-    })
+    $(document).on('change', '#zone', function() {
+        $('#area').val($(this).val());
+    });
+
+    $(document).on('change', '#area', function() {
+        $('#zone').val($(this).val());
+    });
 </script>
 <script src="{{ asset('js/checkout.js') }}?v={{config('app.version')}}"></script>
 @endsection

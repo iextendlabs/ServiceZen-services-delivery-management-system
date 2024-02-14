@@ -26,6 +26,7 @@
           <input type="hidden" name="buildingName" id="popup_buildingName">
           <input type="hidden" name="flatVilla" id="popup_flatVilla">
           <input type="hidden" name="street" id="popup_street">
+          <input type="hidden" name="district" id="popup_district">
           <input type="hidden" name="area" id="popup_area">
           <input type="hidden" name="landmark" id="popup_landmark">
           <input type="hidden" name="city" id="popup_city">

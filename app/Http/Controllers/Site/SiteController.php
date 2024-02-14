@@ -43,6 +43,7 @@ class SiteController extends Controller
                 $address = [];
 
                 $address['buildingName'] = $user->customerProfile->buildingName;
+                $address['district'] = $user->customerProfile->district;
                 $address['area'] = $user->customerProfile->area;
                 $address['flatVilla'] = $user->customerProfile->flatVilla;
                 $address['street'] = $user->customerProfile->street;
@@ -134,6 +135,7 @@ class SiteController extends Controller
             $address = [];
 
             $address['buildingName'] = $request->buildingName;
+            $address['district'] = $request->district;
             $address['area'] = $request->area;
             $address['flatVilla'] = $request->flatVilla;
             $address['street'] = $request->street;
@@ -166,6 +168,7 @@ class SiteController extends Controller
 
             $address['buildingName'] = '';
             $address['area'] = $request->zone;
+            $address['district'] = '';
             $address['flatVilla'] = '';
             $address['street'] = '';
             $address['landmark'] = '';

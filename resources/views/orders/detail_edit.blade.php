@@ -62,6 +62,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
+                                <strong>District:</strong>
+                                <input type="text" name="district" id="district" value="{{ $order->district }}" class="form-control" placeholder="District">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <strong>Area:</strong>
                                 <input type="text" name="area" id="area" value="{{ $order->area }}" class="form-control" placeholder="Area">
                             </div>
