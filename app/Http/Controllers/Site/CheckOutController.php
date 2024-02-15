@@ -87,6 +87,7 @@ class CheckOutController extends Controller
     {
         $this->validate($request, [
             'buildingName' => 'required',
+            'district' => 'required',
             'area' => 'required',
             'flatVilla' => 'required',
             'street' => 'required',
@@ -128,6 +129,7 @@ class CheckOutController extends Controller
         $address = [];
 
         $address['buildingName'] = $request->buildingName;
+        $address['district'] = $request->district;
         $address['area'] = $request->area;
         $address['flatVilla'] = $request->flatVilla;
         $address['street'] = $request->street;
@@ -197,6 +199,7 @@ class CheckOutController extends Controller
         } else {
             $addresses = [
                 'buildingName' => '',
+                'district' => '',
                 'area' => '',
                 'flatVilla' => '',
                 'street' => '',

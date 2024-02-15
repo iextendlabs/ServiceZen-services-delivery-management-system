@@ -26,6 +26,7 @@ function fillAddressFields(place) {
         document.getElementById("popup_buildingName");
     const popup_landmarkField = document.getElementById("popup_landmark");
     const popup_areaField = document.getElementById("popup_area");
+    const popup_districtField = document.getElementById("popup_district");
     const popup_flatVillaField = document.getElementById("popup_flatVilla");
     const popup_streetField = document.getElementById("popup_street");
     const popup_cityField = document.getElementById("popup_city");
@@ -36,6 +37,7 @@ function fillAddressFields(place) {
     popup_buildingNameField.value = "";
     popup_landmarkField.value = "";
     popup_areaField.value = "";
+    popup_districtField.value = "";
     popup_flatVillaField.value = "";
     popup_streetField.value = "";
     popup_latitudeField.value = "";
@@ -56,6 +58,7 @@ function fillAddressFields(place) {
             types.includes("neighborhood") ||
             types.includes("sublocality")
         ) {
+            popup_districtField.value = component.long_name;
             popup_areaField.value = component.long_name;
             $("#zone").val(component.long_name);
         } else if (types.includes("popup_street_number")) {
@@ -66,7 +69,7 @@ function fillAddressFields(place) {
             popup_cityField.value = component.long_name;
         }
         popup_latitudeField.value = place.geometry.location.lat();
-        popup_longitude.value = place.geometry.location.lng();
+        popup_longitudeField.value = place.geometry.location.lng();
     }
 
     popup_searchField.value = place["formatted_address"];
@@ -297,4 +300,3 @@ function placeMarker(location) {
 
     fillAddressFieldsFromMarker();
 }
-$('#zone').change(() => $('#area').val($('#zone').val()));

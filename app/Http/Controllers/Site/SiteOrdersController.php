@@ -91,6 +91,7 @@ class SiteOrdersController extends Controller
             $input['customer_name'] = $address['name'];
             $input['customer_email'] = $address['email'];
             $input['buildingName'] = $address['buildingName'];
+            $input['district'] = $address['district'];
             $input['area'] = $address['area'];
             $input['flatVilla'] = $address['flatVilla'];
             $input['street'] = $address['street'];
