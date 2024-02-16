@@ -137,8 +137,8 @@ class CustomerAuthController extends Controller
             $input = Arr::except($input, array('password'));
         }
 
-        $input['number'] = config('app.country_code') . $request->number;
-        $input['whatsapp'] = config('app.country_code') . $request->whatsapp;
+        $input['number'] =$request->number;
+        $input['whatsapp'] =$request->whatsapp;
         $input['user_id'] = $id;
 
         $user = User::find($id);
@@ -157,8 +157,8 @@ class CustomerAuthController extends Controller
         $address['street'] = $request->street;
         $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
-        $address['number'] = config('app.country_code') . $request->number;
-        $address['whatsapp'] = config('app.country_code') . $request->whatsapp;
+        $address['number'] =$request->number;
+        $address['whatsapp'] =$request->whatsapp;
         $address['email'] = $request->email;
         $address['name'] = $request->name;
         $address['latitude'] = $request->latitude;

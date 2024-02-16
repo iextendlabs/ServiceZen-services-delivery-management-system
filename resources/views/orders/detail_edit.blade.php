@@ -103,23 +103,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Phone Number:</strong>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">{{ config('app.country_code') }}</span>
-                                    </div>
-                                    <input type="text" name="number" id="number" value="{{ str_replace('+971', '', $order->number) }}" class="form-control" placeholder="Phone Number">
-                                </div>
+                                <input type="text" name="number" id="number" value="{{ $order->number }}" class="form-control" placeholder="Enter Phone Number With Country Code">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Whatsapp Number:</strong>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">{{ config('app.country_code') }}</span>
-                                    </div>
-                                    <input type="text" name="whatsapp" id="whatsapp" value="{{ str_replace('+971', '', $order->whatsapp) }}" class="form-control" placeholder="Whatsapp Number">
-                                </div>
+                                <input type="text" name="whatsapp" id="whatsapp" value="{{ $order->whatsapp }}" class="form-control" placeholder="Enter Whatsapp Number With Country Code">
                             </div>
                         </div>
                     </div>

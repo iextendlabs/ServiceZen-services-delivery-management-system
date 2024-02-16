@@ -249,23 +249,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Phone Number:</strong>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">{{ config('app.country_code') }}</span>
-                                </div>
-                                <input required type="text" name="number" id="number" class="form-control" placeholder="Phone Number" value="{{ old('number') ? old('number') : str_replace('+971', '', $addresses['number']) }}" pattern="[0-9]{7,9}">
-                            </div>
+                            <input required type="text" name="number" id="number" class="form-control" placeholder="Enter Phone Number With Country Code" value="{{ old('number') ? old('number') : $addresses['number'] }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">{{ config('app.country_code') }}</span>
-                                </div>
-                                <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Whatsapp Number" value="{{ old('whatsapp') ? old('whatsapp') : str_replace('+971', '', $addresses['whatsapp']) }}" pattern="[0-9]{7,9}">
-                            </div>
+                            <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Enter Whatsapp Number With Country Code" value="{{ old('whatsapp') ? old('whatsapp') : $addresses['whatsapp'] }}">
                         </div>
                     </div>
                     <div class="col-md-12">
