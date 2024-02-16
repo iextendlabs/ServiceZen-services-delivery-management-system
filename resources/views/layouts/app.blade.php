@@ -21,6 +21,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/css/intlTelInput.css"
+    integrity="sha512-MqSNU3ahHjuMbcLdeu1dngxB4OaOS7vnnLjnADs9E+0OhS0qk8CZ8nxvA+xyiU+Qy12+0vl2ove9F9ssWZpeuQ==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/intlTelInput.min.js" integrity="sha512-IxRltlh4EpT/il+hOEpD3g4jlXswVbSyH5vbqw6aF40CUsJTRAnr/7MxmPlKRsv9dYgBPcDSVNrf1P/keoBx+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         .table td,
         .table th {
@@ -253,6 +259,46 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const numberInputField = document.querySelector("#number");
+        const whatsappInputField = document.querySelector("#whatsapp");
+        const numberCountryInputField = document.querySelector("#number_country_code");
+        const whatsappCountryInputField = document.querySelector("#whatsapp_country_code");
+
+        const numberInput = window.intlTelInput(numberInputField, {
+        showSelectedDialCode: true,
+        initialCountry: "ae",
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/utils.js?1707906286003",
+        });
+
+        const whatsappInput = window.intlTelInput(whatsappInputField, {
+        showSelectedDialCode: true,
+        initialCountry: "ae",
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/utils.js?1707906286003",
+        });
+
+        const initialNumberCountryCode = numberInput.getSelectedCountryData().dialCode;
+        numberCountryInputField.value = `+${initialNumberCountryCode}`;
+
+        const initialWhatsappCountryCode = whatsappInput.getSelectedCountryData().dialCode;
+        whatsappCountryInputField.value = `+${initialWhatsappCountryCode}`;
+
+        numberInputField.addEventListener("countrychange", function () {
+        numberInputField.value = "";
+        const selectedCountryData = numberInput.getSelectedCountryData();
+        const countryCode = selectedCountryData.dialCode;
+        numberCountryInputField.value = `+${countryCode}`;
+        });
+
+        whatsappInputField.addEventListener("countrychange", function () {
+        whatsappInputField.value = "";
+        const selectedCountryData = whatsappInput.getSelectedCountryData();
+        const countryCode = selectedCountryData.dialCode;
+        whatsappCountryInputField.value = `+${countryCode}`;
+        });
+    });
+    </script>
     <script>
         $(document).ready(function() {
             $(".smsId").click(function() {

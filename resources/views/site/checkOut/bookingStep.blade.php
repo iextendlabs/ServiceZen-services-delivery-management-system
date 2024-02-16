@@ -249,13 +249,15 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Phone Number:</strong>
-                            <input required type="text" name="number" id="number" class="form-control" placeholder="Enter Phone Number With Country Code" value="{{ old('number') ? old('number') : $addresses['number'] }}">
+                            <input id="number_country_code" type="hidden" name="number_country_code" />
+                            <input required type="tel" name="number" id="number" class="form-control" value="{{ old('number') ? old('number') : $addresses['number'] }}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                            <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Enter Whatsapp Number With Country Code" value="{{ old('whatsapp') ? old('whatsapp') : $addresses['whatsapp'] }}">
+                            <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                            <input required type="tel" name="whatsapp" id="whatsapp" class="form-control" value="{{ old('whatsapp') ? old('whatsapp') : $addresses['whatsapp'] }}">
                         </div>
                     </div>
                     <div class="col-md-12">

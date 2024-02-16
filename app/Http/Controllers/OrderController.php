@@ -256,7 +256,8 @@ class OrderController extends Controller
             }
 
             $staff = User::find($input['service_staff_id']);
-
+            $input['number'] = $request->number_country_code . $request->number;
+            $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
             $input['customer_name'] = $input['name'];
             $input['customer_email'] = $input['email'];
             $input['status'] = "Pending";
@@ -435,6 +436,8 @@ class OrderController extends Controller
             $order->order_total->transport_charges = $request->transport_charges;
             $order->order_total->save();
         }
+        $input['number'] = $request->number_country_code . $request->number;
+        $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
 
         $order->update($input);
 

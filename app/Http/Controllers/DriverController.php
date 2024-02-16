@@ -71,7 +71,8 @@ class DriverController extends Controller
         ]);
 
         $input = $request->all();
-
+        $input['phone'] =$request->number_country_code . $request->phone;
+        $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
         $input['password'] = Hash::make($input['password']);
 
         $driver = User::create($input);
@@ -125,6 +126,8 @@ class DriverController extends Controller
         ]);
         
         $input = $request->all();
+        $input['phone'] =$request->number_country_code . $request->phone;
+        $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
         if(!empty($input['password'])){ 
             $input['password'] = Hash::make($input['password']);
         }else{
