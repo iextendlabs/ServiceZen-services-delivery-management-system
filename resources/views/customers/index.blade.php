@@ -109,7 +109,7 @@
                     <div class="col-12">
                         <div class="form-group">
                             <strong>Number:</strong>
-                            <input type="text" name="number" value="{{$filter['number']}}" class="form-control" placeholder="+971 xxxxxx">
+                            <input type="text" name="number" value="{{$filter['number']}}" class="form-control" placeholder="Enter number with country code">
                         </div>
                     </div>
                     <div class="col-12">
