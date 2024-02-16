@@ -135,8 +135,8 @@ class CheckOutController extends Controller
         $address['street'] = $request->street;
         $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
-        $address['number'] = $request->number;
-        $address['whatsapp'] = $request->whatsapp;
+        $address['number'] = $request->number_country_code . $request->number;
+        $address['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
         $address['email'] = $request->email;
         $address['name'] = $request->name;
         $address['searchField'] = $request->searchField;

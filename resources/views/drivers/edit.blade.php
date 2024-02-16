@@ -48,13 +48,15 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Phone Number:</strong>
-                    <input type="number" name="phone" value="{{ isset($driver->driver->phone) ? ($driver->driver->phone) : null }}" class="form-control" placeholder="Phone Number">
+                    <input id="number_country_code" type="hidden" name="number_country_code" />
+                    <input type="tel" id="number" name="phone" value="{{ isset($driver->driver->phone) ? ($driver->driver->phone) : null }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                    <input type="text" name="whatsapp" value="{{ isset($driver->driver->whatsapp) ? $driver->driver->whatsapp : null }}" class="form-control" placeholder="Whatsapp Number">
+                    <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                    <input type="tel" id="whatsapp" name="whatsapp" value="{{ isset($driver->driver->whatsapp) ? $driver->driver->whatsapp : null }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12 text-center">

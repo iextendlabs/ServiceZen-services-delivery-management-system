@@ -106,13 +106,15 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Phone Number:</strong>
-                        <input required type="text" name="number" id="number" class="form-control" placeholder="Enter Phone Number With Country Code" value="{{ $user->customerProfile->number ?? null }}">
+                        <input id="number_country_code" type="hidden" name="number_country_code" />
+                        <input id="number" type="tel" name="number" class="form-control" value="{{ $user->customerProfile->number ?? null }}"/>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                        <input required type="text" name="whatsapp" id="whatsapp" class="form-control" placeholder="Enter Whatsapp Number With Country Code" value="{{ $user->customerProfile->whatsapp ?? null }}">
+                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                        <input required type="tel" name="whatsapp" id="whatsapp" class="form-control" value="{{ $user->customerProfile->whatsapp ?? null }}">
                     </div>
                 </div>
                 <div class="col-md-12">
