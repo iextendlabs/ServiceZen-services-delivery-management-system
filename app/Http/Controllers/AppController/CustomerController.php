@@ -996,4 +996,15 @@ class CustomerController extends Controller
 
         return redirect()->back();
     }
+
+    public function cancelOrder(Request $request)
+    {
+        $order = Order::find($request->user_id);
+        $order->status = "Canceled";
+        $order->save();
+        
+        return response()->json([
+            'msg' => "Order Cancel Successfully."
+        ], 200);
+    }
 }
