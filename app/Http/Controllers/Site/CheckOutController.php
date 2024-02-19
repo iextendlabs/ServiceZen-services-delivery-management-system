@@ -194,8 +194,10 @@ class CheckOutController extends Controller
         // TODO check cookie if works 
         if ($request->cookie('address') !== null) {
             $addresses = json_decode($request->cookie('address'), true);
-            // if (Session::get('address')) {
-            //     $addresses = Session::get('address');
+            if (!isset($addresses['district'])) {
+                $addresses['district'] = '';
+            }
+            //todo check what is missing in this from stardard adress indexes and set it to empty 
         } else {
             $addresses = [
                 'buildingName' => '',

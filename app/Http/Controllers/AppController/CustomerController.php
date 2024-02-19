@@ -93,7 +93,9 @@ class CustomerController extends Controller
             $user->save();
         }
         $customerProfile = CustomerProfile::where('user_id', $input['user_id'])->first();
-        $customerProfile->update($input);
+        if ($customerProfile) {
+            $customerProfile->update($input);
+        }
         return response()->json([
             'msg' => "Updated Successfully!",
         ], 200);
@@ -895,7 +897,7 @@ class CustomerController extends Controller
     public function deleteAccountMail(Request $request){
         
         $user = User::find($request->id);
-        if($user){
+        if($user && $request->has('email')){
             $from = env('MAIL_FROM_ADDRESS');
             Mail::to($request->email)->send(new DeleteAccount($user->id, $from));
 
