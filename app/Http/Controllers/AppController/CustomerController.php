@@ -999,7 +999,7 @@ class CustomerController extends Controller
 
     public function cancelOrder(Request $request)
     {
-        $order = Order::find($request->user_id);
+        $order = Order::find($request->order_id);
         $order->status = "Canceled";
         $order->save();
         
