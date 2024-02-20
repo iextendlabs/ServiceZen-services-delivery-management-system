@@ -1013,7 +1013,7 @@ class CustomerController extends Controller
 
     public function signInWithFB(Request $request)
     {
-        $user = User::find($request->email);
+        $user = User::where('email',$request->email)->first();
         if($user){
             $token = $user->createToken('app-token')->plainTextToken;
             $user_info = CustomerProfile::where('user_id', $user->id)->first();
