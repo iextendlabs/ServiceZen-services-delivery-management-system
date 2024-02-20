@@ -70,3 +70,4 @@ Route::get('subCategories', [CustomerController::class, 'getSubCategories']);
 Route::get('appOffer', [CustomerController::class, 'getOffer']);
 Route::get('checkUser', [CustomerController::class, 'checkUser']);
 Route::get('cancelOrder', [CustomerController::class, 'cancelOrder']);
+Route::post('signInWithFB', [CustomerController::class, 'signInWithFB']);

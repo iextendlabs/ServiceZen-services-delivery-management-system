@@ -37,7 +37,7 @@ $transport_charges = 0;
                 <div id="slots-container" class="col-md-12">
                     @include('site.checkOut.timeSlots')
                 </div>
-                @if(Auth::user()->hasRole('Staff'))
+                @if(Auth::user() && Auth::user()->hasRole('Staff'))
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Status:</strong>
