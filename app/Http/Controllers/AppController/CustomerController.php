@@ -34,6 +34,7 @@ use App\Mail\DeleteAccount;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
+use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
 
 class CustomerController extends Controller
@@ -1008,5 +1009,45 @@ class CustomerController extends Controller
         return response()->json([
             'msg' => "Order Cancel Successfully."
         ], 200);
+    }
+
+    public function signInWithFB(Request $request)
+    {
+        $user = User::find($request->email);
+        if($user){
+            $token = $user->createToken('app-token')->plainTextToken;
+            return response()->json([
+                'user' => $user,
+                'access_token' => $token,
+            ], 200);
+        }else{
+            $input = $request->all();
+            $password = mt_rand(10000000, 99999999);
+            $input['password'] = Hash::make($password);
+            $input['email'] = strtolower(trim($input['email']));
+            if ($request->has('fcmToken') && $request->fcmToken) {
+                $input['device_token'] = $request->fcmToken;
+            }
+            $user = User::create($input);
+            $dataArray = [
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'password' => $password
+            ];
+            $recipient_email = env('MAIL_FROM_ADDRESS');
+            $user->assignRole("Customer");
+            try {
+                Mail::to($input['email'])->send(new CustomerCreatedEmail($dataArray,$recipient_email));
+            } catch (\Throwable $th) {
+                
+            }
+
+            $token = $user->createToken('app-token')->plainTextToken;
+
+            return response()->json([
+                'user' => $user,
+                'access_token' => $token,
+            ], 200);
+        }
     }
 }
