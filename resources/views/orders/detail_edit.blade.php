@@ -104,14 +104,14 @@
                             <div class="form-group">
                                 <strong>Phone Number:</strong>
                                 <input id="number_country_code" type="hidden" name="number_country_code" />
-                                <input type="tel" name="number" id="number" value="{{ $order->number }}" class="form-control">
+                                <input required type="tel" name="number" id="number" value="{{ $order->number }}" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Whatsapp Number:</strong>
                                 <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                <input type="tel" name="whatsapp" id="whatsapp" value="{{ $order->whatsapp }}" class="form-control">
+                                <input required type="tel" name="whatsapp" id="whatsapp" value="{{ $order->whatsapp }}" class="form-control">
                             </div>
                         </div>
                     </div>
