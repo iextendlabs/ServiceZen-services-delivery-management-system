@@ -128,9 +128,9 @@ function mapReady() {
         var currentPath = window.location.pathname;
 
         if (
-            currentPath !== "/customer-login" &&
-            currentPath !== "/customer-registration" &&
-            !currentPath.startsWith("/staffProfile/")
+            !["/customer-login", "/cart", "/deleteAccount", "/customer-registration"].includes(currentPath) &&
+            !currentPath.startsWith("/staffProfile/") &&
+            !currentPath.startsWith("/customerProfile/")
         ) {
             var session = $('input[name="session"]').val();
             if (session == "false") {
