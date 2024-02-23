@@ -59,7 +59,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Area:</strong>
-                        <input required type="text" name="area" id="area" class="form-control" placeholder="Area" value="{{ $user->customerProfile->area ?? null }}">
+                        <input required type="text" name="area" class="form-control" placeholder="Area" value="{{ $user->customerProfile->area ?? null }}">
                     </div>
                 </div>
                 <div class="col-md-6">

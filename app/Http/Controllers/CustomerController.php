@@ -86,6 +86,7 @@ class CustomerController extends Controller
         ]);
 
         $input = $request->all();
+        $input['customer_source'] = "Admin";
 
         $input['password'] = Hash::make($input['password']);
 

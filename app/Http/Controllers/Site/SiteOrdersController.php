@@ -66,7 +66,7 @@ class SiteOrdersController extends Controller
 
 
         $input = $request->all();
-
+        $input['order_source'] = "Site";
         $staff_and_time = Session::get('staff_and_time');
         $address = Session::get('address');
         $serviceIds = Session::get('serviceIds');
@@ -137,7 +137,13 @@ class SiteOrdersController extends Controller
 
                 $user = User::create($input);
 
-                $user->customerProfile()->create($input);
+                if (isset($user->customerProfile)) {
+                    if ($address['update_profile'] == "on") {
+                        $user->customerProfile->update($input);
+                    }
+                } else {
+                    $user->customerProfile()->create($input);
+                }
 
                 $input['customer_id'] = $user->id;
 
@@ -261,7 +267,9 @@ class SiteOrdersController extends Controller
     {
         if ($request->has('custom_location') == '') {
             $this->validate($request, [
-                'service_staff_id' => 'required'
+                'service_staff_id' => 'required',
+                'number' => 'required',
+                'whatsapp' => 'required',
             ]);
         }
 

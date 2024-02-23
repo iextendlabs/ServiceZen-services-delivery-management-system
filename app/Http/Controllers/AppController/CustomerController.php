@@ -118,6 +118,7 @@ class CustomerController extends Controller
 
         // If validation passes, proceed with creating the user
         $input = $request->all();
+        $input['customer_source'] = "Android";
         $input['password'] = Hash::make($input['password']);
         $input['email'] = strtolower(trim($input['email']));
         if ($request->has('fcmToken') && $request->fcmToken) {
@@ -317,6 +318,7 @@ class CustomerController extends Controller
         try{
             $password = NULL;
             $input = $request->all();
+            $input['order_source'] = "Android";
             $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
             $staff = User::find($input['service_staff_id']);
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
@@ -385,7 +387,11 @@ class CustomerController extends Controller
 
                     if (isset($user)) {
 
-                        $user->customerProfile()->create($input);
+                        if($user->customerProfile){
+                            $user->customerProfile->update($input);
+                        }else{
+                            $user->customerProfile()->create($input);
+                        }
                         $input['customer_id'] = $user->id;
                         $customer_type = "Old";
                     } else {
@@ -397,7 +403,11 @@ class CustomerController extends Controller
 
                         $user = User::create($input);
 
-                        $user->customerProfile()->create($input);
+                        if($user->customerProfile){
+                            $user->customerProfile->update($input);
+                        }else{
+                            $user->customerProfile()->create($input);
+                        }
 
                         $input['customer_id'] = $user->id;
 

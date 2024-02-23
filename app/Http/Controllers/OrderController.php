@@ -226,7 +226,9 @@ class OrderController extends Controller
     {
         $this->validate($request, [
             'service_ids' => 'required',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code']
+            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'number' => 'required',
+            'whatsapp' => 'required',
         ]);
 
         if($request->coupon_code){
@@ -246,6 +248,8 @@ class OrderController extends Controller
 
         $password = NULL;
         $input = $request->all();
+        $input['order_source'] = "Admin";
+
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
 
         if (count($has_order) == 0) {
@@ -269,8 +273,11 @@ class OrderController extends Controller
             $user = User::where('email', $input['email'])->first();
 
             if (isset($user)) {
-
-                $user->customerProfile()->create($input);
+                if($user->customerProfile){
+                    $user->customerProfile->update($input);
+                }else{
+                    $user->customerProfile()->create($input);
+                }
                 $input['customer_id'] = $user->id;
                 $customer_type = "Old";
 
@@ -283,7 +290,11 @@ class OrderController extends Controller
 
                 $user = User::create($input);
 
-                $user->customerProfile()->create($input);
+                if($user->customerProfile){
+                    $user->customerProfile->update($input);
+                }else{
+                    $user->customerProfile()->create($input);
+                }
 
                 $input['customer_id'] = $user->id;
 
@@ -417,6 +428,12 @@ class OrderController extends Controller
 
     public function update(Request $request, $id)
     {
+        if($request->edit == "address"){
+            $this->validate($request, [
+                'number' => 'required',
+                'whatsapp' => 'required',
+            ]);
+        }
         $input = $request->all();
         if ($request->has('service_staff_id')) {
             $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];

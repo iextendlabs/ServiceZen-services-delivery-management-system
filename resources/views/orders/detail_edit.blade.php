@@ -45,43 +45,43 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Building Name:</strong>
-                                <input type="text" name="buildingName" id="buildingName" value="{{ $order->buildingName }}" class="form-control" placeholder="Building Name">
+                                <input required type="text" name="buildingName" id="buildingName" value="{{ $order->buildingName }}" class="form-control" placeholder="Building Name">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Flat / Villa:</strong>
-                                <input type="text" name="flatVilla" id="flatVilla" value="{{ $order->flatVilla }}" class="form-control" placeholder="Flat / Villa">
+                                <input required type="text" name="flatVilla" id="flatVilla" value="{{ $order->flatVilla }}" class="form-control" placeholder="Flat / Villa">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Street:</strong>
-                                <input type="text" name="street" id="street" value="{{ $order->street }}" class="form-control" placeholder="Street">
+                                <input required type="text" name="street" id="street" value="{{ $order->street }}" class="form-control" placeholder="Street">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>District:</strong>
-                                <input type="text" name="district" id="district" value="{{ $order->district }}" class="form-control" placeholder="District">
+                                <input required type="text" name="district" id="district" value="{{ $order->district }}" class="form-control" placeholder="District">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Area:</strong>
-                                <input type="text" name="area" id="area" value="{{ $order->area }}" class="form-control" placeholder="Area">
+                                <input required type="text" name="area" id="area" value="{{ $order->area }}" class="form-control" placeholder="Area">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Landmark:</strong>
-                                <input type="text" name="landmark" id="landmark" value="{{ $order->landmark }}" class="form-control" placeholder="Landmark">
+                                <input required type="text" name="landmark" id="landmark" value="{{ $order->landmark }}" class="form-control" placeholder="Landmark">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>City:</strong>
-                                <input type="text" name="city" id="city" value="{{ $order->city }}" class="form-control" placeholder="City">
+                                <input required type="text" name="city" id="city" value="{{ $order->city }}" class="form-control" placeholder="City">
                             </div>
                         </div>
                     </div>
@@ -91,13 +91,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Name:</strong>
-                                <input type="text" customer_name="customer_name" id="customer_name" value="{{ $order->customer_name }}" class="form-control" placeholder="Customer Name">
+                                <input required type="text" customer_name="customer_name" id="customer_name" value="{{ $order->customer_name }}" class="form-control" placeholder="Customer Name">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Email:</strong>
-                                <input type="text" name="customer_email" id="customer_email" value="{{ $order->customer_email }}" class="form-control" placeholder="Customer Email">
+                                <input required type="text" name="customer_email" id="customer_email" value="{{ $order->customer_email }}" class="form-control" placeholder="Customer Email">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -118,6 +118,7 @@
 
                     <div class="col-md-12 text-right no-print">
                         @can('order-edit')
+                        <input type="hidden" name="edit" value="address" class="form-control">
                         <button type="submit" class="btn btn-primary">Update</button>
                         @endcan
                     </div>

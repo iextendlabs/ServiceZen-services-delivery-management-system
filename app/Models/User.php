@@ -24,7 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'device_token',
-        'last_notification_id'
+        'last_notification_id',
+        'customer_source'
     ];
 
     /**
