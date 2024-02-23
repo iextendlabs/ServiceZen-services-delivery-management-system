@@ -314,6 +314,17 @@ class CustomerController extends Controller
 
     public function addOrder(Request $request)
     {
+        if(strlen($request->number) < 6 ){
+            return response()->json([
+                'msg' => "Pleas check the number in personal information."
+            ], 201);
+        }
+
+        if(strlen($request->whatsapp) < 6){
+            return response()->json([
+                'msg' => "Pleas check the whatsapp in personal information."
+            ], 201);
+        }
         try{
             $password = NULL;
             $input = $request->all();
@@ -346,7 +357,7 @@ class CustomerController extends Controller
             $input['total_amount'] = (int)$total_amount;
             
             $request->merge(['orderTotal' => (float) $total_amount]);
-
+            
             $validator = Validator::make($request->all(), [
                 'service_ids.*' => 'exists:services,id',
                 'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
