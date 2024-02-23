@@ -1048,6 +1048,7 @@ class CustomerController extends Controller
             ], 200);
         }else{
             $input = $request->all();
+            $input['customer_source'] = "FaceBook Android";
             $password = mt_rand(10000000, 99999999);
             $input['password'] = Hash::make($password);
             $input['email'] = strtolower(trim($input['email']));

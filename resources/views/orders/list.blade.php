@@ -43,7 +43,7 @@
         <td>{{ $order->city }}</td>
         <td>{{ $order->buildingName }}</td>
         @else
-        <td><a href="{{ route('customers.show',$order->customer_id) }}">{{ $order->customer_name }}</a></td>
+        <td>@if($order->customer_id)<a href="{{ route('customers.show',$order->customer_id) }}">{{ $order->customer_name }}</a>@else {{ $order->customer_name }} @endif</td>
         <td>@currency($order->total_amount)</td>
         <td>{{ $order->payment_method }}</td>
         <td>{{ substr($order->order_comment, 0, 50) }}...</td>

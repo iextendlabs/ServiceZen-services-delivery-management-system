@@ -37,7 +37,9 @@
             @endcan
         </div>
         <div class="col-md-12 float-end no-print mt-2 mb-2">
+            @if($order->customer_id)
             <a class="btn btn-info float-end mr-1" href="{{ route('customers.show',$order->customer_id) }}">View Customer</a>
+            @endif
             @can('order-download')
             <button type="button" class="btn mr-1 btn-primary float-end" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
             @endcan
