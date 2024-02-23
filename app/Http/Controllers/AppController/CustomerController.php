@@ -314,13 +314,13 @@ class CustomerController extends Controller
 
     public function addOrder(Request $request)
     {
-        if(strlen($request->number) < 6 ){
+        if(strlen(trim($request->number)) < 6 ){
             return response()->json([
                 'msg' => "Pleas check the number in personal information."
             ], 201);
         }
 
-        if(strlen($request->whatsapp) < 6){
+        if(strlen(trim($request->whatsapp)) < 6){
             return response()->json([
                 'msg' => "Pleas check the whatsapp in personal information."
             ], 201);
