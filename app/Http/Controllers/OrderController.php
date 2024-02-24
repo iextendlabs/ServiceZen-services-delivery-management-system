@@ -229,7 +229,7 @@ class OrderController extends Controller
         $password = NULL;
         $input = $request->all();
         $input['order_source'] = "Admin";
-        Log::channel('order_request_log')->info('Request Body:', ['body' => $input]);
+        // Log::channel('order_request_log')->info('Request Body:', ['body' => $input]);
 
         $this->validate($request, [
             'service_ids' => 'required',
