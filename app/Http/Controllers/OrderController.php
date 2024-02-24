@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 class OrderController extends Controller
 {
@@ -224,6 +226,11 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        $password = NULL;
+        $input = $request->all();
+        $input['order_source'] = "Admin";
+        Log::channel('order_request_log')->info('Request Body:', ['body' => $input]);
+
         $this->validate($request, [
             'service_ids' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code']
@@ -244,9 +251,6 @@ class OrderController extends Controller
             }
         }
 
-        $password = NULL;
-        $input = $request->all();
-        $input['order_source'] = "Admin";
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
 
         if (count($has_order) == 0) {
@@ -589,5 +593,30 @@ class OrderController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function showLog()
+    {
+        $logPath = storage_path('logs/order_request.log');
+
+        if (File::exists($logPath)) {
+            $logContent = File::get($logPath);
+        } else {
+            $logContent = 'Log file does not exist.';
+        }
+
+        return view('orders.log.show', compact('logContent'));
+    }
+
+    public function emptyLog()
+    {
+        $logPath = storage_path('logs/order_request.log');
+
+        if (File::exists($logPath)) {
+            File::put($logPath, '');
+            return redirect()->route('log.show')->with('success', 'Log file emptied successfully.');
+        } else {
+            return redirect()->route('log.show')->with('error', 'Log file not found.');
+        }
     }
 }

@@ -51,11 +51,10 @@ return [
     */
 
     'channels' => [
-        'request_log' => [
-            'driver' => 'daily', // You can use 'single', 'daily', or other supported drivers
-            'path' => storage_path('logs/request.log'),
-            'level' => 'debug',
-            'days' => 14,
+        'order_request_log' => [
+            'driver' => 'single', // You can use 'single', 'daily', or other supported drivers
+            'path' => storage_path('logs/order_request.log'),
+            'level' => 'debug'
         ],
         'api' => [
             'driver' => 'single',

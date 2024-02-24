@@ -141,6 +141,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/ckeditor/upload', [CkeditorController::class,"upload"])->name('ckeditor.upload');
     Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
 
+    Route::get('/log', [OrderController::class, 'showLog'])->name('log.show');
+    Route::post('/log/empty', [OrderController::class, 'emptyLog'])->name('log.empty');
 });
 
 // Backups

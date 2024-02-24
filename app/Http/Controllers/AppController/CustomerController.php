@@ -316,7 +316,10 @@ class CustomerController extends Controller
 
     public function addOrder(Request $request)
     {
-        Log::channel('request_log')->info('Request Body:', ['body' => $request->all()]);
+        $password = NULL;
+        $input = $request->all();
+        $input['order_source'] = "Android";
+        Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
 
         if(strlen(trim($request->number)) < 6 ){
             return response()->json([
@@ -330,9 +333,7 @@ class CustomerController extends Controller
             ], 201);
         }
         try{
-            $password = NULL;
-            $input = $request->all();
-            $input['order_source'] = "Android";
+            
             $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
             $staff = User::find($input['service_staff_id']);
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
