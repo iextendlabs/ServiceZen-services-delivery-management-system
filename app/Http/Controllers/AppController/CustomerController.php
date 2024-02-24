@@ -36,6 +36,7 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 
@@ -315,6 +316,8 @@ class CustomerController extends Controller
 
     public function addOrder(Request $request)
     {
+        Log::channel('request_log')->info('Request Body:', ['body' => $request->all()]);
+
         if(strlen(trim($request->number)) < 6 ){
             return response()->json([
                 'msg' => "Pleas check the number in personal information."

@@ -51,6 +51,12 @@ return [
     */
 
     'channels' => [
+        'request_log' => [
+            'driver' => 'daily', // You can use 'single', 'daily', or other supported drivers
+            'path' => storage_path('logs/request.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
         'api' => [
             'driver' => 'single',
             'path' => storage_path('logs/api.log'),
