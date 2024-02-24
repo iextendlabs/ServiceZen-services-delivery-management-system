@@ -66,7 +66,7 @@ class SiteOrdersController extends Controller
 
 
         $input = $request->all();
-
+        $input['order_source'] = "Site";
         $staff_and_time = Session::get('staff_and_time');
         $address = Session::get('address');
         $serviceIds = Session::get('serviceIds');

@@ -42,7 +42,7 @@ class CustomerAuthController extends Controller
         ]);
 
         $input = $request->all();
-
+        $input['customer_source'] = "Site";
         $input['password'] = Hash::make($input['password']);
 
         $customer = User::create($input);

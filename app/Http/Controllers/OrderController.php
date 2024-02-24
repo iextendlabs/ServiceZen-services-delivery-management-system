@@ -246,6 +246,7 @@ class OrderController extends Controller
 
         $password = NULL;
         $input = $request->all();
+        $input['order_source'] = "Admin";
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
 
         if (count($has_order) == 0) {
