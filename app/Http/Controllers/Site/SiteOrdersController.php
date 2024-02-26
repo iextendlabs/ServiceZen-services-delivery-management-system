@@ -284,8 +284,8 @@ class SiteOrdersController extends Controller
             $time_slot = TimeSlot::find($time_slot);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
-            $input['number'] =$request->number_country_code . $request->number;
-            $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
+            $input['number'] =$request->number_country_code . ltrim($request->number,'0');
+            $input['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
 
             $staff = User::find($input['service_staff_id']);
 
