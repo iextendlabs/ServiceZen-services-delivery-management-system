@@ -112,6 +112,10 @@ class SiteOrdersController extends Controller
 
             $input['email'] = $address['email'];
 
+            if (strlen(trim($input['number'])) < 6 || strlen(trim($input['whatsapp'])) < 6 )   {
+                return redirect('/bookingStep')
+                    ->with('error', 'Enter phone or whatsapp in order booking step!');
+            }
             $user = User::where('email', $address['email'])->first();
 
             if (isset($user)) {

@@ -93,7 +93,7 @@ class OrderController extends Controller
                 break;
 
             default:
-                $query = Order::orderBy('date', 'ASC')->orderBy('time_start');
+                $query = Order::orderBy('id', 'DESC');
                 break;
         }
 

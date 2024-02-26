@@ -191,14 +191,6 @@ class CheckOutController extends Controller
 
     public function bookingStep(Request $request)
     {
-        // TODO check cookie if works 
-        if ($request->cookie('address') !== null) {
-            $addresses = json_decode($request->cookie('address'), true);
-            if (!isset($addresses['district'])) {
-                $addresses['district'] = '';
-            }
-            //todo check what is missing in this from stardard adress indexes and set it to empty 
-        } else {
             $addresses = [
                 'buildingName' => '',
                 'district' => '',
@@ -216,7 +208,6 @@ class CheckOutController extends Controller
                 'searchField' => '',
                 'gender' => '',
             ];
-        }
 
         if (session()->has('serviceIds')) {
             $serviceIds = Session::get('serviceIds');
