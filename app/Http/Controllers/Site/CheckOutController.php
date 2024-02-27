@@ -175,7 +175,7 @@ class CheckOutController extends Controller
                 }
             }else{
                 $errors = [
-                    'coupon' => "Coupon is invalid!",
+                    'coupon' => ["Coupon is invalid!"],
                 ];
                 return response()->json(['errors' => $errors], 200);
             }
@@ -276,7 +276,7 @@ class CheckOutController extends Controller
 
         } else {
             $errors = [
-                'coupon' => "Sorry! Unfortunately This slot was booked by someone else just now.",
+                'selected_service_ids' => ["Sorry! Unfortunately, this slot was booked by someone else just now."],
             ];
             return response()->json(['errors' => $errors], 200);
         }

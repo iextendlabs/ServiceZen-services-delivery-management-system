@@ -425,7 +425,7 @@
                 success: function (response) {
                     if (response.errors) {
                         var errorMessages = '<div class="alert alert-danger"><strong>Whoops! There were some problems with your input.</strong><ul>';
-
+                        console.log(response.errors);
                         $.each(response.errors, function (field, errors) {
                             $.each(errors, function (key, error) {
                                 errorMessages += '<li>' + error + '</li>';
