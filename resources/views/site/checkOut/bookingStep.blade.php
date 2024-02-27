@@ -414,8 +414,8 @@
     $(document).ready(function () {
         $("#booking-form").submit(function (event) {
             event.preventDefault();
-
-            var formData = $(this).serialize();
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var formData = $(this).serialize() + '&_token=' + csrfToken;
             var url = $(this).attr("action");
 
             $.ajax({
