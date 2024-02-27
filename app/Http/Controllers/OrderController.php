@@ -420,36 +420,126 @@ class OrderController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function affiliate_edit(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $input = ['affiliate_id' => $request->affiliate_id];
+
+        $order->update($input);
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function booking_edit(Request $request, $id)
+    {
+        $request->validate([
+            'service_staff_id' => 'required',
+        ]);
+        
+        $input = $request->all();
+        
+        $order = Order::findOrFail($id);
+
+        $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
+        $staff_id = $input['service_staff_id'] = $request->service_staff_id;
+        $time_slot = TimeSlot::find($input['time_slot_id']);
+        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+        $staff = User::find($staff_id);
+        $input['staff_name'] = $staff->name;
+
+        $order->update($input);
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function comment_edit(Request $request, $id)
+    {
+        $request->validate([
+            'order_comment' => 'required',
+        ]);
+        
+        $order = Order::findOrFail($id);
+
+        $order->update($request->all());
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function custom_location(Request $request, $id)
+    {
+        $request->validate([
+            'custom_location' => 'required',
+        ]);
+        
+        $input = $request->all();
+        $order = Order::findOrFail($id);
+
+        [$latitude, $longitude] = explode(",", $request->custom_location);
+        $input['latitude'] = $latitude;
+        $input['longitude'] = $longitude;
+        $order->update($input);
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function detail_edit(Request $request, $id)
     {
         $input = $request->all();
-        if ($request->has('service_staff_id')) {
-            $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
-            $staff_id = $input['service_staff_id'] = $request->service_staff_id;
-            $time_slot = TimeSlot::find($input['time_slot_id']);
-            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
-        }
+        $order = Order::findOrFail($id);
 
-        if ($request->has('custom_location') && strpos($request->custom_location, ",") != FALSE) {
-            [$latitude, $longitude] = explode(",", $request->custom_location);
-            $input['latitude'] = $latitude;
-            $input['longitude'] = $longitude;
-        }
-
-        $order = Order::find($id);
         if ($request->transport_charges) {
+            if($order->order_total->transport_charges){
+                $order->total_amount = $order->total_amount - $order->order_total->transport_charges + $request->transport_charges;
+            }else{
+                $order->total_amount = $order->total_amount + $request->transport_charges;
+
+            }
             $order->order_total->transport_charges = $request->transport_charges;
             $order->order_total->save();
         }
         $input['number'] = $request->number_country_code .ltrim($request->number,'0');
         $input['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
-
         $order->update($input);
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function driver_edit(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        
+        $order->update($request->all());
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function driver_status_edit(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        
+        $order->update($request->all());
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+
+    public function status_edit(Request $request, $id)
+    {
+        $input = $request->all();
+
+        $order = Order::findOrFail($id);
 
         if (isset($order->staff->commission)) {
             $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
         }
-
+        
         if (isset($order->affiliate)) {
             $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
         }
@@ -464,7 +554,7 @@ class OrderController extends Controller
             Transaction::create($input);
         }
 
-        if ($order->status == "Complete" && isset($order->staff->commission) && !isset($staff_transaction)) {
+        if ($request->status == "Complete" && isset($order->staff->commission) && !isset($staff_transaction)) {
             $input['user_id'] = $order->service_staff_id;
             $input['order_id'] = $order->id;
             $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
@@ -481,23 +571,17 @@ class OrderController extends Controller
             $staff_transaction->delete(); 
         }
 
-        if (isset($staff_id)) {
-            $staff = User::find($staff_id);
-            $order->staff_name = $staff->name;
-            $order->save();
-        }
-        if ($request->status) {
-            $input['order_id'] = $id;
-            $input['user'] = Auth::user()->name;
+        $order->update($request->all());
 
-            OrderHistory::create($input);
-        }
+
+        $input['order_id'] = $id;
+        $input['user'] = Auth::user()->name;
+
+        OrderHistory::create($input);
 
         $previousUrl = $request->url;
-        return redirect($previousUrl)
-            ->with('success', 'Order updated successfully');
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
-
 
     public function destroy($id, Request $request)
     {
