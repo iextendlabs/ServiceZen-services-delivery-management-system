@@ -168,12 +168,16 @@ class CheckOutController extends Controller
             if($coupon){
                 $isValid = $coupon->isValidCoupon($request->coupon_code,$selected_services);
                 if($isValid !== true){
-                    return redirect()->back()
-                            ->with('error',$isValid);
+                    $errors = [
+                        'coupon' => [$isValid],
+                    ];
+                    return response()->json(['errors' => $errors], 200);
                 }
             }else{
-                return redirect()->back()
-                        ->with('error',"Coupon is invalid!");
+                $errors = [
+                    'coupon' => "Coupon is invalid!",
+                ];
+                return response()->json(['errors' => $errors], 200);
             }
             
         }
@@ -271,8 +275,10 @@ class CheckOutController extends Controller
             }
 
         } else {
-            return redirect()->back()
-                ->with('error', 'Sorry! Unfortunately This slot was booked by someone else just now.');
+            $errors = [
+                'coupon' => "Sorry! Unfortunately This slot was booked by someone else just now.",
+            ];
+            return response()->json(['errors' => $errors], 200);
         }
 
         Session::forget('serviceIds');
