@@ -30,8 +30,12 @@ use App\Models\Setting;
 use App\Models\OrderTotal;
 use App\Models\OrderService;
 use App\Models\CouponHistory;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use App\Mail\OrderAdminEmail;
+use App\Mail\OrderCustomerEmail;
+use Illuminate\Support\Facades\Mail;
 
 class CheckOutController extends Controller
 {
@@ -89,10 +93,10 @@ class CheckOutController extends Controller
         return redirect()->back()->with('success', 'Service Remove to Cart Successfully.');
     }
 
-    public function storeSession(Request $request)
+    public function draftOrder(Request $request)
     {
         $password = NULL;
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'buildingName' => 'required',
             'district' => 'required',
             'area' => 'required',
@@ -110,15 +114,19 @@ class CheckOutController extends Controller
             'selected_service_ids' => 'required'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 200);
+        }
+
         $input = $request->all();
         $input['order_source'] = "Site";
         $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
         $staff = User::find($input['service_staff_id']);
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
             
-        $services = Service::whereIn('id', $request->selected_service_ids)->get();
+        $selected_services = Service::whereIn('id', $request->selected_service_ids)->get();
 
-        $sub_total = $services->sum(function ($service) {
+        $sub_total = $selected_services->sum(function ($service) {
             return isset($service->discount) ? $service->discount : $service->price;
         });
 
@@ -126,7 +134,7 @@ class CheckOutController extends Controller
             $coupon = Coupon::where("code",$request->coupon_code)->first();
             if($coupon){
                 $input['coupon_id'] = $coupon->id;
-                $discount = $coupon->getDiscountForProducts($services,$sub_total);
+                $discount = $coupon->getDiscountForProducts($selected_services,$sub_total);
             }else{
                 $discount = 0;
             }
@@ -146,15 +154,19 @@ class CheckOutController extends Controller
             
         $request->merge(['total_amount' => (float) $total_amount]);
         
-        $this->validate($request, [
-            'total_amount' => 'required|numeric|min:' . $minimum_booking_price
-        ], [
-            'total_amount.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price
-        ]);
+        try {
+            $this->validate($request, [
+                'total_amount' => 'required|numeric|min:' . $minimum_booking_price
+            ], [
+                'total_amount.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json(['errors' => $exception->errors()], 200);
+        }
 
         if($request->coupon_code && $request->selected_service_ids){
             if($coupon){
-                $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
+                $isValid = $coupon->isValidCoupon($request->coupon_code,$selected_services);
                 if($isValid !== true){
                     return redirect()->back()
                             ->with('error',$isValid);
@@ -176,8 +188,6 @@ class CheckOutController extends Controller
                 $input['affiliate_id'] = $affiliate->user_id;
             }
 
-            $staff = User::find($input['service_staff_id']);
-
             $input['customer_name'] = $input['name'];
             $input['customer_email'] = $input['email'];
             $input['status'] = "Draft";
@@ -185,6 +195,8 @@ class CheckOutController extends Controller
             $input['staff_name'] = $staff->name;
             $input['time_slot_id'] = $input['time_slot_id'][$staff->id];
             $input['driver_id'] = $staff->staff->driver_id;
+            $input['number'] = $request->number_country_code . ltrim($request->number,'0');
+            $input['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
 
             $user = User::where('email', $input['email'])->first();
 
@@ -295,33 +307,28 @@ class CheckOutController extends Controller
             $address['latitude'] = $request->latitude;
             $address['longitude'] = $request->longitude;
         }
-        $staff_and_time = [];
-
-        $staff_and_time['date'] = $request->date;
-        $staff_id = $request->service_staff_id;
-        $time_slot = $request->time_slot_id[$staff_id];
-        $staff_and_time['time_slot'] = $time_slot;
-        $staff_and_time['service_staff_id'] = $staff_id;
-
-
-        $code['affiliate_code'] = $request->affiliate_code;
-        $code['coupon_code'] = $request->coupon_code;
+        
         Session::put('address', $address);
-        Session::put('staff_and_time', $staff_and_time);
-        Session::put('code', $code);
-        Session::put('order_id', $input['order_id']);
         
         cookie()->queue('address', json_encode($address), 5256000);
-        cookie()->queue('staff_and_time', json_encode($staff_and_time), 5256000);
-        cookie()->queue('code', json_encode($code), 5256000);
 
-        return redirect('confirmStep');
+        return response()->json([
+            'sub_total' => $input['sub_total'],
+            'discount' => $input['discount'],
+            'staff_charges' => $input['staff_charges'],
+            'transport_charges' => $input['transport_charges'],
+            'total_amount' => $input['total_amount'],
+            'staff_name' => $input['staff_name'],
+            'time_slot' => $input['time_slot_value'],
+            'date' => $input['date'],
+            'order_id' => $input['order_id'],
+            'customer_type' => $customer_type,
+        ], 200);
     }
 
     public function bookingStep(Request $request)
     {
         $session_data = NULL;
-        // TODO check cookie if works 
 
         if(Session::has('address')){
             $session_data = Session::get('address');
@@ -334,21 +341,21 @@ class CheckOutController extends Controller
             }  
         }
         $addresses = [
-            'buildingName' => $session_data && isset($session_data['buildingName']) ? $session_data['buildingName']: '',
-            'district' => $session_data && isset($session_data['district']) ? $session_data['district']: '',
-            'area' => $session_data && isset($session_data['area']) ? $session_data['area']: '',
-            'flatVilla' => $session_data && isset($session_data['flatVilla']) ? $session_data['flatVilla']: '',
-            'street' => $session_data && isset($session_data['street']) ? $session_data['street']: '',
-            'landmark' => $session_data && isset($session_data['landmark']) ? $session_data['landmark']: '',
-            'city' => $session_data && isset($session_data['city']) ? $session_data['city']: '',
-            'number' => $session_data && isset($session_data['number']) ? $session_data['number']: '',
-            'whatsapp' => $session_data && isset($session_data['whatsapp']) ? $session_data['whatsapp']: '',
-            'email' => $session_data && isset($session_data['email']) ? $session_data['email']: '',
-            'name' => $session_data && isset($session_data['name']) ? $session_data['name']: '',
-            'latitude' => $session_data && isset($session_data['latitude']) ? $session_data['latitude']: '',
-            'longitude' => $session_data && isset($session_data['longitude']) ? $session_data['longitude']: '',
-            'searchField' => $session_data && isset($session_data['searchField']) ? $session_data['searchField']: '',
-            'gender' => $session_data && isset($session_data['gender']) ? $session_data['gender']: '',
+            'buildingName' => $session_data['buildingName'] ?? '',
+            'district' => $session_data['district'] ?? '',
+            'area' => $session_data['area'] ?? '',
+            'flatVilla' => $session_data['flatVilla'] ?? '',
+            'street' => $session_data['street'] ?? '',
+            'landmark' => $session_data['landmark'] ?? '',
+            'city' => $session_data['city'] ?? '',
+            'number' => $session_data['number'] ?? '',
+            'whatsapp' => $session_data['whatsapp'] ?? '',
+            'email' => $session_data['email'] ?? '',
+            'name' => $session_data['name'] ?? '',
+            'latitude' => $session_data['latitude'] ?? '',
+            'longitude' => $session_data['longitude'] ?? '',
+            'searchField' => $session_data['searchField'] ?? '',
+            'gender' => $session_data['gender'] ?? '',
         ];
         
 
@@ -370,7 +377,6 @@ class CheckOutController extends Controller
         try {
             $code = json_decode($request->cookie('code'), true);
         } catch (\Throwable $th) {
-            //throw $th;
         }
 
         if ($code && $code['coupon_code'] !== null && !empty($selectedServices)) {
@@ -403,11 +409,7 @@ class CheckOutController extends Controller
         }
 
         $date = date('Y-m-d');
-        if ($addresses['area']) {
-            $area = $addresses['area'];
-        } else {
-            $area = session('address') ? session('address')['area'] : '';
-        }
+        $area = $session_data['area'] ?? '';
 
         $servicesCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
@@ -419,56 +421,35 @@ class CheckOutController extends Controller
 
     public function confirmStep(Request $request)
     {
-        // dd(Session::get('order_id'));
-        // $requiredSessionKeys = ['staff_and_time', 'address', 'serviceIds'];
-        // $missingKeys = array_diff($requiredSessionKeys, array_keys(Session::all()));
-
-        // if (!empty($missingKeys)) {
-        //     if (!Session::has('serviceIds')) {
-        //         $errorMessage = "You have not added any service to cart.";
-        //     } else {
-        //         $errorMessage = "There is no " . implode(", ", $missingKeys);
-        //     }
-        //     return redirect('/')->with('error', $errorMessage);
-        // } elseif (Session::has('serviceIds') && empty(Session::get('serviceIds'))) {
-        //     $errorMessage = "You have not added any service to cart.";
-        //     return redirect('/')->with('error', $errorMessage);
-        // }
-
-        // $staff_and_time = Session::get('staff_and_time');
-        // $address = Session::get('address');
-        // $serviceIds = Session::get('serviceIds');
-        // $code = Session::get('code');
-        // $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($address['area']) . "%"])->first();
-
-        // $services = Service::whereIn('id', $serviceIds)->get();
-        // $time_slot = TimeSlot::find($staff_and_time['time_slot']);
-        // $staff = User::find($staff_and_time['service_staff_id']);
-
-        // $sub_total = $services->sum(function ($service) {
-        //     return isset($service->discount) ? $service->discount : $service->price;
-        // });
-
-        // if ($code['coupon_code']) {
-        //     $coupon = Coupon::where('code', $code['coupon_code'])->first();
-            
-        //     $coupon_discount = $coupon->getDiscountForProducts($services,$sub_total);
-        // } else {
-        //     $coupon_discount = 0;
-        // }
-
-        // $staff_charges = $staff->staff->charges ?? 0;
-        // $transport_charges = $staffZone->transport_charges ?? 0;
-        // $total_amount = $sub_total + $staff_charges + $transport_charges - $coupon_discount;
-
-        $order = Order::find(Session::get('order_id'));
-
-        $services_id = $order->orderServices->pluck('service_id')->toArray();
-        $services = Service::whereIn('id',$services_id)->get();
+        $order = Order::find($request->order_id);
+        $order->status = "Pending";
+        $order->order_comment = $request->comment;
+        $order->save();
+        Session::forget('serviceIds');
         
-        return view('site.checkOut.confirmStep', compact(
-            'order','services'
-        ));
+        $customer = $order->customer;
+        $staff = User::find($order->service_staff_id);
+        if($staff){
+            if (Carbon::now()->toDateString() == $order->date) {
+                $staff->notifyOnMobile('Order', 'New Order Generated.',$order->id);
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$order->id);
+                }
+                try {
+                    $this->sendOrderEmail($order->id, $customer->email);
+                } catch (\Throwable $th) {
+                }
+            }
+        }
+        try {
+            $this->sendAdminEmail($order->id, $customer->email);
+            $this->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
+        } catch (\Throwable $th) {
+            //TODO: log error or queue job later
+        }
+        return response()->json([
+            'message' => "successfully"
+        ], 200);
     }
 
 
@@ -512,5 +493,57 @@ class CheckOutController extends Controller
             }
 
         return response()->json(['message' => 'Coupon applied successfully']);
+    }
+
+    public function sendOrderEmail($order_id, $recipient_email)
+    {
+        $setting = Setting::where('key', 'Emails For Daily Alert')->first();
+
+        $emails = explode(',', $setting->value);
+
+        $order = Order::find($order_id);
+
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new OrderAdminEmail($order, $recipient_email));
+        }
+
+        return redirect()->back();
+    }
+    
+    public function sendCustomerEmail($customer_id, $type, $order_id)
+    {
+        if ($type == "Old") {
+            $customer = User::find($customer_id);
+
+            $dataArray = [
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'password' => ' ',
+                'order_id' => $order_id
+            ];
+        } elseif ($type == "New") {
+            $customer = User::find($customer_id);
+
+            $dataArray = [
+                'name' => $customer->name,
+                'email' => $customer->email,
+                'password' => $customer->name . '1094',
+                'order_id' => $order_id
+            ];
+        }
+        $recipient_email = env('MAIL_FROM_ADDRESS');
+
+        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray,$recipient_email));
+
+        return redirect()->back();
+    }
+
+    public function sendAdminEmail($order_id, $recipient_email)
+    {
+        $order = Order::find($order_id);
+        $to = env('MAIL_FROM_ADDRESS');
+        Mail::to($to)->send(new OrderAdminEmail($order, $recipient_email));
+
+        return redirect()->back();
     }
 }
