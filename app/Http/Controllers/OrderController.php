@@ -449,7 +449,7 @@ class OrderController extends Controller
         $input = $request->all();
         
         $order = Order::findOrFail($id);
-
+        
         $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
         $staff_id = $input['service_staff_id'] = $request->service_staff_id;
         $time_slot = TimeSlot::find($input['time_slot_id']);
@@ -459,6 +459,14 @@ class OrderController extends Controller
 
         $order->update($input);
 
+        if ($order->staff->charges) {
+            
+            $order->total_amount = $order->total_amount - $order->order_total->staff_charges + $order->staff->charges;
+            $order->save();
+            $order->order_total->staff_charges = $order->staff->charges;
+            $order->order_total->save();
+            
+        }
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
