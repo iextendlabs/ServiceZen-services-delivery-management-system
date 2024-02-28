@@ -25,9 +25,8 @@
                 </ul>
             </div>
             @endif
-            <form action="{{ route('orders.update',$order->id) }}" method="POST">
+            <form action="{{ route('orders.detail_edit',$order->id) }}" method="POST">
                 @csrf
-                @method('PUT')
                 <input type="hidden" name="url" value="{{ url()->previous() }}">
 
                 <div class="row">
@@ -69,7 +68,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Area:</strong>
-                                <input required type="text" name="area" id="area" value="{{ $order->area }}" class="form-control" placeholder="Area">
+                                <input required type="text" name="area" value="{{ $order->area }}" class="form-control" placeholder="Area">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -91,13 +90,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Name:</strong>
-                                <input required type="text" customer_name="customer_name" id="customer_name" value="{{ $order->customer_name }}" class="form-control" placeholder="Customer Name">
+                                <input required type="text" name="customer_name" id="customer_name" value="{{ $order->customer_name }}" class="form-control" placeholder="Customer Name">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Email:</strong>
-                                <input required type="text" name="customer_email" id="customer_email" value="{{ $order->customer_email }}" class="form-control" placeholder="Customer Email">
+                                <input required type="email" name="customer_email" id="customer_email" value="{{ $order->customer_email }}" class="form-control" placeholder="Customer Email">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -118,7 +117,6 @@
 
                     <div class="col-md-12 text-right no-print">
                         @can('order-edit')
-                        <input type="hidden" name="edit" value="address" class="form-control">
                         <button type="submit" class="btn btn-primary">Update</button>
                         @endcan
                     </div>

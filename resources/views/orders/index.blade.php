@@ -58,14 +58,17 @@
                 </a>
             </div>
         </div>
-        <div class="col-md-12 margin-tb">
-            @can('order-create')
+        <div class="col-md-12 margin-tb  mt-2">
             <div class="float-end">
-                <a class="btn btn-success mt-2" href="{{route('orders.create')}}">
+                @can('order-create')
+                <a class="btn btn-success mr-1" href="{{route('orders.create')}}">
                     <i class="fas fa-plus"></i> Create Order
                 </a>
+                @endcan
+                <a class="btn btn-secondary float-end " href="{{ route('log.show') }}">
+                    Order request log
+                </a>
             </div>
-            @endcan
         </div>
     </div>
     @if ($message = Session::get('success'))

@@ -25,9 +25,8 @@
                 </ul>
             </div>
             @endif
-            <form action="{{ route('orders.update',$order->id) }}" method="POST">
+            <form action="{{ route('orders.driver_edit',$order->id) }}" method="POST">
                 @csrf
-                @method('PUT')
                 <input type="hidden" name="url" value="{{ url()->previous() }}">
 
                 <div class="row">

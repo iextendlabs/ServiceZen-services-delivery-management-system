@@ -51,6 +51,11 @@ return [
     */
 
     'channels' => [
+        'order_request_log' => [
+            'driver' => 'single', // You can use 'single', 'daily', or other supported drivers
+            'path' => storage_path('logs/order_request.log'),
+            'level' => 'debug'
+        ],
         'api' => [
             'driver' => 'single',
             'path' => storage_path('logs/api.log'),

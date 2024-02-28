@@ -141,6 +141,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/ckeditor/upload', [CkeditorController::class,"upload"])->name('ckeditor.upload');
     Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
 
+    Route::get('/log', [OrderController::class, 'showLog'])->name('log.show');
+    Route::post('/log/empty', [OrderController::class, 'emptyLog'])->name('log.empty');
+
+
+    Route::post('/affiliate_edit/{id}', [OrderController::class, 'affiliate_edit'])->name('orders.affiliate_edit');
+    Route::post('/booking_edit/{id}', [OrderController::class, 'booking_edit'])->name('orders.booking_edit');
+    Route::post('/custom_location/{id}', [OrderController::class, 'custom_location'])->name('orders.custom_location');
+    Route::post('/detail_edit/{id}', [OrderController::class, 'detail_edit'])->name('orders.detail_edit');
+    Route::post('/comment_edit/{id}', [OrderController::class, 'comment_edit'])->name('orders.comment_edit');
+    Route::post('/driver_edit/{id}', [OrderController::class, 'driver_edit'])->name('orders.driver_edit');
+    Route::post('/driver_status_edit/{id}', [OrderController::class, 'driver_status_edit'])->name('orders.driver_status_edit');
+    Route::post('/status_edit/{id}', [OrderController::class, 'status_edit'])->name('orders.status_edit');
 });
 
 // Backups
