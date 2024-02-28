@@ -200,7 +200,8 @@ $transport_charges = 0;
                 </div>
             </div>
             <div class="col-md-12 text-right no-print">
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="submit" class="btn btn-primary">
+                    @if($order->status =="Draft")Save & Confirm Order @else Update @endif</button>
             </div>
         </form>
     </div>

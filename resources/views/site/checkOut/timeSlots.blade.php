@@ -9,7 +9,7 @@
 <div class="col-md-12">
     <div class="form-group">
         <strong>Zone:</strong>
-        <select name="zone" id="zone" class="form-control">
+        <select name="zone" id="zone" class="form-control" required>
             <option value=""></option>
             @foreach($allZones as $zone)
             <option value="{{ $zone->name }}" data-transport-charges="{{ isset($staffZone) &&  $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}"

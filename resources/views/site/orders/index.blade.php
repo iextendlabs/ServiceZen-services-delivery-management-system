@@ -75,14 +75,16 @@
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>
                 <td>
-                    <a class="btn btn-info" href="{{ route('order.show', $order->id) }}"><i class="fas fa-eye"></i> </a>
-
+                    @if($order->status == "Draft")
+                        <a class="btn btn-danger" href="{{ route('cancelOrder', $order->id) }}"><i class="fas fa-trash"></i> </a>
+                    @else
                     @if($order->status == "Pending")
                     <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}"><i class="fas fa-edit"></i> </a>
-                    <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}?edit=custom_location""><i class="fas fa-map-marker"></i> </a>
+                    <a class="btn btn-primary" href="{{ route('order.edit',$order->id) }}?edit=custom_location"><i class="fas fa-map-marker"></i> </a>
                     @endif
+                    <a class="btn btn-info" href="{{ route('order.show', $order->id) }}"><i class="fas fa-eye"></i> </a>
                     <a class="btn btn-primary" href="{{ route('order.reOrder',$order->id) }}">ReOrder </a>
-                   
+                    @endif
                 </td>
             </tr>
             @endforeach

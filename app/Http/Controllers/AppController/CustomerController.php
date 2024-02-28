@@ -333,7 +333,7 @@ class CustomerController extends Controller
             ], 201);
         }
         try{
-            
+
             $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
             $staff = User::find($input['service_staff_id']);
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
@@ -387,7 +387,7 @@ class CustomerController extends Controller
                 ], 201);
             }
 
-            $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
+            $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
 
             if (count($has_order) == 0) {
 
@@ -402,7 +402,11 @@ class CustomerController extends Controller
 
                     if (isset($user)) {
 
-                        $user->customerProfile()->create($input);
+                        if($user->customerProfile){
+                            $user->customerProfile->update($input);
+                        }else{
+                            $user->customerProfile()->create($input);
+                        }
                         $input['customer_id'] = $user->id;
                         $customer_type = "Old";
                     } else {
@@ -414,7 +418,11 @@ class CustomerController extends Controller
 
                         $user = User::create($input);
 
-                        $user->customerProfile()->create($input);
+                        if($user->customerProfile){
+                            $user->customerProfile->update($input);
+                        }else{
+                            $user->customerProfile()->create($input);
+                        }
 
                         $input['customer_id'] = $user->id;
 
@@ -1055,6 +1063,7 @@ class CustomerController extends Controller
             ], 200);
         }else{
             $input = $request->all();
+            $input['customer_source'] = "FaceBook Android";
             $password = mt_rand(10000000, 99999999);
             $input['password'] = Hash::make($password);
             $input['email'] = strtolower(trim($input['email']));

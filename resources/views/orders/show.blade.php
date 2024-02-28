@@ -7,39 +7,42 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 margin-tb">
-            <div class="float-start">
-                <h2>Orders</h2>
-            </div>
-            <div class="float-end no-print">
-                @can('order-download')
-                <button type="button" class="btn ml-1 btn-primary float-end" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
-                @endcan
-                @can('order-booking-edit')
-                <a class="btn btn-success float-end" href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
-                @endcan
-                @can('order-status-edit')
-                @if(auth()->user()->getRoleNames() == '["Supervisor"]' && $order->status == 'Pending')
-                <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
-                @elseif(auth()->user()->getRoleNames() != '["Supervisor"]')
-                <a class="btn btn-info float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
-                @endif
-                @endcan
-                @can('order-detail-edit')
-                <a class="btn btn-warning float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
-                @endcan
-                @can('order-affiliate-edit')
-                <a class="btn btn-primary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=affiliate">Affiliate Edit</a>
-                @endcan
-                @can('order-comment-edit')
-                <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
-                @endcan
-                <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
-                @can('order-driver-status-edit')
-                <a class="btn btn-success float-end mt-2" href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver Status Edit</a>
-                <a class="btn btn-primary float-end mr-1 mt-2" href="{{ route('orders.edit', $order->id) }}?edit=driver">Order Driver Edit</a>
-                @endcan
-            </div>
+        <div class="col-md-12 float-start">
+            <h2>Orders</h2>
+        </div>
+        <div class="col-md-12 float-end no-print">
+            @can('order-booking-edit')
+            <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
+            @endcan
+            @can('order-status-edit')
+            @if(auth()->user()->getRoleNames() == '["Supervisor"]' && $order->status == 'Pending')
+            <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+            @elseif(auth()->user()->getRoleNames() != '["Supervisor"]')
+            <a class="btn btn-info float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+            @endif
+            @endcan
+            @can('order-detail-edit')
+            <a class="btn btn-warning float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
+            @endcan
+            @can('order-affiliate-edit')
+            <a class="btn btn-primary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=affiliate">Affiliate Edit</a>
+            @endcan
+            @can('order-comment-edit')
+            <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
+            @endcan
+            <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
+            @can('order-driver-status-edit')
+            <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver Status Edit</a>
+            <a class="btn btn-primary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=driver">Order Driver Edit</a>
+            @endcan
+        </div>
+        <div class="col-md-12 float-end no-print mt-2 mb-2">
+            @if($order->customer_id)
+            <a class="btn btn-info float-end mr-1" href="{{ route('customers.show',$order->customer_id) }}">View Customer</a>
+            @endif
+            @can('order-download')
+            <button type="button" class="btn mr-1 btn-primary float-end" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
+            @endcan
         </div>
     </div>
     <div class="container">

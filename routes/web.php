@@ -187,10 +187,10 @@ Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@app
 Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
-Route::post('storeSession', [CheckOutController::class, 'storeSession']);
+Route::post('draftOrder', [CheckOutController::class, 'draftOrder']);
 Route::resource('cart', CheckOutController::class);
 Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
-Route::get('confirmStep', [CheckOutController::class, 'confirmStep']);
+Route::get('confirmStep', [CheckOutController::class, 'confirmStep'])->name('confirmStep');
 //TODO :set no cache headers for all ajax calls
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
 Route::get('staff-group', [CheckOutController::class, 'staff_group']);
@@ -198,6 +198,7 @@ Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::resource('siteFAQs', SiteFAQsController::class);
 Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
+Route::get('cancelOrder/{id}', [SiteOrdersController::class, 'cancelOrder'])->name('cancelOrder');
 
 //TODO :Customer Delete
 // app url

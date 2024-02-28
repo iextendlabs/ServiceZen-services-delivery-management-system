@@ -86,13 +86,13 @@
                         <div>Address</div>
                     </div>
                     <div class="detail-item-value">
-                        <div> <strong>Building Name:</strong> {{ $address['buildingName'] }}</div>
-                        <div> <strong>FlatVilla:</strong> {{ $address['flatVilla'] }}</div>
-                        <div> <strong>Street:</strong> {{ $address['street'] }}</div>
-                        <div> <strong>District:</strong> {{ $address['district'] }}</div>
-                        <div> <strong>Area:</strong> {{ $address['area'] }}</div>
-                        <div> <strong>City:</strong> {{ $address['city'] }}</div>
-                        <div> <strong>Number:</strong> {{ $address['number'] }}</div>
+                        <div> <strong>Building Name:</strong> {{ $order->buildingName }}</div>
+                        <div> <strong>FlatVilla:</strong> {{ $order->flatVilla }}</div>
+                        <div> <strong>Street:</strong> {{ $order->street }}</div>
+                        <div> <strong>District:</strong> {{ $order->district }}</div>
+                        <div> <strong>Area:</strong> {{ $order->area }}</div>
+                        <div> <strong>City:</strong> {{ $order->city }}</div>
+                        <div> <strong>Number:</strong> {{ $order->number }}</div>
                     </div>
                 </div>
                 <hr>
@@ -101,9 +101,9 @@
                         <div>Time Slots And Staff</div>
                     </div>
                     <div class="detail-item-value">
-                        <div> <strong>Time Slot:</strong> {{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</div>
-                        <div> <strong>Staff:</strong> {{ $staff->name }}</div>
-                        <div> <strong>Date:</strong> {{ $staff_and_time['date'] }}</div>
+                        <div> <strong>Time Slot:</strong> {{ $order->time_slot_value }}</div>
+                        <div> <strong>Staff:</strong> {{ $order->staff_name }}</div>
+                        <div> <strong>Date:</strong> {{ $order->date }}</div>
                     </div>
                 </div>
                 <hr>
@@ -116,23 +116,23 @@
                 <table class="table">
                     <tr>
                         <td class="text-left"><strong> Service Total:</strong></td>
-                        <td>@currency($sub_total)</td>
+                        <td>@currency($order->order_total->sub_total)</td>
                     </tr>
                     <tr>
                         <td class="text-left"><strong> Coupon Discount:</strong></td>
-                        <td>@currency( '-'.$coupon_discount)</td>
+                        <td>@currency( '-'.$order->order_total->discount ? '-'.$order->order_total->discount : 0)</td>
                     </tr>
                     <tr>
                         <td class="text-left"><strong>Staff Charges:</strong></td>
-                        <td>@currency($staff_charges)</td>
+                        <td>@currency( $order->order_total->transport_charges ? $order->order_total->transport_charges : 0)</td>
                     </tr>
                     <tr>
                         <td class="text-left"><strong>Transport Charges:</strong></td>
-                        <td>@currency($transport_charges)</td>
+                        <td>@currency( $order->order_total->staff_charges ? $order->order_total->staff_charges : 0)</td>
                     </tr>
                     <tr>
                         <td class="text-left"><strong>Total:</strong></td>
-                        <td>@currency($total_amount)</td>
+                        <td>@currency($order->total_amount)</td>
                     </tr>
                 </table>
             </div>
@@ -141,16 +141,8 @@
             <div class="col-md-6 offset-md-3">
                 <form action="{{ route('order.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="total_amount" value="{{ $total_amount }}"/>
+                    <input type="hidden" name="total_amount" value="{{ $order->total_amount }}"/>
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Payment Method:</strong>
-                                <select name="payment_method" class="form-control">
-                                    <option value="Cash-On-Delivery">Cash On Delivery</option>
-                                </select>
-                            </div>
-                        </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <strong>Comment:</strong>

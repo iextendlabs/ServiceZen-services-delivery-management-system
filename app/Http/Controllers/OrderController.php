@@ -233,7 +233,9 @@ class OrderController extends Controller
 
         $this->validate($request, [
             'service_ids' => 'required',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code']
+            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'number' => 'required',
+            'whatsapp' => 'required',
         ]);
 
         if($request->coupon_code){
@@ -251,7 +253,7 @@ class OrderController extends Controller
             }
         }
 
-        $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->get();
+        $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
 
         if (count($has_order) == 0) {
             $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
@@ -274,8 +276,11 @@ class OrderController extends Controller
             $user = User::where('email', $input['email'])->first();
 
             if (isset($user)) {
-
-                $user->customerProfile()->create($input);
+                if($user->customerProfile){
+                    $user->customerProfile->update($input);
+                }else{
+                    $user->customerProfile()->create($input);
+                }
                 $input['customer_id'] = $user->id;
                 $customer_type = "Old";
 
@@ -288,7 +293,11 @@ class OrderController extends Controller
 
                 $user = User::create($input);
 
-                $user->customerProfile()->create($input);
+                if($user->customerProfile){
+                    $user->customerProfile->update($input);
+                }else{
+                    $user->customerProfile()->create($input);
+                }
 
                 $input['customer_id'] = $user->id;
 
@@ -441,7 +450,7 @@ class OrderController extends Controller
         $input = $request->all();
         
         $order = Order::findOrFail($id);
-
+        
         $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
         $staff_id = $input['service_staff_id'] = $request->service_staff_id;
         $time_slot = TimeSlot::find($input['time_slot_id']);
@@ -450,6 +459,15 @@ class OrderController extends Controller
         $input['staff_name'] = $staff->name;
 
         $order->update($input);
+
+        if ($order->staff->charges) {
+            
+            $order->total_amount = $order->total_amount - $order->order_total->staff_charges + $order->staff->charges;
+            $order->save();
+            $order->order_total->staff_charges = $order->staff->charges;
+            $order->order_total->save();
+            
+        }
 
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');

@@ -141,7 +141,13 @@ class SiteOrdersController extends Controller
 
                 $user = User::create($input);
 
-                $user->customerProfile()->create($input);
+                if (isset($user->customerProfile)) {
+                    if ($address['update_profile'] == "on") {
+                        $user->customerProfile->update($input);
+                    }
+                } else {
+                    $user->customerProfile()->create($input);
+                }
 
                 $input['customer_id'] = $user->id;
 
@@ -265,14 +271,16 @@ class SiteOrdersController extends Controller
     {
         if ($request->has('custom_location') == '') {
             $this->validate($request, [
-                'service_staff_id' => 'required'
+                'service_staff_id' => 'required',
+                'number' => 'required',
+                'whatsapp' => 'required',
             ]);
         }
 
         $input = $request->all();
 
         $order = Order::find($id);
-
+        $order->status = "Pending";
         if ($request->service_staff_id) {
 
             $staff_id = $request->service_staff_id;
@@ -377,6 +385,7 @@ class SiteOrdersController extends Controller
 
 
         $order->save();
+
         return redirect()->route('order.index')
             ->with('success', 'Order updated successfully');
     }
@@ -491,5 +500,14 @@ class SiteOrdersController extends Controller
         }
 
         return redirect('/bookingStep')->with('cart-success', 'Service Add to Cart Successfully.');
+    }
+
+    public function cancelOrder($id)
+    {
+        $order = Order::find($id);
+        $order->delete();
+
+        return redirect("/")->with('success', 'Order Canceled successfully');
+
     }
 }

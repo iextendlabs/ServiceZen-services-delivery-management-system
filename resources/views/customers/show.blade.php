@@ -37,7 +37,65 @@
                 @endif
             </div>
         </div>
+        @if(isset($customer->customerProfile))
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Number:</strong>
+                {{ $customer->customerProfile->number }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Whatsapp:</strong>
+                {{ $customer->customerProfile->whatsapp }}
+            </div>
+        </div>
+        <hr><h2> Address</h2>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Building Name:</strong>
+                {{ $customer->customerProfile->buildingName }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Area:</strong>
+                {{ $customer->customerProfile->area }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Landmark:</strong>
+                {{ $customer->customerProfile->landmark }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Flat Villa:</strong>
+                {{ $customer->customerProfile->flatVilla }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Street:</strong>
+                {{ $customer->customerProfile->street }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>City:</strong>
+                {{ $customer->customerProfile->city }}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>District:</strong>
+                {{ $customer->customerProfile->district }}
+            </div>
+        </div>
+        @endif
     </div>
+    
     <hr>
     <div class="row">
         @if(isset($customer->coupons))
