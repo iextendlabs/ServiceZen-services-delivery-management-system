@@ -298,8 +298,8 @@ class CheckOutController extends Controller
         $address['street'] = $request->street;
         $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
-        $address['number'] = $request->number_country_code . $request->number;
-        $address['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
+        $address['number'] = $request->number_country_code . ltrim($request->number,'0');
+        $address['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
         $address['email'] = $request->email;
         $address['name'] = $request->name;
         $address['searchField'] = $request->searchField;
@@ -334,6 +334,7 @@ class CheckOutController extends Controller
 
     public function bookingStep(Request $request)
     {
+
         $session_data = NULL;
 
         if(Session::has('address')){
@@ -363,7 +364,6 @@ class CheckOutController extends Controller
             'searchField' => $session_data['searchField'] ?? '',
             'gender' => $session_data['gender'] ?? '',
         ];
-        
 
         if (session()->has('serviceIds')) {
             $serviceIds = Session::get('serviceIds');

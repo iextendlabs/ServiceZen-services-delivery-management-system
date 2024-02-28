@@ -93,7 +93,7 @@ class OrderController extends Controller
                 break;
 
             default:
-                $query = Order::orderBy('date', 'ASC')->orderBy('time_start');
+                $query = Order::orderBy('id', 'DESC');
                 break;
         }
 
@@ -226,6 +226,11 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        $password = NULL;
+        $input = $request->all();
+        $input['order_source'] = "Admin";
+        // Log::channel('order_request_log')->info('Request Body:', ['body' => $input]);
+
         $this->validate($request, [
             'service_ids' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
@@ -247,10 +252,6 @@ class OrderController extends Controller
                             ->with('error',"Coupon is invalid!");
             }
         }
-
-        $password = NULL;
-        $input = $request->all();
-        $input['order_source'] = "Admin";
 
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
 
@@ -467,6 +468,7 @@ class OrderController extends Controller
             $order->order_total->save();
             
         }
+
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }

@@ -36,6 +36,7 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 
@@ -315,10 +316,24 @@ class CustomerController extends Controller
 
     public function addOrder(Request $request)
     {
+        $password = NULL;
+        $input = $request->all();
+        $input['order_source'] = "Android";
+        Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
+
+        if(strlen(trim($request->number)) < 6 ){
+            return response()->json([
+                'msg' => "Pleas check the number in personal information."
+            ], 201);
+        }
+
+        if(strlen(trim($request->whatsapp)) < 6){
+            return response()->json([
+                'msg' => "Pleas check the whatsapp in personal information."
+            ], 201);
+        }
         try{
-            $password = NULL;
-            $input = $request->all();
-            $input['order_source'] = "Android";
+
             $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
             $staff = User::find($input['service_staff_id']);
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
@@ -348,7 +363,7 @@ class CustomerController extends Controller
             $input['total_amount'] = (int)$total_amount;
             
             $request->merge(['orderTotal' => (float) $total_amount]);
-
+            
             $validator = Validator::make($request->all(), [
                 'service_ids.*' => 'exists:services,id',
                 'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,

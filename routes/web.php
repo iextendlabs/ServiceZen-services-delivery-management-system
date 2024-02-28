@@ -153,6 +153,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/driver_edit/{id}', [OrderController::class, 'driver_edit'])->name('orders.driver_edit');
     Route::post('/driver_status_edit/{id}', [OrderController::class, 'driver_status_edit'])->name('orders.driver_status_edit');
     Route::post('/status_edit/{id}', [OrderController::class, 'status_edit'])->name('orders.status_edit');
+
 });
 
 // Backups

@@ -306,17 +306,17 @@
             });
         });
     </script>
-<script>
-  $(document).ready(function() {
-    $('#number').on('input', function() {
-      $(this).val($(this).val().replace(/\D/g, ''));
-    });
+    <script>
+        $(document).ready(function() {
+            $('#number').on('input', function() {
+                $(this).val($(this).val().replace(/\D/g, ''));
+            });
 
-    $('#whatsapp').on('input', function() {
-      $(this).val($(this).val().replace(/\D/g, ''));
-    });
-  });
-</script>
+            $('#whatsapp').on('input', function() {
+                $(this).val($(this).val().replace(/\D/g, ''));
+            });
+        });
+    </script>
 </body>
 
 </html>
