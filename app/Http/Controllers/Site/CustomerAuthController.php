@@ -167,12 +167,7 @@ class CustomerAuthController extends Controller
         $address['searchField'] = $request->searchField;
         $address['gender'] = $request->gender;
 
-        if (session()->has('address')) {
-            Session::forget('address');
-            Session::put('address', $address);
-        } else {
-            Session::put('address', $address);
-        }
+        cookie()->queue('address', json_encode($address), 5256000);
 
         return redirect()->back()
             ->with('success', 'Your Profile updated successfully');
@@ -225,12 +220,8 @@ class CustomerAuthController extends Controller
             $input['coupon_code'] = $request->coupon;
         }
 
-        if (session()->has('code')) {
-            Session::forget('code');
+        
             Session::put('code', $input);
-        } else {
-            Session::put('code', $input);
-        }
         cookie()->queue('code', json_encode($input), 5256000);
 
         return redirect()->back()->with('success', 'Coupon Apply Successfuly.');

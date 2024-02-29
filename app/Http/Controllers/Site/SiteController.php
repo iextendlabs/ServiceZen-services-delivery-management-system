@@ -34,7 +34,12 @@ class SiteController extends Controller
      */
     public function index(Request $request)
     {
-        $address = Session::get('address');
+        $address = NULL;
+
+        try {
+            $address = json_decode($request->cookie('address'), true);
+        } catch (\Throwable $th) {
+        }
 
         if (Auth::check()) {
 
@@ -58,7 +63,7 @@ class SiteController extends Controller
                 $address['searchField'] = $user->customerProfile->searchField;
                 $address['gender'] = $user->customerProfile->gender;
 
-                Session::put('address', $address);
+                cookie()->queue('address', json_encode($address), 5256000);
             }
         }
 
@@ -150,12 +155,8 @@ class SiteController extends Controller
             $address['searchField'] = $request->searchField;
             $address['gender'] = $request->gender;
 
-            if (session()->has('address')) {
-                Session::forget('address');
-                Session::put('address', $address);
-            } else {
-                Session::put('address', $address);
-            }
+            cookie()->queue('address', json_encode($address), 5256000);
+            
 
             return response()->json("successfully save data.");
         }
@@ -182,7 +183,7 @@ class SiteController extends Controller
             $address['searchField'] = '';
             $address['gender'] = '';
 
-            Session::put('address', $address);
+            cookie()->queue('address', json_encode($address), 5256000);
 
             return redirect()->back();
         }
