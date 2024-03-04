@@ -206,7 +206,7 @@ class CheckOutController extends Controller
 
             if (isset($user)) {
                 if (isset($user->customerProfile)) {
-                    if ($input['update_profile'] == "on") {
+                    if ($request->update_profile == "on") {
                         $user->customerProfile->update($input);
                     }
                 } else {
@@ -314,8 +314,6 @@ class CheckOutController extends Controller
             $address['longitude'] = $request->longitude;
         }
         
-        Session::put('address', $address);
-        
         cookie()->queue('address', json_encode($address), 5256000);
 
         return response()->json([
@@ -335,34 +333,29 @@ class CheckOutController extends Controller
     public function bookingStep(Request $request)
     {
 
-        $session_data = NULL;
+        $address = NULL;
 
-        if(Session::has('address')){
-            $session_data = Session::get('address');
-        }else{
-            if ($request->cookie('address') !== null) {
-                try {
-                    $session_data = json_decode($request->cookie('address'), true);
-                } catch (\Throwable $th) {
-                }
-            }  
+        try {
+            $address = json_decode($request->cookie('address'), true);
+        } catch (\Throwable $th) {
         }
+        
         $addresses = [
-            'buildingName' => $session_data['buildingName'] ?? '',
-            'district' => $session_data['district'] ?? '',
-            'area' => $session_data['area'] ?? '',
-            'flatVilla' => $session_data['flatVilla'] ?? '',
-            'street' => $session_data['street'] ?? '',
-            'landmark' => $session_data['landmark'] ?? '',
-            'city' => $session_data['city'] ?? '',
-            'number' => $session_data['number'] ?? '',
-            'whatsapp' => $session_data['whatsapp'] ?? '',
-            'email' => $session_data['email'] ?? '',
-            'name' => $session_data['name'] ?? '',
-            'latitude' => $session_data['latitude'] ?? '',
-            'longitude' => $session_data['longitude'] ?? '',
-            'searchField' => $session_data['searchField'] ?? '',
-            'gender' => $session_data['gender'] ?? '',
+            'buildingName' => $address['buildingName'] ?? '',
+            'district' => $address['district'] ?? '',
+            'area' => $address['area'] ?? '',
+            'flatVilla' => $address['flatVilla'] ?? '',
+            'street' => $address['street'] ?? '',
+            'landmark' => $address['landmark'] ?? '',
+            'city' => $address['city'] ?? '',
+            'number' => $address['number'] ?? '',
+            'whatsapp' => $address['whatsapp'] ?? '',
+            'email' => $address['email'] ?? '',
+            'name' => $address['name'] ?? '',
+            'latitude' => $address['latitude'] ?? '',
+            'longitude' => $address['longitude'] ?? '',
+            'searchField' => $address['searchField'] ?? '',
+            'gender' => $address['gender'] ?? '',
         ];
 
         if (session()->has('serviceIds')) {
@@ -415,7 +408,7 @@ class CheckOutController extends Controller
         }
 
         $date = date('Y-m-d');
-        $area = $session_data['area'] ?? '';
+        $area = $address['area'] ?? '';
 
         $servicesCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
@@ -474,8 +467,14 @@ class CheckOutController extends Controller
             $date = $request->date;
         }
         if (!isset($area)) {
-            $address = Session::get('address');
-            $area = $address ? $address['area'] : '';
+            $address = NULL;
+
+            try {
+                $address = json_decode($request->cookie('address'), true);
+            } catch (\Throwable $th) {
+            }
+
+            $area = $address['area'] ?? '';
         }
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
