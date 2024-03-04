@@ -128,16 +128,15 @@ class StaffAppController extends Controller
     {
         $order = Order::find($request->order_id);
         try {
-        
+            if (isset($order->affiliate)) {
+                $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+            }
+
+            if (isset($order->staff->commission)) {
+                $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
+            }
+
             if ($request->status == "Complete") {
-                if (isset($order->affiliate)) {
-                    $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
-                }
-
-                if (isset($order->staff->commission)) {
-                    $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
-                }
-
                 if (isset($order->affiliate) && !isset($affiliate_transaction)) {
                     $input['user_id'] = $order->affiliate->id;
                     $input['order_id'] = $order->id;
@@ -151,7 +150,7 @@ class StaffAppController extends Controller
                 if (isset($order->staff->commission) && !isset($staff_transaction)) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->discount) * $order->staff->commission) / 100;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);

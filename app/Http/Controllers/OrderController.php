@@ -554,15 +554,14 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         try {
+            if (isset($order->staff->commission)) {
+                $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
+            }
+            
+            if (isset($order->affiliate)) {
+                $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+            }
             if($request->status == "Complete"){
-                if (isset($order->staff->commission)) {
-                    $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
-                }
-                
-                if (isset($order->affiliate)) {
-                    $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
-                }
-    
                 if (isset($order->affiliate) && !isset($transaction)) {
                     $input['user_id'] = $order->affiliate->id;
                     $input['order_id'] = $order->id;
@@ -576,7 +575,7 @@ class OrderController extends Controller
                 if (isset($order->staff->commission) && !isset($staff_transaction)) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
+                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->discount) * $order->staff->commission) / 100;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
@@ -637,33 +636,37 @@ class OrderController extends Controller
             if (isset($order->staff->commission)) {
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
-
-            if ($request->status == "Complete" && isset($order->affiliate) && !isset($affiliate_transaction)) {
-                $input['user_id'] = $order->affiliate->id;
-                $input['order_id'] = $order->id;
-                $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
-                $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
-                $input['type'] = "Order Commission";
-                $input['status'] = 'Approved';
-                Transaction::create($input);
+            if($request->status == "Complete"){
+                if (isset($order->affiliate) && !isset($affiliate_transaction)) {
+                    $input['user_id'] = $order->affiliate->id;
+                    $input['order_id'] = $order->id;
+                    $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
+                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
+                    $input['type'] = "Order Commission";
+                    $input['status'] = 'Approved';
+                    Transaction::create($input);
+                }
+    
+                if (isset($order->staff->commission) && !isset($staff_transaction)) {
+                    $input['user_id'] = $order->service_staff_id;
+                    $input['order_id'] = $order->id;
+                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->discount) * $order->staff->commission) / 100;
+                    $input['type'] = "Order Commission";
+                    $input['status'] = 'Approved';
+                    Transaction::create($input);
+                }
             }
-
-            if ($request->status == "Complete" && isset($order->staff->commission) && !isset($staff_transaction)) {
-                $input['user_id'] = $order->service_staff_id;
-                $input['order_id'] = $order->id;
-                $input['amount'] = ($order->order_total->sub_total * $order->staff->commission) / 100;
-                $input['type'] = "Order Commission";
-                $input['status'] = 'Approved';
-                Transaction::create($input);
+            
+            if($request->status == "Canceled"){
+                if (isset($transaction)) {
+                    $transaction->delete(); 
+                }
+    
+                if (isset($staff_transaction)) {
+                    $staff_transaction->delete(); 
+                }
             }
-
-            if ($request->status == "Canceled" && isset($transaction)) {
-                $transaction->delete(); 
-            }
-
-            if ($request->status == "Canceled" && isset($staff_transaction)) {
-                $staff_transaction->delete(); 
-            }
+            
         } catch (\Throwable $th) {
         }
 
