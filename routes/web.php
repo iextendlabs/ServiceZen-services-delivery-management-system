@@ -128,6 +128,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
     Route::post('/customers/{customerId}/assign-coupon', [CustomerController::class, 'assignCoupon'])->name('coupons.assign');
     Route::post('/customers/{couponId}/destroy', [CustomerController::class, 'customerCoupon_destroy'])->name('customerCoupon.destroy');
+    Route::get('removeCoupon/{id}', [OrderController::class, 'removeCoupon'])->name('orders.removeCoupon');
+    Route::post('addDiscount/{id}', [OrderController::class, 'addDiscount'])->name('orders.addDiscount');
 
     // affiliate export
     Route::get('/affiliate/exportTransaction/{User}', [AffiliateController::class, 'exportTransaction']);

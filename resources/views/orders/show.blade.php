@@ -165,6 +165,29 @@
                     <td colspan="3" class="text-right"><strong>Total:</strong></td>
                     <td class="text-right">@currency($order->total_amount)</td>
                 </tr>
+                @if($order->order_total->discount > 0)
+                <tr>
+                    <td colspan="4" class="text-right">
+                        <a href="{{ route('orders.removeCoupon',$order->id)}}">
+                            <button type="button" class="btn btn-danger">Remove Discount</button>
+                        </a>
+                    </td>
+                </tr>
+                @endif
+                <tr>
+                    <td colspan="4" class="text-right">
+                        <form action="{{ route('orders.addDiscount',$order->id) }}" method="POST">
+                            @csrf
+                            @method('POST')
+                            <div class="input-group me-2 col-4 float-end">
+                                <input type="number" required name="discount" placeholder="AED"  class="form-control">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">Add Discount</button>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
             </table>
             @can('order-history')
             @if(count($order->orderHistories))

@@ -733,4 +733,33 @@ class OrderController extends Controller
             return redirect()->route('log.show')->with('error', 'Log file not found.');
         }
     }
+
+    public function removeCoupon($id){
+        $order = Order::find($id);
+        if ($order->couponHistory) {
+            $order->couponHistory->delete();
+        }
+        if($order->order_total){
+            $order->total_amount = $order->total_amount + $order->order_total->discount;
+            $order->save();
+            $order->order_total->discount = 0;
+            $order->order_total->save();
+        }
+
+        return redirect()->back()->with('success', 'Coupon removed successfully.');
+    }
+
+    public function addDiscount(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        
+        if($order->order_total){
+            $order->total_amount = $order->total_amount - $request->discount;
+            $order->save();
+            $order->order_total->discount = $order->order_total->discount + $request->discount;
+            $order->order_total->save();
+        }
+
+        return redirect()->back()->with('success', 'Discount added to order.');
+    }
 }
