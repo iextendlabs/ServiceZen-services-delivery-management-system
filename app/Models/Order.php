@@ -119,6 +119,6 @@ class Order extends Model
     }
 
     public function couponHistory(){
-        return $this->hasMany(CouponHistory::class);
+        return $this->hasOne(CouponHistory::class);
     }
 }
