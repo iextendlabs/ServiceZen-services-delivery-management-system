@@ -150,7 +150,7 @@ class StaffAppController extends Controller
                 if (isset($order->staff->commission) && !isset($staff_transaction)) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->discount) * $order->staff->commission) / 100;
+                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
