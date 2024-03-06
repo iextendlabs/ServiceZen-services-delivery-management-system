@@ -246,7 +246,7 @@
                             <td>{{ $order->status }}</td>
                             <td>{{ $order->staff_name }}</td>
                             <td>@currency($order->order_total->sub_total)</td>
-                            <td>@currency((($order->order_total->sub_total - $order->order_total->discount)* $order->staff->commission) / 100)</td>
+                            <td>@currency((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount)* $order->staff->commission) / 100)</td>
                             @if(auth()->user()->getRoleNames() != '["Staff"]')
                             <td class="no-print">
                                 @if(empty($order->getStaffTransactionStatus()))
