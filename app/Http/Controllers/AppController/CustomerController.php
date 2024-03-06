@@ -923,9 +923,9 @@ class CustomerController extends Controller
     public function deleteAccountMail(Request $request){
         
         $user = User::find($request->id);
-        if($user && $request->has('email')){
+        if($user){
             $from = env('MAIL_FROM_ADDRESS');
-            Mail::to($request->email)->send(new DeleteAccount($user->id, $from));
+            Mail::to($user->email)->send(new DeleteAccount($user->id, $from));
 
             return response()->json([
                 'msg' => "Account Deletion Confirmation email sent. Please check your inbox for further instructions."
