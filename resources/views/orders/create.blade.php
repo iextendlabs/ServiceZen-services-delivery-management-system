@@ -299,7 +299,7 @@ $transport_charges = 0;
             $(".service-checkbox:checked").each(function() {
                 selectedServiceIds.push($(this).val());
             });
-
+            $("#responseMessage").html("");
             if(selectedServiceIds.length > 0 && couponCode){
                 $.ajax({
                     type: "POST",
