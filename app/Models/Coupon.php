@@ -10,7 +10,7 @@ class Coupon extends Model
 
     use HasFactory;
 
-    protected $fillable = ['name','code','type','discount','date_start','date_end','status','uses_total'];
+    protected $fillable = ['name','code','type','discount','date_start','date_end','status','uses_total','min_order_value'];
     
     public function couponHistory(){
         return $this->hasMany(CouponHistory::class);
@@ -112,6 +112,13 @@ class Coupon extends Model
                         return 'Coupon already used. Exceeded maximum uses.';
                     }
                 }
+            }
+
+            $services_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+            if( $this->min_order_value > $services_total){
+                return 'The order total must be greater than to'.$this->min_order_value;
             }
         } else {
             return "Coupon is either invalid or expired!";

@@ -326,7 +326,7 @@ $transport_charges = 0;
             }
             setTimeout(function() {
                 $(".coupon-message").css('display', 'none');
-            }, 2000);
+            }, 6000);
 
         });
     });

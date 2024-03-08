@@ -64,6 +64,12 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <span style="color: red;">*</span><strong>Minimum Order</strong>
+                            <input type="text" name="min_order_value" value="{{ $coupon->min_order_value }}" class="form-control" placeholder="Minimum Order">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <span style="color: red;">*</span><strong>Date Start</strong>
                             <input type="date" name="date_start" value="{{ $coupon->date_start }}" class="form-control" placeholder="Date Start">
                         </div>
