@@ -1092,4 +1092,49 @@ class CustomerController extends Controller
             ], 203);
         }
     }
+
+    public function orderTotal(Request $request)
+    {
+        $services_total = 0;
+        $staff_charges = 0;
+        if($request->service_ids){
+            $services = Service::whereIn('id', $request->service_ids)->get();
+
+            $services_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+        }
+        
+        if($request->staff_id){
+            $user = User::find($request->staff_id);
+            $staff_charges = $user && $user->staff
+            ? $user->staff->charges
+            : 0;
+        }
+
+        if($request->zone){
+            $zone = StaffZone::where('name', $request->zone)->first();
+            $transport_charges = $zone
+            ? $zone->transport_charges
+            : 0;
+        }
+    
+        if($request->coupon_id && $services){
+            $coupon = Coupon::find($request->coupon_id);
+
+            $coupon_discount = $coupon
+            ? $coupon->getDiscountForProducts($services, $services_total)
+            : 0;
+        }
+    
+        $total = $services_total + $staff_charges + $transport_charges - $coupon_discount;
+    
+        return response()->json([
+            'total' => $total,
+            'coupon_discount' => $coupon_discount,
+            'transport_charges' => $transport_charges,
+            'staff_charges' => $staff_charges,
+            'services_total' => $services_total,
+        ], 200);
+    }
 }
