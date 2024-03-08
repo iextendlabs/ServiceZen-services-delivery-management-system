@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('coupons', function (Blueprint $table) {
-            $table->decimal('min_order_value', 10, 2)->nullable();
+            $table->decimal('min_order_value', 10, 2)->default(0)->nullable();
         });
     }
 
