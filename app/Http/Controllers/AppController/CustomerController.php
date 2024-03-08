@@ -1097,6 +1097,8 @@ class CustomerController extends Controller
     {
         $services_total = 0;
         $staff_charges = 0;
+        $transport_charges = 0;
+        $coupon_discount = 0;
         if($request->service_ids){
             $services = Service::whereIn('id', $request->service_ids)->get();
 
