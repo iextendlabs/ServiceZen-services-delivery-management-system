@@ -59,6 +59,7 @@ class CouponController extends Controller
             'date_start' => 'required',
             'date_end' => 'required',
             'status' => 'required',
+            'min_order_value' => 'required|numeric|min:1',
         ]);
 
         $coupon = Coupon::create($request->all());
@@ -109,6 +110,7 @@ class CouponController extends Controller
             'date_start' => 'required',
             'date_end' => 'required',
             'status' => 'required',
+            'min_order_value' => 'required|numeric|min:1',
         ]);
 
         $coupon = Coupon::find($id);
