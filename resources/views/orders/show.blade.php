@@ -30,7 +30,7 @@
             @can('order-comment-edit')
             <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
             @endcan
-            <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
+            <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=services">Edit Services</a>
             @can('order-driver-status-edit')
             <a class="btn btn-success float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver Status Edit</a>
             <a class="btn btn-primary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=driver">Order Driver Edit</a>
@@ -43,6 +43,7 @@
             @can('order-download')
             <button type="button" class="btn mr-1 btn-primary float-end" onclick="printDiv()"><i class="fa fa-print"></i>Download PDF</button>
             @endcan
+            <a class="btn btn-secondary float-end mr-1" href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom Location</a>
         </div>
     </div>
     <div class="container">

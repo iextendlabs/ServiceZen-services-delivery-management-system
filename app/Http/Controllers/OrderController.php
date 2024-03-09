@@ -11,6 +11,7 @@ use App\Models\OrderChat;
 use App\Models\OrderHistory;
 use App\Models\OrderTotal;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\OrderService;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
@@ -406,9 +407,19 @@ class OrderController extends Controller
         $date = $order->date;
         $statuses = config('app.order_statuses');
         $driver_statuses = config('app.order_driver_statuses');
-
+        
+        $servicesCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        if($order->orderServices){
+            $serviceIds = $order->orderServices->pluck('service_id')->toArray();
+        }else {
+            $serviceIds = [];
+        }
+        $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
+       
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
-        if ($request->edit == "status") {
+        if ($request->edit == "services") {
+            return view('orders.services_edit', compact('order' ,'serviceIds', 'selectedServices','servicesCategories'));
+        }if ($request->edit == "status") {
             return view('orders.status_edit', compact('order', 'statuses'));
         } elseif ($request->edit == "booking") {
             return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
@@ -606,6 +617,53 @@ class OrderController extends Controller
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
+
+    public function services_edit(Request $request, $id)
+    {
+        $request->validate([
+            'selected_service_ids' => 'required',
+        ]);
+
+        $input = $request->all();
+
+        $services = Service::whereIn('id', $input['selected_service_ids'])->get();
+
+        $sub_total = $services->sum(function ($service) {
+            return isset($service->discount) ? $service->discount : $service->price;
+        });
+
+        $order = Order::findOrFail($id);
+        if($order->order_total){
+            $order->order_total->sub_total = $sub_total;
+            $order->order_total->save();
+            $total_amount = $sub_total + $order->order_total->staff_charges +
+            $order->order_total->transport_charges - $order->order_total->discount;
+        }
+        if($order->orderServices){
+            $order->orderServices()->delete();
+        }
+        $input['order_id'] = $order->id;
+        foreach ($input['selected_service_ids'] as $id) {
+            $services = Service::find($id);
+            $input['service_id'] = $id;
+            $input['service_name'] = $services->name;
+            $input['duration'] = $services->duration;
+            $input['status'] = 'Open';
+            if ($services->discount) {
+                $input['price'] = $services->discount;
+            } else {
+                $input['price'] = $services->price;
+            }
+            OrderService::create($input);
+        }
+        
+        $order->total_amount = $total_amount;
+        $order->save();
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Order updated successfully.');
+    }
+    
 
     public function destroy($id, Request $request)
     {

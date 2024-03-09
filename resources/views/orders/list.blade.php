@@ -110,6 +110,7 @@
                         @can('order-chat')
                         <a class="dropdown-item" href="{{ route('orders.chat', $order->id) }}">Chat</a>
                         @endcan
+                        <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=services">Edit Services</a>
                     </div>
                 </li>
             </ul>
