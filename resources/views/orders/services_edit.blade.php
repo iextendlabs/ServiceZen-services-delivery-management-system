@@ -77,34 +77,32 @@
                 </div>
 
                 <div class="col-md-12">
-                    <div class="form-group">
-                        <div class="form-group" id="selected-services">
-                            <strong>Selected Services:</strong>
-                            <table class="table table-striped table-bordered selected-services-table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Name</th>
-                                        <th>Price</th>
-                                        <th>Duration</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if(count($selectedServices))
-                                    @foreach ($selectedServices as $service)
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
-                                        </td>
-                                        <td>{{ $service->name }}</td>
-                                        <td><span class="price">{{ isset($service->discount) ? $service->discount : $service->price }}</td>
-                                        <td>{{ $service->duration }}</td>
-                                    </tr>
-                                    @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="form-group" id="selected-services">
+                        <strong>Selected Services:</strong>
+                        <table class="table table-striped table-bordered selected-services-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(count($selectedServices))
+                                @foreach ($selectedServices as $service)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                    </td>
+                                    <td>{{ $service->name }}</td>
+                                    <td><span class="price">{{ isset($service->discount) ? $service->discount : $service->price }}</td>
+                                    <td>{{ $service->duration }}</td>
+                                </tr>
+                                @endforeach
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="col-md-6 mt-3 mt-3 offset-md-3 ">
@@ -143,6 +141,13 @@
 </div>
 </div>
 <script>
+    $(document).ready(function () {
+        
+
+        
+    });
+</script>
+<script>
     function calculateTotal() {
         let total = 0;
 
@@ -159,10 +164,23 @@
 
         $('#sub_total').text(sub_total.toFixed(2));
         $('#total').text(total.toFixed(2));
-
-       
     }
 
+    function checkTableResponsive() {
+        var viewportWidth = $(window).width();
+        var $table = $('table');
+
+        if (viewportWidth < 768) { 
+            $table.addClass('table-responsive');
+        } else {
+            $table.removeClass('table-responsive');
+        }
+    }
+
+    $(window).resize(function () {
+        checkTableResponsive();
+    });
+    
     $(document).on("change", ".service-checkbox, .selected-service-checkbox", function() {
         calculateTotal();
     });

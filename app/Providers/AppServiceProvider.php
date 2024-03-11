@@ -30,7 +30,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrapFive();
-        Paginator::useBootstrapFour();
 
         Blade::directive('currency', function ($expression) {
             // if (Session::get('address')) {

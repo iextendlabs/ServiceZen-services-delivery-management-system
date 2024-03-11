@@ -41,12 +41,17 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="offset-6 col-md-3 text-center">
-                        <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 offset-md-8">
+                        <div class="d-flex flex-wrap justify-content-md-end">
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
+                            </div>
+                            <div class="col-md-9 mb-3">
+                                <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -109,5 +114,25 @@
                 document.getElementById('deleteForm' + Id).submit();
             }
         }
+</script>
+<script>
+    $(document).ready(function () {
+        function checkTableResponsive() {
+            var viewportWidth = $(window).width();
+            var $table = $('table');
+
+            if (viewportWidth < 768) { 
+                $table.addClass('table-responsive');
+            } else {
+                $table.removeClass('table-responsive');
+            }
+        }
+
+        checkTableResponsive();
+
+        $(window).resize(function () {
+            checkTableResponsive();
+        });
+    });
 </script>
 @endsection

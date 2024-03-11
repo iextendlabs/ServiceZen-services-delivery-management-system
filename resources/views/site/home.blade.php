@@ -65,19 +65,17 @@
       </div>
   </div>
   @endif
-</div>
-<section class="jumbotron text-center">
-  <div class="container">
-    @if(isset($category))
-    <h1 class="jumbotron-heading">{{$category->title}}</h1>
-    <p class="lead text-muted">{{$category->description}}</p>
-    @else
-    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Saloon Services</h1>
-    <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and just few clicks away.</p>
-    @endif
-  </div>
-</section>
-<div class="container">
+  <section class="jumbotron text-center">
+    <div class="container">
+      @if(isset($category))
+      <h1 class="jumbotron-heading">{{$category->title}}</h1>
+      <p class="lead text-muted">{{$category->description}}</p>
+      @else
+      <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Saloon Services</h1>
+      <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and just few clicks away.</p>
+      @endif
+    </div>
+  </section>
   <div class="row" id="categories">
     @if(isset($all_categories))
     @foreach($all_categories as $single_category)
@@ -105,12 +103,8 @@
     @endif
     @endif
   </div>
-</div>
-
-<hr>
-<div class="album py-5 bg-light">
-  <div class="container">
-
+  <hr>
+  <div class="album py-5 bg-light">
     <div class="row">
       @foreach ($services as $service)
       <div class="col-md-4 service-box">
@@ -142,7 +136,7 @@
       @endforeach
     </div>
     <div class="row">
-      <div class="col-md-12 text-center">
+      <div class="col-md-12">
         {!! $services->links() !!}
       </div>
     </div>
@@ -255,30 +249,33 @@
         <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Team</a>
       </div>
     </div>
-
     @if(count($FAQs) )
-    <h1 id="faqs">Frequently Asked Questions</h1>
-    <div id="accordion">
-      @foreach ($FAQs as $FAQ)
-      <div class="card">
-        <div class="card-header" id="heading{{ $FAQ->id }}">
-          <h5 class="mb-0">
-            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ $FAQ->id }}" aria-expanded="true" aria-controls="collapse{{ $FAQ->id }}">
-              {{ $FAQ->question }}
-            </button>
-          </h5>
-        </div>
-        <div id="collapse{{ $FAQ->id }}" class="collapse" aria-labelledby="heading{{ $FAQ->id }}" data-parent="#accordion">
-          <div class="card-body">
-            {{ $FAQ->answer }}
-          </div>
-        </div>
+    <div class="row">
+      <div class="col-12">
+        <h1 id="faqs">Frequently Asked Questions</h1>
       </div>
-      @endforeach
     </div>
     <div class="row">
-      <div class="col-md-2 offset-md-5 mt-3">
-        <a href="{{ route('siteFAQs.index') }}"><button type="button" class="btn btn-block btn-primary">More..</button></a>
+      <div class="col-12 mt-3" id="accordion">
+        @foreach ($FAQs as $FAQ)
+          <div class="card">
+            <div class="card-header" id="heading{{ $FAQ->id }}">
+              <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ $FAQ->id }}" aria-expanded="true" aria-controls="collapse{{ $FAQ->id }}">
+                  <div style="white-space: normal;">{{ $FAQ->question }}</div>
+                </button>
+              </h5>
+            </div>
+            <div id="collapse{{ $FAQ->id }}" class="collapse" aria-labelledby="heading{{ $FAQ->id }}" data-parent="#accordion">
+              <div class="card-body">
+                {{ $FAQ->answer }}
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+      <div class="col-12 text-center mt-3">
+        <a href="{{ route('siteFAQs.index') }}" class="btn btn-primary">More..</a>
       </div>
     </div>
     @endif
