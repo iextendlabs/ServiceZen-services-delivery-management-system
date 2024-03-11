@@ -45,6 +45,11 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Affiliate Code:</strong>
+                    <input type="text" name="affiliate_code" class="form-control" placeholder="Affiliate Code" value={{ $customer->userAffiliate && $customer->userAffiliate->affiliate ? $customer->userAffiliate->affiliate->code : null }}>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

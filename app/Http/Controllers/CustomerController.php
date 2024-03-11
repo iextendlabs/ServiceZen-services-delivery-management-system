@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Coupon;
+use App\Models\Affiliate;
 use App\Models\CustomerCoupon;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -133,6 +134,7 @@ class CustomerController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
+            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);
 
         $input = $request->all();
@@ -144,6 +146,12 @@ class CustomerController extends Controller
 
         $customer = User::find($id);
         $customer->update($input);
+
+        if ($request->affiliate_code) {
+            $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
+
+            $customer->affiliates()->sync($affiliate->user_id);
+        }
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Customer updated successfully');

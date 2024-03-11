@@ -74,11 +74,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="offset-6 col-md-3 text-center">
-                    <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
-                </div>
-                <div class="col-md-3 text-center">
-                    <button type="submit" class="btn btn-block btn-primary">Filter</button>
+            </div>
+            <div class="row">
+                <div class="col-md-4 offset-md-8">
+                    <div class="d-flex flex-wrap justify-content-md-end">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
+                        </div>
+                        <div class="col-md-9 mb-3">
+                            <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
@@ -135,125 +141,144 @@
 
 </div>
     </div>
-    <script>
-            $('#bulkDeleteBtn').click(function() {
-                const selectedItems = $('.item-checkbox:checked').map(function() {
-                    return $(this).val();
-                }).get();
+<script>
+    $('#bulkDeleteBtn').click(function() {
+        const selectedItems = $('.item-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
     
-                if (selectedItems.length > 0) {
-                    if (confirm('Are you sure you want to delete the selected items?')) {
-                        deleteSelectedItems(selectedItems);
-                    }
-                } else {
-                    alert('Please select items to delete.');
-                }
-            });
+        if (selectedItems.length > 0) {
+            if (confirm('Are you sure you want to delete the selected items?')) {
+                deleteSelectedItems(selectedItems);
+            }
+        } else {
+            alert('Please select items to delete.');
+        }
+    });
     
-            $('#bulkCopyBtn').click(function() {
-                const selectedItems = $('.item-checkbox:checked').map(function() {
-                    return $(this).val();
-                }).get();
+    $('#bulkCopyBtn').click(function() {
+        const selectedItems = $('.item-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
     
-                if (selectedItems.length > 0) {
-                    if (confirm('Are you sure you want to Copy the selected items?')) {
-                        copySelectedItems(selectedItems);
-                    }
-                } else {
-                    alert('Please select items to Copy.');
-                }
-            });
+        if (selectedItems.length > 0) {
+            if (confirm('Are you sure you want to Copy the selected items?')) {
+                copySelectedItems(selectedItems);
+            }
+        } else {
+            alert('Please select items to Copy.');
+        }
+    });
     
-            $('#bulkEditBtn').click(function() {
-                const selectedItems = $('.item-checkbox:checked').map(function() {
-                    return $(this).val();
-                }).get();
-                const status_value = $('select[name="bulk-status"]').val();
-                const status_text = $('select[name="bulk-status"] option:selected').text();
+    $('#bulkEditBtn').click(function() {
+        const selectedItems = $('.item-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+        const status_value = $('select[name="bulk-status"]').val();
+        const status_text = $('select[name="bulk-status"] option:selected').text();
 
-                if (selectedItems.length > 0) {
-                    if (confirm("Are you sure you want to Set " + status_text + " to selected items?")) {
-                        editSelectedItems(selectedItems, status_value);
-                    }
-                } else {
-                    alert('Please select items to Set Status.');
-                }
-            });
+        if (selectedItems.length > 0) {
+            if (confirm("Are you sure you want to Set " + status_text + " to selected items?")) {
+                editSelectedItems(selectedItems, status_value);
+            }
+        } else {
+            alert('Please select items to Set Status.');
+        }
+    });
 
     
-            function deleteSelectedItems(selectedItems) {
-                $.ajax({
-                    url: '{{ route('services.bulkDelete') }}',
-                    method: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: JSON.stringify({
-                        selectedItems
-                    }),
-                    success: function(data) {
-                        alert(data.message);
-                        window.location.reload();
-                    },
-                    error: function(error) {
-                        console.error('Error:', error);
-                    }
-                });
+    function deleteSelectedItems(selectedItems) {
+        $.ajax({
+            url: '{{ route('services.bulkDelete') }}',
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                selectedItems
+            }),
+            success: function(data) {
+                alert(data.message);
+                window.location.reload();
+            },
+            error: function(error) {
+                console.error('Error:', error);
             }
+        });
+    }
     
-            function copySelectedItems(selectedItems) {
-                $.ajax({
-                    url: '{{ route('services.bulkCopy') }}',
-                    method: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: JSON.stringify({
-                        selectedItems
-                    }),
-                    success: function(data) {
-                        alert(data.message);
-                        window.location.reload();
-                    },
-                    error: function(error) {
-                        console.error('Error:', error);
-                    }
-                });
+    function copySelectedItems(selectedItems) {
+        $.ajax({
+            url: '{{ route('services.bulkCopy') }}',
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                selectedItems
+            }),
+            success: function(data) {
+                alert(data.message);
+                window.location.reload();
+            },
+            error: function(error) {
+                console.error('Error:', error);
             }
+        });
+    }
     
-            function editSelectedItems(selectedItems, status) {
-                $.ajax({
-                    url: '{{ route('services.bulkEdit') }}',
-                    method: 'POST',
-                    dataType: 'json',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: JSON.stringify({
-                        selectedItems,
-                        status
-                    }),
-                    success: function(data) {
-                        alert(data.message);
-                        window.location.reload();
-                    },
-                    error: function(error) {
-                        console.error('Error:', error);
-                    }
-                });
+    function editSelectedItems(selectedItems, status) {
+        $.ajax({
+            url: '{{ route('services.bulkEdit') }}',
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                selectedItems,
+                status
+            }),
+            success: function(data) {
+                 alert(data.message);
+                window.location.reload();
+            },
+            error: function(error) {
+                console.error('Error:', error);
             }
+        });
+    }
 
-            function confirmDelete(serviceId) {
-                var result = confirm("Are you sure you want to delete this service?");
-                if (result) {
-                    document.getElementById('deleteForm' + serviceId).submit();
-                }
-            }
-    </script>
+    function confirmDelete(serviceId) {
+        var result = confirm("Are you sure you want to delete this service?");
+        if (result) {
+            document.getElementById('deleteForm' + serviceId).submit();
+        }
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        function checkTableResponsive() {
+            var viewportWidth = $(window).width();
+            var $table = $('table');
     
+            if (viewportWidth < 768) { 
+                $table.addClass('table-responsive');
+            } else {
+                $table.removeClass('table-responsive');
+            }
+        }
+    
+        checkTableResponsive();
+    
+        $(window).resize(function () {
+            checkTableResponsive();
+        });
+    });
+</script>
 @endsection

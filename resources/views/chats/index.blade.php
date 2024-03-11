@@ -30,23 +30,24 @@
 </style>
 <div class="container">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-8 col-sm-12 mb-2">
             <h2>Chat</h2>
         </div>
-        <div class="col-md-9">
-            @can('chat-create')
-            <a class="btn btn-success float-end" href="{{ route('chats.create') }}">New Chat</a>
-            @endcan
-            <button class="btn btn-primary float-end mx-2" id="showAllButton">Show All</button>
-            <button class="btn btn-warning float-end mx-2" id="unreadButton">Unread Chats</button>
-            <div class="float-end mx-2">
-                <div class="input-group">
+        <div class="col-md-4 col-sm-12">
+            <div class="d-flex flex-wrap justify-content-md-end">
+                @can('chat-create')
+                <a class="btn btn-success mb-2" href="{{ route('chats.create') }}">New Chat</a>
+                @endcan
+                <button class="btn btn-primary mb-2 mx-2" id="showAllButton">Show All</button>
+                <button class="btn btn-warning mb-2" id="unreadButton">Unread Chats</button>
+                <div class="input-group mb-2">
                     <input type="text" id="searchInput" class="form-control" placeholder="Search...">
                     <button class="btn btn-info" id="searchButton">Search</button>
                 </div>
             </div>
         </div>
     </div>
+    
     @if ($message = Session::get('success'))
     <div class="alert alert-success">
         <span>{{ $message }}</span>
