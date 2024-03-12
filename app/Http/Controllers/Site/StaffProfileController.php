@@ -8,6 +8,7 @@ use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class StaffProfileController extends Controller
 {
@@ -71,7 +72,9 @@ class StaffProfileController extends Controller
         $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
-        if ($request->app_flag) {
+        $userAgent = $request->header('User-Agent');
+
+        if (Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone'])) {
             $app_flag = true;
         } else {
             $app_flag = false;

@@ -27,24 +27,28 @@ $total_amount = 0;
     @if(count($booked_services) != 0)
     <table class="table table-striped table-bordered album bg-light">
         <tr>
-            <th>Sr#</th>
             <th>image</th>
             <th>Service Name</th>
-            <th>Price</th>
-            <th>Duration</th>
+            <th>
+                <span>Price</span><br>
+                <span>Duration</span>
+            </th>
             <th>Action</th>
         </tr>
         @foreach ($booked_services as $booked_service)
         <tr>
-            <td>{{ ++$i }}</td>
             <td><img src="service-images/{{ $booked_service->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"></td>
             <td>{{ $booked_service->name }}</td>
-            @if(isset($booked_service->discount))
-            <td>@currency( $booked_service->discount)</td>
-            @else
-            <td>@currency( $booked_service->price)</td>
-            @endif
-            <td>{{ $booked_service->duration }}</td>
+            <td>
+                <span>
+                    @if(isset($booked_service->discount))  
+                        @currency($booked_service->discount) 
+                    @else 
+                        @currency($booked_service->price)
+                    @endif
+                </span><br>
+                <span>{{ $booked_service->duration }}</span>
+            </td>
             <td>
                 <div class="btn-group">
                     <a href="/removeToCart/{{ $booked_service->id }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>

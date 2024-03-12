@@ -13,7 +13,7 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Str;
 
 class SiteController extends Controller
 {
@@ -34,6 +34,15 @@ class SiteController extends Controller
      */
     public function index(Request $request)
     {
+
+        $userAgent = $request->header('User-Agent');
+
+        if (Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone'])) {
+            $app_flag = true;
+        } else {
+            $app_flag = false;
+        }
+
         $address = NULL;
 
         try {
@@ -104,7 +113,7 @@ class SiteController extends Controller
             $FAQs = FAQ::where('category_id', $request->id)->where('status','1')->latest()->take(3)->get();
             $filters = $request->only(['id']);
             $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit'));
+            return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','app_flag'));
         } else {
             $all_categories = ServiceCategory::get();
             $FAQs = FAQ::latest()->where('status','1')->take(3)->get();
@@ -113,18 +122,25 @@ class SiteController extends Controller
                     ->orWhereNull('type');
             })->where('status', '1')
             ->paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','all_categories'));
+            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','all_categories','app_flag'));
         }
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
+        $userAgent = $request->header('User-Agent');
+
+        if (Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone'])) {
+            $app_flag = true;
+        } else {
+            $app_flag = false;
+        }
         $service = Service::findOrFail($id);
         $FAQs = FAQ::where('service_id', $id)->where('status','1')->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');
         if ($service->status) {
-            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating'));
+            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating','app_flag'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');

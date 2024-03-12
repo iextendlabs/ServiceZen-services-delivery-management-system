@@ -5,44 +5,52 @@
   }
 </style>
 @section('content')
-<section class="jumbotron text-center">
-  <div class="container">
-    <h1 class="jumbotron-heading">Best In the Town Saloon Services</h1>
-    <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and just few clicks away.</p>
-  </div>
-</section>
-<div class="text-center">
-  @if(Session::has('error'))
-  <span class="alert alert-danger" role="alert">
-    <strong>{{ Session::get('error') }}</strong>
-  </span>
-  @endif
-  @if(Session::has('success'))
-  <span class="alert alert-success" role="alert">
-    <strong>{{ Session::get('success') }}</strong>
-  </span>
-  @endif
-  @if(Session::has('cart-success'))
-  <div class="alert alert-success" role="alert">
-    <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
-    <span>To add more service<a href="/"> Continue</a></span>
-  </div>
-  @endif
-  @if ($errors->any())
-  <div class="alert alert-danger">
-    <strong>Whoops!</strong> There were some problems with your input.<br><br>
-    <ul>
-      @foreach ($errors->all() as $error)
-      <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
-  @endif
-</div>
-<div id="serviceDetailContainer" class="album py-5 bg-light">
-  <div class="container">
-    <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
 
+@php
+if($app_flag === true){
+$addONsCarousel_chunk = 1;
+$packageCarousel_chunk = 1;
+}else{
+$addONsCarousel_chunk = 6;
+$packageCarousel_chunk = 3;
+}
+@endphp
+
+<div class="container">
+  <section class="jumbotron text-center">
+      <h1 class="jumbotron-heading">Best In the Town Saloon Services</h1>
+      <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and just few clicks away.</p>
+  </section>
+  <div class="text-center">
+    @if(Session::has('error'))
+    <span class="alert alert-danger" role="alert">
+      <strong>{{ Session::get('error') }}</strong>
+    </span>
+    @endif
+    @if(Session::has('success'))
+    <span class="alert alert-success" role="alert">
+      <strong>{{ Session::get('success') }}</strong>
+    </span>
+    @endif
+    @if(Session::has('cart-success'))
+    <div class="alert alert-success" role="alert">
+      <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
+      <span>To add more service<a href="/"> Continue</a></span>
+    </div>
+    @endif
+    @if ($errors->any())
+    <div class="alert alert-danger">
+      <strong>Whoops!</strong> There were some problems with your input.<br><br>
+      <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+      </ul>
+    </div>
+    @endif
+  </div>
+  <div id="serviceDetailContainer" class="album py-5 bg-light">
+    <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
     <div class="row">
       <div class="col-md-8">
         <img src="./service-images/{{ $service->image }}" alt="Card image cap" height="auto" width="100%">
@@ -137,25 +145,21 @@
       </div>
     </div>
   </div>
-</div>
-
-<div class="album py-5 bg-light">
-  <div class="container">
-
+  <div class="album py-5 bg-light">
     @if(count($service->addONs))
     <hr>
     <h2>Add ONs</h2><br>
     <div id="myCarousel" class="carousel slide col-md-12" data-ride="carousel">
       <!-- Indicators -->
       <ol class="carousel-indicators">
-        @foreach($service->addONs->chunk(6) as $key => $addONsChunk)
+        @foreach($service->addONs->chunk($addONsCarousel_chunk) as $key => $addONsChunk)
         <li data-target="#myCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
         @endforeach
       </ol>
 
       <!-- Slides -->
       <div class="carousel-inner">
-        @foreach($service->addONs->chunk(6) as $key => $addONsChunk)
+        @foreach($service->addONs->chunk($addONsCarousel_chunk) as $key => $addONsChunk)
         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
           <div class="row">
             @foreach($addONsChunk as $addON)
@@ -210,14 +214,14 @@
     <div id="packageCarousel" class="carousel slide col-md-12" data-ride="carousel">
       <!-- Indicators -->
       <ol class="carousel-indicators">
-        @foreach($service->package->chunk(3) as $key => $packageChunk)
+        @foreach($service->package->chunk($packageCarousel_chunk) as $key => $packageChunk)
         <li data-target="#packageCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
         @endforeach
       </ol>
 
       <!-- Slides -->
       <div class="carousel-inner">
-        @foreach($service->package->chunk(3) as $key => $packageChunk)
+        @foreach($service->package->chunk($packageCarousel_chunk) as $key => $packageChunk)
         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
           <div class="row">
             @foreach($packageChunk as $package)
@@ -272,7 +276,7 @@
         <div class="card-header" id="heading{{ $FAQ->id }}">
           <h5 class="mb-0">
             <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ $FAQ->id }}" aria-expanded="true" aria-controls="collapse{{ $FAQ->id }}">
-              {{ $FAQ->question }}
+              <div style="white-space: normal;">{{ $FAQ->question }}</div>
             </button>
           </h5>
         </div>
