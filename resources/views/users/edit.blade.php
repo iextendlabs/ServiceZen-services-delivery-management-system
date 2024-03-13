@@ -42,7 +42,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Confirm Password:</strong>
-                    <input type="password" name="password_confirmation" placeholder="Confirm Password" class="form-control">
+                    <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">

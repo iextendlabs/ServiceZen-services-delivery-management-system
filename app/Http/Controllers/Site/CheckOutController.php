@@ -368,18 +368,8 @@ class CheckOutController extends Controller
 
         $coupon_code = '';
         
-        $coupon_code_input = request()->cookie('coupon_code');
+        $coupon_code = request()->cookie('coupon_code');
         $affiliate_code = request()->cookie('affiliate_code');
-
-        $selectedServices = $selectedServices ?? [];
-
-        if ($coupon_code_input !== null && !empty($selectedServices)) {
-            $coupon = Coupon::where('code', $coupon_code_input)->first();
-
-            if ($coupon && $coupon->isValidCoupon($coupon_code_input, $selectedServices)) {
-                $coupon_code = $coupon_code_input;
-            }
-        }
 
         if (Auth::check()) {
             $email = Auth::user()->email;
