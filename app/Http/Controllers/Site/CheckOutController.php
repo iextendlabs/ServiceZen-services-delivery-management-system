@@ -36,6 +36,7 @@ use Illuminate\Validation\ValidationException;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
 
 class CheckOutController extends Controller
 {
@@ -171,12 +172,14 @@ class CheckOutController extends Controller
                     $errors = [
                         'coupon' => [$isValid],
                     ];
+                    Cookie::queue(Cookie::forget('coupon_code'));
                     return response()->json(['errors' => $errors], 200);
                 }
             }else{
                 $errors = [
                     'coupon' => ["Coupon is invalid!"],
                 ];
+                Cookie::queue(Cookie::forget('coupon_code'));
                 return response()->json(['errors' => $errors], 200);
             }
             
@@ -369,7 +372,15 @@ class CheckOutController extends Controller
         $coupon_code = '';
         
         $coupon_code = request()->cookie('coupon_code');
-        $affiliate_code = request()->cookie('affiliate_code');
+
+        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
+        
+        if($affiliate){
+            $affiliate_code = request()->cookie('affiliate_code');
+        }else{
+            Cookie::queue(Cookie::forget('affiliate_code'));
+            $affiliate_code = "";
+        }
 
         if (Auth::check()) {
             $email = Auth::user()->email;

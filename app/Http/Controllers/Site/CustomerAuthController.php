@@ -24,7 +24,14 @@ class CustomerAuthController extends Controller
 {
     public function registration(Request $request)
     {
-        $affiliate_code = request()->cookie('affiliate_code');
+        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
+        
+        if($affiliate){
+            $affiliate_code = request()->cookie('affiliate_code');
+        }else{
+            Cookie::queue(Cookie::forget('affiliate_code'));
+            $affiliate_code = "";
+        }
 
         return view('site.auth.signUp', compact('affiliate_code'));
     }
@@ -227,26 +234,29 @@ class CustomerAuthController extends Controller
         $request->validate([
             'coupon' => [
                 'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) {
-                    $query->where('status', 1)
-                        ->where('date_start', '<=', now())
-                        ->where('date_end', '>=', now());
-                }),
                 function ($attribute, $value, $fail) {
-                    $coupon = Coupon::where('code', $value)->first();
-        
-                    if ($coupon && $coupon->uses_total !== null) {
-                        if (!auth()->check()) {
-                            $fail('The ' . $attribute . ' requires Login for validation.');
-                            return;
-                        }
-                        
+                    $coupon = Coupon::where('code', $value)
+                        ->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now())
+                        ->first();
+
+                    if (!$coupon) {
+                        // Coupon doesn't exist or is not valid
+                        cookie()->queue(cookie()->forget('coupon_code'));
+                        $fail('The ' . $attribute . ' is not valid.');
+                        return;
+                    }
+
+                    if ($coupon->uses_total !== null && auth()->check()) {
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
                         $userOrdersCount = Order::where('customer_id', auth()->id())
                             ->whereIn('id', $order_coupon)
                             ->count();
-        
+
                         if ($userOrdersCount >= $coupon->uses_total) {
+                            // Exceeded maximum uses
+                            cookie()->queue(cookie()->forget('coupon_code'));
                             $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
                         }
                     }
@@ -256,8 +266,9 @@ class CustomerAuthController extends Controller
 
         cookie()->queue('coupon_code', $request->coupon);
 
-        return redirect()->back()->with('success', 'Coupon Apply Successfuly.');
+        return redirect()->back()->with('success', 'Coupon Applied Successfully.');
     }
+
 
     public function account()
     {
