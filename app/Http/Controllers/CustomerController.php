@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Coupon;
 use App\Models\Affiliate;
+use App\Models\UserAffiliate;
 use App\Models\CustomerCoupon;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -39,7 +40,7 @@ class CustomerController extends Controller
             'number' => $request->number,
         ];
 
-        $query = User::latest();
+        $query = User::role('Customer')->latest();
 
         if ($request->name) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($request->name) . '%']);
@@ -149,8 +150,21 @@ class CustomerController extends Controller
 
         if ($request->affiliate_code) {
             $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
-
-            $customer->affiliates()->sync($affiliate->user_id);
+        
+            if ($affiliate) {
+                $userAffiliate = UserAffiliate::where("user_id", $customer->id)->first();
+                if ($userAffiliate) {
+                    $userAffiliate->affiliate_id = $affiliate->user_id;
+                    $userAffiliate->save();
+                } else {
+                    UserAffiliate::create([
+                        'user_id' => $customer->id,
+                        'affiliate_id' => $affiliate->user_id,
+                    ]);
+                }
+            }
+        }else{
+            UserAffiliate::where("user_id",$customer->id)->delete();
         }
         $previousUrl = $request->url;
         return redirect($previousUrl)

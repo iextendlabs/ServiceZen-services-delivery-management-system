@@ -63,6 +63,12 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Expire after days:</strong>
+                    <input type="number" name="expire" class="form-control" value="{{ $affiliate->affiliate->expire }}" placeholder="Enter days like 20">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Fix Salary:</strong>
                     <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary }}" class="form-control" placeholder="Fix Salary">
                 </div>

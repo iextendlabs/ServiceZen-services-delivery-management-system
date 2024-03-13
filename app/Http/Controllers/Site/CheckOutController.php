@@ -36,6 +36,7 @@ use Illuminate\Validation\ValidationException;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
 
 class CheckOutController extends Controller
 {
@@ -171,12 +172,14 @@ class CheckOutController extends Controller
                     $errors = [
                         'coupon' => [$isValid],
                     ];
+                    Cookie::queue(Cookie::forget('coupon_code'));
                     return response()->json(['errors' => $errors], 200);
                 }
             }else{
                 $errors = [
                     'coupon' => ["Coupon is invalid!"],
                 ];
+                Cookie::queue(Cookie::forget('coupon_code'));
                 return response()->json(['errors' => $errors], 200);
             }
             
@@ -366,37 +369,17 @@ class CheckOutController extends Controller
             $serviceIds = [];
         }
 
-        if ($request->cookie('affiliate_id')) {
-            $affiliate = Affiliate::where('user_id', $request->cookie('affiliate_id'))->first();
-            $url_affiliate_code = $affiliate->code;
-        } else {
-            $url_affiliate_code = '';
-        }
-        $code = NULL;
-        try {
-            $code = json_decode($request->cookie('code'), true);
-        } catch (\Throwable $th) {
-        }
+        $coupon_code = '';
+        
+        $coupon_code = request()->cookie('coupon_code');
 
-        if ($code && $code['coupon_code'] !== null && !empty($selectedServices)) {
-
-            $coupon = Coupon::where('code', $code['coupon_code'])->first();
-            if($coupon){
-                $isValid = $coupon->isValidCoupon($code['coupon_code'],$selectedServices);
-                
-                if($isValid === true){
-                    $coupon_code = $code['coupon_code'];
-                }else{
-                    $coupon_code = "";
-                }
-            }else{
-                $coupon_code = "";
-            }
-            
-            $affiliate_code = $code['affiliate_code'];
-        } else {
-            $affiliate_code = '';
-            $coupon_code = '';
+        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
+        
+        if($affiliate){
+            $affiliate_code = request()->cookie('affiliate_code');
+        }else{
+            Cookie::queue(Cookie::forget('affiliate_code'));
+            $affiliate_code = "";
         }
 
         if (Auth::check()) {
@@ -415,7 +398,7 @@ class CheckOutController extends Controller
 
         $city = $addresses['city'];
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'url_affiliate_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds'));
     }
 
     public function confirmStep(Request $request)

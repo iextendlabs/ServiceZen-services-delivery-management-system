@@ -44,4 +44,24 @@
             </tbody>
         </table>
     </div>
+<script>
+    $(document).ready(function () {
+        function checkTableResponsive() {
+            var viewportWidth = $(window).width();
+            var $table = $('table');
+
+            if (viewportWidth < 768) { 
+                $table.addClass('table-responsive');
+            } else {
+                $table.removeClass('table-responsive');
+            }
+        }
+
+        checkTableResponsive();
+
+        $(window).resize(function () {
+            checkTableResponsive();
+        });
+    });
+</script>
 @endsection

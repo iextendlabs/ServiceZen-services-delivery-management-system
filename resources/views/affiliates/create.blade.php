@@ -60,6 +60,12 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Expire after days:</strong>
+                    <input type="number" name="expire" class="form-control" value="{{ old('expire') }}" placeholder="Enter days like 20">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Fix Salary:</strong>
                     <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Fix Salary">
                 </div>

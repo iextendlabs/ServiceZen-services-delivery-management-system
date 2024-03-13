@@ -1,5 +1,14 @@
 @extends('site.layout.app')
 @section('content')
+@php
+if($app_flag === true){
+$reviews_chunk = 1;
+$staffs_chunk = 1;
+}else{
+$reviews_chunk = 3;
+$staffs_chunk = 4;
+}
+@endphp
 <style>
   #staffCarousel img {
     height: 200px !important;
@@ -145,12 +154,12 @@
         <h2 class="text-center">Customer Reviews</h2>
         <div id="reviewsCarousel" class="carousel slide" data-ride="carousel">
           <ol class="carousel-indicators">
-            @foreach($reviews->chunk(3) as $key => $chunk)
+            @foreach($reviews->chunk($reviews_chunk) as $key => $chunk)
             <li data-target="#reviewsCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
             @endforeach
           </ol>
           <div class="carousel-inner">
-            @foreach($reviews->chunk(3) as $chunk)
+            @foreach($reviews->chunk($reviews_chunk) as $chunk)
             <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
               <div class="row">
                 @foreach($chunk as $review)
@@ -200,12 +209,12 @@
         <h2 class="text-center">Our Team</h2>
         <div id="staffCarousel" class="carousel slide" data-ride="carousel">
           <ol class="carousel-indicators">
-            @foreach($staffs->chunk(4) as $key => $chunk)
+            @foreach($staffs->chunk($staffs_chunk) as $key => $chunk)
             <li data-target="#staffCarousel" data-slide-to="{{ $key }}" class="{{ $loop->first ? 'active' : '' }}"></li>
             @endforeach
           </ol>
           <div class="carousel-inner">
-            @foreach($staffs->chunk(4) as $chunk)
+            @foreach($staffs->chunk($staffs_chunk) as $chunk)
             <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
               <div class="row">
                 @foreach($chunk as $staff)

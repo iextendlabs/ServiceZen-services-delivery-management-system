@@ -17,17 +17,22 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
 use Illuminate\Support\Facades\Mail;
+use App\Models\UserAffiliate;
+use Illuminate\Support\Facades\Cookie;
 
 class CustomerAuthController extends Controller
 {
     public function registration(Request $request)
     {
-        if ($request->cookie('affiliate_id')) {
-            $affiliate = Affiliate::where('user_id', $request->cookie('affiliate_id'))->first();
-            $affiliate_code = $affiliate->code;
-        } else {
-            $affiliate_code = '';
+        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
+        
+        if($affiliate){
+            $affiliate_code = request()->cookie('affiliate_code');
+        }else{
+            Cookie::queue(Cookie::forget('affiliate_code'));
+            $affiliate_code = "";
         }
+
         return view('site.auth.signUp', compact('affiliate_code'));
     }
 
@@ -52,14 +57,26 @@ class CustomerAuthController extends Controller
 
         if ($request->affiliate_code) {
             $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
-
-            $customer->affiliates()->attach($affiliate->user_id);
+            if($affiliate){
+                UserAffiliate::create([
+                    'user_id' => $customer->id,
+                    'affiliate_id' => $affiliate->user_id,
+                ]);
+    
+                $affiliate_code = $affiliate->code;
+    
+                $expire = $affiliate->expire ? $affiliate->expire * 24 * 60 : null; 
+                if($expire == null){
+                    cookie()->queue('affiliate_code', $affiliate_code);
+                }else{
+                    cookie()->queue('affiliate_code', $affiliate_code, $expire);
+                }
+            }
         }
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return redirect('/')
-                ->with('success', 'You have Successfully loggedin');
+            return redirect('/')->with('success', 'You have successfully logged in');
         }
         return redirect("customer-registration")->with('error', 'Oppes! You have entered invalid credentials');
     }
@@ -85,6 +102,30 @@ class CustomerAuthController extends Controller
                 if (Auth::user()->hasRole('Affiliate')) {
                     return redirect('/affiliate_dashboard')->with('success', 'You have Successfully loggedin');
                 } else {
+                    if(Auth::user()->userAffiliate){
+                        if(Auth::user()->userAffiliate->updated_at == null){
+                            $daysSinceCreation = Auth::user()->created_at->diffInDays(now());
+                        }else{
+                            $daysSinceCreation =Auth::user()->userAffiliate->updated_at->diffInDays(now());
+                        }
+
+                        $affiliate = Affiliate::where('user_id', Auth::user()->userAffiliate->affiliate_id)->first();
+                        
+                        $affiliate_code = $affiliate ? $affiliate->code : "";
+
+                        if ($affiliate->expire) {
+                            $expireInDays = $affiliate->expire - $daysSinceCreation;
+                            if ($expireInDays > 0) {
+                                $expire = $expireInDays * 24 * 60; 
+                                cookie()->queue('affiliate_code', $affiliate_code, $expire);
+                            } else {
+                                Cookie::queue(Cookie::forget('affiliate_code'));
+                            }
+                        } else {
+                            cookie()->queue('affiliate_code', $affiliate_code);
+                        }
+
+                    }
                     return redirect('/')->with('success', 'You have Successfully loggedin');
                 }
             }
@@ -104,13 +145,8 @@ class CustomerAuthController extends Controller
     public function edit($id, Request $request)
     {
         $user = User::find($id);
-        if ($request->cookie('code') !== null) {
-            $code = json_decode($request->cookie('code'), true);
-            $coupon_code = $code['coupon_code'];
-        } else {
-            $coupon_code = "";
-        }
-        
+
+        $coupon_code = request()->cookie('coupon_code');
         return view('site.auth.profile', compact('user','coupon_code'));
     }
 
@@ -175,8 +211,22 @@ class CustomerAuthController extends Controller
 
     public function affiliateUrl(Request $request)
     {
+        if ($request->affiliate_id) {
+            $affiliate = Affiliate::where('user_id', $request->affiliate_id)->first();
+            if($affiliate){
+                $affiliate_code = $affiliate ? $affiliate->code : "";
 
-        return redirect('/')->withCookie('affiliate_id', $request->affiliate_id, 0);
+                $expire = $affiliate->expire ? $affiliate->expire * 24 * 60 : null; 
+                
+                if($expire == null){
+                    cookie()->queue('affiliate_code', $affiliate_code);
+                }else{
+                    cookie()->queue('affiliate_code', $affiliate_code, $expire);
+                }
+            }
+        }
+        
+        return redirect('/');
     }
 
     public function applyCoupon(Request $request)
@@ -184,26 +234,29 @@ class CustomerAuthController extends Controller
         $request->validate([
             'coupon' => [
                 'nullable',
-                Rule::exists('coupons', 'code')->where(function ($query) {
-                    $query->where('status', 1)
-                        ->where('date_start', '<=', now())
-                        ->where('date_end', '>=', now());
-                }),
                 function ($attribute, $value, $fail) {
-                    $coupon = Coupon::where('code', $value)->first();
-        
-                    if ($coupon && $coupon->uses_total !== null) {
-                        if (!auth()->check()) {
-                            $fail('The ' . $attribute . ' requires Login for validation.');
-                            return;
-                        }
-                        
+                    $coupon = Coupon::where('code', $value)
+                        ->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now())
+                        ->first();
+
+                    if (!$coupon) {
+                        // Coupon doesn't exist or is not valid
+                        cookie()->queue(cookie()->forget('coupon_code'));
+                        $fail('The ' . $attribute . ' is not valid.');
+                        return;
+                    }
+
+                    if ($coupon->uses_total !== null && auth()->check()) {
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
                         $userOrdersCount = Order::where('customer_id', auth()->id())
                             ->whereIn('id', $order_coupon)
                             ->count();
-        
+
                         if ($userOrdersCount >= $coupon->uses_total) {
+                            // Exceeded maximum uses
+                            cookie()->queue(cookie()->forget('coupon_code'));
                             $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
                         }
                     }
@@ -211,27 +264,19 @@ class CustomerAuthController extends Controller
             ],
         ]);
 
-        if ($request->cookie('code') !== null) {
-            $code = json_decode($request->cookie('code'), true);
-            $input['affiliate_code'] = $code['affiliate_code'];
-            $input['coupon_code'] = $request->coupon;
-        } else {
-            $input['affiliate_code'] = "";
-            $input['coupon_code'] = $request->coupon;
-        }
+        cookie()->queue('coupon_code', $request->coupon);
 
-        
-            Session::put('code', $input);
-        cookie()->queue('code', json_encode($input), 5256000);
-
-        return redirect()->back()->with('success', 'Coupon Apply Successfuly.');
+        return redirect()->back()->with('success', 'Coupon Applied Successfully.');
     }
 
-    public function account(){
+
+    public function account()
+    {
         return view('site.auth.accountDelete');
     }
 
-    public function deleteAccountMail(Request $request){
+    public function deleteAccountMail(Request $request)
+    {
         $request->validate([
             'email' => [
                 'required',
@@ -246,7 +291,8 @@ class CustomerAuthController extends Controller
         return redirect()->back()->with('success', 'Account Deletion Confirmation email sent. Please check your inbox for further instructions.');
     }
 
-    public function deleteAccount(Request $request){
+    public function deleteAccount(Request $request)
+    {
         User::find($request->id)->delete();
         
         Session::flush();
