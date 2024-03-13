@@ -283,7 +283,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <strong>Affiliate Code:</strong>
-                            <input type="text" name="affiliate_code" id="affiliate_code" class="form-control" placeholder="Affiliate Code" {{ $url_affiliate_code ? 'readonly': null}} value="{{ $url_affiliate_code ?? old('affiliate_code') ?? $affiliate_code }}">
+                            <input type="text" name="affiliate_code" id="affiliate_code" class="form-control" placeholder="Affiliate Code" {{ $affiliate_code ? 'readonly': null}} value="{{ $affiliate_code ?? old('affiliate_code') }}">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -542,8 +542,26 @@
         });
     });
 </script>
-
-
+<script>
+    $(document).ready(function () {
+        function checkTableResponsive() {
+            var viewportWidth = $(window).width();
+            var $table = $('.services-table');
+    
+            if (viewportWidth < 768) { 
+                $table.addClass('table-responsive');
+            } else {
+                $table.removeClass('table-responsive');
+            }
+        }
+    
+        checkTableResponsive();
+    
+        $(window).resize(function () {
+            checkTableResponsive();
+        });
+    });
+</script>
 <script>
     $(document).on("change", "#category", function() {
         let value = $(this).val();
