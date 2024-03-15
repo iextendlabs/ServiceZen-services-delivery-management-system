@@ -235,18 +235,18 @@
                 </tr>
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
+                    @php
+                    $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount)* $order->staff->commission) / 100;
+                    @endphp
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->service_staff_id }}">
-                    <input type="hidden" name="amount" value="{{ ($order->order_total->sub_total * $order->staff->commission) / 100 }}">
-                    @php
-                    $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
-                    @endphp
+                    <input type="hidden" name="amount" value="{{ $staff_commission }}">
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>{{ $order->status }}</td>
                         <td>{{ $order->staff_name }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
-                        <td>@currency((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount)* $order->staff->commission) / 100)</td>
+                        <td>@currency($staff_commission)</td>
                         @if(auth()->user()->getRoleNames() != '["Staff"]')
                         <td class="no-print">
                             @if(empty($order->getStaffTransactionStatus()))
@@ -277,14 +277,19 @@
                 </tr>
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
+                    @php
+                    $commission = $order->customer->userAffiliate->commission ?? $order->affiliate->affiliate->commission;
+
+                    $affiliate_commission = ((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $commission) / 100)
+                    @endphp
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
-                    <input type="hidden" name="amount" value="{{ ((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100) }}">
+                    <input type="hidden" name="amount" value="{{ $affiliate_commission }}">
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
                         <td>{{ $order->affiliate->name }}</td>
-                        <td>@currency((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100)</td>
+                        <td>@currency($affiliate_commission)</td>
                         <td class="no-print">
                             @if(empty($order->getAffiliateTransactionStatus()))
                             @can('order-edit')

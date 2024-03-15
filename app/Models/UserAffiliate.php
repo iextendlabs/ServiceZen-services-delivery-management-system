@@ -9,7 +9,7 @@ class UserAffiliate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','affiliate_id'];
+    protected $fillable = ['user_id','affiliate_id','commission'];
     
     protected $table = 'user_affiliate';
 
@@ -18,8 +18,8 @@ class UserAffiliate extends Model
         return $this->hasOne(Affiliate::class,'user_id','affiliate_id');
     }
 
-    public function user()
+    public function affiliateUser()
     {
-        return $this->hasOne(User::class,'id','user_id');
+        return $this->hasOne(User::class,'id','affiliate_id');
     }
 }
