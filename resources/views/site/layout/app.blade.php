@@ -294,14 +294,21 @@ $cart_product = 0;
  </script>
   <script>
       $(document).ready(function(){
-      if (navigator.userAgent.match(/Android/i)) {
-          var appLinkSection = '<section id="app-link-section">\
-                                  <p>🚀 Elevate your experience with our Android App! 🚀</p>\
-                                  <a href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp">Download Now</a>\
-                                </section>';
-          $('body').prepend(appLinkSection);
-      }
+        if (navigator.userAgent.match(/Android/i)) {
+            var appLinkSection = '<section id="app-link-section">\
+                                    <p>🚀 Elevate your experience with our Android App! 🚀</p>\
+                                    <a href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp" >Download Now</a>\
+                                  </section>';
+            $('body').prepend(appLinkSection);
+        } else if (navigator.userAgent.match(/iPhone/i)) {
+            var appLinkSection = '<section id="app-link-section">\
+                                    <p>🚀 Elevate your experience with our iPhone App! 🚀</p>\
+                                    <a href="https://apps.apple.com/be/app/lipslay/id6477719247">Download Now</a>\
+                                  </section>';
+            $('body').prepend(appLinkSection);
+        }
       });
+
   </script>
   <script>
   $(document).ready(function() {
