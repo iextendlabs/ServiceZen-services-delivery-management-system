@@ -50,7 +50,7 @@
                     <select name="affiliate_id" class="form-control">
                         <option></option>
                         @foreach ($affiliates as $affiliate)
-                            <option value="{{ $affiliate->id }}" @if($customer->userAffiliate && $customer->userAffiliate->affiliate_id == $affiliate->id) selected @endif>{{ $affiliate->name }}({{ $affiliate->affiliate->code ?? "" }})</option>
+                            <option value="{{ $affiliate->id }}" @if($customer->userAffiliate && $customer->userAffiliate->affiliate_id == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
                         @endforeach
                     </select>
                 </div>

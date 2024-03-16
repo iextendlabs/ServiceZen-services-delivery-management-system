@@ -51,7 +51,7 @@
                     </td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->email }}</td>
-                    <td>{{ $customer->userAffiliate->affiliateUser->name ?? "" }}({{ $customer->userAffiliate->affiliate->code ?? "" }})</td>
+                    <td>{{ $customer->userAffiliate->affiliateUser->name ?? "" }}@if(isset($customer->userAffiliate->affiliate->code))({{ $customer->userAffiliate->affiliate->code }}) @endif</td>
                     <td>
                         <form id="deleteForm{{ $customer->id }}" action="{{ route('customers.destroy',$customer->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}"><i class="fas fa-eye"></i></a>
@@ -134,7 +134,7 @@
                             <select name="affiliate_id" class="form-control">
                                 <option></option>
                                 @foreach ($affiliates as $affiliate)
-                                <option value="{{ $affiliate->id }}" @if($filter['affiliate_id'] == $affiliate->id) selected @endif>{{ $affiliate->name }}({{ $affiliate->affiliate->code ?? "" }})</option>
+                                <option value="{{ $affiliate->id }}" @if($filter['affiliate_id'] == $affiliate->id) selected @endif>{{ $affiliate->name }} @if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
                                 @endforeach
                             </select>
                         </div>
