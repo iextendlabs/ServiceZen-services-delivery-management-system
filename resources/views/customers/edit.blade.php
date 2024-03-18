@@ -46,8 +46,18 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="form-group"><strong>Affiliate Code:</strong>
-                    <input type="text" name="affiliate_code" class="form-control" placeholder="Affiliate Code" value={{ $customer->userAffiliate && $customer->userAffiliate->affiliate ? $customer->userAffiliate->affiliate->code : null }}>
+                <div class="form-group"><strong>Affiliate:</strong>
+                    <select name="affiliate_id" class="form-control">
+                        <option></option>
+                        @foreach ($affiliates as $affiliate)
+                            <option value="{{ $affiliate->id }}" @if($customer->userAffiliate && $customer->userAffiliate->affiliate_id == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Affiliate Commission in %:</strong>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in %" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
                 </div>
             </div>
             <div class="col-md-12 text-center">

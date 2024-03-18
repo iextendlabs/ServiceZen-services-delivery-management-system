@@ -96,6 +96,34 @@
         @endif
     </div>
     
+    @if(isset($customer->userAffiliate->affiliateUser))
+    <hr>
+    <div class="row">
+        <h3>Affiliate</h3>
+        <table class="table table-striped table-bordered album bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Commission</th>
+            </tr>
+            <tr>
+                <td>{{ $customer->userAffiliate->affiliateUser->name ?? "" }}</td>
+                <td>{{ $customer->userAffiliate->affiliate->code ?? "" }}</td>
+                <td>
+                    <small>
+                    @if(isset($customer->userAffiliate->commission))<s>@endif
+                    {{$customer->userAffiliate->affiliate->commission }}% <br>
+                    @if(isset($customer->userAffiliate->commission))</s>@endif
+                    @if(isset($customer->userAffiliate->commission))
+                    <b>{{ $customer->userAffiliate->commission }}%</b>
+                    @endif
+                    </small>
+                </td>
+            </tr>
+        </table>
+    </div>
+    @endif
+
     <hr>
     <div class="row">
         @if(isset($customer->coupons))

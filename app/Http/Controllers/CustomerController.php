@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
 {
@@ -38,6 +39,7 @@ class CustomerController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'number' => $request->number,
+            'affiliate_id' => $request->affiliate_id,
         ];
 
         $query = User::role('Customer')->latest();
@@ -55,12 +57,20 @@ class CustomerController extends Controller
                 $subQuery->whereRaw('LOWER(number) LIKE ?', ['%'.strtolower($request->number).'%']);
             });
         }
+        
+        if ($request->affiliate_id) {
+            $query->whereHas('userAffiliate', function ($subQuery) use ($request) {
+                $subQuery->where('affiliate_id', $request->affiliate_id);
+            });
+        }
+
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
         $coupons = Coupon::where('status','1')->get();
         $customers = $query->orderBy('name')->paginate(config('app.paginate'));
-        $filters = $request->only(['name', 'email', 'number']);
+        $filters = $request->only(['name', 'email', 'number','affiliate_id']);
         $customers->appends($filters);
 
-        return view('customers.index', compact('customers', 'filter','coupons'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('customers.index', compact('customers', 'filter','coupons','affiliates'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -70,7 +80,8 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        return view('customers.create');
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
+        return view('customers.create',compact('affiliates'));
     }
 
     /**
@@ -85,6 +96,12 @@ class CustomerController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
+            'affiliate_id' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->commission !== null && $request->commission !== "";
+                }),
+                'nullable',
+            ],
         ]);
 
         $input = $request->all();
@@ -95,6 +112,12 @@ class CustomerController extends Controller
         $customer = User::create($input);
 
         $customer->assignRole('Customer');
+
+        if ($request->affiliate_id) {
+            $input['user_id'] = $customer->id;
+            $input['affiliate_id'] = $request->affiliate_id;
+            UserAffiliate::create($input);
+        }
 
         return redirect()->route('customers.index')
             ->with('success', 'Customer created successfully.');
@@ -119,7 +142,8 @@ class CustomerController extends Controller
      */
     public function edit(User $customer)
     {
-        return view('customers.edit', compact('customer'));
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
+        return view('customers.edit', compact('customer','affiliates'));
     }
 
     /**
@@ -135,7 +159,12 @@ class CustomerController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'affiliate_id' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->commission !== null && $request->commission !== "";
+                }),
+                'nullable'
+            ],
         ]);
 
         $input = $request->all();
@@ -148,20 +177,16 @@ class CustomerController extends Controller
         $customer = User::find($id);
         $customer->update($input);
 
-        if ($request->affiliate_code) {
-            $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
-        
-            if ($affiliate) {
-                $userAffiliate = UserAffiliate::where("user_id", $customer->id)->first();
-                if ($userAffiliate) {
-                    $userAffiliate->affiliate_id = $affiliate->user_id;
-                    $userAffiliate->save();
-                } else {
-                    UserAffiliate::create([
-                        'user_id' => $customer->id,
-                        'affiliate_id' => $affiliate->user_id,
-                    ]);
-                }
+        if ($request->affiliate_id) {
+            $userAffiliate = UserAffiliate::where("user_id", $customer->id)->first();
+            if ($userAffiliate) {
+                $userAffiliate->commission = $request->commission;
+                $userAffiliate->affiliate_id = $request->affiliate_id;
+                $userAffiliate->save();
+            } else {
+                $input['user_id'] = $customer->id;
+                $input['affiliate_id'] = $request->affiliate_id;
+                UserAffiliate::create($input);
             }
         }else{
             UserAffiliate::where("user_id",$customer->id)->delete();
@@ -207,6 +232,39 @@ class CustomerController extends Controller
 
         $previousUrl = url()->previous();
         return redirect($previousUrl)->with('success', 'Coupon assigned successfully');
+    }
+
+    public function bulkAssignCoupon(Request $request)
+    {
+        $selectedItems = $request->input('selectedItems');
+        $coupon_id = $request->input('coupon_id');
+
+        if (!empty($selectedItems)) {
+
+            foreach ($selectedItems as $customerId) {
+                $customer_coupon = CustomerCoupon::where('customer_id',$customerId)->where('coupon_id',$coupon_id)->first();
+                if(!$customer_coupon){
+                    CustomerCoupon::create([
+                        'customer_id' => $customerId, 
+                        'coupon_id' => $coupon_id
+                    ]);
+
+                    $coupon = Coupon::find($coupon_id);
+                    $customer = User::find($customerId);
+                    if($coupon->type == "Percentage"){
+                        $discount = $coupon->discount."%";
+                    }else{
+                        $discount = "AED ".$coupon->discount;
+                    }
+                    $body = "There is new Voucher for You.\nUse " .$coupon->code." Code To Get Discount of ".$discount;
+                    $customer->notifyOnMobile('New Voucher', $body);
+                }
+            }
+
+            return response()->json(['message' => 'Coupon assigned successfully.']);
+        } else {
+            return response()->json(['message' => 'No customer selected.']);
+        }
     }
 
     public function customerCoupon_destroy(Request $request, $couponId)

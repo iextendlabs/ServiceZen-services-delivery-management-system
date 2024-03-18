@@ -6,10 +6,23 @@
             <div class="float-start">
                 <h2>Customer</h2>
             </div>
-            <div class="float-end">
+            <div class="float-end d-flex align-items-center">
                 @can('customer-create')
-                <a class="btn btn-success" href="{{ route('customers.create') }}"> Create New Customer</a>
+                <a class="btn btn-success me-2" href="{{ route('customers.create') }}"> <i class="fa fa-plus"></i></a>
                 @endcan
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="bulk-coupon">Select Coupon</label>
+                    </div>
+                    <select class="custom-select" id="bulk-coupon" name="bulk-coupon">
+                        @foreach($coupons as $coupon)
+                            <option value="{{ $coupon->id }}">{{ $coupon->name }} ({{ $coupon->code }})</option>
+                        @endforeach
+                    </select>
+                    <div class="input-group-append">
+                        <button id="bulkAssignCoupon" class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -24,18 +37,21 @@
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
                 <tr>
-                    <th>Sr#</th>
+                    <td></td>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Affiliate</th>
                     <th width="280px">Action</th>
                 </tr>
                 @if(count($customers))
                 @foreach ($customers as $customer)
                 <tr>
-                    <td>{{ ++$i }}</td>
+                    <td>
+                        <input type="checkbox" class="item-checkbox" value="{{ $customer->id }}">
+                    </td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->email }}</td>
-
+                    <td>{{ $customer->userAffiliate->affiliateUser->name ?? "" }}@if(isset($customer->userAffiliate->affiliate->code))({{ $customer->userAffiliate->affiliate->code }}) @endif</td>
                     <td>
                         <form id="deleteForm{{ $customer->id }}" action="{{ route('customers.destroy',$customer->id) }}" method="POST">
                             <a class="btn btn-info" href="{{ route('customers.show',$customer->id) }}"><i class="fas fa-eye"></i></a>
@@ -113,6 +129,17 @@
                         </div>
                     </div>
                     <div class="col-12">
+                        <div class="form-group">
+                            <strong>Affiliate:</strong>
+                            <select name="affiliate_id" class="form-control">
+                                <option></option>
+                                @foreach ($affiliates as $affiliate)
+                                <option value="{{ $affiliate->id }}" @if($filter['affiliate_id'] == $affiliate->id) selected @endif>{{ $affiliate->name }} @if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
@@ -121,6 +148,47 @@
     </div>
 </div>
 <script>
+
+    $('#bulkAssignCoupon').click(function() {
+        const selectedItems = $('.item-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+        const coupon_value = $('select[name="bulk-coupon"]').val();
+        const coupon_text = $('select[name="bulk-coupon"] option:selected').text();
+
+        if (selectedItems.length > 0) {
+            if (confirm("Are you sure you want to assign " + coupon_text + " coupon to selected customer?")) {
+                console.log("adas");
+                bulkAssignCoupon(selectedItems, coupon_value);
+            }
+        } else {
+            alert('Please select Customer to Assign Coupon.');
+        }
+    });
+
+    function bulkAssignCoupon(selectedItems, coupon_id) {
+        $.ajax({
+            url: '{{ route('customers.bulkAssignCoupon') }}',
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                selectedItems,
+                coupon_id
+            }),
+            success: function(data) {
+                 alert(data.message);
+                window.location.reload();
+            },
+            error: function(error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+
     function confirmDelete(Id) {
         var result = confirm("Are you sure you want to delete this Item?");
             if (result) {

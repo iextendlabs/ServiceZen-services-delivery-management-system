@@ -133,10 +133,13 @@ class StaffAppController2 extends Controller
             }
             if ($request->status == "Complete") {
                 if (isset($order->affiliate) && !isset($affiliate_transaction)) {
+                    $commission = $order->customer->userAffiliate->commission ?? $order->affiliate->affiliate->commission;
+                    
+                    $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
+                    
                     $input['user_id'] = $order->affiliate->id;
                     $input['order_id'] = $order->id;
-                    $staff_commission = ($order->order_total->sub_total * $order->staff->commission) / 100;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100;
+                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $commission) / 100;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);

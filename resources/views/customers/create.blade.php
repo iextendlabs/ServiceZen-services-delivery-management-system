@@ -45,6 +45,21 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Affiliate:</strong>
+                    <select name="affiliate_id" class="form-control">
+                        <option></option>
+                        @foreach ($affiliates as $affiliate)
+                            <option value="{{ $affiliate->id }}" @if(old('affiliate_id') == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Affiliate Commission in %:</strong>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in %" value="{{ old('commission') }}">
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
