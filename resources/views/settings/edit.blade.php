@@ -153,12 +153,59 @@
                             </tr>
                             @endif
                             @endforeach
-
                         </table>
                     </div>
-
+                    
                     @elseif($setting->key === 'App Categories')
-                    <input type="text" name="search-categories" id="search-categories" class="form-control" placeholder="Search Categories By Name">
+                    <table id="categoryTable" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Sort Order</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $row = 0;
+                            @endphp
+                            @if($setting->value)
+                                @foreach (explode(',', $setting->value) as $category)
+                                    @php
+                                        list($id, $sort) = explode('_', $category);
+                                    @endphp
+                                    <tr>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <select name="category[{{ $row }}]" class="form-control">
+                                                        @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}" @if($id == $category->id) selected @endif>{{ $category->title }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" name="sort_order[{{ $row }}]" class="form-control" value="{{ $sort }}" placeholder="Sort Order">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                                        </td>
+                                    </tr>
+                                    @php
+                                        $row++;
+                                    @endphp 
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                    <button id="addCategoryBtn" onclick="addCategoryrow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                    {{-- <input type="text" name="search-categories" id="search-categories" class="form-control" placeholder="Search Categories By Name">
                     <div class="scroll-div">
                         <table class="table table-striped table-bordered categories-table">
                             <tr>
@@ -176,6 +223,26 @@
 
                         </table>
                     </div>
+                    <br><span style="color: red;">*</span><strong>Selected Category</strong>
+                    <div class="scroll-div">
+                        <table class="table table-striped table-bordered categories-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Sort Order</th>
+                            </tr>
+                            @foreach ($categories as $category)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" @if(in_array($category->id,explode(',', $setting->value))) checked @endif class="category-checkbox" name="category_ids[]" value="{{ $category->id }}">
+                                </td>
+                                <td>{{ $category->title }}</td>
+                                <td>{{ $category->title }}</td>
+                            </tr>
+                            @endforeach
+
+                        </table>
+                    </div> --}}
                     @elseif($setting->key === 'App Offer Alert')
                         @if($setting->value)
                             @php
@@ -239,6 +306,43 @@
         </div>
     </form>
 </div>
+<script>
+    var row = {{ $row }};
+    function addCategoryrow(){
+        var newRow = `
+            <tr>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <select name='category[${row}]' class="form-control">
+                                @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="text" name="sort_order[${row}]" class="form-control" placeholder="Sort Order">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                </td>
+            </tr>
+        `;
+        $('#categoryTable tbody').append(newRow);
+        row++
+    }
+
+    $(document).on('click', '.remove-category', function() {
+        $(this).closest('tr').remove();
+    });
+</script>
+
 <script>
     $("#addImageBtn").click(function() {
         // Append a new row to the table
@@ -371,7 +475,7 @@
         row.find('.service').show();
         row.find('.category').hide();
     }
-});
+    });
 </script>
 <script>
     $("#search-services").keyup(function() {
