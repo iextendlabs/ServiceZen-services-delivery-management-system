@@ -115,7 +115,7 @@
                     {{$customer->userAffiliate->affiliate->commission }}% <br>
                     @if(isset($customer->userAffiliate->commission))</s>@endif
                     @if(isset($customer->userAffiliate->commission))
-                    <b>{{ $customer->userAffiliate->commission }}%</b>
+                    <b>AED {{ $customer->userAffiliate->commission }}</b>
                     @endif
                     </small>
                 </td>

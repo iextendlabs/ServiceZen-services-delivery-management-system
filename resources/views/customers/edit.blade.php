@@ -56,8 +56,8 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="form-group"><strong>Affiliate Commission in %:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in %" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
+                <div class="form-group"><strong>Affiliate Commission in AED:</strong>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in AED" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
                 </div>
             </div>
             <div class="col-md-12 text-center">

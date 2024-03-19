@@ -56,8 +56,8 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="form-group"><strong>Affiliate Commission in %:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in %" value="{{ old('commission') }}">
+                <div class="form-group"><strong>Affiliate Commission in AED:</strong>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in AED" value="{{ old('commission') }}">
                 </div>
             </div>
             <div class="col-md-12 text-center">

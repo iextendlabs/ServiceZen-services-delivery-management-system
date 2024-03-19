@@ -130,18 +130,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>Customer:</strong>
-                                    <select name="customer_id" class="form-control">
-                                        <option value="">Select</option>
-                                        @foreach ($users as $customer)
-                                        @if($customer->getRoleNames() == '["Customer"]')
-                                        @if($customer->id == $filter['customer'])
-                                        <option value="{{ $customer->id }}" selected>{{ $customer->name }}</option>
-                                        @else
-                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                        @endif
-                                        @endif
-                                        @endforeach
-                                    </select>
+                                    <input type="text" name="customer" class="form-control" value="{{ $filter['customer'] }}" placeholder="Enter Name or Email">
                                 </div>
                             </div>
                             <div class="col-md-4">

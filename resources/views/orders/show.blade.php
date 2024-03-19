@@ -278,9 +278,14 @@
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
                     @php
-                    $commission = $order->customer->userAffiliate->commission ?? $order->affiliate->affiliate->commission;
-
-                    $affiliate_commission = ((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $commission) / 100)
+                    $commission = $order->customer->userAffiliate->commission ?? null;
+                    
+                    if($commission == null){
+                        $affiliate_commission = ((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100);
+                    }else{
+                        $affiliate_commission = $commission;
+                    }
+                    
                     @endphp
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
