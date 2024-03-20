@@ -210,30 +210,26 @@ class HomeController extends Controller
         $app_categories = Setting::where('key', 'App Categories')->value('value');
         $app_categories = explode(",", $app_categories);
         
-        $categoryIds = [];
-        $sortOrders = [];
-        foreach ($app_categories as $pair) {
-            [$categoryId, $sortOrder] = explode('_', $pair);
-            $categoryIds[] = $categoryId;
-            $sortOrders[] = $sortOrder;
-        }
-
-        $categories = ServiceCategory::whereIn('id',$categoryIds)->where('status', 1)->get();
-
-        $sortedCategories = [];
-        foreach ($sortOrders as $index => $sortOrder) {
-            foreach ($categories as $category) {
-                if ($category->id == $categoryIds[$index]) {
-                    $sortedCategories[$sortOrder] = [
-                        'id' => $category->id,
-                        'title' => $category->title,
-                        'image' => $category->image,
-                        'icon' => $category->icon
-                    ];
-                    break;
-                }
-            }
-        }
+        $categoriesWithOrder = collect($app_categories)->mapWithKeys(function ($item) {
+            [$id, $order] = explode('_', $item);
+            return [(int) $id => (int) $order];
+        });
+        
+        $categoryIds = $categoriesWithOrder->keys()->all();
+        
+        $categories = ServiceCategory::findMany($categoryIds)->keyBy('id');
+        
+        $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
+            $category = $categories->get($id);
+            return [
+                'id' => $category->id,
+                'title' => $category->title,
+                'image' => $category->image,
+                'icon' => $category->icon,
+                'sort_order' => $order
+            ];
+        })->sortBy('sort_order')->values()->toArray();
+        
         ksort($sortedCategories);
 
         $categoriesArray = array_values($sortedCategories);
