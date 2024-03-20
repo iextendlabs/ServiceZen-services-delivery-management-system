@@ -102,6 +102,12 @@ class CustomerController extends Controller
                 }),
                 'nullable',
             ],
+            'commission' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->type !== null && $request->type !== "";
+                }),
+                'nullable'
+            ],
         ]);
 
         $input = $request->all();
@@ -165,6 +171,12 @@ class CustomerController extends Controller
                 }),
                 'nullable'
             ],
+            'commission' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->type !== null && $request->type !== "";
+                }),
+                'nullable'
+            ],
         ]);
 
         $input = $request->all();
@@ -180,6 +192,7 @@ class CustomerController extends Controller
         if ($request->affiliate_id) {
             $userAffiliate = UserAffiliate::where("user_id", $customer->id)->first();
             if ($userAffiliate) {
+                $userAffiliate->type = $request->type;
                 $userAffiliate->commission = $request->commission;
                 $userAffiliate->affiliate_id = $request->affiliate_id;
                 $userAffiliate->save();

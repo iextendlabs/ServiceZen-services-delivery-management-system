@@ -37,7 +37,9 @@
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
                 <tr>
-                    <td></td>
+                    <td>
+                        <input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);">
+                    </td>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Affiliate</th>
@@ -47,7 +49,7 @@
                 @foreach ($customers as $customer)
                 <tr>
                     <td>
-                        <input type="checkbox" class="item-checkbox" value="{{ $customer->id }}">
+                        <input type="checkbox" class="item-checkbox" name="ids[{{ ++$i }}]" value="{{ $customer->id }}">
                     </td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->email }}</td>

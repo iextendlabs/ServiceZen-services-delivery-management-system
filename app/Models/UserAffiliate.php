@@ -9,7 +9,7 @@ class UserAffiliate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','affiliate_id','commission'];
+    protected $fillable = ['user_id','affiliate_id','commission','type'];
     
     protected $table = 'user_affiliate';
 

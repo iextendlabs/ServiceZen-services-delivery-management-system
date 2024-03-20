@@ -228,16 +228,13 @@
                     <th>Order Status</th>
                     <th>Staff</th>
                     <th>Order Sub Total</th>
-                    <th>Staff Commission Amount</th>
+                    <th>Commission</th>
                     @if(auth()->user()->getRoleNames() != '["Staff"]')
                     <th class="no-print">Action</th>
                     @endif
                 </tr>
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
-                    @php
-                    $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount)* $order->staff->commission) / 100;
-                    @endphp
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->service_staff_id }}">
                     <input type="hidden" name="amount" value="{{ $staff_commission }}">
@@ -272,21 +269,11 @@
                     <th>Order Id</th>
                     <th>Order Amount</th>
                     <th>Affiliate</th>
-                    <th>Staff Commission</th>
+                    <th>Commission</th>
                     <th class="no-print">Action</th>
                 </tr>
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
-                    @php
-                    $commission = $order->customer->userAffiliate->commission ?? null;
-                    
-                    if($commission == null){
-                        $affiliate_commission = ((($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $order->affiliate->affiliate->commission) / 100);
-                    }else{
-                        $affiliate_commission = $commission;
-                    }
-                    
-                    @endphp
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
                     <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
                     <input type="hidden" name="amount" value="{{ $affiliate_commission }}">

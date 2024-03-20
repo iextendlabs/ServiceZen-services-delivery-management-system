@@ -56,8 +56,17 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="form-group"><strong>Affiliate Commission in AED:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in AED" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
+                <div class="form-group"><strong>Affiliate Commission type:</strong>
+                    <select name="type" class="form-control">
+                        <option></option>
+                        <option @if($customer->userAffiliate && $customer->userAffiliate->type == "F") selected @endif value="F">Fix</option>
+                        <option @if($customer->userAffiliate && $customer->userAffiliate->type == "P") selected @endif value="P">Persentage</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Affiliate Commission:</strong>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
                 </div>
             </div>
             <div class="col-md-12 text-center">

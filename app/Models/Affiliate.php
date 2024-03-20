@@ -24,4 +24,10 @@ class Affiliate extends Model
     public function transactions() {
         return $this->hasMany(Transaction::class, 'user_id');
     }
+
+    public function userAffiliate()
+    {
+        return $this->hasMany(UserAffiliate::class,'affiliate_id','user_id');
+    }
+
 }
