@@ -46,7 +46,7 @@
         <td>@if($order->customer_id)<a href="{{ route('customers.show',$order->customer_id) }}">{{ $order->customer_name }}</a>@else {{ $order->customer_name }} @endif</td>
         <td>@currency($order->total_amount)</td>
         <td>{{ $order->payment_method }}</td>
-        <td>{{ substr($order->order_comment, 0, 50) }}...</td>
+        <td>@if(isset($order->order_comment)){{ substr($order->order_comment, 0, 50) }}... @endif</td>
         @endif
         <td style="min-width:150px">{{ $order->status }} <br>
             <i class="fas fa-car"></i>{{ $order->driver_status }}

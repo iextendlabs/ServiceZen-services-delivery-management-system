@@ -6,9 +6,11 @@
             <div class="float-start">
                 <h2>Customer</h2>
             </div>
-            <div class="float-end d-flex align-items-center">
+            <div class="float-end">
+                <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i class="fa fa-print"></i> PDF</a>
+                <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i> Excel</a>
                 @can('customer-create')
-                <a class="btn btn-success me-2" href="{{ route('customers.create') }}"> <i class="fa fa-plus"></i></a>
+                <a class="btn btn-success mb-2 ms-md-2" href="{{ route('customers.create') }}"> <i class="fa fa-plus"></i> Create</a>
                 @endcan
                 <div class="input-group">
                     <div class="input-group-prepend">

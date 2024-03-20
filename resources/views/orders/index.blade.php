@@ -9,8 +9,8 @@
                 <div class="d-flex flex-wrap justify-content-md-end">
                     @if(auth()->user()->getRoleNames() != '["Supervisor"]')
                         @can('order-download')
-                            <a class="btn btn-danger mb-2" href="/orders?print=1"><i class="fa fa-print"></i> PDF</a>
-                            <a href="/orders?csv=1" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i> Excel</a>
+                            <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i class="fa fa-print"></i> PDF</a>
+                            <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i> Excel</a>
                         @endcan
                     @endif
         
