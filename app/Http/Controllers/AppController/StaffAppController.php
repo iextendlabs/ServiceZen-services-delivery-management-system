@@ -140,7 +140,10 @@ class StaffAppController extends Controller
             if ($request->status == "Complete") {
                 $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->where('affiliate_id', $order->affiliate_id)->where('commission', '!=', null)->first();
 
-                $staff_commission_rate = $order->staff->commission ?? 0;
+                $staff_commission_rate = 0;
+                if ($order->staff && $order->staff->commission) {
+                    $staff_commission_rate = $order->staff->commission;
+                }
                 $commission_apply_amount = $order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount;
                 $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
 
@@ -151,7 +154,10 @@ class StaffAppController extends Controller
                         $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
                     }
                 } else {
-                    $affiliate_commission_rate = $order->affiliate->affiliate->commission ?? 0;
+                    $affiliate_commission_rate = 0;
+                    if ($order->affiliate && $order->affiliate->affiliate && $order->affiliate->affiliate->commission) {
+                        $affiliate_commission_rate = $order->affiliate->affiliate->commission;
+                    }
                     $affiliate_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
                 }
 
