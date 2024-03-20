@@ -35,7 +35,7 @@
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered ">
                     <tr>
                         <th>Sr#</th>
                         <th>Order#</th>
@@ -78,7 +78,7 @@
                             <td>{{ $order->whatsapp }}</td>
                             <td>@currency($order->total_amount)</td>
                             <td>{{ $order->payment_method }}</td>
-                            <td>{{ $order->order_comment }}</td>
+                            <td>@if(isset($order->order_comment)){{ substr($order->order_comment, 0, 50) }}... @endif</td>
                             <td>{{ $order->created_at }}</td>
                         @endif
                         <td>{{ $order->status }}</td>

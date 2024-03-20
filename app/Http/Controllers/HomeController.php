@@ -209,16 +209,32 @@ class HomeController extends Controller
         
         $app_categories = Setting::where('key', 'App Categories')->value('value');
         $app_categories = explode(",", $app_categories);
-        $categories = ServiceCategory::whereIn('id',$app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-        $categoriesArray = $categories->map(function ($category) {
+        
+        $categoriesWithOrder = collect($app_categories)->mapWithKeys(function ($item) {
+            [$id, $order] = explode('_', $item);
+            return [(int) $id => (int) $order];
+        });
+        
+        $categoryIds = $categoriesWithOrder->keys()->all();
+        
+        $categories = ServiceCategory::findMany($categoryIds)->keyBy('id');
+        
+        $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
+            $category = $categories->get($id);
             return [
                 'id' => $category->id,
                 'title' => $category->title,
                 'image' => $category->image,
-                'icon' => $category->icon
+                'icon' => $category->icon,
+                'sort_order' => $order
             ];
-        })->toArray();
+        })->sortBy('sort_order')->values()->toArray();
+        
+        ksort($sortedCategories);
+
+        $categoriesArray = array_values($sortedCategories);
+
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $servicesArray = $services->map(function ($service) {
             $categoryIds = collect($service->categories)->pluck('id')->toArray();

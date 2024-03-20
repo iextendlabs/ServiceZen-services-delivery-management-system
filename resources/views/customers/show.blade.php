@@ -115,7 +115,12 @@
                     {{$customer->userAffiliate->affiliate->commission }}% <br>
                     @if(isset($customer->userAffiliate->commission))</s>@endif
                     @if(isset($customer->userAffiliate->commission))
+
+                    @if($customer->userAffiliate->type == "F")
+                    <b>AED {{ $customer->userAffiliate->commission }}</b>
+                    @elseif($customer->userAffiliate->type == "P")
                     <b>{{ $customer->userAffiliate->commission }}%</b>
+                    @endif
                     @endif
                     </small>
                 </td>

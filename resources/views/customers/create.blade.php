@@ -56,8 +56,17 @@
                 </div>
             </div>
             <div class="col-md-12">
-                <div class="form-group"><strong>Affiliate Commission in %:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission in %" value="{{ old('commission') }}">
+                <div class="form-group"><strong>Affiliate Commission type:</strong>
+                    <select name="type" class="form-control">
+                        <option></option>
+                        <option @if(old('type') == "F") selected @endif value="F">Fix</option>
+                        <option @if(old('type') == "P") selected @endif value="P">Persentage</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Affiliate Commission:</strong>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value="{{ old('commission') }}">
                 </div>
             </div>
             <div class="col-md-12 text-center">

@@ -6,9 +6,11 @@
             <div class="float-start">
                 <h2>Customer</h2>
             </div>
-            <div class="float-end d-flex align-items-center">
+            <div class="float-end">
+                <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i class="fa fa-print"></i> PDF</a>
+                <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i> Excel</a>
                 @can('customer-create')
-                <a class="btn btn-success me-2" href="{{ route('customers.create') }}"> <i class="fa fa-plus"></i></a>
+                <a class="btn btn-success mb-2 ms-md-2" href="{{ route('customers.create') }}"> <i class="fa fa-plus"></i> Create</a>
                 @endcan
                 <div class="input-group">
                     <div class="input-group-prepend">
@@ -37,7 +39,9 @@
         <div class="col-md-9">
             <table class="table table-striped table-bordered">
                 <tr>
-                    <td></td>
+                    <td>
+                        <input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);">
+                    </td>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Affiliate</th>
@@ -47,7 +51,7 @@
                 @foreach ($customers as $customer)
                 <tr>
                     <td>
-                        <input type="checkbox" class="item-checkbox" value="{{ $customer->id }}">
+                        <input type="checkbox" class="item-checkbox" name="ids[{{ ++$i }}]" value="{{ $customer->id }}">
                     </td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->email }}</td>

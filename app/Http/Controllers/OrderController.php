@@ -17,6 +17,7 @@ use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserAffiliate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -35,7 +36,7 @@ class OrderController extends Controller
     function __construct()
     {
         $this->middleware('permission:order-list', ['only' => ['index']]);
-        $this->middleware('permission:order-download', ['only' => ['downloadCSV','print']]);
+        $this->middleware('permission:order-download', ['only' => ['downloadCSV', 'print']]);
         $this->middleware('permission:order-create', ['only' => ['create', 'store']]);
         $this->middleware('permission:order-edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:order-delete', ['only' => ['destroy']]);
@@ -54,7 +55,7 @@ class OrderController extends Controller
         $filter = [
             'status' => $request->status,
             'affiliate' => $request->affiliate_id,
-            'customer' => $request->customer_id,
+            'customer' => $request->customer,
             'staff' => $request->staff_id,
             'payment_method' => $request->payment_method,
             'appointment_date' => $request->appointment_date,
@@ -76,10 +77,10 @@ class OrderController extends Controller
             case 'Supervisor':
                 $staffIds = $currentUser->getSupervisorStaffIds();
                 $query = Order::whereIn('service_staff_id', $staffIds)
-                ->where(function ($query) {
-                    $query->whereDoesntHave('cashCollection');
-                })
-                ->orderBy('date', 'ASC')->orderBy('time_start');
+                    ->where(function ($query) {
+                        $query->whereDoesntHave('cashCollection');
+                    })
+                    ->orderBy('date', 'ASC')->orderBy('time_start');
                 break;
 
             case 'Staff':
@@ -127,8 +128,8 @@ class OrderController extends Controller
             $query->where('affiliate_id', '=', $request->affiliate_id);
         }
 
-        if ($request->customer_id) {
-            $query->where('customer_id', '=', $request->customer_id);
+        if ($request->customer) {
+            $query->where('customer_name', 'like', '%' . $request->customer . '%')->orWhere('customer_email', 'like', '%' . $request->customer . '%');
         }
 
         if ($request->staff_id) {
@@ -178,7 +179,7 @@ class OrderController extends Controller
             $callback = function () use ($orders, $currentUser) {
                 $output = fopen('php://output', 'w');
                 $header = $currentUser->hasRole('Supervisor')
-                    ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark','District','Area', 'City', 'Building name', 'Status', 'Services')
+                    ? array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Landmark', 'District', 'Area', 'City', 'Building name', 'Status', 'Services')
                     : array('SR#', 'Order ID', 'Staff', 'Appointment Date', 'Slots', 'Customer', 'Number', 'Whatsapp', 'Total Amount', 'Payment Method', 'Comment', 'Status', 'Date Added', 'Services');
 
                 // Write the header row
@@ -208,9 +209,9 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer_id', 'payment_method','driver_status','driver_id']);
+            $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id']);
             $orders->appends($filters);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter','driver_statuses','zones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
@@ -221,7 +222,7 @@ class OrderController extends Controller
         $area = '';
         $city = '';
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones','services'));
+        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services'));
     }
 
 
@@ -239,18 +240,18 @@ class OrderController extends Controller
             'whatsapp' => 'required',
         ]);
 
-        if($request->coupon_code){
-            $coupon = Coupon::where("code",$request->coupon_code)->first();
+        if ($request->coupon_code) {
+            $coupon = Coupon::where("code", $request->coupon_code)->first();
             $services = Service::whereIn('id', $request->service_ids)->get();
-            if($coupon){
-                $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
-                if($isValid !== true){
+            if ($coupon) {
+                $isValid = $coupon->isValidCoupon($request->coupon_code, $services);
+                if ($isValid !== true) {
                     return redirect()->back()
-                            ->with('error',$isValid);
+                        ->with('error', $isValid);
                 }
-            }else{
+            } else {
                 return redirect()->back()
-                            ->with('error',"Coupon is invalid!");
+                    ->with('error', "Coupon is invalid!");
             }
         }
 
@@ -264,8 +265,8 @@ class OrderController extends Controller
             }
 
             $staff = User::find($input['service_staff_id']);
-            $input['number'] = $request->number_country_code . ltrim($request->number,'0');
-            $input['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
+            $input['number'] = $request->number_country_code . ltrim($request->number, '0');
+            $input['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
             $input['customer_name'] = $input['name'];
             $input['customer_email'] = $input['email'];
             $input['status'] = "Pending";
@@ -277,14 +278,13 @@ class OrderController extends Controller
             $user = User::where('email', $input['email'])->first();
 
             if (isset($user)) {
-                if($user->customerProfile){
+                if ($user->customerProfile) {
                     $user->customerProfile->update($input);
-                }else{
+                } else {
                     $user->customerProfile()->create($input);
                 }
                 $input['customer_id'] = $user->id;
                 $customer_type = "Old";
-
             } else {
                 $customer_type = "New";
 
@@ -294,9 +294,9 @@ class OrderController extends Controller
 
                 $user = User::create($input);
 
-                if($user->customerProfile){
+                if ($user->customerProfile) {
                     $user->customerProfile->update($input);
-                }else{
+                } else {
                     $user->customerProfile()->create($input);
                 }
 
@@ -315,8 +315,8 @@ class OrderController extends Controller
 
             if ($input['coupon_code']) {
                 $coupon = Coupon::where('code', $input['coupon_code'])->first();
-                
-                $discount = $coupon->getDiscountForProducts($services,$sub_total);
+
+                $discount = $coupon->getDiscountForProducts($services, $sub_total);
             } else {
                 $discount = 0;
             }
@@ -364,9 +364,9 @@ class OrderController extends Controller
             }
 
             if (Carbon::now()->toDateString() == $input['date']) {
-                $staff->notifyOnMobile('Order', 'New Order Generated.',$input['order_id']);
+                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                 if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$input['order_id']);
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                 }
                 try {
                     $this->sendOrderEmail($input['order_id'], $input['email']);
@@ -382,7 +382,7 @@ class OrderController extends Controller
             }
 
             return redirect()->route('orders.index')
-                        ->with('success','Order created successfully.');
+                ->with('success', 'Order created successfully.');
         } else {
             return redirect()->back()
                 ->with('error', 'Sorry! Unfortunately This slot was booked by someone else just now.');
@@ -393,8 +393,31 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::find($id);
+        $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->where('affiliate_id', $order->affiliate_id)->where('commission', '!=', null)->first();
+
+        $staff_commission_rate = 0;
+        if ($order->staff && $order->staff->commission) {
+            $staff_commission_rate = $order->staff->commission;
+        }
+        $commission_apply_amount = $order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount;
+        $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+
+        if ($userAffiliate !== null) {
+            if ($userAffiliate->type == "F") {
+                $affiliate_commission = $userAffiliate->commission ?? null;
+            } elseif ($userAffiliate->type == "P") {
+                $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
+            }
+        } else {
+            $affiliate_commission_rate = 0;
+            if ($order->affiliate && $order->affiliate->affiliate && $order->affiliate->affiliate->commission) {
+                $affiliate_commission_rate = $order->affiliate->affiliate->commission;
+            }
+            $affiliate_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+        }
+
         $statuses = config('app.order_statuses');
-        return view('orders.show', compact('order', 'statuses'));
+        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission'));
     }
 
 
@@ -407,19 +430,20 @@ class OrderController extends Controller
         $date = $order->date;
         $statuses = config('app.order_statuses');
         $driver_statuses = config('app.order_driver_statuses');
-        
+
         $servicesCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        if($order->orderServices){
+        if ($order->orderServices) {
             $serviceIds = $order->orderServices->pluck('service_id')->toArray();
-        }else {
+        } else {
             $serviceIds = [];
         }
         $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
-       
+
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
         if ($request->edit == "services") {
-            return view('orders.services_edit', compact('order' ,'serviceIds', 'selectedServices','servicesCategories'));
-        }if ($request->edit == "status") {
+            return view('orders.services_edit', compact('order', 'serviceIds', 'selectedServices', 'servicesCategories'));
+        }
+        if ($request->edit == "status") {
             return view('orders.status_edit', compact('order', 'statuses'));
         } elseif ($request->edit == "booking") {
             return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
@@ -457,11 +481,11 @@ class OrderController extends Controller
         $request->validate([
             'service_staff_id' => 'required',
         ]);
-        
+
         $input = $request->all();
-        
+
         $order = Order::findOrFail($id);
-        
+
         $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
         $staff_id = $input['service_staff_id'] = $request->service_staff_id;
         $time_slot = TimeSlot::find($input['time_slot_id']);
@@ -472,12 +496,11 @@ class OrderController extends Controller
         $order->update($input);
 
         if ($order->staff->charges) {
-            
+
             $order->total_amount = $order->total_amount - $order->order_total->staff_charges + $order->staff->charges;
             $order->save();
             $order->order_total->staff_charges = $order->staff->charges;
             $order->order_total->save();
-            
         }
 
         $previousUrl = $request->url;
@@ -489,7 +512,7 @@ class OrderController extends Controller
         $request->validate([
             'order_comment' => 'required',
         ]);
-        
+
         $order = Order::findOrFail($id);
 
         $order->update($request->all());
@@ -503,7 +526,7 @@ class OrderController extends Controller
         $request->validate([
             'custom_location' => 'required',
         ]);
-        
+
         $input = $request->all();
         $order = Order::findOrFail($id);
 
@@ -522,17 +545,16 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         if ($request->transport_charges) {
-            if($order->order_total->transport_charges){
+            if ($order->order_total->transport_charges) {
                 $order->total_amount = $order->total_amount - $order->order_total->transport_charges + $request->transport_charges;
-            }else{
+            } else {
                 $order->total_amount = $order->total_amount + $request->transport_charges;
-
             }
             $order->order_total->transport_charges = $request->transport_charges;
             $order->order_total->save();
         }
-        $input['number'] = $request->number_country_code .ltrim($request->number,'0');
-        $input['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
+        $input['number'] = $request->number_country_code . ltrim($request->number, '0');
+        $input['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
         $order->update($input);
 
         $previousUrl = $request->url;
@@ -542,7 +564,7 @@ class OrderController extends Controller
     public function driver_edit(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        
+
         $order->update($request->all());
 
         $previousUrl = $request->url;
@@ -552,7 +574,7 @@ class OrderController extends Controller
     public function driver_status_edit(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        
+
         $order->update($request->all());
 
         $previousUrl = $request->url;
@@ -568,44 +590,62 @@ class OrderController extends Controller
             if (isset($order->staff->commission)) {
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
-            
+
             if (isset($order->affiliate)) {
                 $transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
             }
-            if($request->status == "Complete"){
+            if ($request->status == "Complete") {
+
+                $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->where('affiliate_id', $order->affiliate_id)->where('commission', '!=', null)->first();
+
+                $staff_commission_rate = 0;
+                if ($order->staff && $order->staff->commission) {
+                    $staff_commission_rate = $order->staff->commission;
+                }
+                $commission_apply_amount = $order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount;
+                $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+
+                if ($userAffiliate !== null) {
+                    if ($userAffiliate->type == "F") {
+                        $affiliate_commission = $userAffiliate->commission ?? null;
+                    } elseif ($userAffiliate->type == "P") {
+                        $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
+                    }
+                } else {
+                    $affiliate_commission_rate = 0;
+                    if ($order->affiliate && $order->affiliate->affiliate && $order->affiliate->affiliate->commission) {
+                        $affiliate_commission_rate = $order->affiliate->affiliate->commission;
+                    }
+                    $affiliate_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+                }
                 if (isset($order->affiliate) && !isset($transaction)) {
-                    $commission = $order->customer->userAffiliate->commission ?? $order->affiliate->affiliate->commission;
-                    
-                    $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
-                    
                     $input['user_id'] = $order->affiliate->id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $commission) / 100;
+                    $input['amount'] = $affiliate_commission;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
-    
+
                 if (isset($order->staff->commission) && !isset($staff_transaction)) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
+                    $input['amount'] = $staff_commission;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
             }
 
-            if($request->status == "Canceled"){
+            if ($request->status == "Canceled") {
                 if (isset($transaction)) {
-                    $transaction->delete(); 
+                    $transaction->delete();
                 }
-    
+
                 if (isset($staff_transaction)) {
-                    $staff_transaction->delete(); 
+                    $staff_transaction->delete();
                 }
             }
-            
         } catch (\Throwable $th) {
         }
 
@@ -636,13 +676,13 @@ class OrderController extends Controller
         });
 
         $order = Order::findOrFail($id);
-        if($order->order_total){
+        if ($order->order_total) {
             $order->order_total->sub_total = $sub_total;
             $order->order_total->save();
             $total_amount = $sub_total + $order->order_total->staff_charges +
-            $order->order_total->transport_charges - $order->order_total->discount;
+                $order->order_total->transport_charges - $order->order_total->discount;
         }
-        if($order->orderServices){
+        if ($order->orderServices) {
             $order->orderServices()->delete();
         }
         $input['order_id'] = $order->id;
@@ -659,14 +699,14 @@ class OrderController extends Controller
             }
             OrderService::create($input);
         }
-        
+
         $order->total_amount = $total_amount;
         $order->save();
 
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
-    
+
 
     public function destroy($id, Request $request)
     {
@@ -689,7 +729,7 @@ class OrderController extends Controller
         $order->save();
         try {
             OrderHistory::create($input);
-            
+
             if (isset($order->affiliate)) {
                 $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
             }
@@ -697,40 +737,60 @@ class OrderController extends Controller
             if (isset($order->staff->commission)) {
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
-            if($request->status == "Complete"){
+            if ($request->status == "Complete") {
+                $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->where('affiliate_id', $order->affiliate_id)->where('commission', '!=', null)->first();
+
+                $staff_commission_rate = 0;
+                if ($order->staff && $order->staff->commission) {
+                    $staff_commission_rate = $order->staff->commission;
+                }
+                $commission_apply_amount = $order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount;
+                $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+
+                if ($userAffiliate !== null) {
+                    if ($userAffiliate->type == "F") {
+                        $affiliate_commission = $userAffiliate->commission ?? null;
+                    } elseif ($userAffiliate->type == "P") {
+                        $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
+                    }
+                } else {
+                    $affiliate_commission_rate = 0;
+                    if ($order->affiliate && $order->affiliate->affiliate && $order->affiliate->affiliate->commission) {
+                        $affiliate_commission_rate = $order->affiliate->affiliate->commission;
+                    }
+                    $affiliate_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+                }
+
                 if (isset($order->affiliate) && !isset($affiliate_transaction)) {
-                    $commission = $order->customer->userAffiliate->commission ?? $order->affiliate->affiliate->commission;
-                    
                     $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
-                    
+
                     $input['user_id'] = $order->affiliate->id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $commission) / 100;
+                    $input['amount'] = $affiliate_commission;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
-    
+
                 if (isset($order->staff->commission) && !isset($staff_transaction)) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
+                    $input['amount'] = $staff_commission;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
             }
-            
-            if($request->status == "Canceled"){
+
+            if ($request->status == "Canceled") {
                 if (isset($transaction)) {
-                    $transaction->delete(); 
+                    $transaction->delete();
                 }
-    
+
                 if (isset($staff_transaction)) {
-                    $staff_transaction->delete(); 
+                    $staff_transaction->delete();
                 }
             }
-            
         } catch (\Throwable $th) {
         }
 
@@ -798,12 +858,13 @@ class OrderController extends Controller
         }
     }
 
-    public function removeCoupon($id){
+    public function removeCoupon($id)
+    {
         $order = Order::find($id);
         if ($order->couponHistory) {
             $order->couponHistory->delete();
         }
-        if($order->order_total){
+        if ($order->order_total) {
             $order->total_amount = $order->total_amount + $order->order_total->discount;
             $order->save();
             $order->order_total->discount = 0;
@@ -816,8 +877,8 @@ class OrderController extends Controller
     public function addDiscount(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        
-        if($order->order_total){
+
+        if ($order->order_total) {
             $order->total_amount = $order->total_amount - $request->discount;
             $order->save();
             $order->order_total->discount = $order->order_total->discount + $request->discount;

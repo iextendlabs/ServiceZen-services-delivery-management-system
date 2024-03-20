@@ -17,6 +17,7 @@ use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\OrderHistory;
 use App\Models\ShortHoliday;
+use App\Models\UserAffiliate;
 
 class StaffAppController2 extends Controller
 
@@ -132,14 +133,35 @@ class StaffAppController2 extends Controller
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
             if ($request->status == "Complete") {
+                $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->where('affiliate_id', $order->affiliate_id)->where('commission', '!=', null)->first();
+
+                $staff_commission_rate = 0;
+                if ($order->staff && $order->staff->commission) {
+                    $staff_commission_rate = $order->staff->commission;
+                }
+                $commission_apply_amount = $order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount;
+                $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+
+                if ($userAffiliate !== null) {
+                    if ($userAffiliate->type == "F") {
+                        $affiliate_commission = $userAffiliate->commission ?? null;
+                    } elseif ($userAffiliate->type == "P") {
+                        $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
+                    }
+                } else {
+                    $affiliate_commission_rate = 0;
+                    if ($order->affiliate && $order->affiliate->affiliate && $order->affiliate->affiliate->commission) {
+                        $affiliate_commission_rate = $order->affiliate->affiliate->commission;
+                    }
+                    $affiliate_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+                }
+
                 if (isset($order->affiliate) && !isset($affiliate_transaction)) {
-                    $commission = $order->customer->userAffiliate->commission ?? $order->affiliate->affiliate->commission;
-                    
                     $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
-                    
+
                     $input['user_id'] = $order->affiliate->id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $commission) / 100;
+                    $input['amount'] = $affiliate_commission;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
@@ -148,7 +170,7 @@ class StaffAppController2 extends Controller
                 if (isset($order->staff->commission) && !isset($staff_transaction)) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
-                    $input['amount'] = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
+                    $input['amount'] = $staff_commission;
                     $input['type'] = "Order Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
