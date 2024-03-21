@@ -601,13 +601,7 @@ class OrderController extends Controller
             }
 
             if ($request->status == "Canceled") {
-                if (isset($transaction)) {
-                    $transaction->delete();
-                }
-
-                if (isset($staff_transaction)) {
-                    $staff_transaction->delete();
-                }
+                Transaction::where('order_id', $order->id)->delete();
             }
         } catch (\Throwable $th) {
         }
@@ -726,13 +720,7 @@ class OrderController extends Controller
             }
 
             if ($request->status == "Canceled") {
-                if (isset($transaction)) {
-                    $transaction->delete();
-                }
-
-                if (isset($staff_transaction)) {
-                    $staff_transaction->delete();
-                }
+                Transaction::where('order_id', $order->id)->delete();
             }
         } catch (\Throwable $th) {
         }
