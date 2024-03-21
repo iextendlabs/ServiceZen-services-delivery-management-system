@@ -154,22 +154,32 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
+        $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
             'affiliate_id' => [
-                Rule::requiredIf(function () use ($request) {
-                    return $request->commission !== null && $request->commission !== "";
-                }),
                 'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission) || !is_null($request->expiry_date);
+                }),
             ],
             'commission' => [
+                'nullable',
                 Rule::requiredIf(function () use ($request) {
-                    return $request->type !== null && $request->type !== "";
+                    return !is_null($request->type);
                 }),
-                'nullable'
             ],
+            'type' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission);
+                }),
+            ],
+        ], [
+            'affiliate_id.required' => 'An affiliate is required when commission or expiry date is set.',
+            'commission.required' => 'A commission is required when the type is set.',
+            'type.required' => 'A type is required when the commission is set.',
         ]);
 
         $input = $request->all();
@@ -180,10 +190,9 @@ class CustomerController extends Controller
         $customer = User::create($input);
 
         $customer->assignRole('Customer');
+        $input['user_id'] = $customer->id;
 
         if ($request->affiliate_id) {
-            $input['user_id'] = $customer->id;
-            $input['affiliate_id'] = $request->affiliate_id;
             UserAffiliate::create($input);
         }
 
@@ -223,22 +232,32 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required',
+        $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
             'affiliate_id' => [
+                'nullable',
                 Rule::requiredIf(function () use ($request) {
-                    return $request->commission !== null && $request->commission !== "";
+                    return !is_null($request->commission) || !is_null($request->expiry_date);
                 }),
-                'nullable'
             ],
             'commission' => [
+                'nullable',
                 Rule::requiredIf(function () use ($request) {
-                    return $request->type !== null && $request->type !== "";
+                    return !is_null($request->type);
                 }),
-                'nullable'
             ],
+            'type' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission);
+                }),
+            ],
+        ], [
+            'affiliate_id.required' => 'An affiliate is required when commission or expiry date is set.',
+            'commission.required' => 'A commission is required when the type is set.',
+            'type.required' => 'A type is required when the commission is set.',
         ]);
 
         $input = $request->all();
@@ -257,10 +276,10 @@ class CustomerController extends Controller
                 $userAffiliate->type = $request->type;
                 $userAffiliate->commission = $request->commission;
                 $userAffiliate->affiliate_id = $request->affiliate_id;
+                $userAffiliate->expiry_date = $request->expiry_date;
                 $userAffiliate->save();
             } else {
                 $input['user_id'] = $customer->id;
-                $input['affiliate_id'] = $request->affiliate_id;
                 UserAffiliate::create($input);
             }
         } else {

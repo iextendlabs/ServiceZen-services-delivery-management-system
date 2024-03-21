@@ -129,8 +129,9 @@ class StaffAppController extends Controller
     {
         $order = Order::find($request->order_id);
         try {
-            if (isset($order->affiliate)) {
-                $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->affiliate->id)->first();
+            $affiliate_id = $order->customer->userAffiliate->affiliate_id ?? $order->affiliate->id;
+            if ($affiliate_id) {
+                $transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
             }
 
             if (isset($order->staff->commission)) {
@@ -138,33 +139,13 @@ class StaffAppController extends Controller
             }
 
             if ($request->status == "Complete") {
-                $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->where('affiliate_id', $order->affiliate_id)->where('commission', '!=', null)->first();
 
-                $staff_commission_rate = 0;
-                if ($order->staff && $order->staff->commission) {
-                    $staff_commission_rate = $order->staff->commission;
-                }
-                $commission_apply_amount = $order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount;
-                $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+                [$affiliate_commission, $staff_commission] = $order->commissionCalculation();
 
-                if ($userAffiliate !== null) {
-                    if ($userAffiliate->type == "F") {
-                        $affiliate_commission = $userAffiliate->commission ?? null;
-                    } elseif ($userAffiliate->type == "P") {
-                        $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
-                    }
-                } else {
-                    $affiliate_commission_rate = 0;
-                    if ($order->affiliate && $order->affiliate->affiliate && $order->affiliate->affiliate->commission) {
-                        $affiliate_commission_rate = $order->affiliate->affiliate->commission;
-                    }
-                    $affiliate_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
-                }
-
-                if (isset($order->affiliate) && !isset($affiliate_transaction)) {
+                if ($affiliate_id && !isset($affiliate_transaction) && $affiliate_commission > 0) {
                     $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
 
-                    $input['user_id'] = $order->affiliate->id;
+                    $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $affiliate_commission;
                     $input['type'] = "Order Commission";
@@ -172,7 +153,7 @@ class StaffAppController extends Controller
                     Transaction::create($input);
                 }
 
-                if (isset($order->staff->commission) && !isset($staff_transaction)) {
+                if (isset($order->staff->commission) && !isset($staff_transaction) && $staff_commission > 0) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $staff_commission;
