@@ -219,7 +219,7 @@
             </tr>
         </table>
         @endif
-        @if(isset($order->staff))
+        @if($staff_commission)
         <fieldset>
             <legend>Staff Commission</legend>
             <table class="table table-striped table-bordered album bg-light">
@@ -261,7 +261,7 @@
         </fieldset>
         @endif
         @if(auth()->user()->getRoleNames() != '["Staff"]')
-        @if(isset($order->affiliate->affiliate))
+        @if($affiliate_commission)
         <fieldset>
             <legend>Affiliate Commission</legend>
             <table class="table table-striped table-bordered album bg-light">
@@ -275,21 +275,21 @@
                 <form action="{{ route('transactions.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="order_id" value="{{ $order->id }}">
-                    <input type="hidden" name="user_id" value="{{ $order->affiliate->id}}">
+                    <input type="hidden" name="user_id" value="{{ $affiliate->id }}">
                     <input type="hidden" name="amount" value="{{ $affiliate_commission }}">
                     <tr>
                         <td>#{{ $order->id }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
-                        <td>{{ $order->affiliate->name }}</td>
+                        <td>{{ $affiliate->name }}</td>
                         <td>@currency($affiliate_commission)</td>
                         <td class="no-print">
-                            @if(empty($order->getAffiliateTransactionStatus()))
                             @can('order-edit')
+                            @if($affiliate_transaction == null)
                             <button type="submit" class="btn btn-primary">Approve</button>
-                            @endcan
                             @else
-                            <a href="{{ route('transactions.Unapprove') }}?order_id={{$order->id}}&user_id={{ $order->affiliate->id }}" type="button" class="btn btn-primary">Un Approve</a>
+                            <a href="{{ route('transactions.Unapprove') }}?order_id={{$order->id}}&user_id={{ $affiliate->id }}" type="button" class="btn btn-primary">Un Approve</a>
                             @endif
+                            @endcan
                         </td>
                     </tr>
                 </form>

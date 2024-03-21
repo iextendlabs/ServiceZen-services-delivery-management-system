@@ -233,3 +233,4 @@ Route::get('/category', function () {
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
 
 Route::post('/apply-coupon', [CheckOutController::class,'applyCoupon'])->name('apply.coupon');
+Route::post('/apply-affiliate', [CustomerAuthController::class,'applyAffiliate'])->name('apply.affiliate');

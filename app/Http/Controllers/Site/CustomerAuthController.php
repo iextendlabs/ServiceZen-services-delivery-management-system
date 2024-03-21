@@ -147,7 +147,8 @@ class CustomerAuthController extends Controller
         $user = User::find($id);
 
         $coupon_code = request()->cookie('coupon_code');
-        return view('site.auth.profile', compact('user','coupon_code'));
+        $affiliate_code = request()->cookie('affiliate_code');
+        return view('site.auth.profile', compact('user','coupon_code','affiliate_code'));
     }
 
     public function update(Request $request, $id)
@@ -269,6 +270,34 @@ class CustomerAuthController extends Controller
         return redirect()->back()->with('success', 'Coupon Applied Successfully.');
     }
 
+    public function applyAffiliate(Request $request)
+    {
+            $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
+            if($affiliate){
+                $userAffiliate = UserAffiliate::where("user_id", auth()->user()->id)->first();
+
+                if ($userAffiliate) {
+                    $userAffiliate->affiliate_id = $affiliate->user_id;
+                    $userAffiliate->save();
+                } else {
+                    $input['user_id'] = auth()->user()->id;
+                    UserAffiliate::create($input);
+                }
+    
+                $affiliate_code = $affiliate->code;
+    
+                $expire = $affiliate->expire ? $affiliate->expire * 24 * 60 : null; 
+                if($expire == null){
+                    cookie()->queue('affiliate_code', $affiliate_code);
+                }else{
+                    cookie()->queue('affiliate_code', $affiliate_code, $expire);
+                }
+            }else{
+                return response()->json(['error' => "Affiliate is invalid!"]);
+            }
+
+        return response()->json(['message' => 'Affiliate applied successfully']);
+    }
 
     public function account()
     {

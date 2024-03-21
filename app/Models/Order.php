@@ -121,4 +121,43 @@ class Order extends Model
     public function couponHistory(){
         return $this->hasOne(CouponHistory::class);
     }
+
+    public function commissionCalculation(){
+        $userAffiliate = UserAffiliate::where('user_id', $this->customer_id)->first();
+        
+        $staff_commission_rate = 0;
+        if ($this->staff && $this->staff->commission) {
+            $staff_commission_rate = $this->staff->commission;
+        }
+        $commission_apply_amount = $this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount;
+        $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+
+        $affiliate_commission = 0;
+        if ($userAffiliate) {
+            if ($userAffiliate->expiry_date == null || $userAffiliate->expiry_date >= now()) {
+                if ($userAffiliate->commission) {
+                    if ($userAffiliate->type == "F") {
+                        $affiliate_commission = $userAffiliate->commission ?? null;
+                    } elseif ($userAffiliate->type == "P") {
+                        $affiliate_commission = (($commission_apply_amount - $staff_commission) * $userAffiliate->commission) / 100;
+                    }
+                } else {
+                    $affiliate_commission_rate = 0;
+                    if ($userAffiliate->affiliate && $userAffiliate->affiliate->commission) {
+                        $affiliate_commission_rate = $userAffiliate->affiliate->commission;
+                    }
+                    $affiliate_commission = (($this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+                }
+            }
+        } else {
+            $affiliate_commission_rate = 0;
+            if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
+                $affiliate_commission_rate = $this->affiliate->affiliate->commission;
+            }
+            $affiliate_commission = (($this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+        }
+
+        return [$affiliate_commission, $staff_commission];
+    } 
+
 }

@@ -45,6 +45,8 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <hr>
+            <h4><strong> Affiliate Session</strong></h4>
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate:</strong>
                     <select name="affiliate_id" class="form-control">
@@ -67,6 +69,11 @@
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate Commission:</strong>
                     <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group"><strong>Expiry Date:</strong>
+                    <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $customer->userAffiliate ? $customer->userAffiliate->expiry_date : null }}>
                 </div>
             </div>
             <div class="col-md-12 text-center">
