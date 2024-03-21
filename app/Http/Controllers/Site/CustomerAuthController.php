@@ -291,7 +291,7 @@ class CustomerAuthController extends Controller
                 return response()->json(['error' => "Affiliate is invalid!"]);
             }
 
-        return response()->json(['message' => 'Coupon applied successfully']);
+        return response()->json(['message' => 'Affiliate applied successfully']);
     }
 
     public function account()
