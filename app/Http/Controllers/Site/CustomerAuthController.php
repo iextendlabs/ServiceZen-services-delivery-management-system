@@ -274,10 +274,15 @@ class CustomerAuthController extends Controller
     {
             $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
             if($affiliate){
-                UserAffiliate::create([
-                    'user_id' => auth()->user()->id,
-                    'affiliate_id' => $affiliate->user_id,
-                ]);
+                $userAffiliate = UserAffiliate::where("user_id", auth()->user()->id)->first();
+
+                if ($userAffiliate) {
+                    $userAffiliate->affiliate_id = $affiliate->user_id;
+                    $userAffiliate->save();
+                } else {
+                    $input['user_id'] = auth()->user()->id;
+                    UserAffiliate::create($input);
+                }
     
                 $affiliate_code = $affiliate->code;
     
