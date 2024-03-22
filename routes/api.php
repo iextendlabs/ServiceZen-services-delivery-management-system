@@ -72,3 +72,4 @@ Route::get('checkUser', [CustomerController::class, 'checkUser']);
 Route::get('cancelOrder', [CustomerController::class, 'cancelOrder']);
 Route::get('orderTotal', [CustomerController::class, 'orderTotal']);
 Route::post('signInWithFB', [CustomerController::class, 'signInWithFB']);
+Route::post('/apply-affiliate', [CustomerController::class,'applyAffiliate'])->name('apply.affiliate');
