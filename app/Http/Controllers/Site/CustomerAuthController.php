@@ -18,6 +18,7 @@ use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
 use Illuminate\Support\Facades\Mail;
 use App\Models\UserAffiliate;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cookie;
 
 class CustomerAuthController extends Controller
@@ -275,9 +276,19 @@ class CustomerAuthController extends Controller
             $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
             if($affiliate){
                 $userAffiliate = UserAffiliate::where("user_id", auth()->user()->id)->first();
+                $input['expiry_date'] = null;
+                if($affiliate->expire){
+                    $now = Carbon::now();
+
+                    $newDate = $now->addDays($affiliate->expire);
+    
+                    $input['expiry_date'] = $newDate->toDateString();
+                }
+                $input['affiliate_id'] = $affiliate->user_id;
 
                 if ($userAffiliate) {
-                    $userAffiliate->affiliate_id = $affiliate->user_id;
+                    $userAffiliate->expiry_date = $input['expiry_date'];
+                    $userAffiliate->affiliate_id = $input['affiliate_id'];
                     $userAffiliate->save();
                 } else {
                     $input['user_id'] = auth()->user()->id;
