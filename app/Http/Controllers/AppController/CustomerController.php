@@ -1145,7 +1145,7 @@ class CustomerController extends Controller
     {
         $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
         if($affiliate){
-            $userAffiliate = UserAffiliate::where("user_id", auth()->user()->id)->first();
+            $userAffiliate = UserAffiliate::where("user_id", $request->userId)->first();
             $input['expiry_date'] = null;
             if($affiliate->expire){
                 $now = Carbon::now();
@@ -1161,7 +1161,7 @@ class CustomerController extends Controller
                 $userAffiliate->affiliate_id = $input['affiliate_id'];
                 $userAffiliate->save();
             } else {
-                $input['user_id'] = auth()->user()->id;
+                $input['user_id'] = $request->userId;
                 UserAffiliate::create($input);
             }
     
