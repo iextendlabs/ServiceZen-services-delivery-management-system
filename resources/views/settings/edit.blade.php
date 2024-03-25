@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+@php
+    $category_row = 0;
+@endphp
 <div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
@@ -166,9 +169,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $row = 0;
-                            @endphp
                             @if($setting->value)
                                 @foreach (explode(',', $setting->value) as $category)
                                     @php
@@ -178,7 +178,7 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <select name="category[{{ $row }}]" class="form-control">
+                                                    <select name="category[{{ $category_row }}]" class="form-control">
                                                         @foreach ($categories as $category)
                                                         <option value="{{ $category->id }}" @if($id == $category->id) selected @endif>{{ $category->title }}</option>
                                                         @endforeach
@@ -189,7 +189,7 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" name="sort_order[{{ $row }}]" class="form-control" value="{{ $sort }}" placeholder="Sort Order">
+                                                    <input type="text" name="sort_order[{{ $category_row }}]" class="form-control" value="{{ $sort }}" placeholder="Sort Order">
                                                 </div>
                                             </div>
                                         </td>
@@ -198,7 +198,7 @@
                                         </td>
                                     </tr>
                                     @php
-                                        $row++;
+                                        $category_row++;
                                     @endphp 
                                 @endforeach
                             @endif
@@ -307,14 +307,14 @@
     </form>
 </div>
 <script>
-    var row = {{ $row }};
+    var category_row = {{ $category_row }};
     function addCategoryrow(){
         var newRow = `
             <tr>
                 <td>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <select name='category[${row}]' class="form-control">
+                            <select name='category[${category_row}]' class="form-control">
                                 @foreach ($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->title }}</option>
                                 @endforeach
@@ -325,7 +325,7 @@
                 <td>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <input type="text" name="sort_order[${row}]" class="form-control" placeholder="Sort Order">
+                            <input type="text" name="sort_order[${category_row}]" class="form-control" placeholder="Sort Order">
                         </div>
                     </div>
                 </td>
@@ -335,7 +335,7 @@
             </tr>
         `;
         $('#categoryTable tbody').append(newRow);
-        row++
+        category_row++
     }
 
     $(document).on('click', '.remove-category', function() {

@@ -36,6 +36,7 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
@@ -1138,5 +1139,44 @@ class CustomerController extends Controller
             'staff_charges' => $staff_charges,
             'services_total' => $services_total,
         ], 200);
+    }
+
+    public function applyAffiliate(Request $request)
+    {
+        $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
+        if($affiliate){
+            $userAffiliate = UserAffiliate::where("user_id", $request->userId)->first();
+            $input['expiry_date'] = null;
+            if($affiliate->expire){
+                $now = Carbon::now();
+
+                $newDate = $now->addDays($affiliate->expire);
+    
+                $input['expiry_date'] = $newDate->toDateString();
+            }
+            $input['affiliate_id'] = $affiliate->user_id;
+
+            if ($userAffiliate) {
+                $userAffiliate->expiry_date = $input['expiry_date'];
+                $userAffiliate->affiliate_id = $input['affiliate_id'];
+                $userAffiliate->save();
+            } else {
+                $input['user_id'] = $request->userId;
+                UserAffiliate::create($input);
+            }
+    
+            $affiliate_code = $affiliate->code;
+    
+            $expire = $affiliate->expire ? $affiliate->expire * 24 * 60 : null; 
+
+            return response()->json([
+                'expire' => $expire,
+                'affiliate_code' => $affiliate_code,
+            ], 200);
+
+        }else{
+            return response()->json(['error' => "Affiliate is invalid!"],201);
+        }
+
     }
 }
