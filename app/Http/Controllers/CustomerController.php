@@ -82,7 +82,7 @@ class CustomerController extends Controller
     
             $callback = function () use ($customers) {
                 $output = fopen('php://output', 'w');
-                $header = array('SR#', 'ID', 'Name', 'Email', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name','Affiliate Code', 'Coupons');
+                $header = array('SR#', 'ID', 'Name', 'Email','Status', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name','Affiliate Code', 'Coupons');
     
                 fputcsv($output, $header);
     
@@ -99,6 +99,7 @@ class CustomerController extends Controller
                         $row->id,
                         $row->name,
                         $row->email,
+                        $row->status && $row->status == 1 ? "Enabled" : "Disabled",
                         $row->customerProfile->buildingName ?? "",
                         $row->customerProfile->area ?? "",
                         $row->customerProfile->landmark ?? "",

@@ -44,6 +44,7 @@
                     </td>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Status</th>
                     <th>Affiliate</th>
                     <th width="280px">Action</th>
                 </tr>
@@ -55,6 +56,7 @@
                     </td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->email }}</td>
+                    <td>@if($customer->status == 1) Enabled @else Disabled @endif</td>
                     <td>{{ $customer->userAffiliate->affiliateUser->name ?? "" }}@if(isset($customer->userAffiliate->affiliate->code))({{ $customer->userAffiliate->affiliate->code }}) @endif</td>
                     <td>
                         <form id="deleteForm{{ $customer->id }}" action="{{ route('customers.destroy',$customer->id) }}" method="POST">

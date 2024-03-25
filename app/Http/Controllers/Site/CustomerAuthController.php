@@ -96,7 +96,10 @@ class CustomerAuthController extends Controller
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-
+            if (Auth::user()->status != 1) {
+                Auth::logout();
+                return redirect()->back()->with('error', 'Your account is not active. Please contact support.');
+            }
             if (!Auth::user()->hasRole('Customer') && !Auth::user()->hasRole('Affiliate')) {
                 return redirect('/admin');
             } else {

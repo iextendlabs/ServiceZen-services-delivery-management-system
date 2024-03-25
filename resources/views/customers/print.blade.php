@@ -41,6 +41,7 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Status</th>
                         <th>Address</th>
                         <th>District</th>
                         <th>Number</th>
@@ -59,6 +60,7 @@
                         <td>{{ $customer->id }}</td>
                         <td>{{ $customer->name }}</td>
                         <td>{{ $customer->email }}</td>
+                        <td>@if($customer->status == 1) Enabled @else Disabled @endif</td>
                         <td>{{ $customer->customerProfile->buildingName ?? '' }} {{ $customer->customerProfile->flatVilla ?? '' }} {{ $customer->customerProfile->street ?? '' }} {{ $customer->customerProfile->area ?? '' }} {{ $customer->customerProfile->city ?? '' }}</td>
                         <td>{{ $customer->customerProfile->district ?? '' }}</td>
                         <td>{{ $customer->customerProfile->number ?? '' }}</td>

@@ -45,6 +45,15 @@
                     <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <span style="color: red;">*</span><strong>Status:</strong>
+                    <select name="status" class="form-control">
+                        <option value="1" @if($customer->status == 1) selected @endif > Enable</option>
+                        <option value="0" @if($customer->status == 0) selected @endif > Disable</option>
+                    </select>
+                </div>
+            </div>
             <hr>
             <h4><strong> Affiliate Session</strong></h4>
             <div class="col-md-12">
