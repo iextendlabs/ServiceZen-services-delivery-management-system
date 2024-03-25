@@ -190,13 +190,13 @@ $cart_product = 0;
           </li>
           @if(count($top_information_page) > 0)
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Other
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOther" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Other
               </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                @foreach ($top_information_page as $page)
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownOther">
+                  @foreach ($top_information_page as $page)
                   <a class="dropdown-item" href="{{ route('siteInformationPage.show', $page->id) }}">{{ $page->name }}</a>
-                @endforeach
+                  @endforeach
               </div>
             </li>
           @endif
