@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'information-list',
+            'information-create',
+            'information-edit',
+            'information-delete',
             'company-list',
             'company-create',
             'company-delete',
