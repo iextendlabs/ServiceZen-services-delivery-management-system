@@ -2,6 +2,7 @@
 
 namespace App\Http\View\Composers;
 
+use App\Models\Information;
 use Illuminate\View\View;
 use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\Session;
@@ -30,12 +31,16 @@ class CategoryComposer
         }
         $zones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
         $head_tag = Setting::where('key', 'Head Tag')->value('value');
+        $top_information_page = Information::where('position', 'Top Menu')->get();
+        $bottom_information_page = Information::where('position', 'Bottom Footer')->get();
 
         $view->with([
             'categories' => $categories,
             'address' => $address,
             'zones' => $zones,
             'head_tag' => $head_tag,
+            'top_information_page' => $top_information_page,
+            'bottom_information_page' => $bottom_information_page,
         ]);
     }
 }

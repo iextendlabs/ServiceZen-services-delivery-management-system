@@ -34,7 +34,8 @@ use App\Http\Controllers\{
     RotaController,
     ChatController,
     CompanyController,
-    CkeditorController
+    CkeditorController,
+    InformationController
 };
 
 use App\Http\Controllers\AppController\{
@@ -52,6 +53,7 @@ use App\Http\Controllers\Site\{
     SiteReviewsController,
     StaffProfileController,
     InformationPageController,
+    SiteInformationController,
 };
 
 /*
@@ -116,6 +118,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('coupons', CouponController::class);
     Route::resource('FAQs', FAQController::class);
+    Route::resource('information', InformationController::class);
     Route::resource('settings', SettingController::class);
     Route::resource('reviews', ReviewController::class);
     Route::get('/removeReviewImages', [ReviewController::class, 'removeImages']);
@@ -203,6 +206,7 @@ Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::resource('siteFAQs', SiteFAQsController::class);
 Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
 Route::get('cancelOrder/{id}', [SiteOrdersController::class, 'cancelOrder'])->name('cancelOrder');
+Route::resource('siteInformationPage', SiteInformationController::class);
 
 //TODO :Customer Delete
 // app url
