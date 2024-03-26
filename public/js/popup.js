@@ -1,21 +1,21 @@
-$(document).ready(function () {
-    // Event listener for gender radio buttons
-    $('input[name="gender"]').on("change", function () {
-        var selectedGender = $(this).val();
-        var $submitButton = $('button[type="submit"]');
-        var $genderError = $("#gender-error");
+// $(document).ready(function () {
+//     // Event listener for gender radio buttons
+//     $('input[name="gender"]').on("change", function () {
+//         var selectedGender = $(this).val();
+//         var $submitButton = $('button[type="submit"]');
+//         var $genderError = $("#gender-error");
 
-        if (selectedGender === "Male") {
-            // Hide the registration button and show the error message
-            $submitButton.hide();
-            $genderError.show();
-        } else {
-            // Show the registration button and hide the error message
-            $submitButton.show();
-            $genderError.hide();
-        }
-    });
-});
+//         if (selectedGender === "Male") {
+//             // Hide the registration button and show the error message
+//             $submitButton.hide();
+//             $genderError.show();
+//         } else {
+//             // Show the registration button and hide the error message
+//             $submitButton.show();
+//             $genderError.hide();
+//         }
+//     });
+// });
 
 var map;
 var marker;
