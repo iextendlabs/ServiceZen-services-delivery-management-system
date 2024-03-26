@@ -75,7 +75,8 @@
                 </td>
                 <td>
                     <b>Total Amount:</b> @currency($order->total_amount) <br><br>
-                    <b>Payment Method:</b> {{ $order->payment_method }}
+                    <b>Payment Method:</b> {{ $order->payment_method }} <br><br>
+                    <b>Order Source:</b> {{ $order->order_source }}
                 </td>
             </tr>
         </table>
