@@ -75,6 +75,7 @@ class CustomerAuthController extends Controller
             }
         }
 
+        Cookie::queue(Cookie::forget('address'));
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             return redirect('/')->with('success', 'You have successfully logged in');
