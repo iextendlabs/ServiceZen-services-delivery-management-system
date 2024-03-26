@@ -22,4 +22,9 @@ class UserAffiliate extends Model
     {
         return $this->hasOne(User::class,'id','affiliate_id');
     }
+
+    public function customer()
+    {
+        return $this->hasOne(User::class,'id','user_id');
+    }
 }

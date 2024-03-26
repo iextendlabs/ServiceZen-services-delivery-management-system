@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\UserAffiliate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +59,18 @@ class AffiliateDashboardController extends Controller
                     ->sum('amount');
                     $other_income *= $pkrRateValue;
 
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance','product_sales','bonus','order_commission','other_income'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+                $affiliateUser = [];
+
+                if($currentUser->affiliate){
+                    if($currentUser->affiliate->display_type == 1){
+                        $affiliateUser = UserAffiliate::where('affiliate_id',$currentUser->id)->paginate(config('app.paginate'));
+                    }elseif($currentUser->affiliate->display_type == 2){
+                        $affiliateUser = UserAffiliate::where('affiliate_id',$currentUser->id)->where('display',1)->paginate(config('app.paginate'));
+                    }
+                }
+
+                
+                return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance','product_sales','bonus','order_commission','other_income','affiliateUser'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect("customer-login")->with('error', 'Oppes! You are not Login.');
