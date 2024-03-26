@@ -140,9 +140,9 @@ class CustomerController extends Controller
                 $input['expiry_date'] = $newDate->toDateString();
             }
 
-            $input['affiliate_id'] = $user->id;
+            $input['affiliate_id'] = $affiliate->user_id;
 
-            $input['user_id'] = $request->userId;
+            $input['user_id'] = $user->id;
             UserAffiliate::create($input);
         }
 
