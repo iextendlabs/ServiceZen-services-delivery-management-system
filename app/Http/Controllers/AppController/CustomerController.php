@@ -132,7 +132,18 @@ class CustomerController extends Controller
         if ($request->affiliate) {
             $affiliate = Affiliate::where('code', $request->affiliate)->first();
 
-            $user->affiliates()->attach($affiliate->user_id);
+            if($affiliate->expire){
+                $now = Carbon::now();
+
+                $newDate = $now->addDays($affiliate->expire);
+    
+                $input['expiry_date'] = $newDate->toDateString();
+            }
+
+            $input['affiliate_id'] = $user->id;
+
+            $input['user_id'] = $request->userId;
+            UserAffiliate::create($input);
         }
 
         $token = $user->createToken('app-token')->plainTextToken;
