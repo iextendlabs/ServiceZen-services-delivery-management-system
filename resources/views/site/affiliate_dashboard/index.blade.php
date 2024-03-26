@@ -107,12 +107,16 @@
                             <th>Sr#</th>
                             <th>Name</th>
                             <th>Emali</th>
+                            <th>Number</th>
+                            <th>Zone</th>
                         </tr>
                         @foreach ($affiliateUser as $user)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td>{{ $user->customer->name }}</td>
-                                <td>{{ $user->customer->email }}</td>
+                                <td>{{ $user->customer->name ?? "" }}</td>
+                                <td>{{ $user->customer->email ?? "" }}</td>
+                                <td>{{ $user->customer->customerProfile->number ?? "" }}</td>
+                                <td>{{ $user->customer->customerProfile->area ?? "" }}</td>
                             </tr>
                         @endforeach
                     </table>
