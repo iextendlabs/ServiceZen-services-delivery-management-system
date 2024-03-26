@@ -6,10 +6,12 @@ use App\Models\Affiliate;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserAffiliate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use DB;
 use Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
 
@@ -136,7 +138,8 @@ class AffiliateController extends Controller
      */
     public function edit(User $affiliate)
     {
-        return view('affiliates.edit', compact('affiliate'));
+        $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->get();
+        return view('affiliates.edit', compact('affiliate', 'affiliateUser'));
     }
 
     /**
@@ -154,6 +157,12 @@ class AffiliateController extends Controller
             'password' => 'same:confirm-password',
             'code' => 'required',
             'commission' => 'required',
+            'selectedCustomerId' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return $request->display_type == 2;
+                }),
+            ],
         ]);
 
         $input = $request->all();
@@ -168,6 +177,13 @@ class AffiliateController extends Controller
 
         $affiliate = Affiliate::find($input['affiliate_id']);
         $affiliate->update($input);
+        if ($input['display_type'] == 2) {
+            UserAffiliate::where('affiliate_id', $id)->update(['display' => null]);
+
+            UserAffiliate::whereIn('user_id', $input['selectedCustomerId'])
+                ->where('affiliate_id', $id)
+                ->update(['display' => 1]);
+        }
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -211,9 +227,9 @@ class AffiliateController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $csvFileName . '"',
         ];
 
-        
 
-        $callback = function() use($data) {
+
+        $callback = function () use ($data) {
             $output = fopen("php://output", "w");
             // Add CSV headers
             $headers = array_keys($data[0]->toArray());
@@ -236,5 +252,4 @@ class AffiliateController extends Controller
         // Send the CSV file as response
         return response()->stream($callback, 200, $headers);
     }
-
 }
