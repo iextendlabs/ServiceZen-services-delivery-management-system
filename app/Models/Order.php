@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['customer_id', 'customer_name', 'customer_email', 'total_amount', 'payment_method', 'status', 'affiliate_id', 'buildingName', 'area', 'landmark', 'flatVilla', 'street', 'city', 'number', 'whatsapp', 'service_staff_id', 'staff_name', 'date', 'time_slot_id', 'time_slot_value', 'latitude', 'longitude', 'order_comment', 'driver_status', 'time_start', 'time_end', 'gender','driver_id','district','order_source'];
+    protected $fillable = ['customer_id', 'customer_name', 'customer_email', 'total_amount', 'payment_method', 'status', 'affiliate_id', 'buildingName', 'area', 'landmark', 'flatVilla', 'street', 'city', 'number', 'whatsapp', 'service_staff_id', 'staff_name', 'date', 'time_slot_id', 'time_slot_value', 'latitude', 'longitude', 'order_comment', 'driver_status', 'time_start', 'time_end', 'gender', 'driver_id', 'district', 'order_source'];
 
     protected $table = 'orders';
 
@@ -90,7 +90,7 @@ class Order extends Model
     public function getServicesAttribute()
     {
         return $this->orderServices->sortByDesc('service_name')->map(function ($orderService) {
-            $serviceNameWithTimeAndPrice = $orderService->service_name . '-' . $orderService->duration . '-' . $orderService->price. ' AED';
+            $serviceNameWithTimeAndPrice = $orderService->service_name . '-' . $orderService->duration . '-' . $orderService->price . ' AED';
             return $serviceNameWithTimeAndPrice;
         })->values()->toArray();
     }
@@ -118,13 +118,15 @@ class Order extends Model
         return $this->hasOne(OrderChat::class, 'order_id')->latest();
     }
 
-    public function couponHistory(){
+    public function couponHistory()
+    {
         return $this->hasOne(CouponHistory::class);
     }
 
-    public function commissionCalculation(){
+    public function commissionCalculation()
+    {
         $userAffiliate = UserAffiliate::where('user_id', $this->customer_id)->first();
-        
+
         $staff_commission_rate = 0;
         if ($this->staff && $this->staff->commission) {
             $staff_commission_rate = $this->staff->commission;
@@ -133,6 +135,7 @@ class Order extends Model
         $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
 
         $affiliate_commission = 0;
+        $affiliate_id = 0;
         if ($userAffiliate) {
             if ($userAffiliate->expiry_date == null || $userAffiliate->expiry_date >= now()) {
                 if ($userAffiliate->commission) {
@@ -146,18 +149,26 @@ class Order extends Model
                     if ($userAffiliate->affiliate && $userAffiliate->affiliate->commission) {
                         $affiliate_commission_rate = $userAffiliate->affiliate->commission;
                     }
-                    $affiliate_commission = (($this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+                    $affiliate_commission = (($commission_apply_amount - $staff_commission) * $affiliate_commission_rate) / 100;
                 }
+                $affiliate_id = $userAffiliate->affiliate_id;
+            } else {
+                $affiliate_commission_rate = 0;
+                if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
+                    $affiliate_commission_rate = $this->affiliate->affiliate->commission;
+                }
+                $affiliate_commission = (($commission_apply_amount - $staff_commission) * $affiliate_commission_rate) / 100;
+                $affiliate_id = $this->affiliate_id;
             }
         } else {
             $affiliate_commission_rate = 0;
             if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
                 $affiliate_commission_rate = $this->affiliate->affiliate->commission;
             }
-            $affiliate_commission = (($this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount - $staff_commission) * $affiliate_commission_rate) / 100;
+            $affiliate_commission = (($commission_apply_amount - $staff_commission) * $affiliate_commission_rate) / 100;
+            $affiliate_id = $this->affiliate_id;
         }
 
-        return [$affiliate_commission, $staff_commission];
-    } 
-
+        return [$affiliate_commission, $staff_commission,$affiliate_id];
+    }
 }
