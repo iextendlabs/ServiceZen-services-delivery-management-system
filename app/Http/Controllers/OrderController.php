@@ -394,9 +394,8 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
 
-        [$affiliate_commission, $staff_commission] = $order->commissionCalculation();
-        
-        $affiliate_id = $order->customer->userAffiliate->affiliate_id ?? $order->affiliate->id ?? '';
+        [$affiliate_commission, $staff_commission,$affiliate_id] = $order->commissionCalculation();
+
         $affiliate_transaction = Transaction::where('user_id', $affiliate_id)->where('order_id', $order->id)->value('status');
         $affiliate = User::find($affiliate_id);
         $statuses = config('app.order_statuses');
@@ -573,14 +572,14 @@ class OrderController extends Controller
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
 
-            $affiliate_id = $order->customer->userAffiliate->affiliate_id ?? $order->affiliate->id;
-            if ($affiliate_id) {
-                $transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
-            }
             if ($request->status == "Complete") {
 
-                [$affiliate_commission, $staff_commission] = $order->commissionCalculation();
-
+                [$affiliate_commission, $staff_commission, $affiliate_id] = $order->commissionCalculation();
+                
+                if ($affiliate_id) {
+                    $transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
+                }
+                
                 if ($affiliate_id && !isset($transaction) && $affiliate_commission > 0) {
                     $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
@@ -687,16 +686,17 @@ class OrderController extends Controller
         try {
             OrderHistory::create($input);
             
-            $affiliate_id = $order->customer->userAffiliate->affiliate_id ?? $order->affiliate->id;
-            if ($affiliate_id) {
-                $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
-            }
+            
 
             if (isset($order->staff->commission)) {
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
             if ($request->status == "Complete") {
-                [$affiliate_commission, $staff_commission] = $order->commissionCalculation();
+                [$affiliate_commission, $staff_commission, $affiliate_id] = $order->commissionCalculation();
+                
+                if ($affiliate_id) {
+                    $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
+                }
 
                 if ($affiliate_id && !isset($affiliate_transaction) && $affiliate_commission > 0) {
                     $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;

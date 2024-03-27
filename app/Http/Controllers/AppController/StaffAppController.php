@@ -129,10 +129,6 @@ class StaffAppController extends Controller
     {
         $order = Order::find($request->order_id);
         try {
-            $affiliate_id = $order->customer->userAffiliate->affiliate_id ?? $order->affiliate->id;
-            if ($affiliate_id) {
-                $transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
-            }
 
             if (isset($order->staff->commission)) {
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
@@ -140,7 +136,11 @@ class StaffAppController extends Controller
 
             if ($request->status == "Complete") {
 
-                [$affiliate_commission, $staff_commission] = $order->commissionCalculation();
+                [$affiliate_commission, $staff_commission, $affiliate_id] = $order->commissionCalculation();
+                
+                if ($affiliate_id) {
+                    $affiliate_commission = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
+                }
 
                 if ($affiliate_id && !isset($affiliate_transaction) && $affiliate_commission > 0) {
                     $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
