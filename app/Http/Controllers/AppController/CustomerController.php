@@ -129,7 +129,6 @@ class CustomerController extends Controller
         $user = User::create($input);
         $user->assignRole("Customer");
         $affiliate_code = "";
-        $expire = "";
         if ($request->affiliate) {
             $affiliate = Affiliate::where('code', $request->affiliate)->first();
 
@@ -147,8 +146,6 @@ class CustomerController extends Controller
             UserAffiliate::create($input);
 
             $affiliate_code = $affiliate->code;
-    
-            $expire = $affiliate->expire ? $affiliate->expire * 24 * 60 : null; 
         }
 
         $token = $user->createToken('app-token')->plainTextToken;
@@ -156,7 +153,6 @@ class CustomerController extends Controller
         return response()->json([
             'user' => $user,
             'access_token' => $token,
-            'expire' => $expire,
             'affiliate_code' => $affiliate_code,
         ], 200);
     }
@@ -1185,10 +1181,8 @@ class CustomerController extends Controller
     
             $affiliate_code = $affiliate->code;
     
-            $expire = $affiliate->expire ? $affiliate->expire * 24 * 60 : null; 
 
             return response()->json([
-                'expire' => $expire,
                 'affiliate_code' => $affiliate_code,
             ], 200);
 
