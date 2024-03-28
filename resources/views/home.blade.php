@@ -28,7 +28,11 @@
                     <a class="btn btn-success float-end" href="{{ route('affiliate_dashboard.index') }}">Affiliate DashBorad</a>
                 @endif
             </div>
-
+            @if(isset(Auth::user()->affiliate_program) && Auth::user()->affiliate_program == 0)
+            <div class="alert alert-warning">
+                <span>Your request to join the affiliate program has been submitted and sent to the administrator for review.</span>
+            </div>
+            @endif
             @if ($message = Session::get('success'))
                 <div class="alert alert-success">
                     <span>{{ $message }}</span>

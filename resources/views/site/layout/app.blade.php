@@ -167,12 +167,13 @@ $cart_product = 0;
               @guest
               <a class="dropdown-item" href="/customer-login">Login</a>
               <a class="dropdown-item" href="/customer-registration">Register</a>
+              <a class="dropdown-item" href="/customer-registration?type=affiliate">Register as Affiliate</a>
               @else
               <a class="dropdown-item" href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>
               @if(Auth::user()->hasRole('Affiliate'))
               <a class="dropdown-item" href="{{ route('affiliate_dashboard.index') }}">Affiliate Dashboard</a>
               @endif
-              @if(!Auth::user()->hasRole("Affiliate"))
+              @if(Auth::user()->affiliate_program == null && !Auth::user()->hasRole("Affiliate"))
               <a class="dropdown-item" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
               @endif
               <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>

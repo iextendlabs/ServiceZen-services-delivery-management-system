@@ -26,7 +26,7 @@ class CustomerAuthController extends Controller
     public function registration(Request $request)
     {
         $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
-        
+        $type = $request->type;
         if($affiliate){
             $affiliate_code = request()->cookie('affiliate_code');
         }else{
@@ -34,7 +34,7 @@ class CustomerAuthController extends Controller
             $affiliate_code = "";
         }
 
-        return view('site.auth.signUp', compact('affiliate_code'));
+        return view('site.auth.signUp', compact('affiliate_code','type'));
     }
 
     public function postRegistration(Request $request)
@@ -47,11 +47,15 @@ class CustomerAuthController extends Controller
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);
 
+        
         $input = $request->all();
         $input['customer_source'] = "Site";
-
+        
+        if($request->type == "affiliate"){
+            $input['affiliate_program'] = 0 ;
+        }
+        
         $input['password'] = Hash::make($input['password']);
-
         $customer = User::create($input);
 
         $customer->assignRole('Customer');

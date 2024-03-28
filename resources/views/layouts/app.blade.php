@@ -85,7 +85,7 @@
                         @endif
                         @else
 
-                        @if(auth()->user()->hasRole("Staff") && !auth()->user()->hasRole("Affiliate"))
+                        @if(Auth::user()->affiliate_program == null && auth()->user()->hasRole("Staff") && !auth()->user()->hasRole("Affiliate"))
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
                         </li>
