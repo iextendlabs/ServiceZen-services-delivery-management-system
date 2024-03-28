@@ -18,7 +18,8 @@
             </div>
         @endif
         <form action="{{ route('affiliates.update', $affiliate->id) }}" method="POST">
-            <input type="hidden" value="{{ $affiliate->affiliate->id }}" name="affiliate_id" />
+            <input type="hidden" value="{{ $affiliate->affiliate->id  ?? ""}}" name="affiliate_id" />
+            <input type="hidden" value="{{ $affiliate_join}}" name="affiliate_join" />
             <input type="hidden" name="url" value="{{ url()->previous() }}" />
             @csrf @method('PUT')
             <div class="row">
@@ -53,14 +54,14 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Code:</strong>
-                        <input type="text" name="code" value="{{ $affiliate->affiliate->code }}" class="form-control"
+                        <input type="text" name="code" value="{{ $affiliate->affiliate->code ?? "" }}" class="form-control"
                             placeholder="Code" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Commission:</strong>
-                        <input type="number" name="commission" value="{{ $affiliate->affiliate->commission }}"
+                        <input type="number" name="commission" value="{{ $affiliate->affiliate->commission ?? "" }}"
                             class="form-control" placeholder="Commission In %" />
                     </div>
                 </div>
@@ -68,13 +69,13 @@
                     <div class="form-group">
                         <strong>Expire after days:</strong>
                         <input type="number" name="expire" class="form-control"
-                            value="{{ $affiliate->affiliate->expire }}" placeholder="Enter days like 20" />
+                            value="{{ $affiliate->affiliate->expire ?? "" }}" placeholder="Enter days like 20" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Fix Salary:</strong>
-                        <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary }}"
+                        <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary ?? "" }}"
                             class="form-control" placeholder="Fix Salary" />
                     </div>
                 </div>
@@ -82,11 +83,11 @@
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Customer Display:</strong>
                         <select name="display_type" id="display_type" class="form-control">
-                            <option value="1" @if ($affiliate->affiliate->display_type == 1) selected @endif>Enable
+                            <option value="1" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable
                             </option>
-                            <option value="0" @if ($affiliate->affiliate->display_type == 0) selected @endif>Disable
+                            <option value="0" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 0) selected @endif>Disable
                             </option>
-                            <option value="2" @if ($affiliate->affiliate->display_type == 2) selected @endif>Selected Customer
+                            <option value="2" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 2) selected @endif>Selected Customer
                             </option>
                         </select>
                     </div>

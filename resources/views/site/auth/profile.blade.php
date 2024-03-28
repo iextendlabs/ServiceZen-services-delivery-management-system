@@ -2,15 +2,25 @@
 
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-md-12 py-5 text-center">
+        <div class="row py-5">
+            <div class="col-md-6">
                 <h2>Profile</h2>
+            </div>
+            <div class="col-md-6 justify-content-end d-flex">
+                @if (auth()->user()->hasRole('Affiliate'))
+                    <a class="btn btn-success" href="/affiliate_dashboard">Affiliate Dashborad</a>
+                @endif
             </div>
         </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
                 <span>{{ $message }}</span>
             </div>
+        @endif
+        @if(isset(Auth::user()->affiliate_program) && Auth::user()->affiliate_program == 0)
+        <div class="alert alert-warning">
+            <span>Your request to join the affiliate program has been submitted and sent to the administrator for review.</span>
+        </div>
         @endif
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -25,12 +35,13 @@
         <form action="{{ route('customerProfile.update', auth()->user()->id) }}" method="POST">
             @csrf
             @method('PUT')
-            <div class="row bg-light py-3 mb-4 card">
+            <div class="row bg-light py-3 mb-4">
                 <div class="col-md-12 text-center">
                     <br>
                     <h3><strong>Address</strong></h3>
                     <hr>
                 </div>
+                
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Building Name:</strong>
@@ -81,7 +92,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row bg-light py-3 mb-4 card">
+            <div class="row bg-light py-3 mb-4">
                 <div class="col-md-12 text-center">
                     <br>
                     <h3><strong>Personal information</strong></h3>
@@ -153,7 +164,8 @@
                 </div>
             </div>
         </form>
-        <div class="row bg-light py-3 mb-4 card">
+        @if(!auth()->user()->hasRole("Affiliate"))
+        <div class="row bg-light py-3 mb-4">
             <div class="col-md-12 text-center">
                 <br>
                 <h3><strong>Join Affiliate</strong></h3>
@@ -173,7 +185,8 @@
                 </div>
             </div>
         </div>
-        <div class="row bg-light py-3 mb-4 card">
+        @endif
+        <div class="row bg-light py-3 mb-4">
             <div class="col-md-12 text-center">
                 <br>
                 <h3><strong>Coupon List</strong></h3>

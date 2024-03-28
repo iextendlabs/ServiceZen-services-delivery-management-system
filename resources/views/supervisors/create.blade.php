@@ -51,7 +51,7 @@
                     <select name="manager_id" class="form-control">
                         <option></option>
                         @foreach($managers as $manager)
-                        @if($manager->getRoleNames() == '["Manager"]')
+                        @if($manager->hasRole("Manager"))
                         <option value="{{ $manager->id }}">{{ $manager->name }}</option>
                         @endif
                         @endforeach

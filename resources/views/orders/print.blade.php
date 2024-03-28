@@ -43,7 +43,7 @@
                         <th><i class="fas fa-clock"></i> Appointment Date</th>
                         <th><i class="fas fa-clock"></i> Slots</th>
 
-                        @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+                        @if (auth()->user()->hasRole("Supervisor"))
                             <th>Landmark</th>
                             <th>Area</th>
                             <th>City</th>
@@ -67,7 +67,7 @@
                         <td>{{ $order->staff_name }}</td>
                         <td>{{ $order->date }}</td>
                         <td>{{ $order->time_slot_value }}</td>
-                        @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+                        @if (auth()->user()->hasRole("Supervisor"))
                             <td>{{ $order->landmark }}</td>
                             <td>{{ $order->area }}</td>
                             <td>{{ $order->city }}</td>

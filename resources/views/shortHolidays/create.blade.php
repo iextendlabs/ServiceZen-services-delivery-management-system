@@ -52,7 +52,7 @@
                     <span style="color: red;">*</span><strong>Staff:</strong>
                     <select name="staff_id" class="form-control">
                         @foreach ($staffs as $staff)
-                        @if($staff->getRoleNames() == '["Staff"]')
+                        @if($staff->hasRole("Staff"))
                         @if($staff->id == $staff_id)
                         <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
                         @else

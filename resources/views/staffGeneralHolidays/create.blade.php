@@ -53,7 +53,7 @@
                         <th>Email</th>
                     </tr>
                     @foreach ($staffs as $staff)
-                    @if($staff->getRoleNames() == '["Staff"]')
+                    @if($staff->hasRole("Staff"))
                     <tr>
                         <td>
                             @if($staff->id == $staff_id)

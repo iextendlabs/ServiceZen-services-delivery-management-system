@@ -59,6 +59,16 @@
                             </div>
                         </div>
                         <div class="row mb-3">
+                            <label for="type" class="col-md-4 col-form-label text-md-end">Login as:</label>
+
+                            <div class="col-md-6">
+                                <select name="type" id="type" class="form-control">
+                                    <option value="customer">Customer</option>
+                                    <option value="affiliate" @if($type === "affiliate") selected @endif>Affiliate</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 affiliate_code" @if($type === "affiliate") style="display: none;" @endif>
                             <label for="affiliate_code" class="col-md-4 col-form-label text-md-end">{{ __('Affiliate Code') }}</label>
 
                             <div class="col-md-6">
@@ -110,4 +120,14 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).on("change","#type",function() {
+            var selectedValue = $(this).val();
+            if (selectedValue == "customer") {
+                $(".affiliate_code").show();
+            } else {
+                $(".affiliate_code").hide();
+            }
+        });
+</script>
 @endsection

@@ -7,14 +7,14 @@
             </div>
             <div class="col-md-12 mb-3">
                 <div class="d-flex flex-wrap justify-content-md-end">
-                    @if(auth()->user()->getRoleNames() != '["Supervisor"]')
+                    @if(!auth()->user()->hasRole("Supervisor"))
                         @can('order-download')
                             <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i class="fa fa-print"></i> PDF</a>
                             <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i> Excel</a>
                         @endcan
                     @endif
         
-                    @if(auth()->user()->getRoleNames() == '["Admin"]')
+                    @if(auth()->user()->hasRole("Admin"))
                         <a class="btn btn-secondary mb-2 ms-md-2" href="/orders">
                             <i class="fas fa-list"></i> All
                         </a>
@@ -23,7 +23,7 @@
                         </a>
                     @endif
         
-                    @if(auth()->user()->getRoleNames() != '["Staff"]')
+                    @if(!auth()->user()->hasRole("Staff"))
                         <a class="btn btn-primary mb-2 ms-md-2" href="/orders?status=Pending">
                             <i class="fas fa-clock"></i> Pending
                         </a>
@@ -71,7 +71,7 @@
         <hr>
 
         <div class="row">
-            @if(auth()->user()->getRoleNames() != '["Staff"]')
+            @if(!auth()->user()->hasRole("Staff"))
                 <!-- Second Column (Filter Form) -->
                 <div class="col-md-12">
                     <h3>Filter</h3>
@@ -87,14 +87,14 @@
                                 <input type="date" name="appointment_date" class="form-control"
                                     value="{{ $filter['appointment_date'] }}">
                             </div>
-                            @if(auth()->user()->getRoleNames() != '["Staff"]')
+                            @if(!auth()->user()->hasRole("Staff"))
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>Staff:</strong>
                                     <select name="staff_id" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($users as $staff)
-                                        @if($staff->getRoleNames() == '["Staff"]')
+                                        @if($staff->hasRole('Staff'))
                                         @if($staff->id == $filter['staff'])
                                         <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
                                         @else
@@ -108,14 +108,14 @@
                             @endif
 
                             <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
-                            @if(auth()->user()->getRoleNames() == '["Admin"]')
+                            @if(auth()->user()->hasRole("Admin"))
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>Affiliate:</strong>
                                     <select name="affiliate_id" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($users as $affiliate)
-                                        @if($affiliate->getRoleNames() == '["Affiliate"]')
+                                        @if($affiliate->hasRole("Affiliate"))
                                         @if($affiliate->id == $filter['affiliate'])
                                         <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
                                         @else
@@ -139,7 +139,7 @@
                                     <select name="driver_id" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($users as $driver)
-                                        @if($driver->getRoleNames() == '["Driver"]')
+                                        @if($driver->hasRole("Driver"))
                                         @if($driver->id == $filter['driver'])
                                         <option value="{{ $driver->id }}" selected>{{ $driver->name }}</option>
                                         @else

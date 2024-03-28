@@ -167,10 +167,14 @@ $cart_product = 0;
               @guest
               <a class="dropdown-item" href="/customer-login">Login</a>
               <a class="dropdown-item" href="/customer-registration">Register</a>
+              <a class="dropdown-item" href="/customer-registration?type=affiliate">Register as Affiliate</a>
               @else
               <a class="dropdown-item" href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>
               @if(Auth::user()->hasRole('Affiliate'))
               <a class="dropdown-item" href="{{ route('affiliate_dashboard.index') }}">Affiliate Dashboard</a>
+              @endif
+              @if(Auth::user()->affiliate_program == null && !Auth::user()->hasRole("Affiliate"))
+              <a class="dropdown-item" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
               @endif
               <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
               <a class="dropdown-item" href="/customer-logout">Logout</a>
@@ -188,6 +192,7 @@ $cart_product = 0;
           <li class="nav-item">
             <a class="nav-link" href="{{ route('contactUs') }}">Contact</a>
           </li>
+          
           @if(count($top_information_page) > 0)
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOther" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

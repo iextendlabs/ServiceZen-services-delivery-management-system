@@ -286,7 +286,7 @@
                             <th>Email</th>
                         </tr>
                         @foreach ($users as $user)
-                        @if($user->getRoleNames() == '["Customer"]')
+                        @if($user->hasRole("Customer"))
                         <tr>
                             <td>
                                 @if(isset($userNote))
