@@ -31,8 +31,7 @@ class AffiliateProgramController extends Controller
         $filter_status = $request->status;
 
         $query = User::whereNotNull('affiliate_program');
-
-        if ($request->status) {
+        if (isset($request->status)) {
             $query->where('affiliate_program', $request->status);
         }
 
