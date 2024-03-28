@@ -344,4 +344,12 @@ class CustomerAuthController extends Controller
 
         return Redirect('customer-login');
     }
+
+    public function JoinAffiliateProgram(){
+        $user = User::find(auth()->user()->id);
+        $user->affiliate_program = 0;
+        $user->save();
+        
+        return redirect()->back()->with('success', 'Your request to join the affiliate program has been submitted and sent to the administrator for review.');
+    }
 }

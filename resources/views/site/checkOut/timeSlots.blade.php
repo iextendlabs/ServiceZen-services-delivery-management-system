@@ -37,13 +37,13 @@
     @endphp
     @foreach($timeSlot->staffs as $staff)
     @auth
-    @if((auth()->user()->getRoleNames() == '["Staff"]' && $staff->id != auth()->user()->id))
+    @if((auth()->user()->hasRole("Staff")  && $staff->id != auth()->user()->id))
     @continue
     @endif
-    @if(auth()->user()->getRoleNames() == '["Supervisor"]' && !in_array($staff->id, auth()->user()->getSupervisorStaffIds()))
+    @if(auth()->user()->hasRole("Supervisor")  && !in_array($staff->id, auth()->user()->getSupervisorStaffIds()))
     @continue
     @endif
-    @if(auth()->user()->getRoleNames() == '["Manager"]' && !in_array($staff->id, auth()->user()->getManagerStaffIds()))
+    @if(auth()->user()->hasRole("Manager")  && !in_array($staff->id, auth()->user()->getManagerStaffIds()))
     @continue
     @endif
 
@@ -155,13 +155,13 @@
                     @endphp
                     @foreach($timeSlot->staffs as $staff)
                     @auth
-                    @if((auth()->user()->getRoleNames() == '["Staff"]' && $staff->id != auth()->user()->id))
+                    @if((auth()->user()->hasRole("Staff")  && $staff->id != auth()->user()->id))
                     @continue
                     @endif
-                    @if(auth()->user()->getRoleNames() == '["Supervisor"]' && !in_array($staff->id, auth()->user()->getSupervisorStaffIds()))
+                    @if(auth()->user()->hasRole("Supervisor")  && !in_array($staff->id, auth()->user()->getSupervisorStaffIds()))
                     @continue
                     @endif
-                    @if(auth()->user()->getRoleNames() == '["Manager"]' && !in_array($staff->id, auth()->user()->getManagerStaffIds()))
+                    @if(auth()->user()->hasRole("Manager")  && !in_array($staff->id, auth()->user()->getManagerStaffIds()))
                     @continue
                     @endif
 
@@ -206,7 +206,7 @@
                     @endforeach
                     @if($staff_counter == 0)
                     <div class="alert alert-danger">
-                        @if( auth()->user() && (auth()->user()->getRoleNames() == '["Supervisor"]' || auth()->user()->getRoleNames() == '["Manager"]'))
+                        @if( auth()->user() && (auth()->user()->hasRole("Supervisor")  || auth()->user()->hasRole("Manager") ))
                         <strong>Whoops!</strong>All of Your Staff is Booked.
                         @else
                         <strong>Whoops! </strong> No Staff Available! 

@@ -25,12 +25,18 @@
         <form action="{{ route('customerProfile.update', auth()->user()->id) }}" method="POST">
             @csrf
             @method('PUT')
+            <div class="col-md-12 text-right">
+                <a href="{{route('apply.affiliateProgram')}}">
+                    <button type="button" class="btn btn-primary">Update</button>
+                </a>
+            </div>
             <div class="row bg-light py-3 mb-4 card">
                 <div class="col-md-12 text-center">
                     <br>
                     <h3><strong>Address</strong></h3>
                     <hr>
                 </div>
+                
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Building Name:</strong>
@@ -153,6 +159,7 @@
                 </div>
             </div>
         </form>
+        @if(!auth()->user()->hasRole("Affiliate"))
         <div class="row bg-light py-3 mb-4 card">
             <div class="col-md-12 text-center">
                 <br>
@@ -173,6 +180,7 @@
                 </div>
             </div>
         </div>
+        @endif
         <div class="row bg-light py-3 mb-4 card">
             <div class="col-md-12 text-center">
                 <br>

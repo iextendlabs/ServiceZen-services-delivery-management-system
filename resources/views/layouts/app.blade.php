@@ -59,7 +59,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm no-print">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/admin') }}">
-                    Services Delivery Management System
+                    Lip Slay Home Salon
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -85,9 +85,19 @@
                         @endif
                         @else
 
+                        @if(auth()->user()->hasRole("Staff") && !auth()->user()->hasRole("Affiliate"))
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
+                        </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
+                        @if(auth()->user()->hasRole("Admin"))
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{{ route('affiliateProgram.index')}}">New Affiliate Joinee</a>
+                        </li>
+                        @endif
                         @can('company-list')
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('companies.index')}}">Companies</a>
@@ -111,7 +121,7 @@
                                 @can('cash-collection-list')
                                 <a class="dropdown-item" href="{{ route('cashCollection.index') }}">Cash Collections</a>
                                 @endcan
-                                @if(auth()->user()->getRoleNames() == '["Staff"]')
+                                @if(auth()->user()->hasRole("Staff"))
                                 <a class="dropdown-item" href="{{ route('staffCashCollection') }}">Cash Collections</a>
                                 @endif
                                 @can('coupon-list')
@@ -216,7 +226,7 @@
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
-                                @if(auth()->user()->getRoleNames() == '["Admin"]')
+                                @if(auth()->user()->hasRole("Admin"))
                                 <a class="dropdown-item" href="{{ route('backups.index') }}">Database Backups</a>
                                 @endif
                                 @can('user-list')

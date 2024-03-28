@@ -47,89 +47,91 @@ class HomeController extends Controller
         $currentMonth = Carbon::now()->startOfMonth();
 
         if (Auth::check()) {
-            if ($currentUser->hasRole('Customer') || $currentUser->hasRole('Affiliate')) {
-                return redirect('/')
-                    ->with('success', 'You have Successfully loggedin');
-            } else {
-                $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
 
-                switch ($userRole) {
-                    case 'Manager':
-                        $staffIds = $currentUser->getManagerStaffIds();
-                        $orders = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC')->take(10)->get();
-                        break;
+            $userRole = $currentUser->getRoleNames()->first();
 
-                    case 'Supervisor':
-                        $staffIds = $currentUser->getSupervisorStaffIds();
-                        $orders = Order::whereIn('service_staff_id', $staffIds)
-                            ->orderBy('date', 'DESC')
-                            ->where('date', '<=', $currentDate)
-                            ->where(function ($query) {
-                                $query->whereDoesntHave('cashCollection');
-                                })
-                            ->take(10)->get();
-                        break;
+            switch ($userRole) {
+                case 'Customer':
+                case 'Affiliate':
+                    return redirect('/')
+                        ->with('success', 'You have successfully logged in');
+                    break;
 
-                    case 'Staff':
-                        $orders = Order::where('service_staff_id', Auth::id())
-                            ->where('date', '<=', $currentDate)
-                            ->orderBy('date', 'DESC')
-                            ->where(function ($query) {
+                case 'Manager':
+                    $staffIds = $currentUser->getManagerStaffIds();
+                    $orders = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC')->take(10)->get();
+                    break;
+
+                case 'Supervisor':
+                    $staffIds = $currentUser->getSupervisorStaffIds();
+                    $orders = Order::whereIn('service_staff_id', $staffIds)
+                        ->orderBy('date', 'DESC')
+                        ->where('date', '<=', $currentDate)
+                        ->where(function ($query) {
+                            $query->whereDoesntHave('cashCollection');
+                        })
+                        ->take(10)->get();
+                    break;
+
+                case 'Staff':
+                    $orders = Order::where('service_staff_id', Auth::id())
+                        ->where('date', '<=', $currentDate)
+                        ->orderBy('date', 'DESC')
+                        ->where(function ($query) {
                             $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
                                 ->whereDoesntHave('cashCollection');
-                            })
-                            ->take(10)->get();
-                        break;
+                        })
+                        ->take(10)->get();
+                    break;
 
-                    default:
-                        $orders = Order::orderBy('date', 'DESC')->take(10)->get();
-                        break;
-                }
-
-                $affiliate_commission = DB::table('transactions')
-                    ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')
-                    ->sum('transactions.amount');
-
-                $staff_commission = DB::table('transactions')
-                    ->join('staff', 'transactions.user_id', '=', 'staff.user_id')
-                    ->sum('transactions.amount');
-
-
-
-                $order = Order::where('status', 'Complete')->get();
-
-                $sale = 0;
-
-                foreach ($order as $single_order) {
-                    $sale = $sale + $single_order->total_amount;
-                }
-
-                $i = 0;
-
-                $staff_total_balance = Transaction::where('user_id', $currentUser->id)->sum('amount');
-
-                $staff_product_sales = Transaction::where('type', 'Product Sale')
-                    ->where('created_at', '>=', $currentMonth)
-                    ->where('user_id', $currentUser->id)
-                    ->sum('amount');
-
-                $staff_bonus = Transaction::where('type', 'Bonus')
-                    ->where('created_at', '>=', $currentMonth)
-                    ->where('user_id', $currentUser->id)
-                    ->sum('amount');
-
-                $staff_order_commission = Transaction::where('type', 'Order Commission')
-                    ->where('created_at', '>=', $currentMonth)
-                    ->where('user_id', $currentUser->id)
-                    ->sum('amount');
-
-                $staff_other_income = Transaction::where('type', 'Debit')
-                    ->where('created_at', '>=', $currentMonth)
-                    ->where('user_id', $currentUser->id)
-                    ->sum('amount');
-
-                return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission','staff_other_income'));
+                default:
+                    $orders = Order::orderBy('date', 'DESC')->take(10)->get();
+                    break;
             }
+
+            $affiliate_commission = DB::table('transactions')
+                ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')
+                ->sum('transactions.amount');
+
+            $staff_commission = DB::table('transactions')
+                ->join('staff', 'transactions.user_id', '=', 'staff.user_id')
+                ->sum('transactions.amount');
+
+
+
+            $order = Order::where('status', 'Complete')->get();
+
+            $sale = 0;
+
+            foreach ($order as $single_order) {
+                $sale = $sale + $single_order->total_amount;
+            }
+
+            $i = 0;
+
+            $staff_total_balance = Transaction::where('user_id', $currentUser->id)->sum('amount');
+
+            $staff_product_sales = Transaction::where('type', 'Product Sale')
+                ->where('created_at', '>=', $currentMonth)
+                ->where('user_id', $currentUser->id)
+                ->sum('amount');
+
+            $staff_bonus = Transaction::where('type', 'Bonus')
+                ->where('created_at', '>=', $currentMonth)
+                ->where('user_id', $currentUser->id)
+                ->sum('amount');
+
+            $staff_order_commission = Transaction::where('type', 'Order Commission')
+                ->where('created_at', '>=', $currentMonth)
+                ->where('user_id', $currentUser->id)
+                ->sum('amount');
+
+            $staff_other_income = Transaction::where('type', 'Debit')
+                ->where('created_at', '>=', $currentMonth)
+                ->where('user_id', $currentUser->id)
+                ->sum('amount');
+
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income'));
         }
     }
 
@@ -196,7 +198,8 @@ class HomeController extends Controller
             ->with('success', 'User updated successfully');
     }
 
-    public function appJsonData(){
+    public function appJsonData()
+    {
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
         $slider_images = Setting::where('key', 'Slider Image For App')->value('value');
@@ -206,19 +209,19 @@ class HomeController extends Controller
 
         $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
         $images = explode(",", $slider_images);
-        
+
         $app_categories = Setting::where('key', 'App Categories')->value('value');
         $app_categories = explode(",", $app_categories);
-        
+
         $categoriesWithOrder = collect($app_categories)->mapWithKeys(function ($item) {
             [$id, $order] = explode('_', $item);
             return [(int) $id => (int) $order];
         });
-        
+
         $categoryIds = $categoriesWithOrder->keys()->all();
-        
+
         $categories = ServiceCategory::findMany($categoryIds)->keyBy('id');
-        
+
         $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
             $category = $categories->get($id);
             return [
@@ -229,7 +232,7 @@ class HomeController extends Controller
                 'sort_order' => $order
             ];
         })->sortBy('sort_order')->values()->toArray();
-        
+
         ksort($sortedCategories);
 
         $categoriesArray = array_values($sortedCategories);
@@ -273,7 +276,7 @@ class HomeController extends Controller
             'staffs' => $staffs,
             'whatsapp_number' => $whatsapp_number,
         ];
-        
+
         try {
             $filename = "AppData.json";
             $filePath = public_path($filename);
@@ -287,7 +290,7 @@ class HomeController extends Controller
                 $currentData = json_decode(File::get($backupFilePath), true);
                 $updatedData = array_merge($currentData, $jsonData);
                 File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-                
+
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));

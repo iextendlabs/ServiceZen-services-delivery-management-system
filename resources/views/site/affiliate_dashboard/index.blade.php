@@ -2,9 +2,14 @@
 
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-md-12 py-5 text-center">
+        <div class="row py-5">
+            <div class="col-md-6">
                 <h2>Dashboard</h2>
+            </div>
+            <div class="col-md-6 justify-content-end d-flex">
+                @if (auth()->user()->hasRole('Staff'))
+                    <a class="btn btn-success" href="/admin">Staff Dashborad</a>
+                @endif
             </div>
             <div class="col-md-4 py-2">
                 <div class="card">
@@ -134,6 +139,7 @@
                         <tr>
                             <th>Sr#</th>
                             <th>Date Added</th>
+                            <th>Type</th>
                             <th>Description</th>
                             <th>Amount</th>
                         </tr>
@@ -141,6 +147,7 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $transaction->created_at }}</td>
+                                <td>{{ $transaction->type }}</td>
                                 <td>
                                     @if ($transaction->order_id)
                                         Order ID: #{{ $transaction->order_id }}

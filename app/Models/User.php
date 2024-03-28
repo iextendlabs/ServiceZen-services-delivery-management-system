@@ -26,7 +26,8 @@ class User extends Authenticatable
         'device_token',
         'last_notification_id',
         'customer_source',
-        'status'
+        'status',
+        'affiliate_program'
     ];
 
     /**

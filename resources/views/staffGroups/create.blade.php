@@ -57,7 +57,7 @@
                             <th>Email</th>
                         </tr>
                         @foreach ($users as $staff)
-                        @if($staff->getRoleNames() == '["Staff"]')
+                        @if($staff->hasRole("Staff"))
                         <tr>
                             <td>
                                 <input type="checkbox" name="staffIds[{{ ++$i }}]" value="{{ $staff->id }}">

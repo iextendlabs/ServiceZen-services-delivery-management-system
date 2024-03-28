@@ -52,7 +52,7 @@
                     <select name="supervisor_id" class="form-control">
                         <option></option>
                         @foreach($supervisors as $supervisor)
-                        @if($supervisor->getRoleNames() == '["Supervisor"]')
+                        @if($supervisor->hasRole("Supervisor"))
                         @if(count($assistant_supervisor->AssistantSupervisorToSupervisor))
                         @foreach($assistant_supervisor->AssistantSupervisorToSupervisor as $assistantSupervisorToSupervisor)
                         @if($supervisor->id == $assistantSupervisorToSupervisor->supervisor_id)

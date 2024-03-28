@@ -17,7 +17,7 @@
         </ul>
     </div>
     @endif
-    @if(Auth::User()->getRoleNames() == '["Staff"]')
+    @if(Auth::User()->hasRole("Staff"))
 
     <div class="text-right mb-2">
 

@@ -19,7 +19,7 @@
     @endif
     <hr>
     <div class="row">
-        @if(auth()->user()->getRoleNames() != '["Staff"]')
+        @if(!auth()->user()->hasRole("Staff"))
         <!-- Second Column (Filter Form) -->
         <div class="col-md-12">
             <h3>Filter</h3>

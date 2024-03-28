@@ -8,7 +8,7 @@
         <th><i class="fas fa-clock"></i> Appointment Date</th>
         <th><i class="fas fa-clock"></i> Slots</th>
 
-        @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+        @if (auth()->user()->hasRole("Supervisor"))
         <th>Landmark</th>
         <th>Area</th>
         <th>City</th>
@@ -37,7 +37,7 @@
             <i class="fas fa-car"></i> {{ $order->driver ? $order->driver->name : 'N/A' }}</td>
         <td>{{ $order->date }}</td>
         <td>{{ $order->time_slot_value }}</td>
-        @if (auth()->user()->getRoleNames() == '["Supervisor"]')
+        @if (auth()->user()->hasRole("Supervisor"))
         <td>{{ $order->landmark }}</td>
         <td>{{ $order->area }}</td>
         <td>{{ $order->city }}</td>
@@ -58,7 +58,7 @@
             @endif
             @endcan
             @if($order->status == 'Complete') <br><br>
-            @if(auth()->user()->getRoleNames() != '["Supervisor"]')
+            @if(!auth()->user()->hasRole("Supervisor"))
             @if(!$order->cashCollection)
             <a href="{{ route('cashCollection.create',$order->id) }}">
                 <i class="fas fa-money-bill"></i> Create
@@ -85,9 +85,9 @@
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
                         @endcan
                         @can('order-status-edit')
-                        @if(auth()->user()->getRoleNames() == '["Supervisor"]' && $order->status == 'Pending')
+                        @if(auth()->user()->hasRole("Supervisor") && $order->status == 'Pending')
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
-                        @elseif(auth()->user()->getRoleNames() != '["Supervisor"]')
+                        @elseif(!auth()->user()->hasRole("Supervisor"))
                         <a class="dropdown-item" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
                         @endif
                         @endcan
@@ -124,7 +124,7 @@
                 </button>
                 @endcan
             </form>
-            @if ($order->status !== 'Complete' && Auth::User()->getRoleNames() == '["Staff"]')
+            @if ($order->status !== 'Complete' && Auth::User()->hasRole("Staff"))
             @if ($order->status == 'Confirm')
             <a class="btn btn-sm btn-success" href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
                 <i class="fas fa-thumbs-up"></i>

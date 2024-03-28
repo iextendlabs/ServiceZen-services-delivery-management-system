@@ -129,7 +129,7 @@
                             <select name="driver_id" class="form-control">
                                 <option></option>
                                 @foreach ($users as $driver)
-                                @if($driver->getRoleNames() == '["Driver"]')
+                                @if($driver->hasRole("Driver"))
                                 <option value="{{ $driver->id }}" @if($serviceStaff->staff->driver_id == $driver->id) selected @endif>{{ $driver->name }}</option>
                                 @endif
                                 @endforeach
@@ -147,7 +147,7 @@
                                     <th>Email</th>
                                 </tr>
                                 @foreach ($users as $user)
-                                @if($user->getRoleNames() == '["Supervisor"]')
+                                @if($user->hasRole("Supervisor"))
                                 <tr>
                                     <td>
                                         <input type="checkbox" @if(in_array($user->id,$supervisor_ids)) checked @endif name="ids[]" value="{{ $user->id }}">

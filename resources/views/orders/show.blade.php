@@ -17,9 +17,9 @@
                 @endcan
 
                 @can('order-status-edit')
-                @if(auth()->user()->getRoleNames() == '["Supervisor"]' && $order->status == 'Pending')
+                @if(auth()->user()->hasRole("Supervisor") && $order->status == 'Pending')
                 <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
-                @elseif(auth()->user()->getRoleNames() != '["Supervisor"]')
+                @elseif(!auth()->user()->hasRole("Supervisor"))
                 <a class="btn btn-info mb-2 ms-md-2" href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
                 @endif
                 @endcan
@@ -230,7 +230,7 @@
                     <th>Staff</th>
                     <th>Order Sub Total</th>
                     <th>Commission</th>
-                    @if(auth()->user()->getRoleNames() != '["Staff"]')
+                    @if(!auth()->user()->hasRole("Staff"))
                     <th class="no-print">Action</th>
                     @endif
                 </tr>
@@ -245,7 +245,7 @@
                         <td>{{ $order->staff_name }}</td>
                         <td>@currency($order->order_total->sub_total)</td>
                         <td>@currency($staff_commission)</td>
-                        @if(auth()->user()->getRoleNames() != '["Staff"]')
+                        @if(!auth()->user()->hasRole("Staff"))
                         <td class="no-print">
                             @if(empty($order->getStaffTransactionStatus()))
                             @can('order-edit')
@@ -261,7 +261,7 @@
             </table>
         </fieldset>
         @endif
-        @if(auth()->user()->getRoleNames() != '["Staff"]')
+        @if(!auth()->user()->hasRole("Staff"))
         @if($affiliate_commission)
         <fieldset>
             <legend>Affiliate Commission</legend>

@@ -38,9 +38,9 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $affiliate->name }}</td>
                     <td>{{ $affiliate->email }}</td>
-                    <td>{{ $affiliate->affiliate->commission }}%</td>
-                    <td>{{ $affiliate->affiliate->code }}</td>
-                    <td> @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})</td>
+                    <td>{{ $affiliate->affiliate->commission ?? "" }}</td>
+                    <td>{{ $affiliate->affiliate->code ?? "" }}</td>
+                    <td> @if($affiliate->affiliate && $affiliate->affiliate->fix_salary) {{ "AED".$affiliate->affiliate->fix_salary }} (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary ?? "" }}) @endif</td>
 
                     <td>
                         <form id="deleteForm{{ $affiliate->id }}" action="{{ route('affiliates.destroy',$affiliate->id) }}" method="POST">

@@ -584,7 +584,7 @@ class OrderController extends Controller
                     $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $affiliate_commission;
-                    $input['type'] = "Order Commission";
+                    $input['type'] = "Order Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
@@ -593,7 +593,7 @@ class OrderController extends Controller
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $staff_commission;
-                    $input['type'] = "Order Commission";
+                    $input['type'] = "Order Staff Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
@@ -699,12 +699,10 @@ class OrderController extends Controller
                 }
 
                 if ($affiliate_id && !isset($affiliate_transaction) && $affiliate_commission > 0) {
-                    $staff_commission = (($order->order_total->sub_total - $order->order_total->staff_charges - $order->order_total->transport_charges - $order->order_total->discount) * $order->staff->commission) / 100;
-
                     $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $affiliate_commission;
-                    $input['type'] = "Order Commission";
+                    $input['type'] = "Order Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
@@ -713,7 +711,7 @@ class OrderController extends Controller
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $staff_commission;
-                    $input['type'] = "Order Commission";
+                    $input['type'] = "Order Staff Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
