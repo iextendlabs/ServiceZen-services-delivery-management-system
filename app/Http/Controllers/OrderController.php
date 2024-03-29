@@ -396,10 +396,9 @@ class OrderController extends Controller
 
         [$affiliate_commission, $staff_commission,$affiliate_id] = $order->commissionCalculation();
 
-        $affiliate_transaction = Transaction::where('user_id', $affiliate_id)->where('order_id', $order->id)->value('status');
         $affiliate = User::find($affiliate_id);
         $statuses = config('app.order_statuses');
-        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission','affiliate_transaction','affiliate'));
+        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission','affiliate','affiliate_id'));
     }
 
     public function edit($id, Request $request)
