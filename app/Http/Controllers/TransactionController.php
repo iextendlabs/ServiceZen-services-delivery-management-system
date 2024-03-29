@@ -35,38 +35,35 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate([
+        $request->validate([
             'amount' => 'required',
         ]);
 
         $input = $request->all();
 
         $input['status'] = "Approved";
-        if ($request->input('submit_type') == "transaction") {
 
-            if ($request->type == "Credit") {
-
-                $input['amount'] = '-' . $request->amount;
-                Transaction::create($input);
-            } elseif ($request->type == "Pay Salary") {
-
-                $input['amount'] = $request->amount;
-                Transaction::create($input);
-
-                $input['amount'] = '-' . $request->amount;
-                Transaction::create($input);
-            } else {
-
-                $input['amount'] = $request->amount;
-                Transaction::create($input);
+        if ($request->has('submit_type') && $request->input('submit_type') == "transaction") {
+            if ($request->has('type')) {
+                if ($request->type == "Credit") {
+                    $input['amount'] = '-' . $request->amount;
+                } elseif ($request->type == "Pay Salary") {
+                    Transaction::create([
+                        'amount' => $request->amount,
+                        'status' => 'Approved',
+                    ]);
+                    Transaction::create([
+                        'amount' => '-' . $request->amount,
+                        'status' => 'Approved',
+                    ]);
+                    return redirect()->back()->with('success', 'Transactions successfully Approved.');
+                }
             }
-        } else {
-            $input['type'] = "Order Commission";
-            Transaction::create($input);
         }
 
-        return redirect()->back()
-            ->with('success', 'Transaction successfully Approved.');
+        Transaction::create($input);
+
+        return redirect()->back()->with('success', 'Transaction successfully Approved.');
     }
 
     /**
@@ -86,9 +83,9 @@ class TransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Transaction $transaction)
     {
-        //
+        return view('transactions.edit',compact('transaction'));
     }
 
     /**
@@ -100,7 +97,15 @@ class TransactionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'amount' => 'required',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update($request->all());
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Transaction successfully Approved.');
     }
 
     /**
@@ -122,7 +127,7 @@ class TransactionController extends Controller
     public function Unapprove(Request $request)
     {
         
-        $transaction = Transaction::where('order_id',$request->order_id)->where('user_id',$request->user_id);
+        $transaction = Transaction::find($request->id);
 
         $transaction->delete();
 

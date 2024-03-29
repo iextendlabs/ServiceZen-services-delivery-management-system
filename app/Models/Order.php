@@ -95,14 +95,38 @@ class Order extends Model
         })->values()->toArray();
     }
 
-    public function getStaffTransactionStatus()
+    public function getStaffTransactionStatus($type = null)
     {
-        return Transaction::where('user_id', $this->staff->user_id)->where('order_id', $this->id)->value('status');
+        $query = Transaction::where('user_id', $this->staff->user_id)->where('order_id', $this->id);
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        $transaction = $query->first(); // Retrieve the first transaction matching the criteria
+
+        if ($transaction) {
+            return $transaction;
+        }
+
+        return null;
     }
 
-    public function getAffiliateTransactionStatus()
+    public function getAffiliateTransactionStatus($affiliate_id, $type = null)
     {
-        return Transaction::where('user_id', $this->affiliate->id)->where('order_id', $this->id)->value('status');
+        $query = Transaction::where('user_id', $affiliate_id)->where('order_id', $this->id);
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        $transaction = $query->first();
+
+        if ($transaction) {
+            return $transaction;
+        }
+
+        return null;
     }
 
     public function driver()
@@ -169,6 +193,6 @@ class Order extends Model
             $affiliate_id = $this->affiliate_id;
         }
 
-        return [$affiliate_commission, $staff_commission,$affiliate_id];
+        return [$affiliate_commission, $staff_commission, $affiliate_id];
     }
 }
