@@ -1,6 +1,6 @@
 @extends('site.layout.app')
 @section('content')
-    <div class="container">
+    <div class="container py-5">
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
