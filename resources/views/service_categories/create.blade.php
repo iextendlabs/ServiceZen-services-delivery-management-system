@@ -58,6 +58,16 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Type:</strong>
+                    <select name="type" class="form-control">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Both">Both</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Parent Category:</strong>
                     <select name="parent_id" class="form-control">
                         <option></option>

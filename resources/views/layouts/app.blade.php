@@ -161,6 +161,9 @@
                                 @can('information-list')
                                 <a class="dropdown-item" href="{{ route('information.index') }}">Information Page</a>
                                 @endcan
+                                @can('complaint-list')
+                                <a class="dropdown-item" href="{{ route('complaints.index') }}">Complaints</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan

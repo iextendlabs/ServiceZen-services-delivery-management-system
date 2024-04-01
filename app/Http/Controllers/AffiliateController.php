@@ -81,6 +81,12 @@ class AffiliateController extends Controller
         $input = $request->all();
 
         $input['password'] = Hash::make($input['password']);
+        if ($request->number) {
+            $input['number'] = $request->number_country_code . $request->number;
+        }
+        if ($request->whatsapp) {
+            $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
+        }
 
         $affiliate = User::create($input);
 
@@ -140,7 +146,7 @@ class AffiliateController extends Controller
     {
         $affiliate_join = $request->affiliate_join;
         $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->get();
-        return view('affiliates.edit', compact('affiliate', 'affiliateUser','affiliate_join'));
+        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join'));
     }
 
     /**
@@ -156,7 +162,7 @@ class AffiliateController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
-            'code' => 'required|unique:affiliates,code,'.$request->affiliate_id,
+            'code' => 'required|unique:affiliates,code,' . $request->affiliate_id,
             'commission' => 'required',
             'selectedCustomerId' => [
                 'nullable',
@@ -173,20 +179,30 @@ class AffiliateController extends Controller
             $input = Arr::except($input, array('password'));
         }
 
+        if ($request->number) {
+            $input['number'] = $request->number_country_code . $request->number;
+        }
+
+        if ($request->whatsapp) {
+            $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
+        }
+
         $user = User::find($id);
-        if($input['affiliate_id']){
+        if ($input['affiliate_id']) {
             $affiliate = Affiliate::find($input['affiliate_id']);
             $affiliate->update($input);
         }
-        
-        if($request->affiliate_join == 1){
-            // dd("Ad");
-            $input['user_id'] = $id;
-            Affiliate::create($input);
 
-            $input['affiliate_program'] = 1;
+        if ($request->affiliate_join == 1) {
+            if ($input['affiliate_id']) {
+                $affiliate->update($input);
+            }else{
+                $input['user_id'] = $id;
+                Affiliate::create($input);
+            }
             
-            $user->assignRole('Affiliate');
+            $input['affiliate_program'] = 1;
+
         }
         if ($input['display_type'] == 2) {
             UserAffiliate::where('affiliate_id', $id)->update(['display' => null]);
@@ -195,6 +211,9 @@ class AffiliateController extends Controller
                 ->where('affiliate_id', $id)
                 ->update(['display' => 1]);
         }
+
+        $user->assignRole('Affiliate');
+
         $user->update($input);
         $previousUrl = $request->url;
         return redirect($previousUrl)

@@ -45,7 +45,19 @@ class CustomerAuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:password_confirmation',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
-        ]);
+            'number' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return $request->type === "affiliate";
+                }),
+            ],
+            'whatsapp' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return $request->type === "affiliate";
+                }),
+            ],
+        ]);        
 
         
         $input = $request->all();
@@ -59,6 +71,17 @@ class CustomerAuthController extends Controller
         $customer = User::create($input);
 
         $customer->assignRole('Customer');
+
+        if($request->type == "affiliate"){
+            $input['user_id'] = $customer->id;
+            if ($request->number) {
+                $input['number'] = $request->number_country_code . $request->number;
+            }
+            if ($request->whatsapp) {
+                $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
+            }
+            Affiliate::create($input);
+        }
 
         if ($request->affiliate_code) {
             $affiliate = Affiliate::where('code', $request->affiliate_code)->first();

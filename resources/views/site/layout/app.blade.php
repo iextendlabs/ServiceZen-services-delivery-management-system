@@ -176,6 +176,7 @@ $cart_product = 0;
               @if(Auth::user()->affiliate_program == null && !Auth::user()->hasRole("Affiliate"))
               <a class="dropdown-item" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
               @endif
+              <a class="dropdown-item" href="{{ route('siteComplaints.index') }}">My Complaint</a>
               <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
               <a class="dropdown-item" href="/customer-logout">Logout</a>
               <a class="dropdown-item" href="/deleteAccount">Delete Account</a>

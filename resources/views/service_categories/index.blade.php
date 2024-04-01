@@ -31,6 +31,7 @@
             <th>Title</th>
             <th>Description</th>
             <th>Status</th>
+            <th>Type</th>
             <th width="280px">Action</th>
         </tr>
         @if(count($service_categories))
@@ -40,6 +41,7 @@
             <td><a href="{{ route('services.index', ['category_id' => $service_category->id]) }}">{{ $service_category->title }}</a></td>
             <td>{{ $service_category->description }}</td>
             <td>@if($service_category->status) Enable @else Disable @endif</td>
+            <td>{{ $service_category->type }}</td>
             <td>
                 <form id="deleteForm{{ $service_category->id }}" action="{{ route('serviceCategories.destroy',$service_category->id) }}" method="POST">
                     @can('FAQs-create')

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceCategory extends Model
 {
-    protected $fillable = ['title', 'description','parent_id','status'];
+    protected $fillable = ['title', 'description','parent_id','status','type'];
     
     public function service()
     {

@@ -36,6 +36,7 @@ use App\Http\Controllers\{
     ChatController,
     CompanyController,
     CkeditorController,
+    ComplaintController,
     InformationController
 };
 
@@ -54,6 +55,7 @@ use App\Http\Controllers\Site\{
     SiteReviewsController,
     StaffProfileController,
     InformationPageController,
+    SiteComplaintController,
     SiteInformationController,
 };
 
@@ -163,6 +165,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/services_edit/{id}', [OrderController::class, 'services_edit'])->name('orders.services_edit');
 
     Route::resource('affiliateProgram', AffiliateProgramController::class);
+    Route::resource('complaints', ComplaintController::class);
 
 });
 
@@ -242,3 +245,4 @@ Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affili
 Route::post('/apply-coupon', [CheckOutController::class,'applyCoupon'])->name('apply.coupon');
 Route::post('/apply-affiliate', [CustomerAuthController::class,'applyAffiliate'])->name('apply.affiliate');
 Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffiliateProgram'])->name('apply.affiliateProgram');
+Route::resource('siteComplaints', SiteComplaintController::class);
