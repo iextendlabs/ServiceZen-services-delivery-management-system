@@ -34,17 +34,17 @@
                                 <td>{{ $user->affiliate_program === '1' ? 'Accepted' : 'Rejected' }}</td>
                                 <td>
                                     @if($user->affiliate_program === '0')
-                                    <a class="btn btn-sm btn-success" href="{{ route('affiliateProgram.edit', $user->id) }}?status=Accepted">
+                                    <a class="btn btn-success" href="{{ route('affiliateProgram.edit', $user->id) }}?status=Accepted">
                                         <i class="fas fa-thumbs-up"></i>
                                     </a>
                                     @elseif ($user->affiliate_program === '1')
-                                    <a class="btn btn-sm btn-danger" href="{{ route('affiliateProgram.edit', $user->id) }}?status=Rejected">
+                                    <a class="btn btn-danger" href="{{ route('affiliateProgram.edit', $user->id) }}?status=Rejected">
                                         <i class="fas fa-thumbs-down"></i>
                                     </a>
-                                    <a class="btn btn-sm btn-primary" href="{{ route('affiliates.edit', $user->id) }}">
+                                    <a class="btn btn-primary" href="{{ route('affiliates.edit', $user->id) }}">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a class="btn btn-sm btn-warning" href="{{ route('affiliates.show', $user->id) }}">
+                                    <a class="btn btn-warning" href="{{ route('affiliates.show', $user->id) }}">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     @endif

@@ -132,8 +132,17 @@ class AffiliateController extends Controller
             ->where('created_at', '>=', $currentMonth)
             ->where('user_id', $affiliate->id)
             ->sum('amount');
+            
+        $affiliateUser = [];
 
-        return view('affiliates.show', compact('affiliate', 'pkrRateValue', 'transactions', 'total_balance', 'total_balance_in_pkr', 'product_sales', 'bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        if ($affiliate->affiliate) {
+            if ($affiliate->affiliate->display_type == 1) {
+                $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->paginate(config('app.paginate'));
+            } elseif ($affiliate->affiliate->display_type == 2) {
+                $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->where('display', 1)->paginate(config('app.paginate'));
+            }
+        }
+        return view('affiliates.show', compact('affiliate', 'pkrRateValue', 'transactions', 'total_balance', 'total_balance_in_pkr', 'product_sales', 'bonus', 'affiliateUser'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -196,13 +205,12 @@ class AffiliateController extends Controller
         if ($request->affiliate_join == 1) {
             if ($input['affiliate_id']) {
                 $affiliate->update($input);
-            }else{
+            } else {
                 $input['user_id'] = $id;
                 Affiliate::create($input);
             }
-            
-            $input['affiliate_program'] = 1;
 
+            $input['affiliate_program'] = 1;
         }
         if ($input['display_type'] == 2) {
             UserAffiliate::where('affiliate_id', $id)->update(['display' => null]);
