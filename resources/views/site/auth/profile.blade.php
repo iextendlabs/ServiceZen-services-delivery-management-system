@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
         <div class="row py-5">
-            <div class="col-md-6">
+            <div class="col-md-6 d-flex align-items-center">
                 <h2>Profile</h2>
             </div>
-            <div class="col-md-6 justify-content-end d-flex">
+            <div class="col-md-6 d-flex justify-content-end align-items-center">
                 @if (auth()->user()->hasRole('Affiliate'))
                     <a class="btn btn-success" href="/affiliate_dashboard">Affiliate Dashborad</a>
                 @endif
