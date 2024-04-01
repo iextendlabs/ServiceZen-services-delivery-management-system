@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'complaint-list',
+            'complaint-create',
+            'complaint-edit',
+            'complaint-delete',
             'information-list',
             'information-create',
             'information-edit',

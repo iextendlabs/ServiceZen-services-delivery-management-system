@@ -85,12 +85,13 @@
                     <a class="btn btn-info" href="{{ route('order.show', $order->id) }}"><i class="fas fa-eye"></i> </a>
                     <a class="btn btn-primary" href="{{ route('order.reOrder',$order->id) }}">ReOrder </a>
                     @endif
+                    <a class="btn btn-warning" href="{{ route('siteComplaints.create', ['order_id' => $order->id]) }}">Add Complaint</a>
                 </td>
             </tr>
             @endforeach
             @if(count($orders) == 0)
             <tr>
-                <td colspan="7" class="text-center"> There is no Order</td>
+                <td colspan="10" class="text-center"> There is no Order</td>
             </tr>
             @endif
         </table>

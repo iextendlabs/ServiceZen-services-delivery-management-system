@@ -18,8 +18,8 @@
             </div>
         @endif
         <form action="{{ route('affiliates.update', $affiliate->id) }}" method="POST">
-            <input type="hidden" value="{{ $affiliate->affiliate->id  ?? ""}}" name="affiliate_id" />
-            <input type="hidden" value="{{ $affiliate_join}}" name="affiliate_join" />
+            <input type="hidden" value="{{ $affiliate->affiliate->id ?? '' }}" name="affiliate_id" />
+            <input type="hidden" value="{{ $affiliate_join }}" name="affiliate_join" />
             <input type="hidden" name="url" value="{{ url()->previous() }}" />
             @csrf @method('PUT')
             <div class="row">
@@ -50,18 +50,34 @@
                             placeholder="Confirm Password" />
                     </div>
                 </div>
-                <hr />
+                <hr>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Phone Number:</strong>
+                        <input id="number_country_code" type="hidden" name="number_country_code" />
+                        <input type="tel" id="number" name="number" value="{{ $affiliate->affiliate->number ?? '' }}"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Whatsapp Number:</strong>
+                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                        <input type="tel" id="whatsapp" name="whatsapp"
+                            value="{{ $affiliate->affiliate->whatsapp ?? '' }}" class="form-control">
+                    </div>
+                </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Code:</strong>
-                        <input type="text" name="code" value="{{ $affiliate->affiliate->code ?? "" }}" class="form-control"
-                            placeholder="Code" />
+                        <input type="text" name="code" value="{{ $affiliate->affiliate->code ?? '' }}"
+                            class="form-control" placeholder="Code" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Commission:</strong>
-                        <input type="number" name="commission" value="{{ $affiliate->affiliate->commission ?? "" }}"
+                        <input type="number" name="commission" value="{{ $affiliate->affiliate->commission ?? '' }}"
                             class="form-control" placeholder="Commission In %" />
                     </div>
                 </div>
@@ -69,13 +85,13 @@
                     <div class="form-group">
                         <strong>Expire after days:</strong>
                         <input type="number" name="expire" class="form-control"
-                            value="{{ $affiliate->affiliate->expire ?? "" }}" placeholder="Enter days like 20" />
+                            value="{{ $affiliate->affiliate->expire ?? '' }}" placeholder="Enter days like 20" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Fix Salary:</strong>
-                        <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary ?? "" }}"
+                        <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary ?? '' }}"
                             class="form-control" placeholder="Fix Salary" />
                     </div>
                 </div>

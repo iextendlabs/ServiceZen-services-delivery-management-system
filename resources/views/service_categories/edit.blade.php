@@ -60,6 +60,16 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Type:</strong>
+                    <select name="type" class="form-control">
+                        <option value="Male" @if($service_category->type === "Male") selected @endif>Male</option>
+                        <option value="Female" @if($service_category->type === "Female") selected @endif>Female</option>
+                        <option value="Both" @if($service_category->type === "Both") selected @endif>Both</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Parent Category:</strong>
                     <select name="parent_id" class="form-control">
                         <option></option>
