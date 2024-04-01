@@ -111,8 +111,9 @@
                         <tr>
                             <th>Sr#</th>
                             <th>Name</th>
-                            <th>Emali</th>
+                            <th>Email</th>
                             <th>Number</th>
+                            <th>Whatsapp</th>
                             <th>Zone</th>
                         </tr>
                         @foreach ($affiliateUser as $user)
@@ -121,6 +122,7 @@
                                 <td>{{ $user->customer->name ?? "" }}</td>
                                 <td>{{ $user->customer->email ?? "" }}</td>
                                 <td>{{ $user->customer->customerProfile->number ?? "" }}</td>
+                                <td>{{ $user->customer->customerProfile->whatsapp ?? "" }}</td>
                                 <td>{{ $user->customer->customerProfile->area ?? "" }}</td>
                             </tr>
                         @endforeach
@@ -128,7 +130,7 @@
                     {!! $affiliateUser->links() !!}
                 @else
                     <div class="text-center">
-                        <h4>There are no Cutomer</h4>
+                        <h4>There are no Customer</h4>
                     </div>
                 @endif
             </div>
