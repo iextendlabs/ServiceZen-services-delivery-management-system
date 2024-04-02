@@ -20,4 +20,9 @@ class Complaint extends Model
     {
         return $this->hasOne(Order::class, 'id', 'order_id');
     }
+
+    public function chats()
+    {
+        return $this->hasMany(ComplaintChat::class, 'complaint_id', 'id');
+    }
 }
