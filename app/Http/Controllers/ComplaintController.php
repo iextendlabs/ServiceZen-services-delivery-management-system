@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Complaint;
+use App\Models\ComplaintChat;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -150,5 +151,19 @@ class ComplaintController extends Controller
 
         return redirect($previousUrl)
             ->with('success', 'Complaint deleted successfully');
+    }
+
+    public function addComplaintChat(Request $request)
+    {
+        $this->validate($request, [
+            'text' => 'required',
+        ]);
+
+        $input = $request->all();
+        $input['user_id'] = auth()->user()->id;
+        ComplaintChat::create($input);
+
+        return redirect()->back()
+            ->with('success', 'Message send successfully.');
     }
 }

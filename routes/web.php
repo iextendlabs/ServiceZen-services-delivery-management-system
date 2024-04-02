@@ -166,6 +166,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('affiliateProgram', AffiliateProgramController::class);
     Route::resource('complaints', ComplaintController::class);
+    Route::post('/add-complaint-chat', [ComplaintController::class, 'addComplaintChat'])->name('complaints.addComplaintChat');
 
 });
 
