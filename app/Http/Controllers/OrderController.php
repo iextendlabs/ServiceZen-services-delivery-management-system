@@ -64,6 +64,8 @@ class OrderController extends Controller
             'driver_status' => $request->driver_status,
             'driver' => $request->driver_id,
             'zone' => $request->zone,
+            'date_to' => $request->date_to,
+            'date_from' => $request->date_from
         ];
         $currentUser = Auth::user();
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
@@ -132,6 +134,22 @@ class OrderController extends Controller
             $query->where('customer_name', 'like', '%' . $request->customer . '%')->orWhere('customer_email', 'like', '%' . $request->customer . '%');
         }
 
+        if ($request->customer_id) {
+            $query->where('customer_id', '=', $request->customer_id);
+        }
+
+        if($request->date_to && $request->date_from){
+            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
+        }else{
+            if ($request->date_to) {
+                $query->whereDate('created_at', '=', $request->date_to);
+            }
+    
+            if ($request->date_from) {
+                $query->whereDate('created_at', '=', $request->date_from);
+            }
+        }
+        
         if ($request->staff_id) {
             $query->where('service_staff_id', '=', $request->staff_id);
         }
@@ -209,7 +227,7 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id']);
+            $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id']);
             $orders->appends($filters);
             return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }

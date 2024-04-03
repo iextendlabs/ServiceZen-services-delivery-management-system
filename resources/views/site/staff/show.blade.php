@@ -55,7 +55,7 @@ $reviewsCarousel_chunk = 3;
             <div class="col-md-12 text-center">
                 <hr>
                 <h5>
-                    <strong>Delivered Order: {{ count($user->orders) }}</strong>
+                    <strong>Delivered Order: {{ count($user->staffOrders) }}</strong>
                 </h5>
             </div>
             <!-- Social Links -->
