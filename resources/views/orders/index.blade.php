@@ -211,7 +211,16 @@
                                     </select>
                                 </div>
                             </div>
-                            
+                            <div class="col-md-4">
+                                <strong>Date From:</strong>
+                                <input type="date" name="date_from" class="form-control"
+                                    value="{{ $filter['date_from'] }}">
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Date To:</strong>
+                                <input type="date" name="date_to" class="form-control"
+                                    value="{{ $filter['date_to'] }}">
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4 offset-md-8">

@@ -146,9 +146,14 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'staff_supervisor', 'staff_id', 'supervisor_id');
     }
 
-    public function orders()
+    public function staffOrders()
     {
         return $this->hasMany(Order::class, 'service_staff_id');
+    }
+
+    public function customerOrders()
+    {
+        return $this->hasMany(Order::class, 'customer_id');
     }
     //  TODO Use Quey to send notification
     public function notifyOnMobile($title, $body, $order_id = null)
