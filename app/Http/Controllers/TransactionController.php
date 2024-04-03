@@ -46,24 +46,29 @@ class TransactionController extends Controller
         if ($request->has('submit_type') && $request->input('submit_type') == "transaction") {
             if ($request->has('type')) {
                 if ($request->type == "Credit") {
+
                     $input['amount'] = '-' . $request->amount;
+                    Transaction::create($input);
                 } elseif ($request->type == "Pay Salary") {
-                    Transaction::create([
-                        'amount' => $request->amount,
-                        'status' => 'Approved',
-                    ]);
-                    Transaction::create([
-                        'amount' => '-' . $request->amount,
-                        'status' => 'Approved',
-                    ]);
-                    return redirect()->back()->with('success', 'Transactions successfully Approved.');
+
+                    $input['amount'] = $request->amount;
+                    Transaction::create($input);
+
+                    $input['amount'] = '-' . $request->amount;
+                    Transaction::create($input);
+                } else {
+
+                    $input['amount'] = $request->amount;
+                    Transaction::create($input);
                 }
+            } else {
+                $input['type'] = "Order Commission";
+                Transaction::create($input);
             }
+
+            return redirect()->back()
+                ->with('success', 'Transaction successfully Approved.');
         }
-
-        Transaction::create($input);
-
-        return redirect()->back()->with('success', 'Transaction successfully Approved.');
     }
 
     /**
@@ -85,7 +90,7 @@ class TransactionController extends Controller
      */
     public function edit(Transaction $transaction)
     {
-        return view('transactions.edit',compact('transaction'));
+        return view('transactions.edit', compact('transaction'));
     }
 
     /**
@@ -126,7 +131,7 @@ class TransactionController extends Controller
 
     public function Unapprove(Request $request)
     {
-        
+
         $transaction = Transaction::find($request->id);
 
         $transaction->delete();
