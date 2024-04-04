@@ -113,31 +113,41 @@
                         <td colspan="6">
                             <form action="{{ route('affiliate_dashboard.index') }}" method="GET"
                                 enctype="multipart/form-data">
-
-                                <div class="row">
+                                <div class="row d-flex flex-wrap justify-content-md-center">
                                     <div class="col-md-6">
-                                        <strong>Date From:</strong>
-                                        <input type="date" name="date_from" class="form-control"
-                                            value="{{ $filter_date_from }}">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <strong>Date To:</strong>
-                                        <input type="date" name="date_to" class="form-control"
-                                            value="{{ $filter_date_to }}">
+                                        <div class="col-md-12">
+                                            <strong>Order Count:</strong>
+                                            <input type="number" name="order_count" class="form-control"
+                                                value="{{ $filter_order_count }}">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <strong>Date From:</strong>
+                                            <input type="date" name="date_from" class="form-control"
+                                                value="{{ $filter_date_from }}">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <strong>Date To:</strong>
+                                            <input type="date" name="date_to" class="form-control"
+                                                value="{{ $filter_date_to }}">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-4 offset-md-8">
-                                        <div class="d-flex flex-wrap justify-content-md-end">
-                                            <div class="col-md-3">
-                                                <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
-                                            </div>
-                                            <div class="col-md-9">
-                                                <button type="submit" class="btn btn-block btn-primary">Filter</button>
+                                <div class="row d-flex flex-wrap justify-content-md-center">
+                                    <div class="col-md-6 mt-3">
+                                        <div class="col-md-8 offset-md-4">
+                                            <div class="d-flex flex-wrap justify-content-md-end">
+                                                <div class="col-md-3">
+                                                    <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <button type="submit"
+                                                        class="btn btn-block btn-primary">Filter</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                             </form>
                         </td>
                     </tr>
@@ -148,6 +158,7 @@
                             <th>Sr#</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Orders</th>
                             <th>Number</th>
                             <th>Whatsapp</th>
                             <th>Zone</th>
@@ -157,6 +168,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->customer->name ?? '' }}</td>
                                 <td>{{ $user->customer->email ?? '' }}</td>
+                                <td>{{ $filter_order_count ? $filter_order_count : count($user->customer->customerOrders) }}</td>
                                 <td>{{ $user->customer->customerProfile->number ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfile->whatsapp ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfile->area ?? '' }}</td>

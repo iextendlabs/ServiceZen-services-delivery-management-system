@@ -139,7 +139,9 @@ class OrderController extends Controller
         }
 
         if($request->date_to && $request->date_from){
-            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
+            $dateFrom = $request->date_from;
+            $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
         }else{
             if ($request->date_to) {
                 $query->whereDate('created_at', '=', $request->date_to);
