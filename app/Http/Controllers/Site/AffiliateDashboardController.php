@@ -10,6 +10,7 @@ use App\Models\UserAffiliate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AffiliateDashboardController extends Controller
 {
@@ -74,46 +75,94 @@ class AffiliateDashboardController extends Controller
                             ->where('display', 1);
                     }
 
-                    if ($request->order_count !== null && $request->date_to === null && $request->date_from === null) {
+                    if ($request->order_count === "0") {
+                        $affiliateUserQuery->leftJoin('orders', 'orders.customer_id', '=', 'users.id')
+                            ->select('users.*')
+                            ->groupBy('users.id')
+                            ->havingRaw('COUNT(orders.id) = 0');
+                    } elseif (isset($request->order_count)) {
                         $affiliateUserQuery->whereHas('customer.customerOrders', function ($subQuery) use ($request) {
-                            $subQuery->havingRaw('COUNT(*) = ?', [(int)$request->order_count]);
+                            $subQuery->whereExists(function ($query) use ($request) {
+                                $query->select(DB::raw(1))
+                                    ->from('orders')
+                                    ->whereColumn('orders.customer_id', 'users.id')
+                                    ->groupBy('orders.customer_id')
+                                    ->havingRaw('COUNT(*) = ?', [(int)$request->order_count]);
+                            });
                         });
                     }
 
                     if ($request->date_to && $request->date_from) {
                         $dateFrom = $request->date_from;
                         $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
-                        $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($dateFrom, $dateTo, $request) {
+                        $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($dateFrom, $dateTo) {
                             $query->whereBetween('created_at', [$dateFrom, $dateTo]);
-                            if ($request->order_count) {
-                                $query->havingRaw('COUNT(*) = ?', [(int) $request->order_count]);
-                            }
                         });
                     } else {
                         if ($request->date_to) {
                             $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($request) {
                                 $query->whereDate('created_at', '=', $request->date_to);
-                                if ($request->order_count) {
-                                    $query->havingRaw('COUNT(*) = ?', [(int) $request->order_count]);
-                                }
                             });
                         }
 
                         if ($request->date_from) {
                             $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($request) {
                                 $query->whereDate('created_at', '=', $request->date_from);
-                                if ($request->order_count) {
-                                    $query->havingRaw('COUNT(*) = ?', [(int) $request->order_count]);
-                                }
                             });
                         }
                     }
+
+                    if ($request->date_to || $request->date_from) {
+                        if ($request->date_to && $request->date_from) {
+                            $dateFrom = $request->date_from;
+                            $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+
+                            $affiliateUserQuery->select('user_affiliate.*')
+                                ->selectSub(function ($query) use ($dateFrom, $dateTo) {
+                                    $query->select(DB::raw('COUNT(*)'))
+                                        ->from('orders')
+                                        ->whereColumn('orders.customer_id', 'user_affiliate.user_id')
+                                        ->whereBetween('created_at', [$dateFrom, $dateTo]);
+                                }, 'order_count');
+                        } else {
+                            if ($request->date_from) {
+                                $affiliateUserQuery->select('user_affiliate.*')
+                                    ->selectSub(function ($query) use ($request) {
+                                        $query->select(DB::raw('COUNT(*)'))
+                                            ->from('orders')
+                                            ->whereColumn('orders.customer_id', 'user_affiliate.user_id')
+                                            ->whereDate('created_at', '=', $request->date_from);
+                                    }, 'order_count');
+                            }
+                            if ($request->date_to) {
+                                $affiliateUserQuery->select('user_affiliate.*')
+                                    ->selectSub(function ($query) use ($request) {
+                                        $query->select(DB::raw('COUNT(*)'))
+                                            ->from('orders')
+                                            ->whereColumn('orders.customer_id', 'user_affiliate.user_id')
+                                            ->whereDate('created_at', '=', $request->date_to);
+                                    }, 'order_count');
+                            }
+                        }
+                    } else {
+                        $affiliateUserQuery->select('user_affiliate.*')
+                            ->selectSub(function ($query) {
+                                $query->select(DB::raw('COUNT(*)'))
+                                    ->from('orders')
+                                    ->whereColumn('orders.customer_id', 'user_affiliate.user_id');
+                            }, 'order_count');
+                    }
+
 
                     $affiliateUser = $affiliateUserQuery->paginate(config('app.paginate'));
                 }
             }
 
-
+            $affiliateUser->appends([
+                'date_from' => $request->date_from,
+                'date_to' => $request->date_to,
+                'order_count' => $request->order_count,
+            ]);
             // dd($affiliateUser);
             return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }

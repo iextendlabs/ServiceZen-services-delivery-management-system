@@ -131,7 +131,10 @@ class OrderController extends Controller
         }
 
         if ($request->customer) {
-            $query->where('customer_name', 'like', '%' . $request->customer . '%')->orWhere('customer_email', 'like', '%' . $request->customer . '%');
+            $query->where(function($query) use ($request) {
+                $query->where('customer_name', 'like', '%' . $request->customer . '%')
+                      ->orWhere('customer_email', 'like', '%' . $request->customer . '%');
+            });
         }
 
         if ($request->customer_id) {

@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Coupon;
-use App\Models\Affiliate;
 use App\Models\UserAffiliate;
 use App\Models\CustomerCoupon;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
 use Illuminate\Support\Arr;
@@ -62,10 +60,20 @@ class CustomerController extends Controller
             });
         }
 
-        if ($request->order_count !== null && $request->date_to === null && $request->date_from === null) {
-            $query->whereHas('customerOrders', function ($subQuery) use ($request) {
-                $subQuery->havingRaw('COUNT(*) = ?', [(int)$request->order_count]);
-            });
+        if (isset($request->order_count)) {
+            if ($request->order_count > 0) {
+                $query->whereHas('customerOrders', function ($subQuery) use ($request) {
+                    $subQuery->whereExists(function ($query) use ($request) {
+                        $query->select(DB::raw(1))
+                              ->from('orders')
+                              ->whereColumn('orders.customer_id', 'users.id')
+                              ->groupBy('orders.customer_id')
+                              ->havingRaw('COUNT(*) = ?', [(int)$request->order_count]);
+                    });
+                });
+            } elseif ($request->order_count == 0) {
+                $query->whereDoesntHave('customerOrders');
+            }
         }
 
         if ($request->date_to && $request->date_from) {
@@ -73,17 +81,11 @@ class CustomerController extends Controller
             $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
             $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo, $request) {
                 $query->whereBetween('created_at', [$dateFrom, $dateTo]);
-                if ($request->order_count) {
-                    $query->havingRaw('COUNT(*) = ?', [(int) $request->order_count]);
-                }
             });
         } else {
             if ($request->date_to) {
                 $query->whereHas('customerOrders', function ($query) use ($request) {
                     $query->whereDate('created_at', '=', $request->date_to);
-                    if ($request->order_count) {
-                        $query->havingRaw('COUNT(*) = ?', [(int) $request->order_count]);
-                    }
                 });
             }
 
@@ -91,9 +93,6 @@ class CustomerController extends Controller
                 if ($request->date_from) {
                     $query->whereHas('customerOrders', function ($query) use ($request) {
                         $query->whereDate('created_at', '=', $request->date_from);
-                        if ($request->order_count) {
-                            $query->havingRaw('COUNT(*) = ?', [(int) $request->order_count]);
-                        }
                     });
                 }
             }

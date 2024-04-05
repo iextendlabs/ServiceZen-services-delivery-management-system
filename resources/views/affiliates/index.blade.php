@@ -27,8 +27,8 @@
                     <th>Sr#</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Commission</th>
-                    <th>Code</th>
+                    <th>Code <br> Commission</th>
+                    <th>Number</th>
                     <th>Salary</th>
                     <th>Action</th>
                 </tr>
@@ -38,8 +38,8 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $affiliate->name }}</td>
                     <td>{{ $affiliate->email }}</td>
-                    <td>{{ $affiliate->affiliate->commission ?? "" }}</td>
-                    <td>{{ $affiliate->affiliate->code ?? "" }}</td>
+                    <td>{{ $affiliate->affiliate->code ?? "" }} <br>{{ $affiliate->affiliate->commission."%" ?? "" }}</td>
+                    <td>{{ $affiliate->affiliate->number ?? "" }}</td>
                     <td> @if($affiliate->affiliate && $affiliate->affiliate->fix_salary) {{ "AED".$affiliate->affiliate->fix_salary }} (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary ?? "" }}) @endif</td>
 
                     <td>

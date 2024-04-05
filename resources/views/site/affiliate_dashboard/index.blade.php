@@ -107,7 +107,7 @@
             <div class="col-md-12">
                 <strong>My Customer</strong>
                 <table class="table table-striped table-bordered album bg-light">
-                    <td class="text-left" colspan="6"><i class="fas fa-filter"></i> Filter Customer by Order Created Date
+                    <td class="text-left" colspan="6"><i class="fas fa-filter"></i> Order Filter
                     </td>
                     <tr>
                         <td colspan="6">
@@ -117,9 +117,21 @@
                                     <div class="col-md-6">
                                         <div class="col-md-12">
                                             <strong>Order Count:</strong>
-                                            <input type="number" name="order_count" class="form-control"
-                                                value="{{ $filter_order_count }}">
+                                            <div class="input-group me-2">
+                                                <input type="number" name="order_count" class="form-control"
+                                                    value="{{ $filter_order_count }}">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="submit">Filter by Count</button>
+                                                </div>
+                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <form action="{{ route('affiliate_dashboard.index') }}" method="GET"
+                                enctype="multipart/form-data">
+                                <div class="row d-flex flex-wrap justify-content-md-center">
+                                    <div class="col-md-6">
                                         <div class="col-md-12">
                                             <strong>Date From:</strong>
                                             <input type="date" name="date_from" class="form-control"
@@ -168,7 +180,8 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->customer->name ?? '' }}</td>
                                 <td>{{ $user->customer->email ?? '' }}</td>
-                                <td>{{ $filter_order_count ? $filter_order_count : count($user->customer->customerOrders) }}</td>
+                                <td>{{ $user->order_count }}
+                                </td>
                                 <td>{{ $user->customer->customerProfile->number ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfile->whatsapp ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfile->area ?? '' }}</td>
