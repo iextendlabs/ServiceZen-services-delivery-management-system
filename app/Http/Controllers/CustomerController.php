@@ -67,6 +67,7 @@ class CustomerController extends Controller
         if ($request->csv == 1 || $request->print == 1) {
             $customers = $query->get();
         } else {
+            $total_customer = $query->count();
             $customers = $query->orderBy('name')->paginate(config('app.paginate'));
         }
     
@@ -132,7 +133,7 @@ class CustomerController extends Controller
             $filters = $request->only(['name', 'email', 'number', 'affiliate_id']);
             $customers->appends($filters);
     
-            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
+            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates', 'total_customer'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

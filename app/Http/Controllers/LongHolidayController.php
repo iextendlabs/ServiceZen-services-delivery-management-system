@@ -23,20 +23,22 @@ class LongHolidayController extends Controller
      */
     public function index(Request $request)
     {
+        $query =  LongHoliday::orderBy('date_start');
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $longHolidays = LongHoliday::whereIn('staff_id', $staffIds)->orderBy('date_start')->paginate(config('app.paginate'));
+            $longHolidays = $query->whereIn('staff_id', $staffIds)->orderBy('date_start')->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $longHolidays = LongHoliday::where('staff_id', Auth::id())->orderBy('date_start')->paginate(config('app.paginate'));
+            $longHolidays = $query->where('staff_id', Auth::id())->orderBy('date_start')->paginate(config('app.paginate'));
         } else {
-            $longHolidays = LongHoliday::orderBy('date_start')->paginate(config('app.paginate'));
         }
+        $total_longHoliday = $query->count();
+        $longHolidays =  $query->paginate(config('app.paginate'));
 
 
-        return view('longHolidays.index', compact('longHolidays'))
+        return view('longHolidays.index', compact('longHolidays', 'total_longHoliday'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

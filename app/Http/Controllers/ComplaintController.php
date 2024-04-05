@@ -53,12 +53,12 @@ class ComplaintController extends Controller
                 $query->where('name', 'like', '%'. $request->user . '%')->orWhere('email', 'like','%'. $request->user . '%');
             });
         }
-
+        $total_complaint = $query->count();
         $complaints = $query->paginate(config('app.paginate'));
 
         $filters = $request->only(['title','order_id','user','status']);
         $complaints->appends($filters);
-        return view('complaints.index', compact('complaints', 'filter'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('complaints.index', compact('complaints', 'filter', 'total_complaint'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

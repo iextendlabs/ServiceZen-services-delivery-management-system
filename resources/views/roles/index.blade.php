@@ -19,6 +19,8 @@
         <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
+    <hr>
+    <h3>Role  ({{ $total_role }})</h3>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>

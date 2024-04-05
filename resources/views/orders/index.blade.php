@@ -238,11 +238,11 @@
                 </div>
             @endif
         </div>
-
         <div class="fluid_container">
             <div class="row">
                 <!-- First Column (Table) -->
                 <div class="col-md-12 mt-3">
+                    <h1>Orders: ({{ $total_order }})</h1>
                     @include('orders.list')
                     {!! $orders->links() !!}
                 </div>

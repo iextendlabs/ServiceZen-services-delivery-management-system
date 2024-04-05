@@ -25,6 +25,7 @@
     </div>
     @endif
     <hr>
+    <h3>Service Categories  ({{ $total_service_categorie }})</h3>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>

@@ -43,6 +43,7 @@ class FAQController extends Controller
         if ($request->category_id) {
             $query->where('category_id', $request->category_id);
         }
+        $total_faq = $query->count();
 
         $FAQs = $query->paginate(config('app.paginate'));
 
@@ -51,7 +52,7 @@ class FAQController extends Controller
 
         $filters = $request->only(['question', 'service_id', 'category_id']);
         $FAQs->appends($filters);
-        return view('FAQs.index', compact('FAQs','filter','services','categories'))
+        return view('FAQs.index', compact('total_faq','FAQs','filter','services','categories'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

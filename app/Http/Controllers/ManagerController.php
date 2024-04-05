@@ -37,11 +37,11 @@ class ManagerController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
-
+        $total_manager = $query->count();
         $managers = $query->paginate(config('app.paginate'));
         $filters = $request->only(['name']);
         $managers->appends($filters);
-        return view('managers.index',compact('managers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('managers.index',compact('total_manager','managers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

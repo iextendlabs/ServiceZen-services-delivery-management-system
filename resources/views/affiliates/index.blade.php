@@ -20,6 +20,7 @@
     </div>
     @endif
     <hr>
+    <h3>Affiliate   ({{ $total_affiliate }})</h3>
     <div class="row">
         <div class="col-md-9">
             <table class="table table-striped table-bordered">

@@ -25,12 +25,14 @@ class ReviewController extends Controller
      */
     public function index()
     {
+        $query = Review::orderBy('id','DESC');
         if(auth()->user()->hasRole('Staff')){
-            $reviews = Review::where('staff_id',auth()->user()->id)->orderBy('id','DESC')->paginate(config('app.paginate'));
+            $reviews = $query->where('staff_id',auth()->user()->id)->orderBy('id','DESC')->paginate(config('app.paginate'));
         }else{
-            $reviews = Review::orderBy('id','DESC')->paginate(config('app.paginate'));
+            $total_review =  $query->count();
+            $reviews = $query->paginate(config('app.paginate'));
         }
-        return view('reviews.index', compact('reviews'))
+        return view('reviews.index', compact('total_review' ,'reviews'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

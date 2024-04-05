@@ -51,6 +51,7 @@
             </form>
         </div>
     </div>
+    <h3>Cash Collections  ({{ $total_cash_collection }})</h3>
     <div class="col-md-12">
         <table class="table table-striped table-bordered table-responsive">
             <tr>

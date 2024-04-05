@@ -27,8 +27,10 @@ class ServiceCategoryController extends Controller
      */
     public function index()
     {
-        $service_categories = ServiceCategory::orderBy('title')->paginate(config('app.paginate'));
-        return view('service_categories.index',compact('service_categories'))
+        $query = ServiceCategory::orderBy('title');
+        $total_service_categorie = $query->count();
+        $service_categories =  $query->paginate(config('app.paginate'));
+        return view('service_categories.index',compact('total_service_categorie' ,'service_categories'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

@@ -82,6 +82,7 @@
                 </div>
             </form>
         </div>
+        <h3>FAQ  ({{ $total_faq }})</h3>
         <div class="col-md-12">
             <table class="table table-striped table-bordered">
                 <tr>

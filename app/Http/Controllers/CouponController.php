@@ -24,8 +24,10 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::orderBy('name','ASC')->paginate(config('app.paginate'));
-        return view('coupons.index', compact('coupons'))
+        $query = Coupon::orderBy('name','ASC');
+        $total_coupons = $query->count();
+        $coupons = $query->paginate(config('app.paginate'));
+        return view('coupons.index', compact('coupons', 'total_coupons'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
