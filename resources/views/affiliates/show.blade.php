@@ -49,6 +49,22 @@
                     {{ $affiliate->affiliate->commission }}%
                 </div>
             </div>
+            @if($affiliate->affiliate && $affiliate->affiliate->number)
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Phone Number:</strong>
+                    {{$affiliate->affiliate->number}}
+                </div>
+            </div>
+            @endif
+            @if($affiliate->affiliate && $affiliate->affiliate->whatsapp)
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Whatsapp Number:</strong>
+                    {{ $affiliate->affiliate->whatsapp }}
+                </div>
+            </div>
+            @endif
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Fix Salary:</strong>

@@ -7,14 +7,16 @@
             </div>
             <div class="col-md-12 mb-3">
                 <div class="d-flex flex-wrap justify-content-md-end">
-                    @if(!auth()->user()->hasRole("Supervisor"))
+                    @if (!auth()->user()->hasRole('Supervisor'))
                         @can('order-download')
-                            <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i class="fa fa-print"></i> PDF</a>
-                            <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i> Excel</a>
+                            <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i
+                                    class="fa fa-print"></i> PDF</a>
+                            <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i
+                                    class="fa fa-download"></i> Excel</a>
                         @endcan
                     @endif
-        
-                    @if(auth()->user()->hasRole("Admin"))
+
+                    @if (auth()->user()->hasRole('Admin'))
                         <a class="btn btn-secondary mb-2 ms-md-2" href="/orders">
                             <i class="fas fa-list"></i> All
                         </a>
@@ -22,8 +24,8 @@
                             <i class="fas fa-times"></i> Canceled
                         </a>
                     @endif
-        
-                    @if(!auth()->user()->hasRole("Staff"))
+
+                    @if (!auth()->user()->hasRole('Staff'))
                         <a class="btn btn-primary mb-2 ms-md-2" href="/orders?status=Pending">
                             <i class="fas fa-clock"></i> Pending
                         </a>
@@ -34,7 +36,7 @@
                             <i class="fas fa-hourglass-split"></i> Inprogress
                         </a>
                     @endif
-        
+
                     <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
                         <i class="fas fa-check"></i> Complete
                     </a>
@@ -44,10 +46,11 @@
                     <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
                         <i class="fas fa-check"></i> Confirm
                     </a>
-                    <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}">
+                    <a class="btn btn-secondary mb-2 ms-md-2"
+                        href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}">
                         <i class="fas fa-calendar"></i> Todays Order
                     </a>
-        
+
                     @can('order-create')
                         <a class="btn btn-success mb-2 ms-md-2" href="{{ route('orders.create') }}">
                             <i class="fas fa-plus"></i> Create Order
@@ -71,7 +74,7 @@
         <hr>
 
         <div class="row">
-            @if(!auth()->user()->hasRole("Staff"))
+            @if (!auth()->user()->hasRole('Staff'))
                 <!-- Second Column (Filter Form) -->
                 <div class="col-md-12">
                     <h3>Filter</h3>
@@ -80,57 +83,69 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <strong>Order Id:</strong>
-                                <input type="number" name="order_id" class="form-control" value="{{ $filter['order_id'] }}">
+                                <input type="number" name="order_id" class="form-control"
+                                    value="{{ $filter['order_id'] }}">
                             </div>
                             <div class="col-md-4">
                                 <strong>Appointment Date:</strong>
                                 <input type="date" name="appointment_date" class="form-control"
                                     value="{{ $filter['appointment_date'] }}">
                             </div>
-                            @if(!auth()->user()->hasRole("Staff"))
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <strong>Staff:</strong>
-                                    <select name="staff_id" class="form-control">
+                                    <strong>Category:</strong>
+                                    <select name="category_id" class="form-control">
                                         <option value="">Select</option>
-                                        @foreach ($users as $staff)
-                                        @if($staff->hasRole('Staff'))
-                                        @if($staff->id == $filter['staff'])
-                                        <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
-                                        @else
-                                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                                        @endif
-                                        @endif
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}"
+                                                @if ($filter['category_id'] == $category->id) selected @endif>{{ $category->title }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
+                            @if (!auth()->user()->hasRole('Staff'))
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <strong>Staff:</strong>
+                                        <select name="staff_id" class="form-control">
+                                            <option value="">Select</option>
+                                            @foreach ($users as $staff)
+                                                @if ($staff->hasRole('Staff'))
+                                                    <option value="{{ $staff->id }}"
+                                                        @if ($staff->id == $filter['staff']) selected @endif>
+                                                        {{ $staff->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                             @endif
 
                             <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
-                            @if(auth()->user()->hasRole("Admin"))
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <strong>Affiliate:</strong>
-                                    <select name="affiliate_id" class="form-control">
-                                        <option value="">Select</option>
-                                        @foreach ($users as $affiliate)
-                                        @if($affiliate->hasRole("Affiliate"))
-                                        @if($affiliate->id == $filter['affiliate'])
-                                        <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
-                                        @else
-                                        <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
-                                        @endif
-                                        @endif
-                                        @endforeach
-                                    </select>
+                            @if (auth()->user()->hasRole('Admin'))
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <strong>Affiliate:</strong>
+                                        <select name="affiliate_id" class="form-control">
+                                            <option value="">Select</option>
+                                            @foreach ($users as $affiliate)
+                                                @if ($affiliate->hasRole('Affiliate'))
+                                                    <option value="{{ $affiliate->id }}"
+                                                        @if ($affiliate->id == $filter['affiliate']) selected @endif>
+                                                        {{ $affiliate->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
                             @endif
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>Customer:</strong>
-                                    <input type="text" name="customer" class="form-control" value="{{ $filter['customer'] }}" placeholder="Enter Name or Email">
+                                    <input type="text" name="customer" class="form-control"
+                                        value="{{ $filter['customer'] }}" placeholder="Enter Name or Email">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -139,13 +154,11 @@
                                     <select name="driver_id" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($users as $driver)
-                                        @if($driver->hasRole("Driver"))
-                                        @if($driver->id == $filter['driver'])
-                                        <option value="{{ $driver->id }}" selected>{{ $driver->name }}</option>
-                                        @else
-                                        <option value="{{ $driver->id }}">{{ $driver->name }}</option>
-                                        @endif
-                                        @endif
+                                            @if ($driver->hasRole('Driver'))
+                                                <option value="{{ $driver->id }}"
+                                                    @if ($driver->id == $filter['driver']) selected @endif>{{ $driver->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -156,11 +169,9 @@
                                     <select name="status" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($statuses as $status)
-                                        @if($status == $filter['status'])
-                                        <option value="{{ $status }}" selected>{{ $status }}</option>
-                                        @else
-                                        <option value="{{ $status }}">{{ $status }}</option>
-                                        @endif
+                                            <option value="{{ $status }}"
+                                                @if ($status == $filter['status']) selected @endif>{{ $status }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -172,11 +183,9 @@
                                     <select name="driver_status" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($driver_statuses as $status)
-                                        @if($status == $filter['driver_status'])
-                                        <option value="{{ $status }}" selected>{{ $status }}</option>
-                                        @else
-                                        <option value="{{ $status }}">{{ $status }}</option>
-                                        @endif
+                                            <option value="{{ $status }}"
+                                                @if ($status == $filter['driver_status']) selected @endif>{{ $status }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -187,26 +196,9 @@
                                     <select name="zone" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($zones as $zone)
-                                        @if($zone == $filter['zone'])
-                                        <option value="{{ $zone }}" selected>{{ $zone }}</option>
-                                        @else
-                                        <option value="{{ $zone }}">{{ $zone }}</option>
-                                        @endif
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <strong>Payment Method:</strong>
-                                    <select name="payment_method" class="form-control">
-                                        <option value="">Select</option>
-                                        @foreach ($payment_methods as $payment_method)
-                                        @if($payment_method == $filter['payment_method'])
-                                        <option value="{{ $payment_method }}" selected>{{ $payment_method }}</option>
-                                        @else
-                                        <option value="{{ $payment_method }}">{{ $payment_method }}</option>
-                                        @endif
+                                            <option
+                                                value="{{ $zone }}"@if ($zone == $filter['zone']) selected @endif>
+                                                {{ $zone }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -220,6 +212,19 @@
                                 <strong>Date To:</strong>
                                 <input type="date" name="date_to" class="form-control"
                                     value="{{ $filter['date_to'] }}">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <strong>Payment Method:</strong>
+                                    <select name="payment_method" class="form-control">
+                                        <option value="">Select</option>
+                                        @foreach ($payment_methods as $payment_method)
+                                            <option value="{{ $payment_method }}"
+                                                @if ($payment_method == $filter['payment_method']) selected @endif>{{ $payment_method }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="row">

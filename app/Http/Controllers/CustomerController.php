@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Coupon;
-use App\Models\Affiliate;
 use App\Models\UserAffiliate;
 use App\Models\CustomerCoupon;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
 use Illuminate\Support\Arr;
@@ -39,37 +38,121 @@ class CustomerController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'number' => $request->number,
+            'order_count' => $request->order_count,
             'affiliate_id' => $request->affiliate_id,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
         ];
-    
+
         $query = User::role('Customer')->latest();
-    
+
         if ($request->name) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->name) . '%']);
         }
-    
+
         if ($request->email) {
             $query->whereRaw('LOWER(email) LIKE ?', ['%' . strtolower($request->email) . '%']);
         }
-    
+
         if ($request->number) {
             $query->whereHas('customerProfile', function ($subQuery) use ($request) {
                 $subQuery->whereRaw('LOWER(number) LIKE ?', ['%' . strtolower($request->number) . '%']);
             });
         }
-    
+
+        if (isset($request->order_count) && $request->date_to === null && $request->date_from === null) {
+            if ($request->order_count > 0) {
+                $query->has('customerOrders', '=', (int)$request->order_count);
+            } elseif ($request->order_count == 0) {
+                $query->whereDoesntHave('customerOrders');
+            }
+        }
+
+        if ($request->date_to && $request->date_from) {
+            $dateFrom = $request->date_from;
+            $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+            $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo, $request) {
+                $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+            });
+            if (isset($request->order_count)) {
+                if ($request->order_count > 0) {
+                    $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo) {
+                        $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+                    }, '=', (int)$request->order_count);
+                } elseif ($request->order_count == 0) {
+                    $query->whereDoesntHave('customerOrders');
+                }
+            }
+        } else {
+            if ($request->date_to) {
+                $query->whereHas('customerOrders', function ($query) use ($request) {
+                    $query->whereDate('created_at', '=', $request->date_to);
+                });
+                if (isset($request->order_count)) {
+                    if ($request->order_count > 0) {
+                        $query->whereHas('customerOrders', function ($query) use ($request) {
+                            $query->whereDate('created_at', '=', $request->date_to);
+                        }, '=', (int)$request->order_count);
+                    } elseif ($request->order_count == 0) {
+                        $query->whereDoesntHave('customerOrders');
+                    }
+                }
+            }
+
+            if ($request->date_from) {
+                if ($request->date_from) {
+                    $query->whereHas('customerOrders', function ($query) use ($request) {
+                        $query->whereDate('created_at', '=', $request->date_from);
+                    });
+                }
+                if (isset($request->order_count)) {
+                    if ($request->order_count > 0) {
+                        $query->whereHas('customerOrders', function ($query) use ($request) {
+                            $query->whereDate('created_at', '=', $request->date_from);
+                        }, '=', (int)$request->order_count);
+                    } elseif ($request->order_count == 0) {
+                        $query->whereDoesntHave('customerOrders');
+                    }
+                }
+            }
+        }
+
         if ($request->affiliate_id) {
             $query->whereHas('userAffiliate', function ($subQuery) use ($request) {
                 $subQuery->where('affiliate_id', $request->affiliate_id);
             });
         }
-    
+
+        if ($request->date_to || $request->date_from) {
+            if ($request->date_to && $request->date_from) {
+                $dateFrom = $request->date_from;
+                $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+                $query->withCount(['customerOrders' => function ($subQuery) use ($dateFrom, $dateTo) {
+                    $subQuery->whereBetween('created_at', [$dateFrom, $dateTo]);
+                }]);
+            } else {
+                if ($request->date_from) {
+                    $query->withCount(['customerOrders' => function ($subQuery) use ($request) {
+                        $subQuery->whereDate('created_at', '=', $request->date_from);
+                    }]);
+                }
+                if ($request->date_to) {
+                    $query->withCount(['customerOrders' => function ($subQuery) use ($request) {
+                        $subQuery->whereDate('created_at', '=', $request->date_to);
+                    }]);
+                }
+            }
+        } else {
+            $query->withCount('customerOrders');
+        }
+
+
         if ($request->csv == 1 || $request->print == 1) {
             $customers = $query->get();
         } else {
             $customers = $query->orderBy('name')->paginate(config('app.paginate'));
         }
-    
+
         if ($request->csv == 1) {
             // Set the CSV response headers
             $headers = array(
@@ -79,13 +162,13 @@ class CustomerController extends Controller
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             );
-    
+
             $callback = function () use ($customers) {
                 $output = fopen('php://output', 'w');
-                $header = array('SR#', 'ID', 'Name', 'Email','Status', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name','Affiliate Code', 'Coupons');
-    
+                $header = array('SR#', 'ID', 'Name', 'Email', 'Status', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name', 'Affiliate Code', 'Coupons');
+
                 fputcsv($output, $header);
-    
+
                 foreach ($customers as $key => $row) {
                     $coupons = [];
                     if ($row->coupons) {
@@ -93,7 +176,7 @@ class CustomerController extends Controller
                             $coupons[] = $coupon->code;
                         }
                     }
-    
+
                     $csvRow = [
                         ++$key,
                         $row->id,
@@ -114,13 +197,13 @@ class CustomerController extends Controller
                         isset($row->userAffiliate->affiliate) ? "'" . $row->userAffiliate->affiliate->code : "",
                         implode(",", $coupons)
                     ];
-    
+
                     fputcsv($output, $csvRow);
                 }
-    
+
                 fclose($output);
             };
-    
+
             // Create a StreamedResponse to send the CSV content
             return response()->stream($callback, 200, $headers);
         } else if ($request->print == 1) {
@@ -128,10 +211,10 @@ class CustomerController extends Controller
         } else {
             $affiliates = User::role('Affiliate')->orderBy('name')->get();
             $coupons = Coupon::where('status', '1')->get();
-            
-            $filters = $request->only(['name', 'email', 'number', 'affiliate_id']);
+
+            $filters = $request->only(['name', 'email', 'number', 'affiliate_id', 'order_count', 'date_from', 'date_to']);
             $customers->appends($filters);
-    
+
             return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         }
     }
