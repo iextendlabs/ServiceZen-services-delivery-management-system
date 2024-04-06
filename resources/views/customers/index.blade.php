@@ -192,15 +192,8 @@
                         </div>
                         <hr>
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary float-end">Submit</button>
+                            <label><i class="fa fa-filter"></i>Filter Customer by Order Created Date</label>
                         </div>
-                    </div>
-                </form>
-
-                <h3>Order Filter</h3>
-                <hr>
-                <form action="{{ route('customers.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
                         <div class="col-12">
                             <div class="form-group">
                                 <strong>Date From:</strong>
@@ -216,7 +209,7 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary float-end">Submit</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
                 </form>

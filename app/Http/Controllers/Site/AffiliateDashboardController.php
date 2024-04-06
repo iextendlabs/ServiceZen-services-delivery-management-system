@@ -75,21 +75,12 @@ class AffiliateDashboardController extends Controller
                             ->where('display', 1);
                     }
 
-                    if ($request->order_count === "0") {
-                        $affiliateUserQuery->leftJoin('orders', 'orders.customer_id', '=', 'users.id')
-                            ->select('users.*')
-                            ->groupBy('users.id')
-                            ->havingRaw('COUNT(orders.id) = 0');
-                    } elseif (isset($request->order_count)) {
-                        $affiliateUserQuery->whereHas('customer.customerOrders', function ($subQuery) use ($request) {
-                            $subQuery->whereExists(function ($query) use ($request) {
-                                $query->select(DB::raw(1))
-                                    ->from('orders')
-                                    ->whereColumn('orders.customer_id', 'users.id')
-                                    ->groupBy('orders.customer_id')
-                                    ->havingRaw('COUNT(*) = ?', [(int)$request->order_count]);
-                            });
-                        });
+                    if (isset($request->order_count) && $request->date_to === null && $request->date_from === null) {
+                        if ($request->order_count > 0) {
+                            $affiliateUserQuery->has('customer.customerOrders', '=', (int)$request->order_count);
+                        } elseif ($request->order_count == 0) {
+                            $affiliateUserQuery->whereDoesntHave('customer.customerOrders');
+                        }
                     }
 
                     if ($request->date_to && $request->date_from) {
@@ -98,17 +89,44 @@ class AffiliateDashboardController extends Controller
                         $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($dateFrom, $dateTo) {
                             $query->whereBetween('created_at', [$dateFrom, $dateTo]);
                         });
+                        if (isset($request->order_count)) {
+                            if ($request->order_count > 0) {
+                                $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($dateFrom, $dateTo) {
+                                    $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+                                }, '=', (int)$request->order_count);
+                            } elseif ($request->order_count == 0) {
+                                $affiliateUserQuery->whereDoesntHave('customer.customerOrders');
+                            }
+                        }
                     } else {
                         if ($request->date_to) {
                             $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($request) {
                                 $query->whereDate('created_at', '=', $request->date_to);
                             });
+                            if (isset($request->order_count)) {
+                                if ($request->order_count > 0) {
+                                    $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($request) {
+                                        $query->whereDate('created_at', '=', $request->date_to);
+                                    }, '=', (int)$request->order_count);
+                                } elseif ($request->order_count == 0) {
+                                    $affiliateUserQuery->whereDoesntHave('customer.customerOrders');
+                                }
+                            }
                         }
 
                         if ($request->date_from) {
                             $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($request) {
                                 $query->whereDate('created_at', '=', $request->date_from);
                             });
+                            if (isset($request->order_count)) {
+                                if ($request->order_count > 0) {
+                                    $affiliateUserQuery->whereHas('customer.customerOrders', function ($query) use ($request) {
+                                        $query->whereDate('created_at', '=', $request->date_from);
+                                    }, '=', (int)$request->order_count);
+                                } elseif ($request->order_count == 0) {
+                                    $affiliateUserQuery->whereDoesntHave('customer.customerOrders');
+                                }
+                            }
                         }
                     }
 

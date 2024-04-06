@@ -52,6 +52,7 @@ class OrderController extends Controller
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $zones = StaffZone::pluck("name")->toArray();
+        $categories = ServiceCategory::get();
         $filter = [
             'status' => $request->status,
             'affiliate' => $request->affiliate_id,
@@ -65,7 +66,8 @@ class OrderController extends Controller
             'driver' => $request->driver_id,
             'zone' => $request->zone,
             'date_to' => $request->date_to,
-            'date_from' => $request->date_from
+            'date_from' => $request->date_from,
+            'category_id' => $request->category_id,
         ];
         $currentUser = Auth::user();
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
@@ -179,6 +181,13 @@ class OrderController extends Controller
             }
         }
 
+        if ($request->category_id) {
+            $query->whereHas('services.categories', function ($query) use ($request) {
+                $query->where('category_id', $request->category_id);
+            });
+        }
+        
+
         if ($request->created_at) {
             $query->where('created_at', '=', $request->created_at);
         }
@@ -232,9 +241,9 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id']);
+            $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id','category_id']);
             $orders->appends($filters);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones','categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

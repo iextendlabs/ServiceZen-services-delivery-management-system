@@ -60,17 +60,9 @@ class CustomerController extends Controller
             });
         }
 
-        if (isset($request->order_count)) {
+        if (isset($request->order_count) && $request->date_to === null && $request->date_from === null) {
             if ($request->order_count > 0) {
-                $query->whereHas('customerOrders', function ($subQuery) use ($request) {
-                    $subQuery->whereExists(function ($query) use ($request) {
-                        $query->select(DB::raw(1))
-                              ->from('orders')
-                              ->whereColumn('orders.customer_id', 'users.id')
-                              ->groupBy('orders.customer_id')
-                              ->havingRaw('COUNT(*) = ?', [(int)$request->order_count]);
-                    });
-                });
+                $query->has('customerOrders', '=', (int)$request->order_count);
             } elseif ($request->order_count == 0) {
                 $query->whereDoesntHave('customerOrders');
             }
@@ -82,11 +74,29 @@ class CustomerController extends Controller
             $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo, $request) {
                 $query->whereBetween('created_at', [$dateFrom, $dateTo]);
             });
+            if (isset($request->order_count)) {
+                if ($request->order_count > 0) {
+                    $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo) {
+                        $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+                    }, '=', (int)$request->order_count);
+                } elseif ($request->order_count == 0) {
+                    $query->whereDoesntHave('customerOrders');
+                }
+            }
         } else {
             if ($request->date_to) {
                 $query->whereHas('customerOrders', function ($query) use ($request) {
                     $query->whereDate('created_at', '=', $request->date_to);
                 });
+                if (isset($request->order_count)) {
+                    if ($request->order_count > 0) {
+                        $query->whereHas('customerOrders', function ($query) use ($request) {
+                            $query->whereDate('created_at', '=', $request->date_to);
+                        }, '=', (int)$request->order_count);
+                    } elseif ($request->order_count == 0) {
+                        $query->whereDoesntHave('customerOrders');
+                    }
+                }
             }
 
             if ($request->date_from) {
@@ -94,6 +104,15 @@ class CustomerController extends Controller
                     $query->whereHas('customerOrders', function ($query) use ($request) {
                         $query->whereDate('created_at', '=', $request->date_from);
                     });
+                }
+                if (isset($request->order_count)) {
+                    if ($request->order_count > 0) {
+                        $query->whereHas('customerOrders', function ($query) use ($request) {
+                            $query->whereDate('created_at', '=', $request->date_from);
+                        }, '=', (int)$request->order_count);
+                    } elseif ($request->order_count == 0) {
+                        $query->whereDoesntHave('customerOrders');
+                    }
                 }
             }
         }

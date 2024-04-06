@@ -107,7 +107,7 @@
             <div class="col-md-12">
                 <strong>My Customer</strong>
                 <table class="table table-striped table-bordered album bg-light">
-                    <td class="text-left" colspan="6"><i class="fas fa-filter"></i> Order Filter
+                    <td class="text-left" colspan="6"><i class="fas fa-filter"></i> Filter Customer by Order Created Date
                     </td>
                     <tr>
                         <td colspan="6">
@@ -117,21 +117,9 @@
                                     <div class="col-md-6">
                                         <div class="col-md-12">
                                             <strong>Order Count:</strong>
-                                            <div class="input-group me-2">
-                                                <input type="number" name="order_count" class="form-control"
-                                                    value="{{ $filter_order_count }}">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-primary" type="submit">Filter by Count</button>
-                                                </div>
-                                            </div>
+                                            <input type="number" name="order_count" class="form-control"
+                                                value="{{ $filter_order_count }}">
                                         </div>
-                                    </div>
-                                </div>
-                            </form>
-                            <form action="{{ route('affiliate_dashboard.index') }}" method="GET"
-                                enctype="multipart/form-data">
-                                <div class="row d-flex flex-wrap justify-content-md-center">
-                                    <div class="col-md-6">
                                         <div class="col-md-12">
                                             <strong>Date From:</strong>
                                             <input type="date" name="date_from" class="form-control"
@@ -164,36 +152,36 @@
                         </td>
                     </tr>
                 </table>
-                @if (count($affiliateUser) != 0)
-                    <table class="table table-striped table-bordered album bg-light">
-                        <tr>
-                            <th>Sr#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Orders</th>
-                            <th>Number</th>
-                            <th>Whatsapp</th>
-                            <th>Zone</th>
-                        </tr>
+                <table class="table table-striped table-bordered album bg-light">
+                    <tr>
+                        <th>Sr#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Orders</th>
+                        <th>Number</th>
+                        <th>Whatsapp</th>
+                        <th>Zone</th>
+                    </tr>
+                    @if (count($affiliateUser) != 0)
                         @foreach ($affiliateUser as $user)
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->customer->name ?? '' }}</td>
                                 <td>{{ $user->customer->email ?? '' }}</td>
-                                <td>{{ $user->order_count }}
-                                </td>
+                                <td>{{ $user->order_count }}</td>
                                 <td>{{ $user->customer->customerProfile->number ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfile->whatsapp ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfile->area ?? '' }}</td>
                             </tr>
                         @endforeach
-                    </table>
-                    {!! $affiliateUser->links() !!}
-                @else
-                    <div class="text-center">
-                        <h4>There are no Customer</h4>
-                    </div>
-                @endif
+                    @else
+                        <tr>
+                            <td colspan="7" class="text-center">There are no Customer</td>
+                        </tr>
+                    @endif
+                </table>
+                {!! $affiliateUser->links() !!}
+
             </div>
             <div class="col-md-12">
                 <p>Your current balance is: <b>Rs.{{ $total_balance }}</b></p>
