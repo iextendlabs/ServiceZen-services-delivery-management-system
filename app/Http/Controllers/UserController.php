@@ -43,13 +43,10 @@ class UserController extends Controller
             $query->where('name', 'like', $request->name . '%');
         }
 
-        if ($request->role) {
-            $query = $query->role($request->role);
-        }
-
+        $total_user = $query->count();
         $data = $query->get();
         
-        return view('users.index',compact('data','roles','filter'));
+        return view('users.index',compact('total_user','data','roles','filter'));
     }
     
     /**

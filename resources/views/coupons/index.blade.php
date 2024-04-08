@@ -23,6 +23,7 @@
     </div>
     @endif
     <hr>
+    <h3>Coupons  ({{ $total_coupons }})</h3>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>

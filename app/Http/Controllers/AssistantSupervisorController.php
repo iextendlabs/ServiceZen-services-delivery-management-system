@@ -38,10 +38,10 @@ class AssistantSupervisorController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
-
+        $total_assistant_supervisor = $query->count();
         $assistant_supervisors = $query->paginate(config('app.paginate'));
 
-        return view('assistantSupervisors.index',compact('assistant_supervisors','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('assistantSupervisors.index',compact('total_assistant_supervisor','assistant_supervisors','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

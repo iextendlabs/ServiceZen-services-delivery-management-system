@@ -24,20 +24,21 @@ class ShortHolidayController extends Controller
      */
     public function index(Request $request)
     {
+        $query = ShortHoliday::orderBy('date');
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $shortHolidays = ShortHoliday::whereIn('staff_id', $staffIds)->orderBy('date')->paginate(config('app.paginate'));
+            $shortHolidays = $query->whereIn('staff_id', $staffIds)->orderBy('date')->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $shortHolidays = ShortHoliday::where('staff_id', Auth::id())->orderBy('date')->paginate(config('app.paginate'));
-        } else {
-            $shortHolidays = ShortHoliday::orderBy('date')->paginate(config('app.paginate'));
+            $shortHolidays = $query->where('staff_id', Auth::id())->orderBy('date')->paginate(config('app.paginate'));
         }
+        $total_shortHoliday = $query->count();
+        $shortHolidays = $query->paginate(config('app.paginate'));
 
 
-        return view('shortHolidays.index', compact('shortHolidays'))
+        return view('shortHolidays.index', compact('shortHolidays', 'total_shortHoliday'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

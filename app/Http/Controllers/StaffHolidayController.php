@@ -31,20 +31,19 @@ class StaffHolidayController extends Controller
      */
     public function index(Request $request)
     {
+        $query = StaffHoliday::orderBy('date');
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $staffHolidays = StaffHoliday::whereIn('staff_id', $staffIds)->orderBy('date')->paginate(config('app.paginate'));
+            $staffHolidays = $query->whereIn('staff_id', $staffIds)->orderBy('date')->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $staffHolidays = StaffHoliday::where('staff_id', Auth::id())->orderBy('date')->paginate(config('app.paginate'));
-        } else {
-            $staffHolidays = StaffHoliday::orderBy('date')->paginate(config('app.paginate'));
-        }
-
-
-        return view('staffHolidays.index',compact('staffHolidays'))
+            $staffHolidays = $query->where('staff_id', Auth::id())->orderBy('date')->paginate(config('app.paginate'));
+        } 
+        $total_staffHoliday = $query->count();
+        $staffHolidays = $query->paginate(config('app.paginate'));
+        return view('staffHolidays.index',compact('staffHolidays', 'total_staffHoliday'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     

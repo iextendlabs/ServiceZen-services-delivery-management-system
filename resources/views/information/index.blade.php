@@ -62,6 +62,7 @@
                 </div>
             </form>
         </div>
+        <h3>Information  ({{ $total_information }})</h3>
         <div class="col-md-12">
             <table class="table table-striped table-bordered">
                 <tr>

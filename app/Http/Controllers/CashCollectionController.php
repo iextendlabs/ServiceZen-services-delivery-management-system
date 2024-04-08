@@ -46,6 +46,7 @@ class CashCollectionController extends Controller
         if ($request->csv == 1 || $request->print == 1) {
             $cash_collections = $query->get();
         } else {
+            $total_cash_collection = $query->count();
             $cash_collections = $query->paginate(config('app.paginate'));
         }
         
@@ -84,7 +85,7 @@ class CashCollectionController extends Controller
         } else {
             $filters = $request->only(['status','order_id']);
             $cash_collections->appends($filters);
-            return view('cashCollections.index',compact('cash_collections','filter_status','filter_order_id'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('cashCollections.index',compact('total_cash_collection','cash_collections','filter_status','filter_order_id'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
 

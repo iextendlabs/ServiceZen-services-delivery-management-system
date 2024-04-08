@@ -20,6 +20,7 @@
     </div>
     @endif
     <hr>
+    <h3>Review  ({{ $total_review }})</h3>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>

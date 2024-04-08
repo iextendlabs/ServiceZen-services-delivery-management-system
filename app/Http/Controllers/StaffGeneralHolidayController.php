@@ -32,20 +32,21 @@ class StaffGeneralHolidayController extends Controller
      */
     public function index(Request $request)
     {
+        $query =  StaffGeneralHoliday::orderBy('day', 'DESC');
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
             $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
 
-            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('day', 'DESC')->whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
+            $staffGeneralHolidays = $query->whereIn('staff_id', $staffIds)->paginate(config('app.paginate'));
         } elseif (Auth::user()->hasRole('Staff')) {
-            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('day', 'DESC')->where('staff_id', Auth::id())->paginate(config('app.paginate'));
-        } else {
-            $staffGeneralHolidays = StaffGeneralHoliday::orderBy('day', 'DESC')->paginate(config('app.paginate'));
+            $staffGeneralHolidays = $query->where('staff_id', Auth::id())->paginate(config('app.paginate'));
         }
+        $total_Staff_general_holiday = $query->count();
+        $staffGeneralHolidays =  $query->paginate(config('app.paginate'));
 
 
-        return view('staffGeneralHolidays.index',compact('staffGeneralHolidays'))
+        return view('staffGeneralHolidays.index',compact('staffGeneralHolidays', 'total_Staff_general_holiday'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     

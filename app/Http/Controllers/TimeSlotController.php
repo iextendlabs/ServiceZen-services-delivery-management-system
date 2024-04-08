@@ -50,12 +50,12 @@ class TimeSlotController extends Controller
                 $q->where('staff_id', $staffId);
             });
         }
-
+        $total_time_slot = $query->count();
         $time_slots = $query->paginate(config('app.paginate'));
         $staffs = User::role('Staff')->get();
         $filters = $request->only(['staff_id']);
         $time_slots->appends($filters);
-        return view('timeSlots.index', compact('time_slots', 'staffs', 'filter'))
+        return view('timeSlots.index', compact('time_slots', 'staffs', 'filter', 'total_time_slot'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
