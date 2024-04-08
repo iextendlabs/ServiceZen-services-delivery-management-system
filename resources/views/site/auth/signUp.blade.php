@@ -136,6 +136,27 @@
                                 <label class="col-md-4 col-form-label text-md-end">{{ __('Gender') }}</label>
 
                                 <div class="col-md-6">
+                                    @if($gender_permission === 'Male')
+                                    <div class="form-check">
+                                        <input class="form-check-input @error('gender') is-invalid @enderror"
+                                            type="radio" name="gender" id="genderMale" value="Male"
+                                            {{ old('gender') == 'Male' ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="genderMale">
+                                            {{ __('Male') }}
+                                        </label>
+                                    </div>
+                                    <strong class="text-danger">Sorry, No Female Services Listed in Our Store.</strong>
+                                    @elseif ($gender_permission === 'Female')
+                                    <div class="form-check">
+                                        <input class="form-check-input @error('gender') is-invalid @enderror"
+                                            type="radio" name="gender" id="genderFemale" value="Female"
+                                            {{ old('gender') == 'Female' ? 'checked' : '' }} required>
+                                        <label class="form-check-label" for="genderFemale">
+                                            {{ __('Female') }}
+                                        </label>
+                                    </div>
+                                    <strong class="text-danger">Sorry, No Male Services Listed in Our Store.</strong>
+                                    @elseif($gender_permission === 'Both')
                                     <div class="form-check">
                                         <input class="form-check-input @error('gender') is-invalid @enderror"
                                             type="radio" name="gender" id="genderMale" value="Male"
@@ -152,10 +173,7 @@
                                             {{ __('Female') }}
                                         </label>
                                     </div>
-                                    <span class="invalid-feedback" id="gender-error" role="alert"
-                                        style="display: none;">
-                                        <strong>Sorry, No Male Services Listed in Our Store.</strong>
-                                    </span>
+                                    @endif
                                     @error('gender')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
