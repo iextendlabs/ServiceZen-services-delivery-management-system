@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    function __construct()
+    function __construct()lekj  
     {
         $this->middleware('permission:setting-list', ['only' => ['index']]);
         $this->middleware('permission:setting-edit', ['only' => ['edit', 'update']]);
