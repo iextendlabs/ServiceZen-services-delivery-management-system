@@ -16,6 +16,7 @@ use App\Models\CustomerProfile;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Mail;
 use App\Models\UserAffiliate;
 use Carbon\Carbon;
@@ -34,7 +35,9 @@ class CustomerAuthController extends Controller
             $affiliate_code = "";
         }
 
-        return view('site.auth.signUp', compact('affiliate_code','type'));
+        $gender_permission = Setting::where('key','Gander Permission')->value('value');
+
+        return view('site.auth.signUp', compact('affiliate_code','type','gender_permission'));
     }
 
     public function postRegistration(Request $request)
