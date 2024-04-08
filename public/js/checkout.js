@@ -1,32 +1,37 @@
-$(document).on("change","#date,#zone,#area",function() {
-    
-    // Make AJAX call to retrieve time slots for selected date
+$(document).on("change", "#date,#zone,#area,.checkout-services,.checkout-selected-services", function () {
+    var checkedServiceIds = [];
+
+    $('.checkout-services:checked').each(function () {
+        checkedServiceIds.push($(this).val());
+    });
+       
     $.ajax({
         url: '/slots',
         method: 'GET',
-        cache: false, 
+        cache: false,
         data: {
             date: $('#date').val(),
             area: $('select[name="zone"]').val(),
             order_id: $('input[name="order_id"]').length ? $('input[name="order_id"]').val() : '',
+            service_ids : checkedServiceIds,
         },
-        beforeSend: function() {
+        beforeSend: function () {
             $('#loading').show(); // Show the loading element
         },
-        success: function(response) {
+        success: function (response) {
             var timeSlots = response;
             var timeSlotsContainer = $('#slots-container');
             timeSlotsContainer.empty();
             timeSlotsContainer.html(response);
-            if(typeof updateTotal === 'function')
-            updateTotal()
+            if (typeof updateTotal === 'function')
+                updateTotal()
             $('[name=service_staff_id]:checked').length === 0 && $('[name=service_staff_id]').first().attr('checked', true).trigger('change');
 
         },
-        error: function() {
+        error: function () {
             alert('Error retrieving time slots.');
         },
-        complete: function() {
+        complete: function () {
             $('#loading').hide(); // Hide the loading element after success or error
         }
     });
@@ -47,10 +52,10 @@ function convertTo12Hour(time) {
     return formattedTime;
 }
 
-$(document).on('change', 'input[name="service_staff_id"]', function() {
+$(document).on('change', 'input[name="service_staff_id"]', function () {
     var slotName = $(this).attr('data-slot');
     var staffName = $(this).attr('data-staff');
     $('#selected-staff').html(staffName);
-    if(typeof updateTotal === 'function')
-    updateTotal()
+    if (typeof updateTotal === 'function')
+        updateTotal()
 });

@@ -72,7 +72,7 @@
                                 @if ($service->status)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" @if(in_array($service->id,$serviceIds)) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                        <input type="checkbox" @if(in_array($service->id,$serviceIds)) checked @endif class="service-checkbox checkout-services" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
                                         $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
                                     </td>
                                     <td>{{ $service->name }}</td>
@@ -103,7 +103,7 @@
                                     @foreach ($selectedServices as $service)
                                     <tr>
                                         <td>
-                                            <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                            <input type="checkbox" checked class="selected-service-checkbox checkout-selected-services" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
                                         $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
                                         </td>
                                         <td>{{ $service->name }}</td>
@@ -596,7 +596,7 @@
         if ($(this).prop("checked")) {
             tableHtml = '<tr>';
             tableHtml += '<td>';
-            tableHtml += '<input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="' + id + '" data-price="' + price + '">';
+            tableHtml += '<input type="checkbox" checked class="selected-service-checkbox checkout-selected-services" name="selected_service_ids[]" value="' + id + '" data-price="' + price + '">';
             tableHtml += '</td>';
             tableHtml += '<td>' + name + '</td>';
             tableHtml += '<td>' + price + '</td>';
@@ -618,14 +618,16 @@
 </script>
 <script>
     $(document).on("change", ".selected-service-checkbox", function() {
-        let $row = $(this).closest('tr');
-        var id = $(this).val();
-        var name = $row.find('td:nth-child(2)').text();
+    let $row = $(this).closest('tr');
+    var id = $(this).val();
+    var name = $row.find('td:nth-child(2)').text();
 
-        if ($(this).prop("checked") === false) {
-            $row.remove();
-        }
-    });
+    if ($(this).prop("checked") === false) {
+        $row.remove();
+        $(".service-checkbox[value='" + id + "']").prop("checked", false).trigger("change");
+    }
+});
+
 </script>
 <script>
     $(document).ready(function() {

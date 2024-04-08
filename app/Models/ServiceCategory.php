@@ -28,4 +28,9 @@ class ServiceCategory extends Model
     {
         return $this->hasMany(FAQ::class,'category_id')->where('status', '=', 'your_desired_status');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'staff_to_categories', 'category_id', 'staff_id');
+    }
 }
