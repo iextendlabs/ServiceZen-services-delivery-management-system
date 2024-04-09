@@ -194,6 +194,7 @@ class OrderController extends Controller
         if ($request->csv == 1 || $request->print == 1) {
             $orders = $query->get();
         } else {
+            $total_order = $query->count();
             $orders = $query->paginate(config('app.paginate'));
         }
         //TODO : show totals and current records info on all lists
@@ -243,7 +244,7 @@ class OrderController extends Controller
 
             $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id','category_id']);
             $orders->appends($filters);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones','categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('total_order','orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones','categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

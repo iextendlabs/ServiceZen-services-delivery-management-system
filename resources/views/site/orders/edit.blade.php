@@ -150,10 +150,10 @@ $transport_charges = 0;
                             <tr>
                                 <td>
                                     @if(in_array($service->id,$order_service))
-                                    <input type="checkbox" class="service-checkbox" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    <input type="checkbox" class="service-checkbox checkout-services" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
                                  $service->discount : $service->price }}">
                                     @else
-                                    <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
+                                    <input type="checkbox" class="service-checkbox checkout-services" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
                                  $service->discount : $service->price }}">
                                     @endif
                                 </td>

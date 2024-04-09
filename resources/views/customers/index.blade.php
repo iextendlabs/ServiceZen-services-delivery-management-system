@@ -39,6 +39,7 @@
             </div>
         @endif
         <hr>
+        <h3>Customers  ({{ $total_customer }})</h3>
         <div class="row">
             <div class="col-md-9">
                 <table class="table table-striped table-bordered">

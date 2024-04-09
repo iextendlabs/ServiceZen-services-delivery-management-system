@@ -18,6 +18,7 @@
     </div>
     @endif
     <hr>
+    <h3>Staff General Holiday  ({{ $total_Staff_general_holiday }})</h3>
     <div class="row">
         <div class="col-md-12">
             <table class="table table-striped table-bordered">

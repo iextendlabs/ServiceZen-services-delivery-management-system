@@ -38,11 +38,12 @@ class SupervisorController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+        $total_supervisors = $query->count();
 
         $supervisors = $query->paginate(config('app.paginate'));
         $filters = $request->only(['name']);
         $supervisors->appends($filters);
-        return view('supervisors.index', compact('supervisors','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('supervisors.index', compact('supervisors','filter_name', 'total_supervisors'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

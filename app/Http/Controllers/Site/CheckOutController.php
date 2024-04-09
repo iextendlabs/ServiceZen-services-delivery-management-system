@@ -124,7 +124,7 @@ class CheckOutController extends Controller
         $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
         $staff = User::find($input['service_staff_id']);
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
-            
+
         $selected_services = Service::whereIn('id', $request->selected_service_ids)->get();
 
         $sub_total = $selected_services->sum(function ($service) {
@@ -132,11 +132,11 @@ class CheckOutController extends Controller
         });
 
         if ($request->coupon_code && $request->selected_service_ids) {
-            $coupon = Coupon::where("code",$request->coupon_code)->first();
-            if($coupon){
+            $coupon = Coupon::where("code", $request->coupon_code)->first();
+            if ($coupon) {
                 $input['coupon_id'] = $coupon->id;
-                $discount = $coupon->getDiscountForProducts($selected_services,$sub_total);
-            }else{
+                $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+            } else {
                 $discount = 0;
             }
         } else {
@@ -152,37 +152,36 @@ class CheckOutController extends Controller
         $input['staff_charges'] = (int)$staff_charges;
         $input['transport_charges'] = (int)$transport_charges;
         $input['total_amount'] = (int)$total_amount;
-            
+
         $request->merge(['total_amount' => (float) $total_amount]);
-        
+
         try {
             $this->validate($request, [
                 'total_amount' => 'required|numeric|min:' . $minimum_booking_price
             ], [
-                'total_amount.min' => 'The total amount must be greater than or equal to AED'.$minimum_booking_price
+                'total_amount.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price
             ]);
         } catch (ValidationException $exception) {
             return response()->json(['errors' => $exception->errors()], 200);
         }
 
-        if($request->coupon_code && $request->selected_service_ids){
-            if($coupon){
-                $isValid = $coupon->isValidCoupon($request->coupon_code,$selected_services);
-                if($isValid !== true){
+        if ($request->coupon_code && $request->selected_service_ids) {
+            if ($coupon) {
+                $isValid = $coupon->isValidCoupon($request->coupon_code, $selected_services);
+                if ($isValid !== true) {
                     $errors = [
                         'coupon' => [$isValid],
                     ];
                     Cookie::queue(Cookie::forget('coupon_code'));
                     return response()->json(['errors' => $errors], 200);
                 }
-            }else{
+            } else {
                 $errors = [
                     'coupon' => ["Coupon is invalid!"],
                 ];
                 Cookie::queue(Cookie::forget('coupon_code'));
                 return response()->json(['errors' => $errors], 200);
             }
-            
         }
 
         $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Draft')->where('status', '!=', 'Rejected')->get();
@@ -202,8 +201,8 @@ class CheckOutController extends Controller
             $input['staff_name'] = $staff->name;
             $input['time_slot_id'] = $input['time_slot_id'][$staff->id];
             $input['driver_id'] = $staff->staff->driver_id;
-            $input['number'] = $request->number_country_code . ltrim($request->number,'0');
-            $input['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
+            $input['number'] = $request->number_country_code . ltrim($request->number, '0');
+            $input['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
 
             $user = User::where('email', $input['email'])->first();
 
@@ -241,7 +240,7 @@ class CheckOutController extends Controller
 
                 $user->assignRole('Customer');
             }
-            
+
             $time_slot = TimeSlot::find($input['time_slot_id']);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
@@ -257,7 +256,7 @@ class CheckOutController extends Controller
             OrderTotal::create($input);
             if ($input['coupon_code']) {
                 $coupon = Coupon::where('code', $input['coupon_code'])->first();
-                if($coupon){
+                if ($coupon) {
                     $input['coupon_id'] = $coupon->id;
                     CouponHistory::create($input);
                 }
@@ -276,7 +275,6 @@ class CheckOutController extends Controller
                 }
                 OrderService::create($input);
             }
-
         } else {
             $errors = [
                 'selected_service_ids' => ["Sorry! Unfortunately, this slot was booked by someone else just now."],
@@ -301,8 +299,8 @@ class CheckOutController extends Controller
         $address['street'] = $request->street;
         $address['landmark'] = $request->landmark;
         $address['city'] = $request->city;
-        $address['number'] = $request->number_country_code . ltrim($request->number,'0');
-        $address['whatsapp'] =$request->whatsapp_country_code . ltrim($request->whatsapp,'0');
+        $address['number'] = $request->number_country_code . ltrim($request->number, '0');
+        $address['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
         $address['email'] = $request->email;
         $address['name'] = $request->name;
         $address['searchField'] = $request->searchField;
@@ -316,7 +314,7 @@ class CheckOutController extends Controller
             $address['latitude'] = $request->latitude;
             $address['longitude'] = $request->longitude;
         }
-        
+
         cookie()->queue('address', json_encode($address), 5256000);
 
         return response()->json([
@@ -342,7 +340,7 @@ class CheckOutController extends Controller
             $address = json_decode($request->cookie('address'), true);
         } catch (\Throwable $th) {
         }
-        
+
         $addresses = [
             'buildingName' => $address['buildingName'] ?? '',
             'district' => $address['district'] ?? '',
@@ -370,14 +368,14 @@ class CheckOutController extends Controller
         }
 
         $coupon_code = '';
-        
+
         $coupon_code = request()->cookie('coupon_code');
 
         $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
-        
-        if($affiliate){
+
+        if ($affiliate) {
             $affiliate_code = request()->cookie('affiliate_code');
-        }else{
+        } else {
             Cookie::queue(Cookie::forget('affiliate_code'));
             $affiliate_code = "";
         }
@@ -397,7 +395,7 @@ class CheckOutController extends Controller
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $city = $addresses['city'];
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
         return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds'));
     }
 
@@ -408,14 +406,14 @@ class CheckOutController extends Controller
         $order->order_comment = $request->comment;
         $order->save();
         Session::forget('serviceIds');
-        
+
         $customer = $order->customer;
         $staff = User::find($order->service_staff_id);
-        if($staff){
+        if ($staff) {
             if (Carbon::now()->toDateString() == $order->date) {
-                $staff->notifyOnMobile('Order', 'New Order Generated.',$order->id);
+                $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
                 if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$order->id);
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
                 }
                 try {
                     $this->sendOrderEmail($order->id, $customer->email);
@@ -437,6 +435,10 @@ class CheckOutController extends Controller
 
     public function slots(Request $request)
     {
+        $serviceIds = [];
+
+        $serviceIds = $request->service_ids;
+
         if ($request->has('order_id') && (int)$request->order_id) {
             $order = Order::find($request->order_id);
             $area = $order->area;
@@ -460,7 +462,7 @@ class CheckOutController extends Controller
             $area = $address['area'] ?? '';
         }
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id, $serviceIds);
         return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date'));
     }
 
@@ -469,16 +471,16 @@ class CheckOutController extends Controller
         $couponCode = $request->input('coupon_code');
         $selectedServiceIds = $request->input('selected_service_ids');
 
-            $coupon = Coupon::where("code",$request->coupon_code)->first();
-            $services = Service::whereIn('id', $request->selected_service_ids)->get();
-            if($coupon){
-                $isValid = $coupon->isValidCoupon($request->coupon_code,$services);
-                if($isValid !== true){
-                    return response()->json(['error' => $isValid]);
-                }
-            }else{
-                return response()->json(['error' => "Coupon is invalid!"]);
+        $coupon = Coupon::where("code", $request->coupon_code)->first();
+        $services = Service::whereIn('id', $request->selected_service_ids)->get();
+        if ($coupon) {
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services);
+            if ($isValid !== true) {
+                return response()->json(['error' => $isValid]);
             }
+        } else {
+            return response()->json(['error' => "Coupon is invalid!"]);
+        }
 
         return response()->json(['message' => 'Coupon applied successfully']);
     }
@@ -497,7 +499,7 @@ class CheckOutController extends Controller
 
         return redirect()->back();
     }
-    
+
     public function sendCustomerEmail($customer_id, $type, $order_id)
     {
         if ($type == "Old") {
@@ -521,7 +523,7 @@ class CheckOutController extends Controller
         }
         $recipient_email = env('MAIL_FROM_ADDRESS');
 
-        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray,$recipient_email));
+        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray, $recipient_email));
 
         return redirect()->back();
     }

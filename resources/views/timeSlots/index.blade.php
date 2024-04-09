@@ -59,6 +59,7 @@
         @endif
 
     </div>
+    <h3>Time Slots  ({{ $total_time_slot }})</h3>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>

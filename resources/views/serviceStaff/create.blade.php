@@ -279,6 +279,13 @@
                                     <th>Price</th>
                                     <th>Duration</th>
                                 </tr>
+                                <tr>
+                                    <td>
+
+                                        <input type="checkbox" class="service-checkbox" name="service" value="all">
+                                    </td>
+                                    <td>All</td>
+                                </tr>
                                 @foreach ($services as $service)
                                 <tr>
                                     <td>
@@ -340,29 +347,16 @@
         if (categoryId === 'all') {
             var allCheckboxState = $(this).prop('checked');
             $('.category-checkbox').prop('checked', allCheckboxState);
-
-            if (allCheckboxState) {
-                $('.service-checkbox').prop('checked', true);
-            } else {
-                $('.service-checkbox').prop('checked', false);
-            }
-
-            $('.service-checkbox').closest('tr').show();
-        } else {
-            var serviceCheckboxes = $('.service-checkbox[data-category="' + categoryId + '"]');
-            serviceCheckboxes.prop('checked', $(this).prop('checked'));
-
-            $('.service-checkbox').closest('tr').hide();
-            $('.service-checkbox[data-category="' + categoryId + '"]').closest('tr').toggle($(this).prop('checked'));
         }
     });
 
     $('.service-checkbox').click(function() {
-        var categoryId = $(this).data('category');
-        var allServiceCheckboxes = $('.service-checkbox[data-category="' + categoryId + '"]');
-        var categoryCheckbox = $('.category-checkbox[value="' + categoryId + '"]');
+        var serviceId = $(this).val();
 
-        categoryCheckbox.prop('checked', allServiceCheckboxes.length === allServiceCheckboxes.filter(':checked').length);
+        if (serviceId === 'all') {
+            var allCheckboxState = $(this).prop('checked');
+            $('.service-checkbox').prop('checked', allCheckboxState);
+        }
     });
 </script>
 <script>

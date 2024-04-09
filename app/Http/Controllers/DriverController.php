@@ -37,11 +37,11 @@ class DriverController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
-
+        $total_driver = $query->count();
         $drivers = $query->paginate(config('app.paginate'));
         $filters = $request->only(['name']);
         $drivers->appends($filters);
-        return view('drivers.index',compact('drivers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('drivers.index',compact('total_driver','drivers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

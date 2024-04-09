@@ -21,9 +21,11 @@ class SettingController extends Controller
      */
     public function index()
     {
-        $settings = Setting::orderBy('key', 'ASC')->paginate(config('app.paginate'));
+        $query = Setting::orderBy('key', 'ASC');
+        $total_setting = $query->count();
+        $settings = $query->paginate(config('app.paginate'));
 
-        return view('settings.index', compact('settings'))
+        return view('settings.index', compact('settings', 'total_setting'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

@@ -30,8 +30,10 @@ class StaffGroupController extends Controller
      */
     public function index(Request $request)
     {
-        $staffGroups = StaffGroup::orderBy('name')->paginate(config('app.paginate'));
-        return view('staffGroups.index', compact('staffGroups'))
+        $query = StaffGroup::orderBy('name');
+        $total_staffGroup = $query->count();
+        $staffGroups = $query->paginate(config('app.paginate'));
+        return view('staffGroups.index', compact('total_staffGroup','staffGroups'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

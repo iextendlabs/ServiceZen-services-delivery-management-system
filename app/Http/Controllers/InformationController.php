@@ -36,12 +36,13 @@ class InformationController extends Controller
         if ($request->position) {
             $query->where('position', $request->position);
         }
+        $total_information = $query->count();
 
         $information = $query->paginate(config('app.paginate'));
 
         $filters = $request->only(['name', 'position']);
         $information->appends($filters);
-        return view('information.index', compact('information','filter'))
+        return view('information.index', compact('information','filter', 'total_information'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

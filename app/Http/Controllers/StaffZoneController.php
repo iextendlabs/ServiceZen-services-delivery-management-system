@@ -31,8 +31,10 @@ class StaffZoneController extends Controller
      */
     public function index(Request $request)
     {
-        $staffZones = StaffZone::orderBy('name')->paginate(config('app.paginate'));
-        return view('staffZones.index',compact('staffZones'))
+        $query = StaffZone::orderBy('name');
+        $total_staffZone = $query->count();
+        $staffZones = $query->paginate(config('app.paginate'));
+        return view('staffZones.index',compact('total_staffZone' , 'staffZones'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
