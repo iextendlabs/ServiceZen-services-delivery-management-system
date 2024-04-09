@@ -39,7 +39,7 @@
             </div>
         @endif
         <hr>
-        <h3>Customers  ({{ $total_customer }})</h3>
+        <h3>Customers ({{ $total_customer }})</h3>
         <div class="row">
             <div class="col-md-9">
                 <table class="table table-striped table-bordered">
@@ -49,8 +49,8 @@
                         </td>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Status</th>
                         <th>Orders</th>
+                        <th>Last Order Date</th>
                         <th>Affiliate</th>
                         <th width="280px">Action</th>
                     </tr>
@@ -61,16 +61,16 @@
                                     <input type="checkbox" class="item-checkbox" name="ids[{{ ++$i }}]"
                                         value="{{ $customer->id }}">
                                 </td>
-                                <td>{{ $customer->name }}</td>
+                                <td class="@if ($customer->status == 1) text-success @else text-danger @endif"> {{ $customer->name }}</td>
                                 <td>{{ $customer->email }}</td>
+                                <td>{{ $customer->customer_orders_count }}</td>
                                 <td>
-                                    @if ($customer->status == 1)
-                                        Enabled
+                                    @if ($customer->customerOrders->isEmpty())
+                                        No orders found.
                                     @else
-                                        Disabled
+                                        {{ $customer->customerOrders->last()->created_at->toDateString() }}
                                     @endif
                                 </td>
-                                <td>{{ $customer->customer_orders_count }}</td>
                                 <td>{{ $customer->userAffiliate->affiliateUser->name ?? '' }}@if (isset($customer->userAffiliate->affiliate->code))
                                         ({{ $customer->userAffiliate->affiliate->code }})
                                     @endif
