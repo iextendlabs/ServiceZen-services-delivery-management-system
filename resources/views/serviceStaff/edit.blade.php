@@ -19,7 +19,7 @@
     </div>
     @endif
     <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
-        <input type="hidden" value="{{ $serviceStaff->staff->id }}" name="staff_id">
+        <input type="hidden" value="{{ $serviceStaff->staff->id ?? "" }}" name="staff_id">
         @csrf
         @method('PUT')
         <input type="hidden" name="url" value="{{ url()->previous() }}">
@@ -51,7 +51,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Sub Title / Designation</strong>
-                            <input type="text" name="sub_title" class="form-control" value="{{ $serviceStaff->staff->sub_title }}" placeholder="Sub Title">
+                            <input type="text" name="sub_title" class="form-control" value="{{ $serviceStaff->staff->sub_title ?? "" }}" placeholder="Sub Title">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -64,14 +64,14 @@
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Phone Number:</strong>
                             <input id="number_country_code" type="hidden" name="number_country_code" />
-                            <input type="tel" id="number" name="phone" value="{{ $serviceStaff->staff->phone }}" class="form-control">
+                            <input type="tel" id="number" name="phone" value="{{ $serviceStaff->staff->phone ?? "" }}" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                             <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                            <input type="tel" id="whatsapp" name="whatsapp" value="{{ $serviceStaff->staff->whatsapp }}" class="form-control">
+                            <input type="tel" id="whatsapp" name="whatsapp" value="{{ $serviceStaff->staff->whatsapp ?? "" }}" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -87,7 +87,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>About:</strong>
-                            <textarea name="about" cols="20" rows="6" class="form-control">{{ $serviceStaff->staff->about }}</textarea>
+                            <textarea name="about" cols="20" rows="6" class="form-control">{{ $serviceStaff->staff->about ?? "" }}</textarea>
                             <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
                             <script>
                                 CKEDITOR.replace('about', {
@@ -108,7 +108,7 @@
                         <div class="form-group">
                             <strong for="image">Upload Image</strong>
                             <input type="file" name="image" class="form-control image-input" accept="image/*">
-                            <img class="image-preview" src="/staff-images/{{$serviceStaff->staff->image}}" height="130px">
+                            <img class="image-preview" src="/staff-images/{{$serviceStaff->staff->image ?? ""}}" height="130px">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -163,19 +163,25 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Commission:</strong>
-                            <input type="number" name="commission" value="{{ $serviceStaff->staff->commission }}" class="form-control" placeholder="Commission In %">
+                            <input type="number" name="commission" value="{{ $serviceStaff->staff->commission ?? "" }}" class="form-control" placeholder="Commission In %">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Additional Charges:</strong>
-                            <input type="number" name="charges" value="{{ $serviceStaff->staff->charges }}" class="form-control" placeholder="Additional Charges">
+                            <input type="number" name="charges" value="{{ $serviceStaff->staff->charges ?? "" }}" class="form-control" placeholder="Additional Charges">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Commission Salary:</strong>
-                            <input type="number" name="fix_salary" class="form-control" value="{{ $serviceStaff->staff->fix_salary }}" placeholder="Commission Salary">
+                            <input type="number" name="fix_salary" class="form-control" value="{{ $serviceStaff->staff->fix_salary ?? "" }}" placeholder="Commission Salary">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Minmum Order Value:</strong>
+                            <input type="number" name="min_order_value" class="form-control" value="{{ $serviceStaff->staff->min_order_value ?? "" }}" placeholder="Minmum Order Value">
                         </div>
                     </div>
                 </div>
@@ -186,31 +192,31 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Instagram <i class="fa fa-instagram"></i>:</strong>
-                            <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ $serviceStaff->staff->instagram }}">
+                            <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ $serviceStaff->staff->instagram ?? "" }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Snapchat:</strong>
-                            <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ $serviceStaff->staff->snapchat }}">
+                            <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ $serviceStaff->staff->snapchat ?? "" }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Facebook:</strong>
-                            <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ $serviceStaff->staff->facebook }}">
+                            <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ $serviceStaff->staff->facebook ?? "" }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Youtube:</strong>
-                            <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ $serviceStaff->staff->youtube }}">
+                            <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ $serviceStaff->staff->youtube ?? "" }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Tiktok:</strong>
-                            <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ $serviceStaff->staff->tiktok }}">
+                            <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ $serviceStaff->staff->tiktok ?? "" }}">
                         </div>
                     </div>
                 </div>
