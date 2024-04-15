@@ -260,7 +260,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'services' => $services,
-            'addONs' => $services->addONs ?? "",
+            'addONs' => $services->addONs,
             'variant' => $services->variant,
             'package' => $services->package,
             'faqs' => $FAQs
@@ -353,10 +353,6 @@ class CustomerController extends Controller
             $staff = User::find($input['service_staff_id']);
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
             
-            if ($staff->staff && $staff->staff->min_order_value) {
-                $minimum_booking_price = (float) $staff->staff->min_order_value;
-            }
-
             $services = Service::whereIn('id', $request->service_ids)->get();
 
             $sub_total = $services->sum(function ($service) {
@@ -388,14 +384,14 @@ class CustomerController extends Controller
                 'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
             ], [
                 'service_ids.*.exists' => 'Invalid service selection(s).',
-                'orderTotal.min' => 'The total amount must be greater than or equal to AED ' . $minimum_booking_price. ($staff->staff->min_order_value ? " For Selected Staff" : ""),
+                'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
             ]);
             
             $validator = Validator::make($request->all(), [
                 'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
                 'service_ids.*' => 'exists:services,id',
             ], [
-                'orderTotal.min' => 'The total amount must be greater than or equal to AED ' . $minimum_booking_price. ($staff->staff->min_order_value ? " For Selected Staff" : ""),
+                'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
                 'service_ids.*.exists' => 'Invalid service selection(s).',
             ]);
             
