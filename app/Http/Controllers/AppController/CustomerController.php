@@ -260,7 +260,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'services' => $services,
-            'addONs' => $services->addONs,
+            'addONs' => $services->addONs ?? "",
             'variant' => $services->variant,
             'package' => $services->package,
             'faqs' => $FAQs
