@@ -79,39 +79,37 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="affiliate_numbers">
-                                <div class="row mb-3">
-                                    <label for="number" class="col-md-4 col-form-label text-md-end">Phone Number</label>
+                            <div class="row mb-3">
+                                <label for="number" class="col-md-4 col-form-label text-md-end">Phone Number</label>
 
-                                    <div class="col-md-6">
-                                        <input id="number_country_code" type="hidden" name="number_country_code" />
-                                        <input id="number" type="tel"
-                                            class="form-control @error('number') is-invalid @enderror" name="number"
-                                            value="{{ old('number') }}" autocomplete="number">
+                                <div class="col-md-6">
+                                    <input id="number_country_code" type="hidden" name="number_country_code" />
+                                    <input id="number" type="tel"
+                                        class="form-control @error('number') is-invalid @enderror" name="number"
+                                        value="{{ old('number') }}" autocomplete="number">
 
-                                        @error('number')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                                    @error('number')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
-                                <div class="row mb-3">
-                                    <label for="whatsapp" class="col-md-4 col-form-label text-md-end">Whatsapp
-                                        whatsapp</label>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="whatsapp" class="col-md-4 col-form-label text-md-end">Whatsapp
+                                    whatsapp</label>
 
-                                    <div class="col-md-6">
-                                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                        <input id="whatsapp" type="tel"
-                                            class="form-control @error('whatsapp') is-invalid @enderror" name="whatsapp"
-                                            value="{{ old('whatsapp') }}" autocomplete="whatsapp">
+                                <div class="col-md-6">
+                                    <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                                    <input id="whatsapp" type="tel"
+                                        class="form-control @error('whatsapp') is-invalid @enderror" name="whatsapp"
+                                        value="{{ old('whatsapp') }}" autocomplete="whatsapp">
 
-                                        @error('whatsapp')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                                    @error('whatsapp')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="row mb-3 affiliate_code">
@@ -205,10 +203,8 @@
     
         function handleTypeChange(selectedValue) {
             if (selectedValue == "customer") {
-                $(".affiliate_numbers").hide();
                 $(".affiliate_code").show();
             } else {
-                $(".affiliate_numbers").show();
                 $(".affiliate_code").hide();
             }
         }
