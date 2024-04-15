@@ -125,6 +125,10 @@ class CheckOutController extends Controller
         $staff = User::find($input['service_staff_id']);
         $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
 
+        if ($staff->staff && $staff->staff->min_order_value) {
+            $minimum_booking_price = (float) $staff->staff->min_order_value;
+        }
+
         $selected_services = Service::whereIn('id', $request->selected_service_ids)->get();
 
         $sub_total = $selected_services->sum(function ($service) {
@@ -159,7 +163,7 @@ class CheckOutController extends Controller
             $this->validate($request, [
                 'total_amount' => 'required|numeric|min:' . $minimum_booking_price
             ], [
-                'total_amount.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price
+                'total_amount.min' => 'The total amount must be greater than or equal to AED ' . $minimum_booking_price . ($staff->staff->min_order_value ? " For Selected Staff" : "")
             ]);
         } catch (ValidationException $exception) {
             return response()->json(['errors' => $exception->errors()], 200);

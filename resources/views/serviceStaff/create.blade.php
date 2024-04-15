@@ -172,6 +172,12 @@
                             <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Commission Salary">
                         </div>
                     </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Minmum Order Value:</strong>
+                            <input type="number" name="min_order_value" class="form-control" value="{{ old('min_order_value') }}" placeholder="Minmum Order Value">
+                        </div>
+                    </div>
                 </div>
             </div>
             @if($socialLinks)
