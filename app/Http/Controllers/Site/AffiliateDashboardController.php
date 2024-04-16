@@ -185,7 +185,7 @@ class AffiliateDashboardController extends Controller
             return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
-        return redirect("customer-login")->with('error', 'Oppes! You are not Login.');
+        return redirect()->route('customer.login')->with('error', 'Oppes! You are not Login.');
     }
 
     /**

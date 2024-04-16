@@ -210,9 +210,9 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             @guest
-                                <a class="dropdown-item" href="/customer-login">Login</a>
-                                <a class="dropdown-item" href="/customer-registration">Register</a>
-                                <a class="dropdown-item" href="/customer-registration?type=affiliate">Register as
+                                <a class="dropdown-item" href="{{ route("customer.login") }}">Login</a>
+                                <a class="dropdown-item" href="{{ route("customer.registration") }}">Register</a>
+                                <a class="dropdown-item" href="{{ route("customer.registration") }}?type=affiliate">Register as
                                     Affiliate</a>
                             @else
                                 <a class="dropdown-item"
@@ -227,7 +227,7 @@
                                 @endif
                                 <a class="dropdown-item" href="{{ route('siteComplaints.index') }}">My Complaint</a>
                                 <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
-                                <a class="dropdown-item" href="/customer-logout">Logout</a>
+                                <a class="dropdown-item" href="{{ route('customer.logout') }}">Logout</a>
                                 <a class="dropdown-item" href="/deleteAccount">Delete Account</a>
                             @endguest
                         </div>

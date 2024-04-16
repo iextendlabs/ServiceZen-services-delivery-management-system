@@ -105,7 +105,7 @@ class CustomerAuthController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect('/')->with('success', 'You have successfully logged in');
         }
-        return redirect("customer-registration")->with('error', 'Oppes! You have entered invalid credentials');
+        return redirect()->route('customer.registration')->with('error', 'Oppes! You have entered invalid credentials');
     }
 
     public function index()
@@ -161,7 +161,7 @@ class CustomerAuthController extends Controller
             }
         }
 
-        return redirect("customer-login")->with('error', 'Oppes! You have entered invalid credentials');
+        return redirect()->route("customer.login")->with('error', 'Oppes! You have entered invalid credentials');
     }
 
     public function logout()
@@ -169,7 +169,7 @@ class CustomerAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        return Redirect('customer-login');
+        return redirect()->route("customer.login");
     }
 
     public function edit($id, Request $request)
@@ -367,7 +367,7 @@ class CustomerAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        return Redirect('customer-login');
+        return redirect()->route("customer.login");
     }
 
     public function JoinAffiliateProgram(){
