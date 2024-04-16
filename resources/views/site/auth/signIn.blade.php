@@ -31,7 +31,7 @@
                     </span>
                 @endif
                 <div class="card-body">
-                    <form method="POST" action="/customer-post-login">
+                    <form method="POST" action="{{ route('customer.post-login') }}">
                         @csrf
 
                         <div class="row mb-3">
@@ -69,10 +69,10 @@
                                 </button>
 
                                 
-                                <a class="btn btn-link" href="/customer-registration">
+                                <a class="btn btn-link" href="{{ route('customer.registration') }}">
                                     Register
                                 </a><br>
-                                <a class="btn btn-link" href="/customer-registration?type=affiliate">
+                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=affiliate">
                                     Register as Affiliate
                                 </a><br>
                                 @if (Route::has('password.request'))

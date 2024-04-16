@@ -36,7 +36,7 @@ class SiteOrdersController extends Controller
             return view('site.orders.index', compact('orders'))
                 ->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         } else {
-            return redirect('/customer-login')
+            return redirect()->route("customer.login")
                 ->with('error', 'Login to view order.');
         }
 
