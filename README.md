@@ -32,39 +32,5 @@ Customer data: This entity represents the customer data required to manage the s
 
 Business systems: This entity represents the integration points with other business systems, such as billing, inventory, and CRM systems.
 
-
-## Command to run this project
-composer install
-
-create database with name 'chatgpt_services_delivery_management_system' then
-
-php artisan migrate
-
-php artisan db:seed
-
-php artisan key:generate
-
-php artisan serve
-
-login with
-
-email: admin@gmail.com
-
-psw: admin1234
-
-## Admin and Store Demo Links
-
-Store link: https://services.upgradeopencart.com/
-
-## Test Customer User for Store
-User: test@customer.com
-Password: testcustomer
-
-Admin panel link: https://services.upgradeopencart.com/admin
-
-## Test Admin User
-User: admin@gmail.com
-Password: admin1234
-
 ## Project Status
 Development is in final stages , we will launch version 1 soon this year.
