@@ -1,4 +1,4 @@
-# Laravel Salon System - Services Delivery Management System Cloud Developed With Assistance Of AI
+# Laravel Salon / Services Management System - Services Delivery Management System Cloud Developed With Assistance Of AI
 
 Our Solution helps organizations manage the delivery of their services to customers. It provides end-to-end visibility into the service delivery process, from service request to delivery and ongoing support. The system allows organizations to streamline their service delivery operations, improve efficiency, and enhance customer satisfaction.
 
