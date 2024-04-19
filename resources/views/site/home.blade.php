@@ -136,8 +136,9 @@ $staffs_chunk = 4;
               <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $service->duration }}</small>
             </div>
 
-            <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
-
+            {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
+            <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
+          
 
           </div>
         </div>

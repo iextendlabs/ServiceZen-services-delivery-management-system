@@ -41,9 +41,9 @@
     </script>
     {!! $head_tag !!}
 </head>
-@if (session()->has('serviceIds'))
+@if (session()->has('bookingData'))
     @php
-        $cart_product = count(Session::get('serviceIds'));
+        $cart_product = count(Session::get('bookingData'));
     @endphp
 @else
     @php
@@ -262,6 +262,7 @@
         </nav>
         @include('site.layout.locationPopup')
 
+        <div id="addToCartPopup"></div>
     </header>
 
     <main role="main">
