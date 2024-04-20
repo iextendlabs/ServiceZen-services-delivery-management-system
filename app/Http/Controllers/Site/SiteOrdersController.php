@@ -312,10 +312,11 @@ class SiteOrdersController extends Controller
         return redirect('/bookingStep')->with('cart-success', 'Service Add to Cart Successfully.');
     }
 
-    public function cancelOrder($id)
+    public function cancelOrder($ids)
     {
-        $order = Order::find($id);
-        $order->delete();
+        $order_ids = explode(',', $ids);
+
+        Order::whereIn('id',$order_ids)->delete();
 
         return redirect("/")->with('success', 'Order Canceled successfully');
 
