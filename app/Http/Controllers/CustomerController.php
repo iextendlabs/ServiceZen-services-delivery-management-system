@@ -42,6 +42,7 @@ class CustomerController extends Controller
             'affiliate_id' => $request->affiliate_id,
             'date_from' => $request->date_from,
             'date_to' => $request->date_to,
+            'zone' => $request->zone,
         ];
 
         $query = User::role('Customer')->latest();
@@ -57,6 +58,12 @@ class CustomerController extends Controller
         if ($request->number) {
             $query->whereHas('customerProfile', function ($subQuery) use ($request) {
                 $subQuery->whereRaw('LOWER(number) LIKE ?', ['%' . strtolower($request->number) . '%']);
+            });
+        }
+
+        if ($request->zone) {
+            $query->whereHas('customerProfile', function ($subQuery) use ($request) {
+                $subQuery->whereRaw('area LIKE ?', ['%' . $request->zone . '%']);
             });
         }
 
