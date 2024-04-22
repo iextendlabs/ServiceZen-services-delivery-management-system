@@ -186,6 +186,13 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
+                                <strong>Zone:</strong>
+                                <input type="text" name="zone" value="{{ $filter['zone'] }}"
+                                    class="form-control" placeholder="Zone">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
                                 <strong>Order Count:</strong>
                                 <input type="number" name="order_count" value="{{ $filter['order_count'] }}"
                                     class="form-control" placeholder="Filter by order count">
