@@ -348,7 +348,7 @@
         </div>
     </div>
 
-    {{-- <script>
+    <script>
     $(document).ready(function() {
         $("#applyCouponBtn").click(function() {
             var couponCode = $("#coupon_code").val();
@@ -383,7 +383,7 @@
 
         });
     });
-</script> --}}
+</script>
     <script>
         $(document).ready(function() {
             $("#booking-form").submit(function(event) {

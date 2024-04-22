@@ -1323,11 +1323,19 @@ class CheckOutController extends Controller
 
     public function applyCoupon(Request $request)
     {
-        $couponCode = $request->input('coupon_code');
-        $selectedServiceIds = $request->input('selected_service_ids');
+        $bookingData = Session::get('bookingData', []);
+
+        $serviceIds = [];
+        foreach ($bookingData as $item) {
+            $serviceIds[] = $item["service_id"];
+        }
 
         $coupon = Coupon::where("code", $request->coupon_code)->first();
-        $services = Service::whereIn('id', $request->selected_service_ids)->get();
+        if(isset($request->selected_service_ids)){
+            $services = Service::whereIn('id', $request->selected_service_ids)->get();
+        }else{
+            $services = Service::whereIn('id', $serviceIds)->get();
+        }
         if ($coupon) {
             $isValid = $coupon->isValidCoupon($request->coupon_code, $services);
             if ($isValid !== true) {
