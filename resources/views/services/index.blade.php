@@ -94,11 +94,11 @@
         <table class="table table-striped table-bordered">
             <tr>
                 <th></th>
-                <th class="text-left">Name</th>
-                <th class="text-right">Price</th>
-                <th class="text-right">Duration</th>
-                <th class="text-right">Status</th>
-                <th class="text-left">Type</th>
+                <th class="text-left"><a href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a></th>
+                <th class="text-right"><a href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'price', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Price</a></th>
+                <th class="text-right"><a href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'duration', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Duration</a></th>
+                <th class="text-right"><a href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a></th>
+                <th class="text-left"><a href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a></th>
                 <th class="text-right">Action</th>
             </tr>
             @if(count($services))
