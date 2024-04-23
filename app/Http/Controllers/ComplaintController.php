@@ -28,13 +28,15 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'title');
+        $direction = $request->input('direction', 'asc');
         $filter = [
             'title' => $request->title,
             'order_id' => $request->order_id,
             'user' => $request->user,
             'status' => $request->status
         ];
-        $query = Complaint::orderBy('title');
+        $query = Complaint::orderBy($sort, $direction);
 
         if ($request->title) {
             $query->where('title', 'like', '%'.$request->title . '%');
@@ -57,8 +59,8 @@ class ComplaintController extends Controller
         $complaints = $query->paginate(config('app.paginate'));
 
         $filters = $request->only(['title','order_id','user','status']);
-        $complaints->appends($filters);
-        return view('complaints.index', compact('complaints', 'filter', 'total_complaint'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $complaints->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+        return view('complaints.index', compact('complaints', 'filter', 'total_complaint', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

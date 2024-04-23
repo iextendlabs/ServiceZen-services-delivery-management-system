@@ -27,12 +27,60 @@
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>
-            <th class="text-left">Name</th>
-            <th class="text-left">Code</th>
-            <th class="text-right">Discount</th>
-            <th class="text-left">Date Start</th>
-            <th class="text-left">Date End</th>
-            <th class="text-left">Status</th>
+            <th>
+                <div class="d-flex">
+                    <a class="ml-2 text-black text-decoration-none" href="{{ route('coupons.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                    @if (request('sort') === 'name')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+
+                </div>
+            </th>
+            <th>
+                <div class="d-flex">
+                    <a class="ml-2 text-black text-decoration-none" href="{{ route('coupons.index', array_merge(request()->query(), ['sort' => 'code', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Code</a>
+                    @if (request('sort') === 'code')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+
+                </div>
+            </th>
+            <th>
+                <div class="d-flex">
+                    <a class="ml-2 text-black text-decoration-none" href="{{ route('coupons.index', array_merge(request()->query(), ['sort' => 'discount', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Discount</a>
+                    @if (request('sort') === 'discount')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+
+                </div>
+            </th>
+            <th>
+                <div class="d-flex">
+                    <a class="ml-2 text-black text-decoration-none" href="{{ route('coupons.index', array_merge(request()->query(), ['sort' => 'date_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date Start</a>
+                    @if (request('sort') === 'date_start')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+
+                </div>
+            </th>
+            <th>
+                <div class="d-flex">
+                    <a class="ml-2 text-black text-decoration-none" href="{{ route('coupons.index', array_merge(request()->query(), ['sort' => 'date_end', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date End</a>
+                    @if (request('sort') === 'date_end')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+
+                </div>
+            </th>
+            <th>
+                <div class="d-flex">
+                    <a class="ml-2 text-black text-decoration-none" href="{{ route('coupons.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
+                    @if (request('sort') === 'status')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+
+                </div>
+            </th>
             <th class="text-right">Action</th>
         </tr>
         @if(count($coupons))

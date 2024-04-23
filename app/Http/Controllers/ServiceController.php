@@ -72,7 +72,7 @@ class ServiceController extends Controller
         $filters = $request->only(['name', 'price', 'category_id']);
         $services->appends(array_merge($filters, ['sort' => $sort, 'direction' => $direction]));
         
-        return view('services.index', compact('total_service','services', 'service_categories', 'filter', 'variant_service', 'master_services'))
+        return view('services.index', compact('total_service','services', 'service_categories', 'filter', 'variant_service', 'master_services', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

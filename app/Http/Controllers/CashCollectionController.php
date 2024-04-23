@@ -30,10 +30,12 @@ class CashCollectionController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'asc');
         $filter_status = $request->status;
         $filter_order_id = $request->order_id;
 
-        $query = CashCollection::latest();
+        $query = CashCollection::orderBy($sort, $direction);
 
         if ($request->status) {
             $query->where('status', $request->status);
@@ -46,10 +48,11 @@ class CashCollectionController extends Controller
         if ($request->csv == 1 || $request->print == 1) {
             $cash_collections = $query->get();
         } else {
+            
             $total_cash_collection = $query->count();
             $cash_collections = $query->paginate(config('app.paginate'));
         }
-        
+ 
         if ($request->csv == 1) {
             // Set the CSV response headers
             $headers = array(
@@ -84,8 +87,8 @@ class CashCollectionController extends Controller
             return view('cashCollections.print', compact('cash_collections'));
         } else {
             $filters = $request->only(['status','order_id']);
-            $cash_collections->appends($filters);
-            return view('cashCollections.index',compact('total_cash_collection','cash_collections','filter_status','filter_order_id'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            $cash_collections->appends($filters,['sort' => $sort, 'direction' => $direction]);
+            return view('cashCollections.index',compact('total_cash_collection','cash_collections','filter_status','filter_order_id', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
 
