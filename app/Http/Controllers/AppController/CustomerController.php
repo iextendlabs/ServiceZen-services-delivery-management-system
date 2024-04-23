@@ -98,6 +98,8 @@ class CustomerController extends Controller
         $customerProfile = CustomerProfile::where('user_id', $input['user_id'])->first();
         if ($customerProfile) {
             $customerProfile->update($input);
+        }else{
+            CustomerProfile::create($input);
         }
         return response()->json([
             'msg' => "Updated Successfully!",
