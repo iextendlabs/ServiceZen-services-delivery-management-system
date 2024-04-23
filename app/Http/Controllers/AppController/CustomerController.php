@@ -1105,6 +1105,13 @@ class CustomerController extends Controller
                 $input['device_token'] = $request->fcmToken;
             }
             $user = User::create($input);
+            
+            $input['user_id'] = $user->id;
+
+            if ($request->number && $request->whatsapp) {
+                CustomerProfile::create($input);
+            }
+            
             $dataArray = [
                 'name' => $input['name'],
                 'email' => $input['email'],
