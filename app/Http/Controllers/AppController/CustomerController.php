@@ -117,18 +117,20 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
         }
-
-        if(strlen(trim($request->number)) < 6 ){
-            return response()->json([
-                'msg' => "Please check the phone number."
-            ], 201);
+        if(isset($request->number) && isset($request->whatsapp)){
+            if(strlen(trim($request->number)) < 6 ){
+                return response()->json([
+                    'msg' => "Please check the phone number."
+                ], 201);
+            }
+    
+            if(strlen(trim($request->whatsapp)) < 6){
+                return response()->json([
+                    'msg' => "Please check the whatsapp number."
+                ], 201);
+            }
         }
-
-        if(strlen(trim($request->whatsapp)) < 6){
-            return response()->json([
-                'msg' => "Please check the whatsapp number."
-            ], 201);
-        }
+        
 
         // If validation passes, proceed with creating the user
         $input = $request->all();
