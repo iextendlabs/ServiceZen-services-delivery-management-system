@@ -118,6 +118,18 @@ class CustomerController extends Controller
             return response()->json(['errors' => $validator->errors()], 201);
         }
 
+        if(strlen(trim($request->number)) < 6 ){
+            return response()->json([
+                'msg' => "Please check the phone number."
+            ], 201);
+        }
+
+        if(strlen(trim($request->whatsapp)) < 6){
+            return response()->json([
+                'msg' => "Please check the whatsapp number."
+            ], 201);
+        }
+
         // If validation passes, proceed with creating the user
         $input = $request->all();
         $input['customer_source'] = "Android";
@@ -128,6 +140,11 @@ class CustomerController extends Controller
         }
         $user = User::create($input);
         $user->assignRole("Customer");
+        $input['user_id'] = $user->id;
+
+        if ($request->number && $request->whatsapp) {
+            CustomerProfile::create($input);
+        }
         $affiliate_code = "";
         if ($request->affiliate) {
             $affiliate = Affiliate::where('code', $request->affiliate)->first();
@@ -338,13 +355,13 @@ class CustomerController extends Controller
 
         if(strlen(trim($request->number)) < 6 ){
             return response()->json([
-                'msg' => "Pleas check the number in personal information."
+                'msg' => "Please check the number in personal information."
             ], 201);
         }
 
         if(strlen(trim($request->whatsapp)) < 6){
             return response()->json([
-                'msg' => "Pleas check the whatsapp in personal information."
+                'msg' => "Please check the whatsapp in personal information."
             ], 201);
         }
         try{
