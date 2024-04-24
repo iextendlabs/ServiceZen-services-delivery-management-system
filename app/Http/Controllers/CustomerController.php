@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Coupon;
 use App\Models\UserAffiliate;
 use App\Models\CustomerCoupon;
+use App\Models\StaffZone;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use DB;
@@ -45,6 +46,7 @@ class CustomerController extends Controller
             'zone' => $request->zone,
         ];
 
+        $staffZones = StaffZone::get();
         $query = User::role('Customer')->latest();
 
         if ($request->name) {
@@ -220,10 +222,10 @@ class CustomerController extends Controller
             $affiliates = User::role('Affiliate')->orderBy('name')->get();
             $coupons = Coupon::where('status', '1')->get();
 
-            $filters = $request->only(['name', 'email', 'number', 'affiliate_id', 'order_count', 'date_from', 'date_to']);
+            $filters = $request->only(['name', 'email', 'number', 'affiliate_id', 'order_count', 'date_from', 'date_to','zone']);
             $customers->appends($filters);
-
-            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates','total_customer'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
+            
+            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates','total_customer','staffZones'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
