@@ -349,6 +349,71 @@ class CustomerController extends Controller
         }
     }
 
+    public function servicesTimeSlot(Request $request)
+    {
+        try {
+            if(isset($request->service_id)){
+                $serviceIds = $request->service_id;
+            }else{
+                $serviceIds = null;
+            }
+            $transportCharges = StaffZone::where('name', $request->area)->value('transport_charges');
+            [$timeSlots, $staffIds, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date,$order=null,$serviceIds);
+            $availableStaff = [];
+            $staffDisplayed = [];
+            $staffSlots = [];
+
+            foreach ($timeSlots as $timeSlot) {
+                $staffCounter = 0;
+                $holidayCounter = 0;
+                $bookedCounter = 0;
+
+                foreach ($timeSlot->staffs as $staff) {
+                    if (!in_array($staff->id, $staffIds)) {
+                        $bookedCounter++;
+                    }
+                    if (!in_array($staff->id, $timeSlot->excluded_staff)) {
+                        $holidayCounter++;
+                    }
+                    if (!in_array($staff->id, $staffIds) && !in_array($staff->id, $timeSlot->excluded_staff)) {
+                        $staffCounter++;
+                        $currentSlot = [$timeSlot->id, date('h:i A', strtotime($timeSlot->time_start)) . '-- ' . date('h:i A', strtotime($timeSlot->time_end)), $timeSlot->id];
+
+                        if (isset($staffSlots[$staff->id])) {
+                            array_push($staffSlots[$staff->id], $currentSlot);
+                        } else {
+                            $staffSlots[$staff->id] = [$currentSlot];
+                        }
+
+                        if (!in_array($staff->id, $staffDisplayed)) {
+                            $staffDisplayed[] = $staff->id;
+                            $availableStaff[] = $staff;
+                        }
+                    }
+                }
+            }
+
+            if (count($staffDisplayed) == 0) {
+                return response()->json([
+                    'msg' => "Whoops! No Staff Available",
+                ], 201);
+            }
+
+            $availableStaff = collect($availableStaff)->map(function ($staff) {
+                $staff->rating = $staff->averageRating();
+                return $staff;
+            });
+
+            return response()->json([
+                'transport_charges' => $transportCharges,
+                'availableStaff' => $availableStaff,
+                'slots' => $staffSlots,
+            ], 200);
+        } catch (\Exception $e) {
+            // Handle exceptions (log or return an error response)
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
     public function addOrder(Request $request)
     {
