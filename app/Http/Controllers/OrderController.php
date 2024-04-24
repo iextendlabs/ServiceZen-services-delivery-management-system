@@ -237,7 +237,7 @@ class OrderController extends Controller
 
             $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id']);
             $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

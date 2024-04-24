@@ -31,13 +31,14 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'desc');
         $filter = [
             'name' => $request->name,
             'role' => $request->role
         ];
-
-        $roles = Role::all();
-        $query = User::orderBy('id','DESC');
+            $roles = Role::all();
+        $query = User::orderBy($sort,$direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
@@ -49,7 +50,7 @@ class UserController extends Controller
         $total_user = $query->count();
         $data = $query->get();
         
-        return view('users.index',compact('total_user','data','roles','filter'));
+        return view('users.index',compact('total_user','data','roles','filter', 'direction'));
     }
     
     /**

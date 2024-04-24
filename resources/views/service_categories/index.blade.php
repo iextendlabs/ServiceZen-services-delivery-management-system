@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="float-left">
-                    <h2>Service Categories</h2>
+                    <h2>Service Categories ({{ $total_service_categorie }})</h2>
                 </div>
                 <div class="float-right">
                     @can('service-category-create')
@@ -25,7 +25,7 @@
             </div>
         @endif
         <hr>
-        <h3>Service Categories ({{ $total_service_categorie }})</h3>
+        {{-- <h3>Service Categories </h3> --}}
         <table class="table table-striped table-bordered">
             <tr>
                 <th>Sr#</th>

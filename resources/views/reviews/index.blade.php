@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="float-left">
-                    <h2>Review</h2>
+                    <h2>Review ({{ $total_review }})</h2>
                 </div>
                 <div class="float-right">
                     @can('review-create')
@@ -20,7 +20,6 @@
             </div>
         @endif
         <hr>
-        <h3>Review ({{ $total_review }})</h3>
         <table class="table table-striped table-bordered">
             <tr>
                 <th>Sr#</th>

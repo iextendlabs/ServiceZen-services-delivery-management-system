@@ -35,6 +35,8 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'desc');
         $filter = [
             'name' => $request->name,
             'email' => $request->email,
@@ -42,7 +44,7 @@ class CustomerController extends Controller
             'affiliate_id' => $request->affiliate_id,
         ];
     
-        $query = User::role('Customer')->latest();
+        $query = User::role('Customer')->orderby($sort, $direction);
     
         if ($request->name) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->name) . '%']);
@@ -131,9 +133,9 @@ class CustomerController extends Controller
             $coupons = Coupon::where('status', '1')->get();
             
             $filters = $request->only(['name', 'email', 'number', 'affiliate_id']);
-            $customers->appends($filters);
+            $customers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
     
-            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates', 'total_customer'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
+            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates', 'total_customer', 'direction'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

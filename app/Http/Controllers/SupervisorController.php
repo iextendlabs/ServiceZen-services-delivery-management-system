@@ -31,9 +31,11 @@ class SupervisorController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
 
-        $query = User::role('Supervisor')->latest();
+        $query = User::role('Supervisor')->orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
@@ -42,8 +44,8 @@ class SupervisorController extends Controller
 
         $supervisors = $query->paginate(config('app.paginate'));
         $filters = $request->only(['name']);
-        $supervisors->appends($filters);
-        return view('supervisors.index', compact('supervisors','filter_name', 'total_supervisors'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $supervisors->appends($filters,['sort' => $sort, 'direction' => $direction]);
+        return view('supervisors.index', compact('supervisors','filter_name', 'total_supervisors', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

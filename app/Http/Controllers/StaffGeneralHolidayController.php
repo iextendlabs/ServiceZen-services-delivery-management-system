@@ -32,7 +32,9 @@ class StaffGeneralHolidayController extends Controller
      */
     public function index(Request $request)
     {
-        $query =  StaffGeneralHoliday::orderBy('day', 'DESC');
+        $sort = $request->input('sort', 'day');
+        $direction = $request->input('direction', 'asc');
+        $query =  StaffGeneralHoliday::orderBy($sort, $direction);
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
@@ -46,7 +48,7 @@ class StaffGeneralHolidayController extends Controller
         $staffGeneralHolidays =  $query->paginate(config('app.paginate'));
 
 
-        return view('staffGeneralHolidays.index',compact('staffGeneralHolidays', 'total_Staff_general_holiday'))
+        return view('staffGeneralHolidays.index',compact('staffGeneralHolidays', 'total_Staff_general_holiday', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     

@@ -23,7 +23,9 @@ class LongHolidayController extends Controller
      */
     public function index(Request $request)
     {
-        $query =  LongHoliday::orderBy('date_start');
+        $sort = $request->input('sort', 'date_start');
+        $direction = $request->input('direction', 'asc');
+        $query =  LongHoliday::orderBy($sort, $direction);
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
@@ -38,7 +40,7 @@ class LongHolidayController extends Controller
         $longHolidays =  $query->paginate(config('app.paginate'));
 
 
-        return view('longHolidays.index', compact('longHolidays', 'total_longHoliday'))
+        return view('longHolidays.index', compact('longHolidays', 'total_longHoliday', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

@@ -3,7 +3,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <h2>Staff Group</h2>
+                <h2>Staff Group ({{ $total_staffGroup }})</h2>
             </div>
             <div class="col-md-6">
                 @can('staff-group-create')
@@ -18,7 +18,7 @@
             </div>
         @endif
         <hr>
-        <h3>Staff Group ({{ $total_staffGroup }})</h3>
+        
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-striped table-bordered">

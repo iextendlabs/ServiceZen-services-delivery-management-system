@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h2>Coupons</h2>
+            <h2>Coupons   ({{ $total_coupons }})</h2>
         </div>
         <div class="col-md-6">
             @can('coupon-create')
@@ -23,7 +23,7 @@
     </div>
     @endif
     <hr>
-    <h3>Coupons  ({{ $total_coupons }})</h3>
+    {{-- <h3>Coupons</h3> --}}
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>

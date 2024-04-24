@@ -29,10 +29,12 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Role::orderBy('id','DESC');
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'desc');
+        $query = Role::orderBy($sort,$direction);
         $total_role = $query->count();
         $roles = $query->paginate(config('app.paginate'));
-        return view('roles.index',compact('roles', 'total_role'))
+        return view('roles.index',compact('roles', 'total_role', 'direction'))
             ->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
     }
     
