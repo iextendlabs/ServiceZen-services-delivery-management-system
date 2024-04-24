@@ -186,11 +186,16 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <strong>Zone:</strong>
-                                <input type="text" name="zone" value="{{ $filter['zone'] }}"
-                                    class="form-control" placeholder="Zone">
+                                <label for="zone"><strong>Zone:</strong></label>
+                                <select name="zone" id="zone" class="form-control">
+                                    <option value="">Select a zone</option>
+                                    @foreach ($staffZones as $zone)
+                                        <option value="{{ $zone->name }}" @if($zone->name == $filter['zone']) selected @endif>{{ $zone->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
+                        
                         <div class="col-12">
                             <div class="form-group">
                                 <strong>Order Count:</strong>

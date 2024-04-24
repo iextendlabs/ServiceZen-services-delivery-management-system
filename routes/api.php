@@ -47,6 +47,7 @@ Route::post('addShortHoliday', [StaffAppController2::class, 'addShortHoliday']);
 Route::post('customerLogin', [CustomerController::class, 'login']);
 Route::post('customerSignup', [CustomerController::class, 'signup']);
 Route::get('appIndex', [CustomerController::class, 'index']);
+Route::get('servicesTimeSlot', [CustomerController::class, 'servicesTimeSlot']);
 Route::get('availableTimeSlot', [CustomerController::class, 'availableTimeSlot']);
 Route::post('addOrder', [CustomerController::class, 'addOrder']);
 Route::get('getOrders', [CustomerController::class, 'getOrders']);
