@@ -353,7 +353,7 @@ class CustomerController extends Controller
     {
         try {
             if(isset($request->service_id)){
-                $serviceIds = $request->service_id;
+                $serviceIds = [$request->service_id];
             }else{
                 $serviceIds = null;
             }
