@@ -1265,7 +1265,7 @@ class CustomerController extends Controller
 
                 if($request->zone){
                     $zone = StaffZone::where('name', $request->zone)->first();
-                    $transport_charges = $zone
+                    $transport_charges += $zone
                     ? $zone->transport_charges
                     : 0;
                 }
