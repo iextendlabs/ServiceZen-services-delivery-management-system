@@ -1262,14 +1262,14 @@ class CustomerController extends Controller
                 $staff_charges += $staff && $staff->staff
                 ? $staff->staff->charges
                 : 0;
+
+                if($request->zone){
+                    $zone = StaffZone::where('name', $request->zone)->first();
+                    $transport_charges = $zone
+                    ? $zone->transport_charges
+                    : 0;
+                }
             }
-        }
-        
-        if($request->zone){
-            $zone = StaffZone::where('name', $request->zone)->first();
-            $transport_charges = $zone
-            ? $zone->transport_charges
-            : 0;
         }
     
         if($request->coupon_id && $services){
