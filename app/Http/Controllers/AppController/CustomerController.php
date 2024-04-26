@@ -1207,8 +1207,12 @@ class CustomerController extends Controller
                 return isset($service->discount) ? $service->discount : $service->price;
             });
         }
-        
-        if($request->staff_id){
+        if(is_array($request->staff_id)){
+            $all_selected_staff = User::whereIn('id', $request->staff_id)->get();
+            $staff_charges = $all_selected_staff->sum(function ($staff) {
+                return $staff->staff->charges ?? 0;
+            });
+        }elseif($request->staff_id){
             $user = User::find($request->staff_id);
             $staff_charges = $user && $user->staff
             ? $user->staff->charges
