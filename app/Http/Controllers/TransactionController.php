@@ -61,14 +61,14 @@ class TransactionController extends Controller
                     $input['amount'] = $request->amount;
                     Transaction::create($input);
                 }
-            } else {
-                $input['type'] = "Order Commission";
-                Transaction::create($input);
             }
-
-            return redirect()->back()
-                ->with('success', 'Transaction successfully Approved.');
+        } else {
+            $input['type'] = "Order Commission";
+            Transaction::create($input);
         }
+        
+        return redirect()->back()
+            ->with('success', 'Transaction successfully Approved.');
     }
 
     /**
