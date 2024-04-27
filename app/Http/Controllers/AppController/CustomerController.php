@@ -1599,6 +1599,24 @@ class CustomerController extends Controller
                 }
                 OrderService::create($input);
             }
+
+            if (Carbon::now()->toDateString() == $input['date']) {
+                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                }
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
+            }
+            try {
+                $this->sendAdminEmail($input['order_id'], $input['email']);
+                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
         }
        
         return [$customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount];
