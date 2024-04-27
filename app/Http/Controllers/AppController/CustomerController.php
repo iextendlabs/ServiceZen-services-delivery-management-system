@@ -687,6 +687,11 @@ class CustomerController extends Controller
                 'msg' => "Whoops! No Staff Available",
             ], 201);
         }
+        if($order->orderServices){
+            $orderServicesId = $order->orderServices->pluck('service_id')->toArray();
+        }else{
+            $orderServicesId = [];
+        }
 
         return response()->json([
             'transport_charges' => $transport_charges,
@@ -694,6 +699,7 @@ class CustomerController extends Controller
             'orderTotal' => $orderTotal,
             'slots' => $staff_slots,
             'order' => $order,
+            'orderServicesId' => $orderServicesId
         ], 200);
     }
 
