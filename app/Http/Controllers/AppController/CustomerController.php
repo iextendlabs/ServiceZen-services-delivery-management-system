@@ -650,7 +650,13 @@ class CustomerController extends Controller
         $orderTotal = OrderTotal::where('order_id', $request->id)->first();
         $transport_charges = StaffZone::where('name', $order->area)->value('transport_charges');
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $request->id);
+        if($order->orderServices){
+            $orderServicesId = $order->orderServices->pluck('service_id')->toArray();
+        }else{
+            $orderServicesId = [];
+        }
+
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $request->id, $orderServicesId);
 
         $availableStaff = [];
         $staff_displayed = [];
@@ -686,11 +692,6 @@ class CustomerController extends Controller
             return response()->json([
                 'msg' => "Whoops! No Staff Available",
             ], 201);
-        }
-        if($order->orderServices){
-            $orderServicesId = $order->orderServices->pluck('service_id')->toArray();
-        }else{
-            $orderServicesId = [];
         }
 
         return response()->json([
