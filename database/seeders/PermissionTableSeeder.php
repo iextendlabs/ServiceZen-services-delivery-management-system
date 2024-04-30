@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'withdraw-list',
+            'withdraw-create',
+            'withdraw-edit',
+            'withdraw-delete',
             'complaint-list',
             'complaint-create',
             'complaint-edit',

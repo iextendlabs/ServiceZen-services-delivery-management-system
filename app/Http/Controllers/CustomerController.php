@@ -462,4 +462,63 @@ class CustomerController extends Controller
         return redirect($previousUrl)
             ->with('success', 'Customer Coupon deleted successfully');
     }
+
+    public function bulkUpdateAffiliate(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'affiliate' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission) || !is_null($request->expireDate);
+                }),
+            ],
+            'commission' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->type);
+                }),
+            ],
+            'type' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission);
+                }),
+            ],
+        ], [
+            'affiliate.required' => 'An affiliate is required when commission or expiry date is set.',
+            'commission.required' => 'A commission is required when the type is set.',
+            'type.required' => 'A type is required when the commission is set.',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $input = $request->all();
+
+        $input['affiliate_id'] = $request->affiliate;
+        $input['expiry_date'] = $request->expiry_date;
+
+        try {
+            // Update affiliate for each selected customer
+            foreach ($request->selectedItems as $customerId) {
+                $input['user_id'] = $customerId;
+
+                $userAffiliate = UserAffiliate::where("user_id", $input['user_id'])->first();
+                if ($userAffiliate) {
+                    $userAffiliate->type = $request->type;
+                    $userAffiliate->commission = $request->commission;
+                    $userAffiliate->affiliate_id = $request->affiliate;
+                    $userAffiliate->expiry_date = $request->expireDate;
+                    $userAffiliate->save();
+                } else {
+                    UserAffiliate::create($input);
+                }
+            }
+
+            return response()->json(['message' => 'Affiliate updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error updating affiliate'], 500);
+        }
+    }
 }

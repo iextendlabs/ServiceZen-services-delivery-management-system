@@ -37,7 +37,8 @@ use App\Http\Controllers\{
     CompanyController,
     CkeditorController,
     ComplaintController,
-    InformationController
+    InformationController,
+    WithdrawController
 };
 
 use App\Http\Controllers\AppController\{
@@ -170,6 +171,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('complaints', ComplaintController::class);
     Route::post('/add-complaint-chat', [ComplaintController::class, 'addComplaintChat'])->name('complaints.addComplaintChat');
     Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
+
+    Route::post('/customers/update-affiliate', [CustomerController::class, 'bulkUpdateAffiliate'])->name('customers.updateAffiliate');
+
+    Route::resource('withdraws', WithdrawController::class);
+    Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus');
 });
 
 Route::get('customer-login', [CustomerAuthController::class, 'index'])->name('customer.login');
@@ -186,6 +192,7 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
     Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
     Route::resource('staffProfile', StaffProfileController::class);
     Route::resource('siteComplaints', SiteComplaintController::class);
+    Route::post('affiliateWithdraw', [AffiliateDashboardController::class, 'affiliateWithdraw'])->name('affiliate.withdraw');
 });
 
 // Backups
