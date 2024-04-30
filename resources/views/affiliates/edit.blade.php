@@ -103,7 +103,7 @@
                             @foreach ($affiliates as $single_affiliate)
                                 @if ($single_affiliate->id !== $affiliate->id)
                                     <option value="{{ $single_affiliate->id }}"
-                                        @if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id === $single_affiliate->id) selected @endif> {{ $single_affiliate->name }}
+                                        @if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id == $single_affiliate->id) selected @endif> {{ $single_affiliate->name }}
                                     </option>
                                 @endif
                             @endforeach
