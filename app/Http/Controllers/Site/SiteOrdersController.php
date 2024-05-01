@@ -300,22 +300,24 @@ class SiteOrdersController extends Controller
         $order = Order::find($order_id);
 
         foreach ($order->orderServices as $service) {
-            $serviceIds[] = $service->service_id;
+            $formattedBooking = [
+                'service_id' => $service->service_id,
+                'date' => date('Y-m-d'),
+                'service_staff_id' => $order->service_staff_id,
+                'time_slot_id' => $order->time_slot_id,
+            ];
+            $bookingData[] = $formattedBooking;
         }
-        if (session()->has('serviceIds')) {
-            Session::forget('serviceIds');
-            Session::put('serviceIds', $serviceIds);
-        } else {
-            Session::put('serviceIds', $serviceIds);
-        }
+        Session::put('bookingData', $bookingData);
 
         return redirect('/bookingStep')->with('cart-success', 'Service Add to Cart Successfully.');
     }
 
-    public function cancelOrder($id)
+    public function cancelOrder($ids)
     {
-        $order = Order::find($id);
-        $order->delete();
+        $order_ids = explode(',', $ids);
+
+        Order::whereIn('id',$order_ids)->delete();
 
         return redirect("/")->with('success', 'Order Canceled successfully');
 

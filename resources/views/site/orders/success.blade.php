@@ -9,7 +9,7 @@
   <div class="container">
         <li>Your order has been successfully processed!</li>
         <li>We have send you email with your login credentials.</li>
-        @if($password)
+        @if(isset($password))
         <li>Your Password is {{$password}}</li>
         @endif
         <li>Visit our website for your order detail and book more service</li>

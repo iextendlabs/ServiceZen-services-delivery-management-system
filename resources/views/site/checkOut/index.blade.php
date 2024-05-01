@@ -24,44 +24,52 @@ $total_amount = 0;
         </span>
         @endif
     </div>
-    @if(count($booked_services) != 0)
+    @if(count($formattedBookings) != 0)
     <table class="table table-striped table-bordered album bg-light">
         <tr>
-            <th>image</th>
+            <th>Image</th>
             <th>Service Name</th>
             <th>
                 <span>Price</span><br>
                 <span>Duration</span>
             </th>
+            <th>
+                Booking Detail
+            </th>
             <th>Action</th>
         </tr>
-        @foreach ($booked_services as $booked_service)
+        @foreach ($formattedBookings as $key => $booking)
         <tr>
-            <td><img src="service-images/{{ $booked_service->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"></td>
-            <td>{{ $booked_service->name }}</td>
+            <td><img src="service-images/{{ $booking['service']->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"></td>
+            <td>{{ $booking['service']->name }}</td>
             <td>
                 <span>
-                    @if(isset($booked_service->discount))  
-                        @currency($booked_service->discount) 
+                    @if(isset($booking['service']->discount))  
+                        @currency($booking['service']->discount) 
                     @else 
-                        @currency($booked_service->price)
+                        @currency($booking['service']->price)
                     @endif
                 </span><br>
-                <span>{{ $booked_service->duration }}</span>
+                <span>{{ $booking['service']->duration }}</span>
+            </td>
+            <td>
+                <i class="fa fa-calendar"></i> {{ $booking['date'] }} <br>
+                <i class="fa fa-user"></i> {{ $booking['staff'] }} <br>
+                <i class="fa fa-clock"></i>  {{ $booking['slot'] }} <br>
             </td>
             <td>
                 <div class="btn-group">
-                    <a href="/removeToCart/{{ $booked_service->id }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>
+                    <a href="/removeToCart/{{ $key }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>
                 </div>
             </td>
         </tr>
-        @if(isset($booked_service->discount))
+        @if(isset($booking['service']->discount))
         @php
-        $total_amount += $booked_service->discount;
+        $total_amount += $booking['service']->discount;
         @endphp
         @else
         @php
-        $total_amount += $booked_service->price;
+        $total_amount += $booking['service']->price;
         @endphp
         @endif
         @endforeach
@@ -72,7 +80,7 @@ $total_amount = 0;
                 <tbody>
                     <tr>
                         <td class="text-right"><strong>Total Services:</strong></td>
-                        <td class="text-right">{{count($booked_services)}}</td>
+                        <td class="text-right">{{count($formattedBookings)}}</td>
                     </tr>
                     <tr>
                         <td class="text-right"><strong>Total:</strong></td>
@@ -87,7 +95,7 @@ $total_amount = 0;
         <h4>Cart is Empty</h4>
     </div>
     @endif
-    @if(count($booked_services))
+    @if(count($formattedBookings))
     <div class="text-center">
         <a href="bookingStep">
             <button type="button" class="btn btn-success">Checkout</button>

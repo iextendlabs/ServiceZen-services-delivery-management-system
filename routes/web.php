@@ -248,3 +248,5 @@ Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affili
 Route::post('/apply-coupon', [CheckOutController::class,'applyCoupon'])->name('apply.coupon');
 Route::post('/apply-affiliate', [CustomerAuthController::class,'applyAffiliate'])->name('apply.affiliate');
 Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffiliateProgram'])->name('apply.affiliateProgram');
+Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartModal'])->name('addToCartModal');
+Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');
