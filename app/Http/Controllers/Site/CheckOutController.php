@@ -256,7 +256,7 @@ class CheckOutController extends Controller
             return response()->json(['errors' => $isValidOrderValue], 200);
         }
         // Create order
-        list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $password, $staffZone);
+        list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone ,$password);
         // Handle addresses
         $this->handleSessionAddresses($request, $input);
 
