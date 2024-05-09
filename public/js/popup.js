@@ -300,3 +300,14 @@ function placeMarker(location) {
 
     fillAddressFieldsFromMarker();
 }
+
+function openBookingPopup(serviceId) {
+    $.ajax({
+        url: '/addToCartModal/' + serviceId,
+        type: 'GET',
+        success: function(response) {
+            $('#addToCartPopup').html(response);
+            $('#addToCartModal').modal('show');
+        }
+    });
+}

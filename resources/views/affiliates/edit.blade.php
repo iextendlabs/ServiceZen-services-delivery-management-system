@@ -97,6 +97,21 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>Parent Affiliate:</strong>
+                        <select name="parent_affiliate_id" class="form-control">
+                            <option value=""></option>
+                            @foreach ($affiliates as $single_affiliate)
+                                @if ($single_affiliate->id !== $affiliate->id)
+                                    <option value="{{ $single_affiliate->id }}"
+                                        @if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id == $single_affiliate->id) selected @endif> {{ $single_affiliate->name }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <span style="color: red">*</span><strong>Customer Display:</strong>
                         <select name="display_type" id="display_type" class="form-control">
                             <option value="1" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable

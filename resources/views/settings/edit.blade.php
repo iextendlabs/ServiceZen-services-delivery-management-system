@@ -40,7 +40,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Value:</strong>
-                    @if(in_array($setting->key, ['Emails For Daily Alert', 'Not Allowed Status for Staff App', 'Not Allowed Status for Driver App']))
+                    @if(in_array($setting->key, ['Emails For Daily Alert', 'Not Allowed Status for Staff App', 'Not Allowed Status for Driver App', 'Affiliate Withdraw Payment Method']))
                     <span class="text-danger">Note: Add by comma separated.</span>
                     @endif
 

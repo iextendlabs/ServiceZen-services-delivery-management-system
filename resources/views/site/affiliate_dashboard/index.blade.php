@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <div class="row py-5">
+        <div class="row bg-light py-5 mb-4">
             <div class="col-md-6 d-flex align-items-center">
                 <h2>Dashboard</h2>
             </div>
@@ -40,7 +40,7 @@
             </div>
             <div class="col-md-4 py-2">
                 <div class="card">
-                    <div class="card-header">Rs.Total Bonus of {{ now()->format('F') }}</div>
+                    <div class="card-header">Total Bonus of {{ now()->format('F') }}</div>
                     <div class="card-body analytic">
                         <i class="fa fa-pkr-sign"></i>
                         <span class="float-end"><b>Rs.</b>{{ $bonus }}</span>
@@ -66,6 +66,11 @@
                 </div>
             </div>
         </div>
+        @if ($message = Session::get('success'))
+            <div class="alert alert-success">
+                <span>{{ $message }}</span>
+            </div>
+        @endif
         @if ($errors->any())
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -76,8 +81,69 @@
                 </ul>
             </div>
         @endif
+        <form action="{{ route('affiliate.withdraw') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="row bg-light py-3 mb-4">
+                <div class="col-md-12">
+                    <h4>Withdraw Amount</h4><br>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Amount</strong>
+                        <input type="number" name="amount" class="form-control" placeholder="Amount">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Payment as:</strong>
+                        <select name="payment_method" class="form-control">
+                            <option></option>
+                            @foreach ($withdraw_payment_method as $payment_method)
+                                <option value="{{ $payment_method }}">{{ $payment_method }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Acount Detail</strong>
+                        <textarea name="account_detail" class="form-control" cols="20" rows="10"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary"> Withdraw</button>
+                </div>
+            </div>
+        </form>
+        <div class="row bg-light py-3 mb-4">
+            <div class="col-md-12">
+                <h4>Withdraw Requests</h4><br>
+                <table class="table table-striped table-bordered album bg-light">
+                    <tr>
+                        <th>Sr#</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment Method</th>
+                    </tr>
+                    @if (count($withdraws) != 0)
+                        @foreach ($withdraws as $withdraw)
+                            <tr>
+                                <td>{{ ++$i }}</td>
+                                <td>{{ $withdraw->amount * $pkrRateValue }}</td>
+                                <td>{{ $withdraw->status }}</td>
+                                <td>{{ $withdraw->payment_method }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="7" class="text-center">There are no Withdraw Request</td>
+                        </tr>
+                    @endif
+                </table>
 
-        <div class="row">
+            </div>
+        </div>
+        <div class="row bg-light py-3 mb-4">
             <div class="col-md-12">
                 <a href="{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}">My Affiliate URL</a>
                 <p>{{ route('affiliateUrl', ['affiliate_id' => auth()->user()->id]) }}</p>
@@ -104,6 +170,42 @@
                         value="{{ 'Rs.' . $user->affiliate->fix_salary * $pkrRateValue ?? null }}">
                 </div>
             </div>
+            <div class="col-md-12">
+                <p>Your current balance is: <b>Rs.{{ $total_balance }}</b></p>
+                @if (count($transactions) != 0)
+                    <table class="table table-striped table-bordered album bg-light">
+                        <tr>
+                            <th>Sr#</th>
+                            <th>Date Added</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                        @foreach ($transactions as $transaction)
+                            <tr>
+                                <td>{{ ++$i }}</td>
+                                <td>{{ $transaction->created_at }}</td>
+                                <td>{{ $transaction->type }}</td>
+                                <td>
+                                    @if ($transaction->order_id)
+                                        Order ID: #{{ $transaction->order_id }}
+                                    @else
+                                        Paid Amount
+                                    @endif
+                                </td>
+                                <td>Rs.{{ $transaction->formatted_amount }}</td>
+                            </tr>
+                        @endforeach
+                    </table>
+                    {!! $transactions->links() !!}
+                @else
+                    <div class="text-center">
+                        <h4>There are no transactions</h4>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="row bg-light py-3 mb-4">
             <div class="col-md-12">
                 <strong>My Customer</strong>
                 <table class="table table-striped table-bordered album bg-light">
@@ -182,40 +284,6 @@
                 </table>
                 {!! $affiliateUser->links() !!}
 
-            </div>
-            <div class="col-md-12">
-                <p>Your current balance is: <b>Rs.{{ $total_balance }}</b></p>
-                @if (count($transactions) != 0)
-                    <table class="table table-striped table-bordered album bg-light">
-                        <tr>
-                            <th>Sr#</th>
-                            <th>Date Added</th>
-                            <th>Type</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                        </tr>
-                        @foreach ($transactions as $transaction)
-                            <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ $transaction->created_at }}</td>
-                                <td>{{ $transaction->type }}</td>
-                                <td>
-                                    @if ($transaction->order_id)
-                                        Order ID: #{{ $transaction->order_id }}
-                                    @else
-                                        Paid Amount
-                                    @endif
-                                </td>
-                                <td>Rs.{{ $transaction->formatted_amount }}</td>
-                            </tr>
-                        @endforeach
-                    </table>
-                    {!! $transactions->links() !!}
-                @else
-                    <div class="text-center">
-                        <h4>There are no transactions</h4>
-                    </div>
-                @endif
             </div>
         </div>
     </div>

@@ -16,12 +16,12 @@ class ServiceCategory extends Model
 
     public function parentCategory()
     {
-        return $this->belongsTo(ServiceCategory::class, 'parent_id');
+        return $this->belongsTo(ServiceCategory::class, 'parent_id')->where('status', 1);
     }
 
     public function childCategories()
     {
-        return $this->hasMany(ServiceCategory::class, 'parent_id');
+        return $this->hasMany(ServiceCategory::class, 'parent_id')->where('status', 1);
     }
 
     public function FAQs()

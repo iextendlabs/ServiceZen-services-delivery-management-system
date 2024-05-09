@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserAffiliate;
+use App\Models\Withdraw;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -181,8 +182,11 @@ class AffiliateDashboardController extends Controller
                 'date_to' => $request->date_to,
                 'order_count' => $request->order_count,
             ]);
-            // dd($affiliateUser);
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            
+            $withdraws = Withdraw::where('user_id',auth()->user()->id)->get();
+            $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
+            $withdraw_payment_method = explode(',', $setting->value);
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count','withdraws','withdraw_payment_method'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect()->route('customer.login')->with('error', 'Oppes! You are not Login.');
@@ -251,5 +255,26 @@ class AffiliateDashboardController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function affiliateWithdraw(Request $request)
+    {
+        request()->validate([
+            'amount' => 'required',
+            'payment_method' => 'required',
+            'account_detail' => 'required',
+        ]);
+        $input = $request->all();
+
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+        $input['amount'] = $request->amount / $pkrRateValue;
+        $input['status'] = "Un Approved";
+        $input['user_id'] = auth()->user()->id;
+        $input['user_name'] = auth()->user()->name;
+        Withdraw::create($input);
+
+        return redirect()->back()
+            ->with('success', 'Withdraw created successfully.');
     }
 }

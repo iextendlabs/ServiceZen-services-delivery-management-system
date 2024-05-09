@@ -1,10 +1,14 @@
 <div class="col-md-12">
     <div class="form-group">
         <strong>Date:</strong>
-        <input required type="date" name="date" id="date" min="{{ date('Y-m-d') }}" value="{{ isset($date) ? $date : date('Y-m-d') }}" class="form-control" placeholder="Date">
+        <input required type="date" name="date" id="date" min="{{ date('Y-m-d') }}" value="{{ 
+            isset($selected_booking) && isset($selected_booking['date']) 
+            ? $selected_booking['date'] 
+            : (isset($date) ? $date : date('Y-m-d')) 
+        }}" class="form-control" placeholder="Date">
     </div>
 </div>
-<div class="col-md-12">
+<div class="col-md-12" @if(isset($zoneShow) && $zoneShow == 0) style="display:none;"  @endif>
     <div class="form-group">
         <strong>Zone:</strong>
         <select name="zone" id="zone" class="form-control" required>
@@ -80,7 +84,7 @@
     @php 
     $staff_displayed[] = $staff->id;
     @endphp
-        <input required style="display: none;" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @endif >
+        <input required style="display: none;" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @elseif(isset($selected_booking) && $selected_booking['service_staff_id'] == $staff->id) checked @endif >
         <label class="staff-label" for="staff-{{$staff->id}}">
             <div class="p-2">
                 <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100"><br>
@@ -114,10 +118,10 @@
         No Staff Availalbe for the Selected Date / Zone
         @endif
         @foreach($staff_slots as $staff_id=>$staff_single_slot)
-        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @else  style="display: none"  @endif class="form-control col-sm-12 col-md-8 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
+        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @elseif(isset($selected_booking) && $staff_id == $selected_booking['service_staff_id']) style="display: block"  @else  style="display: none"  @endif class="form-control col-sm-12 col-md-8 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
             <option value="">Select Slot</option>
             @foreach($staff_single_slot as $staff_single_values)
-            <option value="{{$staff_single_values[2]}}" @if(isset($order)  && $order->time_slot_id == $staff_single_values[2]) selected @endif>{{$staff_single_values[1]}}</option>
+            <option value="{{$staff_single_values[2]}}" @if(isset($order)  && $order->time_slot_id == $staff_single_values[2]) selected @elseif(isset($selected_booking)  && $selected_booking['time_slot_id'] == $staff_single_values[2]) selected @endif>{{$staff_single_values[1]}}</option>
             @endforeach
         </select>
         @endforeach

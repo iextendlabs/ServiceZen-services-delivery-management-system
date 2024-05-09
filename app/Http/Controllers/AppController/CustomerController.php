@@ -650,7 +650,13 @@ class CustomerController extends Controller
         $orderTotal = OrderTotal::where('order_id', $request->id)->first();
         $transport_charges = StaffZone::where('name', $order->area)->value('transport_charges');
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $request->id);
+        if($order->orderServices){
+            $orderServicesId = $order->orderServices->pluck('service_id')->toArray();
+        }else{
+            $orderServicesId = [];
+        }
+
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $request->id, $orderServicesId);
 
         $availableStaff = [];
         $staff_displayed = [];
@@ -694,6 +700,7 @@ class CustomerController extends Controller
             'orderTotal' => $orderTotal,
             'slots' => $staff_slots,
             'order' => $order,
+            'orderServicesId' => $orderServicesId
         ], 200);
     }
 
@@ -1241,6 +1248,56 @@ class CustomerController extends Controller
         ], 200);
     }
 
+    public function OrderTotalSummary(Request $request)
+    {
+        $services_total = 0;
+        $staff_charges = 0;
+        $transport_charges = 0;
+        $coupon_discount = 0;
+        if($request->service_ids){
+            $services = Service::whereIn('id', $request->service_ids)->get();
+
+            $services_total = $services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+        }
+        if($request->group_data){
+            foreach ($request->group_data as $index => $singleBookingService) {
+                list($date, $service_staff_id, $time_slot_id) = explode('_', $index);
+                
+                $staff = User::find($service_staff_id);
+                $staff_charges += $staff && $staff->staff
+                ? $staff->staff->charges
+                : 0;
+
+                if($request->zone){
+                    $zone = StaffZone::where('name', $request->zone)->first();
+                    $transport_charges += $zone
+                    ? $zone->transport_charges
+                    : 0;
+                }
+            }
+        }
+    
+        if($request->coupon_id && $services){
+            $coupon = Coupon::find($request->coupon_id);
+
+            $coupon_discount = $coupon
+            ? $coupon->getDiscountForProducts($services, $services_total)
+            : 0;
+        }
+    
+        $total = $services_total + $staff_charges + $transport_charges - $coupon_discount;
+    
+        return response()->json([
+            'total' => $total,
+            'coupon_discount' => $coupon_discount,
+            'transport_charges' => $transport_charges,
+            'staff_charges' => $staff_charges,
+            'services_total' => $services_total,
+        ], 200);
+    }
+
     public function applyAffiliate(Request $request)
     {
         $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
@@ -1277,4 +1334,340 @@ class CustomerController extends Controller
         }
 
     }
+
+    public function addNewOrder(Request $request)
+    {
+        $password = NULL;
+        $input = $request->all();
+        $input['order_source'] = "Android";
+        Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
+
+        if(strlen(trim($request->number)) < 6 ){
+            return response()->json([
+                'msg' => "Please check the number in personal information."
+            ], 201);
+        }
+
+        if(strlen(trim($request->whatsapp)) < 6){
+            return response()->json([
+                'msg' => "Please check the whatsapp in personal information."
+            ], 201);
+        }
+        try{
+            $bookingData = $request->cartData;
+            $excludedServices = $this->processBookingData($input, $bookingData);
+
+            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
+            $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
+
+            if (count($excludedServices) > 0) {
+                
+                return response()->json([
+                    'msg' => "The Following booking not available. Please Update",
+                    'excludedServices' => $excludedServices
+                ], 201);
+
+            }
+        
+            $isValidOrderValue = $this->min_order_value($input, $bookingData, $staffZone,$minimum_booking_price);
+
+            if($isValidOrderValue !== true){
+                return response()->json([
+                    'msg' => $isValidOrderValue
+                ], 201);
+            }
+
+            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password);
+            // Handle addresses
+
+
+            return response()->json([
+                'sub_total' => $all_sub_total,
+                'discount' => $all_discount,
+                'staff_charges' => $all_staff_charges,
+                'transport_charges' => $all_transport_charges,
+                'total_amount' => $all_total_amount,
+                'order_ids' => $order_ids,
+                'customer_type' => $customer_type,
+            ], 200);
+
+            
+        }catch (\Exception $e){
+            $request_body = $request->all();
+            $recipient_email = $request->email;
+            $to = env('MAIL_FROM_ADDRESS');
+
+            try {
+                Mail::to($to)->send(new OrderIssueNotification($request_body, $recipient_email));
+                Mail::to("support@iextendlabs.com")->send(new OrderIssueNotification($request_body, $recipient_email));
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
+            return response()->json([
+                'mailSend' => true
+            ], 202);
+        }
+    }
+
+    private function processBookingData($input, $bookingData)
+    {
+        $excludedServices = [];
+
+        foreach ($bookingData as $singleBooking) {
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($input['area'], $singleBooking['date'], $order = null, [$singleBooking['service_id']]);
+            $staffDisplayed = [];
+            $staffSlots = [];
+
+            foreach ($timeSlots as $timeSlot) {
+
+                foreach ($timeSlot->staffs as $staff) {
+                    if (!in_array($staff->id, $staff_ids) && !in_array($staff->id, $timeSlot->excluded_staff)) {
+                        $currentSlot = $timeSlot->id;
+
+                        if (isset($staffSlots[$staff->id])) {
+                            array_push($staffSlots[$staff->id], $currentSlot);
+                        } else {
+                            $staffSlots[$staff->id] = [$currentSlot];
+                        }
+
+                        if (!in_array($staff->id, $staffDisplayed)) {
+                            $staffDisplayed[] = $staff->id;
+                        }
+                    }
+                }
+            }
+            if (!in_array($singleBooking['staff_id'], $staffDisplayed)) {
+                $excludedServices[] = $singleBooking['service_id'];
+            } elseif (!in_array($singleBooking['slot_id'], $staffSlots[$singleBooking['staff_id']])) {
+                $excludedServices[] = $singleBooking['service_id'];
+            }
+        }
+
+        return $excludedServices;
+    }
+
+    private function min_order_value($input, $bookingData, $staffZone,$minimum_booking_price)
+    {
+
+        $sub_total = 0;
+        $discount = 0;
+
+        // Calculate subtotal
+        $serviceIds = [];
+        foreach ($bookingData as $item) {
+            $serviceIds[] = $item["service_id"];
+            $serviceStaffIds[] = $item["staff_id"];
+        }
+        $all_selected_staff = User::whereIn('id', $serviceStaffIds)->get();
+        $all_selected_services = Service::whereIn('id', $serviceIds)->get();
+        $sub_total = $all_selected_services->sum(function ($service) {
+            return isset($service->discount) ? $service->discount : $service->price;
+        });
+
+        if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
+            $coupon = Coupon::where("code", $input['coupon_code'])->first();
+
+            if ($coupon) {
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services);
+                if ($isValid === true) {
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total);
+                } else {
+                    return $isValid;
+                }
+            } else {
+                return "Coupon is invalid!";
+            }
+        }
+
+        $staff_charges = $all_selected_staff->sum(function ($staff) {
+            return $staff->staff->charges ?? 0;
+        });
+        $transport_charges = $staffZone->transport_charges ?? 0;
+        $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+        
+        if ($total_amount < $minimum_booking_price) {
+            return "The total amount must be greater than or equal to AED.".$minimum_booking_price;
+        }else{
+            return true;
+
+        }
+
+    }
+
+    private function createOrder($input, $bookingData, $staffZone, &$password)
+    {
+        $customer_type = '';
+        list($customer_type, $customer_id) = $this->findOrCreateUser($input);
+
+        $input['customer_id'] = $customer_id;
+        $input['customer_name'] = $input['name'];
+        $input['customer_email'] = $input['email'];
+        $input['driver_status'] = "Pending";
+
+        $groupedBooking = $this->groupBookingData($bookingData);
+
+        $i = 0;
+        $all_sub_total = 0;
+        $all_discount = 0;
+        $all_staff_charges = 0;
+        $all_transport_charges = 0;
+        $all_total_amount = 0;
+        $order_ids = [];
+
+        foreach ($groupedBooking as $key => $singleBookingService) {
+            $discount = 0;
+            $input['status'] = "Pending";
+
+            list($date, $service_staff_id, $time_slot_id) = explode('_', $key);
+            $input['date'] = $date;
+            $input['service_staff_id'] = $service_staff_id;
+            $input['time_slot_id'] = $time_slot_id;
+            $input['order_source'] = "Site";
+
+            $staff = User::find($service_staff_id);
+
+            $selected_services = Service::whereIn('id', $singleBookingService)->get();
+
+            $sub_total = $selected_services->sum(function ($service) {
+                return isset($service->discount) ? $service->discount : $service->price;
+            });
+
+            if ($input['coupon_code'] && $singleBookingService) {
+                $coupon = Coupon::where("code", $input['coupon_code'])->first();
+                if ($coupon) {
+                    if ($coupon->type == "Fixed Amount" && $i == 0) {
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        if ($discount > 0) {
+                            $input['coupon_id'] = $coupon->id;
+                            $i++;
+                        } elseif ($discount == 0) {
+                            $i = 0;
+                        }
+                    } elseif ($coupon->type == "Percentage") {
+                        $input['coupon_id'] = $coupon->id;
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                    }
+                }
+            }
+
+            $staff_charges = $staff->staff->charges ?? 0;
+            $transport_charges = $staffZone->transport_charges ?? 0;
+            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+
+            $input['sub_total'] = (int)$sub_total;
+            $input['discount'] = (int)$discount;
+            $input['staff_charges'] = (int)$staff_charges;
+            $input['transport_charges'] = (int)$transport_charges;
+            $input['total_amount'] = (int)$total_amount;
+
+            $all_sub_total += $sub_total;
+            $all_discount += $discount;
+            $all_staff_charges += $staff_charges;
+            $all_transport_charges += $transport_charges;
+            $all_total_amount += $total_amount;
+
+            $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
+
+            if (isset($affiliate)) {
+                $input['affiliate_id'] = $affiliate->user_id;
+            }
+
+            $input['staff_name'] = $staff->name;
+            $input['driver_id'] = $staff->staff->driver_id;
+
+            $time_slot = TimeSlot::find($input['time_slot_id']);
+            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+
+            $input['time_start'] = $time_slot->time_start;
+            $input['time_end'] = $time_slot->time_end;
+            $input['payment_method'] = "Cash-On-Delivery";
+
+            $order = Order::create($input);
+            $order_ids[] = $order->id;
+            $input['order_id'] = $order->id;
+            $input['discount_amount'] = $input['discount'];
+
+            OrderTotal::create($input);
+            if (isset($input['coupon_id'])) {
+                $input['coupon_id'] = $coupon->id;
+                CouponHistory::create($input);
+            }
+
+            foreach ($singleBookingService as $id) {
+                $services = Service::find($id);
+                $input['service_id'] = $id;
+                $input['service_name'] = $services->name;
+                $input['duration'] = $services->duration;
+                $input['status'] = 'Open';
+                if ($services->discount) {
+                    $input['price'] = $services->discount;
+                } else {
+                    $input['price'] = $services->price;
+                }
+                OrderService::create($input);
+            }
+
+            if (Carbon::now()->toDateString() == $input['date']) {
+                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                if ($staff->staff->driver) {
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                }
+                try {
+                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                } catch (\Throwable $th) {
+                    //TODO: log error or queue job later
+                }
+            }
+            try {
+                $this->sendAdminEmail($input['order_id'], $input['email']);
+                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+            } catch (\Throwable $th) {
+                //TODO: log error or queue job later
+            }
+        }
+       
+        return [$customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount];
+    }
+
+    private function findOrCreateUser($input)
+    {
+        $user = User::where('email', $input['email'])->first();
+
+        if (!isset($user)) {
+            $user = User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'password' => Hash::make($input['number']),
+            ]);
+
+            $user->assignRole('Customer');
+            $customer_type = "New";
+            $customer_id = $user->id;
+        }else{
+            $customer_type = "Old";
+            $customer_id = $user->id;
+        }
+
+        return [$customer_type,$customer_id];
+
+    }
+
+    private function groupBookingData($bookingData)
+    {
+        $groupedBooking = [];
+
+        foreach ($bookingData as $booking) {
+            $key = $booking['date'] . '_' . $booking['staff_id'] . '_' . $booking['slot_id'];
+
+            if (!isset($groupedBooking[$key])) {
+                $groupedBooking[$key] = [];
+            }
+
+            $groupedBooking[$key][] = $booking['service_id'];
+        }
+
+        return $groupedBooking;
+    }
+
+    
 }

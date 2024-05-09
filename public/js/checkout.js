@@ -4,7 +4,11 @@ $(document).on("change", "#date,#zone,#area,.checkout-services,.checkout-selecte
     $('.checkout-services:checked').each(function () {
         checkedServiceIds.push($(this).val());
     });
-       
+
+    if ($('#addToCartModalServices').val()) {
+        var addToCartModalServices = [$('#addToCartModalServices').val()];
+    }
+
     $.ajax({
         url: '/slots',
         method: 'GET',
@@ -13,7 +17,8 @@ $(document).on("change", "#date,#zone,#area,.checkout-services,.checkout-selecte
             date: $('#date').val(),
             area: $('select[name="zone"]').val(),
             order_id: $('input[name="order_id"]').length ? $('input[name="order_id"]').val() : '',
-            service_ids : checkedServiceIds,
+            service_ids: addToCartModalServices ?? checkedServiceIds,
+            zoneShow : addToCartModalServices ? 0 : 1
         },
         beforeSend: function () {
             $('#loading').show(); // Show the loading element

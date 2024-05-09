@@ -9,8 +9,8 @@ class Affiliate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','code', 'commission','fix_salary','expire','display_type','number','whatsapp'];
-    
+    protected $fillable = ['user_id','code', 'commission','fix_salary','expire','display_type','number','whatsapp', 'parent_affiliate_id'];
+
     public function affiliate()
     {
         return $this->hasOne(User::class,'id','user_id');
