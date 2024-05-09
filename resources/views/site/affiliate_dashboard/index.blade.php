@@ -98,7 +98,7 @@
                         <strong>Payment as:</strong>
                         <select name="payment_method" class="form-control">
                             <option></option>
-                            @foreach (config('app.affiliate_payment_method') as $payment_method)
+                            @foreach ($withdraw_payment_method as $payment_method)
                                 <option value="{{ $payment_method }}">{{ $payment_method }}</option>
                             @endforeach
                         </select>

@@ -55,7 +55,7 @@
                         <span style="color: red;">*</span><strong>Payment as:</strong>
                         <select name="payment_method" class="form-control">
                             <option></option>
-                            @foreach (config('app.affiliate_payment_method') as $payment_method)
+                            @foreach ($payment_methods as $payment_method)
                                 <option value="{{ $payment_method }}" @if (old('payment_method') == $payment_method) selected @endif>
                                     {{ $payment_method }}</option>
                             @endforeach

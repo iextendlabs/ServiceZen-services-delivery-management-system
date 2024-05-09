@@ -184,8 +184,9 @@ class AffiliateDashboardController extends Controller
             ]);
             
             $withdraws = Withdraw::where('user_id',auth()->user()->id)->get();
-
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count','withdraws'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
+            $withdraw_payment_method = explode(',', $setting->value);
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count','withdraws','withdraw_payment_method'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect()->route('customer.login')->with('error', 'Oppes! You are not Login.');

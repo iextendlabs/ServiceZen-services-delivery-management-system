@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Information;
+use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Withdraw;
@@ -58,8 +59,11 @@ class WithdrawController extends Controller
      */
     public function create(Request $request)
     {
+        $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
+        $payment_methods = explode(',', $setting->value);
+
         $users = User::role('Affiliate')->get();
-        return view('withdraws.create', compact('users'));
+        return view('withdraws.create', compact('users','payment_methods'));
     }
 
     /**
@@ -111,9 +115,11 @@ class WithdrawController extends Controller
      */
     public function edit($id)
     {
+        $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
+        $payment_methods = explode(',', $setting->value);
         $users = User::role('Affiliate')->get();
         $withdraw = Withdraw::find($id);
-        return view('withdraws.edit', compact('withdraw', 'users'));
+        return view('withdraws.edit', compact('withdraw', 'users','payment_methods'));
     }
 
     public function update(Request $request, $id)

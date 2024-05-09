@@ -66,7 +66,6 @@ return [
 
     'general_holiday' => env('GENERAL_HOLIDAY', []),
     
-    'affiliate_payment_method' => env('AFFILIATE_PAYMENT_METHOD', ['Bank', 'Easypesa']),
     /*
     |--------------------------------------------------------------------------
     | Application URL
