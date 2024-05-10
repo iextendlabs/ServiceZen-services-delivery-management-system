@@ -1148,6 +1148,10 @@ class CustomerController extends Controller
     {
         $user = User::where('email',$request->email)->first();
         if($user){
+            if ($request->has('fcmToken') && $request->fcmToken) {
+                $user->device_token = $request->fcmToken;
+                $user->save();
+            }
             $token = $user->createToken('app-token')->plainTextToken;
             $user_info = CustomerProfile::where('user_id', $user->id)->first();
             
