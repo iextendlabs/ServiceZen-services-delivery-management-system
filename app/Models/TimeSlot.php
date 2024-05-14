@@ -55,7 +55,7 @@ class TimeSlot extends Model
         $currentDateTime = Carbon::now();
         $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
         $twoHoursLater = $currentDateTime->addHours(2);
-        
+
         $allZones = StaffZone::orderBy("name")->get();
 
         // staff zone find kea based on area user sent 
@@ -65,16 +65,16 @@ class TimeSlot extends Model
         $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
 
         if ($staffZone) {
-               // staff groups
-        $staff_group_staff_ids = [];
+            // staff groups
+            $staff_group_staff_ids = [];
 
-        $staffGroups = $staffZone->staffGroups()->get();
+            $staffGroups = $staffZone->staffGroups()->get();
 
 
-        foreach ($staffGroups as $staffGroup) {
-            $staff_group_staff_ids = array_merge($staff_group_staff_ids, $staffGroup->staffs->pluck('id')->toArray());
-        }
-        // extract staffs
+            foreach ($staffGroups as $staffGroup) {
+                $staff_group_staff_ids = array_merge($staff_group_staff_ids, $staffGroup->staffs->pluck('id')->toArray());
+            }
+            // extract staffs
 
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
 
@@ -97,41 +97,40 @@ class TimeSlot extends Model
                 if ($date == $currentDate) {
                     if ($isAdmin) {
                         $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-            $query->whereIn('staff_id', $staff_group_staff_ids);
-        })->where('date', '=', $date)->where('status','=', 1)->orderBy('time_start')->get();
+                            $query->whereIn('staff_id', $staff_group_staff_ids);
+                        })->where('date', '=', $date)->where('status', '=', 1)->orderBy('time_start')->get();
                     } else {
                         $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-            $query->whereIn('staff_id', $staff_group_staff_ids);
-        })->where('date', '=', $date)->where('status','=', 1)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                            $query->whereIn('staff_id', $staff_group_staff_ids);
+                        })->where('date', '=', $date)->where('status', '=', 1)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
                     }
 
                     if (count($timeSlots) == 0) {
                         if ($isAdmin) {
                             $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-            $query->whereIn('staff_id', $staff_group_staff_ids);
-        })->where('status','=', 1)->orderBy('time_start')->get();
+                                $query->whereIn('staff_id', $staff_group_staff_ids);
+                            })->where('status', '=', 1)->orderBy('time_start')->get();
                         } else {
                             $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-            $query->whereIn('staff_id', $staff_group_staff_ids);
-        })->where('status','=', 1)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
+                                $query->whereIn('staff_id', $staff_group_staff_ids);
+                            })->where('status', '=', 1)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
                         }
                     }
                 } else {
                     $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-            $query->whereIn('staff_id', $staff_group_staff_ids);
-        })->where('date', '=', $date)->where('status','=', 1)->orderBy('time_start')->get();
+                        $query->whereIn('staff_id', $staff_group_staff_ids);
+                    })->where('date', '=', $date)->where('status', '=', 1)->orderBy('time_start')->get();
 
                     if (count($timeSlots) == 0) {
                         $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-            $query->whereIn('staff_id', $staff_group_staff_ids);
-        })->where('status','=',  1)->orderBy('time_start')->get();
-                        
+                            $query->whereIn('staff_id', $staff_group_staff_ids);
+                        })->where('status', '=',  1)->orderBy('time_start')->get();
                     }
                 }
             }
 
             if (count($timeSlots)) {
-                $short_holidays = ShortHoliday::where('date', $date)->where('status','1')->get();
+                $short_holidays = ShortHoliday::where('date', $date)->where('status', '1')->get();
 
                 foreach ($timeSlots as $timeSlot) {
                     $short_holiday_staff_ids = [];
@@ -139,7 +138,7 @@ class TimeSlot extends Model
                         foreach ($short_holidays as $short_holiday) {
                             //ShortHoliday::where('date', $date)->where('start_time_to_sec', '<=', $timeSlot->end_time_to_sec)->where('end_time_to_sec', '>=', $timeSlot->start_time_to_sec)->pluck('staff_id')->toArray();
                             $holiday_end_time = $short_holiday->start_time_to_sec + ($short_holiday->hours * 3600);
-                            $isHolidayTime = $short_holiday->start_time_to_sec <= $timeSlot->end_time_to_sec && $holiday_end_time >= $timeSlot->start_time_to_sec ;
+                            $isHolidayTime = $short_holiday->start_time_to_sec <= $timeSlot->end_time_to_sec && $holiday_end_time >= $timeSlot->start_time_to_sec;
                             if ($isHolidayTime) {
                                 $short_holiday_staff_ids[] = $short_holiday->staff_id;
                             }

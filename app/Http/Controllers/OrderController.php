@@ -128,6 +128,14 @@ class OrderController extends Controller
 
         if ($request->driver_status) {
             $query->where('driver_status', '=', $request->driver_status);
+        } else {
+            if ($request->status) {
+                $query->where('status', '=', $request->status);
+            }
+        }
+
+        if ($request->driver_status) {
+            $query->where('driver_status', '=', $request->driver_status);
         }
 
 
