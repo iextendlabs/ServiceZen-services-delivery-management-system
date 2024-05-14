@@ -44,6 +44,10 @@ class CouponController extends Controller
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $i = 0;
 
+
+
+        
+
         return view('coupons.create', compact('services', 'categories', 'i'));
     }
 
