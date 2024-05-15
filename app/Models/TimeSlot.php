@@ -43,9 +43,10 @@ class TimeSlot extends Model
         return (int) $this->space_availability > 0;
     }
 
-    public static function getTimeSlotsForArea($area, $date, $currentOrder = null)
+    public static function getTimeSlotsForArea($area, $date, $currentOrder = null, $serviceIds = null)
     {
         //TODO check area if empty 
+        $servicesStaffIds = [];
         $timeSlots = [];
         $holiday = [];
         $staff_ids = [];
@@ -55,6 +56,33 @@ class TimeSlot extends Model
         $currentDateTime = Carbon::now();
         $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
         $twoHoursLater = $currentDateTime->addHours(2);
+        if ($serviceIds) {
+            $services = Service::whereIn('id', $serviceIds)
+                ->with('categories.users:id')
+                ->get();
+
+            $staffIdsFromCategories = [];
+
+            foreach ($services as $service) {
+                foreach ($service->categories as $category) {
+                    $staffIdsFromCategories = array_merge($staffIdsFromCategories, $category->users->pluck('id')->toArray());
+                }
+            }
+
+            $staffIdsFromCategories = array_unique($staffIdsFromCategories);
+
+            $staffIdsFromServices = Service::whereIn('id', $serviceIds)
+                ->with('users:id')
+                ->get()
+                ->pluck('users')
+                ->collapse()
+                ->pluck('id')
+                ->unique()
+                ->toArray();
+
+            $staffIds = array_merge($staffIdsFromServices, $staffIdsFromCategories);
+            $servicesStaffIds = array_unique($staffIds);
+        }
 
         $allZones = StaffZone::orderBy("name")->get();
 
@@ -160,6 +188,11 @@ class TimeSlot extends Model
                     foreach ($timeSlot->staffs as $staff) {
 
                         if ($staff->staff->status == 0) {
+                            $excluded_staff[] = $staff->staff->user_id;
+                            $timeSlot->space_availability--;
+                        }
+
+                        if ($serviceIds && !in_array($staff->staff->user_id, $servicesStaffIds)) {
                             $excluded_staff[] = $staff->staff->user_id;
                             $timeSlot->space_availability--;
                         }

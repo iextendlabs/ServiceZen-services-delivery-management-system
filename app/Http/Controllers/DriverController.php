@@ -44,6 +44,7 @@ class DriverController extends Controller
         $filters = $request->only(['name']);
         $drivers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
         return view('drivers.index',compact('total_driver','drivers','filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
     }
     
     /**

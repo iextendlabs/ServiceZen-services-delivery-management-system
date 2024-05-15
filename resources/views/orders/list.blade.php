@@ -144,6 +144,10 @@
                         @else
                             {{ $order->customer_name }}
                         @endif
+                        <br>
+                        {{ $order->customer->customerProfile->number ?? '' }}
+                        <br>
+                        {{ $order->customer->customerProfile->whatsapp ?? '' }}
                     </td>
                     <td>@currency($order->total_amount)</td>
                     <td>{{ $order->payment_method }}</td>
@@ -178,8 +182,8 @@
                 <td>
                     @can('order-edit')
                         <!-- <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a> -->
+                                <i class="fas fa-edit"></i>
+                            </a> -->
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class=" btn btn-primary" href="#" data-bs-toggle="dropdown">

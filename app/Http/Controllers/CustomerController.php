@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Coupon;
-use App\Models\Affiliate;
 use App\Models\UserAffiliate;
 use App\Models\CustomerCoupon;
+use App\Models\StaffZone;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
 use Illuminate\Support\Arr;
@@ -41,38 +41,129 @@ class CustomerController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'number' => $request->number,
+            'order_count' => $request->order_count,
             'affiliate_id' => $request->affiliate_id,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'zone' => $request->zone,
         ];
     
         $query = User::role('Customer')->orderby($sort, $direction);
-    
+        $staffZones = StaffZone::get();
         if ($request->name) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->name) . '%']);
         }
-    
+
         if ($request->email) {
             $query->whereRaw('LOWER(email) LIKE ?', ['%' . strtolower($request->email) . '%']);
         }
-    
+
         if ($request->number) {
             $query->whereHas('customerProfile', function ($subQuery) use ($request) {
                 $subQuery->whereRaw('LOWER(number) LIKE ?', ['%' . strtolower($request->number) . '%']);
             });
         }
-    
+
+        if ($request->zone) {
+            $query->whereHas('customerProfile', function ($subQuery) use ($request) {
+                $subQuery->whereRaw('area LIKE ?', ['%' . $request->zone . '%']);
+            });
+        }
+
+        if (isset($request->order_count) && $request->date_to === null && $request->date_from === null) {
+            if ($request->order_count > 0) {
+                $query->has('customerOrders', '=', (int)$request->order_count);
+            } elseif ($request->order_count == 0) {
+                $query->whereDoesntHave('customerOrders');
+            }
+        }
+
+        if ($request->date_to && $request->date_from) {
+            $dateFrom = $request->date_from;
+            $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+            $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo, $request) {
+                $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+            });
+            if (isset($request->order_count)) {
+                if ($request->order_count > 0) {
+                    $query->whereHas('customerOrders', function ($query) use ($dateFrom, $dateTo) {
+                        $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+                    }, '=', (int)$request->order_count);
+                } elseif ($request->order_count == 0) {
+                    $query->whereDoesntHave('customerOrders');
+                }
+            }
+        } else {
+            if ($request->date_to) {
+                $query->whereHas('customerOrders', function ($query) use ($request) {
+                    $query->whereDate('created_at', '=', $request->date_to);
+                });
+                if (isset($request->order_count)) {
+                    if ($request->order_count > 0) {
+                        $query->whereHas('customerOrders', function ($query) use ($request) {
+                            $query->whereDate('created_at', '=', $request->date_to);
+                        }, '=', (int)$request->order_count);
+                    } elseif ($request->order_count == 0) {
+                        $query->whereDoesntHave('customerOrders');
+                    }
+                }
+            }
+
+            if ($request->date_from) {
+                if ($request->date_from) {
+                    $query->whereHas('customerOrders', function ($query) use ($request) {
+                        $query->whereDate('created_at', '=', $request->date_from);
+                    });
+                }
+                if (isset($request->order_count)) {
+                    if ($request->order_count > 0) {
+                        $query->whereHas('customerOrders', function ($query) use ($request) {
+                            $query->whereDate('created_at', '=', $request->date_from);
+                        }, '=', (int)$request->order_count);
+                    } elseif ($request->order_count == 0) {
+                        $query->whereDoesntHave('customerOrders');
+                    }
+                }
+            }
+        }
+
         if ($request->affiliate_id) {
             $query->whereHas('userAffiliate', function ($subQuery) use ($request) {
                 $subQuery->where('affiliate_id', $request->affiliate_id);
             });
         }
-    
+
+        if ($request->date_to || $request->date_from) {
+            if ($request->date_to && $request->date_from) {
+                $dateFrom = $request->date_from;
+                $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+                $query->withCount(['customerOrders' => function ($subQuery) use ($dateFrom, $dateTo) {
+                    $subQuery->whereBetween('created_at', [$dateFrom, $dateTo]);
+                }]);
+            } else {
+                if ($request->date_from) {
+                    $query->withCount(['customerOrders' => function ($subQuery) use ($request) {
+                        $subQuery->whereDate('created_at', '=', $request->date_from);
+                    }]);
+                }
+                if ($request->date_to) {
+                    $query->withCount(['customerOrders' => function ($subQuery) use ($request) {
+                        $subQuery->whereDate('created_at', '=', $request->date_to);
+                    }]);
+                }
+            }
+        } else {
+            $query->withCount('customerOrders');
+        }
+
+
         if ($request->csv == 1 || $request->print == 1) {
             $customers = $query->get();
         } else {
             $total_customer = $query->count();
             $customers = $query->orderBy('name')->paginate(config('app.paginate'));
         }
-    
+
         if ($request->csv == 1) {
             // Set the CSV response headers
             $headers = array(
@@ -82,13 +173,13 @@ class CustomerController extends Controller
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             );
-    
+
             $callback = function () use ($customers) {
                 $output = fopen('php://output', 'w');
-                $header = array('SR#', 'ID', 'Name', 'Email','Status', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name','Affiliate Code', 'Coupons');
-    
+                $header = array('SR#', 'ID', 'Name', 'Email', 'Status', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name', 'Affiliate Code', 'Coupons');
+
                 fputcsv($output, $header);
-    
+
                 foreach ($customers as $key => $row) {
                     $coupons = [];
                     if ($row->coupons) {
@@ -96,7 +187,7 @@ class CustomerController extends Controller
                             $coupons[] = $coupon->code;
                         }
                     }
-    
+
                     $csvRow = [
                         ++$key,
                         $row->id,
@@ -117,25 +208,24 @@ class CustomerController extends Controller
                         isset($row->userAffiliate->affiliate) ? "'" . $row->userAffiliate->affiliate->code : "",
                         implode(",", $coupons)
                     ];
-    
+
                     fputcsv($output, $csvRow);
                 }
-    
+
                 fclose($output);
             };
-    
+
             // Create a StreamedResponse to send the CSV content
             return response()->stream($callback, 200, $headers);
         } else if ($request->print == 1) {
             return view('customers.print', compact('customers'));
         } else {
             $affiliates = User::role('Affiliate')->orderBy('name')->get();
-            $coupons = Coupon::where('status', '1')->get();
-            
-            $filters = $request->only(['name', 'email', 'number', 'affiliate_id']);
+            $coupons = Coupon::where('status', '1')->get();     
+            $filters = $request->only(['name', 'email', 'number', 'affiliate_id', 'order_count', 'date_from', 'date_to','zone']);
             $customers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
     
-            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates', 'total_customer', 'direction'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
+            return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates', 'total_customer', 'direction', 'staffZones'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
@@ -371,5 +461,64 @@ class CustomerController extends Controller
         $previousUrl = url()->previous();
         return redirect($previousUrl)
             ->with('success', 'Customer Coupon deleted successfully');
+    }
+
+    public function bulkUpdateAffiliate(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'affiliate' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission) || !is_null($request->expireDate);
+                }),
+            ],
+            'commission' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->type);
+                }),
+            ],
+            'type' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->commission);
+                }),
+            ],
+        ], [
+            'affiliate.required' => 'An affiliate is required when commission or expiry date is set.',
+            'commission.required' => 'A commission is required when the type is set.',
+            'type.required' => 'A type is required when the commission is set.',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $input = $request->all();
+
+        $input['affiliate_id'] = $request->affiliate;
+        $input['expiry_date'] = $request->expiry_date;
+
+        try {
+            // Update affiliate for each selected customer
+            foreach ($request->selectedItems as $customerId) {
+                $input['user_id'] = $customerId;
+
+                $userAffiliate = UserAffiliate::where("user_id", $input['user_id'])->first();
+                if ($userAffiliate) {
+                    $userAffiliate->type = $request->type;
+                    $userAffiliate->commission = $request->commission;
+                    $userAffiliate->affiliate_id = $request->affiliate;
+                    $userAffiliate->expiry_date = $request->expireDate;
+                    $userAffiliate->save();
+                } else {
+                    UserAffiliate::create($input);
+                }
+            }
+
+            return response()->json(['message' => 'Affiliate updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error updating affiliate'], 500);
+        }
     }
 }

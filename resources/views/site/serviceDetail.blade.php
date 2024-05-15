@@ -76,8 +76,8 @@ $packageCarousel_chunk = 3;
             @endforeach
           </select>
           @endif
-
-          <a href="/addToCart/{{ $service->id }}" id="add-to-cart" class="btn btn-block btn-primary">Add to Cart</a>
+          <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
+          {{-- <a href="/addToCart/{{ $service->id }}" id="add-to-cart" class="btn btn-block btn-primary">Add to Cart</a> --}}
           @if(count($service->addONs))
           <button class="btn btn-block btn-secondary" id="add-ons-scroll">Add ONs</button>
           @endif
@@ -184,7 +184,9 @@ $packageCarousel_chunk = 3;
                     </small>
                     <small class="text-muted"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
                   </div>
-                  <a href="/addToCart/{{ $service->id }}" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a>
+                  <button onclick="openBookingPopup('{{ $service->id }}')" type="button" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"> <i class="fa fa-plus"></i></button>
+                  {{-- <a href="#" onclick="openBookingPopup('{{ $service->id }}')" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a> --}}
+                  {{-- <a href="/addToCart/{{ $service->id }}" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a> --}}
                 </div>
               </div>
             </div>

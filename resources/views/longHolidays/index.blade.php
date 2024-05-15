@@ -80,9 +80,17 @@
             </div>
         </div>
     </div>
-    <script>
-        function confirmDelete(Id) {
-            var result = confirm("Are you sure you want to delete this Item?");
+</div>
+@if ($message = Session::get('success'))
+<div class="alert alert-success">
+    <span>{{ $message }}</span>
+    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+</div>
+<script>
+    function confirmDelete(Id) {
+        var result = confirm("Are you sure you want to delete this Item?");
             if (result) {
                 document.getElementById('deleteForm' + Id).submit();
             }

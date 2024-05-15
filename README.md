@@ -1,4 +1,4 @@
-# ServiceZen - Services Delivery Management System Cloud Developed With Assistance Of ChatGPT
+# Laravel Salon / Services Management System - Services Delivery Management System Cloud Developed With Assistance Of AI
 
 Our Solution helps organizations manage the delivery of their services to customers. It provides end-to-end visibility into the service delivery process, from service request to delivery and ongoing support. The system allows organizations to streamline their service delivery operations, improve efficiency, and enhance customer satisfaction.
 
@@ -32,56 +32,5 @@ Customer data: This entity represents the customer data required to manage the s
 
 Business systems: This entity represents the integration points with other business systems, such as billing, inventory, and CRM systems.
 
-
-## Command to run this project
-composer install
-
-create database with name 'chatgpt_services_delivery_management_system' then
-
-php artisan migrate
-
-php artisan db:seed
-
-php artisan key:generate
-
-php artisan serve
-
-login with
-
-email: admin@gmail.com
-
-psw: admin1234
-
-## Admin and Store Demo Links
-
-Store link: https://services.upgradeopencart.com/
-
-## Test Customer User for Store
-User: test@customer.com
-Password: testcustomer
-
-Admin panel link: https://services.upgradeopencart.com/admin
-
-## Test Admin User
-User: admin@gmail.com
-Password: admin1234
-
 ## Project Status
 Development is in final stages , we will launch version 1 soon this year.
-
-## ChatGPT Prompts and Assistance
-1. The first help taken from ChatGPT is to write description / Readme for this Project 
-2. Second tasks done by ChatGPT is identifiying main Entities / Objects
-3. We asked ChatGPT to write Object Relation ORM Classes In laravel
-4. Asked ChatGPT to write Migrations for objects
-5. Write bootstrap html for services appointment form 
-6. Write Laravel controller to save service appointment
-7. Write laravel controller and view to show list of service appointments
-8. Write Laravel factory for these objects service, service staff, customer 
-9. Write Laravel seeder for these objects service, service staff, customer
-10. write laravel controller code to find an image in storage and delete if it exists
-11. write migration to add image field to service object
-12. write laravel view and controller function to save image for a service object
-13. write code to delete previously uploaded image in laravel controller
-14. write simple navbar in bootstrap 
-15. write minimal footer in bootstrap 

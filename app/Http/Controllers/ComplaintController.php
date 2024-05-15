@@ -61,6 +61,7 @@ class ComplaintController extends Controller
         $filters = $request->only(['title','order_id','user','status']);
         $complaints->appends($filters, ['sort' => $sort, 'direction' => $direction]);
         return view('complaints.index', compact('complaints', 'filter', 'total_complaint', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
     }
 
     /**

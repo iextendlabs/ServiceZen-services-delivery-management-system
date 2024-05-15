@@ -179,7 +179,6 @@
                 </table>
                 {!! $services->links() !!}
             </div>
-
         </div>
     </div>
     <script>

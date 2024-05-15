@@ -62,7 +62,8 @@ class AffiliateController extends Controller
      */
     public function create()
     {
-        return view('affiliates.create');
+        $affiliates = User::role('Affiliate')->latest()->get();
+        return view('affiliates.create',compact('affiliates'));
     }
 
     /**
@@ -156,9 +157,10 @@ class AffiliateController extends Controller
      */
     public function edit(User $affiliate, Request $request)
     {
+        $affiliates = User::role('Affiliate')->latest()->get();
         $affiliate_join = $request->affiliate_join;
         $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->get();
-        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join'));
+        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join','affiliates'));
     }
 
     /**

@@ -127,6 +127,9 @@
                                 @can('coupon-list')
                                 <a class="dropdown-item" href="{{ route('coupons.index') }}">Coupons</a>
                                 @endcan
+                                @can('withdraw-list')
+                                <a class="dropdown-item" href="{{ route('withdraws.index') }}">Withdraws</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan

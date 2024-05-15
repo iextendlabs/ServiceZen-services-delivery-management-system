@@ -27,6 +27,7 @@ class ServiceCategoryController extends Controller
      */
     public function index(Request $request)
     {
+
         $sort = $request->input('sort', 'title');
         $direction = $request->input('direction', 'asc');
         $query = ServiceCategory::orderBy($sort, $direction);

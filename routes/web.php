@@ -37,7 +37,8 @@ use App\Http\Controllers\{
     CompanyController,
     CkeditorController,
     ComplaintController,
-    InformationController
+    InformationController,
+    WithdrawController
 };
 
 use App\Http\Controllers\AppController\{
@@ -104,7 +105,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/serviceDelete/{id}', [ServiceController::class, 'destroy'])->name('service.delete');
     Route::get('shortHolidays-update/{shortHoliday}', [ShortHolidayController::class, 'updateStatus'])->name('updateStatus');
     Route::post('/customers/bulkAssignCoupon', [CustomerController::class, 'bulkAssignCoupon'])->name('customers.bulkAssignCoupon');
-    
+
     Route::get('orderCSV', [OrderController::class, 'downloadCSV']);
 
     Route::get('holidays', [HolidayController::class, 'index']);
@@ -115,6 +116,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('cashCollection', CashCollectionController::class);
     Route::get('staffCashCollection', [CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
     Route::get('cashCollection/create/{order}', [CashCollectionController::class, 'create'])->name('cashCollection.create');
+    Route::get('cashCollectionUpdate/{id}', [CashCollectionController::class, 'cashCollectionUpdate'])->name('cashCollectionUpdate');
 
     Route::get('profile/{id}', [HomeController::class, 'profile'])->name('profile');
     Route::post('updateProfile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
@@ -137,6 +139,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/customers/{couponId}/destroy', [CustomerController::class, 'customerCoupon_destroy'])->name('customerCoupon.destroy');
     Route::get('removeCoupon/{id}', [OrderController::class, 'removeCoupon'])->name('orders.removeCoupon');
     Route::post('addDiscount/{id}', [OrderController::class, 'addDiscount'])->name('orders.addDiscount');
+    Route::get('order-update/{order}', [OrderController::class, 'updateOrderStatus'])->name('updateOrderStatus');
 
     // affiliate export
     Route::get('/affiliate/exportTransaction/{User}', [AffiliateController::class, 'exportTransaction']);
@@ -167,7 +170,29 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('affiliateProgram', AffiliateProgramController::class);
     Route::resource('complaints', ComplaintController::class);
     Route::post('/add-complaint-chat', [ComplaintController::class, 'addComplaintChat'])->name('complaints.addComplaintChat');
+    Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
 
+    Route::post('/customers/update-affiliate', [CustomerController::class, 'bulkUpdateAffiliate'])->name('customers.updateAffiliate');
+
+    Route::resource('withdraws', WithdrawController::class);
+    Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus');
+});
+
+Route::get('customer-login', [CustomerAuthController::class, 'index'])->name('customer.login');
+Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin'])->name('customer.post-login');
+Route::get('customer-registration', [CustomerAuthController::class, 'registration'])->name('customer.registration');
+Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration'])->name('customer.post-registration');
+
+Route::group(['middleware' => 'checkSessionExpiry'], function () {
+    Route::get('customer-logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+    Route::resource('customerProfile', CustomerAuthController::class);
+    Route::resource('order', SiteOrdersController::class);
+    Route::get('reOrder/{id}', [SiteOrdersController::class, 'reOrder'])->name('order.reOrder');
+    Route::resource('affiliate_dashboard', AffiliateDashboardController::class);
+    Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
+    Route::resource('staffProfile', StaffProfileController::class);
+    Route::resource('siteComplaints', SiteComplaintController::class);
+    Route::post('affiliateWithdraw', [AffiliateDashboardController::class, 'affiliateWithdraw'])->name('affiliate.withdraw');
 });
 
 // Backups
@@ -181,24 +206,12 @@ Route::get('/', [SiteController::class, 'index'])->name('storeHome');
 Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
 Route::get('updateZone', [SiteController::class, 'updateZone']);
 
-Route::get('customer-login', [CustomerAuthController::class, 'index']);
-Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin']);
-Route::get('customer-registration', [CustomerAuthController::class, 'registration']);
-Route::post('customer-post-registration', [CustomerAuthController::class, 'postRegistration']);
-Route::get('customer-logout', [CustomerAuthController::class, 'logout']);
-Route::resource('customerProfile', CustomerAuthController::class);
+
 Route::get('deleteAccount', [CustomerAuthController::class, 'account']);
 Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountMail'])->name('deleteAccountMail');
 Route::get('deleteAccountPage', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccountPage');
 
 
-Route::resource('order', SiteOrdersController::class);
-Route::get('order-update/{order}', [OrderController::class, 'updateOrderStatus'])->name('updateOrderStatus');
-Route::get('reOrder/{id}', [SiteOrdersController::class, 'reOrder'])->name('order.reOrder');
-Route::get('cashCollectionUpdate/{id}', [CashCollectionController::class, 'cashCollectionUpdate'])->name('cashCollectionUpdate');
-Route::resource('affiliate_dashboard', AffiliateDashboardController::class);
-Route::get('manageAppointment', 'App\Http\Controllers\Site\ManagerController@appointment');
-Route::get('supervisor', 'App\Http\Controllers\Site\ManagerController@supervisor');
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('draftOrder', [CheckOutController::class, 'draftOrder']);
@@ -208,7 +221,6 @@ Route::get('confirmStep', [CheckOutController::class, 'confirmStep'])->name('con
 //TODO :set no cache headers for all ajax calls
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
 Route::get('staff-group', [CheckOutController::class, 'staff_group']);
-Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::resource('siteFAQs', SiteFAQsController::class);
 Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
@@ -226,16 +238,6 @@ Route::get('/aboutUs', [InformationPageController::class, 'aboutUs'])->name('abo
 Route::get('/privacyPolicy', [InformationPageController::class, 'privacyPolicy'])->name('privacyPolicy');
 Route::get('/contactUs', [InformationPageController::class, 'contactUs'])->name('contactUs');
 
-Route::get('staffAppOrders', [StaffAppController::class, 'orders']);
-Route::get('staffAppUser', [StaffAppController::class, 'user']);
-Route::get('staffAppAddOrderComment/{order}', [StaffAppController::class, 'addComment']);
-Route::get('staffAppCashCollection/{order}', [StaffAppController::class, 'cashCollection']);
-Route::get('staffAppOrderStatusUpdate/{order}', [StaffAppController::class, 'orderStatusUpdate']);
-Route::get('staffAppRescheduleOrder/{order}', [StaffAppController::class, 'rescheduleOrder']);
-Route::get('staffAppTimeSlots', [StaffAppController::class, 'timeSlots']);
-Route::resource('staffProfile', StaffProfileController::class);
-Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
-
 Route::resource('siteReviews', SiteReviewsController::class);
 Route::get('/category', function () {
     return view('site.categories.index');
@@ -246,4 +248,5 @@ Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affili
 Route::post('/apply-coupon', [CheckOutController::class,'applyCoupon'])->name('apply.coupon');
 Route::post('/apply-affiliate', [CustomerAuthController::class,'applyAffiliate'])->name('apply.affiliate');
 Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffiliateProgram'])->name('apply.affiliateProgram');
-Route::resource('siteComplaints', SiteComplaintController::class);
+Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartModal'])->name('addToCartModal');
+Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');

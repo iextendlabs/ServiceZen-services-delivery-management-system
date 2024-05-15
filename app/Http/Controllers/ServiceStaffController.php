@@ -60,6 +60,7 @@ class ServiceStaffController extends Controller
         $serviceStaff = $query->paginate(config('app.paginate'));
         
         $filters = $request->only(['name']);
+
         $serviceStaff->appends($filters, ['sort' => $sort, 'direction' => $direction]);
         return view('serviceStaff.index', compact('total_staff','serviceStaff', 'filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }

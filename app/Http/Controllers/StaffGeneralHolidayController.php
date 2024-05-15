@@ -47,7 +47,6 @@ class StaffGeneralHolidayController extends Controller
         $total_Staff_general_holiday = $query->count();
         $staffGeneralHolidays =  $query->paginate(config('app.paginate'));
 
-
         return view('staffGeneralHolidays.index',compact('staffGeneralHolidays', 'total_Staff_general_holiday', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }

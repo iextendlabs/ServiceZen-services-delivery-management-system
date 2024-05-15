@@ -48,7 +48,7 @@
                     @endif
                 </th>
                 <th><a class="text-black ml-2"
-                        href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
+                        href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
                     @if (request('sort') === 'type')
                         <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif

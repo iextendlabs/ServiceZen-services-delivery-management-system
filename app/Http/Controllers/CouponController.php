@@ -30,6 +30,7 @@ class CouponController extends Controller
         $total_coupons = $query->count();
         $coupons = $query->paginate(config('app.paginate'));
         return view('coupons.index', compact('coupons', 'total_coupons', 'direction'))
+
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

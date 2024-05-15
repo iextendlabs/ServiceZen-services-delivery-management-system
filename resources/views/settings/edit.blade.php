@@ -40,11 +40,17 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Value:</strong>
-                    @if(in_array($setting->key, ['Emails For Daily Alert', 'Not Allowed Status for Staff App', 'Not Allowed Status for Driver App']))
+                    @if(in_array($setting->key, ['Emails For Daily Alert', 'Not Allowed Status for Staff App', 'Not Allowed Status for Driver App', 'Affiliate Withdraw Payment Method']))
                     <span class="text-danger">Note: Add by comma separated.</span>
                     @endif
 
-                    @if ($setting->key === 'Slider Image' || $setting->key === 'Slider Image For App')
+                    @if ($setting->key === 'Gander Permission')
+                    <select name="value" class="form-control">
+                        <option value="Male" @if($setting->value === "Male") selected @endif>Male</option>
+                        <option value="Female" @if($setting->value === "Female") selected @endif>Female</option>
+                        <option value="Both" @if($setting->value === "Both") selected @endif>Both</option>
+                    </select>
+                    @elseif ($setting->key === 'Slider Image' || $setting->key === 'Slider Image For App')
                     <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions @if ($setting->key === 'Slider Image' ) 1140 × 504px. @else 325 x 200px. @endif Thank you!</p>
                     <table id="imageTable" class="table table-bordered table-hover">
                         <thead>

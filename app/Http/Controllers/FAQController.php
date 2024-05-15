@@ -52,6 +52,7 @@ class FAQController extends Controller
         $categories = ServiceCategory::all();
 
         $filters = $request->only(['question', 'service_id', 'category_id']);
+
         $FAQs->appends($filters, ['sort' => $sort, 'direction' => $direction]);
         return view('FAQs.index', compact('total_faq','FAQs','filter','services','categories', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));

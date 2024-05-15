@@ -46,6 +46,7 @@ class SupervisorController extends Controller
         $filters = $request->only(['name']);
         $supervisors->appends($filters,['sort' => $sort, 'direction' => $direction]);
         return view('supervisors.index', compact('supervisors','filter_name', 'total_supervisors', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
     }
 
     /**

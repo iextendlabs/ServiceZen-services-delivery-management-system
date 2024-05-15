@@ -159,7 +159,6 @@
             {!! $cash_collections->links() !!}
         </div>
     </div>
-    </div>
     <script>
         function confirmDelete(Id) {
             var result = confirm("Are you sure you want to delete this Item?");

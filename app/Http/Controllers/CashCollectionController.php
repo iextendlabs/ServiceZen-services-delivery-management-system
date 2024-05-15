@@ -48,7 +48,7 @@ class CashCollectionController extends Controller
         if ($request->csv == 1 || $request->print == 1) {
             $cash_collections = $query->get();
         } else {
-            
+
             $total_cash_collection = $query->count();
             $cash_collections = $query->paginate(config('app.paginate'));
         }

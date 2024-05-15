@@ -39,7 +39,6 @@ class LongHolidayController extends Controller
         $total_longHoliday = $query->count();
         $longHolidays =  $query->paginate(config('app.paginate'));
 
-
         return view('longHolidays.index', compact('longHolidays', 'total_longHoliday', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }

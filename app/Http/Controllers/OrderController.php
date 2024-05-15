@@ -55,6 +55,7 @@ class OrderController extends Controller
         $payment_methods = ['Cash-On-Delivery'];
         $users = User::all();
         $zones = StaffZone::pluck("name")->toArray();
+        $categories = ServiceCategory::get();
         $filter = [
             'status' => $request->status,
             'affiliate' => $request->affiliate_id,
@@ -68,7 +69,8 @@ class OrderController extends Controller
             'driver' => $request->driver_id,
             'zone' => $request->zone,
             'date_to' => $request->date_to,
-            'date_from' => $request->date_from
+            'date_from' => $request->date_from,
+            'category_id' => $request->category_id,
         ];
         $currentUser = Auth::user();
         $query = Order::orderBy($sort, $direction);
@@ -144,7 +146,10 @@ class OrderController extends Controller
         }
 
         if ($request->customer) {
-            $query->where('customer_name', 'like', '%' . $request->customer . '%')->orWhere('customer_email', 'like', '%' . $request->customer . '%');
+            $query->where(function($query) use ($request) {
+                $query->where('customer_name', 'like', '%' . $request->customer . '%')
+                      ->orWhere('customer_email', 'like', '%' . $request->customer . '%');
+            });
         }
 
         if ($request->customer_id) {
@@ -152,7 +157,9 @@ class OrderController extends Controller
         }
 
         if($request->date_to && $request->date_from){
-            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
+            $dateFrom = $request->date_from;
+            $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
         }else{
             if ($request->date_to) {
                 $query->whereDate('created_at', '=', $request->date_to);
@@ -187,6 +194,11 @@ class OrderController extends Controller
             }
         }
 
+        if ($request->category_id) {
+            $query->whereHas('services.categories', function ($query) use ($request) {
+                $query->where('category_id', $request->category_id);
+            });
+        }
         
 
         if ($request->created_at) {
@@ -243,9 +255,9 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id']);
+            $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id','category_id']);
             $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

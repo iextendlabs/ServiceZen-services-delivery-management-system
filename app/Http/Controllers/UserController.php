@@ -43,7 +43,6 @@ class UserController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
-
         if ($request->role) {
             $query = $query->role($request->role);
         }

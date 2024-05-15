@@ -92,6 +92,17 @@
                             placeholder="Fix Salary">
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Parent Affiliate:</strong>
+                        <select name="parent_affiliate_id" class="form-control">
+                            <option value=""></option>
+                            @foreach ($affiliates as $affiliate)
+                                <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>

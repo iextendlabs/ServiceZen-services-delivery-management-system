@@ -16,6 +16,7 @@ use App\Models\CustomerProfile;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Mail;
 use App\Models\UserAffiliate;
 use Carbon\Carbon;
@@ -34,7 +35,9 @@ class CustomerAuthController extends Controller
             $affiliate_code = "";
         }
 
-        return view('site.auth.signUp', compact('affiliate_code','type'));
+        $gender_permission = Setting::where('key','Gander Permission')->value('value');
+
+        return view('site.auth.signUp', compact('affiliate_code','type','gender_permission'));
     }
 
     public function postRegistration(Request $request)
@@ -45,18 +48,8 @@ class CustomerAuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:password_confirmation',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
-            'number' => [
-                'nullable',
-                Rule::requiredIf(function () use ($request) {
-                    return $request->type === "affiliate";
-                }),
-            ],
-            'whatsapp' => [
-                'nullable',
-                Rule::requiredIf(function () use ($request) {
-                    return $request->type === "affiliate";
-                }),
-            ],
+            'number' => 'required',
+            'whatsapp' => 'required',
         ]);        
 
         
@@ -71,16 +64,21 @@ class CustomerAuthController extends Controller
         $customer = User::create($input);
 
         $customer->assignRole('Customer');
+        
+        $input['user_id'] = $customer->id;
+        
+        if ($request->number) {
+            $input['number'] = $request->number_country_code . $request->number;
+        }
+
+        if ($request->whatsapp) {
+            $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
+        }
 
         if($request->type == "affiliate"){
-            $input['user_id'] = $customer->id;
-            if ($request->number) {
-                $input['number'] = $request->number_country_code . $request->number;
-            }
-            if ($request->whatsapp) {
-                $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
-            }
             Affiliate::create($input);
+        }elseif($request->type == "customer"){
+            CustomerProfile::create($input);
         }
 
         if ($request->affiliate_code) {
@@ -107,7 +105,7 @@ class CustomerAuthController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect('/')->with('success', 'You have successfully logged in');
         }
-        return redirect("customer-registration")->with('error', 'Oppes! You have entered invalid credentials');
+        return redirect()->route('customer.registration')->with('error', 'Oppes! You have entered invalid credentials');
     }
 
     public function index()
@@ -163,7 +161,7 @@ class CustomerAuthController extends Controller
             }
         }
 
-        return redirect("customer-login")->with('error', 'Oppes! You have entered invalid credentials');
+        return redirect()->route("customer.login")->with('error', 'Oppes! You have entered invalid credentials');
     }
 
     public function logout()
@@ -171,7 +169,7 @@ class CustomerAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        return Redirect('customer-login');
+        return redirect()->route("customer.login");
     }
 
     public function edit($id, Request $request)
@@ -369,7 +367,7 @@ class CustomerAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        return Redirect('customer-login');
+        return redirect()->route("customer.login");
     }
 
     public function JoinAffiliateProgram(){

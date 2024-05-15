@@ -89,12 +89,12 @@ $staffs_chunk = 4;
     @if(isset($all_categories))
     @foreach($all_categories as $single_category)
     @if($single_category->status == "1")
-    @if(count($single_category->childCategories) == 0)
-    @if(!$single_category->parentCategory)
+    @if (is_null($single_category->parent_id) && $single_category->childCategories->isNotEmpty())
+    @include('site.categories.category_card', ['category' => $single_category])
+    @else
+    @if (is_null($single_category->parent_id) && $single_category->childCategories->isEmpty())
     @include('site.categories.category_card', ['category' => $single_category])
     @endif
-    @else
-    @include('site.categories.category_card', ['category' => $single_category])
     @endif
     @endif
     @endforeach
@@ -136,8 +136,9 @@ $staffs_chunk = 4;
               <small class="text-muted service-box-time"><i class="fa fa-clock"> </i> {{ $service->duration }}</small>
             </div>
 
-            <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a>
-
+            {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
+            <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
+          
 
           </div>
         </div>

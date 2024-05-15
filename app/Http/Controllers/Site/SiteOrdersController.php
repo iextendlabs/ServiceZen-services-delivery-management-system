@@ -36,7 +36,7 @@ class SiteOrdersController extends Controller
             return view('site.orders.index', compact('orders'))
                 ->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         } else {
-            return redirect('/customer-login')
+            return redirect()->route("customer.login")
                 ->with('error', 'Login to view order.');
         }
 
@@ -64,11 +64,11 @@ class SiteOrdersController extends Controller
         $area = $order->area;
         $date = $order->date;
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
-
         $statuses = config('app.statuses');
         $services = Service::all();
         $order_service = OrderService::where('order_id', $id)->pluck('service_id')->toArray();
+
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id, $order_service);
 
         if ($request->edit == "custom_location") {
             return view('site.orders.custom_location', compact('order'));
@@ -300,22 +300,24 @@ class SiteOrdersController extends Controller
         $order = Order::find($order_id);
 
         foreach ($order->orderServices as $service) {
-            $serviceIds[] = $service->service_id;
+            $formattedBooking = [
+                'service_id' => $service->service_id,
+                'date' => date('Y-m-d'),
+                'service_staff_id' => $order->service_staff_id,
+                'time_slot_id' => $order->time_slot_id,
+            ];
+            $bookingData[] = $formattedBooking;
         }
-        if (session()->has('serviceIds')) {
-            Session::forget('serviceIds');
-            Session::put('serviceIds', $serviceIds);
-        } else {
-            Session::put('serviceIds', $serviceIds);
-        }
+        Session::put('bookingData', $bookingData);
 
         return redirect('/bookingStep')->with('cart-success', 'Service Add to Cart Successfully.');
     }
 
-    public function cancelOrder($id)
+    public function cancelOrder($ids)
     {
-        $order = Order::find($id);
-        $order->delete();
+        $order_ids = explode(',', $ids);
+
+        Order::whereIn('id',$order_ids)->delete();
 
         return redirect("/")->with('success', 'Order Canceled successfully');
 
