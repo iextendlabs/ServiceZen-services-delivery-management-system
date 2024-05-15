@@ -20,7 +20,6 @@
             </div>
         @endif
         <hr>
-        <h3>Complaint  ({{ $total_complaint }})</h3>
         <div class="row">
             <div class="col-md-9">
                 <table class="table table-striped table-bordered">
