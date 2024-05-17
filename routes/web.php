@@ -203,6 +203,8 @@ Route::get('/backups/delete/{filename}', [BackupController::class, 'delete'])->n
 Route::get('/backups/clear', [BackupController::class, 'clear'])->name('backups.clear');
 
 Route::get('/', [SiteController::class, 'index'])->name('storeHome');
+Route::get('/service-list', [SiteController::class, 'service_list']);
+Route::get('/search-services',[SiteController::class, 'search_services'])->name('search.services');
 Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
 Route::get('updateZone', [SiteController::class, 'updateZone']);
 
