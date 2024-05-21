@@ -15,7 +15,12 @@ class Service extends Model
     {
         return 'services';
     }
-
+    public function toSearchableArray()
+    {
+        return [
+            'name' => $this->name,
+        ];
+    }
     public function averageRating()
     {
         return Review::where('service_id', $this->id)->avg('rating');

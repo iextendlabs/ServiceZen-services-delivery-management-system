@@ -78,14 +78,20 @@
         @endif
         <section class="jumbotron text-center">
             <div class="container">
-                @if (isset($category))
-                    <h1 class="jumbotron-heading">{{ $category->title }}</h1>
-                    <p class="lead text-muted">{{ $category->description }}</p>
+                @if (isset($searchResults))
+                    <p class="lead text-muted"> Search Service: <span
+                            @class(['p-4', 'font-bold', 'text-dark' => true])>{{ request('search_service') }}</span></p>
                 @else
-                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Saloon
-                        Services</h1>
-                    <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and
-                        just few clicks away.</p>
+                    @if (isset($category))
+                        <h1 class="jumbotron-heading">{{ $category->title }}</h1>
+                        <p class="lead text-muted">{{ $category->description }}</p>
+                    @else
+                        <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town
+                            Saloon
+                            Services</h1>
+                        <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and
+                            just few clicks away.</p>
+                    @endif
                 @endif
             </div>
         </section>
@@ -119,8 +125,8 @@
         <hr>
         <div class="album py-5 bg-light">
             <div class="row">
-                @if (isset($search_service))
-                    @foreach ($search_service as $item)
+                @if (isset($searchResults))
+                    @foreach ($searchResults as $item)
                         <div class="col-md-4 service-box ">
                             <div class="card mb-4 box-shadow">
                                 <a href="/serviceDetail/{{ $item->id }}">
@@ -153,7 +159,7 @@
                                 </div>
                             </div>
                         </div>
-                        @endforeach
+                    @endforeach
                 @else
                     @foreach ($services as $service)
                         <div class="col-md-4 service-box">

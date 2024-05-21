@@ -88,9 +88,19 @@ class SiteController extends Controller
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
         if ($request->search_service) {
-            $search_service = Service::search($request->search_service)->take(8)->get();
-            if ($search_service->isNotEmpty()) {
-                return view('site.home', compact('search_service', 'address', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'app_flag'));
+
+            $searchTerm = $request->search_service;
+            $searchWords = explode(" ", $searchTerm);
+            $searchResults = collect();
+    
+            foreach ($searchWords as $word) {
+                $results = Service::search($word)->get();
+                $searchResults = $searchResults->merge($results);
+            }
+            $searchResults = $searchResults->unique('id');
+
+            if ($searchResults->isNotEmpty()) {
+                return view('site.home', compact('searchResults', 'address', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'app_flag'));
             } else {
                 return Redirect::route('storeHome')->with('success', 'Service not found');
             }
@@ -124,10 +134,9 @@ class SiteController extends Controller
 
             $filters = $request->only(['id']);
             $services->appends($filters);
-            
+
             $all_categories = ServiceCategory::get();
             return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'app_flag', 'all_categories'))->with('success', 'ni  ');
-
         }
         return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag'));
     }

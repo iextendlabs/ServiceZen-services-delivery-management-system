@@ -201,21 +201,23 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
             <a class="navbar-brand" style="font-size: 30px;font-weight:bold;font-family: 'Titillium Web', sans-serif;"
-                href="/">Laravel </a>
+                href="/">Laravel</a>
+            <div class="col-lg-3">
+                <form action="{{ route('storeHome') }}" method="GET">
+                    @csrf
+                    <div class="input-group flex-nowrap">
+                        <input type="search" id="search_product" class="form-control" placeholder="Search Services"
+                            aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
+                            aria-describedby="addon-wrapping">
+                        <button type="submit" class="input-group-text" id="addon-wrapping"><i
+                                class="fa fa-search fa-magnifying-glass"></i></button>
+                    </div>
+                </form>
+            </div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <form action="{{ route('storeHome') }}" method="GET">
-                @csrf
-                <div class="input-group flex-nowrap ml-5" style="width:120%;">
-                    <input type="search" id="search_product" class="form-control" placeholder="Search Services"
-                        aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
-                        aria-describedby="addon-wrapping">
-                    <button type="submit" class="input-group-text" id="addon-wrapping"><i
-                            class="fa fa-search fa-magnifying-glass"></i></button>
-                </div>
-            </form>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
 
