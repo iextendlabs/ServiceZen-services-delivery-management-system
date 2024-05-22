@@ -1490,7 +1490,7 @@ class CustomerController extends Controller
         $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
         
         if ($total_amount < $minimum_booking_price) {
-            return "The total amount must be greater than or equal to AED.".$minimum_booking_price;
+            return "The total amount must be greater than or equal to AED".$minimum_booking_price;
         }else{
             return true;
 
