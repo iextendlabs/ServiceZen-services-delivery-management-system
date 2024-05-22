@@ -7,7 +7,7 @@
             </div>
             <div class="col-md-12 mb-3 no-print">
                 <div class="d-flex flex-wrap justify-content-md-end">
-                    <a href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger mb-2"><i
+                    <a  href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger mb-2"><i
                             class="fa fa-print"></i> PDF</a>
 
                     <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success mb-2 ms-md-2"><i
@@ -60,7 +60,7 @@
                 <tr>
                     <th>SR#</th>
                     <th class="">
-                        <a class="ml-2 text-black text-decoration-none"
+                        <a class="ml-2  text-decoration-none"
                             href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'id', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Order</a>
                             @if (request('sort') === 'id')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -68,7 +68,7 @@
                     </th>
                     <th>
                         <div class="d-flex">
-                            <a class="ml-2 text-black text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'staff_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Staff</a>
+                            <a class="ml-2  text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'staff_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Staff</a>
                             @if (request('sort') === 'staff_name')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -77,7 +77,7 @@
                     </th>
                     <th>
                         <div class="d-flex">
-                            <a class="ml-2 text-black text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'amount', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Collected Amount</a>
+                            <a class="ml-2  text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'amount', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Collected Amount</a>
                             @if (request('sort') === 'amount')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -88,7 +88,7 @@
                     <th>Order Total</th>
                     <th>
                         <div class="d-flex">
-                            <a class="ml-2 text-black text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'description', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Description</a>
+                            <a class="ml-2  text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'description', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Description</a>
                             @if (request('sort') === 'description')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -98,7 +98,7 @@
                     <th>Order Comment</th>
                     <th>
                         <div class="d-flex">
-                            <a class="ml-2 text-black text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
+                            <a class="ml-2  text-decoration-none" href="{{ route('cashCollection.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
                             @if (request('sort') === 'status')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif

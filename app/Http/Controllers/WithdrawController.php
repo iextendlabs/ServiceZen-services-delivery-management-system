@@ -25,13 +25,14 @@ class WithdrawController extends Controller
      */
     public function index(request $request)
     {
-
+        $sort = $request->input('sort', 'user_name');
+        $direction = $request->input('direction', 'desc');
         $filter = [
             'user_id' => $request->user_id,
             'status' => $request->status
         ];
 
-        $query = Withdraw::latest();
+        $query = Withdraw::orderBy($sort,$direction);
 
         if ($request->user_id) {
             $query->where('user_id', $request->user_id);
@@ -48,7 +49,7 @@ class WithdrawController extends Controller
         $withdraws->appends($filters);
         $users = User::role('Affiliate')->get();
 
-        return view('withdraws.index', compact('withdraws', 'filter', 'total_withdraw', 'users'))
+        return view('withdraws.index', compact('withdraws', 'filter', 'total_withdraw', 'users', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

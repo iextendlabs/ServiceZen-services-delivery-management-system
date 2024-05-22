@@ -24,7 +24,7 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('staffGeneralHolidays.index', array_merge(request()->query(), ['sort' => 'day', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">
                         Day
                         </a>

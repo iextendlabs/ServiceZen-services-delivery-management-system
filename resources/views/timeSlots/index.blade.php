@@ -65,7 +65,7 @@
             <th>Sr#</th>
             <th>
                 <div class="d-flex">
-                    <a class="ml-2 text-black text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                    <a class="ml-2  text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                     @if (request('sort') === 'name')
                     <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif
@@ -74,7 +74,7 @@
             </th>
             <th>
                 <div class="d-flex">
-                    <a class="ml-2 text-black text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time Start -- Time End</a>
+                    <a class="ml-2  text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time Start -- Time End</a>
                     @if (request('sort') === 'time_start')
                     <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif

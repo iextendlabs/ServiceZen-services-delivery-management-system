@@ -3,19 +3,19 @@
     <tr>
         <th>Sr#</th>
 
-        <th class="text-left"><a
+        <th class="text-left"><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'id', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Order#</a>
             @if (request('sort') === 'id')
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
         </th>
-        <th class=""><a
+        <th class=""><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'staff_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Staff</a>
                 @if (request('sort') === 'staff_name')
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
         </th>
-        <th class="fas fa-clock"><a
+        <th class="fas fa-clock"><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Appointment
                 Date</a>
 
@@ -23,7 +23,7 @@
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
         </th>
-        <th class=""><a
+        <th class=""><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'time_slot_value', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Slot
             </a>
             @if (request('sort') === 'time_slot_value')
@@ -32,7 +32,7 @@
         </th>
 
         @if (auth()->user()->hasRole('Supervisor'))
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'landmark', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Landmark
                 </a>
                 @if (request('sort') === 'landmark')
@@ -40,21 +40,21 @@
             @endif
 
             </th>
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'area', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Area
                 </a>
                 @if (request('sort') === 'area')
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
             </th>
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'city', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">City
                 </a>
                 @if (request('sort') === 'city')
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
             </th>
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'buildingName', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Building
                     name
                 </a>
@@ -64,7 +64,7 @@
             </th>
         @else
             <th>
-                <a
+                <a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'customer_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">
                     Customer
                 </a>
@@ -72,7 +72,7 @@
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
             </th>
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'total_amount', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Total
                     Amount
                 </a>
@@ -80,7 +80,7 @@
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
             </th>
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'payment_method', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Payment
                     Method
                 </a>
@@ -88,7 +88,7 @@
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
             </th>
-            <th class=""><a
+            <th class=""><a class="text-decoration-none"
                     href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'order_comment', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Comment
                 </a>
                 @if (request('sort') === 'order_comment')
@@ -96,14 +96,14 @@
             @endif
             </th>
         @endif
-        <th class=""><a
+        <th class=""><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status
             </a>
             @if (request('sort') === 'status')
             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
         @endif
         </th>
-        <th class=""><a
+        <th class=""><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'created_at', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date
                 Added
             </a>
