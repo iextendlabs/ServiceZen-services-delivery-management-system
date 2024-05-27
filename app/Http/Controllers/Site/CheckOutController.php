@@ -363,12 +363,11 @@ class CheckOutController extends Controller
         
         if ($total_amount < $minimum_booking_price) {
             $errors = [
-                'Minimum Order value' => ["The total amount must be greater than or equal to AED "],
+                'Minimum Order value' => ["The total amount must be greater than or equal to AED ".$minimum_booking_price],
             ];
             return $errors;
         }else{
             return true;
-
         }
 
     }
