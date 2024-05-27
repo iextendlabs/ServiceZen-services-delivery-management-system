@@ -21,13 +21,14 @@ class InformationController extends Controller
      */
     public function index(request $request)
     {
-
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
         $filter = [
             'name' => $request->name,
             'position' => $request->position
         ];
 
-        $query = Information::orderBy('name');
+        $query = Information::orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -41,8 +42,8 @@ class InformationController extends Controller
         $information = $query->paginate(config('app.paginate'));
 
         $filters = $request->only(['name', 'position']);
-        $information->appends($filters);
-        return view('information.index', compact('information','filter', 'total_information'))
+        $information->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+        return view('information.index', compact('information','filter', 'total_information', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

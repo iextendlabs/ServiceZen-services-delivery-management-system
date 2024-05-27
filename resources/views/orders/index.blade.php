@@ -243,7 +243,6 @@
                 </div>
             @endif
         </div>
-
         <div class="fluid_container">
             <div class="row">
                 <!-- First Column (Table) -->

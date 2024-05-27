@@ -37,7 +37,7 @@
                                 <strong>User:</strong>
                                 <select name="user_id" class="form-control">
                                     <option></option>
-                                    @foreach ($users as $user)
+                                    @foreach ($withdraws as $user)
                                         <option value="{{ $user->id }}"
                                             @if ($filter['user_id'] == $user->id) selected @endif>
                                             {{ $user->name }}</option>
@@ -77,10 +77,31 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th class="text-left">User Name</th>
-                        <th class="text-left">Amount</th>
-                        <th class="text-left">Status</th>
-                        <th class="text-left">Payment method</th>
+                        <th><a class=" ml-2 text-decoration-none"
+                            href="{{ route('withdraws.index', array_merge(request()->query(), ['sort' => 'user_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">User Name</a>
+                        @if (request('sort') === 'user_name')
+                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                        @endif
+                    </th>
+                    <th><a class=" ml-2 text-decoration-none"
+                        href="{{ route('withdraws.index', array_merge(request()->query(), ['sort' => 'amount', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Amount</a>
+                    @if (request('sort') === 'amount')
+                        <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+                </th>
+                <th><a class=" ml-2 text-decoration-none"
+                    href="{{ route('withdraws.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
+                @if (request('sort') === 'status')
+                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                @endif
+            </th>
+            <th><a class=" ml-2 text-decoration-none"
+                href="{{ route('withdraws.index', array_merge(request()->query(), ['sort' => 'payment_method', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Payment method</a>
+            @if (request('sort') === 'payment_method')
+                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+            @endif
+        </th>
+                        {{-- <th class="text-left">Payment method</th> --}}
                         <th>Action</th>
                     </tr>
                     @if (count($withdraws))

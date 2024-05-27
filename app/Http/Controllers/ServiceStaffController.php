@@ -39,15 +39,18 @@ class ServiceStaffController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
         $filter_name = $request->name;
+        $query = User::orderBy($sort, $direction);
 
         if (Auth::user()->hasRole('Supervisor')) {
             $staffIds = Auth::user()->getSupervisorStaffIds();
-            $query = User::role('Staff')->whereIn('id', $staffIds);
+            $query->role('Staff')->whereIn('id', $staffIds);
         } elseif (Auth::user()->hasRole('Staff')) {
-            $query = User::role('Staff')->where('id', Auth::id());
+            $query->role('Staff')->where('id', Auth::id());
         } else {
-            $query = User::role('Staff')->latest();
+            $query->role('Staff')->latest();
         }
 
         if ($request->name) {
@@ -57,8 +60,9 @@ class ServiceStaffController extends Controller
         $serviceStaff = $query->paginate(config('app.paginate'));
         
         $filters = $request->only(['name']);
-        $serviceStaff->appends($filters);
-        return view('serviceStaff.index', compact('total_staff','serviceStaff', 'filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
+        $serviceStaff->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+        return view('serviceStaff.index', compact('total_staff','serviceStaff', 'filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**

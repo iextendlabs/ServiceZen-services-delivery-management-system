@@ -36,13 +36,13 @@ class TimeSlotController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
         $filter = [
             'staff_id' => $request->staff_id
         ];
 
-
-
-        $query = TimeSlot::orderBy('time_start');
+        $query = TimeSlot::orderBy($sort, $direction);
 
         if ($request->has('staff_id')) {
             $staffId = $request->input('staff_id');
@@ -55,7 +55,7 @@ class TimeSlotController extends Controller
         $staffs = User::role('Staff')->get();
         $filters = $request->only(['staff_id']);
         $time_slots->appends($filters);
-        return view('timeSlots.index', compact('time_slots', 'staffs', 'filter', 'total_time_slot'))
+        return view('timeSlots.index', compact('time_slots', 'staffs', 'filter', 'total_time_slot', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

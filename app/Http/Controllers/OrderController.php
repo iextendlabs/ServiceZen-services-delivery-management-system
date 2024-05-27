@@ -45,6 +45,9 @@ class OrderController extends Controller
     public function index(Request $request)
     {
 
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'asc');
+
         $currentDate = Carbon::today()->toDateString();
 
         $statuses = config('app.order_statuses');
@@ -70,6 +73,7 @@ class OrderController extends Controller
             'category_id' => $request->category_id,
         ];
         $currentUser = Auth::user();
+        $query = Order::orderBy($sort, $direction);
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
 
         switch ($userRole) {
@@ -99,10 +103,11 @@ class OrderController extends Controller
                 break;
 
             default:
-                $query = Order::orderBy('id', 'DESC');
+                // $query = Order::orderBy('id', 'DESC');
+                $query;
                 break;
         }
-
+        
         if ($request->zone) {
             $query->where('area', 'like', '%' . $request->zone . '%');
         }
@@ -117,6 +122,14 @@ class OrderController extends Controller
             } else {
                 $query->whereNotIn('status', ['Rejected', 'Canceled']);
             }
+        } else {
+            if ($request->status) {
+                $query->where('status', '=', $request->status);
+            }
+        }
+
+        if ($request->driver_status) {
+            $query->where('driver_status', '=', $request->driver_status);
         } else {
             if ($request->status) {
                 $query->where('status', '=', $request->status);
@@ -243,8 +256,8 @@ class OrderController extends Controller
         } else {
 
             $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id','category_id']);
-            $orders->appends($filters);
-            return view('orders.index', compact('total_order','orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones','categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
