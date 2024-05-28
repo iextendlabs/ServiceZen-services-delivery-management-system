@@ -95,13 +95,17 @@ class SiteController extends Controller
         $query = Service::query();
 
         if ($request->search_service) {
-
-            $searchTerm = $request->search_service;
-            $searchWords = explode(" ", $searchTerm);
-
-            foreach ($searchWords as $word) {
-                $query->orWhere('name', 'like', '%' . $word . '%');
+            if(count($query->where('name',$request->search_service)->get())){
+                $query->orWhere('name', $request->search_service);
+            }else{
+                $searchTerm = $request->search_service;
+                $searchWords = explode(" ", $searchTerm);
+    
+                foreach ($searchWords as $word) {
+                    $query->orWhere('name', 'like', '%' . $word . '%');
+                }
             }
+            
         } elseif (isset($request->id)) {
             $category = ServiceCategory::find($request->id);
             if (isset($category->childCategories) && count($category->childCategories)) {

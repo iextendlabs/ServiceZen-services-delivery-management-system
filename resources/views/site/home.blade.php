@@ -34,7 +34,11 @@
                     <span>To add more service<a href="/"> Continue</a></span>
                 </div>
             @endif
-
+            @if(count($services) == 0)
+            <span class="alert alert-danger text-center w-75 " role="alert" style="padding:10px 200px">
+                <strong>Service not found</strong>
+            </span>
+            @endif
         </div>
         @if ($slider_images->value && !isset($category))
             <div class="row">
