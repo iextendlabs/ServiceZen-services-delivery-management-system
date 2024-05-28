@@ -15,7 +15,7 @@
                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
             @endif
         </th>
-        <th class="fas fa-clock"><a class="text-decoration-none"
+        <th><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Appointment
                 Date</a>
 
