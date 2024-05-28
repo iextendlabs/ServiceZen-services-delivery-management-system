@@ -85,6 +85,7 @@ class SiteController extends Controller
         $slider_images = Setting::where('key', 'Slider Image')->first();
 
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
+        $home_page_heading = Setting::where('key', 'Home Page Heading')->value('value');
 
         $FAQs = FAQ::latest()->where('status', '1')->take(3)->get();
 
@@ -140,7 +141,7 @@ class SiteController extends Controller
         $services = $query->paginate(config('app.paginate'));
         $filters = $request->only(['id', 'search_service']);
         $services->appends($filters);
-        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag'));
+        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag', 'home_page_heading'));
     }
 
     public function show($id, Request $request)

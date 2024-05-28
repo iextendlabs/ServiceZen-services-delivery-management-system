@@ -121,8 +121,18 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
             <a class="navbar-brand" style="font-size: 30px;font-weight:bold;font-family: 'Titillium Web', sans-serif;"
-                href="/">{{ env('APP_NAME') }}</a>
-            <div class="col-lg-3">
+                href="/">
+                @if ($logo_image)
+                    <img src="logo/{{ $logo_image }}" alt="{{ env('APP_NAME') }}">
+                @else
+                    {{ env('APP_NAME') }}
+                @endif
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="col-lg-3 ">
                 <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
                     <div class="input-group flex-nowrap">
                         <input type="search" id="search_product" class="form-control" placeholder="Search Services"
@@ -133,10 +143,6 @@
                     </div>
                 </form>
             </div>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
 

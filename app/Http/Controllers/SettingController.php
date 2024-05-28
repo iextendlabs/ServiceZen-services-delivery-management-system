@@ -87,7 +87,7 @@ class SettingController extends Controller
     public function update(Request $request, $id)
     {
         $setting = Setting::find($id);
-
+        
         switch ($setting->key) {
             case 'Featured Services':
                 request()->validate([
@@ -175,6 +175,21 @@ class SettingController extends Controller
                     $setting->value = $request->status . '_' . $linkTypes . '_' . $linkedItems . '_' . $filename;
                 }
                 break;
+            case 'Logo image':
+                request()->validate([
+                    'logo_image' => 'required|dimensions:width=133,height=73',
+                ]);
+
+                if ($request->logo_image) {
+                    if (file_exists(public_path('logo') . '/' . $setting->value)) {
+                        unlink(public_path('logo') . '/' . $setting->value);
+                    }
+                    
+                    $image = mt_rand() . '.' . $request->logo_image->getClientOriginalExtension();
+                    $request->logo_image->move(public_path('logo'), $image);
+                    $setting->value = $image;
+                }
+                    break;
 
             case 'Slider Image For App':
                 if ($request->image) {

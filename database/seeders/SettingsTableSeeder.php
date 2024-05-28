@@ -169,11 +169,24 @@ class SettingsTableSeeder extends Seeder
                 'value' => '',
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',
-            ]
-            ,
+            ],
             [
-                'id' => 22,
+                'id' => 23,
                 'key' => 'Affiliate Withdraw Payment Method',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
+            ],
+            [
+                'id' => 24,
+                'key' => 'Home Page Heading',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
+            ],
+            [
+                'id' => 25,
+                'key' => 'Logo image',
                 'value' => '',
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',

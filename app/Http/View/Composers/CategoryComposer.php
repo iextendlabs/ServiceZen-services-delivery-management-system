@@ -33,6 +33,7 @@ class CategoryComposer
         $head_tag = Setting::where('key', 'Head Tag')->value('value');
         $top_information_page = Information::where('position', 'Top Menu')->get();
         $bottom_information_page = Information::where('position', 'Bottom Footer')->get();
+        $logo_image = Setting::where('key', 'Logo image')->value('value');
 
         $view->with([
             'categories' => $categories,
@@ -41,6 +42,7 @@ class CategoryComposer
             'head_tag' => $head_tag,
             'top_information_page' => $top_information_page,
             'bottom_information_page' => $bottom_information_page,
+            'logo_image' => $logo_image
         ]);
     }
 }

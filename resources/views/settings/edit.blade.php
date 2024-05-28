@@ -120,7 +120,7 @@
                     </select>
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
-                    @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy' || $setting->key === 'Contact Us')
+                    @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy' || $setting->key === 'Contact Us' || $setting->key === 'Home Page Heading')
                     <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
                     <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
                     <script>
@@ -301,6 +301,17 @@
                                 </div>
                             </div>
                         @endif
+                    @elseif('Logo image')
+                        @if($setting->value)
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 133 x 73px Thank you!</p>
+                                    <input type="file" name="logo_image" id="image" class="form-control-file">
+                                    <br>
+                                    <img id="preview" src="/logo/{{$setting->value}}" height="130px">
+                                </div>
+                            </div>
+                        @endif    
                     @else
                     <input type="text" name="value" value="{{ $setting->value }}" class="form-control" placeholder="Value">
                     @endif
