@@ -56,18 +56,18 @@
 @endif
 
 <style>
-    .ui-autocomplete .show-more {
-            color: blue !important;
-            background-color: aliceblue;
-            text-align: center;
-            cursor: pointer;
-            justify-content: center;
-        }
+    .ui-autocomplete{
+        border-radius: 20px !important;
+        padding: 15px !important;
+    }
 
-        .ui-autocomplete .show-more:hover {
-            background-color: darkblue;
-            color: white !important;
-        }
+    .ui-menu-item :hover{
+        border-color: #187485;
+        border-radius: 10px;
+        background-color: #187485;
+        color: white !important;
+    }
+        
     .navbar-dark .navbar-nav .nav-link {
         color: rgba(255, 255, 255, 1) !important;
     }
@@ -122,17 +122,6 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
             <a class="navbar-brand" style="font-size: 30px;font-weight:bold;font-family: 'Titillium Web', sans-serif;"
                 href="/">{{ env('APP_NAME') }}</a>
-            <div class="col-lg-3">
-                <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
-                    <div class="input-group flex-nowrap">
-                        <input type="search" id="search_product" class="form-control" placeholder="Search Services"
-                            aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
-                            aria-describedby="addon-wrapping">
-                        <button type="submit" class="input-group-text" id="addon-wrapping"><i
-                                class="fa fa-search fa-magnifying-glass"></i></button>
-                    </div>
-                </form>
-            </div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -293,7 +282,6 @@
             </div>
         </nav>
         @include('site.layout.locationPopup')
-
         <div id="addToCartPopup"></div>
     </header>
 
@@ -355,32 +343,16 @@
                     source: function(request, response) {
                         var results = $.ui.autocomplete.filter(tags, request.term);
                         if (!showMore) {
-                            results = results.slice(0, 10);
+                            results = results.slice(0, 15);
                         }
                         response(results);
                     },
-                    open: function(event, ui) {
-                        var $list = $(this).autocomplete("widget");
-                        if (tags.length > 10 && $list.find(".show-more").length === 0) {
-                            $("<li>")
-                                .append($("<a>").text("Show More").addClass("show-more"))
-                                .appendTo($list);
-                        }
-                    }
+                    
                 }).autocomplete("instance")._renderItem = function(ul, item) {
                     return $("<li>")
                         .append("<div>" + item.label + "</div>")
                         .appendTo(ul);
                 };
-
-                $(document).on("click", ".show-more", function(event) {
-                    event.preventDefault();
-                    showMore = !showMore;
-                    var $input = $("#search_product");
-                    var $list = $input.autocomplete("widget");
-                    $(this).text(showMore ? "Show Less" : "Show More");
-                    $input.autocomplete("search", $input.val());
-                });
             }
         });
     </script>

@@ -14,8 +14,56 @@
             height: 200px !important;
             width: 200px;
         }
+        .input-group {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        #search_product {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            padding: 0.75rem 1.25rem;
+        }
+
+        #search_product:focus {
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        #search-button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background: linear-gradient(45deg, #1f91a5, #0c5460);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            transition: background 0.3s ease;
+        }
+
+        #search-button:hover {
+            background: linear-gradient(45deg, #1f91a5, #0c5460);
+        }
+
+        .fa-search {
+            margin-right: 5px;
+        }
     </style>
     <div class="container">
+        <div class="col-md-6 col-sm-12 offset-md-3 mt-5">
+            <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
+                <div class="input-group">
+                    <input type="search" id="search_product" class="form-control border-right-0" placeholder="Search Services"
+                           aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
+                           aria-describedby="search-button">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary" id="search-button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="text-center mt-3">
             @if (Session::has('error'))
                 <span class="alert alert-danger" role="alert">

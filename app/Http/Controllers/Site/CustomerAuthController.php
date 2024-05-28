@@ -35,7 +35,7 @@ class CustomerAuthController extends Controller
             $affiliate_code = "";
         }
 
-        $gender_permission = Setting::where('key','Gander Permission')->value('value');
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
 
         return view('site.auth.signUp', compact('affiliate_code','type','gender_permission'));
     }

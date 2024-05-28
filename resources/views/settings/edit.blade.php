@@ -44,7 +44,7 @@
                     <span class="text-danger">Note: Add by comma separated.</span>
                     @endif
 
-                    @if ($setting->key === 'Gander Permission')
+                    @if ($setting->key === 'Gender Permission')
                     <select name="value" class="form-control">
                         <option value="Male" @if($setting->value === "Male") selected @endif>Male</option>
                         <option value="Female" @if($setting->value === "Female") selected @endif>Female</option>
