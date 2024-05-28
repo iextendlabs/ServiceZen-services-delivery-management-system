@@ -16,6 +16,7 @@
         integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap"
@@ -30,101 +31,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/intlTelInput.min.js"
         integrity="sha512-IxRltlh4EpT/il+hOEpD3g4jlXswVbSyH5vbqw6aF40CUsJTRAnr/7MxmPlKRsv9dYgBPcDSVNrf1P/keoBx+Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
-    <!-- Ensure jQuery and jQuery UI libraries are included -->
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-<script>
-    $.noConflict();
-    jQuery(document).ready(function($) {
-        var availableTags = [];
-
-        $.ajax({
-            method: "GET",
-            url: "/service-list",
-            success: function(response) {
-                availableTags = response;
-                // Call the function to initialize autocomplete
-                startAutocomplete(availableTags);
-            }
-        });
-
-        function startAutocomplete(tags) {
-            $("#search_product").autocomplete({
-                source: function(request, response) {
-                    var results = $.ui.autocomplete.filter(tags, request.term);
-                    response(results.slice(0, 10)); // Show only the first 10 items initially
-                },
-                // Show More button logic
-                open: function(event, ui) {
-                    var $list = $(this).autocomplete("widget");
-                    if (tags.length > 10 && $list.find(".show-more").length === 0) {
-                        $("<li>")
-                            .append($("<a>").text("Show More").addClass("show-more"))
-                            .appendTo($list);
-                    }
-                }
-            }).autocomplete("instance")._renderItem = function(ul, item) {
-                return $("<li>")
-                    .append("<div>" + item.label + "</div>")
-                    .appendTo(ul);
-            };
-
-            // Show More/Show Less button click event
-            $(document).on("click", ".show-more", function(event) {
-                event.preventDefault();
-                var $input = $("#search_product");
-                var $list = $input.autocomplete("widget");
-                var buttonText = $(this).text();
-
-                if (buttonText === "Show More") {
-                    // Show all items
-                    $input.autocomplete("option", "source", tags);
-                    $input.autocomplete("search", $input.val()); // Trigger search to refresh list
-                    $(this).text("Show Less");
-                } else {
-                    // Show limited items
-                    $input.autocomplete("option", "source", function(request, response) {
-                        var results = $.ui.autocomplete.filter(tags, request.term);
-                        response(results.slice(0, 10));
-                    });
-                    $input.autocomplete("search", $input.val()); // Trigger search to refresh list
-                    $(this).text("Show More");
-                }
-            });
-
-            // Initial check to add "Show More" button if there are more than 10 tags
-            if (tags.length > 10) {
-                $("<li>")
-                    .append($("<a>").text("Show More").addClass("show-more"))
-                    .appendTo($("#search_product").autocomplete("widget"));
-            }
-        }
-    });
-</script>
-
-    <style>
-        .ui-autocomplete .show-more {
-            color: blue !important;
-            background-color: aliceblue;
-            text-align: center;
-            cursor: pointer;
-            justify-content: center;
-        }
-
-        .ui-autocomplete .show-more:hover {
-            background-color: darkblue;
-            color: white !important;
-        }
-    </style>
-
-
-
-
-
-
-
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -148,6 +56,18 @@
 @endif
 
 <style>
+    .ui-autocomplete .show-more {
+            color: blue !important;
+            background-color: aliceblue;
+            text-align: center;
+            cursor: pointer;
+            justify-content: center;
+        }
+
+        .ui-autocomplete .show-more:hover {
+            background-color: darkblue;
+            color: white !important;
+        }
     .navbar-dark .navbar-nav .nav-link {
         color: rgba(255, 255, 255, 1) !important;
     }
@@ -201,10 +121,9 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
             <a class="navbar-brand" style="font-size: 30px;font-weight:bold;font-family: 'Titillium Web', sans-serif;"
-                href="/">Laravel</a>
+                href="/">{{ env('APP_NAME') }}</a>
             <div class="col-lg-3">
-                <form action="{{ route('storeHome') }}" method="GET">
-                    @csrf
+                <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
                     <div class="input-group flex-nowrap">
                         <input type="search" id="search_product" class="form-control" placeholder="Search Services"
                             aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
@@ -412,8 +331,56 @@
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address">
     </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
+    <script>
+        $(document).ready(function($) {
+            var availableTags = [];
+
+            $.ajax({
+                method: "GET",
+                url: "/service-list",
+                success: function(response) {
+                    availableTags = response;
+                    startAutocomplete(availableTags);
+                }
+            });
+
+            function startAutocomplete(tags) {
+                var showMore = false;
+
+                $("#search_product").autocomplete({
+                    source: function(request, response) {
+                        var results = $.ui.autocomplete.filter(tags, request.term);
+                        if (!showMore) {
+                            results = results.slice(0, 10);
+                        }
+                        response(results);
+                    },
+                    open: function(event, ui) {
+                        var $list = $(this).autocomplete("widget");
+                        if (tags.length > 10 && $list.find(".show-more").length === 0) {
+                            $("<li>")
+                                .append($("<a>").text("Show More").addClass("show-more"))
+                                .appendTo($list);
+                        }
+                    }
+                }).autocomplete("instance")._renderItem = function(ul, item) {
+                    return $("<li>")
+                        .append("<div>" + item.label + "</div>")
+                        .appendTo(ul);
+                };
+
+                $(document).on("click", ".show-more", function(event) {
+                    event.preventDefault();
+                    showMore = !showMore;
+                    var $input = $("#search_product");
+                    var $list = $input.autocomplete("widget");
+                    $(this).text(showMore ? "Show Less" : "Show More");
+                    $input.autocomplete("search", $input.val());
+                });
+            }
+        });
+    </script>
     <script>
         var Dropdowns = function() {
             var t = $(".dropdown"),

@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Svg\Tag\Rect;
 
 class SiteController extends Controller
 {
@@ -87,58 +86,57 @@ class SiteController extends Controller
 
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
+        $FAQs = FAQ::latest()->where('status', '1')->take(3)->get();
+
+        $category = null;
+
+        $all_categories = [];
+
+        $query = Service::query();
+
         if ($request->search_service) {
 
             $searchTerm = $request->search_service;
             $searchWords = explode(" ", $searchTerm);
-            $searchResults = collect();
-    
-            foreach ($searchWords as $word) {
-                $results = Service::search($word)->get();
-                $searchResults = $searchResults->merge($results);
-            }
-            $searchResults = $searchResults->unique('id');
 
-            if ($searchResults->isNotEmpty()) {
-                return view('site.home', compact('searchResults', 'address', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'app_flag'));
-            } else {
-                return Redirect::route('storeHome')->with('success', 'Service not found');
+            foreach ($searchWords as $word) {
+                $query->orWhere('name', 'like', '%' . $word . '%');
             }
+        } elseif (isset($request->id)) {
+            $category = ServiceCategory::find($request->id);
+            if (isset($category->childCategories) && count($category->childCategories)) {
+                $child_categories =  $category->childCategories->pluck('id')->toArray();
+                $child_categories[] = $request->id;
+                $query->where(function ($query) {
+                    $query->where('type', 'master')
+                        ->orWhereNull('type');
+                })->where('status', '1')
+                    ->whereHas('categories', function ($q) use ($child_categories) {
+                        $q->whereIn('category_id', $child_categories);
+                    });
+            } else {
+                $query->where(function ($query) {
+                    $query->where('type', 'master')
+                        ->orWhereNull('type');
+                })->where('status', '1')
+                    ->whereHas('categories', function ($q) use ($request) {
+                        $q->where('category_id', $request->id);
+                    });
+            }
+
+            $FAQs = FAQ::where('category_id', $request->id)->where('status', '1')->latest()->take(3)->get();
         } else {
-            $servicesQuery = Service::where(function ($query) {
+            $all_categories = ServiceCategory::get();
+            $query->where(function ($query) {
                 $query->where('type', 'master')
                     ->orWhereNull('type');
-            })
-                ->where('status', '1');
-
-            if ($request->has('id')) {
-                $category = ServiceCategory::find($request->id);
-                $child_categories = [$request->id];
-
-                if ($category && $category->childCategories()->exists()) {
-                    $child_categories = array_merge($child_categories, $category->childCategories()->pluck('id')->toArray());
-                }
-
-                $servicesQuery->whereHas('categories', function ($q) use ($child_categories) {
-                    $q->whereIn('category_id', $child_categories);
-                });
-            }
-
-            $services = $servicesQuery->paginate(config('app.paginate'));
-
-            $FAQs = FAQ::where('status', '1')->latest()->take(3)->get();
-
-            if (isset($category)) {
-                $FAQs = $category->faqs()->where('status', '1')->latest()->take(3)->get();
-            }
-
-            $filters = $request->only(['id']);
-            $services->appends($filters);
-
-            $all_categories = ServiceCategory::get();
-            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'app_flag', 'all_categories'))->with('success', 'ni  ');
+            })->where('status', '1');
         }
-        return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag'));
+
+        $services = $query->paginate(config('app.paginate'));
+        $filters = $request->only(['id', 'search_service']);
+        $services->appends($filters);
+        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag'));
     }
 
     public function show($id, Request $request)
@@ -231,21 +229,5 @@ class SiteController extends Controller
         }
 
         return response()->json($data)->header('Access-Control-Allow-Origin', '*');
-    }
-
-    public function search_services(Request $request)
-    {
-
-        if ($request->service) {
-            $service = Service::where('name', 'Like', "%$request->service%")->first();
-            if ($service) {
-                return view('site.search.search', compact('service'));
-            } else {
-                return Redirect::route('storeHome')->with('success', 'Search keyword not found');
-            }
-        } else {
-            return Redirect::route('storeHome')->with('success', 'Please enter your search keyword');
-        }
-        return view('site.search.search');
     }
 }

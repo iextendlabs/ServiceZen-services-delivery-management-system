@@ -165,7 +165,7 @@
                                         @method('DELETE')
                                         @can('service-delete')
                                             <button type="button" class="btn btn-danger"
-                                                onclick="confirmDelete('{{ $service->id }}')">Delete</button>
+                                                onclick="confirmDelete('{{ $service->id }}')"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

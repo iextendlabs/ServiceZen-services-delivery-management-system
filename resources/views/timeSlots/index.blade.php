@@ -103,14 +103,14 @@
             </td>
             <td>
                 <form id="deleteForm{{ $time_slot->id }}" action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
-                    <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>
+                    <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}"><i class="fa fa-eye"></i></a>
                     @can('time-slot-edit')
-                    <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
+                    <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}"><i class="fa fa-edit"></i></a>
                     @endcan
                     @csrf
                     @method('DELETE')
                     @can('time-slot-delete')
-                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn btn-danger">Delete</button>
+                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                     @endcan
                 </form>
             </td>

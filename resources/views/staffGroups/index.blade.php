@@ -53,16 +53,16 @@
                                     <form id="deleteForm{{ $staffGroup->id }}"
                                         action="{{ route('staffGroups.destroy', $staffGroup->id) }}" method="POST">
                                         <a class="btn btn-info"
-                                            href="{{ route('staffGroups.show', $staffGroup->id) }}">Show</a>
+                                            href="{{ route('staffGroups.show', $staffGroup->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('staff-group-edit')
                                             <a class="btn btn-primary"
-                                                href="{{ route('staffGroups.edit', $staffGroup->id) }}">Edit</a>
+                                                href="{{ route('staffGroups.edit', $staffGroup->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('staff-group-delete')
                                             <button type="button" onclick="confirmDelete('{{ $staffGroup->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

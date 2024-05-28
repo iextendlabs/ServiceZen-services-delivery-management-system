@@ -51,16 +51,16 @@
                                         action="{{ route('assistantSupervisors.destroy', $assistant_supervisor->id) }}"
                                         method="POST">
                                         <a class="btn btn-info"
-                                            href="{{ route('assistantSupervisors.show', $assistant_supervisor->id) }}">Show</a>
+                                            href="{{ route('assistantSupervisors.show', $assistant_supervisor->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('assistant-supervisor-edit')
                                             <a class="btn btn-primary"
-                                                href="{{ route('assistantSupervisors.edit', $assistant_supervisor->id) }}">Edit</a>
+                                                href="{{ route('assistantSupervisors.edit', $assistant_supervisor->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('assistant-supervisor-delete')
                                             <button type="button" onclick="confirmDelete('{{ $assistant_supervisor->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

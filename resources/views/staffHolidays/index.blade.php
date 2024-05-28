@@ -46,7 +46,7 @@
                                         @method('DELETE')
                                         @can('staff-holiday-delete')
                                             <button type="button" onclick="confirmDelete('{{ $staffHoliday->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

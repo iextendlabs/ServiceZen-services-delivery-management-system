@@ -55,16 +55,16 @@
                                     <form id="deleteForm{{ $staffZone->id }}"
                                         action="{{ route('staffZones.destroy', $staffZone->id) }}" method="POST">
                                         <a class="btn btn-info"
-                                            href="{{ route('staffZones.show', $staffZone->id) }}">Show</a>
+                                            href="{{ route('staffZones.show', $staffZone->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('staff-zone-edit')
                                             <a class="btn btn-primary"
-                                                href="{{ route('staffZones.edit', $staffZone->id) }}">Edit</a>
+                                                href="{{ route('staffZones.edit', $staffZone->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('staff-zone-delete')
                                             <button type="button" onclick="confirmDelete('{{ $staffZone->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

@@ -49,15 +49,15 @@
                                 <td>
                                     <form id="deleteForm{{ $driver->id }}"
                                         action="{{ route('drivers.destroy', $driver->id) }}" method="POST">
-                                        <a class="btn btn-info" href="{{ route('drivers.show', $driver->id) }}">Show</a>
+                                        <a class="btn btn-info" href="{{ route('drivers.show', $driver->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('driver-edit')
-                                            <a class="btn btn-primary" href="{{ route('drivers.edit', $driver->id) }}">Edit</a>
+                                            <a class="btn btn-primary" href="{{ route('drivers.edit', $driver->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('driver-delete')
                                             <button type="button" onclick="confirmDelete('{{ $driver->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

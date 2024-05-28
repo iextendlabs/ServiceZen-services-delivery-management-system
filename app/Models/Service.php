@@ -4,23 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 
 class Service extends Model
 {
-    use Searchable;
     protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type'];
 
-    public function searchableAs()
-    {
-        return 'services';
-    }
-    public function toSearchableArray()
-    {
-        return [
-            'name' => $this->name,
-        ];
-    }
     public function averageRating()
     {
         return Review::where('service_id', $this->id)->avg('rating');

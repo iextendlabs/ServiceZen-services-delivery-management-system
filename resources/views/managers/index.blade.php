@@ -49,16 +49,16 @@
                                 <td>
                                     <form id="deleteForm{{ $manager->id }}"
                                         action="{{ route('managers.destroy', $manager->id) }}" method="POST">
-                                        <a class="btn btn-info" href="{{ route('managers.show', $manager->id) }}">Show</a>
+                                        <a class="btn btn-info" href="{{ route('managers.show', $manager->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('manager-edit')
                                             <a class="btn btn-primary"
-                                                href="{{ route('managers.edit', $manager->id) }}">Edit</a>
+                                                href="{{ route('managers.edit', $manager->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('manager-delete')
                                             <button type="button" onclick="confirmDelete('{{ $manager->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

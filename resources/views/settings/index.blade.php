@@ -42,7 +42,7 @@
                                 <td>{{ substr($setting->value, 0, 50) }}</td>
                                 <td>
                                     @can('setting-edit')
-                                        <a class="btn btn-primary" href="{{ route('settings.edit', $setting->id) }}">Edit</a>
+                                        <a class="btn btn-primary" href="{{ route('settings.edit', $setting->id) }}"><i class="fa fa-edit"></i></a>
                                     @endcan
                                 </td>
                             </tr>
