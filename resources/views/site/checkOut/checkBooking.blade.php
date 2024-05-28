@@ -1,6 +1,14 @@
 @extends('site.layout.app')
 <link href="{{ asset('css/checkout.css') }}?v={{ config('app.version') }}" rel="stylesheet">
+<style>
+    label {
+        display: contents;
+    }
 
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+</style>
 @section('content')
     <div class="album bg-light">
         <div class="container">
@@ -71,7 +79,6 @@
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Select</th>
                                         <th>Name</th>
                                         <th>Price</th>
                                         <th>Duration</th>
@@ -80,12 +87,14 @@
                                 <tbody id="services-list">
                                     @foreach ($services as $service)
                                         <tr data-category="{{ json_encode($service->categories->pluck('id')) }}">
-                                            <td><input required type="radio" name="service_id"
-                                                    class="checkBooking_service_id" value="{{ $service->id }}"
-                                                    data-name="{{ $service->name }}"
-                                                    data-price="{{ $service->discount ? $service->discount : $service->price }}"
-                                                    data-duration="{{ $service->duration }}"></td>
-                                            <td>{{ $service->name }}</td>
+                                            <td>
+                                                <label style="display: contents;">
+                                                    <input required type="radio" name="service_id" class="checkBooking_service_id" 
+                                                           value="{{ $service->id }}" data-name="{{ $service->name }}"
+                                                           data-price="{{ $service->discount ? $service->discount : $service->price }}"
+                                                           data-duration="{{ $service->duration }}">
+                                                    {{ $service->name }}
+                                            </td>
                                             <td>
                                                 @if (isset($service->discount))
                                                     <s>
@@ -99,6 +108,7 @@
                                                 @endif
                                             </td>
                                             <td>{{ $service->duration }}</td>
+                                                </label>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -120,7 +130,7 @@
                         @include('site.checkOut.timeSlots')
                     </div>
                     <div class="row">
-                        <div class="col-md-12 text-center">
+                        <div class="col-md-6 offset-md-3 col-sm-12">
                             <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Book Now</button>
                         </div>
                     </div>

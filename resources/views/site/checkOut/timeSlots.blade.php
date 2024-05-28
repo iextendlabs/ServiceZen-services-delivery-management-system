@@ -1,4 +1,4 @@
-<div class="col-md-12">
+<div class="col-md-6 offset-md-3 col-sm-12">
     <div class="form-group">
         <strong>Date:</strong>
         <input required type="date" name="date" id="date" min="{{ date('Y-m-d') }}" value="{{ 
@@ -113,12 +113,12 @@
     @endif
     <hr>
     <h3>Available Time Slot for Selected Staff</h3>
-    <div class="row text-center" > 
+    <div class="row" > 
         @if(count($staff_slots ) == 0)
         No Staff Availalbe for the Selected Date / Zone
         @endif
         @foreach($staff_slots as $staff_id=>$staff_single_slot)
-        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @elseif(isset($selected_booking) && $staff_id == $selected_booking['service_staff_id']) style="display: block"  @else  style="display: none"  @endif class="form-control col-sm-12 col-md-8 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
+        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @elseif(isset($selected_booking) && $staff_id == $selected_booking['service_staff_id']) style="display: block"  @else  style="display: none"  @endif class="form-control col-sm-12 col-md-6 offset-md-3 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
             <option value="">Select Slot</option>
             @foreach($staff_single_slot as $staff_single_values)
             <option value="{{$staff_single_values[2]}}" @if(isset($order)  && $order->time_slot_id == $staff_single_values[2]) selected @elseif(isset($selected_booking)  && $selected_booking['time_slot_id'] == $staff_single_values[2]) selected @endif>{{$staff_single_values[1]}}</option>
