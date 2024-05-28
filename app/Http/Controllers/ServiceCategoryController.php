@@ -33,11 +33,11 @@ class ServiceCategoryController extends Controller
         $query = ServiceCategory::query()
             ->with('parentCategory')
             ->when($request->title, function ($query) use ($request) {
-                $query->where('title', $request->title)
+                $query->where('title', 'like', "%".$request->title."%")
                     ->orWhereIn('parent_id', function ($subQuery) use ($request) {
                         $subQuery->select('id')
                             ->from('service_categories')
-                            ->where('title', $request->title);
+                            ->where('title', 'like', "%". $request->title."%");
                     })->orderBy('parent_id');
             })
             ->orderBy($sort, $direction);
