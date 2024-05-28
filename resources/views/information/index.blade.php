@@ -96,8 +96,10 @@
                         @foreach ($information as $info)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td class="text-left">{{ $info->name }}...</td>
-                                <td class="text-left">{{ substr($info->description, 0, 50) }}...</td>
+                                <td class="text-left">{{ $info->name }}</td>
+                                <td class="text-left">{{ Str::limit(strip_tags(html_entity_decode($info->description)), 50, '...') }}</td>
+
+
                                 <td class="text-left">{{ $info->position }}</td>
                                 <td>
                                     <form id="deleteForm{{ $info->id }}"
