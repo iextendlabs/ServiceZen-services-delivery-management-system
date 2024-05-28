@@ -252,3 +252,4 @@ Route::post('/apply-affiliate', [CustomerAuthController::class,'applyAffiliate']
 Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffiliateProgram'])->name('apply.affiliateProgram');
 Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartModal'])->name('addToCartModal');
 Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');
+Route::get('/checkBooking', [CheckOutController::class,'checkBooking'])->name('checkBooking');

@@ -151,8 +151,11 @@
                                 location</a>
                         </li>
                     @endif
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link" href="/bookingStep">Booking</a>
+                    </li> --}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('checkBooking')}}">Availability</a>
                     </li>
 
                     <li class="nav-item dropdown">
