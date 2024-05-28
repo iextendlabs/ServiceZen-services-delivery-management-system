@@ -98,7 +98,7 @@
             <td>{{ $time_slot->group->name }}</td>
             <td>
                 @foreach($time_slot->staffs as $key => $staff)
-                    {{ $staff->name }} @if($key != count($time_slot->staffs) -1),@endif
+                    {{ $staff->name }}@if($key != count($time_slot->staffs) -1),@endif
                 @endforeach
             </td>
             <td>
