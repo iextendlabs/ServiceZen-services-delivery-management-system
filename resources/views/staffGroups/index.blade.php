@@ -40,13 +40,13 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $staffGroup->name }}</td>
                                 <td>
-                                    @foreach ($staffGroup->staffs as $staff)
-                                        {{ $staff->name }},
+                                    @foreach ($staffGroup->staffs as $key=>$staff)
+                                        {{ $staff->name }}@if($key != count($staffGroup->staffs) -1),@endif
                                     @endforeach
                                 </td>
                                 <td>
-                                    @foreach ($staffGroup->staffZones as $staff_zone)
-                                        {{ $staff_zone->name }},
+                                    @foreach ($staffGroup->staffZones as $key => $staff_zone)
+                                        {{ $staff_zone->name }}@if($key != count($staffGroup->staffZones) -1),@endif
                                     @endforeach
                                 </td>
                                 <td>
