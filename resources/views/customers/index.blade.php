@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
-                    <h2>Customer</h2>
+                    <h2>Customer ({{ $total_customer }})</h2>
                 </div>
                 <div class="float-end">
                     <button type="button" class="btn btn-primary mb-2" id="updateAffiliateBtn">Update Affiliate</button>
@@ -91,7 +91,6 @@
             </div>
         @endif
         <hr>
-        <h3>Customers ({{ $total_customer }})</h3>
         <div class="row">
             <div class="col-md-9">
                 <table class="table table-striped table-bordered">
@@ -99,8 +98,18 @@
                         <td>
                             <input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);">
                         </td>
-                        <th>Name</th>
-                        <th>Email</th>
+                        <th><a class=" ml-2 text-decoration-none"
+                            href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                        @if (request('sort') === 'name')
+                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                        @endif
+                    </th>
+                    <th><a class=" ml-2 text-decoration-none"
+                            href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
+                        @if (request('sort') === 'email')
+                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                        @endif
+                    </th>
                         <th>Orders</th>
                         <th>Last Order Date</th>
                         <th>Affiliate</th>

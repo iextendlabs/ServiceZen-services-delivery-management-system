@@ -56,6 +56,7 @@ class TimeSlot extends Model
         $currentDateTime = Carbon::now();
         $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
         $twoHoursLater = $currentDateTime->addHours(2);
+        $currentTime = $currentDateTime->toTimeString();
 
         if ($serviceIds) {
             $services = Service::whereIn('id', $serviceIds)
@@ -206,6 +207,14 @@ class TimeSlot extends Model
                 }
             }
         }
+        if ($date == $currentDate) {
+            if (!$isAdmin) {
+                if ($currentTime > '22:00:00') {
+                    return [[], $staff_ids, $holiday, $staffZone, $allZones];
+                }
+            }
+        }
+        
 
         return [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones];
     }

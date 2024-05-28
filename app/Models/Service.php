@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    protected $fillable = ['name','image', 'description', 'price','duration','category_id','short_description','discount','status','type'];
-    
+    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type'];
+
     public function averageRating()
     {
         return Review::where('service_id', $this->id)->avg('rating');
@@ -28,7 +28,7 @@ class Service extends Model
     {
         return $this->hasOne(ServiceToUserNote::class);
     }
-    
+
     public function orderServices()
     {
         return $this->hasMany(OrderService::class);
@@ -43,10 +43,10 @@ class Service extends Model
     {
         return $this->hasMany(ServiceVariant::class);
     }
-    
+
     public function FAQs()
     {
-        return $this->hasMany(FAQ::class,'service_id')->where('status', '=', '1');;
+        return $this->hasMany(FAQ::class, 'service_id')->where('status', '=', '1');;
     }
 
     public function users()

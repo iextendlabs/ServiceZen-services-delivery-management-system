@@ -30,9 +30,11 @@ class ManagerController extends Controller
      */
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
 
-        $query = User::role('Manager')->latest();
+        $query = User::role('Manager')->orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
@@ -40,8 +42,8 @@ class ManagerController extends Controller
         $total_manager = $query->count();
         $managers = $query->paginate(config('app.paginate'));
         $filters = $request->only(['name']);
-        $managers->appends($filters);
-        return view('managers.index',compact('total_manager','managers','filter_name'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $managers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+        return view('managers.index',compact('total_manager','managers','filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

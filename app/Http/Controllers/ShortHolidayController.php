@@ -24,7 +24,9 @@ class ShortHolidayController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ShortHoliday::orderBy('date');
+        $sort = $request->input('sort', 'date');
+        $direction = $request->input('direction', 'asc');
+        $query = ShortHoliday::orderBy($sort, $direction);
         if (Auth::user()->hasRole('Supervisor')) {
             $supervisor = User::find(Auth::id());
 
@@ -38,7 +40,7 @@ class ShortHolidayController extends Controller
         $shortHolidays = $query->paginate(config('app.paginate'));
 
 
-        return view('shortHolidays.index', compact('shortHolidays', 'total_shortHoliday'))
+        return view('shortHolidays.index', compact('shortHolidays', 'total_shortHoliday', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

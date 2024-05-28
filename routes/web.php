@@ -175,8 +175,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/customers/update-affiliate', [CustomerController::class, 'bulkUpdateAffiliate'])->name('customers.updateAffiliate');
 
     Route::resource('withdraws', WithdrawController::class);
-    Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus');
+    Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus'); 
 });
+Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 
 Route::get('customer-login', [CustomerAuthController::class, 'index'])->name('customer.login');
 Route::post('customer-post-login', [CustomerAuthController::class, 'postLogin'])->name('customer.post-login');
@@ -203,6 +204,7 @@ Route::get('/backups/delete/{filename}', [BackupController::class, 'delete'])->n
 Route::get('/backups/clear', [BackupController::class, 'clear'])->name('backups.clear');
 
 Route::get('/', [SiteController::class, 'index'])->name('storeHome');
+Route::get('/service-list', [SiteController::class, 'service_list']);
 Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
 Route::get('updateZone', [SiteController::class, 'updateZone']);
 

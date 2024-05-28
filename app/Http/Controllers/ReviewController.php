@@ -23,16 +23,18 @@ class ReviewController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $query = Review::orderBy('id','DESC');
+        $sort = $request->input('sort', 'user_name');
+        $direction = $request->input('direction', 'asc');
+        $query = Review::orderBy($sort, $direction);
         if(auth()->user()->hasRole('Staff')){
             $reviews = $query->where('staff_id',auth()->user()->id)->orderBy('id','DESC')->paginate(config('app.paginate'));
         }else{
             $total_review =  $query->count();
             $reviews = $query->paginate(config('app.paginate'));
         }
-        return view('reviews.index', compact('total_review' ,'reviews'))
+        return view('reviews.index', compact('total_review' ,'reviews', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

@@ -22,12 +22,15 @@ class CouponController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $query = Coupon::orderBy('name','ASC');
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+        $query = Coupon::orderBy($sort, $direction);
         $total_coupons = $query->count();
         $coupons = $query->paginate(config('app.paginate'));
-        return view('coupons.index', compact('coupons', 'total_coupons'))
+        return view('coupons.index', compact('coupons', 'total_coupons', 'direction'))
+
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -42,9 +45,13 @@ class CouponController extends Controller
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $i = 0;
 
-        return view('coupons.create',compact('services','categories','i'));
+
+
+        
+
+        return view('coupons.create', compact('services', 'categories', 'i'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -67,11 +74,11 @@ class CouponController extends Controller
         $coupon = Coupon::create($request->all());
         $coupon->category()->attach($request->categoriesId);
         $coupon->service()->attach($request->servicesId);
-        
+
         return redirect()->route('coupons.index')
-                        ->with('success','Coupon created successfully.');
+            ->with('success', 'Coupon created successfully.');
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -81,9 +88,9 @@ class CouponController extends Controller
     public function show($id)
     {
         $coupon = Coupon::find($id);
-        return view('coupons.show',compact('coupon'));
+        return view('coupons.show', compact('coupon'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -99,14 +106,14 @@ class CouponController extends Controller
 
         $category_ids = $coupon->category()->pluck('category_id')->toArray();
         $service_ids = $coupon->service()->pluck('service_id')->toArray();
-        return view('coupons.edit', compact('coupon','services','categories','category_ids','service_ids','i'));
+        return view('coupons.edit', compact('coupon', 'services', 'categories', 'category_ids', 'service_ids', 'i'));
     }
 
     public function update(Request $request, $id)
     {
         request()->validate([
             'name' => 'required',
-            'code' => 'required|unique:coupons,code,'.$id,
+            'code' => 'required|unique:coupons,code,' . $id,
             'type' => 'required',
             'discount' => 'required',
             'date_start' => 'required',
@@ -122,9 +129,9 @@ class CouponController extends Controller
         $coupon->update($request->all());
 
         return redirect()->route('coupons.index')
-                        ->with('success','Coupon Update successfully.');
+            ->with('success', 'Coupon Update successfully.');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -134,10 +141,10 @@ class CouponController extends Controller
     public function destroy($id)
     {
         $coupon = Coupon::find($id);
-        
+
         $coupon->delete();
-    
+
         return redirect()->route('coupons.index')
-                        ->with('success','Coupon deleted successfully');
+            ->with('success', 'Coupon deleted successfully');
     }
 }

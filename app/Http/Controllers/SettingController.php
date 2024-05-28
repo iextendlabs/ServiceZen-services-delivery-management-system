@@ -19,13 +19,15 @@ class SettingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $query = Setting::orderBy('key', 'ASC');
+        $sort = $request->input('sort', 'key');
+        $direction = $request->input('direction', 'asc');
+        $query = Setting::orderBy($sort, $direction);
         $total_setting = $query->count();
         $settings = $query->paginate(config('app.paginate'));
 
-        return view('settings.index', compact('settings', 'total_setting'))
+        return view('settings.index', compact('settings', 'total_setting', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

@@ -16,11 +16,13 @@
         integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap"
         rel="stylesheet">
     <link href="{{ asset('css/site.css') }}?v=3" rel="stylesheet">
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEMW2WSQE1"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/css/intlTelInput.css"
@@ -29,6 +31,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/intlTelInput.min.js"
         integrity="sha512-IxRltlh4EpT/il+hOEpD3g4jlXswVbSyH5vbqw6aF40CUsJTRAnr/7MxmPlKRsv9dYgBPcDSVNrf1P/keoBx+Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -52,6 +56,18 @@
 @endif
 
 <style>
+    .ui-autocomplete .show-more {
+            color: blue !important;
+            background-color: aliceblue;
+            text-align: center;
+            cursor: pointer;
+            justify-content: center;
+        }
+
+        .ui-autocomplete .show-more:hover {
+            background-color: darkblue;
+            color: white !important;
+        }
     .navbar-dark .navbar-nav .nav-link {
         color: rgba(255, 255, 255, 1) !important;
     }
@@ -106,6 +122,17 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="background-color:#0c5460!important">
             <a class="navbar-brand" style="font-size: 30px;font-weight:bold;font-family: 'Titillium Web', sans-serif;"
                 href="/">{{ env('APP_NAME') }}</a>
+            <div class="col-lg-3">
+                <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
+                    <div class="input-group flex-nowrap">
+                        <input type="search" id="search_product" class="form-control" placeholder="Search Services"
+                            aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
+                            aria-describedby="addon-wrapping">
+                        <button type="submit" class="input-group-text" id="addon-wrapping"><i
+                                class="fa fa-search fa-magnifying-glass"></i></button>
+                    </div>
+                </form>
+            </div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -189,7 +216,8 @@
                                     @endif
                                 @endif
                             @endforeach
-                            <a class="dropdown-item text-center" href="{{ route('categories.index') }}"><b>All</b></a>
+                            <a class="dropdown-item text-center"
+                                href="{{ route('categories.index') }}"><b>All</b></a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -210,9 +238,10 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             @guest
-                                <a class="dropdown-item" href="{{ route("customer.login") }}">Login</a>
-                                <a class="dropdown-item" href="{{ route("customer.registration") }}">Register</a>
-                                <a class="dropdown-item" href="{{ route("customer.registration") }}?type=affiliate">Register as
+                                <a class="dropdown-item" href="{{ route('customer.login') }}">Login</a>
+                                <a class="dropdown-item" href="{{ route('customer.registration') }}">Register</a>
+                                <a class="dropdown-item"
+                                    href="{{ route('customer.registration') }}?type=affiliate">Register as
                                     Affiliate</a>
                             @else
                                 <a class="dropdown-item"
@@ -302,6 +331,56 @@
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address">
     </script>
+
+    <script>
+        $(document).ready(function($) {
+            var availableTags = [];
+
+            $.ajax({
+                method: "GET",
+                url: "/service-list",
+                success: function(response) {
+                    availableTags = response;
+                    startAutocomplete(availableTags);
+                }
+            });
+
+            function startAutocomplete(tags) {
+                var showMore = false;
+
+                $("#search_product").autocomplete({
+                    source: function(request, response) {
+                        var results = $.ui.autocomplete.filter(tags, request.term);
+                        if (!showMore) {
+                            results = results.slice(0, 10);
+                        }
+                        response(results);
+                    },
+                    open: function(event, ui) {
+                        var $list = $(this).autocomplete("widget");
+                        if (tags.length > 10 && $list.find(".show-more").length === 0) {
+                            $("<li>")
+                                .append($("<a>").text("Show More").addClass("show-more"))
+                                .appendTo($list);
+                        }
+                    }
+                }).autocomplete("instance")._renderItem = function(ul, item) {
+                    return $("<li>")
+                        .append("<div>" + item.label + "</div>")
+                        .appendTo(ul);
+                };
+
+                $(document).on("click", ".show-more", function(event) {
+                    event.preventDefault();
+                    showMore = !showMore;
+                    var $input = $("#search_product");
+                    var $list = $input.autocomplete("widget");
+                    $(this).text(showMore ? "Show Less" : "Show More");
+                    $input.autocomplete("search", $input.val());
+                });
+            }
+        });
+    </script>
     <script>
         var Dropdowns = function() {
             var t = $(".dropdown"),
@@ -376,15 +455,15 @@
         $(document).ready(function() {
             if (navigator.userAgent.match(/Android/i)) {
                 var appLinkSection = '<section id="app-link-section">\
-                                        <p>🚀 Elevate your experience with our Android App! 🚀</p>\
-                                        <a target="_blank" href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp" >Download Now</a>\
-                                      </section>';
+                                                                                <p>🚀 Elevate your experience with our Android App! 🚀</p>\
+                                                                                <a target="_blank" href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp" >Download Now</a>\
+                                                                              </section>';
                 $('body').prepend(appLinkSection);
             } else if (navigator.userAgent.match(/iPhone/i)) {
                 var appLinkSection = '<section id="app-link-section">\
-                                        <p>🚀 Elevate your experience with our iPhone App! 🚀</p>\
-                                        <a target="_blank" href="https://apps.apple.com/be/app/lipslay/id6477719247">Download Now</a>\
-                                      </section>';
+                                                                                <p>🚀 Elevate your experience with our iPhone App! 🚀</p>\
+                                                                                <a target="_blank" href="https://apps.apple.com/be/app/lipslay/id6477719247">Download Now</a>\
+                                                                              </section>';
                 $('body').prepend(appLinkSection);
             }
         });

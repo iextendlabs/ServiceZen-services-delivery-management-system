@@ -39,8 +39,11 @@ class ServiceController extends Controller
             'price' => $request->price,
             'category_id' => $request->category_id
         ];
+        
+        $sort = $request->input('sort', 'name'); // Default sort column
+        $direction = $request->input('direction', 'asc');
 
-        $query = Service::orderBy('name', 'ASC');
+        $query = Service::orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -67,8 +70,9 @@ class ServiceController extends Controller
 
         $service_categories = ServiceCategory::all();
         $filters = $request->only(['name', 'price', 'category_id']);
-        $services->appends($filters);
-        return view('services.index', compact('total_service','services', 'service_categories', 'filter', 'variant_service', 'master_services'))
+        $services->appends(array_merge($filters, ['sort' => $sort, 'direction' => $direction]));
+        
+        return view('services.index', compact('total_service','services', 'service_categories', 'filter', 'variant_service', 'master_services', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
