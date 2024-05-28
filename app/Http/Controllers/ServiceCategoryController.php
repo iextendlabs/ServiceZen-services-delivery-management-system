@@ -15,22 +15,36 @@ class ServiceCategoryController extends Controller
      */
     function __construct()
     {
-         $this->middleware('permission:service-category-list|service-category-create|service-category-edit|service-category-delete', ['only' => ['index','show']]);
-         $this->middleware('permission:service-category-create', ['only' => ['create','store']]);
-         $this->middleware('permission:service-category-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:service-category-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:service-category-list|service-category-create|service-category-edit|service-category-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:service-category-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:service-category-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:service-category-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $query = ServiceCategory::orderBy('title');
-        $total_service_categorie = $query->count();
-        $service_categories =  $query->paginate(config('app.paginate'));
-        return view('service_categories.index',compact('total_service_categorie' ,'service_categories'))
+        $sort = $request->input('sort', 'title');
+        $direction = $request->input('direction', 'desc');
+
+        $query = ServiceCategory::query()
+            ->with('parentCategory')
+            ->when($request->title, function ($query) use ($request) {
+                $query->where('title', 'like', "%".$request->title."%")
+                    ->orWhereIn('parent_id', function ($subQuery) use ($request) {
+                        $subQuery->select('id')
+                            ->from('service_categories')
+                            ->where('title', 'like', "%". $request->title."%");
+                    })->orderBy('parent_id');
+            })
+            ->orderBy($sort, $direction);
+
+        $total_service_category = $query->count();
+        $service_categories = $query->paginate(config('app.paginate'));
+        return view('service_categories.index', compact('total_service_category', 'service_categories', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -42,7 +56,7 @@ class ServiceCategoryController extends Controller
     public function create()
     {
         $categories = ServiceCategory::all();
-        return view('service_categories.create',compact('categories'));
+        return view('service_categories.create', compact('categories'));
     }
 
     /**
@@ -82,7 +96,7 @@ class ServiceCategoryController extends Controller
 
 
         return redirect()->route('serviceCategories.index')
-                        ->with('success','Service Category created successfully.');
+            ->with('success', 'Service Category created successfully.');
     }
 
     /**
@@ -94,7 +108,7 @@ class ServiceCategoryController extends Controller
     public function show($id)
     {
         $service_category = ServiceCategory::find($id);
-        return view('service_categories.show',compact('service_category'));
+        return view('service_categories.show', compact('service_category'));
     }
 
     /**
@@ -122,8 +136,8 @@ class ServiceCategoryController extends Controller
         $service_category->update($request->all());
 
         if (isset($request->image)) {
-            if ($service_category->image && file_exists(public_path('service-category-images').'/'.$service_category->image)) {
-                unlink(public_path('service-category-images').'/'.$service_category->image);
+            if ($service_category->image && file_exists(public_path('service-category-images') . '/' . $service_category->image)) {
+                unlink(public_path('service-category-images') . '/' . $service_category->image);
             }
         }
 
@@ -137,8 +151,8 @@ class ServiceCategoryController extends Controller
         }
 
         if (isset($request->icon)) {
-            if ($service_category->icon && file_exists(public_path('service-category-icons').'/'.$service_category->icon)) {
-                unlink(public_path('service-category-icons').'/'.$service_category->icon);
+            if ($service_category->icon && file_exists(public_path('service-category-icons') . '/' . $service_category->icon)) {
+                unlink(public_path('service-category-icons') . '/' . $service_category->icon);
             }
         }
 
@@ -152,7 +166,7 @@ class ServiceCategoryController extends Controller
         }
 
         return redirect()->route('serviceCategories.index')
-                        ->with('success','Service Category Update successfully.');
+            ->with('success', 'Service Category Update successfully.');
     }
 
     /**
@@ -165,20 +179,31 @@ class ServiceCategoryController extends Controller
     {
         $service_category = ServiceCategory::find($id);
         //delete image for service_category
-        if(isset($service_category->image)){
-            if(file_exists(public_path('service-category-images').'/'.$service_category->image)) {
-                unlink(public_path('service-category-images').'/'.$service_category->image);
+        if (isset($service_category->image)) {
+            if (file_exists(public_path('service-category-images') . '/' . $service_category->image)) {
+                unlink(public_path('service-category-images') . '/' . $service_category->image);
             }
         }
 
-        if(isset($service_category->icon)){
-            if(file_exists(public_path('service-category-icons').'/'.$service_category->icon)) {
-                unlink(public_path('service-category-icons').'/'.$service_category->icon);
+        if (isset($service_category->icon)) {
+            if (file_exists(public_path('service-category-icons') . '/' . $service_category->icon)) {
+                unlink(public_path('service-category-icons') . '/' . $service_category->icon);
             }
         }
         $service_category->delete();
 
         return redirect()->route('serviceCategories.index')
-                        ->with('success','Service Category deleted successfully');
+            ->with('success', 'Service Category deleted successfully');
+    }
+
+    public function listServiceCategory()
+    {
+        $service_categories = ServiceCategory::all();
+        $data = [];
+
+        foreach ($service_categories as $item) {
+            $data[] = $item['title'];
+        }
+        return response()->json($data);
     }
 }

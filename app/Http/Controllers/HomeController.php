@@ -267,7 +267,9 @@ class HomeController extends Controller
             return $staff;
         });
 
-        $gender_permission = Setting::where('key','Gander Permission')->value('value');
+
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
+
 
 
         $jsonData = [

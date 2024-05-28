@@ -12,6 +12,7 @@ use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -34,7 +35,6 @@ class SiteController extends Controller
      */
     public function index(Request $request)
     {
-
         $userAgent = $request->header('User-Agent');
 
         if (Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone'])) {
@@ -86,44 +86,61 @@ class SiteController extends Controller
 
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
-        if (isset($request->id)) {
+        $FAQs = FAQ::latest()->where('status', '1')->take(3)->get();
+
+        $category = null;
+
+        $all_categories = [];
+
+        $query = Service::query();
+
+        if ($request->search_service) {
+            if(count($query->where('name',$request->search_service)->get())){
+                $query->orWhere('name', $request->search_service);
+            }else{
+                $searchTerm = $request->search_service;
+                $searchWords = explode(" ", $searchTerm);
+    
+                foreach ($searchWords as $word) {
+                    $query->orWhere('name', 'like', '%' . $word . '%');
+                }
+            }
+            
+        } elseif (isset($request->id)) {
             $category = ServiceCategory::find($request->id);
             if (isset($category->childCategories) && count($category->childCategories)) {
                 $child_categories =  $category->childCategories->pluck('id')->toArray();
                 $child_categories[] = $request->id;
-                $services = Service::where(function ($query) {
+                $query->where(function ($query) {
                     $query->where('type', 'master')
                         ->orWhereNull('type');
                 })->where('status', '1')
-                ->whereHas('categories', function ($q) use ($child_categories) {
-                    $q->whereIn('category_id', $child_categories);
-                })
-                ->paginate(config('app.paginate'));
+                    ->whereHas('categories', function ($q) use ($child_categories) {
+                        $q->whereIn('category_id', $child_categories);
+                    });
             } else {
-                $services = Service::where(function ($query) {
+                $query->where(function ($query) {
                     $query->where('type', 'master')
                         ->orWhereNull('type');
                 })->where('status', '1')
-                ->whereHas('categories', function ($q) use ($request) {
-                    $q->where('category_id', $request->id);
-                })
-                ->paginate(config('app.paginate'));
+                    ->whereHas('categories', function ($q) use ($request) {
+                        $q->where('category_id', $request->id);
+                    });
             }
 
-            $FAQs = FAQ::where('category_id', $request->id)->where('status','1')->latest()->take(3)->get();
-            $filters = $request->only(['id']);
-            $services->appends($filters);
-            return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','app_flag'));
+            $FAQs = FAQ::where('category_id', $request->id)->where('status', '1')->latest()->take(3)->get();
         } else {
             $all_categories = ServiceCategory::get();
-            $FAQs = FAQ::latest()->where('status','1')->take(3)->get();
-            $services = Service::where(function ($query) {
+            $query->where(function ($query) {
                 $query->where('type', 'master')
                     ->orWhereNull('type');
-            })->where('status', '1')
-            ->paginate(config('app.paginate'));
-            return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit','all_categories','app_flag'));
+            })->where('status', '1');
         }
+
+        $services = $query->paginate(config('app.paginate'));
+        $filters = $request->only(['id', 'search_service']);
+        $services->appends($filters);
+        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag'));
     }
 
     public function show($id, Request $request)
@@ -136,11 +153,11 @@ class SiteController extends Controller
             $app_flag = false;
         }
         $service = Service::findOrFail($id);
-        $FAQs = FAQ::where('service_id', $id)->where('status','1')->get();
+        $FAQs = FAQ::where('service_id', $id)->where('status', '1')->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');
         if ($service->status) {
-            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating','app_flag'));
+            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');
@@ -172,7 +189,7 @@ class SiteController extends Controller
             $address['gender'] = $request->gender;
 
             cookie()->queue('address', json_encode($address), 5256000);
-            
+
 
             return response()->json("successfully save data.");
         }
@@ -203,5 +220,18 @@ class SiteController extends Controller
 
             return redirect()->back();
         }
+    }
+
+
+    public function service_list()
+    {
+        $service = Service::select('name')->where('status', '1')->get();
+        $data = [];
+
+        foreach ($service as $item) {
+            $data[] = $item['name'];
+        }
+
+        return response()->json($data)->header('Access-Control-Allow-Origin', '*');
     }
 }

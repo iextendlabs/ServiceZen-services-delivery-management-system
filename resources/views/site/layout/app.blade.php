@@ -16,11 +16,13 @@
         integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap"
         rel="stylesheet">
     <link href="{{ asset('css/site.css') }}?v=3" rel="stylesheet">
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEMW2WSQE1"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/css/intlTelInput.css"
@@ -29,6 +31,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/intlTelInput.min.js"
         integrity="sha512-IxRltlh4EpT/il+hOEpD3g4jlXswVbSyH5vbqw6aF40CUsJTRAnr/7MxmPlKRsv9dYgBPcDSVNrf1P/keoBx+Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -52,6 +56,18 @@
 @endif
 
 <style>
+    .ui-autocomplete{
+        border-radius: 20px !important;
+        padding: 15px !important;
+    }
+
+    .ui-menu-item :hover{
+        border-color: #187485;
+        border-radius: 10px;
+        background-color: #187485;
+        color: white !important;
+    }
+        
     .navbar-dark .navbar-nav .nav-link {
         color: rgba(255, 255, 255, 1) !important;
     }
@@ -124,8 +140,11 @@
                                 location</a>
                         </li>
                     @endif
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link" href="/bookingStep">Booking</a>
+                    </li> --}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('checkBooking')}}">Availability</a>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -189,7 +208,8 @@
                                     @endif
                                 @endif
                             @endforeach
-                            <a class="dropdown-item text-center" href="{{ route('categories.index') }}"><b>All</b></a>
+                            <a class="dropdown-item text-center"
+                                href="{{ route('categories.index') }}"><b>All</b></a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -210,9 +230,10 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             @guest
-                                <a class="dropdown-item" href="{{ route("customer.login") }}">Login</a>
-                                <a class="dropdown-item" href="{{ route("customer.registration") }}">Register</a>
-                                <a class="dropdown-item" href="{{ route("customer.registration") }}?type=affiliate">Register as
+                                <a class="dropdown-item" href="{{ route('customer.login') }}">Login</a>
+                                <a class="dropdown-item" href="{{ route('customer.registration') }}">Register</a>
+                                <a class="dropdown-item"
+                                    href="{{ route('customer.registration') }}?type=affiliate">Register as
                                     Affiliate</a>
                             @else
                                 <a class="dropdown-item"
@@ -261,7 +282,6 @@
             </div>
         </nav>
         @include('site.layout.locationPopup')
-
         <div id="addToCartPopup"></div>
     </header>
 
@@ -301,6 +321,40 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address">
+    </script>
+
+    <script>
+        $(document).ready(function($) {
+            var availableTags = [];
+
+            $.ajax({
+                method: "GET",
+                url: "/service-list",
+                success: function(response) {
+                    availableTags = response;
+                    startAutocomplete(availableTags);
+                }
+            });
+
+            function startAutocomplete(tags) {
+                var showMore = false;
+
+                $("#search_product").autocomplete({
+                    source: function(request, response) {
+                        var results = $.ui.autocomplete.filter(tags, request.term);
+                        if (!showMore) {
+                            results = results.slice(0, 15);
+                        }
+                        response(results);
+                    },
+                    
+                }).autocomplete("instance")._renderItem = function(ul, item) {
+                    return $("<li>")
+                        .append("<div>" + item.label + "</div>")
+                        .appendTo(ul);
+                };
+            }
+        });
     </script>
     <script>
         var Dropdowns = function() {
@@ -376,15 +430,15 @@
         $(document).ready(function() {
             if (navigator.userAgent.match(/Android/i)) {
                 var appLinkSection = '<section id="app-link-section">\
-                                        <p>🚀 Elevate your experience with our Android App! 🚀</p>\
-                                        <a target="_blank" href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp" >Download Now</a>\
-                                      </section>';
+                                                                                <p>🚀 Elevate your experience with our Android App! 🚀</p>\
+                                                                                <a target="_blank" href="https://play.google.com/store/apps/details?id=com.lipslay.Customerapp" >Download Now</a>\
+                                                                              </section>';
                 $('body').prepend(appLinkSection);
             } else if (navigator.userAgent.match(/iPhone/i)) {
                 var appLinkSection = '<section id="app-link-section">\
-                                        <p>🚀 Elevate your experience with our iPhone App! 🚀</p>\
-                                        <a target="_blank" href="https://apps.apple.com/be/app/lipslay/id6477719247">Download Now</a>\
-                                      </section>';
+                                                                                <p>🚀 Elevate your experience with our iPhone App! 🚀</p>\
+                                                                                <a target="_blank" href="https://apps.apple.com/be/app/lipslay/id6477719247">Download Now</a>\
+                                                                              </section>';
                 $('body').prepend(appLinkSection);
             }
         });

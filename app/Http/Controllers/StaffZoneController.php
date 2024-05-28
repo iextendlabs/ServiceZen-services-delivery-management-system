@@ -31,10 +31,12 @@ class StaffZoneController extends Controller
      */
     public function index(Request $request)
     {
-        $query = StaffZone::orderBy('name');
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+        $query = StaffZone::orderBy($sort, $direction);
         $total_staffZone = $query->count();
         $staffZones = $query->paginate(config('app.paginate'));
-        return view('staffZones.index',compact('total_staffZone' , 'staffZones'))
+        return view('staffZones.index',compact('total_staffZone' , 'staffZones', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     

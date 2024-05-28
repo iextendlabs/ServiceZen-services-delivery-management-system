@@ -1,4 +1,4 @@
-$(document).on("change", "#date,#zone,#area,.checkout-services,.checkout-selected-services", function () {
+$(document).on("change", "#date,#zone,#area,.checkout-services,.checkBooking_service_id", function () {
     var checkedServiceIds = [];
 
     $('.checkout-services:checked').each(function () {
@@ -7,6 +7,8 @@ $(document).on("change", "#date,#zone,#area,.checkout-services,.checkout-selecte
 
     if ($('#addToCartModalServices').val()) {
         var addToCartModalServices = [$('#addToCartModalServices').val()];
+    } else if($('.checkBooking_service_id:checked').val()){
+        var addToCartModalServices = [$('.checkBooking_service_id:checked').val()];
     }
 
     $.ajax({

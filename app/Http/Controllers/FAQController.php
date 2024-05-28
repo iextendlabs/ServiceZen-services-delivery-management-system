@@ -23,14 +23,15 @@ class FAQController extends Controller
      */
     public function index(request $request)
     {
-
+        $sort = $request->input('sort', 'question');
+        $direction = $request->input('direction', 'asc');
         $filter = [
             'question' => $request->question,
             'service_id' => $request->service_id,
             'category_id' => $request->category_id
         ];
 
-        $query = FAQ::orderBy('question');
+        $query = FAQ::orderBy($sort, $direction);
 
         if ($request->question) {
             $query->where('question', 'like', '%' . $request->question . '%');
@@ -51,8 +52,9 @@ class FAQController extends Controller
         $categories = ServiceCategory::all();
 
         $filters = $request->only(['question', 'service_id', 'category_id']);
-        $FAQs->appends($filters);
-        return view('FAQs.index', compact('total_faq','FAQs','filter','services','categories'))
+
+        $FAQs->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+        return view('FAQs.index', compact('total_faq','FAQs','filter','services','categories', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
