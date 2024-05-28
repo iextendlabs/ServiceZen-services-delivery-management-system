@@ -97,8 +97,8 @@
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
             <td>
-                @foreach($time_slot->staffs as $staff)
-                    {{ $staff->name }}
+                @foreach($time_slot->staffs as $key => $staff)
+                    {{ $staff->name }} @if($key != count($time_slot->staffs) -1),@endif
                 @endforeach
             </td>
             <td>
