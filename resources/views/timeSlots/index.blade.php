@@ -65,7 +65,7 @@
             <th>Sr#</th>
             <th>
                 <div class="d-flex">
-                    <a class="ml-2 text-black text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                    <a class="ml-2  text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                     @if (request('sort') === 'name')
                     <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif
@@ -74,7 +74,7 @@
             </th>
             <th>
                 <div class="d-flex">
-                    <a class="ml-2 text-black text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time Start -- Time End</a>
+                    <a class="ml-2  text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time Start -- Time End</a>
                     @if (request('sort') === 'time_start')
                     <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif
@@ -97,20 +97,20 @@
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
             <td>
-                @foreach($time_slot->staffs as $staff)
-                    {{ $staff->name }}
+                @foreach($time_slot->staffs as $key => $staff)
+                    {{ $staff->name }}@if($key != count($time_slot->staffs) -1),@endif
                 @endforeach
             </td>
             <td>
                 <form id="deleteForm{{ $time_slot->id }}" action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
-                    <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}">Show</a>
+                    <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}"><i class="fa fa-eye"></i></a>
                     @can('time-slot-edit')
-                    <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}">Edit</a>
+                    <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}"><i class="fa fa-edit"></i></a>
                     @endcan
                     @csrf
                     @method('DELETE')
                     @can('time-slot-delete')
-                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn btn-danger">Delete</button>
+                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                     @endcan
                 </form>
             </td>

@@ -99,30 +99,30 @@
                     <tr>
                         <th></th>
                         <th class="text-left"><a
-                                class="text-black text-decoration-none" href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                                class=" text-decoration-none" href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th class="text-right"><a class="text-black text-decoration-none"
+                        <th class="text-right"><a class=" text-decoration-none"
                                 href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'price', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Price</a>
                             @if (request('sort') === 'price')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th class="text-right"><a class="text-black text-decoration-none"
+                        <th class="text-right"><a class=" text-decoration-none"
                             href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'duration', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Duration</a>
                             @if (request('sort') === 'duration')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                         @endif    
                         </th>
-                        <th class="text-right"><a class="text-black text-decoration-none"
+                        <th class="text-right"><a class=" text-decoration-none"
                             href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
                             @if (request('sort') === 'status')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                         @endif     
                         </th>
-                        <th class="text-left"><a class="text-black text-decoration-none"
+                        <th class="text-left"><a class=" text-decoration-none"
                             href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
                             @if (request('sort') === 'type')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -165,7 +165,7 @@
                                         @method('DELETE')
                                         @can('service-delete')
                                             <button type="button" class="btn btn-danger"
-                                                onclick="confirmDelete('{{ $service->id }}')">Delete</button>
+                                                onclick="confirmDelete('{{ $service->id }}')"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

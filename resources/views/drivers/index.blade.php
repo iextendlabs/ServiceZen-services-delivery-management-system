@@ -25,13 +25,13 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('drivers.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('drivers.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
                             @if (request('sort') === 'email')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -49,15 +49,15 @@
                                 <td>
                                     <form id="deleteForm{{ $driver->id }}"
                                         action="{{ route('drivers.destroy', $driver->id) }}" method="POST">
-                                        <a class="btn btn-info" href="{{ route('drivers.show', $driver->id) }}">Show</a>
+                                        <a class="btn btn-info" href="{{ route('drivers.show', $driver->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('driver-edit')
-                                            <a class="btn btn-primary" href="{{ route('drivers.edit', $driver->id) }}">Edit</a>
+                                            <a class="btn btn-primary" href="{{ route('drivers.edit', $driver->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('driver-delete')
                                             <button type="button" onclick="confirmDelete('{{ $driver->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

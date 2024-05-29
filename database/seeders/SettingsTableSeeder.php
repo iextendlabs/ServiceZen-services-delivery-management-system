@@ -165,7 +165,7 @@ class SettingsTableSeeder extends Seeder
             ],
             [
                 'id' => 22,
-                'key' => 'Gander Permission',
+                'key' => 'Gender Permission',
                 'value' => '',
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',

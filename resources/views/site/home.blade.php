@@ -14,29 +14,79 @@
             height: 200px !important;
             width: 200px;
         }
+        .input-group {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        #search_product {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            padding: 0.75rem 1.25rem;
+        }
+
+        #search_product:focus {
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        #search-button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background: linear-gradient(45deg, #1f91a5, #0c5460);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            transition: background 0.3s ease;
+        }
+
+        #search-button:hover {
+            background: linear-gradient(45deg, #1f91a5, #0c5460);
+        }
+
+        .fa-search {
+            margin-right: 5px;
+        }
     </style>
     <div class="container">
+        <div class="col-md-6 col-sm-12 offset-md-3 mt-5">
+            <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
+                <div class="input-group">
+                    <input type="search" id="search_product" class="form-control border-right-0" placeholder="Search Services"
+                           aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
+                           aria-describedby="search-button">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary" id="search-button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="text-center mt-3">
             @if (Session::has('error'))
                 <span class="alert alert-danger" role="alert">
                     <strong>{{ Session::get('error') }}</strong>
                 </span>
             @endif
-            <div class="">
-                @if (Session::has('success'))
-                    <span class="alert alert-success text-center w-75 " role="alert" style="padding:10px 200px">
-                        <strong>{{ Session::get('success') }}</strong>
-                    </span>
-                @endif
-            </div>
+            @if (Session::has('success'))
+                <span class="alert alert-success" role="alert">
+                    <strong>{{ Session::get('success') }}</strong>
+                </span>
+            @endif
             @if (Session::has('cart-success'))
                 <div class="alert alert-success" role="alert">
                     <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
-                    <span><a href="bookingStep">Book Now!</a></span><br>
+                    <span><a href="bookingStep">Go and Book Now!</a></span><br>
                     <span>To add more service<a href="/"> Continue</a></span>
                 </div>
             @endif
-
+            @if(count($services) == 0)
+            <span class="alert alert-danger text-center w-75 " role="alert" style="padding:10px 200px">
+                <strong>Service not found</strong>
+            </span>
+            @endif
         </div>
         @if ($slider_images->value && !isset($category))
             <div class="row">
@@ -78,20 +128,18 @@
         @endif
         <section class="jumbotron text-center">
             <div class="container">
-                @if (isset($searchResults))
-                    <p class="lead text-muted"> Search Service: <span
-                            @class(['p-4', 'font-bold', 'text-dark' => true])>{{ request('search_service') }}</span></p>
+                @if (request('search_service'))
+                    <p class="lead text-muted"> Search Service:
+                        <span @class(['p-4', 'font-bold', 'text-dark' => true])>{{ request('search_service') }}</span>
+                    </p>
+                @elseif(isset($category))
+                    <h1 class="jumbotron-heading">{{ $category->title }}</h1>
+                    <p class="lead text-muted">{{ $category->description }}</p>
                 @else
-                    @if (isset($category))
-                        <h1 class="jumbotron-heading">{{ $category->title }}</h1>
-                        <p class="lead text-muted">{{ $category->description }}</p>
-                    @else
-                        <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town
-                            Saloon
-                            Services</h1>
-                        <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and
-                            just few clicks away.</p>
-                    @endif
+                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Saloon
+                        Services</h1>
+                    <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and
+                        just few clicks away.</p>
                 @endif
             </div>
         </section>
@@ -125,86 +173,48 @@
         <hr>
         <div class="album py-5 bg-light">
             <div class="row">
-                @if (isset($searchResults))
-                    @foreach ($searchResults as $item)
-                        <div class="col-md-4 service-box ">
-                            <div class="card mb-4 box-shadow">
-                                <a href="/serviceDetail/{{ $item->id }}">
-                                    <p class="card-text service-box-title text-center"><b>{{ $item->name }}</b></p>
-                                    <img class="card-img-top" src="./service-images/{{ $item->image }}"
-                                        alt="Card image cap">
-                                </a>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted service-box-price">
-                                            @if (isset($item->discount))
-                                                <s>
-                                            @endif
-                                            @currency($item->price)
-                                            @if (isset($item->discount))
-                                                </s>
-                                            @endif
-                                            @if (isset($item->discount))
-                                                <b class="discount"> @currency($item->discount)</b>
-                                            @endif
-                                        </small>
+                @foreach ($services as $service)
+                    <div class="col-md-4 service-box">
+                        <div class="card mb-4 box-shadow">
+                            <a href="/serviceDetail/{{ $service->id }}">
+                                <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
+                                <img class="card-img-top" src="./service-images/{{ $service->image }}"
+                                    alt="Card image cap">
+                            </a>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted service-box-price">
+                                        @if (isset($service->discount))
+                                            <s>
+                                        @endif
+                                        @currency($service->price)
+                                        @if (isset($service->discount))
+                                            </s>
+                                        @endif
+                                        @if (isset($service->discount))
+                                            <b class="discount"> @currency($service->discount)</b>
+                                        @endif
+                                    </small>
 
-                                        <small class="text-muted service-box-time"><i class="fa fa-clock"> </i>
-                                            {{ $item->duration }}</small>
-                                    </div>
-
-                                    {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
-                                    <button onclick="openBookingPopup('{{ $item->id }}')" type="button"
-                                        class="btn btn-block btn-primary"> Book Now</button>
+                                    <small class="text-muted service-box-time"><i class="fa fa-clock"> </i>
+                                        {{ $service->duration }}</small>
                                 </div>
+
+                                {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
+                                <button onclick="openBookingPopup('{{ $service->id }}')" type="button"
+                                    class="btn btn-block btn-primary"> Book Now</button>
+
+
                             </div>
                         </div>
-                    @endforeach
-                @else
-                    @foreach ($services as $service)
-                        <div class="col-md-4 service-box">
-                            <div class="card mb-4 box-shadow">
-                                <a href="/serviceDetail/{{ $service->id }}">
-                                    <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-                                    <img class="card-img-top" src="./service-images/{{ $service->image }}"
-                                        alt="Card image cap">
-                                </a>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted service-box-price">
-                                            @if (isset($service->discount))
-                                                <s>
-                                            @endif
-                                            @currency($service->price)
-                                            @if (isset($service->discount))
-                                                </s>
-                                            @endif
-                                            @if (isset($service->discount))
-                                                <b class="discount"> @currency($service->discount)</b>
-                                            @endif
-                                        </small>
-
-                                        <small class="text-muted service-box-time"><i class="fa fa-clock"> </i>
-                                            {{ $service->duration }}</small>
-                                    </div>
-
-                                    {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
-                                    <button onclick="openBookingPopup('{{ $service->id }}')" type="button"
-                                        class="btn btn-block btn-primary"> Book Now</button>
-
-
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @endif
-
+                    </div>
+                @endforeach
             </div>
-            {{-- <div class="row">
+            <div class="row">
                 <div class="col-md-12">
                     {!! $services->links() !!}
                 </div>
-            </div> --}}
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <h2 class="text-center">Customer Reviews</h2>
@@ -324,40 +334,38 @@
                     <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Team</a>
                 </div>
             </div>
-            @if (isset($service))
-                @if (count($FAQs))
-                    <div class="row">
-                        <div class="col-12">
-                            <h1 id="faqs">Frequently Asked Questions</h1>
-                        </div>
+            @if (count($FAQs))
+                <div class="row">
+                    <div class="col-12">
+                        <h1 id="faqs">Frequently Asked Questions</h1>
                     </div>
-                    <div class="row">
-                        <div class="col-12 mt-3" id="accordion">
-                            @foreach ($FAQs as $FAQ)
-                                <div class="card">
-                                    <div class="card-header" id="heading{{ $FAQ->id }}">
-                                        <h5 class="mb-0">
-                                            <button class="btn btn-link" data-toggle="collapse"
-                                                data-target="#collapse{{ $FAQ->id }}" aria-expanded="true"
-                                                aria-controls="collapse{{ $FAQ->id }}">
-                                                <div style="white-space: normal;">{{ $FAQ->question }}</div>
-                                            </button>
-                                        </h5>
-                                    </div>
-                                    <div id="collapse{{ $FAQ->id }}" class="collapse"
-                                        aria-labelledby="heading{{ $FAQ->id }}" data-parent="#accordion">
-                                        <div class="card-body">
-                                            {{ $FAQ->answer }}
-                                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-3" id="accordion">
+                        @foreach ($FAQs as $FAQ)
+                            <div class="card">
+                                <div class="card-header" id="heading{{ $FAQ->id }}">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" data-toggle="collapse"
+                                            data-target="#collapse{{ $FAQ->id }}" aria-expanded="true"
+                                            aria-controls="collapse{{ $FAQ->id }}">
+                                            <div style="white-space: normal;">{{ $FAQ->question }}</div>
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapse{{ $FAQ->id }}" class="collapse"
+                                    aria-labelledby="heading{{ $FAQ->id }}" data-parent="#accordion">
+                                    <div class="card-body">
+                                        {{ $FAQ->answer }}
                                     </div>
                                 </div>
-                            @endforeach
-                        </div>
-                        <div class="col-12 text-center mt-3">
-                            <a href="{{ route('siteFAQs.index') }}" class="btn btn-primary">More..</a>
-                        </div>
+                            </div>
+                        @endforeach
                     </div>
-                @endif
+                    <div class="col-12 text-center mt-3">
+                        <a href="{{ route('siteFAQs.index') }}" class="btn btn-primary">More..</a>
+                    </div>
+                </div>
             @endif
         </div>
     </div>

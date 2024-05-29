@@ -30,26 +30,26 @@
                     <tr>
                         <th></th>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date</a>
                             @if (request('sort') === 'date')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time
                                 Start</a>
                             @if (request('sort') === 'time_start')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'hours', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Hours</a>
                             @if (request('sort') === 'hours')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
                             @if (request('sort') === 'status')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>

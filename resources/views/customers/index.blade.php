@@ -98,13 +98,13 @@
                         <td>
                             <input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);">
                         </td>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                             href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                         @if (request('sort') === 'name')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                         @endif
                     </th>
-                    <th><a class="text-black ml-2 text-decoration-none"
+                    <th><a class=" ml-2 text-decoration-none"
                             href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
                         @if (request('sort') === 'email')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>

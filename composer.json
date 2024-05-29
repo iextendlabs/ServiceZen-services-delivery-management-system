@@ -6,19 +6,15 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
-        "algolia/algoliasearch-client-php": "^3.4",
         "barryvdh/laravel-dompdf": "^2.0",
         "doctrine/dbal": "^3.6",
         "fruitcake/laravel-cors": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
-        "http-interop/http-factory-guzzle": "^1.2",
         "intervention/image": "^2.5",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.3",
-        "laravel/scout": "^10.9",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.2",
-        "meilisearch/meilisearch-php": "^1.8",
         "spatie/laravel-permission": "^5.10"
     },
     "require-dev": {
@@ -74,7 +70,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": false
         }
     },
     "minimum-stability": "stable",

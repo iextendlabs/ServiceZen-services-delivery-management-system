@@ -24,7 +24,7 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('staffGeneralHolidays.index', array_merge(request()->query(), ['sort' => 'day', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">
                         Day
                         </a>
@@ -49,7 +49,7 @@
                                         @method('DELETE')
                                         @can('staff-holiday-delete')
                                             <button type="button" onclick="confirmDelete('{{ $staffGeneralHoliday->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

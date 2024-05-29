@@ -11,6 +11,7 @@ public/service-images/
 public/service-category-images/
 public/staff-images/
 public/partner-images/
+public/AppData.json
 
 # Laravel 5 & Lumen specific
 public/storage
@@ -27,3 +28,4 @@ Homestead.json
 /.vagrant
 .phpunit.result.cache
 package-lock.json
+composer.lock

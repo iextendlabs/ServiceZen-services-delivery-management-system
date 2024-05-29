@@ -26,13 +26,13 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('assistantSupervisors.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('assistantSupervisors.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
                             @if (request('sort') === 'email')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -51,16 +51,16 @@
                                         action="{{ route('assistantSupervisors.destroy', $assistant_supervisor->id) }}"
                                         method="POST">
                                         <a class="btn btn-info"
-                                            href="{{ route('assistantSupervisors.show', $assistant_supervisor->id) }}">Show</a>
+                                            href="{{ route('assistantSupervisors.show', $assistant_supervisor->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('assistant-supervisor-edit')
                                             <a class="btn btn-primary"
-                                                href="{{ route('assistantSupervisors.edit', $assistant_supervisor->id) }}">Edit</a>
+                                                href="{{ route('assistantSupervisors.edit', $assistant_supervisor->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('assistant-supervisor-delete')
                                             <button type="button" onclick="confirmDelete('{{ $assistant_supervisor->id }}')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

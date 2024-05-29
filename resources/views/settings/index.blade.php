@@ -20,13 +20,13 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('settings.index', array_merge(request()->query(), ['sort' => 'key', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Key</a>
                             @if (request('sort') === 'key')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('settings.index', array_merge(request()->query(), ['sort' => 'value', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Value</a>
                             @if (request('sort') === 'value')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -42,7 +42,7 @@
                                 <td>{{ substr($setting->value, 0, 50) }}</td>
                                 <td>
                                     @can('setting-edit')
-                                        <a class="btn btn-primary" href="{{ route('settings.edit', $setting->id) }}">Edit</a>
+                                        <a class="btn btn-primary" href="{{ route('settings.edit', $setting->id) }}"><i class="fa fa-edit"></i></a>
                                     @endcan
                                 </td>
                             </tr>

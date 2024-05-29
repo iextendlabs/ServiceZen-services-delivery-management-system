@@ -87,6 +87,9 @@
                 <form id="booking-form" action="draftOrder" method="POST">
                     @csrf
                     <div class="row">
+                        <div class="col-md-12 d-flex justify-content-end align-items-center">
+                            <a href="{{route('checkBooking')}}" class="btn btn-primary">Add More Services</a>
+                        </div>
                         <div class="col-md-12 text-center">
                             <br>
                             <h3><strong>Address</strong></h3>

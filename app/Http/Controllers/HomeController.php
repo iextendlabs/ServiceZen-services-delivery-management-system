@@ -267,6 +267,11 @@ class HomeController extends Controller
             return $staff;
         });
 
+
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
+
+
+
         $jsonData = [
             'images' => $images,
             'categories' => $categoriesArray,
@@ -275,6 +280,7 @@ class HomeController extends Controller
             'staffZones' => $staffZones,
             'staffs' => $staffs,
             'whatsapp_number' => $whatsapp_number,
+            'gender_permission' => $gender_permission
         ];
 
         try {

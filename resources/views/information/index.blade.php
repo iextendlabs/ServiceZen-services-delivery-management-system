@@ -71,19 +71,19 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('information.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('information.index', array_merge(request()->query(), ['sort' => 'description', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Description</a>
                             @if (request('sort') === 'description')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class="text-black ml-2 text-decoration-none"
+                        <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('information.index', array_merge(request()->query(), ['sort' => 'position', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Position</a>
                             @if (request('sort') === 'position')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -96,8 +96,10 @@
                         @foreach ($information as $info)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td class="text-left">{{ $info->name }}...</td>
-                                <td class="text-left">{{ substr($info->description, 0, 50) }}...</td>
+                                <td class="text-left">{{ $info->name }}</td>
+                                <td class="text-left">{{ Str::limit(strip_tags(html_entity_decode($info->description)), 50, '...') }}</td>
+
+
                                 <td class="text-left">{{ $info->position }}</td>
                                 <td>
                                     <form id="deleteForm{{ $info->id }}"
