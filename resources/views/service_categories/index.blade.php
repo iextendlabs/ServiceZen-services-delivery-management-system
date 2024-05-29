@@ -126,63 +126,77 @@
     </div>
 @endsection
 @section('scripts')
-    <script>
-        jQuery(document).ready(function($) {
-            var availableTags = [];
-            var results = [];
+<script>
+    jQuery(document).ready(function($) {
+        var availableTags = [];
+        var results = [];
 
-            $.ajax({
-                method: "GET",
-                url: "/service-category-list",
-                success: function(response) {
-                    availableTags = response;
-                    startAutocomplete(availableTags);
-                }
-            });
-
-            function startAutocomplete(tags) {
-                $("#search_service_category").autocomplete({
-                    source: function(request, response) {
-                        results = $.ui.autocomplete.filter(tags, request.term);
-                        response(results.slice(0, 10));
-
-                    },
-                    open: function(event, ui) {
-                        var $list = $(this).autocomplete("widget");
-                        if (results && results.length >= 10) {
-                            $("<li>")
-                                .append($("<a>").text("Show More").addClass("show-more").css("color",
-                                    "blue"))
-                                .appendTo($list);
-                        }
-                    }
-                }).autocomplete("instance")._renderItem = function(ul, item) {
-                    return $("<li>")
-                        .append("<div>" + item.label + "</div>")
-                        .appendTo(ul);
-                };
-                $(document).on("click", ".show-more", function(event) {
-                    event.preventDefault();
-                    var $input = $("#search_service_category");
-                    var $list = $input.autocomplete("widget");
-                    var buttonText = $(this).text();
-
-                    if (buttonText === "Show More") {
-                        $input.autocomplete("option", "source", tags);
-                        $input.autocomplete("search", $input.val()); // Trigger search to refresh list
-                        $(this).text("Show Less");
-                    } else {
-                        // Show only the first 10 items
-                        $input.autocomplete("option", "source", function(request, response) {
-                            var results = $.ui.autocomplete.filter(tags, request.term);
-                            response(results.slice(0, 10));
-                        });
-                        $(this).text("Show More"); // Change button text to "Show More"
-                    }
-                });
+        $.ajax({
+            method: "GET",
+            url: "/service-category-list",
+            success: function(response) {
+                availableTags = response;
+                startAutocomplete(availableTags);
             }
         });
-    </script>
+
+        function startAutocomplete(tags) {
+            var showingMore = false;
+
+            $("#search_service_category").autocomplete({
+                source: function(request, response) {
+                    results = $.ui.autocomplete.filter(tags, request.term);
+                    if (showingMore) {
+                        response(results);
+                    } else {
+                        response(results.slice(0, 10));
+                    }
+                },
+                open: function(event, ui) {
+                    var $list = $(this).autocomplete("widget");
+                    if (results.length > 10 && $list.find(".toggle-more").length === 0) {
+                        $("<li>")
+                            .append($("<a>").text(showingMore ? "Show Less" : "Show More")
+                            .addClass("toggle-more").css({
+                                "color": 'black',
+                                "background-color": 'rgba(0, 0, 0, 0.10) !important',
+                                "display": 'block',
+                                "padding": "5px",
+                                "text-decoration": "none",
+                                "border-radius": "10px",
+                                "text-align": "center",
+                            }))
+                            .appendTo($list);
+                    }
+                }
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append("<div>" + item.label + "</div>")
+                    .appendTo(ul);
+            };
+
+            $(document).on("click", ".toggle-more", function(event) {
+                event.preventDefault();
+                showingMore = !showingMore;
+
+                var $input = $("#search_service_category");
+                $input.autocomplete("search", $input.val()); // Trigger search to refresh list
+            });
+            $("<style>")
+            .prop("type", "text/css")
+            .html("\
+                .toggle-more:hover { \
+                    background-color: rgba(0, 0, 0, 0.5) !important; \
+                    border-radius: 10px; \
+                    color: white !important; \
+                } \
+            ")
+            .appendTo("head");
+        }
+    });
+</script>
+
+
 
     <script>
         function confirmDelete(Id) {

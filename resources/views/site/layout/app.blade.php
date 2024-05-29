@@ -323,39 +323,76 @@
         src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address">
     </script>
 
-    <script>
-        $(document).ready(function($) {
-            var availableTags = [];
+<script>
+    $(document).ready(function($) {
+        var availableTags = [];
+        var results = [];
+        var showMore = false; // Initialize showMore flag
 
-            $.ajax({
-                method: "GET",
-                url: "/service-list",
-                success: function(response) {
-                    availableTags = response;
-                    startAutocomplete(availableTags);
-                }
-            });
-
-            function startAutocomplete(tags) {
-                var showMore = false;
-
-                $("#search_product").autocomplete({
-                    source: function(request, response) {
-                        var results = $.ui.autocomplete.filter(tags, request.term);
-                        if (!showMore) {
-                            results = results.slice(0, 15);
-                        }
-                        response(results);
-                    },
-                    
-                }).autocomplete("instance")._renderItem = function(ul, item) {
-                    return $("<li>")
-                        .append("<div>" + item.label + "</div>")
-                        .appendTo(ul);
-                };
+        $.ajax({
+            method: "GET",
+            url: "/service-list",
+            success: function(response) {
+                availableTags = response;
+                startAutocomplete(availableTags);
             }
         });
-    </script>
+
+        function startAutocomplete(tags) {
+            var showMore = false;
+            $("#search_product").autocomplete({
+                source: function(request, response) {
+                    results = $.ui.autocomplete.filter(tags, request.term);
+                    if (showMore) {
+                        response(results);
+                    } else {
+                        response(results.slice(0, 10));
+                    }
+                },
+                open: function(event, ui) {
+                    var $list = $(this).autocomplete("widget");
+                    if (results.length > 10 && $list.find(".toggle-more").length === 0) {
+                        $("<li>")
+                            .append($("<a>").text(showMore ? "Show Less" : "Show More")
+                            .addClass("toggle-more").css({
+                                "color": 'white',
+                                "background-color": '#0c5460 !important',
+                                 "display": 'block',
+                                 "text-align": "center",
+                                "padding": "5px",
+                                "text-decoration": "none",
+                                "border-radius": "10px"
+                            } ))
+                            .appendTo($list);
+                    }
+                }
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append("<div>" + item.label + "</div>")
+                    .appendTo(ul);
+            };
+
+            $(document).on("click", ".toggle-more", function(event) {
+                event.preventDefault();
+                showMore = !showMore;
+
+                var $input = $("#search_product");
+                $input.autocomplete("search", $input.val()); // Trigger search to refresh list
+            });
+            $("<style>")
+            .prop("type", "text/css")
+            .html("\
+                .toggle-more:hover { \
+                    background-color: #1f91a5 !important; \
+                    border-radius: 10px; \
+                    color: white !important; \
+                } \
+            ")
+            .appendTo("head");
+        }
+    });
+</script>
+
     <script>
         var Dropdowns = function() {
             var t = $(".dropdown"),
