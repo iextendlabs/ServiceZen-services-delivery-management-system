@@ -112,6 +112,13 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>Parent Affiliate Commission:</strong>
+                        <input type="number" name="parent_affiliate_commission" value="{{ $affiliate->affiliate->parent_affiliate_commission ?? '' }}"
+                            class="form-control" placeholder="Parent Affiliate Commission In %" />
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <span style="color: red">*</span><strong>Customer Display:</strong>
                         <select name="display_type" id="display_type" class="form-control">
                             <option value="1" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable

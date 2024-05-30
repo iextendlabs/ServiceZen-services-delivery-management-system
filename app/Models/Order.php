@@ -160,6 +160,9 @@ class Order extends Model
 
         $affiliate_commission = 0;
         $affiliate_id = 0;
+        $parent_affiliate_commission = 0;
+        $parent_affiliate_id = 0;
+
         if ($userAffiliate) {
             if ($userAffiliate->expiry_date == null || $userAffiliate->expiry_date >= now()) {
                 if ($userAffiliate->commission) {
@@ -184,15 +187,26 @@ class Order extends Model
                 $affiliate_commission = (($commission_apply_amount - $staff_commission) * $affiliate_commission_rate) / 100;
                 $affiliate_id = $this->affiliate_id;
             }
-        } else {
+        } elseif ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
             $affiliate_commission_rate = 0;
-            if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
-                $affiliate_commission_rate = $this->affiliate->affiliate->commission;
-            }
+            $affiliate_commission_rate = $this->affiliate->affiliate->commission;
             $affiliate_commission = (($commission_apply_amount - $staff_commission) * $affiliate_commission_rate) / 100;
             $affiliate_id = $this->affiliate_id;
         }
 
-        return [$affiliate_commission, $staff_commission, $affiliate_id];
+        if ($userAffiliate) {
+            if ($userAffiliate->affiliate && $userAffiliate->affiliate->parent_affiliate_id) {
+                $parent_affiliate_commission = ($affiliate_commission * $userAffiliate->affiliate->parent_affiliate_commission) / 100;
+                $parent_affiliate_id = $userAffiliate->affiliate->parent_affiliate_id;
+            }
+        } elseif ($this->affiliate) {
+            if ($this->affiliate->affiliate && $this->affiliate->affiliate->parent_affiliate_id) {
+                $parent_affiliate_commission = ($affiliate_commission * $this->affiliate->affiliate->parent_affiliate_commission) / 100;
+                $parent_affiliate_id = $this->affiliate->affiliate->parent_affiliate_id;
+            }
+        }
+
+        $affiliate_commission -= $parent_affiliate_commission;
+        return [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id];
     }
 }

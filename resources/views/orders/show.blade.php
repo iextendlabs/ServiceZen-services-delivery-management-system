@@ -342,6 +342,54 @@
                         </table>
                     </fieldset>
                 @endif
+                @if ($parent_affiliate_commission)
+                    <fieldset>
+                        <legend>Parent Affiliate Commission</legend>
+                        <table class="table table-striped table-bordered album bg-light">
+                            <tr>
+                                <th>Order Id</th>
+                                <th>Child Affiliate Commission</th>
+                                <th>Affiliate</th>
+                                <th>Commission</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                            <form action="{{ route('transactions.store') }}" method="POST">
+                                @csrf
+                                @php
+                                    $parentAffiliateTransactionStatus =
+                                        $order->service_staff_id == $parent_affiliate_id
+                                            ? $order->getAffiliateTransactionStatus(
+                                                $parent_affiliate_id,
+                                                'Order Parent Affiliate Commission',
+                                            )
+                                            : $order->getAffiliateTransactionStatus($parent_affiliate_id);
+                                @endphp
+                                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                <input type="hidden" name="user_id" value="{{ $parent_affiliate_id }}">
+                                <input type="hidden" name="amount" value="{{ $parent_affiliate_commission }}">
+                                <input type="hidden" name="type" value="Order Parent Affiliate Commission">
+                                <tr>
+                                    <td>#{{ $order->id }}</td>
+                                    <td>@currency($affiliate_commission)</td>
+                                    <td>{{ $affiliate->affiliate->parentAffiliate->name }}</td>
+                                    <td>@currency($parentAffiliateTransactionStatus->amount ?? $parent_affiliate_commission)</td>
+                                    <td class="no-print">
+                                        @can('order-edit')
+                                            @if (empty($parentAffiliateTransactionStatus))
+                                                <button type="submit" class="btn btn-primary">Approve</button>
+                                            @else
+                                                <a href="{{ route('transactions.Unapprove') }}?id={{ $parentAffiliateTransactionStatus->id }}"
+                                                    type="button" class="btn btn-warning">Un Approve</a>
+                                                <a href="{{ route('transactions.edit', $parentAffiliateTransactionStatus->id) }}"
+                                                    type="button" class="btn btn-primary">Edit</a>
+                                            @endif
+                                        @endcan
+                                    </td>
+                                </tr>
+                            </form>
+                        </table>
+                    </fieldset>
+                @endif
             @endif
         </div>
     </div>
