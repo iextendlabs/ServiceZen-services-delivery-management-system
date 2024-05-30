@@ -63,7 +63,6 @@ class TransactionController extends Controller
                 }
             }
         } else {
-            $input['type'] = "Order Commission";
             Transaction::create($input);
         }
         
