@@ -103,6 +103,13 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                       <strong>Parent Affiliate Commission:</strong>
+                        <input type="number" name="parent_affiliate_commission" class="form-control" value="{{ old('parent_affiliate_commission') }}"
+                            placeholder="Parent Affiliate Commission In %">
+                    </div>
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>

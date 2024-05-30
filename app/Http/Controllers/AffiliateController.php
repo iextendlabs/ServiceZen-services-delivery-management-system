@@ -74,12 +74,30 @@ class AffiliateController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
             'code' => 'required|unique:affiliates,code',
             'commission' => 'required',
+            'parent_affiliate_id' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->parent_affiliate_commission);
+                }),
+            ],
+            'parent_affiliate_commission' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->parent_affiliate_id);
+                }),
+            ],
+        ], [
+            'parent_affiliate_id.required' => 'A parent affiliate is required when parent affiliate commission is set.',
+            'parent_affiliate_commission.required' => 'A parent affiliate commission is required when parent affiliate is set.',
+        ]);
+        $this->validate($request, [
+            
         ]);
 
         $input = $request->all();
@@ -172,7 +190,7 @@ class AffiliateController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
@@ -184,6 +202,21 @@ class AffiliateController extends Controller
                     return $request->display_type == 2;
                 }),
             ],
+            'parent_affiliate_id' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->parent_affiliate_commission);
+                }),
+            ],
+            'parent_affiliate_commission' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return !is_null($request->parent_affiliate_id);
+                }),
+            ],
+        ], [
+            'parent_affiliate_id.required' => 'A parent affiliate is required when parent affiliate commission is set.',
+            'parent_affiliate_commission.required' => 'A parent affiliate commission is required when parent affiliate is set.',
         ]);
 
         $input = $request->all();

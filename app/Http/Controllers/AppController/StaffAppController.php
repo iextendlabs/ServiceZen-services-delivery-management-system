@@ -142,7 +142,7 @@ class StaffAppController extends Controller
 
             if ($request->status == "Complete") {
 
-                [$affiliate_commission, $staff_commission, $affiliate_id] = $order->commissionCalculation();
+                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
                 
                 if ($affiliate_id) {
                     $affiliate_commission = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
@@ -153,6 +153,19 @@ class StaffAppController extends Controller
                     $input['order_id'] = $order->id;
                     $input['amount'] = $affiliate_commission;
                     $input['type'] = "Order Affiliate Commission";
+                    $input['status'] = 'Approved';
+                    Transaction::create($input);
+                }
+
+                if ($parent_affiliate_id) {
+                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->first();
+                }
+                
+                if ($parent_affiliate_id && !isset($parent_affiliate_transaction) && $parent_affiliate_commission > 0) {
+                    $input['user_id'] = $parent_affiliate_id;
+                    $input['order_id'] = $order->id;
+                    $input['amount'] = $parent_affiliate_commission;
+                    $input['type'] = "Order Parent Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
