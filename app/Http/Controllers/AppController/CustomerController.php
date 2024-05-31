@@ -1264,7 +1264,16 @@ class CustomerController extends Controller
             $services_total = $services->sum(function ($service) {
                 return isset($service->discount) ? $service->discount : $service->price;
             });
+
+            if($request->coupon_id && $services){
+                $coupon = Coupon::find($request->coupon_id);
+    
+                $coupon_discount = $coupon
+                ? $coupon->getDiscountForProducts($services, $services_total)
+                : 0;
+            }
         }
+        
         if($request->group_data){
             foreach ($request->group_data as $index => $singleBookingService) {
                 list($date, $service_staff_id, $time_slot_id) = explode('_', $index);
@@ -1281,14 +1290,6 @@ class CustomerController extends Controller
                     : 0;
                 }
             }
-        }
-    
-        if($request->coupon_id && $services){
-            $coupon = Coupon::find($request->coupon_id);
-
-            $coupon_discount = $coupon
-            ? $coupon->getDiscountForProducts($services, $services_total)
-            : 0;
         }
     
         $total = $services_total + $staff_charges + $transport_charges - $coupon_discount;
