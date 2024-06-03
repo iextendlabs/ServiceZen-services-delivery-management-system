@@ -301,9 +301,9 @@ function placeMarker(location) {
     fillAddressFieldsFromMarker();
 }
 
-function openBookingPopup(serviceId) {
+function openBookingPopup(serviceId, option_id = null) {
     $.ajax({
-        url: '/addToCartModal/' + serviceId,
+        url: '/addToCartModal/' + serviceId+"?option_id="+option_id,
         type: 'GET',
         success: function(response) {
             $('#addToCartPopup').html(response);

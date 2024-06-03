@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceAddOn;
 use App\Models\ServiceCategory;
+use App\Models\ServiceOption;
 use App\Models\ServicePackage;
 use App\Models\ServiceToUserNote;
 use App\Models\ServiceVariant;
@@ -150,6 +151,16 @@ class ServiceController extends Controller
             ServiceToUserNote::create($input);
         }
 
+        if($request->option_name && $request->option_price){
+            foreach($request->option_name as $key=>$name){
+                ServiceOption::create([
+                    'service_id' => $service->id, 
+                    'option_name' => $name,
+                    'option_price' => $request->option_price[$key]
+                ]);
+            }
+        }
+
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
             
@@ -261,6 +272,18 @@ class ServiceController extends Controller
                 ServiceAddOn::create($input);
             }
         }
+
+        if($request->option_name && $request->option_price){
+            ServiceOption::where('service_id',$service_id)->delete();
+            foreach($request->option_name as $key=>$name){
+                ServiceOption::create([
+                    'service_id' => $service->id, 
+                    'option_name' => $name,
+                    'option_price' => $request->option_price[$key]
+                ]);
+            }
+        }
+        
         ServiceToUserNote::where('service_id', $id)->delete();
 
         if (isset($request->note) && isset($request->userIds)) {

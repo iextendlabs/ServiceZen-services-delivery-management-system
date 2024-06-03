@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+<div class="container">
 <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
 <div class="row">
     <div class="col-md-12">
@@ -42,6 +42,9 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" id="variant-tab" data-toggle="tab" href="#variant" role="tab" aria-controls="variant" aria-selected="false">Variant Services</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Price Options</a>
         </li>
     </ul>
     <div class="tab-content" id="myTabsContent">
@@ -165,17 +168,17 @@
                                 <th>Name</th>
                                 <th>Price</th>
                             </tr>
-                            @foreach ($all_services as $service)
+                            @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($service->id,$package_services))
-                                    <input type="checkbox" checked name="packageId[{{ ++$i }}]" value="{{ $service->id }}">
+                                    @if(in_array($single_service->id,$package_services))
+                                    <input type="checkbox" checked name="packageId[{{ ++$i }}]" value="{{ $single_service->id }}">
                                     @else
-                                    <input type="checkbox" name="packageId[{{ ++$i }}]" value="{{ $service->id }}">
+                                    <input type="checkbox" name="packageId[{{ ++$i }}]" value="{{ $single_service->id }}">
                                     @endif
                                 </td>
-                                <td>{{ $service->name }}</td>
-                                <td>{{ $service->price }}</td>
+                                <td>{{ $single_service->name }}</td>
+                                <td>{{ $single_service->price }}</td>
 
                             </tr>
                             @endforeach
@@ -196,17 +199,17 @@
                                 <th>Name</th>
                                 <th>Price</th>
                             </tr>
-                            @foreach ($all_services as $service)
+                            @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($service->id,$add_on_services))
-                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" checked value="{{ $service->id }}">
+                                    @if(in_array($single_service->id,$add_on_services))
+                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" checked value="{{ $single_service->id }}">
                                     @else
-                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" value="{{ $service->id }}">
+                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" value="{{ $single_service->id }}">
                                     @endif
                                 </td>
-                                <td>{{ $service->name }}</td>
-                                <td>{{ $service->price }}</td>
+                                <td>{{ $single_service->name }}</td>
+                                <td>{{ $single_service->price }}</td>
                             </tr>
                             @endforeach
                         </table>
@@ -267,9 +270,63 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-
-            <!-- <div class="col-md-12">
+        <div class="tab-pane fade" id="options" role="tabpanel" aria-labelledby="options-tab">
+            <div class="row mt-3">
+                @php
+                    $option_row = 0;
+                @endphp
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Service Options</strong>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <table id="optionTable" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Option Name</th>
+                                <th>Option Price (AED)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(isset($service->serviceOption))
+                                @foreach ($service->serviceOption as $option_row => $option)
+                                    @php
+                                        $option_row = $option_row;
+                                    @endphp
+                                    <tr>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" required name="option_name[{{ $option_row }}]" class="form-control" value="{{ $option->option_name }}" placeholder="Option Name">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control" value="{{ $option->option_price }}" placeholder="Option Price">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger remove-option"><i class="fa fa-minus-circle"></i></button>
+                                        </td>
+                                    </tr>
+                                    @php
+                                        $option_row++;
+                                    @endphp 
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                    <button id="addOptionBtn" onclick="addOptionrow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                </div>
+            </div>
+        </div>
+        {{-- <div class="row">
+            <div class="col-md-12">
                 <div class="form-group">
                     <strong>Note:</strong>
                     <textarea class="form-control" style="height:150px" name="note" placeholder="Note">@if(isset($userNote)){{$userNote->note}}@endif</textarea>
@@ -306,15 +363,46 @@
                         @endforeach
                     </table>
                 </div>
-            </div> -->
-
-        </div>
-        <div class="col-md-12 text-center">
+            </div>
+        </div> --}}
+        <div class="col-md-12 text-center mt-4">
             <button type="submit" class="btn btn-block btn-primary">Update</button>
         </div>
     </div>
 </form>
-    </div>
+</div>
+<script>
+    var option_row = {{ $option_row}};
+    function addOptionrow(){
+        var newRow = `
+            <tr>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="text" required name="option_name[${option_row}]" class="form-control" placeholder="Option Name">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="number" required name="option_price[${option_row}]" class="form-control" placeholder="Option Price">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-option"><i class="fa fa-minus-circle"></i></button>
+                </td>
+            </tr>
+        `;
+        $('#optionTable tbody').append(newRow);
+        option_row++
+    }
+
+    $(document).on('click', '.remove-option', function() {
+        $(this).closest('tr').remove();
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('bulkCopyBtn').addEventListener('click', function() {
