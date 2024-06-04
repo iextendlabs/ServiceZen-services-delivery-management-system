@@ -95,17 +95,16 @@ class SiteController extends Controller
         $query = Service::query();
 
         if ($request->search_service) {
-            if(count($query->where('name',$request->search_service)->get())){
+            if (count($query->where('name', $request->search_service)->get())) {
                 $query->orWhere('name', $request->search_service);
-            }else{
+            } else {
                 $searchTerm = $request->search_service;
                 $searchWords = explode(" ", $searchTerm);
-    
+
                 foreach ($searchWords as $word) {
                     $query->orWhere('name', 'like', '%' . $word . '%');
                 }
             }
-            
         } elseif (isset($request->id)) {
             $category = ServiceCategory::find($request->id);
             if (isset($category->childCategories) && count($category->childCategories)) {
@@ -156,8 +155,19 @@ class SiteController extends Controller
         $FAQs = FAQ::where('service_id', $id)->where('status', '1')->get();
         $reviews = Review::where('service_id', $id)->get();
         $averageRating = Review::where('service_id', $id)->avg('rating');
+
+        $lowestPriceOption = null;
+        $price = null;
+        foreach ($service->serviceOption as $option) {
+            if (is_null($lowestPriceOption) || $option->option_price < $lowestPriceOption->option_price) {
+                $lowestPriceOption = $option;
+            }
+            if (is_null($price) || $lowestPriceOption->option_price < $price) {
+                $price = $lowestPriceOption->option_price; 
+            }
+        }
         if ($service->status) {
-            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag'));
+            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');

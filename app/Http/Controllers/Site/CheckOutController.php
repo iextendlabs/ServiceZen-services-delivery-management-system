@@ -165,11 +165,16 @@ class CheckOutController extends Controller
 
             cookie()->queue('address', json_encode($address), 5256000);
         }
+        
+        if (!$request->time_slot_id || !isset($request->time_slot_id[$request->service_staff_id])) {
+            return back()->with('error', 'please select available staff and time slot first ');  
+        }
+        
         $formattedBooking = [
             'service_id' => $request->service_id,
             'date' => $request->date,
             'service_staff_id' => $request->service_staff_id,
-            'time_slot_id' => $request->time_slot_id[$request->service_staff_id],
+            'time_slot_id' => $request->time_slot_id ? $request->time_slot_id[$request->service_staff_id] : null, // Set to null if no selection
             'option_id' => $request->option_id,
         ];
 
@@ -187,7 +192,7 @@ class CheckOutController extends Controller
         if ($selected_key !== false) {
             unset($bookingData[$selected_key]);
         }
-
+        
         $bookingData[] = $formattedBooking;
 
         Session::put('bookingData', $bookingData);
