@@ -56,6 +56,11 @@ $packageCarousel_chunk = 3;
       <div class="col-md-8">
         <img src="./service-images/{{ $service->image }}" alt="Card image cap" height="auto" width="100%">
       </div>
+      @if (isset($lowestPriceOption))
+          @php ($currentLowestPrice = $lowestPriceOption->option_price)
+      @else
+          @php ($currentLowestPrice = null)
+      @endif
       <div class="col-md-4 box-shadow">
         <div class="card-body">
           <p id="price" class="text-muted">
@@ -63,7 +68,7 @@ $packageCarousel_chunk = 3;
             <s class="text-danger">@currency($service->price)</s>
             <b class="discount text-success">@currency($service->discount)</b>
             @else
-            <span class="font-weight-bold">@currency($service->price)</span>
+            <span class="font-weight-bold">@currency($price ?? $service->price ?? null)</span>
             @endif
           </p>
         
@@ -76,7 +81,12 @@ $packageCarousel_chunk = 3;
             <strong>Available Options</strong>
             @foreach ($service->serviceOption as $option)
             <div class="form-check">
-              <input required type="radio" name="option" class="form-check-input" value="{{$option->id}}" id="option{{$option->id}}" data-price="@currency($option->option_price)">
+              <input required type="radio" name="option" class="form-check-input" value="{{$option->id}}" id="option{{$option->id}}" data-price="@currency($option->option_price)"   @if (isset($lowestPriceOption) && $option->id === $lowestPriceOption->id)
+              checked
+          @elseif (is_null($currentLowestPrice) || $option->option_price < $currentLowestPrice)
+              checked
+              @php ($currentLowestPrice = $option->option_price)
+          @endif>
               <label class="form-check-label" for="option{{$option->id}}">{{ $option->option_name }} (@currency( $option->option_price))</label>
             </div>
             @endforeach
