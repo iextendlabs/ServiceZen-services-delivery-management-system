@@ -23,8 +23,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
 use App\Models\Notification;
@@ -274,9 +272,18 @@ class CustomerController extends Controller
 
     public function getServiceDetails(Request $request)
     {
-        if ($request->service_id) {
-            $services = Service::where('status', 1)->where('id', $request->service_id)->where('status','1')->orderBy('name', 'ASC')->first();
-            $FAQs = FAQ::where('service_id', $request->service_id)->get();
+        $services = Service::where('status', 1)->where('id', $request->service_id)->where('status','1')->orderBy('name', 'ASC')->first();
+        $FAQs = FAQ::where('service_id', $request->service_id)->get();
+        
+        $lowestPriceOption = null;
+        $price = null;
+        foreach ($services->serviceOption as $option) {
+            if (is_null($lowestPriceOption) || $option->option_price < $lowestPriceOption->option_price) {
+                $lowestPriceOption = $option;
+            }
+            if (is_null($price) || $lowestPriceOption->option_price < $price) {
+                $price = $lowestPriceOption->option_price; 
+            }
         }
 
         return response()->json([
@@ -284,7 +291,9 @@ class CustomerController extends Controller
             'addONs' => $services->addONs,
             'variant' => $services->variant,
             'package' => $services->package,
-            'faqs' => $FAQs
+            'faqs' => $FAQs,
+            'lowestPriceOption' => $lowestPriceOption,
+            'price' => $price
         ], 200);
     }
 
