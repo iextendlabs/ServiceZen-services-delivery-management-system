@@ -47,9 +47,9 @@ class UserController extends Controller
             $query = $query->role($request->role);
         }
         $total_user = $query->count();
-        $data = $query->get();
-        
-        return view('users.index',compact('total_user','data','roles','filter', 'direction'));
+        $data = $query->paginate(config('app.paginate'));
+        $data->appends($filter);
+        return view('users.index',compact('total_user','data','roles','filter', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**
