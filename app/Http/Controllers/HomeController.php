@@ -250,7 +250,8 @@ class HomeController extends Controller
                 'duration' => $service->duration,
                 'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
-                'rating' => $service->averageRating()
+                'rating' => $service->averageRating(),
+                'options' => $service->serviceOption
             ];
         })->toArray();
 
