@@ -272,9 +272,10 @@ class ServiceController extends Controller
                 ServiceAddOn::create($input);
             }
         }
+        
+        ServiceOption::where('service_id',$service_id)->delete();
 
         if($request->option_name && $request->option_price){
-            ServiceOption::where('service_id',$service_id)->delete();
             foreach($request->option_name as $key=>$name){
                 ServiceOption::create([
                     'service_id' => $service->id, 
