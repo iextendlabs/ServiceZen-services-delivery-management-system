@@ -288,9 +288,9 @@ class CustomerController extends Controller
 
         return response()->json([
             'services' => $services,
-            'addONs' => $services->addONs,
-            'variant' => $services->variant,
-            'package' => $services->package,
+            'addONs' => $services->addONs ?? [],
+            'variant' => $services->variant ?? [],
+            'package' => $services->package ?? [],
             'faqs' => $FAQs,
             'lowestPriceOption' => $lowestPriceOption,
             'price' => $price
@@ -1268,13 +1268,18 @@ class CustomerController extends Controller
         $transport_charges = 0;
         $coupon_discount = 0;
         if($request->service_ids){
-            $services = Service::whereIn('id', $request->service_ids)->get();
-
-            $services_total = $services->sum(function ($service) {
+            $services = Service::whereIn('id', $request->service_ids)->with('serviceOption')->get();
+        
+            $services_total = $services->sum(function ($service) use ($request) {
+                if (isset($request->options[$service->id])) {
+                    $option_id = $request->options[$service->id];
+                    $option = $service->serviceOption->find($option_id);
+                    return $option ? $option->option_price : 0;
+                }
                 return isset($service->discount) ? $service->discount : $service->price;
             });
 
-            if($request->coupon_id && $services){
+            if($request->coupon_id && $services->isNotEmpty()) {
                 $coupon = Coupon::find($request->coupon_id);
     
                 $coupon_discount = $coupon
@@ -1542,7 +1547,12 @@ class CustomerController extends Controller
 
             $selected_services = Service::whereIn('id', $singleBookingService)->get();
 
-            $sub_total = $selected_services->sum(function ($service) {
+            $sub_total = $selected_services->sum(function ($service) use ($input) {
+                if (isset($input['options'][$service->id])) {
+                    $option_id = $input['options'][$service->id];
+                    $option = $service->serviceOption->find($option_id);
+                    return $option ? $option->option_price : 0;
+                }
                 return isset($service->discount) ? $service->discount : $service->price;
             });
 
@@ -1608,15 +1618,23 @@ class CustomerController extends Controller
             }
 
             foreach ($singleBookingService as $id) {
-                $services = Service::find($id);
+
+                $input['option_id'] = null;
+                $input['option_name'] = null;
+
+                $service = Service::find($id);
                 $input['service_id'] = $id;
-                $input['service_name'] = $services->name;
-                $input['duration'] = $services->duration;
+                $input['service_name'] = $service->name;
+                $input['duration'] = $service->duration;
                 $input['status'] = 'Open';
-                if ($services->discount) {
-                    $input['price'] = $services->discount;
-                } else {
-                    $input['price'] = $services->price;
+                if (isset($input['options'][$service->id])) {
+                    $option_id = $input['options'][$service->id];
+                    $option = $service->serviceOption->find($option_id);
+                    $input['price'] = $option->option_price;
+                    $input['option_id'] = $option_id;
+                    $input['option_name'] = $option->option_name;
+                }else{
+                    $input['price'] = $service->discount ?? $service->price;
                 }
                 OrderService::create($input);
             }

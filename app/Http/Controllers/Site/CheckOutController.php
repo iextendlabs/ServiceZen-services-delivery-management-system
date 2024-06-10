@@ -478,11 +478,12 @@ class CheckOutController extends Controller
                 $input['coupon_id'] = $coupon->id;
                 CouponHistory::create($input);
             }
-
-            $input['option_id'] = null;
-            $input['option_name'] = null;
-
+            
             foreach ($singleBookingService as $id) {
+
+                $input['option_id'] = null;
+                $input['option_name'] = null;
+
                 $service = Service::find($id);
                 $input['service_id'] = $id;
                 $input['service_name'] = $service->name;
