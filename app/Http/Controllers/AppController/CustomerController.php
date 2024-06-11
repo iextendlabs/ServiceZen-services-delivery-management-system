@@ -1274,7 +1274,7 @@ class CustomerController extends Controller
                 if (isset($request->options[$service->id])) {
                     $option_id = $request->options[$service->id];
                     $option = $service->serviceOption->find($option_id);
-                    return $option ? $option->option_price : 0;
+                    return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
                 }
                 return isset($service->discount) ? $service->discount : $service->price;
             });
