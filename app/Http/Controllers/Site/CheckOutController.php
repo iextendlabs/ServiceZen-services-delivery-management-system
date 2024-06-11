@@ -329,8 +329,14 @@ class CheckOutController extends Controller
         }
         $all_selected_staff = User::whereIn('id', $serviceStaffIds)->get();
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
-        $sub_total = $all_selected_services->sum(function ($service) {
-            return isset($service->discount) ? $service->discount : $service->price;
+        [$groupedBooking, $groupedBookingOption] = $this->groupBookingData($bookingData);
+
+        $sub_total = $all_selected_services->sum(function ($service) use ($groupedBookingOption) {
+            $optionId = $groupedBookingOption[$service->id] ?? null;
+            if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                return $service->serviceOption->find($optionId)->option_price;
+            }
+            return $service->discount ?? $service->price;
         });
 
         // Apply coupon discount

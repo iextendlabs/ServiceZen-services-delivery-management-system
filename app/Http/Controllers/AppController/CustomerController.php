@@ -1479,10 +1479,16 @@ class CustomerController extends Controller
         }
         $all_selected_staff = User::whereIn('id', $serviceStaffIds)->get();
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
-        $sub_total = $all_selected_services->sum(function ($service) {
-            return isset($service->discount) ? $service->discount : $service->price;
+        $sub_total = $all_selected_services->sum(function ($service) use ($input) {
+            if (isset($input['options'][$service->id])) {
+                $option_id = (int) $input['options'][$service->id];
+                $option = $service->serviceOption->find($option_id);
+                return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
+            } else {
+                return isset($service->discount) ? $service->discount : $service->price;
+            }
         });
-
+     
         if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
