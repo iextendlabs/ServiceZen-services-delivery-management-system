@@ -26,7 +26,7 @@ class Coupon extends Model
         return $this->belongsToMany(ServiceCategory::class, 'coupon_to_category', 'coupon_id', 'category_id');
     }
 
-    public function getDiscountForProducts($services, $services_total)
+    public function getDiscountForProducts($services, $services_total, $bookingOption = [])
     {
         if (!$this->category()->exists() && !$this->service()->exists() && $services_total) {
             return ($this->type == "Percentage") ? ($services_total * $this->discount) / 100 : $this->discount;
@@ -51,7 +51,12 @@ class Coupon extends Model
             if($applicable_services){
                 foreach ($services as $service) {
                     if (in_array($service->id, $applicable_services)) {
-                        $sub_total += isset($service->discount) ? $service->discount : $service->price;
+                        $optionId = $bookingOption[$service->id] ?? null;
+                        if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                            $sub_total += $service->serviceOption->find($optionId)->option_price;
+                        }else{
+                            $sub_total += isset($service->discount) ? $service->discount : $service->price;
+                        }
                     }
                 }
                 if($sub_total){

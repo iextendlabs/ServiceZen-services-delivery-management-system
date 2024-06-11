@@ -68,6 +68,12 @@
                                                                 @endphp
                                                                 @if($option)
                                                                     @currency($option->option_price)
+                                                                @else
+                                                                    @if (isset($service->discount))
+                                                                        @currency($service->discount)
+                                                                    @else
+                                                                        @currency($service->price)
+                                                                    @endif
                                                                 @endif
 
                                                             @else
