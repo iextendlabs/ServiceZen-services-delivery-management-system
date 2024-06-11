@@ -645,7 +645,7 @@ class CustomerController extends Controller
     public function getOrders(Request $request)
     {
 
-        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->with('orderServices.service')->with('order_total')->with('review')->get();
+        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->with('orderServices.service')->with('order_total')->with('review')->with('services')->get();
 
         return response()->json([
             'orders' => $orders
@@ -1549,9 +1549,9 @@ class CustomerController extends Controller
 
             $sub_total = $selected_services->sum(function ($service) use ($input) {
                 if (isset($input['options'][$service->id])) {
-                    $option_id = $input['options'][$service->id];
+                    $option_id = (int) $input['options'][$service->id];  // Cast to integer
                     $option = $service->serviceOption->find($option_id);
-                    return $option ? $option->option_price : 0;
+                    return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
                 }
                 return isset($service->discount) ? $service->discount : $service->price;
             });

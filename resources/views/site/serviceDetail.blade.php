@@ -93,7 +93,7 @@ $packageCarousel_chunk = 3;
           </div>
           @endif
         
-          @if(count($service->variant))
+          {{-- @if(count($service->variant))
           <div class="form-group">
             <strong>Service Variants</strong>
             <select name="variant" id="variant-select" class="form-control mb-2">
@@ -107,7 +107,7 @@ $packageCarousel_chunk = 3;
               @endforeach
             </select>
           </div>
-          @endif
+          @endif --}}
         
           <button id="bookNowButton" type="button" class="btn btn-primary btn-block mb-2">Book Now</button>
         

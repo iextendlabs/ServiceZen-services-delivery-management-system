@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('option_id')
                 ->references('id')
                 ->on('service_options')
-                ->onDelete('CASCADE');
+                ->onDelete('SET NULL');
         });
     }
 
@@ -32,6 +32,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('order_services', function (Blueprint $table) {
+            $table->dropForeign(['option_id']);
             $table->dropColumn('option_id');
             $table->dropColumn('option_name');
         });
