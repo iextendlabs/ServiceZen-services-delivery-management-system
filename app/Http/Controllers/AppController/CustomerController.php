@@ -787,7 +787,7 @@ class CustomerController extends Controller
         if ($request->coupon && $request->service_ids && $request->options) {
             $services = Service::whereIn('id', $request->service_ids)->get();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id,$request->options);
+                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id ?? null,$request->options ?? []);
                 if ($isValid !== true) {
                     return response()->json(['errors' => ['coupon' => [$isValid]]], 201);
                 }
@@ -802,7 +802,7 @@ class CustomerController extends Controller
             $sub_total = $services->sum(function ($service) {
                 return $service->discount ?? $service->price;
             });
-            $coupon_discount = $coupon->getDiscountForProducts($services, $sub_total);
+            $coupon_discount = $coupon->getDiscountForProducts($services, $sub_total, $request->options ?? []);
         }
 
         return response()->json([
@@ -1298,7 +1298,7 @@ class CustomerController extends Controller
                 $coupon = Coupon::find($request->coupon_id);
     
                 $coupon_discount = $coupon
-                ? $coupon->getDiscountForProducts($services, $services_total)
+                ? $coupon->getDiscountForProducts($services, $services_total, $request->options ?? [])
                 : 0;
             }
         }
@@ -1508,9 +1508,9 @@ class CustomerController extends Controller
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,$input['user_id'],$input['options']);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,$input['user_id'] ?? null, $input['options'] ?? []);
                 if ($isValid === true) {
-                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total);
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total,$input['options'] ?? []);
                 } else {
                     return $isValid;
                 }
@@ -1581,7 +1581,7 @@ class CustomerController extends Controller
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$input['options'] ?? []);
                         if ($discount > 0) {
                             $input['coupon_id'] = $coupon->id;
                             $i++;
@@ -1590,7 +1590,7 @@ class CustomerController extends Controller
                         }
                     } elseif ($coupon->type == "Percentage") {
                         $input['coupon_id'] = $coupon->id;
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$input['options'] ?? []);
                     }
                 }
             }
