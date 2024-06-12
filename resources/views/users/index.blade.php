@@ -65,10 +65,10 @@
                                         action="{{ route('users.destroy', $user->id) }}" method="POST">
                                         <a class="btn btn-warning" href="{{ route('users.show', $user->id) }}"><i
                                                 class="fa fa-eye"></i></a>
-                                        @can('user-edit')
+                                        {{-- @can('user-edit')
                                             <a class="btn btn-primary" href="{{ route('users.edit', $user->id) }}"><i
                                                     class="fa fa-edit"></i></a>
-                                        @endcan
+                                        @endcan --}}
                                         @csrf
                                         @method('DELETE')
                                         @can('user-delete')
@@ -85,6 +85,8 @@
                         </tr>
                     @endif
                 </table>
+                {!! $data->links() !!}
+
             </div>
             <div class="col-md-3">
                 <h3>Filter</h3>
