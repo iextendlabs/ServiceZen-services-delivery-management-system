@@ -342,9 +342,9 @@ class CheckOutController extends Controller
         // Apply coupon discount
         if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
-
+            
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,null,$groupedBookingOption);
                 if ($isValid === true) {
                     $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total, $groupedBookingOption);
                 } else {
@@ -804,6 +804,8 @@ class CheckOutController extends Controller
             $serviceIds[] = $item["service_id"];
         }
 
+        [$groupedBooking, $groupedBookingOption] = $this->groupBookingData($bookingData);
+
         $coupon = Coupon::where("code", $request->coupon_code)->first();
         if(isset($request->selected_service_ids)){
             $services = Service::whereIn('id', $request->selected_service_ids)->get();
@@ -811,7 +813,7 @@ class CheckOutController extends Controller
             $services = Service::whereIn('id', $serviceIds)->get();
         }
         if ($coupon) {
-            $isValid = $coupon->isValidCoupon($request->coupon_code, $services);
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services,null,$groupedBookingOption);
             if ($isValid !== true) {
                 return response()->json(['error' => $isValid]);
             }

@@ -68,7 +68,7 @@ class Coupon extends Model
         return 0;
     }
 
-    public function isValidCoupon($code, $services, $user_id = null)
+    public function isValidCoupon($code, $services, $user_id = null, $options = [])
     {
         $isValid = self::where('code', $code)
             ->where('status', 1)
@@ -119,8 +119,13 @@ class Coupon extends Model
                 }
             }
 
-            $services_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
+            $services_total = $services->sum(function ($service) use($options) {
+                $optionId = $options[$service->id] ?? null;
+                if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                    return $service->serviceOption->find($optionId)->option_price;
+                }else{
+                    return isset($service->discount) ? $service->discount : $service->price;
+                }
             });
             if( $this->min_order_value > $services_total){
                 return 'The order total must be greater than to'.$this->min_order_value;
