@@ -64,11 +64,15 @@ $packageCarousel_chunk = 3;
       <div class="col-md-4 box-shadow">
         <div class="card-body">
           <p id="price" class="text-muted">
-            @if(isset($service->discount))
-            <s class="text-danger">@currency($service->price)</s>
-            <b class="discount text-success">@currency($service->discount)</b>
+            @if($price)
+            <span class="font-weight-bold">@currency($price)</span>
             @else
-            <span class="font-weight-bold">@currency($price ?? $service->price ?? null)</span>
+              @if(isset($service->discount))
+              <s class="text-danger">@currency($service->price)</s>
+              <b class="discount text-success">@currency($service->discount)</b>
+              @else
+              <span class="font-weight-bold">@currency($service->price)</span>
+              @endif
             @endif
           </p>
         
