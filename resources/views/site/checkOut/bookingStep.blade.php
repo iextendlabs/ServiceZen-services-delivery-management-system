@@ -62,7 +62,7 @@
                                                     <div><strong>Name:</strong> {{ $service->name }}</div>
                                                     <div><strong>Price:</strong> 
                                                         <span class="price">
-                                                            @if($groupedBookingOption[$service->id] != null)
+                                                            @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id] != null)
                                                                 @php
                                                                     $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
                                                                 @endphp
@@ -86,7 +86,7 @@
 
                                                         </span>
                                                     </div>
-                                                    @if($groupedBookingOption[$service->id] != null)
+                                                    @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id] != null)
                                                         @php
                                                             $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
                                                         @endphp

@@ -42,7 +42,7 @@ class CheckOutController extends Controller
             $service = Service::find($booking['service_id']);
             $staff = User::find($booking['service_staff_id']);
             $slot = TimeSlot::find($booking['time_slot_id']);
-            if($booking['option_id'] !== null){
+            if(isset($booking['option_id']) && $booking['option_id'] !== null){
                 $option = $service->serviceOption->find($booking['option_id']);
             }else{
                 $option = null;
@@ -125,7 +125,9 @@ class CheckOutController extends Controller
             }
             if (isset($selected_key)) {
                 $selected_booking = $bookingData[$selected_key];
-                $option_id = $bookingData[$selected_key]['option_id'];
+                if(isset($bookingData[$selected_key]['option_id'])){
+                    $option_id = $bookingData[$selected_key]['option_id'];
+                }
             }
         }
         if($request->option_id !== "null"){
@@ -201,19 +203,20 @@ class CheckOutController extends Controller
     }
     public function removeToCart(Request $request, $id)
     {
-
-        $idToRemove = $id;
+        $service_id = $id;
 
         $bookingData = Session::get('bookingData', []);
 
-        if (isset($bookingData[$idToRemove])) {
-            unset($bookingData[$idToRemove]);
+        foreach ($bookingData as $key => $booking) {
+            if ($booking['service_id'] == $service_id) {
+                unset($bookingData[$key]);
+                break;
+            }
         }
 
         Session::put('bookingData', $bookingData);
 
-
-        return redirect()->back()->with('success', 'Service Remove to Cart Successfully.');
+        return redirect()->back()->with('success', 'Service removed from cart successfully.');
     }
 
     public function draftOrder(Request $request)
@@ -557,7 +560,9 @@ class CheckOutController extends Controller
                 $groupedBooking[$key] = [];
             }
 
-            $groupedBookingOption[$booking['service_id']] = $booking['option_id'];
+            if(isset($booking['option_id'])){
+                $groupedBookingOption[$booking['service_id']] = $booking['option_id'];
+            }
             $groupedBooking[$key][] = $booking['service_id'];
         }
 
@@ -604,7 +609,9 @@ class CheckOutController extends Controller
             $key = $booking['date'] . '_' . $booking['service_staff_id'] . '_' . $booking['time_slot_id'];
 
             $groupedBooking[$key][] = $booking['service_id'];
-            $groupedBookingOption[$booking['service_id']] = $booking['option_id'];
+            if(isset($booking['option_id'])){
+                $groupedBookingOption[$booking['service_id']] = $booking['option_id'];
+            }
         }
         foreach ($groupedBooking as $index => $singleBookingService) {
             list($date, $service_staff_id, $time_slot_id) = explode('_', $index);

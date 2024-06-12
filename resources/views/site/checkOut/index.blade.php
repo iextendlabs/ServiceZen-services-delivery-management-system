@@ -66,7 +66,7 @@ $total_amount = 0;
             </td>
             <td>
                 <div class="btn-group">
-                    <a href="/removeToCart/{{ $key }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>
+                    <a href="/removeToCart/{{ $booking['service']->id }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>
                 </div>
             </td>
         </tr>
