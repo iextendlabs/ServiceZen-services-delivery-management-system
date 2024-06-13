@@ -277,6 +277,12 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <strong>Comment:</strong>
+                            <textarea name="order_comment" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
+                    </div>
                     <div class="col-md-6 mt-3 mt-3 offset-md-3 ">
                         <h5>Payment Summary</h5>
                         <table class="table">
