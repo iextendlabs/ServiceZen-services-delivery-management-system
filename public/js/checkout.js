@@ -1,9 +1,7 @@
-$(document).on("change", "#date,#zone,#area,.checkout-services,.checkBooking_service_id", function () {
-    var checkedServiceIds = [];
-
-    $('.checkout-services:checked').each(function () {
-        checkedServiceIds.push($(this).val());
-    });
+$(document).on("change", "#date,#zone,#area,.checkout_service_id,.checkBooking_service_id,.order_service_id", function () {
+    if($('.checkout_service_id:checked').val()){
+        var checkedServiceIds = [$('.checkout_service_id:checked').val()];
+    }
 
     if ($('#addToCartModalServices').val()) {
         var addToCartModalServices = [$('#addToCartModalServices').val()];

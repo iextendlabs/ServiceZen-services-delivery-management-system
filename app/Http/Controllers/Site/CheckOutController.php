@@ -241,6 +241,17 @@ class CheckOutController extends Controller
             return response()->json(['errors' => $validator->errors()], 200);
         }
 
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
+
+        if ($gender_permission != "Both") {
+            if ($request->gender != $gender_permission) {
+                $errors = [
+                    'Gender Error' => ["Sorry, no {$request->gender} services listed in our store."],
+                ];
+                return response()->json(['errors' => $errors], 200);
+            }
+        }
+        
         $input = $request->all();
         $bookingData = Session::get('bookingData', []);
         $excludedServices = $this->processBookingData($input, $bookingData);

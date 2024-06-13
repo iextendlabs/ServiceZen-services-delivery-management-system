@@ -102,7 +102,7 @@ class Coupon extends Model
             if ($this->uses_total !== null) {
                 if (!auth()->check() && $user_id == null) {
                     return 'Coupon requires login for validation.';
-                } else {
+                } elseif(!auth()->user()->hasRole('Admin')){
                     $userIdToCheck = $user_id ?? auth()->id();
 
                     $userOrdersCount = Order::where('customer_id', $userIdToCheck)

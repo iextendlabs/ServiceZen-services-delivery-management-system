@@ -54,7 +54,7 @@
                 </div>
             </div>
 
-            <div id="booking-step">
+            <div>
                 <form action="{{ route('addToCartServicesStaff') }}" method="POST">
                     @csrf
                     <div class="row">
@@ -90,7 +90,7 @@
                                             <td>
                                                 <label style="display: contents;">
                                                     <input required type="radio" name="service_id" class="checkBooking_service_id" 
-                                                           value="{{ $service->id }}" data-name="{{ $service->name }}"
+                                                           value="{{ $service->id }}" data-options="{{ $service->serviceOption }}" data-name="{{ $service->name }}"
                                                            data-price="{{ $service->discount ? $service->discount : $service->price }}"
                                                            data-duration="{{ $service->duration }}">
                                                     {{ $service->name }}
@@ -123,6 +123,10 @@
                                 <p><strong>Name:</strong> <span id="selected-service-name"></span></p>
                                 <p><strong>Price:</strong> <span id="selected-service-price"></span></p>
                                 <p><strong>Duration:</strong> <span id="selected-service-duration"></span></p>
+                            </div>
+                            <div id="service-options" class="alert alert-info" style="display: none;">
+                                <h4>Service Options</h4>
+                                <div id="service-options-list"></div>
                             </div>
                         </div>
                     </div>
@@ -180,12 +184,50 @@
                 var serviceName = $(this).data('name');
                 var servicePrice = $(this).data('price');
                 var serviceDuration = $(this).data('duration');
-
+                var serviceOptions = $(this).data('options');
+    
                 $('#selected-service-name').text(serviceName);
                 $('#selected-service-price').text(servicePrice);
                 $('#selected-service-duration').text(serviceDuration);
 
                 $('#selected-service').show();
+    
+                if (serviceOptions && serviceOptions.length > 0) {
+                    var optionsHtml = '';
+                    var minPrice = Infinity;
+                    var minPriceOption = null;
+    
+                    serviceOptions.forEach(function(option) {
+                        var optionPrice = parseFloat(option.option_price);
+                        optionsHtml += `
+                            <div>
+                                <label>
+                                    <input type="radio" name="option_id" value="${option.id}" data-option-price="${optionPrice}" required> ${option.option_name} (AED ${optionPrice})
+                                </label>
+                            </div>
+                        `;
+                        if (optionPrice < minPrice) {
+                            minPrice = optionPrice;
+                            minPriceOption = option.id;
+                        }
+                    });
+    
+                    $('#service-options-list').html(optionsHtml);
+                    $('#service-options').show();
+    
+                    if (minPriceOption !== null) {
+                        $(`input[name="option_id"][value="${minPriceOption}"]`).prop('checked', true);
+                        $('#selected-service-price').text(minPrice);
+                    }
+    
+                    $('input[name="option_id"]').on('change', function() {
+                        var selectedOptionPrice = $(this).data('option-price');
+                        $('#selected-service-price').text(selectedOptionPrice);
+                    });
+                } else {
+                    $('#service-options').hide();
+                    $('#service-options-list').html('');
+                }
             });
         });
     </script>
