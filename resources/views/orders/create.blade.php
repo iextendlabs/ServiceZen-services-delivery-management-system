@@ -613,6 +613,14 @@
                 setTimeout(handleZoneAreaChange, 3000);
             });
 
+            $(document).on("change", "#date", function() {
+                setTimeout(() => {
+                    $("#area").val($("#zone").val());
+                    handleZoneAreaChange();
+                }, 3000);
+
+            });
+
             $(document).on("change", "#area", function() {
                 $("#zone").val($(this).val());
                 setTimeout(handleZoneAreaChange, 3000);
