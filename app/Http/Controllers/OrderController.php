@@ -530,7 +530,12 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         $input = ['affiliate_id' => $request->affiliate_id];
-
+        if(isset($order->affiliate_id)){
+            if(isset($order->affiliate) && isset($order->affiliate->affiliate) && $order->affiliate->affiliate->parent_affiliate_id != null){
+                Transaction::where('user_id',$order->affiliate->affiliate->parent_affiliate_id)->where('order_id',$id)->where('type','Order Parent Affiliate Commission')->delete();
+            }
+            Transaction::where('user_id',$order->affiliate_id)->where('order_id',$id)->where('type','Order Affiliate Commission')->delete();
+        }
         $order->update($input);
 
         $previousUrl = $request->url;
