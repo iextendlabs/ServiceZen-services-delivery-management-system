@@ -1,6 +1,6 @@
 @extends('layouts.app')
 <link href="{{ asset('css/checkout.css') }}?v={{ config('app.version') }}" rel="stylesheet">
-<link href="{{ asset('css/site.css') }}?v=3" rel="stylesheet">
+<link href="{{ asset('css/site.css') }}?v={{ config('app.version') }}" rel="stylesheet">
 
 @section('content')
     @php
