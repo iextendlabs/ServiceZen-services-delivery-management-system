@@ -1,7 +1,4 @@
-$(document).on("change", "#date,#zone,#area,.checkout_service_id,.checkBooking_service_id,.order_service_id", function () {
-    if($('.checkout_service_id:checked').val()){
-        var checkedServiceIds = [$('.checkout_service_id:checked').val()];
-    }
+$(document).on("change", "#date,#zone,#area,.checkBooking_service_id,.order_service_id", function () {
 
     if ($('#addToCartModalServices').val()) {
         var addToCartModalServices = [$('#addToCartModalServices').val()];
@@ -17,7 +14,7 @@ $(document).on("change", "#date,#zone,#area,.checkout_service_id,.checkBooking_s
             date: $('#date').val(),
             area: $('select[name="zone"]').val(),
             order_id: $('input[name="order_id"]').length ? $('input[name="order_id"]').val() : '',
-            service_ids: addToCartModalServices ?? checkedServiceIds,
+            service_ids: addToCartModalServices ?? [],
             zoneShow : addToCartModalServices ? 0 : 1
         },
         beforeSend: function () {

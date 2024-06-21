@@ -45,75 +45,31 @@
             <form action="{{ route('orders.store') }}" method="POST">
                 @csrf
                 <div class="row">
-                    <div class="col-md-12">
-                        <strong>Search services by categories </strong>
-                        <select name="category" id="category-select" class="form-control">
-                            <option value="">All</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}"> {{ $category->title }}</option>
-                            @endforeach
-                        </select><br>
-                    </div>
-
-                    <div class="col-md-12">
-                        <input type="text" id="search-service" class="form-control" placeholder="Search services...">
-                    </div>
-
-                    <div class="col-md-12 scroll-div mb-4">
-                        <table class="table table-bordered table-striped">
-                            <tr>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Duration</th>
-                            </tr>
-                            </thead>
-                            <tbody id="services-list">
-                                @foreach ($services as $service)
-                                    <tr data-category="{{ json_encode($service->categories->pluck('id')) }}">
-                                        <td>
-                                            <label style="display: contents;">
-                                                <input type="radio" name="service_id" class="checkout_service_id"
-                                                    value="{{ $service->id }}"
-                                                    data-options="{{ $service->serviceOption }}"
-                                                    data-name="{{ $service->name }}"
-                                                    data-price="{{ $service->discount ? $service->discount : $service->price }}"
-                                                    data-duration="{{ $service->duration }}">
-                                                {{ $service->name }}
-                                        </td>
-                                        <td>
-                                            @if (isset($service->discount))
-                                                <s>
-                                            @endif
-                                            @currency($service->price)
-                                            @if (isset($service->discount))
-                                                </s>
-                                            @endif
-                                            @if (isset($service->discount))
-                                                <b class="discount"> @currency($service->discount)</b>
-                                            @endif
-                                        </td>
-                                        <td>{{ $service->duration }}</td>
-                                        </label>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div id="selected-service" class="alert alert-secondary" style="display: none;">
-                            <h4>Selected Service</h4>
-                            <p><strong>Name:</strong> <span id="selected-service-name"></span></p>
-                            <p><strong>Price:</strong> <span id="selected-service-price"></span></p>
-                            <p><strong>Duration:</strong> <span id="selected-service-duration"></span></p>
-                        </div>
-                        <div id="service-options" class="alert alert-info" style="display: none;">
-                            <h4>Service Options</h4>
-                            <div id="service-options-list"></div>
-                        </div>
-                    </div>
                     <div id="slots-container">
                         @include('site.checkOut.timeSlots')
+                    </div>
+                    <div id="categories-services-container">
+                        <!-- Content will be dynamically appended here -->
+                    </div>
+                    <div id="selected-services-container" class="col-md-12 mt-4" style="display: none;">
+                        <input type="hidden" name="selected_service_ids" id="selected_service_ids">
+                        <input type="hidden" name="selected_option_ids" id="selected_option_ids">
+                        <h4>Selected Services</h4>
+                        <div class="mb-4">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Duration</th>
+                                        <th>Options</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="selected-services-list">
+                                    <!-- Selected services will be appended here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="col-md-12 text-center">
                         <br>
@@ -317,81 +273,272 @@
     </div>
 
     <script>
-        function updateTotal() {
-            let transport_charges = parseFloat($('#zone').find(':selected').data('transport-charges'));
+        $(document).ready(function() {
 
-            $('#transport_charges').text(transport_charges);
+            function updateTotal() {
+                let subTotal = 0;
+                let totalAmount = 0;
 
-            let staff_charges = parseFloat($('input[name="service_staff_id"]:checked').data('staff-charges'));
+                let transportCharges = parseFloat($('#zone').find(':selected').data('transport-charges'));
 
-            let coupon_discount = parseFloat($('#coupon-discount').text());
+                $('#transport_charges').text(transportCharges);
 
-            $('#staff_charges').text(staff_charges);
+                let staffCharges = parseFloat($('input[name="service_staff_id"]:checked').data('staff-charges'));
 
-            let total_amount = 0;
+                $('#staff_charges').text(staffCharges);
 
-            let sub_total = parseFloat($('#sub_total').text());
-            total_amount = sub_total + staff_charges + transport_charges - coupon_discount;
+                let couponDiscount = parseFloat($('#coupon-discount').text());
 
-            $('#total_amount').text(total_amount.toFixed(2));
-        }
+                $('input[name="service_id"]:checked').each(function() {
+                    let serviceId = $(this).val();
+                    let serviceOptions = $(this).data('options');
+                    let servicePrice = parseFloat($(this).data('price'));
 
-        function applyCoupon() {
-            var couponCode = $("#coupon_code").val();
-            var selectedServiceId = $('.checkout_service_id:checked').val();
-            var selectedOptionId = $('input[name="option_id"]:checked').val() || null;
+                    if (serviceOptions) {
+                        let selectedOptionPrice = parseFloat($(
+                            `input[name="service_option_${serviceId}"]:checked`).data('price'));
+                        if (!isNaN(selectedOptionPrice)) {
+                            servicePrice = selectedOptionPrice;
+                        }
+                    }
 
-            $("#responseMessage").html("");
+                    subTotal += servicePrice;
+                });
 
-            if (selectedServiceId && couponCode) {
+                totalAmount = subTotal + staffCharges + transportCharges - couponDiscount;
+
+                $('#sub_total').text(subTotal.toFixed(2));
+                $('#total_amount').text(totalAmount.toFixed(2));
+            }
+
+            function applyCoupon() {
+
+                let selectedServiceIds = [];
+                let selectedOptionIds = {};
+
+                $('input[name="service_id"]:checked').each(function() {
+                    let serviceId = $(this).val();
+                    selectedServiceIds.push(serviceId);
+
+                    let selectedOptionId = $(`input[name="service_option_${serviceId}"]:checked`).val();
+                    if (selectedOptionId) {
+                        selectedOptionIds[serviceId] = selectedOptionId;
+                    } else {
+                        selectedOptionIds[serviceId] =
+                            null;
+                    }
+                });
+
+                var couponCode = $("#coupon_code").val();
+                $("#responseMessage").html("");
+
+                if (selectedServiceIds && couponCode) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ route('apply.order_coupon') }}",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            coupon_code: couponCode,
+                            selected_service_ids: selectedServiceIds,
+                            selected_option_ids: selectedOptionIds
+                        },
+                        success: function(response) {
+                            var messageClass = response.error ? 'alert-danger' :
+                                'alert-success';
+                            var message = response.error ? response.error : response.message;
+                            $("#coupon_code").val(response.error ? "" : couponCode);
+                            $("#responseMessage").append(
+                                '<p class="coupon-message alert ' + messageClass + '">' +
+                                message + '</p>'
+                            );
+                            if (response.message) {
+                                $('#coupon-discount').text(response.discount);
+                                updateTotal();
+                            } else if (response.error) {
+                                $('#coupon-discount').text(0);
+                                updateTotal();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            $("#responseMessage").append(
+                                '<p class="coupon-message alert alert-danger">An error occurred while applying the coupon. Please try again.</p>'
+                            );
+                        }
+                    });
+                } else {
+                    $("#responseMessage").append(
+                        '<p class="coupon-message alert alert-danger">Please select a service and enter a coupon code.</p>'
+                    );
+                }
+
+                setTimeout(function() {
+                    $(".coupon-message").fadeOut('slow', function() {
+                        $(this).remove();
+                    });
+                }, 6000);
+            };
+
+            function fetchCategoriesAndServices(serviceIds, categoryIds) {
                 $.ajax({
-                    type: "POST",
-                    url: "{{ route('apply.order_coupon') }}",
+                    type: "GET",
+                    url: "{{ route('fetch.staff_categories_services') }}",
                     data: {
-                        _token: "{{ csrf_token() }}",
-                        coupon_code: couponCode,
-                        selected_service_id: selectedServiceId,
-                        selected_option_id: selectedOptionId
+                        serviceIds: serviceIds,
+                        categoryIds: categoryIds
                     },
                     success: function(response) {
-                        var messageClass = response.error ? 'alert-danger' :
-                            'alert-success';
-                        var message = response.error ? response.error : response.message;
-                        $("#coupon_code").val(response.error ? "" : couponCode);
-                        $("#responseMessage").append(
-                            '<p class="coupon-message alert ' + messageClass + '">' +
-                            message + '</p>'
-                        );
-                        if (response.message) {
-                            $('#coupon-discount').text(response.discount);
-                            updateTotal();
-                        }else if(response.error){
-                            $('#coupon-discount').text(0);
-                            updateTotal();
+                        let categoriesHtml = '';
+                        if (response.categories.length > 0) {
+                            categoriesHtml = `
+                        <div class="col-md-12">
+                            <strong>Search services by categories </strong>
+                            <select name="category" id="category-select" class="form-control">
+                                <option value="">All</option>
+                    `;
+                            response.categories.forEach(category => {
+                                categoriesHtml +=
+                                    `<option value="${category.id}">${category.title}</option>`;
+                            });
+                            categoriesHtml += `</select><br></div>`;
+                        }
+
+                        let servicesHtml = `
+                    <div class="col-md-12">
+                        <input type="text" id="search-service" class="form-control" placeholder="Search services...">
+                    </div>
+                    <div class="col-md-12 scroll-div mb-4">
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                            </tr>
+                            <tbody id="services-list">
+                `;
+                        response.services.forEach(service => {
+                            let categories = JSON.stringify(service.categories.map(category =>
+                                category.id));
+                            servicesHtml += `
+                        <tr data-category='${categories}'>
+                            <td>
+                                <label style="display: contents;">
+                                    <input type="checkbox" name="service_id" class="form-check-input checkout_service_id"
+                                        value="${service.id}"
+                                        data-options='${JSON.stringify(service.service_option)}'
+                                        data-name="${service.name}"
+                                        data-price="${service.discount ? service.discount : service.price}"
+                                        data-duration="${service.duration}">
+                                    ${service.name}
+                            </td>
+                            <td>
+                                ${service.discount ? `<s>${service.price}</s> <b class="discount">${service.discount}</b>` : service.price}
+                            </td>
+                            <td>${service.duration}</td>
+                                </label>
+                            </tr>
+                    `;
+                        });
+                        servicesHtml += `</tbody></table></div>`;
+
+                        if (response.categories.length === 0 && response.services.length === 0) {
+                            let html = `
+                    <div class="col-md-12">
+                        <div class="alert alert-danger text-center">
+                            There are no services available for this staff.
+                        </div>
+                    </div>`;
+                            $('#categories-services-container').html(html);
+                        } else {
+                            $('#categories-services-container').html(categoriesHtml + servicesHtml);
+
+                            // Re-attach event handlers if necessary
+                            $('#search-service').on('keyup', filterServices);
+                            $('#category-select').on('change', filterServices);
+                            $('input[name="service_id"]').on('change', serviceSelectionChanged);
                         }
                     },
                     error: function(xhr, status, error) {
-                        $("#responseMessage").append(
-                            '<p class="coupon-message alert alert-danger">An error occurred while applying the coupon. Please try again.</p>'
-                        );
+                        console.error("An error occurred while fetching categories and services:",
+                            error);
                     }
                 });
-            } else {
-                $("#responseMessage").append(
-                    '<p class="coupon-message alert alert-danger">Please select a service and enter a coupon code.</p>'
-                );
             }
 
-            setTimeout(function() {
-                $(".coupon-message").fadeOut('slow', function() {
-                    $(this).remove();
-                });
-            }, 6000);
-        };
-    </script>
+            function serviceSelectionChanged() {
+                let selectedServices = [];
 
-    <script>
-        $(document).ready(function() {
+                $('input[name="service_id"]:checked').each(function() {
+                    let serviceId = $(this).val();
+                    let serviceName = $(this).data('name');
+                    let servicePrice = $(this).data('price');
+                    let serviceDuration = $(this).data('duration');
+                    let serviceOptions = $(this).data('options');
+
+                    let optionsHtml = '';
+                    let lowestPrice = servicePrice;
+
+                    if (serviceOptions) {
+                        serviceOptions.forEach((option, index) => {
+                            if (index === 0 || parseFloat(option.option_price) < lowestPrice) {
+                                lowestPrice = parseFloat(option.option_price);
+                            }
+                            optionsHtml += `
+                                <label>
+                                    <input type="radio" name="service_option_${serviceId}" value="${option.id}" class="form-check-input"
+                                        data-price="${option.option_price}" data-name="${option.option_name}" ${index === 0 ? 'checked' : ''}>
+                                    ${option.option_name} (AED ${option.option_price})
+                                </label><br>
+                            `;
+                        });
+                    }
+
+                    selectedServices.push({
+                        id: serviceId,
+                        name: serviceName,
+                        price: lowestPrice,
+                        duration: serviceDuration,
+                        optionsHtml: optionsHtml
+                    });
+                });
+
+                let selectedServicesHtml = '';
+
+                selectedServices.forEach(service => {
+                    selectedServicesHtml += `
+                        <tr>
+                            <td>${service.name}</td>
+                            <td class="service-price">${service.price}</td>
+                            <td>${service.duration}</td>
+                            <td>${service.optionsHtml}</td>
+                        </tr>
+                    `;
+                });
+
+                $('#selected-services-list').html(selectedServicesHtml);
+
+                // Show or hide the selected services container
+                if (selectedServices.length > 0) {
+                    $('#selected-services-container').show();
+                } else {
+                    $('#selected-services-container').hide();
+                }
+
+                // Attach event listener to new option radios to update price on change
+                $('input[type="radio"]').change(function() {
+                    let serviceRow = $(this).closest('tr');
+                    let newPrice = $(this).data('price');
+                    serviceRow.find('.service-price').text(newPrice);
+                    $('#coupon-discount').text(0);
+                    $("#coupon_code").val("");
+                    handleSelectedServiceOption();
+                    updateTotal();
+                });
+                $('#coupon-discount').text(0);
+                $("#coupon_code").val("");
+                handleSelectedServiceOption();
+                updateTotal();
+            }
+
             function filterServices() {
                 var searchValue = $('#search-service').val().toLowerCase();
                 var selectedCategory = $('#category-select').val();
@@ -419,94 +566,60 @@
                 });
             }
 
-            $('#search-service').on('keyup', function() {
-                filterServices();
-            });
+            function handleSelectedServiceOption() {
+                let selectedServiceIds = [];
+                let selectedOptionIds = {};
 
-            $('#category-select').on('change', function() {
-                filterServices();
-            });
+                $('input[name="service_id"]:checked').each(function() {
+                    let serviceId = $(this).val();
+                    selectedServiceIds.push(serviceId);
 
-            $('input[name="service_id"]').on('change', function() {
-                var serviceName = $(this).data('name');
-                var servicePrice = $(this).data('price');
-                var serviceDuration = $(this).data('duration');
-                var serviceOptions = $(this).data('options');
-
-                $('#selected-service-name').text(serviceName);
-                $('#selected-service-price').text(servicePrice);
-                $('#selected-service-duration').text(serviceDuration);
-                $('#sub_total').text(servicePrice);
-                updateTotal();
-
-                var couponCode = $("#coupon_code").val();
-                var selectedServiceId = $('.checkout_service_id:checked').val();
-
-                if (couponCode && selectedServiceId) {
-                    applyCoupon();
-                }
-
-                $('#selected-service').show();
-
-                if (serviceOptions && serviceOptions.length > 0) {
-                    var optionsHtml = '';
-                    var minPrice = Infinity;
-                    var minPriceOption = null;
-
-                    serviceOptions.forEach(function(option) {
-                        var optionPrice = parseFloat(option.option_price);
-                        optionsHtml += `
-                        <div>
-                            <label>
-                                <input type="radio" name="option_id" value="${option.id}" data-option-price="${optionPrice}" required> ${option.option_name} (AED ${optionPrice})
-                            </label>
-                        </div>
-                    `;
-                        if (optionPrice < minPrice) {
-                            minPrice = optionPrice;
-                            minPriceOption = option.id;
-                        }
-                    });
-
-                    $('#service-options-list').html(optionsHtml);
-                    $('#service-options').show();
-
-                    if (minPriceOption !== null) {
-                        $(`input[name="option_id"][value="${minPriceOption}"]`).prop('checked', true);
-                        $('#selected-service-price').text(minPrice);
-                        $('#sub_total').text(minPrice);
-                        console.log(couponCode, selectedServiceId);
-                        if (couponCode && selectedServiceId) {
-                            applyCoupon();
-                        }
-                        updateTotal();
+                    let selectedOptionId = $(`input[name="service_option_${serviceId}"]:checked`).val();
+                    if (selectedOptionId) {
+                        selectedOptionIds[serviceId] = selectedOptionId;
+                    } else {
+                        selectedOptionIds[serviceId] =
+                            null;
                     }
+                });
 
-                    $('input[name="option_id"]').on('change', function() {
-                        var selectedOptionPrice = $(this).data('option-price');
-                        $('#selected-service-price').text(selectedOptionPrice);
-                        $('#sub_total').text(selectedOptionPrice);
-                        if (couponCode && selectedServiceId) {
-                            applyCoupon();
-                        }
-                        updateTotal();
-                    });
-                } else {
-                    $('#service-options').hide();
-                    $('#service-options-list').html('');
-                }
-            });
+                $('input[name="selected_service_ids"]').val(JSON.stringify(selectedServiceIds));
+                $('input[name="selected_option_ids"]').val(JSON.stringify(selectedOptionIds));
+
+            }
 
             $("#applyCouponBtn").click(function() {
                 applyCoupon();
             });
 
+            function handleZoneAreaChange() {
+                var selectedStaffId = $('input[name="service_staff_id"]:checked').val();
+                if (selectedStaffId) {
+                    $('#selected-services-container').hide();
+                    $('#selected-services-list').html("");
+                    var serviceIds = $('input[name="service_staff_id"]:checked').data('serviceids');
+                    var categoryIds = $('input[name="service_staff_id"]:checked').data('categoryids');
+                    fetchCategoriesAndServices(serviceIds, categoryIds);
+                    $('input[name="service_id"]').prop('checked', false);
+                    $('#coupon-discount').text(0);
+                    $("#coupon_code").val("");
+                    updateTotal();
+                    handleSelectedServiceOption();
+                }
+            }
+
             $(document).on("change", "#zone", function() {
                 $("#area").val($(this).val());
+                setTimeout(handleZoneAreaChange, 3000);
             });
 
             $(document).on("change", "#area", function() {
                 $("#zone").val($(this).val());
+                setTimeout(handleZoneAreaChange, 3000);
+            });
+
+            $(document).on("change", "input[name='service_staff_id']", function() {
+                handleZoneAreaChange();
             });
         });
     </script>

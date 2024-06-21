@@ -177,6 +177,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('withdraws', WithdrawController::class);
     Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus'); 
     Route::post('/apply-order-coupon', [OrderController::class,'applyOrderCoupon'])->name('apply.order_coupon');
+    Route::get('/staff-categories-services', [OrderController::class,'staffCategoriesServices'])->name('fetch.staff_categories_services');
 
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');

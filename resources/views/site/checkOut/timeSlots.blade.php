@@ -84,7 +84,7 @@
     @php 
     $staff_displayed[] = $staff->id;
     @endphp
-        <input required style="display: none;" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @elseif(isset($selected_booking) && $selected_booking['service_staff_id'] == $staff->id) checked @endif >
+        <input required style="display: none;" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" data-serviceIds="{{ $staff->services ? $staff->services->pluck('id') : [] }}" data-categoryIds="{{ $staff->categories ?$staff->categories->pluck('id') : [] }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @elseif(isset($selected_booking) && $selected_booking['service_staff_id'] == $staff->id) checked @endif >
         <label class="staff-label" for="staff-{{$staff->id}}">
             <div class="p-2">
                 <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100"><br>

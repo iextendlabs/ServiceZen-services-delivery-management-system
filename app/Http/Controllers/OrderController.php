@@ -292,29 +292,26 @@ class OrderController extends Controller
         }
 
         $request->validate([
-            'service_id' => 'required',
+            'service_staff_id' => 'required',
+            'time_slot_id' => 'required',
+            'selected_service_ids' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
             'number' => 'required',
             'whatsapp' => 'required',
         ]);
 
-        $groupedBookingOption = [];
+        $selectedServiceIds = json_decode($request->input('selected_service_ids'), true);
+        $selectedOptionIds = json_decode($request->input('selected_option_ids'), true);
 
-        if ($request->option_id) {
-            $groupedBookingOption = [
-                $request->service_id => $request->option_id
-            ];
-        }
-
-        $service = Service::where('id', $request->service_id)->get();
+        $services = Service::whereIn('id', $selectedServiceIds)->get();
         $sub_total = 0;
         $discount = 0;
 
-        if (!$service) {
+        if (count($services) == 0) {
             return redirect()->back()->with('error', "Service not found");
         } else {
-            $sub_total = $service->sum(function ($service) use ($groupedBookingOption) {
-                $optionId = $groupedBookingOption[$service->id] ?? null;
+            $sub_total = $services->sum(function ($service) use ($selectedOptionIds) {
+                $optionId = $selectedOptionIds[$service->id] ?? null;
                 if ($optionId !== null && $service->serviceOption->find($optionId)) {
                     return $service->serviceOption->find($optionId)->option_price;
                 }
@@ -325,13 +322,13 @@ class OrderController extends Controller
         if ($request->coupon_code) {
             $coupon = Coupon::where("code", $request->coupon_code)->first();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon_code, $service, null, $groupedBookingOption);
+                $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $selectedOptionIds);
 
                 if ($isValid !== true) {
                     return redirect()->back()
                         ->with('error', $isValid);
                 } else {
-                    $discount = $coupon->getDiscountForProducts($service, $sub_total, $groupedBookingOption);
+                    $discount = $coupon->getDiscountForProducts($services, $sub_total, $selectedOptionIds);
                 }
             } else {
                 return redirect()->back()
@@ -414,12 +411,15 @@ class OrderController extends Controller
                             CouponHistory::create($input);
                         }
 
-                        foreach ($service as $service) {
+                        foreach ($services as $service) {
+                            $input['option_id'] = null;
+                            $input['option_name'] = null;
+
                             $input['service_id'] = $service->id;
                             $input['service_name'] = $service->name;
                             $input['duration'] = $service->duration;
                             $input['status'] = 'Open';
-                            $optionId = $request->option_id ?? null;
+                            $optionId = $selectedOptionIds[$service->id] ?? null;
                             if ($optionId !== null && $service->serviceOption->find($optionId)) {
                                 $serviceOption = $service->serviceOption->find($optionId);
                                 $input['price'] = $serviceOption->option_price;
@@ -924,24 +924,16 @@ class OrderController extends Controller
 
     public function applyOrderCoupon(Request $request)
     {
-        $groupedBookingOption = [];
-
-        if ($request->selected_option_id) {
-            $groupedBookingOption = [
-                $request->selected_service_id => $request->selected_option_id
-            ];
-        }
-
         $coupon = Coupon::where("code", $request->coupon_code)->first();
 
-        $service = Service::where('id', $request->selected_service_id)->get();
+        $services = Service::whereIn('id', $request->selected_service_ids)->get();
         $sub_total = 0;
 
-        if (!$service) {
+        if (count($services) == 0) {
             return response()->json(['error' => 'Service not found'], 404);
         } else {
-            $sub_total = $service->sum(function ($service) use ($groupedBookingOption) {
-                $optionId = $groupedBookingOption[$service->id] ?? null;
+            $sub_total = $services->sum(function ($service) use ($request) {
+                $optionId = $request->selected_option_ids[$service->id] ?? null;
                 if ($optionId !== null && $service->serviceOption->find($optionId)) {
                     return $service->serviceOption->find($optionId)->option_price;
                 }
@@ -950,11 +942,11 @@ class OrderController extends Controller
         }
 
         if ($coupon) {
-            $isValid = $coupon->isValidCoupon($request->coupon_code, $service, null, $groupedBookingOption);
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $request->selected_option_ids);
             if ($isValid !== true) {
                 return response()->json(['error' => $isValid]);
             } else {
-                $discount = $coupon->getDiscountForProducts($service, $sub_total, $groupedBookingOption);
+                $discount = $coupon->getDiscountForProducts($services, $sub_total, $request->selected_option_ids);
                 return response()->json([
                     'message' => 'Coupon applied successfully',
                     'discount' => $discount
@@ -964,4 +956,33 @@ class OrderController extends Controller
             return response()->json(['error' => "Coupon is invalid!"]);
         }
     }
+
+    public function staffCategoriesServices(Request $request)
+    {
+        $categories = [];
+        $services = collect();
+
+        if (isset($request->categoryIds) && count($request->categoryIds) > 0) {
+            $categories = ServiceCategory::whereIn('id', $request->categoryIds)->where('status', 1)->get();
+
+            $category_services = Service::whereHas('categories', function ($query) use ($request) {
+                $query->whereIn('service_categories.id', $request->categoryIds);
+            })->with('categories')->with('serviceOption')->get();
+
+            $services = $services->merge($category_services);
+        }
+
+        if (isset($request->serviceIds) && count($request->serviceIds) > 0) {
+            $service_list = Service::whereIn('id', $request->serviceIds)->where('status', 1)->with('categories')->with('serviceOption')->get();
+            $services = $services->merge($service_list);
+        }
+
+        $services = $services->unique('id')->values();
+
+        return response()->json([
+            'categories' => $categories,
+            'services' => $services,
+        ]);
+    }
+
 }
