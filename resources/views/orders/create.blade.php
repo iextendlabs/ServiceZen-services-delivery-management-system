@@ -45,6 +45,7 @@
             <form action="{{ route('orders.store') }}" method="POST">
                 @csrf
                 <div class="row">
+                    <input type="hidden" name="isAdmin" value="true">
                     <div id="slots-container">
                         @include('site.checkOut.timeSlots')
                     </div>
@@ -101,7 +102,7 @@
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Area:</strong>
 
-                            <select required class="form-control" name="area" id="area">
+                            <select disabled required class="form-control" name="area" id="area">
                                 <option value="">-- Select Zone -- </option>
                                 @foreach ($zones as $zone)
                                     <option @if (old('area') == $zone) selected @endif value="{{ $zone }}">
@@ -610,19 +611,6 @@
 
             $(document).on("change", "#zone", function() {
                 $("#area").val($(this).val());
-                setTimeout(handleZoneAreaChange, 3000);
-            });
-
-            $(document).on("change", "#date", function() {
-                setTimeout(() => {
-                    $("#area").val($("#zone").val());
-                    handleZoneAreaChange();
-                }, 3000);
-
-            });
-
-            $(document).on("change", "#area", function() {
-                $("#zone").val($(this).val());
                 setTimeout(handleZoneAreaChange, 3000);
             });
 

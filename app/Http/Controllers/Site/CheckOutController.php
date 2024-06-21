@@ -799,7 +799,11 @@ class CheckOutController extends Controller
         }
 
         if (!isset($area)) {
-            $area = $address['area'] ?? '';
+            if (isset($request->isAdmin) && $request->isAdmin == true) {
+                $area = $request->area;
+            }else{
+                $area = $address['area'] ?? '';
+            }
         }
 
         if ($request->zoneShow == 0 && $address && $address['area']) {
