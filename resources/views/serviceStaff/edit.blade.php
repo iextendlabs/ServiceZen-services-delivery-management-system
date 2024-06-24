@@ -20,6 +20,7 @@
     @endif
     <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
         <input type="hidden" value="{{ $serviceStaff->staff->id ?? "" }}" name="staff_id">
+        <input type="hidden" value="{{ $freelancer_join }}" name="freelancer_join" />
         @csrf
         @method('PUT')
         <input type="hidden" name="url" value="{{ url()->previous() }}">
@@ -79,8 +80,8 @@
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
 
-                                <option value="1" @if($serviceStaff->staff->status == 1) selected @endif>Enable</option>
-                                <option value="0" @if($serviceStaff->staff->status == 0) selected @endif>Disable</option>
+                                <option value="1" @if($serviceStaff->staff && $serviceStaff->staff->status == 1) selected @endif>Enable</option>
+                                <option value="0" @if($serviceStaff->staff && $serviceStaff->staff->status == 0) selected @endif>Disable</option>
                             </select>
                         </div>
                     </div>
@@ -130,7 +131,7 @@
                                 <option></option>
                                 @foreach ($users as $driver)
                                 @if($driver->hasRole("Driver"))
-                                <option value="{{ $driver->id }}" @if($serviceStaff->staff->driver_id == $driver->id) selected @endif>{{ $driver->name }}</option>
+                                <option value="{{ $driver->id }}" @if($serviceStaff->staff && $serviceStaff->staff->driver_id == $driver->id) selected @endif>{{ $driver->name }}</option>
                                 @endif
                                 @endforeach
                             </select>
@@ -184,6 +185,14 @@
                             <input type="number" name="min_order_value" class="form-control" value="{{ $serviceStaff->staff->min_order_value ?? "" }}" placeholder="Minmum Order Value">
                         </div>
                     </div>
+                    @if($freelancer_join)
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Expiry Date:</strong>
+                            <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $serviceStaff->staff->expiry_date ?? "" }}>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
             @if($socialLinks)

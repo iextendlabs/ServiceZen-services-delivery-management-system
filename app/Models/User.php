@@ -27,7 +27,8 @@ class User extends Authenticatable
         'last_notification_id',
         'customer_source',
         'status',
-        'affiliate_program'
+        'affiliate_program',
+        'freelancer_program'
     ];
 
     /**
