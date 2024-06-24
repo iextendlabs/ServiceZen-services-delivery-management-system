@@ -162,7 +162,7 @@ class ServiceStaffController extends Controller
      * @param  \App\User  $service
      * @return \Illuminate\Http\Response
      */
-    public function show(User $serviceStaff)
+    public function show(User $serviceStaff, Request $request)
     {
         $currentMonth = Carbon::now()->startOfMonth();
 
@@ -179,8 +179,10 @@ class ServiceStaffController extends Controller
             ->where('created_at', '>=', $currentMonth)
             ->where('user_id', $serviceStaff->id)
             ->sum('amount');
+        
+        $freelancer_join = $request->freelancer_join;
 
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -189,7 +191,7 @@ class ServiceStaffController extends Controller
      * @param  \App\User  $User
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $serviceStaff)
+    public function edit(User $serviceStaff,Request $request)
     {
         $users = User::all();
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
@@ -198,7 +200,8 @@ class ServiceStaffController extends Controller
         $supervisor_ids = $serviceStaff->supervisors()->pluck('supervisor_id')->toArray();
         $service_ids = $serviceStaff->services()->pluck('service_id')->toArray();
         $category_ids = $serviceStaff->categories()->pluck('category_id')->toArray();
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services'));
+        $freelancer_join = $request->freelancer_join;
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join'));
     }
 
     /**
@@ -210,7 +213,7 @@ class ServiceStaffController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $rules = [
             'name' => 'required',
             'whatsapp' => 'required',
             'phone' => 'required',
@@ -218,7 +221,13 @@ class ServiceStaffController extends Controller
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
             'commission' => 'required'
-        ]);
+        ];
+    
+        if ($request->freelancer_join == 1) {
+            $rules['expiry_date'] = 'required';
+        }
+    
+        $this->validate($request, $rules);
 
         $input = $request->all();
         $input['phone'] =$request->number_country_code . $request->phone;
@@ -230,7 +239,6 @@ class ServiceStaffController extends Controller
         }
 
         $serviceStaff = User::find($id);
-        $serviceStaff->update($input);
 
         $staff = Staff::find($input['staff_id']);
 
@@ -249,17 +257,13 @@ class ServiceStaffController extends Controller
         }
 
         if (isset($request->image)) {
-            //delete previous Image if new Image submitted
-            if ($staff->image && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+            if ($staff && $staff->image && file_exists(public_path('staff-images') . '/' . $staff->image)) {
                 unlink(public_path('staff-images') . '/' . $staff->image);
             }
 
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
 
-            // move the uploaded file to the public/staff-images directory
             $request->image->move(public_path('staff-images'), $filename);
-
-            // save the filename to the gallery object and persist it to the database
 
             $input['image'] = $filename;
         }
@@ -275,11 +279,23 @@ class ServiceStaffController extends Controller
                 }
             }
         }
-
-        $staff->update($input);
+        if($staff){
+            $staff->update($input);
+        }else{
+            $input['user_id'] = $id;
+            Staff::create($input);
+        }
         $serviceStaff->supervisors()->sync($request->ids);
         $serviceStaff->services()->sync($request->service_ids);
         $serviceStaff->categories()->sync($request->category_ids);
+
+        if ($request->freelancer_join == 1) {
+            $input['freelancer_program'] = 1;
+        }
+        $serviceStaff->update($input);
+
+        $serviceStaff->assignRole('Staff');
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Service Staff updated successfully');

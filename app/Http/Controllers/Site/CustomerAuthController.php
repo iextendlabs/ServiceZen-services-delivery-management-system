@@ -17,6 +17,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
 use App\Models\Setting;
+use App\Models\Staff;
 use Illuminate\Support\Facades\Mail;
 use App\Models\UserAffiliate;
 use Carbon\Carbon;
@@ -58,8 +59,10 @@ class CustomerAuthController extends Controller
         
         if($request->type == "affiliate"){
             $input['affiliate_program'] = 0 ;
+        }elseif($request->type == "freelancer"){
+            $input['freelancer_program'] = 0 ;
         }
-        
+
         $input['password'] = Hash::make($input['password']);
         $customer = User::create($input);
 
@@ -75,7 +78,12 @@ class CustomerAuthController extends Controller
             $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
         }
 
-        if($request->type == "affiliate"){
+        if($request->type == "freelancer"){
+            if ($request->number) {
+                $input['phone'] = $request->number_country_code . $request->number;
+            }
+            Staff::create($input);
+        }elseif($request->type == "affiliate"){
             Affiliate::create($input);
         }elseif($request->type == "customer"){
             CustomerProfile::create($input);
@@ -103,7 +111,14 @@ class CustomerAuthController extends Controller
         Cookie::queue(Cookie::forget('address'));
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return redirect('/')->with('success', 'You have successfully logged in');
+            if($request->type == "freelancer"){
+                $msg = "You have successfully registered as a customer, and your request to become a freelancer has been submitted to the admin for approval.";
+            }elseif($request->type == "affiliate"){
+                $msg = "You have successfully registered as a customer, and your request to become a affiliate has been submitted to the admin for approval.";
+            }elseif($request->type == "customer"){
+                $msg = "You have successfully logged in";
+            }
+            return redirect('/')->with('success', $msg);
         }
         return redirect()->route('customer.registration')->with('error', 'Oppes! You have entered invalid credentials');
     }

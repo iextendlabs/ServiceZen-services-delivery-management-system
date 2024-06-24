@@ -235,6 +235,9 @@
                                 <a class="dropdown-item"
                                     href="{{ route('customer.registration') }}?type=affiliate">Register as
                                     Affiliate</a>
+                                <a class="dropdown-item"
+                                    href="{{ route('customer.registration') }}?type=freelancer">Register as
+                                    Freelancer</a>
                             @else
                                 <a class="dropdown-item"
                                     href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>

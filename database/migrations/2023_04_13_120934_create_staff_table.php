@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('commission');
+            $table->string('commission')->nullable();
             $table->unsignedBigInteger('supervisor_id')->nullable();
             $table->string('image')->nullable();
             $table->string('charges')->nullable();

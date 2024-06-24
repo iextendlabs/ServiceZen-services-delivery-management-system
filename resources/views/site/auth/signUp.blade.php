@@ -74,8 +74,8 @@
                                 <div class="col-md-6">
                                     <select name="type" id="type" class="form-control">
                                         <option value="customer">Customer</option>
-                                        <option value="affiliate" @if ($type === 'affiliate') selected @endif>
-                                            Affiliate</option>
+                                        <option value="affiliate" @if ($type === 'affiliate') selected @endif>Affiliate</option>
+                                        <option value="freelancer" @if ($type === 'freelancer') selected @endif>Freelancer</option>
                                     </select>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@
 
                                 <div class="col-md-6">
                                     <input id="number_country_code" type="hidden" name="number_country_code" />
-                                    <input id="number" type="tel"
+                                    <input id="number" type="tel" required
                                         class="form-control @error('number') is-invalid @enderror" name="number"
                                         value="{{ old('number') }}" autocomplete="number">
 
@@ -101,11 +101,27 @@
 
                                 <div class="col-md-6">
                                     <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                    <input id="whatsapp" type="tel"
+                                    <input id="whatsapp" type="tel" required
                                         class="form-control @error('whatsapp') is-invalid @enderror" name="whatsapp"
                                         value="{{ old('whatsapp') }}" autocomplete="whatsapp">
 
                                     @error('whatsapp')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 sub_title">
+                                <label for="sub_title"
+                                    class="col-md-4 col-form-label text-md-end">Sub Title / Designation</label>
+
+                                <div class="col-md-6">
+                                    <input id="sub_title" type="text" required
+                                        class="form-control @error('sub_title') is-invalid @enderror"
+                                        name="sub_title" value="{{ old('sub_title') }}"
+                                        autocomplete="sub_title">
+                                    @error('sub_title')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -205,6 +221,11 @@
         });
     
         function handleTypeChange(selectedValue) {
+            if (selectedValue == "freelancer") {
+                $(".sub_title").show();
+            } else {
+                $(".sub_title").hide();
+            }
             if (selectedValue == "customer") {
                 $(".affiliate_code").show();
             } else {

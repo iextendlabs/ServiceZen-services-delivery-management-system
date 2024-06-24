@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
             ->dailyAt($setting->value);
         $schedule->command('orders:send-notification')
             ->dailyAt($setting->value);
+        $schedule->command('update:freelancer-expired-status')->daily();
     }
 
     /**
