@@ -35,6 +35,7 @@ $packageCarousel_chunk = 3;
     @if(Session::has('cart-success'))
     <div class="alert alert-success" role="alert">
       <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
+      <span><a href="bookingStep">Go and Book Now!</a></span><br>
       <span>To add more service<a href="/"> Continue</a></span>
     </div>
     @endif
@@ -49,43 +50,80 @@ $packageCarousel_chunk = 3;
     </div>
     @endif
   </div>
-  <div id="serviceDetailContainer" class="album py-5 bg-light">
+  <div id="serviceDetailContainer" class="album py-5">
     <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
     <div class="row">
       <div class="col-md-8">
         <img src="./service-images/{{ $service->image }}" alt="Card image cap" height="auto" width="100%">
       </div>
+      @if (isset($lowestPriceOption))
+          @php ($currentLowestPrice = $lowestPriceOption->option_price)
+      @else
+          @php ($currentLowestPrice = null)
+      @endif
       <div class="col-md-4 box-shadow">
         <div class="card-body">
           <p id="price" class="text-muted">
-            @if(isset($service->discount))
-            <s>@currency($service->price)</s>
-            <b class="discount">@currency($service->discount)</b>
+            @if($price)
+            <span class="font-weight-bold">@currency($price)</span>
             @else
-            @currency($service->price)
+              @if(isset($service->discount))
+              <s class="text-danger">@currency($service->price)</s>
+              <b class="discount text-success">@currency($service->discount)</b>
+              @else
+              <span class="font-weight-bold">@currency($service->price)</span>
+              @endif
             @endif
           </p>
-
-          <p class="text-muted"><b><i class="fa fa-clock"> </i> <span id="duration">{{ $service->duration }}</span></b></p>
-          @if(count($service->variant))
-          <strong>Service Variants</strong>
-          <select name="variant" id="variant-select" class="form-control mb-2">
-            <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-name="{{ $service->name }}" data-duration="{{ $service->duration }}" data-price="@currency(isset($service->discount) ? $service->discount : $service->price)">{{ $service->name }}</option>
-            @foreach($service->variant as $variant)
-            <option value="{{ $variant->service->name }}" data-id="{{ $variant->service->id }}" data-name="{{ $variant->service->name }}" data-duration="{{ $variant->service->duration }}" data-price="@currency(isset($variant->service->discount) ? $variant->service->discount : $variant->service->price)">{{ $variant->service->name }}</option>
+        
+          <p class="text-muted">
+            <b><i class="fa fa-clock mr-2"></i><span id="duration">{{ $service->duration }}</span></b>
+          </p>
+        
+          @if(count($service->serviceOption))
+          <div class="mb-3">
+            <strong>Available Options</strong>
+            @foreach ($service->serviceOption as $option)
+            <div class="form-check">
+              <input required type="radio" name="option" class="form-check-input" value="{{$option->id}}" id="option{{$option->id}}" data-price="@currency($option->option_price)"   @if (isset($lowestPriceOption) && $option->id === $lowestPriceOption->id)
+              checked
+          @elseif (is_null($currentLowestPrice) || $option->option_price < $currentLowestPrice)
+              checked
+              @php ($currentLowestPrice = $option->option_price)
+          @endif>
+              <label class="form-check-label" for="option{{$option->id}}">{{ $option->option_name }} (@currency( $option->option_price))</label>
+            </div>
             @endforeach
-          </select>
+          </div>
           @endif
-          <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
-          {{-- <a href="/addToCart/{{ $service->id }}" id="add-to-cart" class="btn btn-block btn-primary">Add to Cart</a> --}}
+        
+          {{-- @if(count($service->variant))
+          <div class="form-group">
+            <strong>Service Variants</strong>
+            <select name="variant" id="variant-select" class="form-control mb-2">
+              <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-name="{{ $service->name }}" data-duration="{{ $service->duration }}" data-price="@currency(isset($service->discount) ? $service->discount : $service->price)">
+                {{ $service->name }}
+              </option>
+              @foreach($service->variant as $variant)
+              <option value="{{ $variant->service->name }}" data-id="{{ $variant->service->id }}" data-name="{{ $variant->service->name }}" data-duration="{{ $variant->service->duration }}" data-price="@currency(isset($variant->service->discount) ? $variant->service->discount : $variant->service->price)">
+                {{ $variant->service->name }}
+              </option>
+              @endforeach
+            </select>
+          </div>
+          @endif --}}
+        
+          <button id="bookNowButton" type="button" class="btn btn-primary btn-block mb-2">Book Now</button>
+        
           @if(count($service->addONs))
-          <button class="btn btn-block btn-secondary" id="add-ons-scroll">Add ONs</button>
+          <button class="btn btn-secondary btn-block mb-2" id="add-ons-scroll">Add ONs</button>
           @endif
           @if(count($FAQs))
-          <button class="btn btn-block btn-secondary" id="faqs-scroll">FAQs</button>
+          <button class="btn btn-secondary btn-block mb-2" id="faqs-scroll">FAQs</button>
           @endif
+        
           <!-- AddToAny BEGIN -->
-          <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon">
+          <div class="a2a_kit a2a_kit_size_32 a2a_default_style service-social-icon d-flex justify-content-around mt-3 mb-3">
             <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
             <a class="a2a_button_facebook"></a>
             <a class="a2a_button_twitter"></a>
@@ -94,17 +132,25 @@ $packageCarousel_chunk = 3;
           </div>
           <script async src="https://static.addtoany.com/menu/page.js"></script>
           <!-- AddToAny END -->
+        
           <p class="card-text">{!! $service->short_description !!}</p>
+        
           @if(auth()->check())
-          <button class="btn btn-block btn-primary" id="review">Write a review</button>
+          <button class="btn btn-primary btn-block mb-3" id="review">Write a review</button>
           @endif
-          @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
-            @else
-            <span class="text-muted">&#9734;</span>
-            @endif
+        
+          <div class="rating mb-3">
+            @for($i = 1; $i <= 5; $i++)
+              @if($i <= $averageRating)
+                <span class="text-warning">&#9733;</span>
+              @else
+                <span class="text-muted">&#9734;</span>
+              @endif
             @endfor
-            {{count($reviews)}} Reviews
+            <span>{{count($reviews)}} Reviews</span>
+          </div>
         </div>
+        
       </div>
     </div>
     <div class="row">
@@ -145,7 +191,7 @@ $packageCarousel_chunk = 3;
       </div>
     </div>
   </div>
-  <div class="album py-5 bg-light">
+  <div class="album py-5">
     @if(count($service->addONs))
     <hr>
     <h2>Add ONs</h2><br>
@@ -184,7 +230,11 @@ $packageCarousel_chunk = 3;
                     </small>
                     <small class="text-muted"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
                   </div>
-                  <button onclick="openBookingPopup('{{ $service->id }}')" type="button" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"> <i class="fa fa-plus"></i></button>
+                  @if(count($addON->service->serviceOption)>0)
+                      <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $addON->service->id }}" type="button" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a>
+                  @else
+                      <button onclick="openBookingPopup('{{ $addON->service->id }}')" type="button" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></button>
+                  @endif
                   {{-- <a href="#" onclick="openBookingPopup('{{ $service->id }}')" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a> --}}
                   {{-- <a href="/addToCart/{{ $service->id }}" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a> --}}
                 </div>
@@ -293,6 +343,30 @@ $packageCarousel_chunk = 3;
     @endif
   </div>
 </div>
+<script>
+  $(document).ready(function() {
+    const $priceElement = $('#price');
+    const $options = $('input[name="option"]');
+
+    $options.on('change', function() {
+      if ($(this).is(':checked')) {
+        $priceElement.html(`<span class="font-weight-bold">${$(this).data('price')}</span>`);
+      }
+    });
+
+    $('#bookNowButton').on('click', function() {
+      if ($options.length > 0 && !$options.is(':checked')) {
+        alert('Please select an option before booking.');
+        return false;
+      } else if ($options.length > 0 && $options.is(':checked')) {
+        const selectedOptionValue = $('input[name="option"]:checked').val();
+        openBookingPopup('{{ $service->id }}', selectedOptionValue);
+      } else {
+        openBookingPopup('{{ $service->id }}');
+      }
+    });
+  });
+</script>
 <script>
   $(document).on('change', '#variant-select', function() {
     var selectedOption = $(this).find('option:selected');

@@ -85,6 +85,14 @@
                 @endif
             </div>
         </div>
+        @if($freelancer_join)
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>Expir at:</strong>
+                {{ $serviceStaff->staff->expiry_date }}
+            </div>
+        </div>
+        @endif
     </div>
 
     <hr>

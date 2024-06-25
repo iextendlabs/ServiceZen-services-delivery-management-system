@@ -26,7 +26,7 @@ class Coupon extends Model
         return $this->belongsToMany(ServiceCategory::class, 'coupon_to_category', 'coupon_id', 'category_id');
     }
 
-    public function getDiscountForProducts($services, $services_total)
+    public function getDiscountForProducts($services, $services_total, $bookingOption = [])
     {
         if (!$this->category()->exists() && !$this->service()->exists() && $services_total) {
             return ($this->type == "Percentage") ? ($services_total * $this->discount) / 100 : $this->discount;
@@ -51,7 +51,12 @@ class Coupon extends Model
             if($applicable_services){
                 foreach ($services as $service) {
                     if (in_array($service->id, $applicable_services)) {
-                        $sub_total += isset($service->discount) ? $service->discount : $service->price;
+                        $optionId = $bookingOption[$service->id] ?? null;
+                        if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                            $sub_total += $service->serviceOption->find($optionId)->option_price;
+                        }else{
+                            $sub_total += isset($service->discount) ? $service->discount : $service->price;
+                        }
                     }
                 }
                 if($sub_total){
@@ -63,7 +68,7 @@ class Coupon extends Model
         return 0;
     }
 
-    public function isValidCoupon($code, $services, $user_id = null)
+    public function isValidCoupon($code, $services, $user_id = null, $options = [])
     {
         $isValid = self::where('code', $code)
             ->where('status', 1)
@@ -97,7 +102,7 @@ class Coupon extends Model
             if ($this->uses_total !== null) {
                 if (!auth()->check() && $user_id == null) {
                     return 'Coupon requires login for validation.';
-                } else {
+                } elseif(!auth()->user()->hasRole('Admin')){
                     $userIdToCheck = $user_id ?? auth()->id();
 
                     $userOrdersCount = Order::where('customer_id', $userIdToCheck)
@@ -114,8 +119,13 @@ class Coupon extends Model
                 }
             }
 
-            $services_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
+            $services_total = $services->sum(function ($service) use($options) {
+                $optionId = $options[$service->id] ?? null;
+                if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                    return $service->serviceOption->find($optionId)->option_price;
+                }else{
+                    return isset($service->discount) ? $service->discount : $service->price;
+                }
             });
             if( $this->min_order_value > $services_total){
                 return 'The order total must be greater than to'.$this->min_order_value;

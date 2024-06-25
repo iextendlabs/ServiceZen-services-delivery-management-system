@@ -46,7 +46,7 @@ class Service extends Model
 
     public function FAQs()
     {
-        return $this->hasMany(FAQ::class, 'service_id')->where('status', '=', '1');;
+        return $this->hasMany(FAQ::class, 'service_id')->where('status', '=', '1');
     }
 
     public function users()
@@ -57,5 +57,10 @@ class Service extends Model
     public function categories()
     {
         return $this->belongsToMany(ServiceCategory::class, 'service_to_category', 'service_id', 'category_id');
+    }
+
+    public function serviceOption()
+    {
+        return $this->hasMany(ServiceOption::class, 'service_id');
     }
 }

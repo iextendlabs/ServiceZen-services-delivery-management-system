@@ -1,15 +1,12 @@
-$(document).on("change", "#date,#zone,#area,.checkout-services,.checkBooking_service_id", function () {
-    var checkedServiceIds = [];
-
-    $('.checkout-services:checked').each(function () {
-        checkedServiceIds.push($(this).val());
-    });
+$(document).on("change", "#date,#zone,#area,.checkBooking_service_id,.order_service_id", function () {
 
     if ($('#addToCartModalServices').val()) {
         var addToCartModalServices = [$('#addToCartModalServices').val()];
     } else if($('.checkBooking_service_id:checked').val()){
         var addToCartModalServices = [$('.checkBooking_service_id:checked').val()];
     }
+
+    var isAdmin = $('input[name="isAdmin"]').val() ?? false;
 
     $.ajax({
         url: '/slots',
@@ -19,8 +16,9 @@ $(document).on("change", "#date,#zone,#area,.checkout-services,.checkBooking_ser
             date: $('#date').val(),
             area: $('select[name="zone"]').val(),
             order_id: $('input[name="order_id"]').length ? $('input[name="order_id"]').val() : '',
-            service_ids: addToCartModalServices ?? checkedServiceIds,
-            zoneShow : addToCartModalServices ? 0 : 1
+            service_ids: addToCartModalServices ?? [],
+            zoneShow : addToCartModalServices ? 0 : 1,
+            isAdmin: isAdmin
         },
         beforeSend: function () {
             $('#loading').show(); // Show the loading element

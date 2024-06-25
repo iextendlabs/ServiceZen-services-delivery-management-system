@@ -173,7 +173,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="4" class="text-center">There is no service.</td>
+                            <td colspan="7" class="text-center">There is no service.</td>
                         </tr>
                     @endif
                 </table>

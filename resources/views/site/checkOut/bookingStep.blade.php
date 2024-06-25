@@ -60,13 +60,41 @@
                                                 role="alert" id="{{ $service->id }}">
                                                 <div class="col-md-6">
                                                     <div><strong>Name:</strong> {{ $service->name }}</div>
-                                                    <div><strong>Price:</strong> <span class="price">
-                                                            @if (isset($service->discount))
-                                                                @currency($service->discount)
+                                                    <div><strong>Price:</strong> 
+                                                        <span class="price">
+                                                            @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id] != null)
+                                                                @php
+                                                                    $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
+                                                                @endphp
+                                                                @if($option)
+                                                                    @currency($option->option_price)
+                                                                @else
+                                                                    @if (isset($service->discount))
+                                                                        @currency($service->discount)
+                                                                    @else
+                                                                        @currency($service->price)
+                                                                    @endif
+                                                                @endif
+
                                                             @else
-                                                                @currency($service->price)
+                                                                @if (isset($service->discount))
+                                                                    @currency($service->discount)
+                                                                @else
+                                                                    @currency($service->price)
+                                                                @endif
                                                             @endif
-                                                        </span></div>
+
+                                                        </span>
+                                                    </div>
+                                                    @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id] != null)
+                                                        @php
+                                                            $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
+                                                        @endphp
+                                                        @if($option)
+                                                        <div><strong>Option:</strong> {{ $option->option_name }}</div>
+                                                        @endif
+
+                                                    @endif
                                                     <div><strong>Duration:</strong> {{ $service->duration }}</div>
                                                 </div>
                                                 <div class="col-md-6 d-flex justify-content-end align-items-center">

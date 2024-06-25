@@ -42,13 +42,18 @@ class CheckOutController extends Controller
             $service = Service::find($booking['service_id']);
             $staff = User::find($booking['service_staff_id']);
             $slot = TimeSlot::find($booking['time_slot_id']);
-
+            if(isset($booking['option_id']) && $booking['option_id'] !== null){
+                $option = $service->serviceOption->find($booking['option_id']);
+            }else{
+                $option = null;
+            }
             if ($service && $staff && $slot) {
                 $formattedBooking = [
                     'date' => $booking['date'],
                     'service' => $service,
                     'staff' => $staff->name,
-                    'slot' => date('h:i A', strtotime($slot->time_start)) . '-- ' . date('h:i A', strtotime($slot->time_end))
+                    'slot' => date('h:i A', strtotime($slot->time_start)) . '-- ' . date('h:i A', strtotime($slot->time_end)),
+                    'option' => $option,
                 ];
 
                 $formattedBookings[] = $formattedBooking;
@@ -110,7 +115,7 @@ class CheckOutController extends Controller
 
         $selected_key = null;
         $selected_booking = null;
-
+        $option_id = null;
         if (count($bookingData) > 0) {
             foreach ($bookingData as $index => $booking) {
                 if ($booking['service_id'] == $serviceId) {
@@ -120,10 +125,16 @@ class CheckOutController extends Controller
             }
             if (isset($selected_key)) {
                 $selected_booking = $bookingData[$selected_key];
+                if(isset($bookingData[$selected_key]['option_id'])){
+                    $option_id = $bookingData[$selected_key]['option_id'];
+                }
             }
         }
+        if($request->option_id !== "null"){
+            $option_id = $request->option_id;
+        }
 
-        return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'serviceIds', 'zoneShow', 'selected_booking'));
+        return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'serviceIds', 'zoneShow', 'selected_booking','option_id'));
     }
 
     public function addToCartServicesStaff(Request $request)
@@ -156,11 +167,17 @@ class CheckOutController extends Controller
 
             cookie()->queue('address', json_encode($address), 5256000);
         }
+        
+        if (!$request->time_slot_id || !isset($request->time_slot_id[$request->service_staff_id])) {
+            return back()->with('error', 'please select available staff and time slot first ');  
+        }
+        
         $formattedBooking = [
             'service_id' => $request->service_id,
             'date' => $request->date,
             'service_staff_id' => $request->service_staff_id,
-            'time_slot_id' => $request->time_slot_id[$request->service_staff_id],
+            'time_slot_id' => $request->time_slot_id ? $request->time_slot_id[$request->service_staff_id] : null, // Set to null if no selection
+            'option_id' => $request->option_id,
         ];
 
         $selected_key = null;
@@ -177,7 +194,7 @@ class CheckOutController extends Controller
         if ($selected_key !== false) {
             unset($bookingData[$selected_key]);
         }
-
+        
         $bookingData[] = $formattedBooking;
 
         Session::put('bookingData', $bookingData);
@@ -186,19 +203,20 @@ class CheckOutController extends Controller
     }
     public function removeToCart(Request $request, $id)
     {
-
-        $idToRemove = $id;
+        $service_id = $id;
 
         $bookingData = Session::get('bookingData', []);
 
-        if (isset($bookingData[$idToRemove])) {
-            unset($bookingData[$idToRemove]);
+        foreach ($bookingData as $key => $booking) {
+            if ($booking['service_id'] == $service_id) {
+                unset($bookingData[$key]);
+                break;
+            }
         }
 
         Session::put('bookingData', $bookingData);
 
-
-        return redirect()->back()->with('success', 'Service Remove to Cart Successfully.');
+        return redirect()->back()->with('success', 'Service removed from cart successfully.');
     }
 
     public function draftOrder(Request $request)
@@ -223,6 +241,17 @@ class CheckOutController extends Controller
             return response()->json(['errors' => $validator->errors()], 200);
         }
 
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
+
+        if ($gender_permission != "Both") {
+            if ($request->gender != $gender_permission) {
+                $errors = [
+                    'Gender Error' => ["Sorry, no {$request->gender} services listed in our store."],
+                ];
+                return response()->json(['errors' => $errors], 200);
+            }
+        }
+        
         $input = $request->all();
         $bookingData = Session::get('bookingData', []);
         $excludedServices = $this->processBookingData($input, $bookingData);
@@ -247,7 +276,7 @@ class CheckOutController extends Controller
         // Handle addresses
         $this->handleSessionAddresses($request, $input);
 
-        $formattedBookings = $this->formattingBookingData($bookingData);
+        [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
 
         return response()->json([
             'sub_total' => $all_sub_total,
@@ -260,7 +289,7 @@ class CheckOutController extends Controller
             'customer_type' => $customer_type,
         ], 200);
         
-        return view('site.orders.success', compact('customer_type', 'password'));
+        // return view('site.orders.success', compact('customer_type', 'password'));
     }
 
     private function processBookingData($input, $bookingData)
@@ -314,18 +343,24 @@ class CheckOutController extends Controller
         }
         $all_selected_staff = User::whereIn('id', $serviceStaffIds)->get();
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
-        $sub_total = $all_selected_services->sum(function ($service) {
-            return isset($service->discount) ? $service->discount : $service->price;
+        [$groupedBooking, $groupedBookingOption] = $this->groupBookingData($bookingData);
+
+        $sub_total = $all_selected_services->sum(function ($service) use ($groupedBookingOption) {
+            $optionId = $groupedBookingOption[$service->id] ?? null;
+            if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                return $service->serviceOption->find($optionId)->option_price;
+            }
+            return $service->discount ?? $service->price;
         });
 
         // Apply coupon discount
         if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
-
+            
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,null,$groupedBookingOption);
                 if ($isValid === true) {
-                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total);
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total, $groupedBookingOption);
                 } else {
                     Cookie::queue(Cookie::forget('coupon_code'));
                     $errors = [
@@ -371,7 +406,7 @@ class CheckOutController extends Controller
         $input['number'] = $input['number_country_code'] . ltrim($input['number'], '0');
         $input['whatsapp'] = $input['whatsapp_country_code'] . ltrim($input['whatsapp'], '0');
 
-        $groupedBooking = $this->groupBookingData($bookingData);
+        [$groupedBooking, $groupedBookingOption] = $this->groupBookingData($bookingData);
 
         $i = 0;
         $all_sub_total = 0;
@@ -395,15 +430,19 @@ class CheckOutController extends Controller
 
             $selected_services = Service::whereIn('id', $singleBookingService)->get();
 
-            $sub_total = $selected_services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
+            $sub_total = $selected_services->sum(function ($service) use ($groupedBookingOption) {
+                $optionId = $groupedBookingOption[$service->id] ?? null;
+                if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                    return $service->serviceOption->find($optionId)->option_price;
+                }
+                return $service->discount ?? $service->price;
             });
 
             if ($input['coupon_code'] && $singleBookingService) {
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption);
                         if ($discount > 0) {
                             $input['coupon_id'] = $coupon->id;
                             $i++;
@@ -412,7 +451,7 @@ class CheckOutController extends Controller
                         }
                     } elseif ($coupon->type == "Percentage") {
                         $input['coupon_id'] = $coupon->id;
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption);
                     }
                 }
             }
@@ -459,24 +498,35 @@ class CheckOutController extends Controller
                 $input['coupon_id'] = $coupon->id;
                 CouponHistory::create($input);
             }
-
+            
             foreach ($singleBookingService as $id) {
-                $services = Service::find($id);
+
+                $input['option_id'] = null;
+                $input['option_name'] = null;
+
+                $service = Service::find($id);
                 $input['service_id'] = $id;
-                $input['service_name'] = $services->name;
-                $input['duration'] = $services->duration;
+                $input['service_name'] = $service->name;
+                $input['duration'] = $service->duration;
                 $input['status'] = 'Open';
-                if ($services->discount) {
-                    $input['price'] = $services->discount;
+
+                $optionId = $groupedBookingOption[$service->id] ?? null;
+                if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                    $serviceOption = $service->serviceOption->find($optionId);
+                    $input['price'] = $serviceOption->option_price;
+                    $input['option_id'] = $optionId;
+                    $input['option_name'] = $serviceOption->option_name;
                 } else {
-                    $input['price'] = $services->price;
+                    $input['price'] = $service->discount ?? $service->price;
                 }
+
                 OrderService::create($input);
             }
         }
-       
-        return [$customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount];
+
+        return [$customer_type, $order_ids, $all_sub_total, $all_discount, $all_staff_charges, $all_transport_charges, $all_total_amount];
     }
+
 
     private function findOrCreateUser($input)
     {
@@ -512,6 +562,7 @@ class CheckOutController extends Controller
     private function groupBookingData($bookingData)
     {
         $groupedBooking = [];
+        $groupedBookingOption = [];
 
         foreach ($bookingData as $booking) {
             $key = $booking['date'] . '_' . $booking['service_staff_id'] . '_' . $booking['time_slot_id'];
@@ -520,10 +571,13 @@ class CheckOutController extends Controller
                 $groupedBooking[$key] = [];
             }
 
+            if(isset($booking['option_id'])){
+                $groupedBookingOption[$booking['service_id']] = $booking['option_id'];
+            }
             $groupedBooking[$key][] = $booking['service_id'];
         }
 
-        return $groupedBooking;
+        return [$groupedBooking, $groupedBookingOption];
     }
 
     private function handleSessionAddresses($request, $input)
@@ -560,11 +614,15 @@ class CheckOutController extends Controller
     {
         $groupedBooking = [];
         $formattedBookings = [];
+        $groupedBookingOption = [];
 
         foreach ($bookingData as $booking) {
             $key = $booking['date'] . '_' . $booking['service_staff_id'] . '_' . $booking['time_slot_id'];
 
             $groupedBooking[$key][] = $booking['service_id'];
+            if(isset($booking['option_id'])){
+                $groupedBookingOption[$booking['service_id']] = $booking['option_id'];
+            }
         }
         foreach ($groupedBooking as $index => $singleBookingService) {
             list($date, $service_staff_id, $time_slot_id) = explode('_', $index);
@@ -583,7 +641,7 @@ class CheckOutController extends Controller
             $formattedBookings[$index] = $formattedBooking;
         }
 
-        return $formattedBookings;
+        return [$formattedBookings,$groupedBookingOption];
     }
 
     public function bookingStep(Request $request)
@@ -670,9 +728,9 @@ class CheckOutController extends Controller
             }
         }
 
-        $formattedBookings = $this->formattingBookingData($bookingData);
+        [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
 
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings','groupedBookingOption'));
     }
 
     public function confirmStep(Request $request)
@@ -741,7 +799,11 @@ class CheckOutController extends Controller
         }
 
         if (!isset($area)) {
-            $area = $address['area'] ?? '';
+            if (isset($request->isAdmin) && $request->isAdmin == true) {
+                $area = $request->area;
+            }else{
+                $area = $address['area'] ?? '';
+            }
         }
 
         if ($request->zoneShow == 0 && $address && $address['area']) {
@@ -764,6 +826,8 @@ class CheckOutController extends Controller
             $serviceIds[] = $item["service_id"];
         }
 
+        [$groupedBooking, $groupedBookingOption] = $this->groupBookingData($bookingData);
+
         $coupon = Coupon::where("code", $request->coupon_code)->first();
         if(isset($request->selected_service_ids)){
             $services = Service::whereIn('id', $request->selected_service_ids)->get();
@@ -771,7 +835,7 @@ class CheckOutController extends Controller
             $services = Service::whereIn('id', $serviceIds)->get();
         }
         if ($coupon) {
-            $isValid = $coupon->isValidCoupon($request->coupon_code, $services);
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services,null,$groupedBookingOption);
             if ($isValid !== true) {
                 return response()->json(['error' => $isValid]);
             }

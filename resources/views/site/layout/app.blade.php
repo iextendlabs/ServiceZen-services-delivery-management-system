@@ -21,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&family=Titillium+Web:wght@300&display=swap"
         rel="stylesheet">
-    <link href="{{ asset('css/site.css') }}?v=3" rel="stylesheet">
+    <link href="{{ asset('css/site.css') }}?v={{ config('app.version') }}" rel="stylesheet">
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEMW2WSQE1"></script>
@@ -235,6 +235,9 @@
                                 <a class="dropdown-item"
                                     href="{{ route('customer.registration') }}?type=affiliate">Register as
                                     Affiliate</a>
+                                <a class="dropdown-item"
+                                    href="{{ route('customer.registration') }}?type=freelancer">Register as
+                                    Freelancer</a>
                             @else
                                 <a class="dropdown-item"
                                     href="{{ route('customerProfile.edit', auth()->user()->id) }}">Profile</a>

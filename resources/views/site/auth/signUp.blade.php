@@ -10,7 +10,7 @@
                             @csrf
 
                             <div class="row mb-3">
-                                <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
+                                <label for="name" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Name') }}</label>
 
                                 <div class="col-md-6">
                                     <input id="name" type="text"
@@ -27,7 +27,7 @@
 
                             <div class="row mb-3">
                                 <label for="email"
-                                    class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Email Address') }}</label>
 
                                 <div class="col-md-6">
                                     <input id="email" type="email"
@@ -44,7 +44,7 @@
 
                             <div class="row mb-3">
                                 <label for="password"
-                                    class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Password') }}</label>
 
                                 <div class="col-md-6">
                                     <input id="password" type="password"
@@ -61,7 +61,7 @@
 
                             <div class="row mb-3">
                                 <label for="password-confirm"
-                                    class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
+                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Confirm Password') }}</label>
 
                                 <div class="col-md-6">
                                     <input id="password-confirm" type="password" class="form-control"
@@ -69,22 +69,22 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="type" class="col-md-4 col-form-label text-md-end">Login as:</label>
+                                <label for="type" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Login as:</label>
 
                                 <div class="col-md-6">
                                     <select name="type" id="type" class="form-control">
                                         <option value="customer">Customer</option>
-                                        <option value="affiliate" @if ($type === 'affiliate') selected @endif>
-                                            Affiliate</option>
+                                        <option value="affiliate" @if ($type === 'affiliate') selected @endif>Affiliate</option>
+                                        <option value="freelancer" @if ($type === 'freelancer') selected @endif>Freelancer</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="number" class="col-md-4 col-form-label text-md-end">Phone Number</label>
+                                <label for="number" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Phone Number</label>
 
                                 <div class="col-md-6">
                                     <input id="number_country_code" type="hidden" name="number_country_code" />
-                                    <input id="number" type="tel"
+                                    <input id="number" type="tel" required
                                         class="form-control @error('number') is-invalid @enderror" name="number"
                                         value="{{ old('number') }}" autocomplete="number">
 
@@ -96,16 +96,32 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="whatsapp" class="col-md-4 col-form-label text-md-end">Whatsapp
+                                <label for="whatsapp" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Whatsapp
                                     whatsapp</label>
 
                                 <div class="col-md-6">
                                     <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                    <input id="whatsapp" type="tel"
+                                    <input id="whatsapp" type="tel" required
                                         class="form-control @error('whatsapp') is-invalid @enderror" name="whatsapp"
                                         value="{{ old('whatsapp') }}" autocomplete="whatsapp">
 
                                     @error('whatsapp')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 sub_title">
+                                <label for="sub_title"
+                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Sub Title / Designation</label>
+
+                                <div class="col-md-6">
+                                    <input id="sub_title" type="text"
+                                        class="form-control @error('sub_title') is-invalid @enderror"
+                                        name="sub_title" value="{{ old('sub_title') }}"
+                                        autocomplete="sub_title">
+                                    @error('sub_title')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -131,7 +147,7 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label class="col-md-4 col-form-label text-md-end">{{ __('Gender') }}</label>
+                                <label class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Gender') }}</label>
 
                                 <div class="col-md-6">
                                     @if($gender_permission === 'Male')
@@ -205,6 +221,13 @@
         });
     
         function handleTypeChange(selectedValue) {
+            if (selectedValue == "freelancer") {
+                $(".sub_title").show();
+                $("#sub_title").attr("required", true);
+            } else {
+                $(".sub_title").hide();
+                $("#sub_title").attr("required", false);
+            }
             if (selectedValue == "customer") {
                 $(".affiliate_code").show();
             } else {

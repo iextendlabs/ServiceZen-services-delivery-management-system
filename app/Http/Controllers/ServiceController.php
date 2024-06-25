@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceAddOn;
 use App\Models\ServiceCategory;
+use App\Models\ServiceOption;
 use App\Models\ServicePackage;
 use App\Models\ServiceToUserNote;
 use App\Models\ServiceVariant;
+use App\Models\Setting;
+use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\File;
 
 class ServiceController extends Controller
 {
@@ -150,6 +154,16 @@ class ServiceController extends Controller
             ServiceToUserNote::create($input);
         }
 
+        if($request->option_name && $request->option_price){
+            foreach($request->option_name as $key=>$name){
+                ServiceOption::create([
+                    'service_id' => $service->id, 
+                    'option_name' => $name,
+                    'option_price' => $request->option_price[$key]
+                ]);
+            }
+        }
+
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
             
@@ -164,6 +178,8 @@ class ServiceController extends Controller
             $service->image = $filename;
             $service->save();
         }
+
+        $this->appJsonData();
 
         return redirect()->route('services.edit',$service->id)
             ->with('success', 'Service created successfully.');
@@ -261,6 +277,19 @@ class ServiceController extends Controller
                 ServiceAddOn::create($input);
             }
         }
+        
+        ServiceOption::where('service_id',$service_id)->delete();
+
+        if($request->option_name && $request->option_price){
+            foreach($request->option_name as $key=>$name){
+                ServiceOption::create([
+                    'service_id' => $service->id, 
+                    'option_name' => $name,
+                    'option_price' => $request->option_price[$key]
+                ]);
+            }
+        }
+        
         ServiceToUserNote::where('service_id', $id)->delete();
 
         if (isset($request->note) && isset($request->userIds)) {
@@ -286,6 +315,7 @@ class ServiceController extends Controller
             $service->save();
         }
 
+        $this->appJsonData();
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -314,6 +344,7 @@ class ServiceController extends Controller
 
         ServiceToUserNote::where('service_id', $service->id)->delete();
         $previousUrl = url()->previous();
+        $this->appJsonData();
 
         return redirect($previousUrl)
             ->with('success', 'Service deleted successfully');
@@ -335,6 +366,7 @@ class ServiceController extends Controller
 
                 $service->delete();
             }
+            $this->appJsonData();
 
             return response()->json(['message' => 'Selected items deleted successfully.']);
         } else {
@@ -360,6 +392,8 @@ class ServiceController extends Controller
                 $copiedService->save();
             }
 
+            $this->appJsonData();
+
             return response()->json(['message' => 'Selected items Copy successfully.']);
         } elseif ($new_variant && $service_id) {
             $service = Service::findOrFail($service_id);
@@ -369,6 +403,8 @@ class ServiceController extends Controller
             $copiedService->image = '';
             $copiedService->type = 'Variant';
             $copiedService->save();
+
+            $this->appJsonData();
 
             return response()->json(['service_id' => $copiedService->id]);
         } else {
@@ -388,10 +424,124 @@ class ServiceController extends Controller
                 $service->status = $status;
                 $service->save();
             }
+            
+            $this->appJsonData();
 
             return response()->json(['message' => 'Selected items Edit successfully.']);
         } else {
             return response()->json(['message' => 'No items selected.']);
         }
+    }
+
+    public function appJsonData()
+    {
+        $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
+
+        $slider_images = Setting::where('key', 'Slider Image For App')->value('value');
+        $featured_services = Setting::where('key', 'Featured Services')->value('value');
+
+        $featured_services = explode(",", $featured_services);
+
+        $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
+        $images = explode(",", $slider_images);
+
+        $app_categories = Setting::where('key', 'App Categories')->value('value');
+        $app_categories = explode(",", $app_categories);
+
+        $categoriesWithOrder = collect($app_categories)->mapWithKeys(function ($item) {
+            [$id, $order] = explode('_', $item);
+            return [(int) $id => (int) $order];
+        });
+
+        $categoryIds = $categoriesWithOrder->keys()->all();
+
+        $categories = ServiceCategory::findMany($categoryIds)->keyBy('id');
+
+        $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
+            $category = $categories->get($id);
+            return [
+                'id' => $category->id,
+                'title' => $category->title,
+                'image' => $category->image,
+                'icon' => $category->icon,
+                'sort_order' => $order
+            ];
+        })->sortBy('sort_order')->values()->toArray();
+
+        ksort($sortedCategories);
+
+        $categoriesArray = array_values($sortedCategories);
+
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+
+        $servicesArray = $services->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'image' => $service->image,
+                'price' => $service->price,
+                'discount' => $service->discount,
+                'duration' => $service->duration,
+                'category_id' => $categoryIds,
+                'short_description' => $service->short_description,
+                'rating' => $service->averageRating(),
+                'options' => $service->serviceOption
+            ];
+        })->toArray();
+
+        $staffs = User::role('Staff')
+            ->whereHas('staff', function ($query) {
+                $query->where('status', 1);
+            })
+            ->orderBy('name', 'ASC')
+            ->with('staff')
+            ->get();
+
+        $staffs->map(function ($staff) {
+            $staff->rating = $staff->averageRating();
+            return $staff;
+        });
+
+
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
+
+
+
+        $jsonData = [
+            'images' => $images,
+            'categories' => $categoriesArray,
+            'services' => $servicesArray,
+            'featured_services' => $featured_services,
+            'staffZones' => $staffZones,
+            'staffs' => $staffs,
+            'whatsapp_number' => $whatsapp_number,
+            'gender_permission' => $gender_permission
+        ];
+
+        try {
+            $filename = "AppData.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppData_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $jsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        return true;
     }
 }

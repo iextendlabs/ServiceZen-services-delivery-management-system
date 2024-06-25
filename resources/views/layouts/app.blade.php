@@ -97,8 +97,16 @@
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
                         @if(auth()->user()->hasRole("Admin"))
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('affiliateProgram.index')}}">New Affiliate Joinee</a>
+                        
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Joinee Program
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('affiliateProgram.index') }}">Affiliate</a>
+                                <a class="dropdown-item" href="{{ route('freelancerProgram.index') }}">Freelancer</a>
+                            </div>
                         </li>
                         @endif
                         @can('company-list')

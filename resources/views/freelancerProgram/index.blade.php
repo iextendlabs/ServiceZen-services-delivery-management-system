@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
-                    <h2>Affiliate Program Joinee</h2>
+                    <h2>Freelancer Program Joinee</h2>
                 </div>
             </div>
         </div>
@@ -31,40 +31,41 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->affiliate_program === '1' ? 'Accepted' : 'Rejected' }}</td>
+                                <td>{{ $user->freelancer_program === '1' ? 'Accepted' : 'Rejected' }}</td>
                                 <td>
+
                                     <form id="deleteForm{{ $user->id }}"
-                                        action="{{ route('affiliates.destroy', $user->id) }}" method="POST">
-                                        @if ($user->affiliate_program === '0')
+                                        action="{{ route('serviceStaff.destroy', $user->id) }}" method="POST">
+                                        @if ($user->freelancer_program === '0')
                                             <a class="btn btn-success"
-                                                href="{{ route('affiliateProgram.edit', $user->id) }}?status=Accepted">
+                                                href="{{ route('freelancerProgram.edit', $user->id) }}?status=Accepted">
                                                 <i class="fas fa-thumbs-up"></i>
                                             </a>
-                                        @elseif ($user->affiliate_program === '1')
+                                        @elseif ($user->freelancer_program === '1')
                                             <a class="btn btn-danger"
-                                                href="{{ route('affiliateProgram.edit', $user->id) }}?status=Rejected">
+                                                href="{{ route('freelancerProgram.edit', $user->id) }}?status=Rejected">
                                                 <i class="fas fa-thumbs-down"></i>
                                             </a>
-                                            <a class="btn btn-primary" href="{{ route('affiliates.edit', $user->id) }}">
+                                            <a class="btn btn-primary"
+                                                href="{{ route('serviceStaff.edit', $user->id) }}?freelancer_join=1">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a class="btn btn-warning" href="{{ route('affiliates.show', $user->id) }}">
+                                            <a class="btn btn-warning"
+                                                href="{{ route('serviceStaff.show', $user->id) }}?freelancer_join=1">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         @endif
-
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-danger"
-                                            onclick="confirmDelete('{{ $user->id }}')"><i
-                                                class="fa fa-trash"></i></button>
+                                        <button type="button" onclick="confirmDelete('{{ $user->id }}')"
+                                            class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="5" class="text-center">There is no New Affiliate Joinee.</td>
+                            <td colspan="5" class="text-center">There is no New Freelancer Joinee.</td>
                         </tr>
                     @endif
                 </table>
@@ -74,7 +75,7 @@
             <div class="col-md-3">
                 <h3>Filter</h3>
                 <hr>
-                <form action="{{ route('affiliateProgram.index') }}" method="GET" enctype="multipart/form-data">
+                <form action="{{ route('freelancerProgram.index') }}" method="GET" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
@@ -101,7 +102,6 @@
                                 <input type="email" name="email" value="{{ $filter_email }}" class="form-control">
                             </div>
                         </div>
-
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary">Filter</button>
                         </div>

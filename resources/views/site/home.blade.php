@@ -201,9 +201,11 @@
                                 </div>
 
                                 {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
-                                <button onclick="openBookingPopup('{{ $service->id }}')" type="button"
-                                    class="btn btn-block btn-primary"> Book Now</button>
-
+                                @if(count($service->serviceOption)>0)
+                                    <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $service->id }}" type="button" class="btn btn-block btn-primary">Book Now</a>
+                                @else
+                                    <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
+                                @endif
 
                             </div>
                         </div>

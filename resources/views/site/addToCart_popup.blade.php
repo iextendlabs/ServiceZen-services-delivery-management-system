@@ -13,6 +13,7 @@
             <form action="{{ route('addToCartServicesStaff') }}" method="POST">
                 <div class="modal-body">
                     @csrf
+                    <input type="hidden" name="option_id" value="{{ $option_id }}">
                     <input type="hidden" id="addToCartModalServices" name="service_id" value="{{ $serviceIds[0] }}">
                     <div id="slots-container" class="col-md-12">
                         @include('site.checkOut.timeSlots')

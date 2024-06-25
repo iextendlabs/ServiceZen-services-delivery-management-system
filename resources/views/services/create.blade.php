@@ -34,6 +34,9 @@
             <li class="nav-item">
                 <a class="nav-link" id="variant-tab" data-toggle="tab" href="#variant" role="tab" aria-controls="variant" aria-selected="false">Variant Services</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Price Options</a>
+            </li>
         </ul>
         <div class="tab-content" id="myTabsContent">
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -201,53 +204,107 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <!-- <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Note:</strong>
-                    <textarea class="form-control" style="height:150px" name="note" placeholder="Note">{{old('note') }}</textarea>
+            <div class="tab-pane fade" id="options" role="tabpanel" aria-labelledby="options-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Service Options</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <table id="optionTable" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Option Name</th>
+                                    <th>Option Price (AED)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <button id="addOptionBtn" onclick="addOptionrow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Select User For Note:</strong>
-                    <input type="text" name="search_user" id="search-user" class="form-control" placeholder="Search User By Name And Price">
-                    <table class="table table-striped table-bordered user-table">
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Email</th>
-                        </tr>
-                        @foreach ($users as $user)
-                        @if($user->hasRole("Customer"))
-                        <tr>
-                            <td>
-                                @if(isset($userNote))
-                                @if(in_array($user->id,unserialize($userNote->user_ids)))
-                                    <input type="checkbox" checked name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
+            {{-- <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Note:</strong>
+                        <textarea class="form-control" style="height:150px" name="note" placeholder="Note">{{old('note') }}</textarea>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Select User For Note:</strong>
+                        <input type="text" name="search_user" id="search-user" class="form-control" placeholder="Search User By Name And Price">
+                        <table class="table table-striped table-bordered user-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Email</th>
+                            </tr>
+                            @foreach ($users as $user)
+                            @if($user->hasRole("Customer"))
+                            <tr>
+                                <td>
+                                    @if(isset($userNote))
+                                    @if(in_array($user->id,unserialize($userNote->user_ids)))
+                                        <input type="checkbox" checked name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
+                                        @else
+                                        <input type="checkbox" name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
+                                        @endif
                                     @else
                                     <input type="checkbox" name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
                                     @endif
-                                @else
-                                <input type="checkbox" name="userIds[{{ ++$i }}]" value="{{ $user->id }}">
-                                @endif
-                            </td>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                        </tr>
-                        @endif
-                        @endforeach
-                    </table>
+                                </td>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->email }}</td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </table>
+                    </div>
                 </div>
-            </div> -->
-
-            </div>
-            <div class="col-md-12 text-center">
+            </div> --}}
+            <div class="col-md-12 text-center mt-4">
                 <button type="submit" class="btn btn-block btn-primary">Save</button>
             </div>
         </div>
     </form>
 </div>
+<script>
+    var option_row = 1;
+    function addOptionrow(){
+        var newRow = `
+            <tr>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="text" required name="option_name[${option_row}]" class="form-control" placeholder="Option Name">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="number" required name="option_price[${option_row}]" class="form-control" placeholder="Option Price">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-option"><i class="fa fa-minus-circle"></i></button>
+                </td>
+            </tr>
+        `;
+        $('#optionTable tbody').append(newRow);
+        option_row++
+    }
+
+    $(document).on('click', '.remove-option', function() {
+        $(this).closest('tr').remove();
+    });
+</script>
 <script>
     $(document).ready(function() {
         $("#categories-search").keyup(function() {

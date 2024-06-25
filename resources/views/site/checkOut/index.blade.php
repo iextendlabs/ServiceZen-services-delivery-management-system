@@ -43,14 +43,21 @@ $total_amount = 0;
             <td><img src="service-images/{{ $booking['service']->image }}" height="60px" width="60px" style="border: 1px solid #ddd; border-radius: 4px;"></td>
             <td>{{ $booking['service']->name }}</td>
             <td>
-                <span>
-                    @if(isset($booking['service']->discount))  
-                        @currency($booking['service']->discount) 
-                    @else 
-                        @currency($booking['service']->price)
-                    @endif
-                </span><br>
-                <span>{{ $booking['service']->duration }}</span>
+                @if($booking['option'] !== null)
+                    <span>@currency($booking['option']->option_price)</span>
+                @else
+                    <span>
+                        @if(isset($booking['service']->discount))  
+                            @currency($booking['service']->discount) 
+                        @else 
+                            @currency($booking['service']->price)
+                        @endif
+                    </span>
+                @endif
+                <br><span>{{ $booking['service']->duration }}</span><br>
+                @if($booking['option'] !== null)
+                <span>{{ $booking['option']->option_name }}</span>
+                @endif
             </td>
             <td>
                 <i class="fa fa-calendar"></i> {{ $booking['date'] }} <br>
@@ -59,10 +66,15 @@ $total_amount = 0;
             </td>
             <td>
                 <div class="btn-group">
-                    <a href="/removeToCart/{{ $key }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>
+                    <a href="/removeToCart/{{ $booking['service']->id }}"><button type="button" class="btn btn-md btn-outline-danger"><i class="fa fa-times-circle"></i></button></a>
                 </div>
             </td>
         </tr>
+        @if($booking['option'] !== null)
+        @php
+        $total_amount += $booking['option']->option_price;
+        @endphp
+        @else
         @if(isset($booking['service']->discount))
         @php
         $total_amount += $booking['service']->discount;
@@ -71,6 +83,7 @@ $total_amount = 0;
         @php
         $total_amount += $booking['service']->price;
         @endphp
+        @endif
         @endif
         @endforeach
     </table>

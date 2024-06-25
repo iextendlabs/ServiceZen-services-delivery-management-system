@@ -37,6 +37,7 @@ use App\Http\Controllers\{
     CompanyController,
     CkeditorController,
     ComplaintController,
+    FreelancerProgramController,
     InformationController,
     WithdrawController
 };
@@ -168,6 +169,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/services_edit/{id}', [OrderController::class, 'services_edit'])->name('orders.services_edit');
 
     Route::resource('affiliateProgram', AffiliateProgramController::class);
+    Route::resource('freelancerProgram', FreelancerProgramController::class);
     Route::resource('complaints', ComplaintController::class);
     Route::post('/add-complaint-chat', [ComplaintController::class, 'addComplaintChat'])->name('complaints.addComplaintChat');
     Route::get('/removeSliderImage', [SettingController::class, 'removeSliderImage']);
@@ -176,6 +178,9 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('withdraws', WithdrawController::class);
     Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus'); 
+    Route::post('/apply-order-coupon', [OrderController::class,'applyOrderCoupon'])->name('apply.order_coupon');
+    Route::get('/staff-categories-services', [OrderController::class,'staffCategoriesServices'])->name('fetch.staff_categories_services');
+
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 
@@ -191,7 +196,6 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
     Route::get('reOrder/{id}', [SiteOrdersController::class, 'reOrder'])->name('order.reOrder');
     Route::resource('affiliate_dashboard', AffiliateDashboardController::class);
     Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
-    Route::resource('staffProfile', StaffProfileController::class);
     Route::resource('siteComplaints', SiteComplaintController::class);
     Route::post('affiliateWithdraw', [AffiliateDashboardController::class, 'affiliateWithdraw'])->name('affiliate.withdraw');
 });
@@ -213,7 +217,7 @@ Route::get('deleteAccount', [CustomerAuthController::class, 'account']);
 Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountMail'])->name('deleteAccountMail');
 Route::get('deleteAccountPage', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccountPage');
 
-
+Route::resource('staffProfile', StaffProfileController::class);
 Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('draftOrder', [CheckOutController::class, 'draftOrder']);

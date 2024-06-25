@@ -13,6 +13,7 @@ use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\OrderService;
+use App\Models\Setting;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\Transaction;
@@ -107,7 +108,7 @@ class OrderController extends Controller
                 $query;
                 break;
         }
-        
+
         if ($request->zone) {
             $query->where('area', 'like', '%' . $request->zone . '%');
         }
@@ -146,9 +147,9 @@ class OrderController extends Controller
         }
 
         if ($request->customer) {
-            $query->where(function($query) use ($request) {
+            $query->where(function ($query) use ($request) {
                 $query->where('customer_name', 'like', '%' . $request->customer . '%')
-                      ->orWhere('customer_email', 'like', '%' . $request->customer . '%');
+                    ->orWhere('customer_email', 'like', '%' . $request->customer . '%');
             });
         }
 
@@ -156,20 +157,20 @@ class OrderController extends Controller
             $query->where('customer_id', '=', $request->customer_id);
         }
 
-        if($request->date_to && $request->date_from){
+        if ($request->date_to && $request->date_from) {
             $dateFrom = $request->date_from;
             $dateTo = Carbon::createFromFormat('Y-m-d', $request->date_to)->endOfDay()->toDateTimeString();
             $query->whereBetween('created_at', [$dateFrom, $dateTo]);
-        }else{
+        } else {
             if ($request->date_to) {
                 $query->whereDate('created_at', '=', $request->date_to);
             }
-    
+
             if ($request->date_from) {
                 $query->whereDate('created_at', '=', $request->date_from);
             }
         }
-        
+
         if ($request->staff_id) {
             $query->where('service_staff_id', '=', $request->staff_id);
         }
@@ -199,7 +200,7 @@ class OrderController extends Controller
                 $query->where('category_id', $request->category_id);
             });
         }
-        
+
 
         if ($request->created_at) {
             $query->where('created_at', '=', $request->created_at);
@@ -255,7 +256,7 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['date_from','date_to','zone','order_id','appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id','category_id']);
+            $filters = $request->only(['date_from', 'date_to', 'zone', 'order_id', 'appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id', 'category_id']);
             $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
             return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
@@ -264,11 +265,12 @@ class OrderController extends Controller
     public function create(Request $request)
     {
         $date = date('Y-m-d');
-        $services = Service::all();
+        $services = Service::where('status', 1)->get();
+        $categories = ServiceCategory::where('status', 1)->get();
         $area = '';
         $city = '';
         [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services'));
+        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'categories'));
     }
 
 
@@ -277,23 +279,57 @@ class OrderController extends Controller
         $password = NULL;
         $input = $request->all();
         $input['order_source'] = "Admin";
+        $input['area'] = $request->zone;
         // Log::channel('order_request_log')->info('Request Body:', ['body' => $input]);
+        $gender_permission = Setting::where('key','Gender Permission')->value('value');
+        
+        if ($gender_permission != "Both") {
+            if ($request->gender != $gender_permission) {
+                $errors = [
+                    'gender' => ["Sorry, no {$request->gender} services listed in our store."],
+                ];
+                return redirect()->back()->with('error', $errors);
+            }
+        }
 
-        $this->validate($request, [
-            'service_ids' => 'required',
+        $request->validate([
+            'service_staff_id' => 'required',
+            'time_slot_id' => 'required',
+            'selected_service_ids' => 'required',
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
             'number' => 'required',
             'whatsapp' => 'required',
         ]);
 
+        $selectedServiceIds = json_decode($request->input('selected_service_ids'), true);
+        $selectedOptionIds = json_decode($request->input('selected_option_ids'), true);
+
+        $services = Service::whereIn('id', $selectedServiceIds)->get();
+        $sub_total = 0;
+        $discount = 0;
+
+        if (count($services) == 0) {
+            return redirect()->back()->with('error', "Service not found");
+        } else {
+            $sub_total = $services->sum(function ($service) use ($selectedOptionIds) {
+                $optionId = $selectedOptionIds[$service->id] ?? null;
+                if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                    return $service->serviceOption->find($optionId)->option_price;
+                }
+                return $service->discount ?? $service->price;
+            });
+        }
+
         if ($request->coupon_code) {
             $coupon = Coupon::where("code", $request->coupon_code)->first();
-            $services = Service::whereIn('id', $request->service_ids)->get();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon_code, $services);
+                $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $selectedOptionIds);
+
                 if ($isValid !== true) {
                     return redirect()->back()
                         ->with('error', $isValid);
+                } else {
+                    $discount = $coupon->getDiscountForProducts($services, $sub_total, $selectedOptionIds);
                 }
             } else {
                 return redirect()->back()
@@ -301,134 +337,133 @@ class OrderController extends Controller
             }
         }
 
-        $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'][$input['service_staff_id']])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
+        $has_order = Order::where('service_staff_id', $request->service_staff_id)->where('date', $request->date)->where('time_slot_id', $request->time_slot_id[$request->service_staff_id])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
 
         if (count($has_order) == 0) {
-            $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
+            if ($request->affiliate_code) {
+                $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
 
-            if (isset($affiliate)) {
-                $input['affiliate_id'] = $affiliate->user_id;
-            }
-
-            $staff = User::find($input['service_staff_id']);
-            $input['number'] = $request->number_country_code . ltrim($request->number, '0');
-            $input['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
-            $input['customer_name'] = $input['name'];
-            $input['customer_email'] = $input['email'];
-            $input['status'] = "Pending";
-            $input['driver_status'] = "Pending";
-            $input['staff_name'] = $staff->name;
-            $input['time_slot_id'] = $input['time_slot_id'][$input['service_staff_id']];
-            $input['driver_id'] = $staff->staff->driver_id;
-
-            $user = User::where('email', $input['email'])->first();
-
-            if (isset($user)) {
-                if ($user->customerProfile) {
-                    $user->customerProfile->update($input);
-                } else {
-                    $user->customerProfile()->create($input);
+                if (isset($affiliate)) {
+                    $input['affiliate_id'] = $affiliate->user_id;
                 }
-                $input['customer_id'] = $user->id;
-                $customer_type = "Old";
-            } else {
-                $customer_type = "New";
-
-                $password = $input['number'];
-
-                $input['password'] = Hash::make($password);
-
-                $user = User::create($input);
-
-                if ($user->customerProfile) {
-                    $user->customerProfile->update($input);
-                } else {
-                    $user->customerProfile()->create($input);
-                }
-
-                $input['customer_id'] = $user->id;
-
-                $user->assignRole('Customer');
             }
 
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
 
-            $services = Service::whereIn('id', $input['service_ids'])->get();
+            if (isset($staffZone)) {
+                $staff = User::find($request->service_staff_id);
+                if (isset($staff)) {
 
-            $sub_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
-            });
+                    $input['number'] = $request->number_country_code . ltrim($request->number, '0');
+                    $input['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
+                    $input['customer_name'] = $request->name;
+                    $input['customer_email'] = $request->email;
+                    $input['status'] = "Pending";
+                    $input['driver_status'] = "Pending";
+                    $input['staff_name'] = $staff->name;
+                    $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
+                    $input['driver_id'] = $staff->staff ? $staff->staff->driver_id : null;
 
-            if ($input['coupon_code']) {
-                $coupon = Coupon::where('code', $input['coupon_code'])->first();
+                    $time_slot = TimeSlot::find($input['time_slot_id']);
 
-                $discount = $coupon->getDiscountForProducts($services, $sub_total);
-            } else {
-                $discount = 0;
-            }
+                    if (isset($time_slot)) {
+                        $user = User::where('email', $request->email)->first();
 
-            $staff_charges = $staff->staff->charges ?? 0;
-            $transport_charges = $staffZone->transport_charges ?? 0;
-            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+                        if (isset($user)) {
+                            $input['customer_id'] = $user->id;
+                            $customer_type = "Old";
+                        } else {
+                            $customer_type = "New";
 
-            $input['sub_total'] = (int)$sub_total;
-            $input['discount'] = (int)$discount;
-            $input['staff_charges'] = (int)$staff_charges;
-            $input['transport_charges'] = (int)$transport_charges;
-            $input['total_amount'] = (int)$total_amount;
+                            $password = $request->number;
 
-            $time_slot = TimeSlot::find($input['time_slot_id']);
-            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+                            $input['password'] = Hash::make($password);
 
-            $input['time_start'] = $time_slot->time_start;
-            $input['time_end'] = $time_slot->time_end;
+                            $user = User::create($input);
 
-            $order = Order::create($input);
+                            $input['customer_id'] = $user->id;
 
-            $input['order_id'] = $order->id;
-            $input['discount_amount'] = $input['discount'];
+                            $user->assignRole('Customer');
+                        }
 
-            OrderTotal::create($input);
-            if ($input['coupon_code']) {
-                $coupon = Coupon::where('code', $input['coupon_code'])->first();
-                $input['coupon_id'] = $coupon->id;
-                CouponHistory::create($input);
-            }
+                        $staff_charges = $staff->staff->charges ?? 0;
+                        $transport_charges = $staffZone->transport_charges ?? 0;
+                        $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
 
-            foreach ($input['service_ids'] as $id) {
-                $services = Service::find($id);
-                $input['service_id'] = $id;
-                $input['service_name'] = $services->name;
-                $input['duration'] = $services->duration;
-                $input['status'] = 'Open';
-                if ($services->discount) {
-                    $input['price'] = $services->discount;
+                        $input['sub_total'] = (int)$sub_total;
+                        $input['discount'] = (int)$discount;
+                        $input['staff_charges'] = (int)$staff_charges;
+                        $input['transport_charges'] = (int)$transport_charges;
+                        $input['total_amount'] = (int)$total_amount;
+
+                        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+
+                        $input['time_start'] = $time_slot->time_start;
+                        $input['time_end'] = $time_slot->time_end;
+
+                        $order = Order::create($input);
+
+                        $input['order_id'] = $order->id;
+                        $input['discount_amount'] = $input['discount'];
+
+                        OrderTotal::create($input);
+                        if ($request->coupon_code && $coupon) {
+                            $input['coupon_id'] = $coupon->id;
+                            CouponHistory::create($input);
+                        }
+
+                        foreach ($services as $service) {
+                            $input['option_id'] = null;
+                            $input['option_name'] = null;
+
+                            $input['service_id'] = $service->id;
+                            $input['service_name'] = $service->name;
+                            $input['duration'] = $service->duration;
+                            $input['status'] = 'Open';
+                            $optionId = $selectedOptionIds[$service->id] ?? null;
+                            if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                                $serviceOption = $service->serviceOption->find($optionId);
+                                $input['price'] = $serviceOption->option_price;
+                                $input['option_id'] = $optionId;
+                                $input['option_name'] = $serviceOption->option_name;
+                            } else {
+                                $input['price'] = $service->discount ?? $service->price;
+                            }
+                            OrderService::create($input);
+                        }
+
+                        if (Carbon::now()->toDateString() == $request->date) {
+                            $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            if ($staff->staff && $staff->staff->driver) {
+                                $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            }
+                            try {
+                                $this->sendOrderEmail($input['order_id'], $request->email);
+                            } catch (\Throwable $th) {
+                                //TODO: log error or queue job later
+                            }
+                        }
+                        try {
+                            $this->sendAdminEmail($input['order_id'], $request->email);
+                            $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+                        } catch (\Throwable $th) {
+                            //TODO: log error or queue job later
+                        }
+
+                        return redirect()->route('orders.index')
+                            ->with('success', 'Order created successfully.');
+                    } else {
+                        return redirect()->back()
+                            ->with('error', 'Sorry! Unfortunately This Slot is not available.');
+                    }
                 } else {
-                    $input['price'] = $services->price;
+                    return redirect()->back()
+                        ->with('error', 'Sorry! Unfortunately This Staff is not available.');
                 }
-                OrderService::create($input);
+            } else {
+                return redirect()->back()
+                    ->with('error', 'Sorry! Unfortunately Your select zone is not available.');
             }
-
-            if (Carbon::now()->toDateString() == $input['date']) {
-                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                }
-                try {
-                    $this->sendOrderEmail($input['order_id'], $input['email']);
-                } catch (\Throwable $th) {
-                    //TODO: log error or queue job later
-                }
-            }
-            try {
-                $this->sendAdminEmail($input['order_id'], $input['email']);
-                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
-            } catch (\Throwable $th) {
-                //TODO: log error or queue job later
-            }
-
-            return redirect()->route('orders.index')
-                ->with('success', 'Order created successfully.');
         } else {
             return redirect()->back()
                 ->with('error', 'Sorry! Unfortunately This slot was booked by someone else just now.');
@@ -444,7 +479,7 @@ class OrderController extends Controller
 
         $affiliate = User::find($affiliate_id);
         $statuses = config('app.order_statuses');
-        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission','affiliate','affiliate_id','parent_affiliate_commission','parent_affiliate_id'));
+        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission', 'affiliate', 'affiliate_id', 'parent_affiliate_commission', 'parent_affiliate_id'));
     }
 
     public function edit($id, Request $request)
@@ -625,11 +660,11 @@ class OrderController extends Controller
             if ($request->status == "Complete") {
 
                 [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
-                
+
                 if ($affiliate_id) {
                     $transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
                 }
-                
+
                 if ($affiliate_id && !isset($transaction) && $affiliate_commission > 0) {
                     $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
@@ -642,7 +677,7 @@ class OrderController extends Controller
                 if ($parent_affiliate_id) {
                     $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->first();
                 }
-                
+
                 if ($parent_affiliate_id && !isset($parent_affiliate_transaction) && $parent_affiliate_commission > 0) {
                     $input['user_id'] = $parent_affiliate_id;
                     $input['order_id'] = $order->id;
@@ -748,15 +783,15 @@ class OrderController extends Controller
         $order->save();
         try {
             OrderHistory::create($input);
-            
-            
+
+
 
             if (isset($order->staff->commission)) {
                 $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
             }
             if ($request->status == "Complete") {
                 [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
-                
+
                 if ($affiliate_id) {
                     $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
                 }
@@ -773,7 +808,7 @@ class OrderController extends Controller
                 if ($parent_affiliate_id) {
                     $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->first();
                 }
-                
+
                 if ($parent_affiliate_id && !isset($parent_affiliate_transaction) && $parent_affiliate_commission > 0) {
                     $input['user_id'] = $parent_affiliate_id;
                     $input['order_id'] = $order->id;
@@ -892,4 +927,68 @@ class OrderController extends Controller
 
         return redirect()->back()->with('success', 'Discount added to order.');
     }
+
+    public function applyOrderCoupon(Request $request)
+    {
+        $coupon = Coupon::where("code", $request->coupon_code)->first();
+
+        $services = Service::whereIn('id', $request->selected_service_ids)->get();
+        $sub_total = 0;
+
+        if (count($services) == 0) {
+            return response()->json(['error' => 'Service not found'], 404);
+        } else {
+            $sub_total = $services->sum(function ($service) use ($request) {
+                $optionId = $request->selected_option_ids[$service->id] ?? null;
+                if ($optionId !== null && $service->serviceOption->find($optionId)) {
+                    return $service->serviceOption->find($optionId)->option_price;
+                }
+                return $service->discount ?? $service->price;
+            });
+        }
+
+        if ($coupon) {
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $request->selected_option_ids);
+            if ($isValid !== true) {
+                return response()->json(['error' => $isValid]);
+            } else {
+                $discount = $coupon->getDiscountForProducts($services, $sub_total, $request->selected_option_ids);
+                return response()->json([
+                    'message' => 'Coupon applied successfully',
+                    'discount' => $discount
+                ]);
+            }
+        } else {
+            return response()->json(['error' => "Coupon is invalid!"]);
+        }
+    }
+
+    public function staffCategoriesServices(Request $request)
+    {
+        $categories = [];
+        $services = collect();
+
+        if (isset($request->categoryIds) && count($request->categoryIds) > 0) {
+            $categories = ServiceCategory::whereIn('id', $request->categoryIds)->where('status', 1)->get();
+
+            $category_services = Service::whereHas('categories', function ($query) use ($request) {
+                $query->whereIn('service_categories.id', $request->categoryIds);
+            })->with('categories')->with('serviceOption')->get();
+
+            $services = $services->merge($category_services);
+        }
+
+        if (isset($request->serviceIds) && count($request->serviceIds) > 0) {
+            $service_list = Service::whereIn('id', $request->serviceIds)->where('status', 1)->with('categories')->with('serviceOption')->get();
+            $services = $services->merge($service_list);
+        }
+
+        $services = $services->unique('id')->values();
+
+        return response()->json([
+            'categories' => $categories,
+            'services' => $services,
+        ]);
+    }
+
 }

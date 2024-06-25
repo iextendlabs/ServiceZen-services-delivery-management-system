@@ -75,6 +75,9 @@
                                 <a class="btn btn-link" href="{{ route('customer.registration') }}?type=affiliate">
                                     Register as Affiliate
                                 </a><br>
+                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=freelancer">
+                                    Register as Freelancer
+                                </a><br>
                                 @if (Route::has('password.request'))
                                     <a class="btn btn-link" href="{{ route('password.request') }}">
                                         {{ __('Forgot Your Password?') }}

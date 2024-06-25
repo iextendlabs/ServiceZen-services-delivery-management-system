@@ -23,8 +23,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReviewImage;
 use App\Models\Notification;
@@ -274,17 +272,28 @@ class CustomerController extends Controller
 
     public function getServiceDetails(Request $request)
     {
-        if ($request->service_id) {
-            $services = Service::where('status', 1)->where('id', $request->service_id)->where('status','1')->orderBy('name', 'ASC')->first();
-            $FAQs = FAQ::where('service_id', $request->service_id)->get();
+        $services = Service::where('status', 1)->where('id', $request->service_id)->where('status','1')->orderBy('name', 'ASC')->first();
+        $FAQs = FAQ::where('service_id', $request->service_id)->get();
+        
+        $lowestPriceOption = null;
+        $price = null;
+        foreach ($services->serviceOption as $option) {
+            if (is_null($lowestPriceOption) || $option->option_price < $lowestPriceOption->option_price) {
+                $lowestPriceOption = $option;
+            }
+            if (is_null($price) || $lowestPriceOption->option_price < $price) {
+                $price = $lowestPriceOption->option_price; 
+            }
         }
 
         return response()->json([
             'services' => $services,
-            'addONs' => $services->addONs,
-            'variant' => $services->variant,
-            'package' => $services->package,
-            'faqs' => $FAQs
+            'addONs' => $services->addONs ?? [],
+            'variant' => $services->variant ?? [],
+            'package' => $services->package ?? [],
+            'faqs' => $FAQs,
+            'lowestPriceOption' => $lowestPriceOption,
+            'price' => $price
         ], 200);
     }
 
@@ -636,7 +645,7 @@ class CustomerController extends Controller
     public function getOrders(Request $request)
     {
 
-        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->with('orderServices.service')->with('order_total')->with('review')->get();
+        $orders = Order::where('customer_id', $request->user_id)->orderBy('id', 'DESC')->with('orderServices.service')->with('order_total')->with('review')->with('services')->get();
 
         return response()->json([
             'orders' => $orders
@@ -740,51 +749,66 @@ class CustomerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'affiliate' => ['nullable', 'exists:affiliates,code'],
-        ]);
-    
-        if($request->coupon && $request->service_ids){
-            $coupon = Coupon::where("code",$request->coupon)->first();
-            $services = Service::whereIn('id', $request->service_ids)->get();
-            if($coupon){
-                $isValid = $coupon->isValidCoupon($request->coupon,$services,$request->user_id);
-                if($isValid !== true){
-                    $errors = [
-                        'coupon' => [$isValid],
-                    ];
-                    return response()->json(['errors' => $errors], 201);
-                }
-            }else{
-                $errors = [
-                    'coupon' => ['Coupon is invalid!'],
-                ];
-                return response()->json(['errors' => $errors], 201);
-            }
-            
-        }
+            'coupon' => [
+                'nullable',
+                function ($attribute, $value, $fail) use ($request) {
+                    $coupon = Coupon::where('code', $value)
+                        ->where('status', 1)
+                        ->where('date_start', '<=', now())
+                        ->where('date_end', '>=', now())
+                        ->first();
 
-        // Check if validation fails
+                    if (!$coupon) {
+                        $fail('The ' . $attribute . ' is not valid.');
+                        return;
+                    }
+
+                    if ($coupon->uses_total !== null) {
+                        $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
+                        $userOrdersCount = Order::where('customer_id', $request->user_id)
+                            ->whereIn('id', $order_coupon)
+                            ->count();
+
+                        if ($userOrdersCount >= $coupon->uses_total) {
+                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
+                        }
+                    }
+                },
+            ],
+        ]);
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
-        } else {
-            $affiliate_id = Affiliate::where('code', $request->affiliate)->value('user_id');
-            $coupon = Coupon::where('code', $request->coupon)->first();
         }
-        if($coupon && $request->service_ids){
+
+        $affiliate_id = Affiliate::where('code', $request->affiliate)->value('user_id');
+        $coupon = Coupon::where('code', $request->coupon)->first();
+
+        if ($request->coupon && $request->service_ids && $request->options) {
             $services = Service::whereIn('id', $request->service_ids)->get();
+            if ($coupon) {
+                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id ?? null,$request->options ?? []);
+                if ($isValid !== true) {
+                    return response()->json(['errors' => ['coupon' => [$isValid]]], 201);
+                }
+            } else {
+                return response()->json(['errors' => ['coupon' => ['Coupon is invalid!']]], 201);
+            }
+        }
 
+        $coupon_discount = 0;
+        if ($coupon && $request->service_ids) {
+            $services = Service::whereIn('id', $request->service_ids)->get();
             $sub_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
+                return $service->discount ?? $service->price;
             });
-
-            $coupon_discount = $coupon->getDiscountForProducts($services,$sub_total);
-        }else{
-            $coupon_discount = "0";
+            $coupon_discount = $coupon->getDiscountForProducts($services, $sub_total, $request->options ?? []);
         }
 
         return response()->json([
             'affiliate_id' => $affiliate_id,
             'coupon' => $coupon,
-            'coupon_discount'=>$coupon_discount
+            'coupon_discount' => $coupon_discount,
         ], 200);
     }
 
@@ -1259,17 +1283,22 @@ class CustomerController extends Controller
         $transport_charges = 0;
         $coupon_discount = 0;
         if($request->service_ids){
-            $services = Service::whereIn('id', $request->service_ids)->get();
-
-            $services_total = $services->sum(function ($service) {
+            $services = Service::whereIn('id', $request->service_ids)->with('serviceOption')->get();
+        
+            $services_total = $services->sum(function ($service) use ($request) {
+                if (isset($request->options[$service->id])) {
+                    $option_id = $request->options[$service->id];
+                    $option = $service->serviceOption->find($option_id);
+                    return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
+                }
                 return isset($service->discount) ? $service->discount : $service->price;
             });
 
-            if($request->coupon_id && $services){
+            if($request->coupon_id && $services->isNotEmpty()) {
                 $coupon = Coupon::find($request->coupon_id);
     
                 $coupon_discount = $coupon
-                ? $coupon->getDiscountForProducts($services, $services_total)
+                ? $coupon->getDiscountForProducts($services, $services_total, $request->options ?? [])
                 : 0;
             }
         }
@@ -1465,17 +1494,23 @@ class CustomerController extends Controller
         }
         $all_selected_staff = User::whereIn('id', $serviceStaffIds)->get();
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
-        $sub_total = $all_selected_services->sum(function ($service) {
-            return isset($service->discount) ? $service->discount : $service->price;
+        $sub_total = $all_selected_services->sum(function ($service) use ($input) {
+            if (isset($input['options'][$service->id])) {
+                $option_id = (int) $input['options'][$service->id];
+                $option = $service->serviceOption->find($option_id);
+                return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
+            } else {
+                return isset($service->discount) ? $service->discount : $service->price;
+            }
         });
-
+     
         if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,$input['user_id'] ?? null, $input['options'] ?? []);
                 if ($isValid === true) {
-                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total);
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total,$input['options'] ?? []);
                 } else {
                     return $isValid;
                 }
@@ -1533,7 +1568,12 @@ class CustomerController extends Controller
 
             $selected_services = Service::whereIn('id', $singleBookingService)->get();
 
-            $sub_total = $selected_services->sum(function ($service) {
+            $sub_total = $selected_services->sum(function ($service) use ($input) {
+                if (isset($input['options'][$service->id])) {
+                    $option_id = (int) $input['options'][$service->id];  // Cast to integer
+                    $option = $service->serviceOption->find($option_id);
+                    return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
+                }
                 return isset($service->discount) ? $service->discount : $service->price;
             });
 
@@ -1541,7 +1581,7 @@ class CustomerController extends Controller
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$input['options'] ?? []);
                         if ($discount > 0) {
                             $input['coupon_id'] = $coupon->id;
                             $i++;
@@ -1550,7 +1590,7 @@ class CustomerController extends Controller
                         }
                     } elseif ($coupon->type == "Percentage") {
                         $input['coupon_id'] = $coupon->id;
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$input['options'] ?? []);
                     }
                 }
             }
@@ -1599,15 +1639,27 @@ class CustomerController extends Controller
             }
 
             foreach ($singleBookingService as $id) {
-                $services = Service::find($id);
+
+                $input['option_id'] = null;
+                $input['option_name'] = null;
+
+                $service = Service::find($id);
                 $input['service_id'] = $id;
-                $input['service_name'] = $services->name;
-                $input['duration'] = $services->duration;
+                $input['service_name'] = $service->name;
+                $input['duration'] = $service->duration;
                 $input['status'] = 'Open';
-                if ($services->discount) {
-                    $input['price'] = $services->discount;
-                } else {
-                    $input['price'] = $services->price;
+                if (isset($input['options'][$service->id])) {
+                    $option_id = $input['options'][$service->id];
+                    $option = $service->serviceOption->find($option_id);
+                    if($option){
+                        $input['price'] = $option->option_price;
+                        $input['option_id'] = $option_id;
+                        $input['option_name'] = $option->option_name;
+                    }else{
+                    $input['price'] = $service->discount ?? $service->price;
+                    }
+                }else{
+                    $input['price'] = $service->discount ?? $service->price;
                 }
                 OrderService::create($input);
             }
