@@ -117,7 +117,7 @@
                                     class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Sub Title / Designation</label>
 
                                 <div class="col-md-6">
-                                    <input id="sub_title" type="text" required
+                                    <input id="sub_title" type="text"
                                         class="form-control @error('sub_title') is-invalid @enderror"
                                         name="sub_title" value="{{ old('sub_title') }}"
                                         autocomplete="sub_title">
@@ -223,8 +223,10 @@
         function handleTypeChange(selectedValue) {
             if (selectedValue == "freelancer") {
                 $(".sub_title").show();
+                $("#sub_title").attr("required", true);
             } else {
                 $(".sub_title").hide();
+                $("#sub_title").attr("required", false);
             }
             if (selectedValue == "customer") {
                 $(".affiliate_code").show();
