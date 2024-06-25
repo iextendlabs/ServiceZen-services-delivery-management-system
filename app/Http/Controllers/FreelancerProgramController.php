@@ -41,7 +41,7 @@ class FreelancerProgramController extends Controller
         }
 
         if (isset($request->name)) {
-            $query->where('name', $request->name);
+            $query->where('name', 'like', '%' . $request->name . '%');
         }
 
         if (isset($request->email)) {
@@ -110,7 +110,7 @@ class FreelancerProgramController extends Controller
             
             $user->services()->detach();
             $user->categories()->detach();
-            
+
             $staff->delete();
 
             $user->freelancer_program = 0;
