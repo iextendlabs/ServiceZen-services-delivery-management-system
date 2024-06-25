@@ -33,21 +33,32 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->affiliate_program === '1' ? 'Accepted' : 'Rejected' }}</td>
                                 <td>
-                                    @if($user->affiliate_program === '0')
-                                    <a class="btn btn-success" href="{{ route('affiliateProgram.edit', $user->id) }}?status=Accepted">
-                                        <i class="fas fa-thumbs-up"></i>
-                                    </a>
-                                    @elseif ($user->affiliate_program === '1')
-                                    <a class="btn btn-danger" href="{{ route('affiliateProgram.edit', $user->id) }}?status=Rejected">
-                                        <i class="fas fa-thumbs-down"></i>
-                                    </a>
-                                    <a class="btn btn-primary" href="{{ route('affiliates.edit', $user->id) }}">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a class="btn btn-warning" href="{{ route('affiliates.show', $user->id) }}">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    @endif
+                                    <form id="deleteForm{{ $user->id }}"
+                                        action="{{ route('affiliates.destroy', $user->id) }}" method="POST">
+                                        @if ($user->affiliate_program === '0')
+                                            <a class="btn btn-success"
+                                                href="{{ route('affiliateProgram.edit', $user->id) }}?status=Accepted">
+                                                <i class="fas fa-thumbs-up"></i>
+                                            </a>
+                                        @elseif ($user->affiliate_program === '1')
+                                            <a class="btn btn-danger"
+                                                href="{{ route('affiliateProgram.edit', $user->id) }}?status=Rejected">
+                                                <i class="fas fa-thumbs-down"></i>
+                                            </a>
+                                            <a class="btn btn-primary" href="{{ route('affiliates.edit', $user->id) }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a class="btn btn-warning" href="{{ route('affiliates.show', $user->id) }}">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        @endif
+
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-danger"
+                                            onclick="confirmDelete('{{ $user->id }}')"><i
+                                                class="fa fa-trash"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
@@ -70,10 +81,24 @@
                                 <strong>Status:</strong>
                                 <select name="status" class="form-control">
                                     <option value="">-- Select Status --</option>
-                                    <option value="1" @if ($filter_status === '1') selected @endif>Accepted</option>
-                                    <option value="0" @if ($filter_status === '0') selected @endif>Rejected</option>
+                                    <option value="1" @if ($filter_status === '1') selected @endif>Accepted
+                                    </option>
+                                    <option value="0" @if ($filter_status === '0') selected @endif>Rejected
+                                    </option>
                                 </select>
-                                
+
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Name:</strong>
+                                <input type="text" name="name" value="{{ $filter_name }}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Email:</strong>
+                                <input type="email" name="email" value="{{ $filter_email }}" class="form-control">
                             </div>
                         </div>
 
@@ -85,6 +110,14 @@
             </div>
         </div>
     </div>
+    <script>
+        function confirmDelete(Id) {
+            var result = confirm("Are you sure you want to delete this Item?");
+            if (result) {
+                document.getElementById('deleteForm' + Id).submit();
+            }
+        }
+    </script>
     <script>
         $(document).ready(function() {
             function checkTableResponsive() {

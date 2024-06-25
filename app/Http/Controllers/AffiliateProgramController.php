@@ -29,17 +29,27 @@ class AffiliateProgramController extends Controller
     {
         
         $filter_status = $request->status;
+        $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::whereNotNull('affiliate_program');
         if (isset($request->status)) {
             $query->where('affiliate_program', $request->status);
         }
 
+        if (isset($request->name)) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if (isset($request->email)) {
+            $query->where('email', $request->email);
+        }
+
         $users = $query->paginate(config('app.paginate'));
 
         $filters = $request->only(['status']);
         $users->appends($filters);
-        return view('affiliateProgram.index',compact('users','filter_status'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('affiliateProgram.index',compact('users','filter_status','filter_name','filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**
