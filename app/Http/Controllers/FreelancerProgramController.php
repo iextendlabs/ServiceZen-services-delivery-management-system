@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Affiliate;
 use App\Models\Chat;
 use App\Models\Staff;
+use App\Models\StaffImages;
+use App\Models\StaffYoutubeVideo;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,17 +32,27 @@ class FreelancerProgramController extends Controller
     {
         
         $filter_status = $request->status;
+        $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::whereNotNull('freelancer_program');
         if (isset($request->status)) {
             $query->where('freelancer_program', $request->status);
         }
 
+        if (isset($request->name)) {
+            $query->where('name', $request->name);
+        }
+
+        if (isset($request->email)) {
+            $query->where('email', $request->email);
+        }
+
         $users = $query->paginate(config('app.paginate'));
 
         $filters = $request->only(['status']);
         $users->appends($filters);
-        return view('freelancerProgram.index',compact('users','filter_status'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('freelancerProgram.index',compact('users','filter_status','filter_name','filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**
@@ -79,7 +91,28 @@ class FreelancerProgramController extends Controller
     
             return redirect($url);
         } elseif ($request->status == "Rejected") {
-            Staff::where('user_id',$id)->delete();
+            $staff = Staff::where('user_id',$id)->first();
+            if (isset($staff->image) && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+                unlink(public_path('staff-images') . '/' . $staff->image);
+            }
+    
+            if (isset($user->staffImages)) {
+    
+                foreach ($user->staffImages as $image) {
+                    if ($image->image && file_exists(public_path('staff-images') . '/' . $image->image)) {
+                        unlink(public_path('staff-images') . '/' . $image->image);
+                    }
+                }
+            }
+
+            StaffImages::where('staff_id',$id)->delete();
+            StaffYoutubeVideo::where('staff_id',$id)->delete();
+            
+            $user->services()->detach();
+            $user->categories()->detach();
+            
+            $staff->delete();
+
             $user->freelancer_program = 0;
             $user->update();
             $user->removeRole("Staff");
