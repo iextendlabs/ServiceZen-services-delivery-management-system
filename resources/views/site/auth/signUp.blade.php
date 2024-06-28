@@ -128,6 +128,33 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="row mb-3 membership_plan_id">
+                                <label for="membership_plan_id"
+                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Membership Plan</label>
+                                    <div class="col-md-6">
+                                        <select name="membership_plan_id" id="membership_plan_id" class="form-control">
+                                            @foreach ($membership_plans as $membership_plan)
+                                                <option value="{{$membership_plan->id}}">{{$membership_plan->plan_name}} (@currency($membership_plan->membership_fee))</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="row mb-3 parent_affiliate_code">
+                                <label for="parent_affiliate_code"
+                                    class="col-md-4 col-form-label text-md-end">Parent Affiliate</label>
+
+                                <div class="col-md-6">
+                                    <input id="parent_affiliate_code" type="text"
+                                        class="form-control @error('parent_affiliate_code') is-invalid @enderror"
+                                        name="parent_affiliate_code" 
+                                        autocomplete="parent_affiliate_code">
+                                    @error('parent_affiliate_code')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="row mb-3 affiliate_code">
                                 <label for="affiliate_code"
                                     class="col-md-4 col-form-label text-md-end">{{ __('Affiliate Code') }}</label>
@@ -228,6 +255,17 @@
                 $(".sub_title").hide();
                 $("#sub_title").attr("required", false);
             }
+
+            if (selectedValue == "affiliate") {
+                $(".membership_plan_id").show();
+                $(".parent_affiliate_code").show();
+                $("#membership_plan_id").attr("required", true);
+            } else {
+                $(".membership_plan_id").hide();
+                $(".parent_affiliate_code").hide();
+                $("#membership_plan_id").attr("required", false);
+            }
+            
             if (selectedValue == "customer") {
                 $(".affiliate_code").show();
             } else {
