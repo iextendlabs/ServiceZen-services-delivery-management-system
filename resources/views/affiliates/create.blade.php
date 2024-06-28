@@ -110,6 +110,17 @@
                             placeholder="Parent Affiliate Commission In %">
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Membership Plan:</strong>
+                        <select name="membership_plan_id" class="form-control">
+                            <option value=""></option>
+                            @foreach ($membership_plans as $membership_plan)
+                                <option value="{{ $membership_plan->id }}">{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
