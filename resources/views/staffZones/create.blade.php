@@ -41,13 +41,12 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Currency:</strong>
-                    <input type="text" name="currency" value="{{ old('currency') }}" class="form-control" placeholder="Currency">
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Currency Rate:</strong>
-                    <input type="number" name="currency_rate" value="{{ old('currency_rate') }}" class="form-control" placeholder="Currency Rate">
+                    <select name="currency_id" class="form-control">
+                        <option></option>
+                        @foreach ($currencies as $currency)
+                            <option value="{{ $currency->id }}" @if(old('currency_id') == $currency->id) selected @endif>{{ $currency->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-md-12">

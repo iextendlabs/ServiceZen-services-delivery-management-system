@@ -271,12 +271,21 @@ class CheckOutController extends Controller
         if($isValidOrderValue !== true){
             return response()->json(['errors' => $isValidOrderValue], 200);
         }
+        $input['currency_id'] = $staffZone->currency_id ?? null;
+        $input['currency_rate'] = $staffZone->currency->rate ?? null;
+        $input['extra_charges'] = $staffZone->extra_charges ?? null;
         // Create order
         list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone ,$password);
         // Handle addresses
         $this->handleSessionAddresses($request, $input);
 
         [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
+
+        $all_sub_total = formatCurrency($all_sub_total);
+        $all_discount = formatCurrency($all_discount);
+        $all_staff_charges = formatCurrency($all_staff_charges);
+        $all_transport_charges = formatCurrency($all_transport_charges);
+        $all_total_amount = formatCurrency($all_total_amount);
 
         return response()->json([
             'sub_total' => $all_sub_total,
@@ -923,5 +932,12 @@ class CheckOutController extends Controller
             $zoneShow = 1;
         }
         return view('site.checkOut.checkBooking', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'zoneShow','categories'));
+    }
+
+    public function formatCurrencyJS(Request $request)
+    {
+        $amount = $request->input('amount');
+        $formattedAmount = formatCurrency($amount);
+        return response()->json(['formattedAmount' => $formattedAmount]);
     }
 }

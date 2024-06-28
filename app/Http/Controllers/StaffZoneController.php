@@ -2,6 +2,7 @@
     
 namespace App\Http\Controllers;
 
+use App\Models\Currency;
 use App\Models\Staff;
 use App\Models\StaffGroup;
 use App\Models\StaffZone;
@@ -47,7 +48,8 @@ class StaffZoneController extends Controller
      */
     public function create()
     {
-        return view('staffZones.create');
+        $currencies = Currency::get();
+        return view('staffZones.create',compact('currencies'));
     }
     
     /**
@@ -94,7 +96,8 @@ class StaffZoneController extends Controller
      */
     public function edit(StaffZone $staffZone)
     {
-        return view('staffZones.edit', compact('staffZone'));
+        $currencies = Currency::get();
+        return view('staffZones.edit', compact('staffZone','currencies'));
     }
     
     public function update(Request $request, $id)

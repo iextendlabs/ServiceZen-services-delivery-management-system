@@ -32,13 +32,6 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         Blade::directive('currency', function ($expression) {
-            // if (Session::get('address')) {
-            //     $addresses = Session::get('address');
-            //     $zone = $addresses['area'];
-            // } else {
-            //     $zone = "";
-            // }
-
             return "<?php echo formatCurrency($expression); ?>";
         });
     }

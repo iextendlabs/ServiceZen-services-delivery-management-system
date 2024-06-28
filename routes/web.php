@@ -37,6 +37,7 @@ use App\Http\Controllers\{
     CompanyController,
     CkeditorController,
     ComplaintController,
+    CurrencyController,
     FreelancerProgramController,
     InformationController,
     WithdrawController
@@ -180,6 +181,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus'); 
     Route::post('/apply-order-coupon', [OrderController::class,'applyOrderCoupon'])->name('apply.order_coupon');
     Route::get('/staff-categories-services', [OrderController::class,'staffCategoriesServices'])->name('fetch.staff_categories_services');
+    Route::resource('currencies', CurrencyController::class);
 
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
@@ -257,3 +259,4 @@ Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffili
 Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartModal'])->name('addToCartModal');
 Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');
 Route::get('/checkBooking', [CheckOutController::class,'checkBooking'])->name('checkBooking');
+Route::post('/format-currency', [CheckOutController::class, 'formatCurrencyJS'])->name('format-currency');

@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'currency-list',
+            'currency-create',
+            'currency-edit',
+            'currency-delete',
             'withdraw-list',
             'withdraw-create',
             'withdraw-edit',
