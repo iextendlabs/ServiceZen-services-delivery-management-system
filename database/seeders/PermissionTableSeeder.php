@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'membership-plan-list',
+            'membership-plan-create',
+            'membership-plan-edit',
+            'membership-plan-delete',
             'withdraw-list',
             'withdraw-create',
             'withdraw-edit',

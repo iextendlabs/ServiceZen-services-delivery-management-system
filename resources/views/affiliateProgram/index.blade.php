@@ -23,6 +23,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Status</th>
+                        <th>Membership Plan</th>
                         <th>Action</th>
                     </tr>
                     @if (count($users))
@@ -32,6 +33,10 @@
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->affiliate_program === '1' ? 'Accepted' : 'Rejected' }}</td>
+                                <td>@if($user->affiliate && $user->affiliate->membershipPlan)
+                                    {{ $user->affiliate->membershipPlan->plan_name }} (AED{{ $user->affiliate->membershipPlan->membership_fee }})
+                                    @endif
+                                </td>
                                 <td>
                                     <form id="deleteForm{{ $user->id }}"
                                         action="{{ route('affiliates.destroy', $user->id) }}" method="POST">

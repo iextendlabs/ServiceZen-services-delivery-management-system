@@ -65,6 +65,17 @@
                     </div>
                 </div>
             </div>
+            @if($user->affiliate->membershipPlan)
+            <div class="col-md-4 py-2">
+                <div class="card">
+                    <div class="card-header">Membership Plan</div>
+                    <div class="card-body analytic">
+                        <i class="fa fa-pkr-sign"></i>
+                        <span class="float-end">{{ $user->affiliate->membershipPlan->plan_name }} (Rs.{{ $user->affiliate->membershipPlan->membership_fee * $pkrRateValue }})</span>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">

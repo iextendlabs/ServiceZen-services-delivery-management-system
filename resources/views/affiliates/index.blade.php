@@ -42,6 +42,7 @@
                         <th>Code <br> Commission</th>
                         <th>Number</th>
                         <th>Salary</th>
+                        <th>Membership Plan</th>
                         <th>Action</th>
                     </tr>
                     @if (count($affiliates))
@@ -60,7 +61,10 @@
                                         (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary ?? '' }})
                                     @endif
                                 </td>
-
+                                <td>@if($affiliate->affiliate && $affiliate->affiliate->membershipPlan)
+                                    {{ $affiliate->affiliate->membershipPlan->plan_name }} (AED{{ $affiliate->affiliate->membershipPlan->membership_fee }})
+                                    @endif
+                                </td>
                                 <td>
                                     <form id="deleteForm{{ $affiliate->id }}"
                                         action="{{ route('affiliates.destroy', $affiliate->id) }}" method="POST">
