@@ -67,20 +67,20 @@
                                                                     $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
                                                                 @endphp
                                                                 @if($option)
-                                                                    @currency($option->option_price)
+                                                                    @currency($option->option_price,false,true)
                                                                 @else
                                                                     @if (isset($service->discount))
-                                                                        @currency($service->discount)
+                                                                        @currency($service->discount,false,true)
                                                                     @else
-                                                                        @currency($service->price)
+                                                                        @currency($service->price,false,true)
                                                                     @endif
                                                                 @endif
 
                                                             @else
                                                                 @if (isset($service->discount))
-                                                                    @currency($service->discount)
+                                                                    @currency($service->discount,false,true)
                                                                 @else
-                                                                    @currency($service->price)
+                                                                    @currency($service->price,false,true)
                                                                 @endif
                                                             @endif
 
@@ -414,7 +414,7 @@
 
         });
     });
-</script>
+    </script>
     <script>
         $(document).ready(function() {
             $("#booking-form").submit(function(event) {
@@ -478,129 +478,28 @@
                 });
             });
             $("#confirmOrder").click(function() {
-            var order_ids =$(this).attr('data-order-id');
-            var comment =$("#order_comment").val();
-            var customer_type =$("#customer_type").val();
-            $.ajax({
-                type: "GET",
-                url: "{{ route('confirmStep') }}",
-                data: {
-                    order_ids: order_ids,
-                    comment: comment,
-                    customer_type: customer_type,
-                },
-                success: function(response) {
-                    $('#confirm-step').hide();
-                    $('#selected-booking-staff-slot').hide();
-                    $('#success-step').show();
-                    $('html, body').scrollTop(0);
-                },
-                error: function(error) {
-                    console.log("Error:", error);
-                }
+                var order_ids =$(this).attr('data-order-id');
+                var comment =$("#order_comment").val();
+                var customer_type =$("#customer_type").val();
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('confirmStep') }}",
+                    data: {
+                        order_ids: order_ids,
+                        comment: comment,
+                        customer_type: customer_type,
+                    },
+                    success: function(response) {
+                        $('#confirm-step').hide();
+                        $('#selected-booking-staff-slot').hide();
+                        $('#success-step').show();
+                        $('html, body').scrollTop(0);
+                    },
+                    error: function(error) {
+                        console.log("Error:", error);
+                    }
+                });
             });
-        });
-        });
-    </script>
-    <script>
-        function searchSelectOptions(selectElement, searchString) {
-            // Convert the search string to lowercase for case-insensitive comparison
-            const searchLower = searchString.toLowerCase();
-
-            // Loop through all the options in the select menu
-            for (let i = 0; i < selectElement.options.length; i++) {
-                const option = selectElement.options[i];
-                const optionValue = option.value.toLowerCase();
-
-                // Check if the search string matches the option value exactly or partially
-                if (optionValue === searchLower || optionValue.includes(searchLower)) {
-                    // Match found, you can perform your desired action here
-                    // console.log(`Found a match: ${option.value}`);
-                    return true; // Return true if you want to stop searching after the first match
-                }
-            }
-
-            // No match found
-            // console.log("No match found");
-            return false;
-        }
-
-        function fillFormAddressFields(place) {
-            const buildingNameField = document.getElementById('buildingName');
-            const landmarkField = document.getElementById('landmark');
-            const areaField = document.getElementById('area');
-            const districtField = document.getElementById('district');
-            const flatVillaField = document.getElementById('flatVilla');
-            const streetField = document.getElementById('street');
-            const cityField = document.getElementById('city');
-            const latitudeField = document.getElementById('latitude');
-            const longitudeField = document.getElementById('longitude');
-            const searchField = document.getElementById("searchField");
-
-            const addressComponents = place.address_components;
-            // const selectElement = document.getElementById('mySelect');
-            // const searchString = "OPT";
-            // searchSelectOptions(selectElement, searchString);
-            for (let i = 0; i < addressComponents.length; i++) {
-                const component = addressComponents[i];
-                const types = component.types;
-
-                if (types.includes('premise')) {
-                    buildingNameField.value = component.long_name;
-                } else if (types.includes('point_of_interest')) {
-                    landmarkField.value = component.long_name;
-                } else if (types.includes('neighborhood') || types.includes('sublocality')) {
-                    areaField.value = component.long_name;
-                    districtField.value = component.long_name;
-                } else if (types.includes('street_number')) {
-                    flatVillaField.value = component.long_name;
-                } else if (types.includes('route')) {
-                    streetField.value = component.long_name;
-                } else if (types.includes('locality')) {
-                    cityField.value = component.long_name;
-                }
-                latitudeField.value = place.geometry.location.lat();
-                longitude.value = place.geometry.location.lng();
-            }
-            searchField.value = place["formatted_address"];
-        }
-
-        function initMap() {
-            $('.location-search-wrapper').show();
-            initAutocompleteLocal();
-        }
-
-        $(document).ready(function() {
-            $("#manualLocationButton").click(function() {
-                $("#locationPopup").modal('show');
-            });
-        });
-
-        function initAutocompleteLocal() {
-            var autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchField'));
-            autocomplete.addListener('place_changed', function() {
-                var place = autocomplete.getPlace();
-
-                if (!place.geometry) {
-                    return;
-                }
-
-                if (marker) {
-                    marker.setMap(null);
-                }
-
-                map.setCenter(place.geometry.location);
-                placeMarker(place.geometry.location);
-
-                fillFormAddressFields(place);
-            });
-        }
-        $(document).on('change', '#zone', function() {
-            $('#area').val($(this).val());
-        });
-
-        $(document).on('change', '#area', function() {
-            $('#zone').val($(this).val());
         });
     </script>
     <script src="{{ asset('js/checkout.js') }}?v={{ config('app.version') }}"></script>

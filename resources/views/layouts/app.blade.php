@@ -193,6 +193,9 @@
                                 @can('setting-list')
                                 <a class="dropdown-item" href="{{ route('settings.index') }}">Settings</a>
                                 @endcan
+                                @can('currency-list')
+                                <a class="dropdown-item" href="{{ route('currencies.index') }}">Currencies</a>
+                                @endcan
                                 @can('holiday-list')
                                 <a class="dropdown-item" href="/holidays">Holidays</a>
                                 @endcan

@@ -28,6 +28,7 @@
             <form action="{{ route('orders.booking_edit',$order->id) }}" method="POST">
                 @csrf
                 <input type="hidden" name="url" value="{{ url()->previous() }}">
+                <input type="hidden" name="isAdmin" value="true">
                 <div class="row">
                     <div id="slots-container" class="col-md-12">
                         @include('site.checkOut.timeSlots')

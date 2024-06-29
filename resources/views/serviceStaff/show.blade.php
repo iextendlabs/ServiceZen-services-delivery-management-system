@@ -53,26 +53,26 @@
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Additional Charges:</strong>
-                @currency($serviceStaff->staff->charges)
+                @currency($serviceStaff->staff->charges,true)
             </div>
         </div>
         @endif
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Commission Salary:</strong>
-                @currency($serviceStaff->staff->fix_salary)
+                @currency($serviceStaff->staff->fix_salary,true)
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Bonus of {{ now()->format('F') }}:</strong>
-                @currency($bonus)
+                @currency($bonus,true)
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Product Sales of {{ now()->format('F') }}:</strong>
-                @currency($product_sales)
+                @currency($product_sales,true)
             </div>
         </div>
         <div class="col-md-12">
@@ -97,7 +97,7 @@
 
     <hr>
     <div class="row">
-        <p>Current balance is: <b>@currency($total_balance)</b></p>
+        <p>Current balance is: <b>@currency($total_balance,true)</b></p>
         @if(count($transactions) != 0)
         <table class="table table-striped table-bordered album bg-light">
             <tr>
@@ -114,7 +114,7 @@
                 <td>{{ $transaction->created_at }}</td>
                 <td>{{ $transaction->type }}</td>
                 <td>@if($transaction->order_id) Order ID: #{{ $transaction->order_id }} @else {{ substr($transaction->description,0,70) }} @endif </td>
-                <td>@currency($transaction->amount)</td>
+                <td>@currency($transaction->amount,true)</td>
                 <td>
                     <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
                         @csrf
@@ -140,8 +140,8 @@
     <div class="row">
         <div class="col-md-6">
             <h3>Add Transaction</h3>
-            <p>Current balance is: <b>@currency($total_balance)</b></p>
-            <p>Current balance with salary is: <b>@currency($total_balance)+ @currency($serviceStaff->staff->fix_salary)</b></p>
+            <p>Current balance is: <b>@currency($total_balance,true)</b></p>
+            <p>Current balance with salary is: <b>@currency($total_balance,true)+ @currency($serviceStaff->staff->fix_salary,true)</b></p>
             <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
                 @csrf
                 <input type="hidden" name="user_id" value="{{ $serviceStaff->id }}">

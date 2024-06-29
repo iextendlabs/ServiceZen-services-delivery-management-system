@@ -91,7 +91,7 @@
                                                 <label style="display: contents;">
                                                     <input required type="radio" name="service_id" class="checkBooking_service_id" 
                                                            value="{{ $service->id }}" data-options="{{ $service->serviceOption }}" data-name="{{ $service->name }}"
-                                                           data-price="{{ $service->discount ? $service->discount : $service->price }}"
+                                                           data-price="@if($service->discount) @currency($service->discount,false,true) @else @currency($service->price,false,true) @endif"
                                                            data-duration="{{ $service->duration }}">
                                                     {{ $service->name }}
                                             </td>
@@ -99,12 +99,12 @@
                                                 @if (isset($service->discount))
                                                     <s>
                                                 @endif
-                                                @currency($service->price)
+                                                @currency($service->price,false,true)
                                                 @if (isset($service->discount))
                                                     </s>
                                                 @endif
                                                 @if (isset($service->discount))
-                                                    <b class="discount"> @currency($service->discount)</b>
+                                                    <b class="discount"> @currency($service->discount,false,true)</b>
                                                 @endif
                                             </td>
                                             <td>{{ $service->duration }}</td>
@@ -180,7 +180,7 @@
                 filterServices();
             });
 
-            $('input[name="service_id"]').on('change', function() {
+            $('input[name="service_id"]').on('change', async function() {
                 var serviceName = $(this).data('name');
                 var servicePrice = $(this).data('price');
                 var serviceDuration = $(this).data('duration');
@@ -197,29 +197,43 @@
                     var minPrice = Infinity;
                     var minPriceOption = null;
     
-                    serviceOptions.forEach(function(option) {
+                    for (const option of serviceOptions) {
                         var optionPrice = parseFloat(option.option_price);
-                        optionsHtml += `
-                            <div>
-                                <label>
-                                    <input type="radio" name="option_id" value="${option.id}" data-option-price="${optionPrice}" required> ${option.option_name} (AED ${optionPrice})
-                                </label>
-                            </div>
-                        `;
-                        if (optionPrice < minPrice) {
-                            minPrice = optionPrice;
-                            minPriceOption = option.id;
+                        
+                        try {
+                            var formattedOptionPrice = await formatCurrencyJS(optionPrice,true);
+                            
+                            optionsHtml += `
+                                <div>
+                                    <label>
+                                        <input type="radio" name="option_id" value="${option.id}" data-option-price="${formattedOptionPrice}" required> ${option.option_name} (${formattedOptionPrice})
+                                    </label>
+                                </div>
+                            `;
+                            
+                            if (optionPrice < minPrice) {
+                                minPrice = optionPrice;
+                                minPriceOption = option.id;
+                            }
+                        } catch (error) {
+                            console.error("Error formatting currency:", error);
                         }
-                    });
-    
+                    }
+
                     $('#service-options-list').html(optionsHtml);
                     $('#service-options').show();
-    
+
                     if (minPriceOption !== null) {
-                        $(`input[name="option_id"][value="${minPriceOption}"]`).prop('checked', true);
-                        $('#selected-service-price').text(minPrice);
+                        try {
+                            var formattedMinPrice = await formatCurrencyJS(minPrice,true);
+                            $(`input[name="option_id"][value="${minPriceOption}"]`).prop('checked', true);
+                            $('#selected-service-price').text(formattedMinPrice);
+                        } catch (error) {
+                            console.error("Error formatting currency:", error);
+                            $('#selected-service-price').text(minPrice);
+                        }
                     }
-    
+
                     $('input[name="option_id"]').on('change', function() {
                         var selectedOptionPrice = $(this).data('option-price');
                         $('#selected-service-price').text(selectedOptionPrice);
@@ -229,6 +243,26 @@
                     $('#service-options-list').html('');
                 }
             });
+
+            function formatCurrencyJS(amount,extra_charges=false) {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('format-currency') }}',
+                        data: {
+                            amount: amount,
+                            extra_charges: extra_charges,
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            resolve(response.formattedAmount); // Resolve with formatted amount
+                        },
+                        error: function(error) {
+                            reject(error); // Reject with error
+                        }
+                    });
+                });
+            }
         });
     </script>
     <script src="{{ asset('js/checkout.js') }}?v={{ config('app.version') }}"></script>

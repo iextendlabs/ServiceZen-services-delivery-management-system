@@ -47,7 +47,7 @@
                             <div class="card-header">TOTAL SALES</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-credit-card"></i>
-                                <span class="float-md-end">@currency($sale)</span>
+                                <span class="float-md-end">@currency($sale,true)</span>
                             </div>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                             <div class="card-header">TOTAL AFFILIATE COMMISSION</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($affiliate_commission)</span>
+                                <span class="float-md-end">@currency($affiliate_commission,true)</span>
                             </div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                             <div class="card-header">TOTAL STAFF COMMISSION</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_commission)</span>
+                                <span class="float-md-end">@currency($staff_commission,true)</span>
                             </div>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                             <div class="card-header">Salary</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-credit-card"></i>
-                                <span class="float-md-end">@currency(auth()->user()->staff->fix_salary)</span>
+                                <span class="float-md-end">@currency(auth()->user()->staff->fix_salary,true)</span>
                             </div>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
                             <div class="card-header">Total Balance</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-credit-card"></i>
-                                <span class="float-md-end">@currency($staff_total_balance)</span>
+                                <span class="float-md-end">@currency($staff_total_balance,true)</span>
                             </div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                             <div class="card-header">Product Sale of {{ now()->format('F') }}</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_product_sales)</span>
+                                <span class="float-md-end">@currency($staff_product_sales,true)</span>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                             <div class="card-header">Total Bonus of {{ now()->format('F') }}</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_bonus)</span>
+                                <span class="float-md-end">@currency($staff_bonus,true)</span>
                             </div>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                             <div class="card-header">Total Order Commission of {{ now()->format('F') }}</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_order_commission)</span>
+                                <span class="float-md-end">@currency($staff_order_commission,true)</span>
                             </div>
                         </div>
                     </div>
@@ -122,7 +122,7 @@
                             <div class="card-header">Other Income of {{ now()->format('F') }}</div>
                             <div class="card-body analytic">
                                 <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_other_income)</span>
+                                <span class="float-md-end">@currency($staff_other_income,true)</span>
                             </div>
                         </div>
                     </div>

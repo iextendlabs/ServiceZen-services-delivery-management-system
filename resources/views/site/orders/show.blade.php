@@ -49,7 +49,10 @@
                         <b>Order Status:</b> {{ $order->status }}
                     </td>
                     <td>
-                        <b>Total Amount:</b> @currency( $order->total_amount ) <br><br>
+                        <b>Total Amount:</b> @currency($order->total_amount, true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->total_amount * $order->currency_rate, 2) }})
+                        @endif <br><br>
                         <b>Payment Method:</b> {{ $order->payment_method }}
                     </td>
                 </tr>
@@ -118,29 +121,59 @@
                     <td>{{ $orderService->service_name }}</td>
                     <td>{{ $orderService->status }}</td>
                     <td>{{ $orderService->duration ?? $orderService->service->duration ?? '' }}</td>
-                    <td class="text-right">@currency($orderService->price)</td>
+                    <td class="text-right">
+                        @currency($orderService->price,true) 
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($orderService->price * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
 
                 <tr>
                     <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
-                    <td class="text-right">@currency($order->order_total->sub_total)</td>
+                    <td class="text-right">
+                        @currency($order->order_total->sub_total,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->order_total->sub_total * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Coupon Discount:</strong></td>
-                    <td class="text-right">{{ config('app.currency') }}{{ $order->order_total->discount ? '-'.$order->order_total->discount : 0 }}</td>
+                    <td class="text-right">
+                        @currency($order->order_total->discount ? '-' . $order->order_total->discount : 0 ,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format(($order->order_total->discount ?? 0) * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Staff Transport Charges:</strong></td>
-                    <td class="text-right">{{ config('app.currency') }}{{ $order->order_total->transport_charges ? $order->order_total->transport_charges : 0 }}</td>
+                    <td class="text-right">
+                        @currency($order->order_total->transport_charges ? $order->order_total->transport_charges : 0 ,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format(($order->order_total->transport_charges ?? 0) * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Staff Charges:</strong></td>
-                    <td class="text-right">{{ config('app.currency') }}{{ $order->order_total->staff_charges ? $order->order_total->staff_charges : 0 }}</td>
+                    <td class="text-right">
+                        @currency( $order->order_total->staff_charges ? $order->order_total->staff_charges : 0,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format(($order->order_total->staff_charges ?? 0) * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                    <td class="text-right">@currency($order->total_amount)</td>
+                    <td class="text-right">
+                        @currency($order->total_amount,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->total_amount * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
             </table>
             @if($order->order_comment)

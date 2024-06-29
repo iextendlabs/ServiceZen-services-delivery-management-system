@@ -269,8 +269,8 @@ class OrderController extends Controller
         $categories = ServiceCategory::where('status', 1)->get();
         $area = '';
         $city = '';
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'categories'));
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date,$order = null, $serviceIds = null,true);
+        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'categories','isAdmin'));
     }
 
 
@@ -500,14 +500,14 @@ class OrderController extends Controller
         }
         $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id, $serviceIds,true);
         if ($request->edit == "services") {
             return view('orders.services_edit', compact('order', 'serviceIds', 'selectedServices', 'servicesCategories'));
         }
         if ($request->edit == "status") {
             return view('orders.status_edit', compact('order', 'statuses'));
         } elseif ($request->edit == "booking") {
-            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
+            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area','isAdmin'));
         } elseif ($request->edit == "address") {
             return view('orders.detail_edit', compact('order'));
         } elseif ($request->edit == "affiliate") {

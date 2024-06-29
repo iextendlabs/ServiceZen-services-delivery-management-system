@@ -86,7 +86,10 @@
                         <b>Order Status:</b> {{ $order->status }}
                     </td>
                     <td>
-                        <b>Total Amount:</b> @currency($order->total_amount) <br><br>
+                        <b>Total Amount:</b> @currency($order->total_amount, true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->total_amount * $order->currency_rate, 2) }})
+                        @endif <br><br>
                         <b>Payment Method:</b> {{ $order->payment_method }} <br><br>
                         <b>Order Source:</b> {{ $order->order_source }}
                     </td>
@@ -159,34 +162,58 @@
                         <td>{{ $orderService->service_name }}@if($orderService->option_name) ({{$orderService->option_name }})@endif</td>
                         <td>{{ $orderService->status }}</td>
                         <td>{{ $orderService->duration ?? ($orderService->service->duration ?? '') }}</td>
-                        <td class="text-right">@currency($orderService->price)</td>
+                        <td class="text-right">
+                            @currency($orderService->price,true) 
+                            @if($order->currency_symbol && $order->currency_rate)
+                                ({{ $order->currency_symbol }}{{ number_format($orderService->price * $order->currency_rate, 2) }})
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
                 <tr>
                     <td colspan="3" class="text-right"><strong>Sub Total:</strong></td>
-                    <td class="text-right">@currency($order->order_total->sub_total)</td>
+                    <td class="text-right">
+                        @currency($order->order_total->sub_total,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->order_total->sub_total * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Coupon Discount:</strong></td>
                     <td class="text-right">
-                        {{ config('app.currency') }}{{ $order->order_total->discount ? '-' . $order->order_total->discount : 0 }}
+                        @currency($order->order_total->discount ? '-' . $order->order_total->discount : 0 ,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format(($order->order_total->discount ?? 0) * $order->currency_rate, 2) }})
+                        @endif
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Staff Transport Charges:</strong></td>
                     <td class="text-right">
-                        {{ config('app.currency') }}{{ $order->order_total->transport_charges ? $order->order_total->transport_charges : 0 }}
+                        @currency($order->order_total->transport_charges ? $order->order_total->transport_charges : 0 ,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format(($order->order_total->transport_charges ?? 0) * $order->currency_rate, 2) }})
+                        @endif
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Staff Charges:</strong></td>
                     <td class="text-right">
-                        {{ config('app.currency') }}{{ $order->order_total->staff_charges ? $order->order_total->staff_charges : 0 }}
+                        @currency( $order->order_total->staff_charges ? $order->order_total->staff_charges : 0,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format(($order->order_total->staff_charges ?? 0) * $order->currency_rate, 2) }})
+                        @endif
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-right"><strong>Total:</strong></td>
-                    <td class="text-right">@currency($order->total_amount)</td>
+                    <td class="text-right">
+                        @currency($order->total_amount,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->total_amount * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                 </tr>
                 @if ($order->order_total->discount > 0)
                     <tr>
@@ -271,8 +298,8 @@
                                 <td>#{{ $order->id }}</td>
                                 <td>{{ $order->status }}</td>
                                 <td>{{ $order->staff_name }}</td>
-                                <td>@currency($order->order_total->sub_total)</td>
-                                <td>@currency($staffTransactionStatus->amount ?? $staff_commission)</td>
+                                <td>@currency($order->order_total->sub_total,true)</td>
+                                <td>@currency($staffTransactionStatus->amount ?? $staff_commission,true)</td>
                                 @if (!auth()->user()->hasRole('Staff'))
                                     <td class="no-print">
 
@@ -322,9 +349,9 @@
                                 <input type="hidden" name="type" value="Order Affiliate Commission">
                                 <tr>
                                     <td>#{{ $order->id }}</td>
-                                    <td>@currency($order->order_total->sub_total)</td>
+                                    <td>@currency($order->order_total->sub_total,true)</td>
                                     <td>{{ $affiliate->name }}</td>
-                                    <td>@currency($affiliateTransactionStatus->amount ?? $affiliate_commission)</td>
+                                    <td>@currency($affiliateTransactionStatus->amount ?? $affiliate_commission,true)</td>
                                     <td class="no-print">
                                         @can('order-edit')
                                             @if (empty($affiliateTransactionStatus))
@@ -370,9 +397,9 @@
                                 <input type="hidden" name="type" value="Order Parent Affiliate Commission">
                                 <tr>
                                     <td>#{{ $order->id }}</td>
-                                    <td>@currency($affiliate_commission)</td>
+                                    <td>@currency($affiliate_commission,true)</td>
                                     <td>{{ $affiliate->affiliate->parentAffiliate->name }}</td>
-                                    <td>@currency($parentAffiliateTransactionStatus->amount ?? $parent_affiliate_commission)</td>
+                                    <td>@currency($parentAffiliateTransactionStatus->amount ?? $parent_affiliate_commission,true)</td>
                                     <td class="no-print">
                                         @can('order-edit')
                                             @if (empty($parentAffiliateTransactionStatus))

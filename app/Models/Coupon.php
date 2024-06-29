@@ -26,7 +26,7 @@ class Coupon extends Model
         return $this->belongsToMany(ServiceCategory::class, 'coupon_to_category', 'coupon_id', 'category_id');
     }
 
-    public function getDiscountForProducts($services, $services_total, $bookingOption = [])
+    public function getDiscountForProducts($services, $services_total, $bookingOption = [],$zone_extra_charges = null)
     {
         if (!$this->category()->exists() && !$this->service()->exists() && $services_total) {
             return ($this->type == "Percentage") ? ($services_total * $this->discount) / 100 : $this->discount;
@@ -53,9 +53,9 @@ class Coupon extends Model
                     if (in_array($service->id, $applicable_services)) {
                         $optionId = $bookingOption[$service->id] ?? null;
                         if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                            $sub_total += $service->serviceOption->find($optionId)->option_price;
+                            $sub_total += $service->serviceOption->find($optionId)->option_price + $zone_extra_charges ?? 0;
                         }else{
-                            $sub_total += isset($service->discount) ? $service->discount : $service->price;
+                            $sub_total += ($service->discount ?? $service->price) + ($zone_extra_charges ?? 0);
                         }
                     }
                 }
@@ -68,7 +68,7 @@ class Coupon extends Model
         return 0;
     }
 
-    public function isValidCoupon($code, $services, $user_id = null, $options = [])
+    public function isValidCoupon($code, $services, $user_id = null, $options = [],$zone_extra_charges = null)
     {
         $isValid = self::where('code', $code)
             ->where('status', 1)
@@ -119,12 +119,12 @@ class Coupon extends Model
                 }
             }
 
-            $services_total = $services->sum(function ($service) use($options) {
+            $services_total = $services->sum(function ($service) use($options,$zone_extra_charges) {
                 $optionId = $options[$service->id] ?? null;
                 if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price;
+                    return $service->serviceOption->find($optionId)->option_price + $zone_extra_charges ?? 0;
                 }else{
-                    return isset($service->discount) ? $service->discount : $service->price;
+                    return ($service->discount ?? $service->price) + ($zone_extra_charges ?? 0);
                 }
             });
             if( $this->min_order_value > $services_total){
