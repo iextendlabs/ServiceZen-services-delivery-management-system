@@ -14,13 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('currency_id')->nullable();
+            $table->string('currency_symbol')->nullable();
             $table->decimal('currency_rate', 10, 2)->nullable();
-            $table->string('extra_charges')->nullable();
-            $table->foreign('currency_id')
-            ->references('id')
-            ->on('currencies')
-            ->onDelete('SET NULL');
         });
     }
 
@@ -32,10 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeign(['currency_id']);
-            $table->dropColumn('currency_id');
+            $table->dropColumn('currency_symbol');
             $table->dropColumn('currency_rate');
-            $table->dropColumn('extra_charges');
         });
     }
 };

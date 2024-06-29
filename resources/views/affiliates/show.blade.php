@@ -68,19 +68,19 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Fix Salary:</strong>
-                    @currency($affiliate->affiliate->fix_salary) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})
+                    @currency($affiliate->affiliate->fix_salary,true) (Rs.{{ $pkrRateValue * $affiliate->affiliate->fix_salary }})
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Bonus of {{ now()->format('F') }}:</strong>
-                    @currency($bonus) (Rs.{{ $pkrRateValue * $bonus }})
+                    @currency($bonus,true) (Rs.{{ $pkrRateValue * $bonus }})
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Product Sales of {{ now()->format('F') }}:</strong>
-                    @currency($product_sales) (Rs.{{ $pkrRateValue * $product_sales }})
+                    @currency($product_sales,true) (Rs.{{ $pkrRateValue * $product_sales }})
                 </div>
             </div>
             <div class="col-md-12">
@@ -132,7 +132,7 @@
                     <a href="{{ url('/affiliate/exportTransaction', ['User' => $affiliate->id]) }}"
                         class="btn btn-primary">Export
                         CSV</a>
-                    <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
+                    <p>Current balance is: <b>@currency($total_balance,true) (Rs.{{ $total_balance_in_pkr }})</b></p>
                     <table class="table table-striped table-bordered album bg-light">
                         <tr>
                             <th>Sr#</th>
@@ -154,7 +154,7 @@
                                         {{ $transaction->description }}
                                     @endif
                                 </td>
-                                <td>@currency($transaction->amount) (Rs.{{ $transaction->formatted_amount }})</td>
+                                <td>@currency($transaction->amount,true) (Rs.{{ $transaction->formatted_amount }})</td>
                                 <td>
                                     <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
                                         @csrf
@@ -180,8 +180,8 @@
             <hr>
             <div class="col-md-6">
                 <h3>Add Transaction</h3>
-                <p>Current balance is: <b>@currency($total_balance) (Rs.{{ $total_balance_in_pkr }})</b></p>
-                <p>Current balance with salary is: <b>@currency($total_balance)+@currency($affiliate->affiliate->fix_salary)
+                <p>Current balance is: <b>@currency($total_balance,true) (Rs.{{ $total_balance_in_pkr }})</b></p>
+                <p>Current balance with salary is: <b>@currency($total_balance,true)+@currency($affiliate->affiliate->fix_salary,true)
                         Rs.({{ $total_balance_in_pkr . '+' . $pkrRateValue * $affiliate->affiliate->fix_salary }})</b></p>
                 <form action="{{ route('transactions.store') }}" method="POST" id="pay-transactions">
                     @csrf

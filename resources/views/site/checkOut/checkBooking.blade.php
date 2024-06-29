@@ -91,7 +91,7 @@
                                                 <label style="display: contents;">
                                                     <input required type="radio" name="service_id" class="checkBooking_service_id" 
                                                            value="{{ $service->id }}" data-options="{{ $service->serviceOption }}" data-name="{{ $service->name }}"
-                                                           data-price="@if($service->discount) @currency($service->discount) @else @currency($service->price) @endif"
+                                                           data-price="@if($service->discount) @currency($service->discount,false,true) @else @currency($service->price,false,true) @endif"
                                                            data-duration="{{ $service->duration }}">
                                                     {{ $service->name }}
                                             </td>
@@ -99,12 +99,12 @@
                                                 @if (isset($service->discount))
                                                     <s>
                                                 @endif
-                                                @currency($service->price)
+                                                @currency($service->price,false,true)
                                                 @if (isset($service->discount))
                                                     </s>
                                                 @endif
                                                 @if (isset($service->discount))
-                                                    <b class="discount"> @currency($service->discount)</b>
+                                                    <b class="discount"> @currency($service->discount,false,true)</b>
                                                 @endif
                                             </td>
                                             <td>{{ $service->duration }}</td>
@@ -201,7 +201,7 @@
                         var optionPrice = parseFloat(option.option_price);
                         
                         try {
-                            var formattedOptionPrice = await formatCurrency(optionPrice);
+                            var formattedOptionPrice = await formatCurrencyJS(optionPrice,true);
                             
                             optionsHtml += `
                                 <div>
@@ -225,7 +225,7 @@
 
                     if (minPriceOption !== null) {
                         try {
-                            var formattedMinPrice = await formatCurrency(minPrice);
+                            var formattedMinPrice = await formatCurrencyJS(minPrice,true);
                             $(`input[name="option_id"][value="${minPriceOption}"]`).prop('checked', true);
                             $('#selected-service-price').text(formattedMinPrice);
                         } catch (error) {
@@ -244,13 +244,14 @@
                 }
             });
 
-            function formatCurrency(amount) {
+            function formatCurrencyJS(amount,extra_charges=false) {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
                         url: '{{ route('format-currency') }}',
                         data: {
                             amount: amount,
+                            extra_charges: extra_charges,
                             _token: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {

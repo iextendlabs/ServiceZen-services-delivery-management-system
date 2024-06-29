@@ -187,12 +187,12 @@
                                         @if (isset($service->discount))
                                             <s>
                                         @endif
-                                        @currency($service->price)
+                                        @currency($service->price,false,true)
                                         @if (isset($service->discount))
                                             </s>
                                         @endif
                                         @if (isset($service->discount))
-                                            <b class="discount"> @currency($service->discount)</b>
+                                            <b class="discount"> @currency($service->discount,false,true)</b>
                                         @endif
                                     </small>
 
@@ -303,7 +303,7 @@
                                                     <div class="card-body text-center">
                                                         <h5 class="card-title">{{ $staff->name }}</h5>
                                                         <h5 class="card-title">{{ $staff->staff->sub_title }}</h5>
-                                                        <p class="card-title">Extra Charges:<b>@currency($staff->staff->charges)</b></p>
+                                                        <p class="card-title">Extra Charges:<b>@currency($staff->staff->charges,false)</b></p>
                                                         <a href="{{ route('staffProfile.show', $staff->id) }}"
                                                             class="btn btn-block btn-primary">View</a>
                                                         @for ($i = 1; $i <= 5; $i++)

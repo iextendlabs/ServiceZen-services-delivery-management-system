@@ -149,7 +149,12 @@
                         <br>
                         {{ $order->customer->customerProfile->whatsapp ?? '' }}
                     </td>
-                    <td>@currency($order->total_amount)</td>
+                    <td>
+                        @currency($order->total_amount,true)
+                        @if($order->currency_symbol && $order->currency_rate)
+                            ({{ $order->currency_symbol }}{{ number_format($order->total_amount * $order->currency_rate, 2) }})
+                        @endif
+                    </td>
                     <td>{{ $order->payment_method }}</td>
                     <td>
                         @if (isset($order->order_comment))

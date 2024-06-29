@@ -52,7 +52,12 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Extra Charges:</strong>
-                    <input type="number" name="extra_charges" value="{{ old('extra_charges') }}" class="form-control" placeholder="Extra Charges">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">AED</span>
+                        </div>
+                        <input type="number" name="extra_charges" value="{{ old('extra_charges') }}" class="form-control" placeholder="Extra Charges">
+                    </div>
                 </div>
             </div>
             <div class="col-md-12 text-center">

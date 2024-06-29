@@ -103,7 +103,7 @@ class CheckOutController extends Controller
         $date = date('Y-m-d');
         $area = $address['area'] ?? '';
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
 
         if ($address && $address['area']) {
             $zoneShow = 0;
@@ -134,7 +134,7 @@ class CheckOutController extends Controller
             $option_id = $request->option_id;
         }
 
-        return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'serviceIds', 'zoneShow', 'selected_booking','option_id'));
+        return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'serviceIds', 'zoneShow', 'selected_booking','option_id','isAdmin'));
     }
 
     public function addToCartServicesStaff(Request $request)
@@ -271,9 +271,8 @@ class CheckOutController extends Controller
         if($isValidOrderValue !== true){
             return response()->json(['errors' => $isValidOrderValue], 200);
         }
-        $input['currency_id'] = $staffZone->currency_id ?? null;
+        $input['currency_symbol'] = $staffZone->currency->symbol ?? null;
         $input['currency_rate'] = $staffZone->currency->rate ?? null;
-        $input['extra_charges'] = $staffZone->extra_charges ?? null;
         // Create order
         list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone ,$password);
         // Handle addresses
@@ -281,11 +280,11 @@ class CheckOutController extends Controller
 
         [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
 
-        $all_sub_total = formatCurrency($all_sub_total);
-        $all_discount = formatCurrency($all_discount);
-        $all_staff_charges = formatCurrency($all_staff_charges);
-        $all_transport_charges = formatCurrency($all_transport_charges);
-        $all_total_amount = formatCurrency($all_total_amount);
+        $all_sub_total = formatCurrency($all_sub_total,false);
+        $all_discount = formatCurrency($all_discount,false);
+        $all_staff_charges = formatCurrency($all_staff_charges,false);
+        $all_transport_charges = formatCurrency($all_transport_charges,false);
+        $all_total_amount = formatCurrency($all_total_amount,false);
 
         return response()->json([
             'sub_total' => $all_sub_total,
@@ -354,12 +353,12 @@ class CheckOutController extends Controller
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
         [$groupedBooking, $groupedBookingOption] = $this->groupBookingData($bookingData);
 
-        $sub_total = $all_selected_services->sum(function ($service) use ($groupedBookingOption) {
+        $sub_total = $all_selected_services->sum(function ($service) use ($groupedBookingOption,$staffZone) {
             $optionId = $groupedBookingOption[$service->id] ?? null;
             if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                return $service->serviceOption->find($optionId)->option_price;
+                return $service->serviceOption->find($optionId)->option_price + $staffZone->extra_charges ?? 0;
             }
-            return $service->discount ?? $service->price;
+            return ($service->discount ?? $service->price) + ($staffZone->extra_charges ?? 0);
         });
 
         // Apply coupon discount
@@ -367,9 +366,9 @@ class CheckOutController extends Controller
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
             
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,null,$groupedBookingOption);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,null,$groupedBookingOption,$staffZone->extra_charges ?? 0);
                 if ($isValid === true) {
-                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total, $groupedBookingOption);
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total, $groupedBookingOption,$staffZone->extra_charges ?? 0);
                 } else {
                     Cookie::queue(Cookie::forget('coupon_code'));
                     $errors = [
@@ -439,19 +438,19 @@ class CheckOutController extends Controller
 
             $selected_services = Service::whereIn('id', $singleBookingService)->get();
 
-            $sub_total = $selected_services->sum(function ($service) use ($groupedBookingOption) {
+            $sub_total = $selected_services->sum(function ($service) use ($groupedBookingOption,$staffZone) {
                 $optionId = $groupedBookingOption[$service->id] ?? null;
                 if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price;
+                    return $service->serviceOption->find($optionId)->option_price + $staffZone->extra_charges ?? 0;
                 }
-                return $service->discount ?? $service->price;
+                return ($service->discount ?? $service->price) + ($staffZone->extra_charges ?? 0);
             });
 
             if ($input['coupon_code'] && $singleBookingService) {
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption,$staffZone->extra_charges ?? 0);
                         if ($discount > 0) {
                             $input['coupon_id'] = $coupon->id;
                             $i++;
@@ -460,7 +459,7 @@ class CheckOutController extends Controller
                         }
                     } elseif ($coupon->type == "Percentage") {
                         $input['coupon_id'] = $coupon->id;
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption,$staffZone->extra_charges ?? 0);
                     }
                 }
             }
@@ -468,18 +467,18 @@ class CheckOutController extends Controller
             $staff_charges = $staff->staff->charges ?? 0;
             $transport_charges = $staffZone->transport_charges ?? 0;
             $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
+            
+            $input['sub_total'] = (float)$sub_total;
+            $input['discount'] = (float)$discount;
+            $input['staff_charges'] = (float)$staff_charges;
+            $input['transport_charges'] = (float)$transport_charges;
+            $input['total_amount'] = (float)$total_amount;
 
-            $input['sub_total'] = (int)$sub_total;
-            $input['discount'] = (int)$discount;
-            $input['staff_charges'] = (int)$staff_charges;
-            $input['transport_charges'] = (int)$transport_charges;
-            $input['total_amount'] = (int)$total_amount;
-
-            $all_sub_total += $sub_total;
-            $all_discount += $discount;
-            $all_staff_charges += $staff_charges;
-            $all_transport_charges += $transport_charges;
-            $all_total_amount += $total_amount;
+            $all_sub_total = $sub_total;
+            $all_discount = $discount;
+            $all_staff_charges = $staff_charges;
+            $all_transport_charges = $transport_charges;
+            $all_total_amount = $total_amount;
 
             $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
 
@@ -522,11 +521,11 @@ class CheckOutController extends Controller
                 $optionId = $groupedBookingOption[$service->id] ?? null;
                 if ($optionId !== null && $service->serviceOption->find($optionId)) {
                     $serviceOption = $service->serviceOption->find($optionId);
-                    $input['price'] = $serviceOption->option_price;
+                    $input['price'] = $serviceOption->option_price + $staffZone->extra_charges ?? 0;
                     $input['option_id'] = $optionId;
                     $input['option_name'] = $serviceOption->option_name;
                 } else {
-                    $input['price'] = $service->discount ?? $service->price;
+                    $input['price'] = $service->discount ?? $service->price + $staffZone->extra_charges ?? 0;
                 }
 
                 OrderService::create($input);
@@ -720,7 +719,7 @@ class CheckOutController extends Controller
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $city = $addresses['city'];
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
 
 
         foreach ($bookingData as $index => $booking) {
@@ -739,7 +738,7 @@ class CheckOutController extends Controller
 
         [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
 
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings','groupedBookingOption'));
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings','groupedBookingOption','isAdmin'));
     }
 
     public function confirmStep(Request $request)
@@ -806,9 +805,12 @@ class CheckOutController extends Controller
             $address = json_decode($request->cookie('address'), true);
         } catch (\Throwable $th) {
         }
-
+        $isAdmin = false;
+        if (isset($request->isAdmin) && $request->isAdmin == "true") {
+            $isAdmin = true;
+        }
         if (!isset($area)) {
-            if (isset($request->isAdmin) && $request->isAdmin == true) {
+            if ($isAdmin === true) {
                 $area = $request->area;
             }else{
                 $area = $address['area'] ?? '';
@@ -820,10 +822,9 @@ class CheckOutController extends Controller
         } else {
             $zoneShow = 1;
         }
-
         $order_id = $request->has('order_id') && (int)$request->order_id ? $request->order_id : NULL;
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id, $serviceIds);
-        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date', 'zoneShow'));
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date, $order_id, $serviceIds,$isAdmin);
+        return view('site.checkOut.timeSlots', compact('timeSlots', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'area', 'date', 'zoneShow','isAdmin'));
     }
 
     public function applyCoupon(Request $request)
@@ -924,20 +925,21 @@ class CheckOutController extends Controller
         $date = date('Y-m-d');
         $area = $address['area'] ?? '';
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date);
 
         if ($address && $address['area']) {
             $zoneShow = 0;
         } else {
             $zoneShow = 1;
         }
-        return view('site.checkOut.checkBooking', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'zoneShow','categories'));
+        return view('site.checkOut.checkBooking', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'zoneShow','categories','isAdmin'));
     }
 
     public function formatCurrencyJS(Request $request)
     {
         $amount = $request->input('amount');
-        $formattedAmount = formatCurrency($amount);
+        $extra_charges = $request->input('extra_charges');
+        $formattedAmount = formatCurrency($amount,false,$extra_charges);
         return response()->json(['formattedAmount' => $formattedAmount]);
     }
 }

@@ -67,20 +67,20 @@
                                                                     $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
                                                                 @endphp
                                                                 @if($option)
-                                                                    @currency($option->option_price)
+                                                                    @currency($option->option_price,false,true)
                                                                 @else
                                                                     @if (isset($service->discount))
-                                                                        @currency($service->discount)
+                                                                        @currency($service->discount,false,true)
                                                                     @else
-                                                                        @currency($service->price)
+                                                                        @currency($service->price,false,true)
                                                                     @endif
                                                                 @endif
 
                                                             @else
                                                                 @if (isset($service->discount))
-                                                                    @currency($service->discount)
+                                                                    @currency($service->discount,false,true)
                                                                 @else
-                                                                    @currency($service->price)
+                                                                    @currency($service->price,false,true)
                                                                 @endif
                                                             @endif
 
