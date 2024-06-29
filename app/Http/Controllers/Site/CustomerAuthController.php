@@ -16,6 +16,7 @@ use App\Models\CustomerProfile;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
+use App\Models\AffiliateMembershipPlan;
 use App\Models\Setting;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Mail;
@@ -38,7 +39,10 @@ class CustomerAuthController extends Controller
 
         $gender_permission = Setting::where('key','Gender Permission')->value('value');
 
-        return view('site.auth.signUp', compact('affiliate_code','type','gender_permission'));
+        $membership_plans = AffiliateMembershipPlan::where('status', 1)
+            ->where('expiry_date', '>', Carbon::now())
+            ->get();
+        return view('site.auth.signUp', compact('affiliate_code','type','gender_permission','membership_plans'));
     }
 
     public function postRegistration(Request $request)
@@ -51,6 +55,7 @@ class CustomerAuthController extends Controller
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
             'number' => 'required',
             'whatsapp' => 'required',
+            'parent_affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);        
 
         
@@ -58,6 +63,7 @@ class CustomerAuthController extends Controller
         $input['customer_source'] = "Site";
         
         if($request->type == "affiliate"){
+
             $input['affiliate_program'] = 0 ;
         }elseif($request->type == "freelancer"){
             $input['freelancer_program'] = 0 ;
@@ -84,6 +90,10 @@ class CustomerAuthController extends Controller
             }
             Staff::create($input);
         }elseif($request->type == "affiliate"){
+            if($request->parent_affiliate_code){
+                $affiliate = Affiliate::where('code',$request->parent_affiliate_code)->first();
+                $input['parent_affiliate_id'] = $affiliate->user_id ?? null;
+            }
             Affiliate::create($input);
         }elseif($request->type == "customer"){
             CustomerProfile::create($input);

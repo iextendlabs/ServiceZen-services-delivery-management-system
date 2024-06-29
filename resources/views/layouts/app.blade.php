@@ -178,6 +178,9 @@
                                 @can('complaint-list')
                                 <a class="dropdown-item" href="{{ route('complaints.index') }}">Complaints</a>
                                 @endcan
+                                @can('membership-plan-list')
+                                <a class="dropdown-item" href="{{ route('membershipPlans.index') }}">Affiliate Membership Plans</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan
