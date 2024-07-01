@@ -162,6 +162,16 @@ class WithdrawController extends Controller
     public function destroy($id)
     {
         $withdraw = Withdraw::find($id);
+        if($withdraw->status == "Approved" && $withdraw->user_id){
+            $input['user_id'] = $withdraw->user_id;
+            $input['type'] = "Withdraw";
+            $input['status'] = "Approved";
+            $input['type'] = "Withdraw";
+            $input['amount'] = $withdraw->amount;
+    
+            Transaction::create($input);
+        }
+        
         $withdraw->delete();
 
         $previousUrl = url()->previous();

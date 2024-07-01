@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AffiliateDashboardController extends Controller
 {
@@ -182,11 +183,11 @@ class AffiliateDashboardController extends Controller
                 'date_to' => $request->date_to,
                 'order_count' => $request->order_count,
             ]);
-            
-            $withdraws = Withdraw::where('user_id',auth()->user()->id)->get();
+
+            $withdraws = Withdraw::where('user_id', auth()->user()->id)->get();
             $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
             $withdraw_payment_method = explode(',', $setting->value);
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count','withdraws','withdraw_payment_method'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count', 'withdraws', 'withdraw_payment_method'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect()->route('customer.login')->with('error', 'Oppes! You are not Login.');
@@ -259,14 +260,31 @@ class AffiliateDashboardController extends Controller
 
     public function affiliateWithdraw(Request $request)
     {
-        request()->validate([
-            'amount' => 'required',
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+        $total_balance = Transaction::where('user_id', auth()->user()->id)->sum('amount');
+        $total_balance *= $pkrRateValue;
+
+        $validator = Validator::make($request->all(), [
+            'amount' => [
+                'required',
+                function ($attribute, $value, $fail) use ($total_balance) {
+                    if ($value > $total_balance) {
+                        $fail('Your withdraw amount is greater than your total balance.');
+                    }
+                },
+            ],
             'payment_method' => 'required',
             'account_detail' => 'required',
         ]);
-        $input = $request->all();
 
-        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $input = $request->all();
 
         $input['amount'] = $request->amount / $pkrRateValue;
         $input['status'] = "Un Approved";

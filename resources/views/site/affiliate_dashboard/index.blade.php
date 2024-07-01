@@ -65,20 +65,26 @@
                     </div>
                 </div>
             </div>
-            @if($user->affiliate->membershipPlan)
-            <div class="col-md-4 py-2">
-                <div class="card">
-                    <div class="card-header">Membership Plan</div>
-                    <div class="card-body analytic">
-                        <i class="fa fa-pkr-sign"></i>
-                        <span class="float-end">{{ $user->affiliate->membershipPlan->plan_name }} (Rs.{{ $user->affiliate->membershipPlan->membership_fee * $pkrRateValue }})</span>
+            @if ($user->affiliate->membershipPlan)
+                <div class="col-md-4 py-2">
+                    <div class="card">
+                        <div class="card-header">Membership Plan</div>
+                        <div class="card-body analytic">
+                            <i class="fa fa-pkr-sign"></i>
+                            <span class="float-end">{{ $user->affiliate->membershipPlan->plan_name }}
+                                (Rs.{{ $user->affiliate->membershipPlan->membership_fee * $pkrRateValue }})</span>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endif
         </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
+                <span>{{ $message }}</span>
+            </div>
+        @endif
+        @if ($message = Session::get('error'))
+            <div class="alert alert-danger">
                 <span>{{ $message }}</span>
             </div>
         @endif
@@ -92,40 +98,48 @@
                 </ul>
             </div>
         @endif
-        <form action="{{ route('affiliate.withdraw') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="row bg-light py-3 mb-4">
-                <div class="col-md-12">
-                    <h4>Withdraw Amount</h4><br>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Amount</strong>
-                        <input type="number" name="amount" class="form-control" placeholder="Amount">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Payment as:</strong>
-                        <select name="payment_method" class="form-control">
-                            <option></option>
-                            @foreach ($withdraw_payment_method as $payment_method)
-                                <option value="{{ $payment_method }}">{{ $payment_method }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Acount Detail</strong>
-                        <textarea name="account_detail" class="form-control" cols="20" rows="10"></textarea>
-                    </div>
-                </div>
-                <div class="col-md-12 d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary"> Withdraw</button>
-                </div>
+        @if ($withdraws->where('status', 'Un Approved')->first())
+            <div class="alert alert-danger">
+                <span>There is a pending request. You cannot make another withdrawal request until the current one is completed.</span>
             </div>
-        </form>
+        @else
+            <form action="{{ route('affiliate.withdraw') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="row bg-light py-3 mb-4">
+                    <div class="col-md-12">
+                        <h4>Withdraw Amount</h4><br>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Amount</strong>
+                            <input type="number" name="amount" class="form-control" placeholder="Amount"
+                                value="{{ old('amount') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Payment as:</strong>
+                            <select name="payment_method" class="form-control">
+                                <option></option>
+                                @foreach ($withdraw_payment_method as $payment_method)
+                                    <option value="{{ $payment_method }}"
+                                        @if (old('payment_method') == $payment_method) selected @endif>{{ $payment_method }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Acount Detail</strong>
+                            <textarea name="account_detail" class="form-control" cols="20" rows="10">{{ old('account_detail') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary"> Withdraw</button>
+                    </div>
+                </div>
+            </form>
+        @endif
         <div class="row bg-light py-3 mb-4">
             <div class="col-md-12">
                 <h4>Withdraw Requests</h4><br>
@@ -220,7 +234,8 @@
             <div class="col-md-12">
                 <strong>My Customer</strong>
                 <table class="table table-striped table-bordered album bg-light">
-                    <td class="text-left" colspan="6"><i class="fas fa-filter"></i> Filter Customer by Order Created Date
+                    <td class="text-left" colspan="6"><i class="fas fa-filter"></i> Filter Customer by Order Created
+                        Date
                     </td>
                     <tr>
                         <td colspan="6">
