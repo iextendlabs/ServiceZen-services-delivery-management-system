@@ -184,7 +184,8 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <select name="category[{{ $category_row }}]" class="form-control">
+                                                    <select name="category[{{ $category_row }}]" class="form-control" required>
+                                                        <option></option>
                                                         @foreach ($categories as $category)
                                                         <option value="{{ $category->id }}" @if($id == $category->id) selected @endif>{{ $category->title }}</option>
                                                         @endforeach
@@ -195,7 +196,7 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" name="sort_order[{{ $category_row }}]" class="form-control" value="{{ $sort }}" placeholder="Sort Order">
+                                                    <input type="text" name="sort_order[{{ $category_row }}]" class="form-control" value="{{ $sort }}" placeholder="Sort Order" required>
                                                 </div>
                                             </div>
                                         </td>
@@ -320,7 +321,8 @@
                 <td>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <select name='category[${category_row}]' class="form-control">
+                            <select name='category[${category_row}]' class="form-control" required>
+                                <option></option>
                                 @foreach ($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->title }}</option>
                                 @endforeach
@@ -331,7 +333,7 @@
                 <td>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <input type="text" name="sort_order[${category_row}]" class="form-control" placeholder="Sort Order">
+                            <input type="text" name="sort_order[${category_row}]" class="form-control" placeholder="Sort Order" required>
                         </div>
                     </div>
                 </td>
