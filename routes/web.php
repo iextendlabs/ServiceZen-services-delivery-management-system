@@ -23,7 +23,7 @@ use App\Http\Controllers\{
     TransactionController,
     DriverController,
     AffiliateController,
-    AffiliateMembershipPlanController,
+    MembershipPlanController,
     AffiliateProgramController,
     StaffGeneralHolidayController,
     BackupController,
@@ -182,7 +182,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/apply-order-coupon', [OrderController::class,'applyOrderCoupon'])->name('apply.order_coupon');
     Route::get('/staff-categories-services', [OrderController::class,'staffCategoriesServices'])->name('fetch.staff_categories_services');
 
-    Route::resource('membershipPlans', AffiliateMembershipPlanController::class);
+    Route::resource('membershipPlans', MembershipPlanController::class);
 
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');

@@ -13,12 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('affiliate_membership_plans', function (Blueprint $table) {
+        Schema::create('membership_plans', function (Blueprint $table) {
             $table->id();
             $table->string('plan_name');
             $table->decimal('membership_fee', 8, 2);
             $table->date('expiry_date');
             $table->tinyInteger('status');
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('affiliate_membership_plans');
+        Schema::dropIfExists('membership_plans');
     }
 };

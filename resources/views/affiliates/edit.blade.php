@@ -123,7 +123,7 @@
                         <select name="membership_plan_id" class="form-control">
                             <option value=""></option>
                             @foreach ($membership_plans as $membership_plan)
-                                <option value="{{ $membership_plan->id }}" @if($affiliate->affiliate->membership_plan_id && $membership_plan->id == $affiliate->affiliate->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                <option value="{{ $membership_plan->id }}" @if($affiliate->affiliate && $affiliate->affiliate->membership_plan_id && $membership_plan->id == $affiliate->affiliate->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
                             @endforeach
                         </select>
                     </div>

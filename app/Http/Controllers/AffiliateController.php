@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
-use App\Models\AffiliateMembershipPlan;
+use App\Models\MembershipPlan;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
@@ -63,7 +63,8 @@ class AffiliateController extends Controller
      */
     public function create()
     {
-        $membership_plans = AffiliateMembershipPlan::where('status', 1)
+        $membership_plans = MembershipPlan::where('status', 1)
+            ->where('type',"Affiliate")
             ->where('expiry_date', '>', Carbon::now())
             ->get();
         $affiliates = User::role('Affiliate')->latest()->get();
@@ -180,7 +181,8 @@ class AffiliateController extends Controller
     public function edit(User $affiliate, Request $request)
     {
 
-        $membership_plans = AffiliateMembershipPlan::where('status', 1)
+        $membership_plans = MembershipPlan::where('status', 1)
+            ->where('type',"Affiliate")
             ->where('expiry_date', '>', Carbon::now())
             ->get();
 

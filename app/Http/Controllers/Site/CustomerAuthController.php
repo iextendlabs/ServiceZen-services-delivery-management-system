@@ -16,7 +16,7 @@ use App\Models\CustomerProfile;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Validation\Rule;
 use App\Mail\DeleteAccount;
-use App\Models\AffiliateMembershipPlan;
+use App\Models\MembershipPlan;
 use App\Models\Setting;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Mail;
@@ -39,7 +39,8 @@ class CustomerAuthController extends Controller
 
         $gender_permission = Setting::where('key','Gender Permission')->value('value');
 
-        $membership_plans = AffiliateMembershipPlan::where('status', 1)
+        $membership_plans = MembershipPlan::where('status', 1)
+            ->where('type',"Affiliate")
             ->where('expiry_date', '>', Carbon::now())
             ->get();
         return view('site.auth.signUp', compact('affiliate_code','type','gender_permission','membership_plans'));

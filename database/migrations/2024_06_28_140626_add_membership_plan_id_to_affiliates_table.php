@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->foreign('membership_plan_id')
                   ->references('id')
-                  ->on('affiliate_membership_plans')
+                  ->on('membership_plans')
                   ->onDelete('SET NULL');
         });
     }
