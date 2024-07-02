@@ -68,12 +68,12 @@ class SiteOrdersController extends Controller
         $services = Service::all();
         $order_service = OrderService::where('order_id', $id)->pluck('service_id')->toArray();
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id, $order_service);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id, $order_service);
 
         if ($request->edit == "custom_location") {
             return view('site.orders.custom_location', compact('order'));
         } else {
-            return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area', 'services', 'order_service'));
+            return view('site.orders.edit', compact('order', 'staff_ids', 'timeSlots', 'statuses', 'holiday', 'staffZone', 'allZones', 'date', 'area', 'services', 'order_service','isAdmin'));
         }
     }
 

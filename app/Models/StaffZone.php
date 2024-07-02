@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StaffZone extends Model
 {
-    protected $fillable = ['name', 'description','transport_charges','currency','currency_rate','extra_charges'];
+    protected $fillable = ['name', 'description','transport_charges','currency_id','extra_charges'];
 
     use HasFactory;
 
@@ -19,5 +19,10 @@ class StaffZone extends Model
     public function staffGroups()
     {
         return $this->belongsToMany(StaffGroup::class, 'staff_group_staff_zone', 'staff_zone_id', 'staff_group_id');
+    }
+
+    public function currency()
+    {
+        return $this->hasOne(Currency::class,'id','currency_id');
     }
 }

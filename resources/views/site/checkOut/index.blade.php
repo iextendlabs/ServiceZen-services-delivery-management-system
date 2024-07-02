@@ -44,13 +44,13 @@ $total_amount = 0;
             <td>{{ $booking['service']->name }}</td>
             <td>
                 @if($booking['option'] !== null)
-                    <span>@currency($booking['option']->option_price)</span>
+                    <span>@currency($booking['option']->option_price,false,true)</span>
                 @else
                     <span>
                         @if(isset($booking['service']->discount))  
-                            @currency($booking['service']->discount) 
+                            @currency($booking['service']->discount,false,true) 
                         @else 
-                            @currency($booking['service']->price)
+                            @currency($booking['service']->price,false,true)
                         @endif
                     </span>
                 @endif
@@ -70,7 +70,7 @@ $total_amount = 0;
                 </div>
             </td>
         </tr>
-        @if($booking['option'] !== null)
+        {{-- @if($booking['option'] !== null)
         @php
         $total_amount += $booking['option']->option_price;
         @endphp
@@ -84,10 +84,10 @@ $total_amount = 0;
         $total_amount += $booking['service']->price;
         @endphp
         @endif
-        @endif
+        @endif --}}
         @endforeach
     </table>
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-sm-4 offset-sm-8 ">
             <table class="table table-striped table-bordered">
                 <tbody>
@@ -102,7 +102,7 @@ $total_amount = 0;
                 </tbody>
             </table>
         </div>
-    </div>
+    </div> --}}
     @else
     <div class="text-center">
         <h4>Cart is Empty</h4>

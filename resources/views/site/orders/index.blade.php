@@ -70,7 +70,12 @@
                 <td>{{ $order->date }}</td>
                 <td>{{ $order->time_slot_value }}</td>
                 <td>{{ $order->area}}</td>
-                <td>@currency( $order->total_amount )</td>
+                <td>
+                    @currency($order->total_amount,true)
+                    @if($order->currency_symbol && $order->currency_rate)
+                        ({{ $order->currency_symbol }}{{ number_format($order->total_amount * $order->currency_rate, 2) }})
+                    @endif
+                </td>
                 <td>{{ $order->payment_method }}</td>
                 <td>{{ $order->status }}</td>
                 <td>{{ $order->created_at }}</td>

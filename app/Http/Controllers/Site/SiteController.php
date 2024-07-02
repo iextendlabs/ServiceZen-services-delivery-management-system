@@ -50,32 +50,6 @@ class SiteController extends Controller
         } catch (\Throwable $th) {
         }
 
-        if (Auth::check()) {
-
-            $user = User::find(auth()->user()->id);
-            if (isset($user->customerProfile) && session()->has('address') == false) {
-                $address = [];
-
-                $address['buildingName'] = $user->customerProfile->buildingName;
-                $address['district'] = $user->customerProfile->district;
-                $address['area'] = $user->customerProfile->area;
-                $address['flatVilla'] = $user->customerProfile->flatVilla;
-                $address['street'] = $user->customerProfile->street;
-                $address['landmark'] = $user->customerProfile->landmark;
-                $address['city'] = $user->customerProfile->city;
-                $address['number'] = $user->customerProfile->number;
-                $address['whatsapp'] = $user->customerProfile->whatsapp;
-                $address['email'] = $user->email;
-                $address['name'] = $user->name;
-                $address['latitude'] = $user->customerProfile->latitude;
-                $address['longitude'] = $user->customerProfile->longitude;
-                $address['searchField'] = $user->customerProfile->searchField;
-                $address['gender'] = $user->customerProfile->gender;
-
-                cookie()->queue('address', json_encode($address), 5256000);
-            }
-        }
-
         $reviews = Review::latest()->take(6)->get();
 
         $staffs = User::whereHas('staff', function ($query) {

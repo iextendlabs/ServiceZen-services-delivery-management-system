@@ -215,7 +215,7 @@
                                         @if ($coupons->type == 'Percentage')
                                             {{ $coupons->discount }} %
                                         @else
-                                            @currency($coupons->discount)
+                                            @currency($coupons->discount,false)
                                         @endif
                                     </td>
                                     <td>
