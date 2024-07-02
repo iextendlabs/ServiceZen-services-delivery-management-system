@@ -224,14 +224,16 @@ class HomeController extends Controller
 
         $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
             $category = $categories->get($id);
-            return [
-                'id' => $category->id,
-                'title' => $category->title,
-                'image' => $category->image,
-                'icon' => $category->icon,
-                'sort_order' => $order
-            ];
-        })->sortBy('sort_order')->values()->toArray();
+            if ($category) {
+                return [
+                    'id' => $category->id,
+                    'title' => $category->title,
+                    'image' => $category->image,
+                    'icon' => $category->icon,
+                    'sort_order' => $order
+                ];
+            }
+        })->filter()->sortBy('sort_order')->values()->toArray();
 
         ksort($sortedCategories);
 

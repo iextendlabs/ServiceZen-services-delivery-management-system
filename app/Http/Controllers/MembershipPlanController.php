@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AffiliateMembershipPlan;
+use App\Models\MembershipPlan;
 use App\Models\Complaint;
 use App\Models\ComplaintChat;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class AffiliateMembershipPlanController extends Controller
+class MembershipPlanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,9 +35,10 @@ class AffiliateMembershipPlanController extends Controller
             'plan_name' => $request->plan_name,
             'membership_fee' => $request->membership_fee,
             'expiry_date' => $request->expiry_date,
-            'status' => $request->status
+            'status' => $request->status,
+            'type' => $request->type
         ];
-        $query = AffiliateMembershipPlan::orderBy($sort, $direction);
+        $query = MembershipPlan::orderBy($sort, $direction);
 
         if ($request->plan_name) {
             $query->where('plan_name', 'like', '%'.$request->plan_name . '%');
@@ -51,6 +52,10 @@ class AffiliateMembershipPlanController extends Controller
             $query->where('expiry_date', $request->expiry_date);
         }
 
+        if ($request->type) {
+            $query->where('type', $request->type);
+        }
+
         if (isset($request->status)) {
             $query->where('status', $request->status);
         }
@@ -58,7 +63,7 @@ class AffiliateMembershipPlanController extends Controller
         $total_membership_plan = $query->count();
         $membership_plans = $query->paginate(config('app.paginate'));
 
-        $filters = $request->only(['plan_name','membership_fee','expiry_date','status']);
+        $filters = $request->only(['plan_name','membership_fee','expiry_date','status','type']);
         $membership_plans->appends($filters, ['sort' => $sort, 'direction' => $direction]);
         return view('membershipPlans.index', compact('membership_plans', 'filter', 'total_membership_plan', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
 
@@ -87,36 +92,37 @@ class AffiliateMembershipPlanController extends Controller
             'membership_fee' => 'required',
             'status' => 'required',
             'expiry_date' => 'required',
+            'type' => 'required',
         ]);
 
         $input = $request->all();
-        AffiliateMembershipPlan::create($input);
+        MembershipPlan::create($input);
 
         return redirect()->route('membershipPlans.index')
-            ->with('success', 'Affiliate Membership Plan created successfully.');
+            ->with('success', 'Membership Plan created successfully.');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\AffiliateMembershipPlan $membership_plan
+     * @param  \App\MembershipPlan $membership_plan
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $membership_plan = AffiliateMembershipPlan::find($id);
+        $membership_plan = MembershipPlan::find($id);
         return view('membershipPlans.show', compact('membership_plan'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\AffiliateMembershipPlan $membership_plan
+     * @param  \App\MembershipPlan $membership_plan
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $membership_plan = AffiliateMembershipPlan::find($id);
+        $membership_plan = MembershipPlan::find($id);
         return view('membershipPlans.edit', compact('membership_plan'));
     }
 
@@ -134,28 +140,29 @@ class AffiliateMembershipPlanController extends Controller
             'membership_fee' => 'required',
             'status' => 'required',
             'expiry_date' => 'required',
+            'type' => 'required',
         ]);
 
-        $membership_plan = AffiliateMembershipPlan::find($id);
+        $membership_plan = MembershipPlan::find($id);
         $membership_plan->update($request->all());
         $previousUrl = $request->url;
-        return redirect($previousUrl)->with('success', 'Affiliate Membership Plan updated successfully');
+        return redirect($previousUrl)->with('success', 'Membership Plan updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\AffiliateMembershipPlan $membership_plan
+     * @param  \App\MembershipPlan $membership_plan
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        AffiliateMembershipPlan::find($id)->delete();
+        MembershipPlan::find($id)->delete();
 
         $previousUrl = url()->previous();
 
         return redirect($previousUrl)
-            ->with('success', 'Affiliate Membership Plan deleted successfully');
+            ->with('success', 'Membership Plan deleted successfully');
     }
 
 }
