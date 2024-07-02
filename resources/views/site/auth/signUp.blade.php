@@ -134,7 +134,7 @@
                                     <div class="col-md-6">
                                         <select name="membership_plan_id" id="membership_plan_id" class="form-control">
                                             @foreach ($membership_plans as $membership_plan)
-                                                <option value="{{$membership_plan->id}}">{{$membership_plan->plan_name}} (@currency($membership_plan->membership_fee))</option>
+                                                <option value="{{$membership_plan->id}}">{{$membership_plan->plan_name}} (@currency($membership_plan->membership_fee,true))</option>
                                             @endforeach
                                         </select>
                                     </div>
