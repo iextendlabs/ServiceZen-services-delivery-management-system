@@ -56,7 +56,6 @@ class CustomerAuthController extends Controller
             'affiliate_code' => ['nullable', 'exists:affiliates,code'],
             'number' => 'required',
             'whatsapp' => 'required',
-            'parent_affiliate_code' => ['nullable', 'exists:affiliates,code'],
         ]);        
 
         
@@ -85,23 +84,19 @@ class CustomerAuthController extends Controller
             $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
         }
 
+        $affiliate = Affiliate::where('code',$request->affiliate_code)->first();
+
         if($request->type == "freelancer"){
             if ($request->number) {
                 $input['phone'] = $request->number_country_code . $request->number;
             }
+            $input['affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;
             Staff::create($input);
         }elseif($request->type == "affiliate"){
-            if($request->parent_affiliate_code){
-                $affiliate = Affiliate::where('code',$request->parent_affiliate_code)->first();
-                $input['parent_affiliate_id'] = $affiliate->user_id ?? null;
-            }
+            $input['parent_affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;
             Affiliate::create($input);
         }elseif($request->type == "customer"){
             CustomerProfile::create($input);
-        }
-
-        if ($request->affiliate_code) {
-            $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
             if($affiliate){
                 UserAffiliate::create([
                     'user_id' => $customer->id,
