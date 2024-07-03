@@ -193,6 +193,19 @@
                         </div>
                     </div>
                     @endif
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Affiliate:</strong>
+                            <select name="affiliate_id" class="form-control">
+                                <option value=""></option>
+                                @foreach ($affiliates as $affiliate)
+                                        <option value="{{ $affiliate->id }}"
+                                            @if ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
+                                        </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             @if($socialLinks)

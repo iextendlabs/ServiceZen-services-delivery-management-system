@@ -9,7 +9,7 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp','min_order_value','expiry_date'];
+    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp','min_order_value','expiry_date','affiliate_id'];
 
     public function appointments()
     {
@@ -34,5 +34,10 @@ class Staff extends Model
     public function driver()
     {
         return $this->hasOne(User::class, 'id', 'driver_id');
+    }
+
+    public function affiliate()
+    {
+        return $this->hasOne(User::class, 'id', 'affiliate_id');
     }
 }

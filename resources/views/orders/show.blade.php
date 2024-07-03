@@ -285,10 +285,7 @@
                         <form action="{{ route('transactions.store') }}" method="POST">
                             @csrf
                             @php
-                                $staffTransactionStatus =
-                                    $order->service_staff_id == $affiliate_id
-                                        ? $order->getStaffTransactionStatus('Order Staff Commission')
-                                        : $order->getStaffTransactionStatus();
+                                $staffTransactionStatus = $order->getTransactionStatus($order->service_staff_id,'Order Staff Commission');
                             @endphp
                             <input type="hidden" name="order_id" value="{{ $order->id }}">
                             <input type="hidden" name="user_id" value="{{ $order->service_staff_id }}">
@@ -320,6 +317,53 @@
                     </table>
                 </fieldset>
             @endif
+            @if ($staff_affiliate_commission)
+                <fieldset>
+                    <legend>Staff Affiliate Commission</legend>
+                    <table class="table table-striped table-bordered album bg-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Staff Commission</th>
+                            <th>Affiliate</th>
+                            <th>Commission</th>
+                            @if (!auth()->user()->hasRole('Staff'))
+                                <th class="no-print">Action</th>
+                            @endif
+                        </tr>
+                        <form action="{{ route('transactions.store') }}" method="POST">
+                            @csrf
+                            @php
+                                $staffAffiliateTransactionStatus = $order->getTransactionStatus($order->staff->affiliate_id,'Order Staff Affiliate Commission');
+                            @endphp
+                            <input type="hidden" name="order_id" value="{{ $order->id }}">
+                            <input type="hidden" name="user_id" value="{{ $order->staff->affiliate_id }}">
+                            <input type="hidden" name="amount" value="{{ $staff_affiliate_commission }}">
+                            <input type="hidden" name="type" value="Order Staff Affiliate Commission">
+                            <tr>
+                                <td>#{{ $order->id }}</td>
+                                <td>{{ $staff_commission }}</td>
+                                <td>{{ $order->staff->affiliate->name }}</td>
+                                <td>@currency($staffAffiliateTransactionStatus->amount ?? $staff_affiliate_commission,true)</td>
+                                @if (!auth()->user()->hasRole('Staff'))
+                                    <td class="no-print">
+
+                                        @if (empty($staffAffiliateTransactionStatus))
+                                            @can('order-edit')
+                                                <button type="submit" class="btn btn-primary">Approve</button>
+                                            @endcan
+                                        @else
+                                            <a href="{{ route('transactions.Unapprove') }}?id={{ $staffAffiliateTransactionStatus->id }}"
+                                                type="button" class="btn btn-warning">Un Approve</a>
+                                            <a href="{{ route('transactions.edit', $staffAffiliateTransactionStatus->id) }}"
+                                                type="button" class="btn btn-primary">Edit</a>
+                                        @endif
+                                    </td>
+                                @endif
+                            </tr>
+                        </form>
+                    </table>
+                </fieldset>
+            @endif
             @if (!auth()->user()->hasRole('Staff'))
                 @if ($affiliate_commission)
                     <fieldset>
@@ -335,13 +379,7 @@
                             <form action="{{ route('transactions.store') }}" method="POST">
                                 @csrf
                                 @php
-                                    $affiliateTransactionStatus =
-                                        $order->service_staff_id == $affiliate_id
-                                            ? $order->getAffiliateTransactionStatus(
-                                                $affiliate_id,
-                                                'Order Affiliate Commission',
-                                            )
-                                            : $order->getAffiliateTransactionStatus($affiliate_id);
+                                    $affiliateTransactionStatus = $order->getTransactionStatus( $affiliate_id, 'Order Affiliate Commission');
                                 @endphp
                                 <input type="hidden" name="order_id" value="{{ $order->id }}">
                                 <input type="hidden" name="user_id" value="{{ $affiliate_id }}">
@@ -383,13 +421,7 @@
                             <form action="{{ route('transactions.store') }}" method="POST">
                                 @csrf
                                 @php
-                                    $parentAffiliateTransactionStatus =
-                                        $order->service_staff_id == $parent_affiliate_id
-                                            ? $order->getAffiliateTransactionStatus(
-                                                $parent_affiliate_id,
-                                                'Order Parent Affiliate Commission',
-                                            )
-                                            : $order->getAffiliateTransactionStatus($parent_affiliate_id);
+                                    $parentAffiliateTransactionStatus = $order->getTransactionStatus($parent_affiliate_id,'Order Parent Affiliate Commission');
                                 @endphp
                                 <input type="hidden" name="order_id" value="{{ $order->id }}">
                                 <input type="hidden" name="user_id" value="{{ $parent_affiliate_id }}">

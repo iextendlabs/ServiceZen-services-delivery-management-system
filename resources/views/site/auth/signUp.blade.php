@@ -139,25 +139,9 @@
                                         </select>
                                     </div>
                             </div>
-                            <div class="row mb-3 parent_affiliate_code">
-                                <label for="parent_affiliate_code"
-                                    class="col-md-4 col-form-label text-md-end">Parent Affiliate</label>
-
-                                <div class="col-md-6">
-                                    <input id="parent_affiliate_code" type="text"
-                                        class="form-control @error('parent_affiliate_code') is-invalid @enderror"
-                                        name="parent_affiliate_code" 
-                                        autocomplete="parent_affiliate_code">
-                                    @error('parent_affiliate_code')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3 affiliate_code">
-                                <label for="affiliate_code"
-                                    class="col-md-4 col-form-label text-md-end">{{ __('Affiliate Code') }}</label>
+                            <div class="row mb-3">
+                                <label for="affiliate_code" class="col-md-4 col-form-label text-md-end affiliate_code">{{ __('Affiliate Code') }}</label>
+                                <label for="affiliate_code" class="col-md-4 col-form-label text-md-end parent_affiliate_code">Parent Affiliate Code</label>
 
                                 <div class="col-md-6">
                                     <input id="affiliate_code" type="text"
@@ -257,19 +241,19 @@
             }
 
             if (selectedValue == "affiliate") {
-                $(".membership_plan_id").show();
+                $(".affiliate_code").hide();
                 $(".parent_affiliate_code").show();
-                $("#membership_plan_id").attr("required", true);
             } else {
-                $(".membership_plan_id").hide();
+                $(".affiliate_code").show();
                 $(".parent_affiliate_code").hide();
-                $("#membership_plan_id").attr("required", false);
             }
             
             if (selectedValue == "customer") {
-                $(".affiliate_code").show();
+                $(".membership_plan_id").hide();
+                $("#membership_plan_id").attr("required", false);
             } else {
-                $(".affiliate_code").hide();
+                $(".membership_plan_id").show();
+                $("#membership_plan_id").attr("required", true);
             }
         }
     </script>
