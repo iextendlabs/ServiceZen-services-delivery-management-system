@@ -91,7 +91,7 @@ class MembershipPlanController extends Controller
             'plan_name' => 'required',
             'membership_fee' => 'required',
             'status' => 'required',
-            'expiry_date' => 'required',
+            'expire' => 'required',
             'type' => 'required',
         ]);
 
@@ -139,7 +139,7 @@ class MembershipPlanController extends Controller
             'plan_name' => 'required',
             'membership_fee' => 'required',
             'status' => 'required',
-            'expiry_date' => 'required',
+            'expire' => 'required',
             'type' => 'required',
         ]);
 

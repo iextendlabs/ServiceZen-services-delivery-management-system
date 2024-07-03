@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('plan_name');
             $table->decimal('membership_fee', 8, 2);
-            $table->date('expiry_date');
+            $table->string('expire');
             $table->tinyInteger('status');
             $table->string('type');
             $table->timestamps();

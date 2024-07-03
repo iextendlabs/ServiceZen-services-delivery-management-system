@@ -40,8 +40,8 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>Expiry Date:</strong>
-                    {{ $membership_plan->expiry_date }}
+                    <strong>Expire after days:</strong>
+                    {{ $membership_plan->expire }}
                 </div>
             </div>
             <div class="col-md-12">

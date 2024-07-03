@@ -65,7 +65,6 @@ class AffiliateController extends Controller
     {
         $membership_plans = MembershipPlan::where('status', 1)
             ->where('type',"Affiliate")
-            ->where('expiry_date', '>', Carbon::now())
             ->get();
         $affiliates = User::role('Affiliate')->latest()->get();
         return view('affiliates.create',compact('affiliates','membership_plans'));
@@ -183,7 +182,6 @@ class AffiliateController extends Controller
 
         $membership_plans = MembershipPlan::where('status', 1)
             ->where('type',"Affiliate")
-            ->where('expiry_date', '>', Carbon::now())
             ->get();
 
         $affiliates = User::role('Affiliate')->latest()->get();
