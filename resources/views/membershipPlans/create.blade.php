@@ -32,14 +32,14 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Membership Fee:</strong>
                         <input type="number" name="membership_fee" class="form-control" value="{{ old('membership_fee') }}"
-                            placeholder="membership_fee">
+                            placeholder="Membership Fee">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Expiry Date:</strong>
-                        <input type="date" name="expiry_date" class="form-control" value="{{ old('expiry_date') }}"
-                            placeholder="Expiry Date">
+                        <strong>Expire after days:</strong>
+                        <input type="number" name="expire" class="form-control" value="{{ old('expire') }}"
+                            placeholder="Enter days like 20">
                     </div>
                 </div>
                 <div class="col-md-12">

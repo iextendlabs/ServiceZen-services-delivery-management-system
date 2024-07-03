@@ -38,8 +38,8 @@
                             @endif
                         </th>
                         <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'expiry_date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Expiry Date</a>
-                            @if (request('sort') === 'expiry_date')
+                                href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'expire', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Expire after days</a>
+                            @if (request('sort') === 'expire')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
@@ -63,7 +63,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $membership_plan->plan_name }}</td>
                                 <td>{{ $membership_plan->membership_fee }}</td>
-                                <td>{{ $membership_plan->expiry_date }}</td>
+                                <td>{{ $membership_plan->expire }}</td>
                                 <td>{{ $membership_plan->type }}</td>
                                 <td>{{ $membership_plan->status == 1 ? "Enable" : "Disable"  }}</td>
                                 <td>

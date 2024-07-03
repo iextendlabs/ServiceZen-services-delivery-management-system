@@ -41,7 +41,6 @@ class CustomerAuthController extends Controller
 
         $membership_plans = MembershipPlan::where('status', 1)
             ->where('type',"Affiliate")
-            ->where('expiry_date', '>', Carbon::now())
             ->get();
         return view('site.auth.signUp', compact('affiliate_code','type','gender_permission','membership_plans'));
     }
