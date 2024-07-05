@@ -233,10 +233,10 @@
                                 <a class="dropdown-item" href="{{ route('customer.login') }}">Login</a>
                                 <a class="dropdown-item" href="{{ route('customer.registration') }}">Register</a>
                                 <a class="dropdown-item"
-                                    href="{{ route('customer.registration') }}?type=affiliate">Register as
+                                    href="{{ route('customer.registration') }}?type=Affiliate">Register as
                                     Affiliate</a>
                                 <a class="dropdown-item"
-                                    href="{{ route('customer.registration') }}?type=freelancer">Register as
+                                    href="{{ route('customer.registration') }}?type=Freelancer">Register as
                                     Freelancer</a>
                             @else
                                 <a class="dropdown-item"

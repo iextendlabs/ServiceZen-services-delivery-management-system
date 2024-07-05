@@ -37,7 +37,7 @@
                                 <strong>User:</strong>
                                 <select name="user_id" class="form-control">
                                     <option></option>
-                                    @foreach ($withdraws as $user)
+                                    @foreach ($users as $user)
                                         <option value="{{ $user->id }}"
                                             @if ($filter['user_id'] == $user->id) selected @endif>
                                             {{ $user->name }}</option>

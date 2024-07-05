@@ -25,8 +25,10 @@
                         <select name="user_id" class="form-control">
                             <option></option>
                             @foreach ($users as $user)
+                            @if($user->affiliate->status == 1)
                                 <option value="{{ $user->id }}" @if ($withdraw->user_id == $user->id) selected @endif>
                                     {{ $user->name }}</option>
+                            @endif
                             @endforeach
                         </select>
                     </div>

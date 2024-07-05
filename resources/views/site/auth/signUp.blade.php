@@ -74,8 +74,8 @@
                                 <div class="col-md-6">
                                     <select name="type" id="type" class="form-control">
                                         <option value="customer">Customer</option>
-                                        <option value="affiliate" @if ($type === 'affiliate') selected @endif>Affiliate</option>
-                                        <option value="freelancer" @if ($type === 'freelancer') selected @endif>Freelancer</option>
+                                        <option value="Affiliate" @if ($type === 'Affiliate') selected @endif>Affiliate</option>
+                                        <option value="Freelancer" @if ($type === 'Freelancer') selected @endif>Freelancer</option>
                                     </select>
                                 </div>
                             </div>
@@ -133,8 +133,9 @@
                                     class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Membership Plan</label>
                                     <div class="col-md-6">
                                         <select name="membership_plan_id" id="membership_plan_id" class="form-control">
+                                            <option></option>
                                             @foreach ($membership_plans as $membership_plan)
-                                                <option value="{{$membership_plan->id}}">{{$membership_plan->plan_name}} (@currency($membership_plan->membership_fee,true))</option>
+                                                <option data-type="{{ $membership_plan->type }}" value="{{ $membership_plan->id }}">{{ $membership_plan->plan_name }} (@currency($membership_plan->membership_fee,true))</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -232,7 +233,7 @@
         });
     
         function handleTypeChange(selectedValue) {
-            if (selectedValue == "freelancer") {
+            if (selectedValue == "Freelancer") {
                 $(".sub_title").show();
                 $("#sub_title").attr("required", true);
             } else {
@@ -240,7 +241,7 @@
                 $("#sub_title").attr("required", false);
             }
 
-            if (selectedValue == "affiliate") {
+            if (selectedValue == "Affiliate") {
                 $(".affiliate_code").hide();
                 $(".parent_affiliate_code").show();
             } else {
@@ -254,7 +255,19 @@
             } else {
                 $(".membership_plan_id").show();
                 $("#membership_plan_id").attr("required", true);
+                filterMembershipPlans(selectedValue);
             }
+            $("#membership_plan_id").val('');
+        }
+
+        function filterMembershipPlans(selectedValue) {
+            $("#membership_plan_id option").each(function() {
+                if ($(this).data("type") == selectedValue) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
         }
     </script>
 @endsection

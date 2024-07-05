@@ -36,10 +36,12 @@
                             <select name="affiliate_id" class="form-control" required>
                                 <option></option>
                                 @foreach ($affiliates as $affiliate)
+                                @if($affiliate->affiliate->status == 1)
                                 @if($affiliate->id == $order->affiliate_id)
                                 <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
                                 @else
                                 <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
+                                @endif
                                 @endif
                                 @endforeach
                             </select>

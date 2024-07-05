@@ -188,24 +188,37 @@
                     @if($freelancer_join)
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Membership Plan:</strong>
+                            <select name="membership_plan_id" class="form-control">
+                                <option value=""></option>
+                                @foreach ($membership_plans as $membership_plan)
+                                    <option value="{{ $membership_plan->id }}" @if($serviceStaff->staff && $serviceStaff->staff->membership_plan_id && $membership_plan->id == $serviceStaff->staff->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <span style="color: red;">*</span><strong>Expiry Date:</strong>
                             <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $serviceStaff->staff->expiry_date ?? "" }}>
                         </div>
                     </div>
-                    @endif
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Affiliate:</strong>
                             <select name="affiliate_id" class="form-control">
                                 <option value=""></option>
                                 @foreach ($affiliates as $affiliate)
+                                    @if($affiliate->affiliate->status == 1)
                                         <option value="{{ $affiliate->id }}"
                                             @if ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
                                         </option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
             @if($socialLinks)

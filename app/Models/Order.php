@@ -153,7 +153,7 @@ class Order extends Model
 
         if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
             $affiliate_commission_rate = 0;
-            $affiliate_commission_rate = $this->affiliate->affiliate->commission;
+            $affiliate_commission_rate = $this->affiliate->affiliate->commission ?? 0;
             $affiliate_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $affiliate_commission_rate) / 100;
             $affiliate_id = $this->affiliate_id;
         }elseif ($userAffiliate) {
@@ -172,13 +172,6 @@ class Order extends Model
                     $affiliate_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $affiliate_commission_rate) / 100;
                 }
                 $affiliate_id = $userAffiliate->affiliate_id;
-            } else {
-                $affiliate_commission_rate = 0;
-                if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
-                    $affiliate_commission_rate = $this->affiliate->affiliate->commission;
-                }
-                $affiliate_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $affiliate_commission_rate) / 100;
-                $affiliate_id = $this->affiliate_id;
             }
         }
 
@@ -188,9 +181,11 @@ class Order extends Model
                 $parent_affiliate_id = $this->affiliate->affiliate->parent_affiliate_id;
             }
         } elseif ($userAffiliate) {
-            if ($userAffiliate->affiliate && $userAffiliate->affiliate->parent_affiliate_id) {
-                $parent_affiliate_commission = ($affiliate_commission * $userAffiliate->affiliate->parent_affiliate_commission) / 100;
-                $parent_affiliate_id = $userAffiliate->affiliate->parent_affiliate_id;
+            if ($userAffiliate->expiry_date == null || $userAffiliate->expiry_date >= now()) {
+                if ($userAffiliate->affiliate && $userAffiliate->affiliate->parent_affiliate_id) {
+                    $parent_affiliate_commission = ($affiliate_commission * $userAffiliate->affiliate->parent_affiliate_commission) / 100;
+                    $parent_affiliate_id = $userAffiliate->affiliate->parent_affiliate_id;
+                }
             }
         }
 

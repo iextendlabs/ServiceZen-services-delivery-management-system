@@ -296,7 +296,15 @@ class OrderController extends Controller
             'service_staff_id' => 'required',
             'time_slot_id' => 'required',
             'selected_service_ids' => 'required',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'affiliate_code' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
             'number' => 'required',
             'whatsapp' => 'required',
         ]);
