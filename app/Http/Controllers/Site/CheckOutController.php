@@ -233,10 +233,19 @@ class CheckOutController extends Controller
             'number' => 'required',
             'email' => 'required|email',
             'whatsapp' => 'required',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'affiliate_code' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        Cookie::queue(Cookie::forget('affiliate_code'));
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
             'gender' => 'required',
         ]);
-        
+            
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 200);
         }
@@ -695,7 +704,7 @@ class CheckOutController extends Controller
 
         $coupon_code = request()->cookie('coupon_code');
 
-        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
+        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->where('status',1)->first();
 
         if ($affiliate) {
             $affiliate_code = request()->cookie('affiliate_code');

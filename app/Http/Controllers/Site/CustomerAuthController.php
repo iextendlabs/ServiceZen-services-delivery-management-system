@@ -28,7 +28,7 @@ class CustomerAuthController extends Controller
 {
     public function registration(Request $request)
     {
-        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->first();
+        $affiliate = Affiliate::where('code', request()->cookie('affiliate_code'))->where('status',1)->first();
         $type = $request->type;
         if($affiliate){
             $affiliate_code = request()->cookie('affiliate_code');
@@ -39,9 +39,7 @@ class CustomerAuthController extends Controller
 
         $gender_permission = Setting::where('key','Gender Permission')->value('value');
 
-        $membership_plans = MembershipPlan::where('status', 1)
-            ->where('type',"Affiliate")
-            ->get();
+        $membership_plans = MembershipPlan::where('status', 1)->get();
         return view('site.auth.signUp', compact('affiliate_code','type','gender_permission','membership_plans'));
     }
 
@@ -52,7 +50,16 @@ class CustomerAuthController extends Controller
             'gender' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:password_confirmation',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'affiliate_code' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        Cookie::queue(Cookie::forget('affiliate_code'));
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
             'number' => 'required',
             'whatsapp' => 'required',
         ]);        
@@ -61,10 +68,9 @@ class CustomerAuthController extends Controller
         $input = $request->all();
         $input['customer_source'] = "Site";
         
-        if($request->type == "affiliate"){
-
+        if($request->type == "Affiliate"){
             $input['affiliate_program'] = 0 ;
-        }elseif($request->type == "freelancer"){
+        }elseif($request->type == "Freelancer"){
             $input['freelancer_program'] = 0 ;
         }
 
@@ -85,13 +91,13 @@ class CustomerAuthController extends Controller
 
         $affiliate = Affiliate::where('code',$request->affiliate_code)->first();
 
-        if($request->type == "freelancer"){
+        if($request->type == "Freelancer"){
             if ($request->number) {
                 $input['phone'] = $request->number_country_code . $request->number;
             }
             $input['affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;
             Staff::create($input);
-        }elseif($request->type == "affiliate"){
+        }elseif($request->type == "Affiliate"){
             $input['parent_affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;
             Affiliate::create($input);
         }elseif($request->type == "customer"){
@@ -116,9 +122,9 @@ class CustomerAuthController extends Controller
         Cookie::queue(Cookie::forget('address'));
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            if($request->type == "freelancer"){
+            if($request->type == "Freelancer"){
                 $msg = "You have successfully registered as a customer, and your request to become a freelancer has been submitted to the admin for approval.";
-            }elseif($request->type == "affiliate"){
+            }elseif($request->type == "Affiliate"){
                 $msg = "You have successfully registered as a customer, and your request to become a affiliate has been submitted to the admin for approval.";
             }elseif($request->type == "customer"){
                 $msg = "You have successfully logged in";
@@ -159,7 +165,7 @@ class CustomerAuthController extends Controller
                             $daysSinceCreation =Auth::user()->userAffiliate->updated_at->diffInDays(now());
                         }
 
-                        $affiliate = Affiliate::where('user_id', Auth::user()->userAffiliate->affiliate_id)->first();
+                        $affiliate = Affiliate::where('user_id', Auth::user()->userAffiliate->affiliate_id)->where('status',1)->first();
                         
                         $affiliate_code = $affiliate ? $affiliate->code : "";
 
@@ -289,7 +295,7 @@ class CustomerAuthController extends Controller
     public function affiliateUrl(Request $request)
     {
         if ($request->affiliate_id) {
-            $affiliate = Affiliate::where('user_id', $request->affiliate_id)->first();
+            $affiliate = Affiliate::where('user_id', $request->affiliate_id)->where('status',1)->first();
             if($affiliate){
                 $affiliate_code = $affiliate ? $affiliate->code : "";
 
@@ -348,7 +354,7 @@ class CustomerAuthController extends Controller
 
     public function applyAffiliate(Request $request)
     {
-            $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
+            $affiliate = Affiliate::where("code",$request->affiliate_code)->where('status',1)->first();
             if($affiliate){
                 $userAffiliate = UserAffiliate::where("user_id", auth()->user()->id)->first();
                 $input['expiry_date'] = null;

@@ -47,6 +47,15 @@
                         <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Status:</strong>
+                        <select name="status" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                </div>
                 <hr>
                 <div class="col-md-12">
                     <div class="form-group">
@@ -98,7 +107,9 @@
                         <select name="parent_affiliate_id" class="form-control">
                             <option value=""></option>
                             @foreach ($affiliates as $affiliate)
+                            @if($affiliate->affiliate->status == 1)
                                 <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
+                            @endif
                             @endforeach
                         </select>
                     </div>
@@ -121,6 +132,12 @@
                         </select>
                     </div>
                 </div>
+                {{-- <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Expiry Date:</strong>
+                        <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ old('expiry_date') }}>
+                    </div>
+                </div> --}}
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>

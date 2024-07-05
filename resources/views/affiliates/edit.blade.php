@@ -50,6 +50,15 @@
                             placeholder="Confirm Password" />
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Status:</strong>
+                        <select name="status" class="form-control">
+                            <option value="1" @if($affiliate->affiliate && $affiliate->affiliate->status == 1) selected @endif>Enable</option>
+                            <option value="0" @if($affiliate->affiliate && $affiliate->affiliate->status == 0) selected @endif>Disable</option>
+                        </select>
+                    </div>
+                </div>
                 <hr>
                 <div class="col-md-12">
                     <div class="form-group">
@@ -101,7 +110,7 @@
                         <select name="parent_affiliate_id" class="form-control">
                             <option value=""></option>
                             @foreach ($affiliates as $single_affiliate)
-                                @if ($single_affiliate->id !== $affiliate->id)
+                                @if ($single_affiliate->affiliate->status == 1 && $single_affiliate->id !== $affiliate->id)
                                     <option value="{{ $single_affiliate->id }}"
                                         @if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id == $single_affiliate->id) selected @endif> {{ $single_affiliate->name }}
                                     </option>
@@ -128,6 +137,12 @@
                         </select>
                     </div>
                 </div>
+                {{-- <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Expiry Date:</strong>
+                        <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $affiliate->affiliate->expiry_date ?? "" }}>
+                    </div>
+                </div> --}}
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Customer Display:</strong>

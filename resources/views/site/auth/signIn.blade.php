@@ -72,10 +72,10 @@
                                 <a class="btn btn-link" href="{{ route('customer.registration') }}">
                                     Register
                                 </a><br>
-                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=affiliate">
+                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=Affiliate">
                                     Register as Affiliate
                                 </a><br>
-                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=freelancer">
+                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=Freelancer">
                                     Register as Freelancer
                                 </a><br>
                                 @if (Route::has('password.request'))

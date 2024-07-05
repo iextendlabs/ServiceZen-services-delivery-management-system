@@ -111,7 +111,15 @@ class CustomerController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
-            'affiliate' => ['nullable', 'exists:affiliates,code'],
+            'affiliate' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
         ]);
         // Check if validation fails
         if ($validator->fails()) {
@@ -748,7 +756,15 @@ class CustomerController extends Controller
     public function applyCouponAffiliate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'affiliate' => ['nullable', 'exists:affiliates,code'],
+            'affiliate' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
             'coupon' => [
                 'nullable',
                 function ($attribute, $value, $fail) use ($request) {
@@ -1334,7 +1350,7 @@ class CustomerController extends Controller
 
     public function applyAffiliate(Request $request)
     {
-        $affiliate = Affiliate::where("code",$request->affiliate_code)->first();
+        $affiliate = Affiliate::where("code",$request->affiliate_code)->where('status',1)->first();
         if($affiliate){
             $userAffiliate = UserAffiliate::where("user_id", $request->userId)->first();
             $input['expiry_date'] = null;
@@ -1611,7 +1627,7 @@ class CustomerController extends Controller
             $all_transport_charges += $transport_charges;
             $all_total_amount += $total_amount;
 
-            $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
+            $affiliate = Affiliate::where('code', $input['affiliate_code'])->where('status',1)->first();
 
             if (isset($affiliate)) {
                 $input['affiliate_id'] = $affiliate->user_id;

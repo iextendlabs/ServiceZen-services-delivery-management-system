@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MembershipPlan;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
@@ -202,8 +203,10 @@ class ServiceStaffController extends Controller
         $category_ids = $serviceStaff->categories()->pluck('category_id')->toArray();
         $freelancer_join = $request->freelancer_join;
         $affiliates = User::role('Affiliate')->latest()->get();
-
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates'));
+        $membership_plans = MembershipPlan::where('status', 1)
+        ->where('type',"Freelancer")
+        ->get();
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans'));
     }
 
     /**
