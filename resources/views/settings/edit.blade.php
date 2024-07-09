@@ -121,23 +121,9 @@
                     @elseif($setting->key === 'Daily Order Summary Mail and Notification')
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
                     @elseif($setting->key === 'Terms & Condition' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy' || $setting->key === 'Contact Us')
-                    <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
-                    <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
-                    <script>
-                        CKEDITOR.replace('value', {
-                            filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
-                            filebrowserUploadSuccess: function (file, response) {
-                                var imageUrl = response.url;
-                                var imageInfoUrl = response.image_info_url;
-
-                                CKEDITOR.instances['value'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
-
-                                window.location.href = imageInfoUrl;
-                            }
-                        });
-                    </script>
+                    <textarea name="value" id="summernote" class="form-control"> {{ $setting->value }}</textarea>
                     @elseif($setting->key === 'Head Tag')
-                    <textarea name="value" style="height:150px" class="form-control"> {{ $setting->value }}</textarea>
+                    <textarea name="value" id="summernote" class="form-control"> {{ $setting->value }}</textarea>
                     @elseif($setting->key === 'Featured Services')
                     <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">
                     <div class="scroll-div">
@@ -313,6 +299,39 @@
         </div>
     </form>
 </div>
+<script>
+    (function($) {
+        $('#summernote').summernote({
+            tabsize: 2,
+            height: 250,
+            callbacks: {
+                onImageUpload: function(files) {
+                    uploadImage(files[0]);
+                }
+            }
+        });
+
+        function uploadImage(file) {
+            let data = new FormData();
+            data.append("file", file);
+            data.append("_token", "{{ csrf_token() }}");
+
+            $.ajax({
+                url: "{{ route('summerNote.upload') }}",
+                method: "POST",
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#summernote').summernote('insertImage', response.url);
+                },
+                error: function(response) {
+                    console.error(response);
+                }
+            });
+        }
+    })(jQuery);
+</script>
 <script>
     var category_row = {{ $category_row }};
     function addCategoryrow(){

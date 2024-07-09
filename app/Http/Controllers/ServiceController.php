@@ -105,7 +105,6 @@ class ServiceController extends Controller
     {
         request()->validate([
             'name' => 'required',
-            'description' => 'required',
             'price' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',
@@ -220,7 +219,6 @@ class ServiceController extends Controller
     {
         request()->validate([
             'name' => 'required',
-            'description' => 'required',
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'duration' => 'required',

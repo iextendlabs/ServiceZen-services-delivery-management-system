@@ -88,20 +88,39 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>About:</strong>
-                            <textarea name="about" cols="20" rows="6" class="form-control">{{ $serviceStaff->staff->about ?? "" }}</textarea>
-                            <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
+                            <textarea name="about" id="summernote" class="form-control">{{ $serviceStaff->staff->about ?? "" }}</textarea>
                             <script>
-                                CKEDITOR.replace('about', {
-                                    filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
-                                    filebrowserUploadSuccess: function (file, response) {
-                                        var imageUrl = response.url;
-                                        var imageInfoUrl = response.image_info_url;
-
-                                        CKEDITOR.instances['about'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
-
-                                        window.location.href = imageInfoUrl;
+                                (function($) {
+                                    $('#summernote').summernote({
+                                        tabsize: 2,
+                                        height: 250,
+                                        callbacks: {
+                                            onImageUpload: function(files) {
+                                                uploadImage(files[0]);
+                                            }
+                                        }
+                                    });
+    
+                                    function uploadImage(file) {
+                                        let data = new FormData();
+                                        data.append("file", file);
+                                        data.append("_token", "{{ csrf_token() }}");
+    
+                                        $.ajax({
+                                            url: "{{ route('summerNote.upload') }}",
+                                            method: "POST",
+                                            data: data,
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                $('#summernote').summernote('insertImage', response.url);
+                                            },
+                                            error: function(response) {
+                                                console.error(response);
+                                            }
+                                        });
                                     }
-                                });
+                                })(jQuery);
                             </script>
                         </div>
                     </div>

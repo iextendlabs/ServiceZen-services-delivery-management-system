@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-<script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
 <div class="row">
     <div class="col-md-12">
         <div class="float-left">
@@ -77,22 +76,41 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Description:</strong>
-                        <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$service->description}}</textarea>
-                            <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
-                            <script>
-                                CKEDITOR.replace('description', {
-                                    filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
-                                    filebrowserUploadSuccess: function (file, response) {
-                                        var imageUrl = response.url;
-                                        var imageInfoUrl = response.image_info_url;
-
-                                        CKEDITOR.instances['description'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
-
-                                        window.location.href = imageInfoUrl;
+                        <strong>Description:</strong>
+                        <textarea class="form-control" id="summernote" name="description" placeholder="Description">{{$service->description}}</textarea>
+                        <script>
+                            (function($) {
+                                $('#summernote').summernote({
+                                    tabsize: 2,
+                                    height: 250,
+                                    callbacks: {
+                                        onImageUpload: function(files) {
+                                            uploadImage(files[0]);
+                                        }
                                     }
                                 });
-                            </script>
+
+                                function uploadImage(file) {
+                                    let data = new FormData();
+                                    data.append("file", file);
+                                    data.append("_token", "{{ csrf_token() }}");
+
+                                    $.ajax({
+                                        url: "{{ route('summerNote.upload') }}",
+                                        method: "POST",
+                                        data: data,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            $('#summernote').summernote('insertImage', response.url);
+                                        },
+                                        error: function(response) {
+                                            console.error(response);
+                                        }
+                                    });
+                                }
+                            })(jQuery);
+                        </script>
                     </div>
                 </div>
                 <div class="col-md-12">

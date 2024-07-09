@@ -36,7 +36,7 @@ use App\Http\Controllers\{
     RotaController,
     ChatController,
     CompanyController,
-    CkeditorController,
+    SummerNoteController,
     ComplaintController,
     CurrencyController,
     FreelancerProgramController,
@@ -153,7 +153,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('companies', CompanyController::class);
     Route::get('clear', [CompanyController::class,"clear"])->name('companies.clear');
 
-    Route::post('/ckeditor/upload', [CkeditorController::class,"upload"])->name('ckeditor.upload');
+    Route::post('/summerNote/upload', [SummerNoteController::class,"upload"])->name('summerNote.upload');
     Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
 
     Route::get('/log', [OrderController::class, 'showLog'])->name('log.show');
