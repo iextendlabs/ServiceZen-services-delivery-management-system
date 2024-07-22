@@ -59,7 +59,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Discount</strong>
-                            <input type="text" name="discount" value="{{ $coupon->discount }}" class="form-control" placeholder="Discount">
+                            <input type="number" name="discount" value="{{ $coupon->discount }}" class="form-control" placeholder="Discount">
                         </div>
                     </div>
                     <div class="col-md-12">
