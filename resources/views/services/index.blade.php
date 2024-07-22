@@ -137,7 +137,7 @@
                                     <input type="checkbox" class="item-checkbox" value="{{ $service->id }}">
                                 </td>
                                 <td class="text-left">{{ $service->name }}</td>
-                                <td class="text-right">@currency($service->price)</td>
+                                <td class="text-right">@currency($service->price,true)</td>
                                 <td class="text-right">{{ $service->duration }}</td>
                                 <td class="text-right">
                                     @if ($service->status)

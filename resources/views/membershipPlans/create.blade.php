@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
-                    <h2>Add New Affiliate Membership Plan</h2>
+                    <h2>Add New Membership Plan</h2>
                 </div>
             </div>
         </div>
@@ -32,14 +32,24 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Membership Fee:</strong>
                         <input type="number" name="membership_fee" class="form-control" value="{{ old('membership_fee') }}"
-                            placeholder="membership_fee">
+                            placeholder="Membership Fee">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Expiry Date:</strong>
-                        <input type="date" name="expiry_date" class="form-control" value="{{ old('expiry_date') }}"
-                            placeholder="Expiry Date">
+                        <strong>Expire after days:</strong>
+                        <input type="number" name="expire" class="form-control" value="{{ old('expire') }}"
+                            placeholder="Enter days like 20">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <span style="color: red;">*</span><strong>Type:</strong>
+                        <select name="type" class="form-control">
+                            <option></option>
+                            <option value="Affiliate" @if (old('type') == 'Affiliate') selected @endif>Affiliate</option>
+                            <option value="Freelancer" @if (old('type') == 'Freelancer') selected @endif>Freelancer</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-12">

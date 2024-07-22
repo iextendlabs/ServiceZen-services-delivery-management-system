@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
-                    <h2>Affiliate Membership Plan ({{ $total_membership_plan }})</h2>
+                    <h2>Membership Plan ({{ $total_membership_plan }})</h2>
                 </div>
                 <div class="float-end">
                     @can('membership-plan-create')
@@ -38,17 +38,23 @@
                             @endif
                         </th>
                         <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'expiry_date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Expiry Date</a>
-                            @if (request('sort') === 'expiry_date')
+                                href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'expire', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Expire after days</a>
+                            @if (request('sort') === 'expire')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
+                        </th>
+                        <th><a class=" ml-2 text-decoration-none"
+                            href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
+                        @if (request('sort') === 'type')
+                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                        @endif
                         </th>
                         <th><a class=" ml-2 text-decoration-none"
                             href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
                         @if (request('sort') === 'status')
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                         @endif
-                    </th>
+                        </th>
                         <th>Action</th>
                     </tr>
                     @if (count($membership_plans))
@@ -57,7 +63,8 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $membership_plan->plan_name }}</td>
                                 <td>{{ $membership_plan->membership_fee }}</td>
-                                <td>{{ $membership_plan->expiry_date }}</td>
+                                <td>{{ $membership_plan->expire }}</td>
+                                <td>{{ $membership_plan->type }}</td>
                                 <td>{{ $membership_plan->status == 1 ? "Enable" : "Disable"  }}</td>
                                 <td>
                                     <form id="deleteForm{{ $membership_plan->id }}"
@@ -112,6 +119,16 @@
                                 <strong>Expiry Date:</strong>
                                 <input type="date" name="expiry_date" value="{{ $filter['expiry_date'] }}"
                                     class="form-control" placeholder="Expiry Date">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <span style="color: red;">*</span><strong>Type:</strong>
+                                <select name="type" class="form-control">
+                                    <option></option>
+                                    <option value="Affiliate" @if ($filter['type'] == 'Affiliate') selected @endif>Affiliate</option>
+                                    <option value="Freelancer" @if ($filter['type'] == 'Freelancer') selected @endif>Freelancer</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-12">

@@ -88,20 +88,39 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>About:</strong>
-                            <textarea name="about" cols="20" rows="6" class="form-control">{{ $serviceStaff->staff->about ?? "" }}</textarea>
-                            <script src="https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js"></script>
+                            <textarea name="about" id="summernote" class="form-control">{{ $serviceStaff->staff->about ?? "" }}</textarea>
                             <script>
-                                CKEDITOR.replace('about', {
-                                    filebrowserUploadUrl: '{{ route("ckeditor.upload") }}',
-                                    filebrowserUploadSuccess: function (file, response) {
-                                        var imageUrl = response.url;
-                                        var imageInfoUrl = response.image_info_url;
-
-                                        CKEDITOR.instances['about'].insertHtml('<img src="' + imageUrl + '" alt="Preview">');
-
-                                        window.location.href = imageInfoUrl;
+                                (function($) {
+                                    $('#summernote').summernote({
+                                        tabsize: 2,
+                                        height: 250,
+                                        callbacks: {
+                                            onImageUpload: function(files) {
+                                                uploadImage(files[0]);
+                                            }
+                                        }
+                                    });
+    
+                                    function uploadImage(file) {
+                                        let data = new FormData();
+                                        data.append("file", file);
+                                        data.append("_token", "{{ csrf_token() }}");
+    
+                                        $.ajax({
+                                            url: "{{ route('summerNote.upload') }}",
+                                            method: "POST",
+                                            data: data,
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                $('#summernote').summernote('insertImage', response.url);
+                                            },
+                                            error: function(response) {
+                                                console.error(response);
+                                            }
+                                        });
                                     }
-                                });
+                                })(jQuery);
                             </script>
                         </div>
                     </div>
@@ -188,8 +207,34 @@
                     @if($freelancer_join)
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Membership Plan:</strong>
+                            <select name="membership_plan_id" class="form-control">
+                                <option value=""></option>
+                                @foreach ($membership_plans as $membership_plan)
+                                    <option value="{{ $membership_plan->id }}" @if($serviceStaff->staff && $serviceStaff->staff->membership_plan_id && $membership_plan->id == $serviceStaff->staff->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <span style="color: red;">*</span><strong>Expiry Date:</strong>
                             <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $serviceStaff->staff->expiry_date ?? "" }}>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Affiliate:</strong>
+                            <select name="affiliate_id" class="form-control">
+                                <option value=""></option>
+                                @foreach ($affiliates as $affiliate)
+                                    @if($affiliate->affiliate->status == 1)
+                                        <option value="{{ $affiliate->id }}"
+                                            @if ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     @endif

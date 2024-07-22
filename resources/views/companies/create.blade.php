@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <div class="row">
         <div class="col-md-12 margin-tb">
             <h2>New Company</h2>

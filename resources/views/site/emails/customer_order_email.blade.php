@@ -45,7 +45,7 @@
                 <b>Order Status:</b> {{ $order->status }}
             </td>
             <td>
-                <b>Total Amount:</b> @currency( $order->total_amount ) <br><br>
+                <b>Total Amount:</b> @currency( $order->total_amount,false ) <br><br>
                 <b>Payment Method:</b> {{ $order->payment_method }}
             </td>
         </tr>
@@ -109,29 +109,29 @@
             <td>{{ $orderService->service->name }}</td>
             <td>{{ $orderService->status }}</td>
             <td>{{ $orderService->service->duration }}</td>
-            <td>@currency($orderService->price)</td>
+            <td>@currency($orderService->price,false)</td>
         </tr>
         @endforeach
 
         <tr>
             <td colspan="3"><strong>Sub Total:</strong></td>
-            <td>@currency($order->order_total->sub_total)</td>
+            <td>@currency($order->order_total->sub_total,false)</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Coupon Discount:</strong></td>
-            <td>{{ config('app.currency') }}{{ $order->order_total->discount ? '-'.$order->order_total->discount : 0 }}</td>
+            <td>@currency($order->order_total->discount ? '-'.$order->order_total->discount : 0,false )</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Staff Transport Charges:</strong></td>
-            <td>{{ config('app.currency') }}{{ $order->order_total->transport_charges ? $order->order_total->transport_charges : 0 }}</td>
+            <td>@currency($order->order_total->transport_charges ? $order->order_total->transport_charges : 0,false )</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Staff Charges:</strong></td>
-            <td>{{ config('app.currency') }}{{ $order->order_total->staff_charges ? $order->order_total->staff_charges : 0 }}</td>
+            <td>@currency($order->order_total->staff_charges ? $order->order_total->staff_charges : 0,false )</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Total:</strong></td>
-            <td>@currency($order->total_amount)</td>
+            <td>@currency($order->total_amount,false)</td>
         </tr>
     </table>
     @if($order->order_comment)

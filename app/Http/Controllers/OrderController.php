@@ -269,8 +269,8 @@ class OrderController extends Controller
         $categories = ServiceCategory::where('status', 1)->get();
         $area = '';
         $city = '';
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($area, $date);
-        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'categories'));
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date,$order = null, $serviceIds = null,true);
+        return view('orders.create', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'services', 'categories','isAdmin'));
     }
 
 
@@ -296,7 +296,15 @@ class OrderController extends Controller
             'service_staff_id' => 'required',
             'time_slot_id' => 'required',
             'selected_service_ids' => 'required',
-            'affiliate_code' => ['nullable', 'exists:affiliates,code'],
+            'affiliate_code' => [
+                'nullable', 
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
             'number' => 'required',
             'whatsapp' => 'required',
         ]);
@@ -475,11 +483,11 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
 
-        [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
+        [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission] = $order->commissionCalculation();
 
         $affiliate = User::find($affiliate_id);
         $statuses = config('app.order_statuses');
-        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission', 'affiliate', 'affiliate_id', 'parent_affiliate_commission', 'parent_affiliate_id'));
+        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission', 'affiliate', 'affiliate_id', 'parent_affiliate_commission', 'parent_affiliate_id','staff_affiliate_commission'));
     }
 
     public function edit($id, Request $request)
@@ -500,14 +508,14 @@ class OrderController extends Controller
         }
         $selectedServices = Service::whereIn('id', $serviceIds)->orderBy('name', 'ASC')->get();
 
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id);
+        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($order->area, $order->date, $id, $serviceIds,true);
         if ($request->edit == "services") {
             return view('orders.services_edit', compact('order', 'serviceIds', 'selectedServices', 'servicesCategories'));
         }
         if ($request->edit == "status") {
             return view('orders.status_edit', compact('order', 'statuses'));
         } elseif ($request->edit == "booking") {
-            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area'));
+            return view('orders.booking_edit', compact('order', 'timeSlots', 'statuses', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'date', 'area','isAdmin'));
         } elseif ($request->edit == "address") {
             return view('orders.detail_edit', compact('order'));
         } elseif ($request->edit == "affiliate") {
@@ -653,16 +661,26 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         try {
-            if (isset($order->staff->commission)) {
-                $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
-            }
 
             if ($request->status == "Complete") {
 
-                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
+                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission] = $order->commissionCalculation();
+
+                if (isset($order->staff->commission)) {
+                    $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->where('type','Order Staff Commission')->first();
+                }
+
+                if ($order->staff->affiliate && $order->staff->affiliate->affiliate) {
+                    $staff_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->staff->affiliate_id)->where('type','Order Staff Affiliate Commission')->first();
+                }
 
                 if ($affiliate_id) {
-                    $transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
+                    $transaction = Transaction::where('order_id', $order->id)
+                    ->where('type','Order Affiliate Commission')->where('user_id', $affiliate_id)->first();
+                }
+
+                if ($parent_affiliate_id) {
+                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->where('type','Order Parent Affiliate Commission')->first();
                 }
 
                 if ($affiliate_id && !isset($transaction) && $affiliate_commission > 0) {
@@ -672,10 +690,6 @@ class OrderController extends Controller
                     $input['type'] = "Order Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
-                }
-
-                if ($parent_affiliate_id) {
-                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->first();
                 }
 
                 if ($parent_affiliate_id && !isset($parent_affiliate_transaction) && $parent_affiliate_commission > 0) {
@@ -692,6 +706,15 @@ class OrderController extends Controller
                     $input['order_id'] = $order->id;
                     $input['amount'] = $staff_commission;
                     $input['type'] = "Order Staff Commission";
+                    $input['status'] = 'Approved';
+                    Transaction::create($input);
+                }
+
+                if ($order->staff->affiliate && $order->staff->affiliate->affiliate && !isset($staff_affiliate_transaction) && $staff_affiliate_commission > 0) {
+                    $input['user_id'] = $order->staff->affiliate_id;
+                    $input['order_id'] = $order->id;
+                    $input['amount'] = $staff_affiliate_commission;
+                    $input['type'] = "Order Staff Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
@@ -781,32 +804,38 @@ class OrderController extends Controller
         $input['status'] = $request->status;
 
         $order->save();
+        OrderHistory::create($input);
+
         try {
-            OrderHistory::create($input);
-
-
-
-            if (isset($order->staff->commission)) {
-                $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
-            }
+            
             if ($request->status == "Complete") {
-                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
 
-                if ($affiliate_id) {
-                    $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
+                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission] = $order->commissionCalculation();
+
+                if (isset($order->staff->commission)) {
+                    $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->where('type','Order Staff Commission')->first();
                 }
 
-                if ($affiliate_id && !isset($affiliate_transaction) && $affiliate_commission > 0) {
+                if ($order->staff->affiliate && $order->staff->affiliate->affiliate) {
+                    $staff_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->staff->affiliate_id)->where('type','Order Staff Affiliate Commission')->first();
+                }
+
+                if ($affiliate_id) {
+                    $transaction = Transaction::where('order_id', $order->id)
+                    ->where('type','Order Affiliate Commission')->where('user_id', $affiliate_id)->first();
+                }
+
+                if ($parent_affiliate_id) {
+                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->where('type','Order Parent Affiliate Commission')->first();
+                }
+
+                if ($affiliate_id && !isset($transaction) && $affiliate_commission > 0) {
                     $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $affiliate_commission;
                     $input['type'] = "Order Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
-                }
-
-                if ($parent_affiliate_id) {
-                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->first();
                 }
 
                 if ($parent_affiliate_id && !isset($parent_affiliate_transaction) && $parent_affiliate_commission > 0) {
@@ -823,6 +852,15 @@ class OrderController extends Controller
                     $input['order_id'] = $order->id;
                     $input['amount'] = $staff_commission;
                     $input['type'] = "Order Staff Commission";
+                    $input['status'] = 'Approved';
+                    Transaction::create($input);
+                }
+
+                if ($order->staff->affiliate && $order->staff->affiliate->affiliate && !isset($staff_affiliate_transaction) && $staff_affiliate_commission > 0) {
+                    $input['user_id'] = $order->staff->affiliate_id;
+                    $input['order_id'] = $order->id;
+                    $input['amount'] = $staff_affiliate_commission;
+                    $input['type'] = "Order Staff Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }

@@ -23,7 +23,7 @@ use App\Http\Controllers\{
     TransactionController,
     DriverController,
     AffiliateController,
-    AffiliateMembershipPlanController,
+    MembershipPlanController,
     AffiliateProgramController,
     StaffGeneralHolidayController,
     BackupController,
@@ -36,8 +36,9 @@ use App\Http\Controllers\{
     RotaController,
     ChatController,
     CompanyController,
-    CkeditorController,
+    SummerNoteController,
     ComplaintController,
+    CurrencyController,
     FreelancerProgramController,
     InformationController,
     WithdrawController
@@ -152,7 +153,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('companies', CompanyController::class);
     Route::get('clear', [CompanyController::class,"clear"])->name('companies.clear');
 
-    Route::post('/ckeditor/upload', [CkeditorController::class,"upload"])->name('ckeditor.upload');
+    Route::post('/summerNote/upload', [SummerNoteController::class,"upload"])->name('summerNote.upload');
     Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
 
     Route::get('/log', [OrderController::class, 'showLog'])->name('log.show');
@@ -181,8 +182,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus'); 
     Route::post('/apply-order-coupon', [OrderController::class,'applyOrderCoupon'])->name('apply.order_coupon');
     Route::get('/staff-categories-services', [OrderController::class,'staffCategoriesServices'])->name('fetch.staff_categories_services');
+    Route::resource('currencies', CurrencyController::class);
 
-    Route::resource('membershipPlans', AffiliateMembershipPlanController::class);
+    Route::resource('membershipPlans', MembershipPlanController::class);
 
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
@@ -260,3 +262,4 @@ Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffili
 Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartModal'])->name('addToCartModal');
 Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');
 Route::get('/checkBooking', [CheckOutController::class,'checkBooking'])->name('checkBooking');
+Route::post('/format-currency', [CheckOutController::class, 'formatCurrencyJS'])->name('format-currency');

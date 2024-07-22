@@ -65,13 +65,13 @@ $packageCarousel_chunk = 3;
         <div class="card-body">
           <p id="price" class="text-muted">
             @if($price)
-            <span class="font-weight-bold">@currency($price)</span>
+            <span class="font-weight-bold">@currency($price,false,true)</span>
             @else
               @if(isset($service->discount))
-              <s class="text-danger">@currency($service->price)</s>
-              <b class="discount text-success">@currency($service->discount)</b>
+              <s class="text-danger">@currency($service->price,false,true)</s>
+              <b class="discount text-success">@currency($service->discount,false,true)</b>
               @else
-              <span class="font-weight-bold">@currency($service->price)</span>
+              <span class="font-weight-bold">@currency($service->price,false,true)</span>
               @endif
             @endif
           </p>
@@ -85,13 +85,13 @@ $packageCarousel_chunk = 3;
             <strong>Available Options</strong>
             @foreach ($service->serviceOption as $option)
             <div class="form-check">
-              <input required type="radio" name="option" class="form-check-input" value="{{$option->id}}" id="option{{$option->id}}" data-price="@currency($option->option_price)"   @if (isset($lowestPriceOption) && $option->id === $lowestPriceOption->id)
+              <input required type="radio" name="option" class="form-check-input" value="{{$option->id}}" id="option{{$option->id}}" data-price="@currency($option->option_price,false,true)"   @if (isset($lowestPriceOption) && $option->id === $lowestPriceOption->id)
               checked
           @elseif (is_null($currentLowestPrice) || $option->option_price < $currentLowestPrice)
               checked
               @php ($currentLowestPrice = $option->option_price)
           @endif>
-              <label class="form-check-label" for="option{{$option->id}}">{{ $option->option_name }} (@currency( $option->option_price))</label>
+              <label class="form-check-label" for="option{{$option->id}}">{{ $option->option_name }} (@currency( $option->option_price,false,true))</label>
             </div>
             @endforeach
           </div>
@@ -101,11 +101,11 @@ $packageCarousel_chunk = 3;
           <div class="form-group">
             <strong>Service Variants</strong>
             <select name="variant" id="variant-select" class="form-control mb-2">
-              <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-name="{{ $service->name }}" data-duration="{{ $service->duration }}" data-price="@currency(isset($service->discount) ? $service->discount : $service->price)">
+              <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-name="{{ $service->name }}" data-duration="{{ $service->duration }}" data-price="@currency(isset($service->discount,true) ? $service->discount : $service->price)">
                 {{ $service->name }}
               </option>
               @foreach($service->variant as $variant)
-              <option value="{{ $variant->service->name }}" data-id="{{ $variant->service->id }}" data-name="{{ $variant->service->name }}" data-duration="{{ $variant->service->duration }}" data-price="@currency(isset($variant->service->discount) ? $variant->service->discount : $variant->service->price)">
+              <option value="{{ $variant->service->name }}" data-id="{{ $variant->service->id }}" data-name="{{ $variant->service->name }}" data-duration="{{ $variant->service->duration }}" data-price="@currency(isset($variant->service->discount) ? $variant->service->discount : $variant->service->price,true)">
                 {{ $variant->service->name }}
               </option>
               @endforeach
@@ -222,10 +222,10 @@ $packageCarousel_chunk = 3;
                   <div class="d-flex justify-content-between align-items-center">
                     <small class="text-mutede">
                       @if(isset($addON->service->discount))<s>@endif
-                        @currency($addON->service->price)
+                        @currency($addON->service->price,false,true)
                         @if(isset($addON->service->discount))</s>@endif
                       @if(isset($addON->service->discount))
-                      <b class="discount"> @currency( $addON->service->discount )</b>
+                      <b class="discount"> @currency( $addON->service->discount,false, true )</b>
                       @endif
                     </small>
                     <small class="text-muted"><i class="fa fa-clock"> </i> {{ $addON->service->duration }}</small>
@@ -288,10 +288,10 @@ $packageCarousel_chunk = 3;
                   <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted service-box-price">
                       @if(isset($package->service->discount))<s>@endif
-                        @currency($package->service->price)
+                        @currency($package->service->price,false,true)
                         @if(isset($package->service->discount))</s>@endif
                       @if(isset($package->service->discount))
-                      <b class="discount"> @currency( $package->service->discount )</b>
+                      <b class="discount"> @currency( $package->service->discount,false, true )</b>
                       @endif
                     </small>
 

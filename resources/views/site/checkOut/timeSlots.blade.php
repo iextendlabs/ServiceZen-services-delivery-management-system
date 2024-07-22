@@ -90,7 +90,7 @@
                 <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100"><br>
                 <span class="text-center">{{ $staff->name }}</span><br>
                 <span class="text-center">{{ $staff->staff->sub_title }}</span><br>
-                @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges)</b></span>@endif <br>
+                @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges,$isAdmin)</b></span>@endif <br>
                 @for($i = 1; $i <= 5; $i++)
                 @if($i <=$staff->averageRating())
                     <span class="text-warning">&#9733;</span>
@@ -196,7 +196,7 @@
                             <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100"><br>
                             <span class="text-center">{{ $staff->name }}</span><br>
                             <span class="text-center">{{ $staff->staff->sub_title }}</span><br>
-                            @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges)</b></span>@endif <br>
+                            @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges,$isAdmin)</b></span>@endif <br>
                             @for($i = 1; $i <= 5; $i++) @if($i <=$staff->averageRating()) <span class="text-warning">&#9733;</span>
                                 @else
                                 <span class="text-muted">&#9734;</span>

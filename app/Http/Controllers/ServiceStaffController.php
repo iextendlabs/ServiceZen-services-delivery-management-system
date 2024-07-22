@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MembershipPlan;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
@@ -75,7 +76,7 @@ class ServiceStaffController extends Controller
         $users = User::all();
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services'));
     }
 
@@ -195,13 +196,17 @@ class ServiceStaffController extends Controller
     {
         $users = User::all();
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->whereIn('category_id', $categories->pluck('id')->toArray())->orderBy('name', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
         $supervisor_ids = $serviceStaff->supervisors()->pluck('supervisor_id')->toArray();
         $service_ids = $serviceStaff->services()->pluck('service_id')->toArray();
         $category_ids = $serviceStaff->categories()->pluck('category_id')->toArray();
         $freelancer_join = $request->freelancer_join;
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join'));
+        $affiliates = User::role('Affiliate')->latest()->get();
+        $membership_plans = MembershipPlan::where('status', 1)
+        ->where('type',"Freelancer")
+        ->get();
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans'));
     }
 
     /**

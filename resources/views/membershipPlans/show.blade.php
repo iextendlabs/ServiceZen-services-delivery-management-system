@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
-                    <h2> Show Affiliate Membership Plan</h2>
+                    <h2> Show Membership Plan</h2>
                 </div>
             </div>
         </div>
@@ -34,14 +34,20 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>membership_fee:</strong>
+                    <strong>Membership Fee:</strong>
                     {{ $membership_plan->membership_fee }}
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <strong>expiry_date:</strong>
-                    {{ $membership_plan->expiry_date }}
+                    <strong>Expire after days:</strong>
+                    {{ $membership_plan->expire }}
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Type:</strong>
+                    {{ $membership_plan->type }}
                 </div>
             </div>
             <div class="col-md-12">

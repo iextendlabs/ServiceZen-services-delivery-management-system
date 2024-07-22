@@ -126,18 +126,28 @@ class StaffAppController2 extends Controller
         $order = Order::find($request->order_id);
         try {
 
-            if (isset($order->staff->commission)) {
-                $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->first();
-            }
             if ($request->status == "Complete") {
 
-                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id] = $order->commissionCalculation();
-                
-                if ($affiliate_id) {
-                    $affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $affiliate_id)->first();
+                [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission] = $order->commissionCalculation();
+
+                if (isset($order->staff->commission)) {
+                    $staff_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->service_staff_id)->where('type','Order Staff Commission')->first();
                 }
-                
-                if ($affiliate_id && !isset($affiliate_transaction) && $affiliate_commission > 0) {
+
+                if ($order->staff->affiliate && $order->staff->affiliate->affiliate) {
+                    $staff_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $order->staff->affiliate_id)->where('type','Order Staff Affiliate Commission')->first();
+                }
+
+                if ($affiliate_id) {
+                    $transaction = Transaction::where('order_id', $order->id)
+                    ->where('type','Order Affiliate Commission')->where('user_id', $affiliate_id)->first();
+                }
+
+                if ($parent_affiliate_id) {
+                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->where('type','Order Parent Affiliate Commission')->first();
+                }
+
+                if ($affiliate_id && !isset($transaction) && $affiliate_commission > 0) {
                     $input['user_id'] = $affiliate_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $affiliate_commission;
@@ -146,10 +156,6 @@ class StaffAppController2 extends Controller
                     Transaction::create($input);
                 }
 
-                if ($parent_affiliate_id) {
-                    $parent_affiliate_transaction = Transaction::where('order_id', $order->id)->where('user_id', $parent_affiliate_id)->first();
-                }
-                
                 if ($parent_affiliate_id && !isset($parent_affiliate_transaction) && $parent_affiliate_commission > 0) {
                     $input['user_id'] = $parent_affiliate_id;
                     $input['order_id'] = $order->id;
@@ -158,12 +164,21 @@ class StaffAppController2 extends Controller
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }
-                
+
                 if (isset($order->staff->commission) && !isset($staff_transaction) && $staff_commission > 0) {
                     $input['user_id'] = $order->service_staff_id;
                     $input['order_id'] = $order->id;
                     $input['amount'] = $staff_commission;
                     $input['type'] = "Order Staff Commission";
+                    $input['status'] = 'Approved';
+                    Transaction::create($input);
+                }
+
+                if ($order->staff->affiliate && $order->staff->affiliate->affiliate && !isset($staff_affiliate_transaction) && $staff_affiliate_commission > 0) {
+                    $input['user_id'] = $order->staff->affiliate_id;
+                    $input['order_id'] = $order->id;
+                    $input['amount'] = $staff_affiliate_commission;
+                    $input['type'] = "Order Staff Affiliate Commission";
                     $input['status'] = 'Approved';
                     Transaction::create($input);
                 }

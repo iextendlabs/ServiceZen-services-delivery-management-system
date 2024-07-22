@@ -30,7 +30,7 @@
                 <tr>
                     <td>{{ ++$i }}</td>
                     <td>{{ $order->customer_name }}</td>
-                    <td>@currency( $order->total_amount )</td>
+                    <td>@currency( $order->total_amount,true )</td>
                     <td>{{ $order->payment_method }}</td>
                     <td>{{ $order->date }} \ {{ $order->time_slot_value }}</td>
                     <td>{{ $order->status }}</td>
@@ -40,7 +40,7 @@
                         <a class="btn btn-info" href="{{ route('cashCollection.create',$order->id) }}">Create</a>
                         @else
                         {{$order->cashCollection->status}} :
-                        @currency($order->cashCollection->amount)
+                        @currency($order->cashCollection->amount,true)
 
                         @endif
                     </td>

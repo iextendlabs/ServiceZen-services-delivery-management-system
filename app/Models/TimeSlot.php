@@ -43,7 +43,7 @@ class TimeSlot extends Model
         return (int) $this->space_availability > 0;
     }
 
-    public static function getTimeSlotsForArea($area, $date, $currentOrder = null, $serviceIds = null)
+    public static function getTimeSlotsForArea($area, $date, $currentOrder = null, $serviceIds = null,$isAdmin=false)
     {
         //TODO check area if empty 
         $servicesStaffIds = [];
@@ -92,7 +92,7 @@ class TimeSlot extends Model
         $staffZone = StaffZone::where('name', $area)->first();
 
 
-        $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
+        // $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
 
         if ($staffZone) {
             // staff groups
@@ -216,6 +216,6 @@ class TimeSlot extends Model
         }
         
 
-        return [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones];
+        return [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin];
     }
 }

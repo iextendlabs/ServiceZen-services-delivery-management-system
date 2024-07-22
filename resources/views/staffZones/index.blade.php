@@ -42,6 +42,7 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
+                        <th>Currency</th>
                         <th width="280px">Action</th>
                     </tr>
                     @if (count($staffZones))
@@ -51,6 +52,7 @@
                                 <td>{{ $staffZone->name }}</td>
                                 <td>{{ $staffZone->description }}</td>
                                 <td>{{ $staffZone->transport_charges }}</td>
+                                <td>{{ $staffZone->currency->name ?? '' }}</td>
                                 <td>
                                     <form id="deleteForm{{ $staffZone->id }}"
                                         action="{{ route('staffZones.destroy', $staffZone->id) }}" method="POST">

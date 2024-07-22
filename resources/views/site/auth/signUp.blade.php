@@ -74,8 +74,8 @@
                                 <div class="col-md-6">
                                     <select name="type" id="type" class="form-control">
                                         <option value="customer">Customer</option>
-                                        <option value="affiliate" @if ($type === 'affiliate') selected @endif>Affiliate</option>
-                                        <option value="freelancer" @if ($type === 'freelancer') selected @endif>Freelancer</option>
+                                        <option value="Affiliate" @if ($type === 'Affiliate') selected @endif>Affiliate</option>
+                                        <option value="Freelancer" @if ($type === 'Freelancer') selected @endif>Freelancer</option>
                                     </select>
                                 </div>
                             </div>
@@ -133,31 +133,16 @@
                                     class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Membership Plan</label>
                                     <div class="col-md-6">
                                         <select name="membership_plan_id" id="membership_plan_id" class="form-control">
+                                            <option></option>
                                             @foreach ($membership_plans as $membership_plan)
-                                                <option value="{{$membership_plan->id}}">{{$membership_plan->plan_name}} (@currency($membership_plan->membership_fee))</option>
+                                                <option data-type="{{ $membership_plan->type }}" value="{{ $membership_plan->id }}">{{ $membership_plan->plan_name }} (@currency($membership_plan->membership_fee,true))</option>
                                             @endforeach
                                         </select>
                                     </div>
                             </div>
-                            <div class="row mb-3 parent_affiliate_code">
-                                <label for="parent_affiliate_code"
-                                    class="col-md-4 col-form-label text-md-end">Parent Affiliate</label>
-
-                                <div class="col-md-6">
-                                    <input id="parent_affiliate_code" type="text"
-                                        class="form-control @error('parent_affiliate_code') is-invalid @enderror"
-                                        name="parent_affiliate_code" 
-                                        autocomplete="parent_affiliate_code">
-                                    @error('parent_affiliate_code')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3 affiliate_code">
-                                <label for="affiliate_code"
-                                    class="col-md-4 col-form-label text-md-end">{{ __('Affiliate Code') }}</label>
+                            <div class="row mb-3">
+                                <label for="affiliate_code" class="col-md-4 col-form-label text-md-end affiliate_code">{{ __('Affiliate Code') }}</label>
+                                <label for="affiliate_code" class="col-md-4 col-form-label text-md-end parent_affiliate_code">Parent Affiliate Code</label>
 
                                 <div class="col-md-6">
                                     <input id="affiliate_code" type="text"
@@ -248,7 +233,7 @@
         });
     
         function handleTypeChange(selectedValue) {
-            if (selectedValue == "freelancer") {
+            if (selectedValue == "Freelancer") {
                 $(".sub_title").show();
                 $("#sub_title").attr("required", true);
             } else {
@@ -256,21 +241,33 @@
                 $("#sub_title").attr("required", false);
             }
 
-            if (selectedValue == "affiliate") {
-                $(".membership_plan_id").show();
+            if (selectedValue == "Affiliate") {
+                $(".affiliate_code").hide();
                 $(".parent_affiliate_code").show();
-                $("#membership_plan_id").attr("required", true);
             } else {
-                $(".membership_plan_id").hide();
+                $(".affiliate_code").show();
                 $(".parent_affiliate_code").hide();
-                $("#membership_plan_id").attr("required", false);
             }
             
             if (selectedValue == "customer") {
-                $(".affiliate_code").show();
+                $(".membership_plan_id").hide();
+                $("#membership_plan_id").attr("required", false);
             } else {
-                $(".affiliate_code").hide();
+                $(".membership_plan_id").show();
+                $("#membership_plan_id").attr("required", true);
+                filterMembershipPlans(selectedValue);
             }
+            $("#membership_plan_id").val('');
+        }
+
+        function filterMembershipPlans(selectedValue) {
+            $("#membership_plan_id option").each(function() {
+                if ($(this).data("type") == selectedValue) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
         }
     </script>
 @endsection

@@ -37,7 +37,7 @@
                                 <strong>User:</strong>
                                 <select name="user_id" class="form-control">
                                     <option></option>
-                                    @foreach ($withdraws as $user)
+                                    @foreach ($users as $user)
                                         <option value="{{ $user->id }}"
                                             @if ($filter['user_id'] == $user->id) selected @endif>
                                             {{ $user->name }}</option>
@@ -118,6 +118,7 @@
                                         @can('withdraw-edit')
                                             {{-- <a class="btn btn-primary" href="{{ route('withdraws.edit', $withdraw->id) }}"><i
                                                     class="fa fa-edit"></i></a> --}}
+                                            @if($withdraw->user_id)
                                             @if ($withdraw->status == 'Approved')
                                                 <a class="btn btn-sm btn-danger"
                                                     href="{{ route('updateWithdrawStatus', $withdraw->id) }}?status=Un Approved">
@@ -128,6 +129,7 @@
                                                     href="{{ route('updateWithdrawStatus', $withdraw->id) }}?status=Approved">
                                                     <i class="fas fa-thumbs-up"></i>
                                                 </a>
+                                            @endif
                                             @endif
                                         @endcan
                                         <a class="btn btn-warning" href="{{ route('withdraws.show', $withdraw->id) }}"><i

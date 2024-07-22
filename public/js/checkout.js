@@ -6,7 +6,7 @@ $(document).on("change", "#date,#zone,#area,.checkBooking_service_id,.order_serv
         var addToCartModalServices = [$('.checkBooking_service_id:checked').val()];
     }
 
-    var isAdmin = $('input[name="isAdmin"]').val() ?? false;
+    var isAdmin = $('input[name="isAdmin"]').val() ? true : false;
 
     $.ajax({
         url: '/slots',

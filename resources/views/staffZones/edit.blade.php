@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <div class="row">
         <div class="col-md-12 margin-tb">
             <h2>Add New Staff Zone</h2>
@@ -42,19 +41,23 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Currency:</strong>
-                    <input type="text" name="currency" value="{{$staffZone->currency}}" class="form-control" placeholder="Currency">
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Currency Rate:</strong>
-                    <input type="number" name="currency_rate" value="{{$staffZone->currency_rate}}" class="form-control" placeholder="Currency Rate">
+                    <select name="currency_id" class="form-control">
+                        <option></option>
+                        @foreach ($currencies as $currency)
+                            <option value="{{ $currency->id }}" @if( $staffZone->currency && $staffZone->currency->id == $currency->id) selected @endif>{{ $currency->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Extra Charges:</strong>
-                    <input type="number" name="extra_charges" value="{{$staffZone->extra_charges}}" class="form-control" placeholder="Extra Charges">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">AED</span>
+                        </div>
+                        <input type="number" name="extra_charges" value="{{$staffZone->extra_charges}}" class="form-control" placeholder="Extra Charges">
+                    </div>
                 </div>
             </div>
             <div class="col-md-12 text-center">
