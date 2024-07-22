@@ -483,11 +483,11 @@ class CheckOutController extends Controller
             $input['transport_charges'] = (float)$transport_charges;
             $input['total_amount'] = (float)$total_amount;
 
-            $all_sub_total = $sub_total;
-            $all_discount = $discount;
-            $all_staff_charges = $staff_charges;
-            $all_transport_charges = $transport_charges;
-            $all_total_amount = $total_amount;
+            $all_sub_total += $sub_total;
+            $all_discount += $discount;
+            $all_staff_charges += $staff_charges;
+            $all_transport_charges += $transport_charges;
+            $all_total_amount += $total_amount;
 
             $affiliate = Affiliate::where('code', $input['affiliate_code'])->first();
 
