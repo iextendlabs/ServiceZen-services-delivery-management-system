@@ -210,7 +210,7 @@ class TimeSlot extends Model
         if ($date == $currentDate) {
             if (!$isAdmin) {
                 if ($currentTime > '22:00:00') {
-                    return [[], $staff_ids, $holiday, $staffZone, $allZones];
+                    return [[], $staff_ids, $holiday, $staffZone, $allZones,$isAdmin];
                 }
             }
         }
