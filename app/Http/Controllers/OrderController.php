@@ -53,7 +53,7 @@ class OrderController extends Controller
 
         $statuses = config('app.order_statuses');
         $driver_statuses = config('app.order_driver_statuses');
-        $payment_methods = ['Cash-On-Delivery'];
+        $payment_methods = ['Cash-On-Delivery','Credit-Debit-Card'];
         $users = User::all();
         $zones = StaffZone::pluck("name")->toArray();
         $categories = ServiceCategory::get();

@@ -304,77 +304,65 @@
                 </form>
             </div>
             <div id="confirm-step" style="display: none;">
-                <div class="row">
-                    <div class="col-md-6 mt-3 mt-3 offset-md-3 ">
-                        <h5>Payment Summary</h5>
-                        <table class="table">
-                            <tr>
-                                <td class="text-left"><strong> Service Total:</strong></td>
-                                <td><span id="sub_total"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-left"><strong> Coupon Discount:</strong></td>
-                                <td><span id="discount"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-left"><strong>Staff Charges:</strong></td>
-                                <td><span id="staff_charges"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-left"><strong>Transport Charges:</strong></td>
-                                <td><span id="transport_charges"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-left"><strong>Total:</strong></td>
-                                <td><span id="total_amount"></span></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <input type="hidden" name="customer_type" id="customer_type">
-                    <div class="col-md-6 offset-md-3">
-                        <div class="form-group">
-                            <strong>Comment:</strong>
-                            <textarea id="order_comment" name="order_comment" class="form-control" cols="30" rows="5"></textarea>
+                <form action="confirmStep" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6 mt-3 mt-3 offset-md-3 ">
+                            <h5>Payment Summary</h5>
+                            <table class="table">
+                                <tr>
+                                    <td class="text-left"><strong> Service Total:</strong></td>
+                                    <td><span id="sub_total"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong> Coupon Discount:</strong></td>
+                                    <td><span id="discount"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Staff Charges:</strong></td>
+                                    <td><span id="staff_charges"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Transport Charges:</strong></td>
+                                    <td><span id="transport_charges"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Total:</strong></td>
+                                    <td><span id="total_amount"></span></td>
+                                </tr>
+                            </table>
                         </div>
-                    </div>
-                    <div class="col-md-12 text-center">
-                        <button id="confirmOrder" data-order-id="" type="button" class="btn btn-primary">Confirm
-                            Order</button><br><br>
-                        {{-- @auth
-                            <a id="orderEdit" href="">
-                                <button type="button" class="btn btn-secondary">Edit Order</button>
-                            </a>
-                        @endauth --}}
-                        <a id="orderCancel" href="">
-                            <button type="button" class="btn btn-primary">Cancel Order</button>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div id="success-step" style="display: none;">
-                <section class="jumbotron text-center">
-                    <div class="container">
-                        <h1 class="jumbotron-heading">Your order has been placed!</h1>
-                    </div>
-                </section>
-                <div class="album py-5 bg-light">
-                    <div class="container">
-                        <li>Your order has been successfully processed!</li>
-                        <li>We have send you email with your login credentials.</li>
-                        <li>Visit our website for your order detail and book more service</li>
-                        @auth
-                            <li>You can view your order history by clicking on <a href="/order">Order History</a>.</li>
-                        @endauth
-                        <li>Please direct any questions you have to the store owner.</li>
-                        <li>Thanks for booking our service!</li>
-                        <div class="col-md-12 text-right">
-                            <a href="/">
-                                <button type="button" class="btn btn-primary">Continue</button>
+                        <input type="hidden" name="customer_type" id="customer_type">
+                        <input type="hidden" name="order_ids" value="" id="order_ids">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="form-group">
+                                <strong>Payment Method:</strong>
+                                <select id="payment_method" name="payment_method" class="form-control">
+                                    <option value="Cash-On-Delivery">Cash On Delivery</option>
+                                    <option value="Credit-Debit-Card">Credit or Debit Card</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 offset-md-3">
+                            <div class="form-group">
+                                <strong>Comment:</strong>
+                                <textarea id="order_comment" name="order_comment" class="form-control" cols="30" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 text-center">
+                            <button id="confirmOrder" type="submit" class="btn btn-primary">Confirm
+                                Order</button><br><br>
+                            {{-- @auth
+                                <a id="orderEdit" href="">
+                                    <button type="button" class="btn btn-secondary">Edit Order</button>
+                                </a>
+                            @endauth --}}
+                            <a id="orderCancel" href="">
+                                <button type="button" class="btn btn-primary">Cancel Order</button>
                             </a>
                         </div>
                     </div>
-                </div>
-
+                </form>
             </div>
         </div>
     </div>
@@ -456,8 +444,9 @@
                             $('#staff_charges').text(response.staff_charges);
                             $('#transport_charges').text(response.transport_charges);
                             $('#total_amount').text(response.total_amount);
-                            $('#confirmOrder').attr("data-order-id", response.order_ids);
                             $('#customer_type').val(response.customer_type);
+                            $('#order_ids').val(response
+                            .order_ids);
 
                             var editOrderRoute = "{{ route('order.edit', ':orderId') }}";
                             editOrderRoute = editOrderRoute.replace(':orderId', response
@@ -471,29 +460,6 @@
 
                             $('#orderCancel').attr('href', cancelOrderRoute);
                         }
-                    },
-                    error: function(error) {
-                        console.log("Error:", error);
-                    }
-                });
-            });
-            $("#confirmOrder").click(function() {
-                var order_ids =$(this).attr('data-order-id');
-                var comment =$("#order_comment").val();
-                var customer_type =$("#customer_type").val();
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('confirmStep') }}",
-                    data: {
-                        order_ids: order_ids,
-                        comment: comment,
-                        customer_type: customer_type,
-                    },
-                    success: function(response) {
-                        $('#confirm-step').hide();
-                        $('#selected-booking-staff-slot').hide();
-                        $('#success-step').show();
-                        $('html, body').scrollTop(0);
                     },
                     error: function(error) {
                         console.log("Error:", error);
