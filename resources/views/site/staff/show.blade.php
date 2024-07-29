@@ -64,29 +64,36 @@ $reviewsCarousel_chunk = 3;
                 <h3>Social Links</h3>
 
                 <!-- Facebook -->
+                @if($user->staff->facebook)
                 <a style="color: #3b5998;" href="{{$user->staff->facebook}}" target="_blank" class="btn btn-lg" role="button">
                     <i class="fab fa-facebook-f fa-lg"></i>
                 </a>
+                @endif
 
                 <!-- Twitter -->
+                @if($user->staff->snapchat)
                 <a style="color: #fffc00;" href="{{$user->staff->snapchat}}" target="_blank" class="btn btn-lg" role="button">
                     <i class="fab fa-snapchat fa-lg"></i>
                 </a>
-
+                @endif
                 <!-- Youtube -->
+                @if($user->staff->youtube)
                 <a style="color: #ed302f;" href="{{$user->staff->youtube}}" target="_blank" class="btn btn-lg" role="button">
                     <i class="fab fa-youtube fa-lg"></i>
                 </a>
-
+                @endif
                 <!-- Instagram -->
+                @if($user->staff->instagram)
                 <a style="color: #ac2bac;" href="{{$user->staff->instagram}}" target="_blank" class="btn btn-lg" role="button">
                     <i class="fab fa-instagram fa-lg"></i>
                 </a>
-
+                @endif
                 <!-- Tiktok -->
+                @if($user->staff->tiktok)
                 <a style="color: #1e3050;" href="{{$user->staff->tiktok}}" target="_blank" class="btn btn-lg" role="button">
                     <i class="fab fa-tiktok"></i>
                 </a>
+                @endif
             </div>
             @endif
             <hr>

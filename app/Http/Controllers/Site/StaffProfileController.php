@@ -65,8 +65,10 @@ class StaffProfileController extends Controller
         ];
 
         foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
-            if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
-                $user->staff->$platform = $urlPrefix . $user->staff->$platform;
+            if(isset($user->staff)){
+                if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
+                    $user->staff->$platform = $user->staff->$platform ? $urlPrefix . $user->staff->$platform : null;
+                }
             }
         }
         $category_ids = $user->categories()->pluck('category_id')->toArray();

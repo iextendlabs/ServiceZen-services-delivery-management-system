@@ -71,7 +71,7 @@ class StripePaymentController extends Controller
                     "amount" => $order_total * 100, // Amount in cents
                     "currency" => $currency,
                     "customer" => $customer->id,
-                    "description" => "New Order Payment from Lipslay web store."
+                    "description" => "New Order Payment from Lipslay web store. Order ids are ".$request->order_ids
                 ]);
 
                 // Update orders and send notifications/emails
