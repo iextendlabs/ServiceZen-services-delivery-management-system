@@ -752,42 +752,53 @@ class CheckOutController extends Controller
 
     public function confirmStep(Request $request)
     {
-        $order_ids = explode(',', $request->order_ids);
-        if(isset($order_ids)){
-            foreach($order_ids as $order_id){
-                $order = Order::find($order_id);
-                $order->status = "Pending";
-                $order->order_comment = $request->comment;
-                $order->save();
-                Session::forget('bookingData');
-        
-                $customer = $order->customer;
-                $staff = User::find($order->service_staff_id);
-                if ($staff) {
-                    if (Carbon::now()->toDateString() == $order->date) {
-                        $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                        if ($staff->staff->driver) {
-                            $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                        }
-                        try {
-                            $this->sendOrderEmail($order->id, $customer->email);
-                        } catch (\Throwable $th) {
+        $order_ids = $request->order_ids;
+        $comment = $request->comment;
+        $customer_type = $request->customer_type;
+
+        if($request->payment_method == "Credit-Debit-Card"){
+            session([
+                'order_ids' => $order_ids,
+                'comment' => $comment,
+                'customer_type' => $customer_type,
+            ]);
+    
+            return redirect()->route('stripe.form');
+        }else{
+            $order_ids = explode(',', $request->order_ids);
+            if(isset($order_ids)){
+                foreach($order_ids as $order_id){
+                    $order = Order::find($order_id);
+                    $order->status = "Pending";
+                    $order->order_comment = $request->comment;
+                    $order->save();
+                    Session::forget('bookingData');
+            
+                    $customer = $order->customer;
+                    $staff = User::find($order->service_staff_id);
+                    if ($staff) {
+                        if (Carbon::now()->toDateString() == $order->date) {
+                            $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                            if ($staff->staff->driver) {
+                                $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                            }
+                            try {
+                                $this->sendOrderEmail($order->id, $customer->email);
+                            } catch (\Throwable $th) {
+                            }
                         }
                     }
+                    try {
+                        $this->sendAdminEmail($order->id, $customer->email);
+                        $this->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
+                    } catch (\Throwable $th) {
+                        //TODO: log error or queue job later
+                    }
                 }
-                try {
-                    $this->sendAdminEmail($order->id, $customer->email);
-                    $this->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
-                } catch (\Throwable $th) {
-                    //TODO: log error or queue job later
-                }
+                
+                return view('site.checkOut.success');
             }
-            
-            return response()->json([
-                'message' => "successfully"
-            ], 200);
         }
-        
     }
     
     public function slots(Request $request)

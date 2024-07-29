@@ -41,6 +41,7 @@ use App\Http\Controllers\{
     CurrencyController,
     FreelancerProgramController,
     InformationController,
+    StripePaymentController,
     WithdrawController
 };
 
@@ -228,7 +229,7 @@ Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('draftOrder', [CheckOutController::class, 'draftOrder']);
 Route::resource('cart', CheckOutController::class);
 Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
-Route::get('confirmStep', [CheckOutController::class, 'confirmStep'])->name('confirmStep');
+Route::post('confirmStep', [CheckOutController::class, 'confirmStep'])->name('confirmStep');
 //TODO :set no cache headers for all ajax calls
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
 Route::get('staff-group', [CheckOutController::class, 'staff_group']);
@@ -263,3 +264,7 @@ Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartM
 Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');
 Route::get('/checkBooking', [CheckOutController::class,'checkBooking'])->name('checkBooking');
 Route::post('/format-currency', [CheckOutController::class, 'formatCurrencyJS'])->name('format-currency');
+Route::controller(StripePaymentController::class)->group(function(){
+    Route::get('stripe', 'stripe')->name('stripe.form');
+    Route::post('stripe', 'stripePost')->name('stripe.post');
+});

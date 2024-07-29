@@ -202,7 +202,7 @@ class SiteController extends Controller
 
             cookie()->queue('address', json_encode($address), 5256000);
 
-            return redirect()->back();
+            return redirect('/');
         }
     }
 
