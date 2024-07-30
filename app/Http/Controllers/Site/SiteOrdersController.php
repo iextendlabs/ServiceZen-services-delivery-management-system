@@ -26,6 +26,7 @@ use App\Models\TimeSlot;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\Site\CheckOutController;
 
 class SiteOrdersController extends Controller
 {
@@ -77,7 +78,7 @@ class SiteOrdersController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id,CheckOutController $checkOutController)
     {
         if ($request->has('custom_location') == '') {
             $this->validate($request, [
@@ -149,7 +150,7 @@ class SiteOrdersController extends Controller
                     $staff->staff->driver->notifyOnMobile('Order Update', $msg,$id);
                 }
                 try {
-                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
                 } catch (\Throwable $th) {
                     //TODO: log error or queue job later
                 }
@@ -159,7 +160,7 @@ class SiteOrdersController extends Controller
                     $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$id);
                 }
                 try {
-                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
                 } catch (\Throwable $th) {
                     //TODO: log error or queue job later
                 }
@@ -203,58 +204,6 @@ class SiteOrdersController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function sendCustomerEmail($customer_id, $type, $order_id)
-    {
-        if ($type == "Old") {
-            $customer = User::find($customer_id);
-
-            $dataArray = [
-                'name' => $customer->name,
-                'email' => $customer->email,
-                'password' => ' ',
-                'order_id' => $order_id
-            ];
-        } elseif ($type == "New") {
-            $customer = User::find($customer_id);
-
-            $dataArray = [
-                'name' => $customer->name,
-                'email' => $customer->email,
-                'password' => $customer->name . '1094',
-                'order_id' => $order_id
-            ];
-        }
-        $recipient_email = env('MAIL_FROM_ADDRESS');
-
-        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray,$recipient_email));
-
-        return redirect()->back();
-    }
-
-    public function sendAdminEmail($order_id, $recipient_email)
-    {
-        $order = Order::find($order_id);
-        $to = env('MAIL_FROM_ADDRESS');
-        Mail::to($to)->send(new OrderAdminEmail($order, $recipient_email));
-
-        return redirect()->back();
-    }
-
-    public function sendOrderEmail($order_id, $recipient_email)
-    {
-        $setting = Setting::where('key', 'Emails For Daily Alert')->first();
-
-        $emails = explode(',', $setting->value);
-
-        $order = Order::find($order_id);
-
-        foreach ($emails as $email) {
-            Mail::to($email)->send(new OrderAdminEmail($order, $recipient_email));
-        }
-
-        return redirect()->back();
     }
 
     public function downloadCSV(Request $request)

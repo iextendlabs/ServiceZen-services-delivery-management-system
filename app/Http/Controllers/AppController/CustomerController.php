@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Site\CheckOutController;
 use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CouponHistory;
@@ -432,7 +433,7 @@ class CustomerController extends Controller
         }
     }
 
-    public function addOrder(Request $request)
+    public function addOrder(Request $request, CheckOutController $checkOutController)
     {
         $password = NULL;
         $input = $request->all();
@@ -590,14 +591,14 @@ class CustomerController extends Controller
                                     $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                                 }
                                 try {
-                                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
                                 } catch (\Throwable $th) {
                                     //TODO: log error or queue job later
                                 }
                             }
                             try {
-                                $this->sendAdminEmail($input['order_id'], $input['email']);
-                                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+                                $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
+                                $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
                             } catch (\Throwable $th) {
                                 //TODO: log error or queue job later
                             }
@@ -1550,7 +1551,7 @@ class CustomerController extends Controller
 
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password)
+    private function createOrder($input, $bookingData, $staffZone, &$password, CheckOutController $checkOutController)
     {
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
@@ -1686,14 +1687,14 @@ class CustomerController extends Controller
                     $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                 }
                 try {
-                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
                 } catch (\Throwable $th) {
                     //TODO: log error or queue job later
                 }
             }
             try {
-                $this->sendAdminEmail($input['order_id'], $input['email']);
-                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+                $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
+                $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
             } catch (\Throwable $th) {
                 //TODO: log error or queue job later
             }
