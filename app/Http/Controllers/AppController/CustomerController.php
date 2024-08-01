@@ -1429,19 +1429,23 @@ class CustomerController extends Controller
             }
             $checkOutController = new CheckOutController();
             list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController);
-            // Handle addresses
 
-
-            return response()->json([
-                'sub_total' => $all_sub_total,
-                'discount' => $all_discount,
-                'staff_charges' => $all_staff_charges,
-                'transport_charges' => $all_transport_charges,
-                'total_amount' => $all_total_amount,
-                'order_ids' => $order_ids,
-                'customer_type' => $customer_type,
-            ], 200);
-
+            if($input['payment_method'] == "Credit-Debit-Card"){
+                return response()->json([
+                    'order_ids' => $order_ids,
+                    'customer_type' => $customer_type,
+                ], 300);
+            }else{
+                return response()->json([
+                    'sub_total' => $all_sub_total,
+                    'discount' => $all_discount,
+                    'staff_charges' => $all_staff_charges,
+                    'transport_charges' => $all_transport_charges,
+                    'total_amount' => $all_total_amount,
+                    'order_ids' => $order_ids,
+                    'customer_type' => $customer_type,
+                ], 200);
+            }
             
         }catch (\Exception $e){
             $request_body = $request->all();
@@ -1573,7 +1577,11 @@ class CustomerController extends Controller
 
         foreach ($groupedBooking as $key => $singleBookingService) {
             $discount = 0;
-            $input['status'] = "Pending";
+            if($input['payment_method'] == "Credit-Debit-Card"){
+                $input['status'] = "Draft";
+            }else{
+                $input['status'] = "Pending";
+            }
 
             list($date, $service_staff_id, $time_slot_id) = explode('_', $key);
             $input['date'] = $date;
@@ -1681,7 +1689,7 @@ class CustomerController extends Controller
                 OrderService::create($input);
             }
 
-            if (Carbon::now()->toDateString() == $input['date']) {
+            if (Carbon::now()->toDateString() == $input['date'] && $input['payment_method'] == "Cash-On-Delivery") {
                 $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                 if ($staff->staff->driver) {
                     $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
