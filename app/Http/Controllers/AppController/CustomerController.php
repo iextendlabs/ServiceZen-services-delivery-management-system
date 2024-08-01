@@ -1432,6 +1432,11 @@ class CustomerController extends Controller
 
             if($input['payment_method'] == "Credit-Debit-Card"){
                 return response()->json([
+                    'sub_total' => $all_sub_total,
+                    'discount' => $all_discount,
+                    'staff_charges' => $all_staff_charges,
+                    'transport_charges' => $all_transport_charges,
+                    'total_amount' => $all_total_amount,
                     'order_ids' => $order_ids,
                     'customer_type' => $customer_type,
                 ], 300);
