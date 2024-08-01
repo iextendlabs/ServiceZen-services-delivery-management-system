@@ -1642,7 +1642,7 @@ class CustomerController extends Controller
 
             $input['time_start'] = $time_slot->time_start;
             $input['time_end'] = $time_slot->time_end;
-            $input['payment_method'] = "Cash-On-Delivery";
+            $input['payment_method'] = $input['payment_method'];
 
             $order = Order::create($input);
             $order_ids[] = $order->id;
