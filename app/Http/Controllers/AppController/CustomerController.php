@@ -1427,8 +1427,8 @@ class CustomerController extends Controller
                     'msg' => $isValidOrderValue
                 ], 201);
             }
-
-            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password);
+            $checkOutController = new CheckOutController();
+            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController);
             // Handle addresses
 
 
@@ -1551,7 +1551,7 @@ class CustomerController extends Controller
 
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password, CheckOutController $checkOutController)
+    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController)
     {
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
