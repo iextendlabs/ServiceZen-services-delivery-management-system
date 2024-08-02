@@ -1682,23 +1682,24 @@ class CustomerController extends Controller
                 }
                 OrderService::create($input);
             }
-
-            if (Carbon::now()->toDateString() == $input['date'] && $input['payment_method'] == "Cash-On-Delivery") {
-                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+            if($input['payment_method'] == "Cash-On-Delivery"){
+                if (Carbon::now()->toDateString() == $input['date']) {
+                    $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    if ($staff->staff->driver) {
+                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    }
+                    try {
+                        $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
+                    } catch (\Throwable $th) {
+                        //TODO: log error or queue job later
+                    }
                 }
                 try {
-                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
                 } catch (\Throwable $th) {
                     //TODO: log error or queue job later
                 }
-            }
-            try {
-                $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
-                $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
-            } catch (\Throwable $th) {
-                //TODO: log error or queue job later
             }
         }
        
