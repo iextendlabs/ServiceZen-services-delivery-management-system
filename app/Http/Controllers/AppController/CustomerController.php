@@ -1430,27 +1430,16 @@ class CustomerController extends Controller
             $checkOutController = new CheckOutController();
             list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController);
 
-            if($input['payment_method'] == "Credit-Debit-Card"){
-                return response()->json([
-                    'sub_total' => $all_sub_total,
-                    'discount' => $all_discount,
-                    'staff_charges' => $all_staff_charges,
-                    'transport_charges' => $all_transport_charges,
-                    'total_amount' => $all_total_amount,
-                    'order_ids' => $order_ids,
-                    'customer_type' => $customer_type,
-                ], 300);
-            }else{
-                return response()->json([
-                    'sub_total' => $all_sub_total,
-                    'discount' => $all_discount,
-                    'staff_charges' => $all_staff_charges,
-                    'transport_charges' => $all_transport_charges,
-                    'total_amount' => $all_total_amount,
-                    'order_ids' => $order_ids,
-                    'customer_type' => $customer_type,
-                ], 200);
-            }
+            return response()->json([
+                'sub_total' => $all_sub_total,
+                'discount' => $all_discount,
+                'staff_charges' => $all_staff_charges,
+                'transport_charges' => $all_transport_charges,
+                'total_amount' => $all_total_amount,
+                'order_ids' => $order_ids,
+                'customer_type' => $customer_type,
+                'payment_method' => $input['payment_method'],
+            ], 200);
             
         }catch (\Exception $e){
             $request_body = $request->all();
