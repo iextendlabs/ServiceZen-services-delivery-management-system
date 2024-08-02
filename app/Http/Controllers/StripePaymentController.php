@@ -45,14 +45,18 @@ class StripePaymentController extends Controller
         $order_total += $orders->sum(function ($order) {
             return $order->total_amount;
         });
-
-        $staffZone = StaffZone::where('name', $orders->first()->area)->first();
-        if ($staffZone && $staffZone->currency) {
-            $currency = $staffZone->currency->name;
-            $order_total *= $staffZone->currency->rate ?? 1;
-        } else {
+        if($app === true){
             $currency = "AED";
+        }else{
+            $staffZone = StaffZone::where('name', $orders->first()->area)->first();
+            if ($staffZone && $staffZone->currency) {
+                $currency = $staffZone->currency->name;
+                $order_total *= $staffZone->currency->rate ?? 1;
+            } else {
+                $currency = "AED";
+            }
         }
+        
 
         try {
             Stripe::setApiKey(env('STRIPE_SECRET'));
