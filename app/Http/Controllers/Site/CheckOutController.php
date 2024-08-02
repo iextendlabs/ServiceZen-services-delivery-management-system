@@ -753,7 +753,7 @@ class CheckOutController extends Controller
     public function confirmStep(Request $request)
     {
         $order_ids = $request->order_ids;
-        $comment = $request->comment;
+        $comment = $request->order_comment;
         $customer_type = $request->customer_type;
 
         if($request->payment_method == "Credit-Debit-Card"){
@@ -770,7 +770,7 @@ class CheckOutController extends Controller
                 foreach($order_ids as $order_id){
                     $order = Order::find($order_id);
                     $order->status = "Pending";
-                    $order->order_comment = $request->comment;
+                    $order->order_comment = $request->order_comment;
                     $order->save();
                     Session::forget('bookingData');
             
