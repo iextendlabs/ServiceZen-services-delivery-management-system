@@ -47,7 +47,7 @@ class CustomerController extends Controller
             'date_to' => $request->date_to,
             'zone' => $request->zone,
         ];
-    
+
         $query = User::role('Customer')->orderby($sort, $direction);
         $staffZones = StaffZone::get();
         if ($request->name) {
@@ -221,10 +221,10 @@ class CustomerController extends Controller
             return view('customers.print', compact('customers'));
         } else {
             $affiliates = User::role('Affiliate')->orderBy('name')->get();
-            $coupons = Coupon::where('status', '1')->get();     
-            $filters = $request->only(['name', 'email', 'number', 'affiliate_id', 'order_count', 'date_from', 'date_to','zone']);
+            $coupons = Coupon::where('status', '1')->get();
+            $filters = $request->only(['name', 'email', 'number', 'affiliate_id', 'order_count', 'date_from', 'date_to', 'zone']);
             $customers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-    
+
             return view('customers.index', compact('customers', 'filter', 'coupons', 'affiliates', 'total_customer', 'direction', 'staffZones'))->with('i', ($request->input('page', 1) - 1) * config('app.paginate'));
         }
     }
@@ -400,22 +400,29 @@ class CustomerController extends Controller
 
     public function assignCoupon(Request $request, $customerId)
     {
-        $customer_coupon = CustomerCoupon::where('customer_id', $customerId)->where('coupon_id', $request->coupon_id)->first();
-        if (!$customer_coupon) {
-            CustomerCoupon::create([
-                'customer_id' => $customerId,
-                'coupon_id' => $request->coupon_id
-            ]);
+        $selectedCoupons = $request->input('selectItem');
+        foreach ($selectedCoupons as $couponId) {
+            $customer_coupon = CustomerCoupon::where('customer_id', $customerId)
+                ->where('coupon_id', $couponId)
+                ->first();
+            if (!$customer_coupon) {
+                CustomerCoupon::create([
+                    'customer_id' => $customerId,
+                    'coupon_id' => $couponId
+                ]);
 
-            $coupon = Coupon::find($request->coupon_id);
-            $customer = User::find($customerId);
-            if ($coupon->type == "Percentage") {
-                $discount = $coupon->discount . "%";
-            } else {
-                $discount = "AED " . $coupon->discount;
+                $coupon = Coupon::find($couponId);
+                $customer = User::find($customerId);
+
+                if ($coupon && $customer) {
+                    $discount = $coupon->type === "Percentage"
+                        ? $coupon->discount . "%"
+                        : "AED " . $coupon->discount;
+
+                    $body = "There is a new Voucher for You.\nUse the code " . $coupon->code . " to get a discount of " . $discount;
+                    $customer->notifyOnMobile('New Voucher', $body);
+                }
             }
-            $body = "There is new Voucher for You.\nUse " . $coupon->code . " Code To Get Discount of " . $discount;
-            $customer->notifyOnMobile('New Voucher', $body);
         }
 
         $previousUrl = url()->previous();
@@ -425,35 +432,42 @@ class CustomerController extends Controller
     public function bulkAssignCoupon(Request $request)
     {
         $selectedItems = $request->input('selectedItems');
-        $coupon_id = $request->input('coupon_id');
+        $selectedCoupons = $request->input('selectedCoupons');
 
-        if (!empty($selectedItems)) {
-
+        if (!empty($selectedItems) && !empty($selectedCoupons)) {
             foreach ($selectedItems as $customerId) {
-                $customer_coupon = CustomerCoupon::where('customer_id', $customerId)->where('coupon_id', $coupon_id)->first();
-                if (!$customer_coupon) {
-                    CustomerCoupon::create([
-                        'customer_id' => $customerId,
-                        'coupon_id' => $coupon_id
-                    ]);
+                foreach ($selectedCoupons as $coupon_id) {
+                    $customer_coupon = CustomerCoupon::where('customer_id', $customerId)
+                        ->where('coupon_id', $coupon_id)
+                        ->first();
 
-                    $coupon = Coupon::find($coupon_id);
-                    $customer = User::find($customerId);
-                    if ($coupon->type == "Percentage") {
-                        $discount = $coupon->discount . "%";
-                    } else {
-                        $discount = "AED " . $coupon->discount;
+                    if (!$customer_coupon) {
+                        CustomerCoupon::create([
+                            'customer_id' => $customerId,
+                            'coupon_id' => $coupon_id
+                        ]);
+
+                        $coupon = Coupon::find($coupon_id);
+                        $customer = User::find($customerId);
+
+                        if ($coupon && $customer) {
+                            $discount = $coupon->type == "Percentage"
+                                ? $coupon->discount . "%"
+                                : "AED " . $coupon->discount;
+
+                            $body = "There is a new Voucher for You.\nUse " . $coupon->code . " Code To Get Discount of " . $discount;
+                            $customer->notifyOnMobile('New Voucher', $body);
+                        }
                     }
-                    $body = "There is new Voucher for You.\nUse " . $coupon->code . " Code To Get Discount of " . $discount;
-                    $customer->notifyOnMobile('New Voucher', $body);
                 }
             }
 
-            return response()->json(['message' => 'Coupon assigned successfully.']);
+            return response()->json(['message' => 'Coupons assigned successfully.']);
         } else {
-            return response()->json(['message' => 'No customer selected.']);
+            return response()->json(['message' => 'No customers or coupons selected.'], 400);
         }
     }
+
 
     public function customerCoupon_destroy(Request $request, $couponId)
     {
@@ -489,7 +503,7 @@ class CustomerController extends Controller
             'commission.required' => 'A commission is required when the type is set.',
             'type.required' => 'A type is required when the commission is set.',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
