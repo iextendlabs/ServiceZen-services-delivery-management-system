@@ -72,7 +72,7 @@ class StripePaymentController extends Controller
                 $paymentIntent = PaymentIntent::create([
                     'amount' => $order_total * 100,
                     'currency' => $currency,
-                    'description' => "New Order Payment from Lipslay App. Order ids are " . $order_ids,
+                    'description' => "New Order Payment from Lipslay App. Order ids are " . $request->order_ids,
                     'customer' => $customer->id,
                 ]);
             } elseif ($app === false) {
