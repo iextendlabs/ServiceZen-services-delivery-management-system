@@ -121,7 +121,11 @@ class StripePaymentController extends Controller
                 }
             }
             if ($app === true) {
-                return response()->json(['client_secret' => $paymentIntent->client_secret], 200);
+                return response()->json([
+                    'client_secret' => $paymentIntent->client_secret,
+                    'email' => $customer->email,
+                    'name' => $customer->name,
+                ], 200);
             } elseif ($app === false) {
                 session()->forget(['order_ids', 'comment', 'customer_type']);
                 Session::flash('success', 'Payment successful!');
