@@ -12,24 +12,59 @@
                             class="fa fa-print"></i> PDF</a>
                     <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2"><i
                             class="fa fa-download"></i> Excel</a>
+
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-success" id="bulkAssignCouponButton" style="margin-top: -8px">
+                        <i class="fas fa-gift"></i> Apply Bulk Coupon
+                    </button>
+
+                    <!-- Modal structure -->
+                    <div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="couponModalLabel">Select Coupon for Customers</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="couponSelect" class="form-label">Select Coupon:</label>
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Select</th>
+                                                    <th>Coupon Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($coupons as $coupon)
+                                                    <tr>
+                                                        <td>
+                                                            <input class="form-check-input coupon-checkbox"
+                                                                id="bulk-coupon{{ $coupon->id }}" type="checkbox"
+                                                                name="bulk-coupon[]" value="{{ $coupon->id }}"
+                                                                style="margin-top: -8px">
+                                                        </td>
+                                                        <td>{{ $coupon->name }} ({{ $coupon->code }})</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button id="assignCouponButton" class="btn btn-primary" type="button"><i
+                                            class=""></i> Assign Coupon</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{--  --}}
                     @can('customer-create')
                         <a class="btn btn-success mb-2" href="{{ route('customers.create') }}"> <i class="fa fa-plus"></i>
                             Create</a>
                     @endcan
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="bulk-coupon">Select Coupon</label>
-                        </div>
-                        <select class="custom-select" id="bulk-coupon" name="bulk-coupon">
-                            @foreach ($coupons as $coupon)
-                                <option value="{{ $coupon->id }}">{{ $coupon->name }} ({{ $coupon->code }})</option>
-                            @endforeach
-                        </select>
-                        <div class="input-group-append">
-                            <button id="bulkAssignCoupon" class="btn btn-primary" type="button"><i
-                                    class="fa fa-save"></i></button>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal fade" id="affiliateModal" tabindex="-1" aria-labelledby="affiliateModalLabel"
                     aria-hidden="true">
@@ -47,13 +82,13 @@
                                         <select name="affiliate_id" class="form-control" id="affiliateInput">
                                             <option></option>
                                             @foreach ($affiliates as $affiliate)
-                                            @if($affiliate->affiliate->status == 1)
-                                                <option value="{{ $affiliate->id }}">{{ $affiliate->name }}
-                                                    @if ($affiliate->affiliate->code)
-                                                        ({{ $affiliate->affiliate->code }})
-                                                    @endif
-                                                </option>
-                                            @endif
+                                                @if ($affiliate->affiliate->status == 1)
+                                                    <option value="{{ $affiliate->id }}">{{ $affiliate->name }}
+                                                        @if ($affiliate->affiliate->code)
+                                                            ({{ $affiliate->affiliate->code }})
+                                                        @endif
+                                                    </option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
@@ -101,17 +136,17 @@
                             <input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);">
                         </td>
                         <th><a class=" ml-2 text-decoration-none"
-                            href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
-                        @if (request('sort') === 'name')
-                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                        @endif
-                    </th>
-                    <th><a class=" ml-2 text-decoration-none"
-                            href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
-                        @if (request('sort') === 'email')
-                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                        @endif
-                    </th>
+                                href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                            @if (request('sort') === 'name')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th><a class=" ml-2 text-decoration-none"
+                                href="{{ route('customers.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
+                            @if (request('sort') === 'email')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
                         <th>Orders</th>
                         <th>Last Order Date</th>
                         <th>Affiliate</th>
@@ -124,7 +159,8 @@
                                     <input type="checkbox" class="item-checkbox" name="ids[{{ ++$i }}]"
                                         value="{{ $customer->id }}">
                                 </td>
-                                <td class="@if ($customer->status == 1) text-success @else text-danger @endif"> {{ $customer->name }}</td>
+                                <td class="@if ($customer->status == 1) text-success @else text-danger @endif">
+                                    {{ $customer->name }}</td>
                                 <td>{{ $customer->email }}</td>
                                 <td>{{ $customer->customer_orders_count }}</td>
                                 <td>
@@ -168,7 +204,8 @@
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="couponModalLabel{{ $customer->id }}">Select
+                                                    <h5 class="modal-title" id="couponModalLabel{{ $customer->id }}">
+                                                        Select
                                                         Coupon for {{ $customer->name }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
@@ -180,15 +217,33 @@
                                                         <div class="mb-3">
                                                             <label for="couponSelect{{ $customer->id }}"
                                                                 class="form-label">Select Coupon:</label>
-                                                            <select class="form-select"
-                                                                id="couponSelect{{ $customer->id }}" name="coupon_id">
-                                                                @foreach ($coupons as $coupon)
-                                                                    <option value="{{ $coupon->id }}">
-                                                                        {{ $coupon->name }} ({{ $coupon->code }})</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <table class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Select</th>
+                                                                        <th>Coupon Name</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach ($coupons as $coupon)
+                                                                        <tr>
+                                                                            <td>
+                                                                                <input class="form-check-input mb-5"
+                                                                                    id="couponSelect{{ $coupon->id }}"
+                                                                                    type="checkbox" name="selectItem[]"
+                                                                                    value="{{ $coupon->id }}"
+                                                                                    style="margin-top: -8px">
+                                                                            </td>
+                                                                            <td>{{ $coupon->name }} {{ $coupon->code }}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
                                                         </div>
-                                                        <button type="submit" class="btn btn-primary">Save Coupon</button>
+                                                        <button type="submit" class="btn btn-primary">Save
+                                                            Coupon</button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -237,14 +292,14 @@
                                 <select name="affiliate_id" class="form-control">
                                     <option></option>
                                     @foreach ($affiliates as $affiliate)
-                                    @if($affiliate->affiliate->status == 1)
-                                        <option value="{{ $affiliate->id }}"
-                                            @if ($filter['affiliate_id'] == $affiliate->id) selected @endif>{{ $affiliate->name }}
-                                            @if ($affiliate->affiliate->code)
-                                                ({{ $affiliate->affiliate->code }})
-                                            @endif
-                                        </option>
-                                    @endif
+                                        @if ($affiliate->affiliate->status == 1)
+                                            <option value="{{ $affiliate->id }}"
+                                                @if ($filter['affiliate_id'] == $affiliate->id) selected @endif>{{ $affiliate->name }}
+                                                @if ($affiliate->affiliate->code)
+                                                    ({{ $affiliate->affiliate->code }})
+                                                @endif
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
@@ -255,12 +310,13 @@
                                 <select name="zone" id="zone" class="form-control">
                                     <option value="">Select a zone</option>
                                     @foreach ($staffZones as $zone)
-                                        <option value="{{ $zone->name }}" @if($zone->name == $filter['zone']) selected @endif>{{ $zone->name }}</option>
+                                        <option value="{{ $zone->name }}"
+                                            @if ($zone->name == $filter['zone']) selected @endif>{{ $zone->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="col-12">
                             <div class="form-group">
                                 <strong>Order Count:</strong>
@@ -356,24 +412,40 @@
     </script>
 
     <script>
-        $('#bulkAssignCoupon').click(function() {
+        $(document).ready(function() {
+            $('#bulkAssignCouponButton').click(function() {
+                const selectedItems = $('.item-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (selectedItems.length > 0) {
+                    // Manually trigger the modal if items are selected
+
+                    $('#couponModal').modal('show');
+                } else {
+                    alert('Please select a Customer to Assign Coupon.');
+                }
+            });
+        });
+
+        $('#assignCouponButton').click(function() {
             const selectedItems = $('.item-checkbox:checked').map(function() {
                 return $(this).val();
             }).get();
-            const coupon_value = $('select[name="bulk-coupon"]').val();
-            const coupon_text = $('select[name="bulk-coupon"] option:selected').text();
 
-            if (selectedItems.length > 0) {
-                if (confirm("Are you sure you want to assign " + coupon_text + " coupon to selected customer?")) {
-                    console.log("adas");
-                    bulkAssignCoupon(selectedItems, coupon_value);
+            const selectedCoupons = $('input[name="bulk-coupon[]"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            if (selectedItems.length > 0 && selectedCoupons.length > 0) {
+                if (confirm("Are you sure you want to assign the selected coupons to customers?")) {
+                    bulkAssignCoupon(selectedItems, selectedCoupons);
                 }
             } else {
-                alert('Please select Customer to Assign Coupon.');
+                alert('Please select both customers and coupons to assign.');
             }
         });
 
-        function bulkAssignCoupon(selectedItems, coupon_id) {
+        function bulkAssignCoupon(selectedItems, selectedCoupons) {
             $.ajax({
                 url: '{{ route('customers.bulkAssignCoupon') }}',
                 method: 'POST',
@@ -384,7 +456,7 @@
                 },
                 data: JSON.stringify({
                     selectedItems,
-                    coupon_id
+                    selectedCoupons
                 }),
                 success: function(data) {
                     alert(data.message);
