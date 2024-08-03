@@ -1724,6 +1724,12 @@ class CustomerController extends Controller
             $customer_id = $user->id;
         }
 
+        if (isset($user->customerProfile)) {
+            $user->customerProfile->update($input);
+        } else {
+            $user->customerProfile()->create($input);
+        }
+
         return [$customer_type,$customer_id];
 
     }
