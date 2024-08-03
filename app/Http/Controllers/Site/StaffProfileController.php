@@ -71,7 +71,7 @@ class StaffProfileController extends Controller
                 }
             }
         }
-        $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $category_ids = $user->categories() ? $user->categories()->pluck('category_id')->toArray() : [];
         $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
