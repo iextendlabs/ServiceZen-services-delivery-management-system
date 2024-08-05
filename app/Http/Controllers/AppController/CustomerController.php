@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Site\CheckOutController;
 use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CouponHistory;
@@ -431,7 +432,7 @@ class CustomerController extends Controller
         }
     }
 
-    public function addOrder(Request $request)
+    public function addOrder(Request $request, CheckOutController $checkOutController)
     {
         $password = NULL;
         $input = $request->all();
@@ -589,14 +590,14 @@ class CustomerController extends Controller
                                     $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                                 }
                                 try {
-                                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
                                 } catch (\Throwable $th) {
                                     //TODO: log error or queue job later
                                 }
                             }
                             try {
-                                $this->sendAdminEmail($input['order_id'], $input['email']);
-                                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+                                $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
+                                $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
                             } catch (\Throwable $th) {
                                 //TODO: log error or queue job later
                             }
@@ -1425,10 +1426,8 @@ class CustomerController extends Controller
                     'msg' => $isValidOrderValue
                 ], 201);
             }
-
-            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password);
-            // Handle addresses
-
+            $checkOutController = new CheckOutController();
+            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController);
 
             return response()->json([
                 'sub_total' => $all_sub_total,
@@ -1438,8 +1437,8 @@ class CustomerController extends Controller
                 'total_amount' => $all_total_amount,
                 'order_ids' => $order_ids,
                 'customer_type' => $customer_type,
+                'payment_method' => $input['payment_method'] ?? "",
             ], 200);
-
             
         }catch (\Exception $e){
             $request_body = $request->all();
@@ -1549,7 +1548,7 @@ class CustomerController extends Controller
 
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password)
+    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController)
     {
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
@@ -1571,7 +1570,11 @@ class CustomerController extends Controller
 
         foreach ($groupedBooking as $key => $singleBookingService) {
             $discount = 0;
-            $input['status'] = "Pending";
+            if(isset($input['payment_method']) && $input['payment_method'] == "Credit-Debit-Card"){
+                $input['status'] = "Draft";
+            }else{
+                $input['status'] = "Pending";
+            }
 
             list($date, $service_staff_id, $time_slot_id) = explode('_', $key);
             $input['date'] = $date;
@@ -1640,7 +1643,7 @@ class CustomerController extends Controller
 
             $input['time_start'] = $time_slot->time_start;
             $input['time_end'] = $time_slot->time_end;
-            $input['payment_method'] = "Cash-On-Delivery";
+            $input['payment_method'] = $input['payment_method'] ?? "Cash-On-Delivery";
 
             $order = Order::create($input);
             $order_ids[] = $order->id;
@@ -1678,23 +1681,24 @@ class CustomerController extends Controller
                 }
                 OrderService::create($input);
             }
-
-            if (Carbon::now()->toDateString() == $input['date']) {
-                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+            if(isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery"){
+                if (Carbon::now()->toDateString() == $input['date']) {
+                    $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    if ($staff->staff->driver) {
+                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    }
+                    try {
+                        $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
+                    } catch (\Throwable $th) {
+                        //TODO: log error or queue job later
+                    }
                 }
                 try {
-                    $this->sendOrderEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
+                    $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
                 } catch (\Throwable $th) {
                     //TODO: log error or queue job later
                 }
-            }
-            try {
-                $this->sendAdminEmail($input['order_id'], $input['email']);
-                $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
-            } catch (\Throwable $th) {
-                //TODO: log error or queue job later
             }
         }
        
@@ -1718,6 +1722,12 @@ class CustomerController extends Controller
         }else{
             $customer_type = "Old";
             $customer_id = $user->id;
+        }
+
+        if (isset($user->customerProfile)) {
+            $user->customerProfile->update($input);
+        } else {
+            $user->customerProfile()->create($input);
         }
 
         return [$customer_type,$customer_id];

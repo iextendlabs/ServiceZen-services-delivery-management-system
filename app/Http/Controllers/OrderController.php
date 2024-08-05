@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Site\CheckOutController;
 use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CouponHistory;
@@ -274,7 +275,7 @@ class OrderController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(Request $request,CheckOutController $checkOutController)
     {
         $password = NULL;
         $input = $request->all();
@@ -446,14 +447,14 @@ class OrderController extends Controller
                                 $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                             }
                             try {
-                                $this->sendOrderEmail($input['order_id'], $request->email);
+                                $checkOutController->sendOrderEmail($input['order_id'], $request->email);
                             } catch (\Throwable $th) {
                                 //TODO: log error or queue job later
                             }
                         }
                         try {
-                            $this->sendAdminEmail($input['order_id'], $request->email);
-                            $this->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
+                            $checkOutController->sendAdminEmail($input['order_id'], $request->email);
+                            $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
                         } catch (\Throwable $th) {
                             //TODO: log error or queue job later
                         }

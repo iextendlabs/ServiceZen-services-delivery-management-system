@@ -7,8 +7,10 @@ use App\Http\Controllers\AppController\{
     StaffAppController,
     DriverAppController,
     ChatController,
-    CustomerController
+    CustomerController,
 };
+
+use App\Http\Controllers\StripePaymentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -76,3 +78,4 @@ Route::get('OrderTotalSummary', [CustomerController::class, 'OrderTotalSummary']
 Route::post('signInWithFB', [CustomerController::class, 'signInWithFB']);
 Route::post('/apply-affiliate', [CustomerController::class,'applyAffiliate'])->name('apply.affiliate');
 Route::post('addNewOrder', [CustomerController::class, 'addNewOrder']);
+Route::post('/create-payment-intent', [StripePaymentController::class, 'stripePost']);
