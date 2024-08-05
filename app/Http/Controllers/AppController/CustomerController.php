@@ -1437,7 +1437,7 @@ class CustomerController extends Controller
                 'total_amount' => $all_total_amount,
                 'order_ids' => $order_ids,
                 'customer_type' => $customer_type,
-                'payment_method' => $input['payment_method'],
+                'payment_method' => $input['payment_method'] ?? "",
             ], 200);
             
         }catch (\Exception $e){
@@ -1570,7 +1570,7 @@ class CustomerController extends Controller
 
         foreach ($groupedBooking as $key => $singleBookingService) {
             $discount = 0;
-            if($input['payment_method'] == "Credit-Debit-Card"){
+            if(isset($input['payment_method']) && $input['payment_method'] == "Credit-Debit-Card"){
                 $input['status'] = "Draft";
             }else{
                 $input['status'] = "Pending";
@@ -1643,7 +1643,7 @@ class CustomerController extends Controller
 
             $input['time_start'] = $time_slot->time_start;
             $input['time_end'] = $time_slot->time_end;
-            $input['payment_method'] = $input['payment_method'];
+            $input['payment_method'] = $input['payment_method'] ?? "Cash-On-Delivery";
 
             $order = Order::create($input);
             $order_ids[] = $order->id;
@@ -1681,7 +1681,7 @@ class CustomerController extends Controller
                 }
                 OrderService::create($input);
             }
-            if($input['payment_method'] == "Cash-On-Delivery"){
+            if(isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery"){
                 if (Carbon::now()->toDateString() == $input['date']) {
                     $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                     if ($staff->staff->driver) {
