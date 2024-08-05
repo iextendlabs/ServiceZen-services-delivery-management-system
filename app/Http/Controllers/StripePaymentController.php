@@ -45,9 +45,10 @@ class StripePaymentController extends Controller
         $order_total += $orders->sum(function ($order) {
             return $order->total_amount;
         });
-        if($app === true){
+
+        if ($app === true) {
             $currency = "AED";
-        }else{
+        } else {
             $staffZone = StaffZone::where('name', $orders->first()->area)->first();
             if ($staffZone && $staffZone->currency) {
                 $currency = $staffZone->currency->name;
@@ -56,7 +57,6 @@ class StripePaymentController extends Controller
                 $currency = "AED";
             }
         }
-        
 
         try {
             Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -88,42 +88,86 @@ class StripePaymentController extends Controller
                 ]);
             }
 
+            if ($app === true) {
+                // Confirm payment status
+                $paymentIntent = PaymentIntent::retrieve($paymentIntent->id);
+                if ($paymentIntent->status === 'succeeded') {
+                    foreach ($order_ids as $order_id) {
+                        $order = Order::find($order_id);
+                        if ($order) {
+                            $order->status = "Pending";
+                            if ($app === false) {
+                                $order->order_comment = $request->comment;
+                                $order->payment_method = "Credit-Debit-Card";
+                            }
+                            $order->save();
 
-            foreach ($order_ids as $order_id) {
-                $order = Order::find($order_id);
-                if ($order) {
-                    $order->status = "Pending";
-                    if ($app === false) {
-                        $order->order_comment = $request->comment;
-                        $order->payment_method = "Credit-Debit-Card";
-                    }
-                    $order->save();
+                            if ($app === false) {
+                                Session::forget('bookingData');
+                            }
 
-                    if ($app === false) {
-                        Session::forget('bookingData');
-                    }
-
-                    $customer = $order->customer;
-                    $staff = User::find($order->service_staff_id);
-                    if ($staff) {
-                        if (Carbon::now()->toDateString() == $order->date) {
-                            $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                            if ($staff->staff->driver) {
-                                $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                            $customer = $order->customer;
+                            $staff = User::find($order->service_staff_id);
+                            if ($staff) {
+                                if (Carbon::now()->toDateString() == $order->date) {
+                                    $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                                    if ($staff->staff->driver) {
+                                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                                    }
+                                    try {
+                                        $checkOutController->sendOrderEmail($order->id, $customer->email);
+                                    } catch (\Throwable $th) {
+                                    }
+                                }
                             }
                             try {
-                                $checkOutController->sendOrderEmail($order->id, $customer->email);
+                                $checkOutController->sendAdminEmail($order->id, $customer->email);
+                                $checkOutController->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
                             } catch (\Throwable $th) {
                             }
                         }
                     }
-                    try {
-                        $checkOutController->sendAdminEmail($order->id, $customer->email);
-                        $checkOutController->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
-                    } catch (\Throwable $th) {
+                }
+            } else {
+                foreach ($order_ids as $order_id) {
+                    $order = Order::find($order_id);
+                    if ($order) {
+                        $order->status = "Pending";
+                        if ($app === false) {
+                            $order->order_comment = $request->comment;
+                            $order->payment_method = "Credit-Debit-Card";
+                        }
+                        $order->save();
+
+                        if ($app === false) {
+                            Session::forget('bookingData');
+                        }
+
+                        $customer = $order->customer;
+                        $staff = User::find($order->service_staff_id);
+                        if ($staff) {
+                            if (Carbon::now()->toDateString() == $order->date) {
+                                $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                                if ($staff->staff->driver) {
+                                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                                }
+                                try {
+                                    $checkOutController->sendOrderEmail($order->id, $customer->email);
+                                } catch (\Throwable $th) {
+                                }
+                            }
+                        }
+                        try {
+                            $checkOutController->sendAdminEmail($order->id, $customer->email);
+                            $checkOutController->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
+                        } catch (\Throwable $th) {
+                        }
                     }
                 }
             }
+
+
+
             if ($app === true) {
                 return response()->json([
                     'client_secret' => $paymentIntent->client_secret,
