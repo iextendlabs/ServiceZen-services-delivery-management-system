@@ -83,6 +83,7 @@
             </th>
             <th>Group</th>
             <th>Staff</th>
+            <th>No. of Seats</th>
             <th width="280px">Action</th>
         </tr>
         @if(count($time_slots))
@@ -101,6 +102,7 @@
                     {{ $staff->name }}@if($key != count($time_slot->staffs) -1),@endif
                 @endforeach
             </td>
+            <td>{{ $time_slot->seat }}</td>
             <td>
                 <form id="deleteForm{{ $time_slot->id }}" action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
                     <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}"><i class="fa fa-eye"></i></a>

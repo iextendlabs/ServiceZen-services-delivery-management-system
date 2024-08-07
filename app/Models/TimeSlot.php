@@ -11,7 +11,7 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status', 'start_time_to_sec', 'end_time_to_sec'];
+    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status', 'start_time_to_sec', 'end_time_to_sec', 'seat'];
 
     public $space_availability;
 
@@ -91,9 +91,6 @@ class TimeSlot extends Model
         // staff zone find kea based on area user sent 
         $staffZone = StaffZone::where('name', $area)->first();
 
-
-        // $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
-
         if ($staffZone) {
             // staff groups
             $staff_group_staff_ids = [];
@@ -166,7 +163,6 @@ class TimeSlot extends Model
                     $short_holiday_staff_ids = [];
                     if (count($short_holidays) > 0) {
                         foreach ($short_holidays as $short_holiday) {
-                            //ShortHoliday::where('date', $date)->where('start_time_to_sec', '<=', $timeSlot->end_time_to_sec)->where('end_time_to_sec', '>=', $timeSlot->start_time_to_sec)->pluck('staff_id')->toArray();
                             $holiday_end_time = $short_holiday->start_time_to_sec + ($short_holiday->hours * 3600);
                             $isHolidayTime = $short_holiday->start_time_to_sec <= $timeSlot->end_time_to_sec && $holiday_end_time >= $timeSlot->start_time_to_sec;
                             if ($isHolidayTime) {
@@ -177,14 +173,27 @@ class TimeSlot extends Model
                         $short_holiday_staff_ids = [];
                     }
 
-                    if ($currentOrder)
-                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('id', '!=', $currentOrder)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
-                    else
-                        $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
+                    $ordersQuery = Order::where('time_slot_id', $timeSlot->id)
+                        ->where('date', '=', $date)
+                        ->where('status', '!=', 'Canceled')
+                        ->where('status', '!=', 'Rejected')
+                        ->where('status', '!=', 'Draft');
+
+                    if ($currentOrder) {
+                        $ordersQuery->where('id', '!=', $currentOrder);
+                    }
+
+                    $orders = $ordersQuery->select('service_staff_id')
+                    ->selectRaw('COUNT(*) as order_count')
+                    ->groupBy('service_staff_id')
+                    ->get();
+                    
                     $excluded_staff = [];
                     foreach ($orders as $order) {
-                        $timeSlot->space_availability--;
-                        $excluded_staff[] = $order->service_staff_id;
+                        if ( $order->order_count >= $timeSlot->seat ) {
+                            $timeSlot->space_availability--;
+                            $excluded_staff[] = $order->service_staff_id;
+                        }
                     }
 
                     foreach ($timeSlot->staffs as $staff) {
