@@ -39,9 +39,13 @@ class DriverController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
         $total_driver = $query->count();
         $drivers = $query->paginate(config('app.paginate'));
-        $filters = $request->only(['name']);
+        $filters = $request->only(['name','id']);
         $drivers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
         return view('drivers.index',compact('total_driver','drivers','filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
 
