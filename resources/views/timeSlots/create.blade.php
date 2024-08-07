@@ -46,6 +46,12 @@
                     <input type="time" name="time_end" value="{{ old('time_end') }}" class="form-control" placeholder="Time End">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <span style="color: red;">*</span><strong>No. of Seats:</strong>
+                    <input type="number" name="seat" value="{{ old('seat',1) }}" class="form-control">
+                </div>
+            </div>
             <div class="col-md-12" id="date" style="display: none;">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>

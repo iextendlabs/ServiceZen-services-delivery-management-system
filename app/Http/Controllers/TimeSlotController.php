@@ -85,6 +85,7 @@ class TimeSlotController extends Controller
             'time_start' => 'required',
             'time_end' => 'required',
             'ids' => 'required',
+            'seat' => 'required',
             'date' => Rule::requiredIf($request->type === 'Specific')
         ]);
 
@@ -166,6 +167,7 @@ class TimeSlotController extends Controller
             'time_start' => 'required',
             'time_end' => 'required',
             'ids' => 'required',
+            'seat' => 'required',
             'date' => Rule::requiredIf($request->type === 'Specific')
         ]);
 

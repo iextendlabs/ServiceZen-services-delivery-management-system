@@ -53,6 +53,12 @@
                     <input type="time" name="time_end" value="{{ \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_end)->format('H:i') }}" class="form-control" placeholder="Time End">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <span style="color: red;">*</span><strong>No. of Seats:</strong>
+                    <input type="number" name="seat" value="{{$time_slot->seat}}" class="form-control">
+                </div>
+            </div>
             <div class="col-md-12" id="date" style="display: none;">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>

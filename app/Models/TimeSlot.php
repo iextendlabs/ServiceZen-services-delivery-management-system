@@ -11,7 +11,7 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status', 'start_time_to_sec', 'end_time_to_sec'];
+    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status', 'start_time_to_sec', 'end_time_to_sec','seat'];
 
     public $space_availability;
 
@@ -90,9 +90,6 @@ class TimeSlot extends Model
 
         // staff zone find kea based on area user sent 
         $staffZone = StaffZone::where('name', $area)->first();
-
-
-        // $isAdmin = auth()->check() && auth()->user()->hasRole('Admin');
 
         if ($staffZone) {
             // staff groups
@@ -182,9 +179,12 @@ class TimeSlot extends Model
                     else
                         $orders = Order::where('time_slot_id', $timeSlot->id)->where('date', '=', $date)->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
                     $excluded_staff = [];
-                    foreach ($orders as $order) {
-                        $timeSlot->space_availability--;
-                        $excluded_staff[] = $order->service_staff_id;
+                    
+                    if(count($orders) >= $timeSlot->seat){
+                        foreach ($orders as $order) {
+                            $timeSlot->space_availability--;
+                            $excluded_staff[] = $order->service_staff_id;
+                        }
                     }
 
                     foreach ($timeSlot->staffs as $staff) {

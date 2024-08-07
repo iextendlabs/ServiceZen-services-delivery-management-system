@@ -33,6 +33,12 @@
                 {{ date('h:i A', strtotime($time_slot->time_end)) }}
             </div>
         </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <strong>No. of Seats:</strong>
+                {{ $time_slot->seat }}
+            </div>
+        </div>
         @if($time_slot->type == 'Specific')
         <div class="col-md-12">
             <div class="form-group">
