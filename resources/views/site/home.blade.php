@@ -136,9 +136,8 @@
                     <h1 class="jumbotron-heading">{{ $category->title }}</h1>
                     <p class="lead text-muted">{{ $category->description }}</p>
                 @else
-                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Saloon
-                        Services</h1>
-                    <p class="lead text-muted">Get Your Desired Saloon Beauty service at Your Door, easy to schedule and
+                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Services</h1>
+                    <p class="lead text-muted">Get Your Desired service at Your Door, easy to schedule and
                         just few clicks away.</p>
                 @endif
             </div>
