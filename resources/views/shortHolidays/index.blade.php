@@ -78,15 +78,18 @@
                                 </td>
                                 <td>{{ $shortHoliday->staff->name }}</td>
                                 <td>
-                                    <a class="btn btn-sm btn-success mb-2"
-                                        href="{{ route('updateStatus', $shortHoliday->id) }}?status=1">
-                                        <i class="fas fa-thumbs-up"></i>
-                                    </a>
+                                    @if ($shortHoliday->status == 1)
+                                        <a class="btn btn-sm btn-danger mb-2"
+                                            href="{{ route('updateStatus', $shortHoliday->id) }}?status=0">
+                                            <i class="fas fa-thumbs-down"></i>
+                                        </a>
+                                    @else
+                                        <a class="btn btn-sm btn-success mb-2"
+                                            href="{{ route('updateStatus', $shortHoliday->id) }}?status=1">
+                                            <i class="fas fa-thumbs-up"></i>
+                                        </a>
+                                    @endif
 
-                                    <a class="btn btn-sm btn-danger mb-2"
-                                        href="{{ route('updateStatus', $shortHoliday->id) }}?status=0">
-                                        <i class="fas fa-thumbs-down"></i>
-                                    </a>
                                     <form id="deleteForm{{ $shortHoliday->id }}"
                                         action="{{ route('shortHolidays.destroy', $shortHoliday->id) }}" method="POST">
                                         @csrf

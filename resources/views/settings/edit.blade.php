@@ -151,6 +151,25 @@
                         </table>
                     </div>
                     
+                    @elseif($setting->key === 'Staffs For Holiday Auto Approve')
+                    <input type="text" name="search-staff" id="search-staff" class="form-control" placeholder="Search staff By Name">
+                    <div class="scroll-div">
+                        <table class="table table-striped table-bordered staff-table">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                            </tr>
+                            @foreach ($staffs as $staff)
+                            <tr>
+                                <td>
+                                    <input type="checkbox" @if(in_array($staff->id,explode(',', $setting->value))) checked @endif class="staff-checkbox" name="staff_ids[]" value="{{ $staff->id }}">
+                                </td>
+                                <td>{{ $staff->name }}</td>
+                            </tr>
+                            @endforeach
+                        </table>
+                    </div>
+                    
                     @elseif($setting->key === 'App Categories')
                     <table id="categoryTable" class="table table-bordered table-hover">
                         <thead>
@@ -518,6 +537,22 @@
             let duration = $row.find("td:last").text().toLowerCase();
 
             if (name.indexOf(value) !== -1 || price.indexOf(value) !== -1 || duration.indexOf(value) !== -1) {
+                $row.show();
+            }
+        });
+    });
+
+    $("#search-staff").keyup(function() {
+        let value = $(this).val().toLowerCase();
+
+        $(".staff-table tr").hide();
+
+        $(".staff-table tr").each(function() {
+            let $row = $(this);
+
+            let name = $row.find("td:nth-child(2)").text().toLowerCase();
+
+            if (name.indexOf(value) !== -1) {
                 $row.show();
             }
         });
