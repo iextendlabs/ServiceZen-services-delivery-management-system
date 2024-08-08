@@ -330,6 +330,12 @@ class StaffAppController2 extends Controller
 
         $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
 
+        $staff_auto_approve = Setting::where('key',"Staffs For Holiday Auto Approve")->value('value');
+
+        if(in_array($request->staff_id,explode(',', $staff_auto_approve))){
+            $input['status'] = 1;
+        }
+        
         ShortHoliday::create($input);
 
         return response()->json(['success' => 'Your Short Holiday Request Send to Admin.']);

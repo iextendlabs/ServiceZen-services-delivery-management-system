@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -74,7 +75,8 @@ class SettingController extends Controller
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $setting = Setting::find($id);
-        return view('settings.edit', compact('setting', 'services', 'categories'));
+        $staffs = User::role('Staff')->get();
+        return view('settings.edit', compact('setting', 'services', 'categories', 'staffs'));
     }
 
     /**
@@ -97,8 +99,17 @@ class SettingController extends Controller
                 if ($request->service_ids) {
                     $services = implode(',', $request->service_ids);
                     $setting->value = $services;
-                } else {
-                    $setting->value = $request->input('value');
+                }
+                break;
+
+            case 'Staffs For Holiday Auto Approve':
+                request()->validate([
+                    'staff_ids' => 'required',
+                ]);
+
+                if ($request->staff_ids) {
+                    $staffs = implode(',', $request->staff_ids);
+                    $setting->value = $staffs;
                 }
                 break;
 
