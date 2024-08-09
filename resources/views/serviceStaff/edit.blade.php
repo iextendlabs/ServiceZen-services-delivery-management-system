@@ -39,6 +39,9 @@
             <li class="nav-item">
                 <a class="nav-link" id="category-services-tab" data-toggle="tab" href="#category-services" role="tab" aria-controls="category-services" aria-selected="false">Categories & Services</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="document-tab" data-toggle="tab" href="#document" role="tab" aria-controls="document" aria-selected="false">Document</a>
+            </li>
         </ul>
         <div class="tab-content" id="myTabsContent">
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -385,6 +388,21 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="document" role="tabpanel" aria-labelledby="document-tab">
+                <div class="row">
+                    @foreach($documents as $field => $label)
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>{{ $label }}:</strong>
+                                <input type="file" name="{{ $field }}" class="form-control">
+                                @if($serviceStaff->document && $serviceStaff->document->$field)
+                                <p>Current File: <a href="{{ asset('staff-document/' .$serviceStaff->document->$field) }}" target="_blank">{{ $serviceStaff->document->$field }}</a></p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
             <div class="col-md-12 text-center mt-3">

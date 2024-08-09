@@ -238,4 +238,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Chat::class, 'user_id')->latest();
     }
+
+    public function document()
+    {
+        return $this->hasOne(UserDocument::class, 'user_id');
+    }
 }
