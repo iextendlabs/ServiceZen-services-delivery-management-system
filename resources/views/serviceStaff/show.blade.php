@@ -85,6 +85,20 @@
                 @endif
             </div>
         </div>
+        @foreach($documents as $field => $label)
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>{{ $label }}:</strong>
+                    @if($serviceStaff->document && $serviceStaff->document->$field)
+                        <p>
+                            <a href="{{ asset('staff-document/' . $serviceStaff->document->$field) }}" target="_blank">{{ $serviceStaff->document->$field }}</a>
+                        </p>
+                    @else
+                        <p>No {{ $label }} uploaded.</p>
+                    @endif
+                </div>
+            </div>
+        @endforeach
         @if($freelancer_join)
         <div class="col-md-12">
             <div class="form-group">

@@ -12,6 +12,7 @@ use App\Models\StaffImages;
 use App\Models\StaffYoutubeVideo;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserDocument;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Hash;
@@ -38,6 +39,17 @@ class ServiceStaffController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    private $documents = [
+        'address_proof' => 'Address Proof',
+        'noc' => 'NOC', 
+        'id_card' => 'Id Card', 
+        'passport' => 'Passport', 
+        'driving_license' => 'Driving License', 
+        'education' => 'Education', 
+        'other' => 'Other'
+    ];
+
     public function index(Request $request)
     {
         $sort = $request->input('sort', 'name');
@@ -77,7 +89,8 @@ class ServiceStaffController extends Controller
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services'));
+        $documents = $this->documents;
+        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services','documents'));
     }
 
     /**
@@ -96,6 +109,11 @@ class ServiceStaffController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
+            'address_proof' => 'required',
+            'id_card' => 'required',
+            'passport' => 'required',
+            'driving_license' => 'required',
+            'education' => 'required',
         ]);
 
         $input = $request->all();
@@ -153,6 +171,17 @@ class ServiceStaffController extends Controller
         $ServiceStaff->categories()->attach($request->category_ids);
 
         $ServiceStaff->supervisors()->attach($request->ids);
+        $documents = $this->documents;
+        foreach ($documents as $fileField => $dbField) {
+            if ($request->hasFile($fileField)) {
+                $filename = mt_rand(1000, 9999) . '.' . $request->$fileField->getClientOriginalExtension();
+                $request->$fileField->move(public_path('staff-document'), $filename);
+                $input[$fileField] = $filename;
+            }
+        }
+        
+        UserDocument::create($input);
+
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -183,7 +212,9 @@ class ServiceStaffController extends Controller
         
         $freelancer_join = $request->freelancer_join;
 
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $documents = $this->documents;
+
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -206,7 +237,9 @@ class ServiceStaffController extends Controller
         $membership_plans = MembershipPlan::where('status', 1)
         ->where('type',"Freelancer")
         ->get();
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans'));
+        $documents = $this->documents;
+
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents'));
     }
 
     /**
@@ -301,6 +334,36 @@ class ServiceStaffController extends Controller
 
         $serviceStaff->assignRole('Staff');
 
+
+        $documentFields = $this->documents;
+    
+        $userDocuments = UserDocument::where('user_id', $id)->first();
+    
+        foreach ($documentFields as $fileField => $dbField) {
+            if ($request->hasFile($fileField)) {
+                $filename = mt_rand(1000, 9999) . '.' . $request->$fileField->getClientOriginalExtension();
+                $request->$fileField->move(public_path('staff-document'), $filename);
+    
+                $input[$fileField] = $filename;
+    
+                if ($userDocuments && $userDocuments->$fileField) {
+                    $oldFile = public_path('staff-document/' . $userDocuments->$fileField);
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+            } else {
+                $input[$fileField] = $userDocuments->$fileField ?? null;
+            }
+        }
+    
+        if ($userDocuments) {
+            $userDocuments->update($input);
+        } else {
+            $input['user_id'] = $id;
+            UserDocument::create($input);
+        }
+        
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Service Staff updated successfully');
@@ -323,6 +386,18 @@ class ServiceStaffController extends Controller
             foreach ($serviceStaff->staffImages as $image) {
                 if ($image->image && file_exists(public_path('staff-images') . '/' . $image->image)) {
                     unlink(public_path('staff-images') . '/' . $image->image);
+                }
+            }
+        }
+
+        if (isset($serviceStaff->document)) {
+            $documents = $this->documents;
+            foreach ($documents as $fileField => $dbField) {
+                if ($serviceStaff->document->$fileField) {
+                    $oldFile = public_path('staff-document/' . $serviceStaff->document->$fileField);
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
                 }
             }
         }

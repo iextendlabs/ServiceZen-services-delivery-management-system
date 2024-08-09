@@ -33,6 +33,9 @@
             <li class="nav-item">
                 <a class="nav-link" id="category-services-tab" data-toggle="tab" href="#category-services" role="tab" aria-controls="category-services" aria-selected="false">Categories & Services</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="document-tab" data-toggle="tab" href="#document" role="tab" aria-controls="document" aria-selected="false">Document</a>
+            </li>
         </ul>
         <div class="tab-content" id="myTabsContent">
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -326,6 +329,21 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="document" role="tabpanel" aria-labelledby="document-tab">
+                <div class="row">
+                    @foreach($documents as $field => $label)
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                @if(in_array($field, ['address_proof', 'id_card', 'passport', 'driving_license', 'education']))
+                                    <span style="color: red;">*</span>
+                                @endif
+                                <strong>{{ $label }}:</strong>
+                                <input type="file" name="{{ $field }}" class="form-control">
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
             <div class="col-md-12 text-center mt-3">
