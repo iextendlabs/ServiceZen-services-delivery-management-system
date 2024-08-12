@@ -545,6 +545,15 @@ class OrderController extends Controller
             }
             Transaction::where('user_id',$order->affiliate_id)->where('order_id',$id)->where('type','Order Affiliate Commission')->delete();
         }
+
+        $userAffiliate = UserAffiliate::where('user_id', $order->customer_id)->first();
+        if($userAffiliate){
+            if($userAffiliate->affiliate && $userAffiliate->affiliate->parent_affiliate_id){
+                Transaction::where('user_id',$userAffiliate->affiliate->parent_affiliate_id)->where('order_id',$id)->where('type','Order Parent Affiliate Commission')->delete();
+            }
+            Transaction::where('user_id',$userAffiliate->affiliate_id)->where('order_id',$id)->where('type','Order Affiliate Commission')->delete();
+        }
+
         $order->update($input);
 
         $previousUrl = $request->url;
