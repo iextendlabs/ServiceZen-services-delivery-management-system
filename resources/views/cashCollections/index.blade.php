@@ -114,7 +114,7 @@
                             <td>{{ $cash_collection->order_id }}</td>
                             <td>{{ $cash_collection->staff_name }}</td>
                             <td>@currency($cash_collection->amount,true)</td>
-                            <td>{{ $cash_collection->order->customer->name }}</td>
+                            <td>{{ $cash_collection->order->customer_name }}</td>
                             <td>@currency($cash_collection->order->total_amount,true)</td>
                             <td>{{ $cash_collection->description }}</td>
                             <td> {{ substr($cash_collection->order->order_comment, 0, 50) }}...</td>
