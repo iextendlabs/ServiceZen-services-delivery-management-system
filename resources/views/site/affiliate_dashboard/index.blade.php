@@ -98,75 +98,153 @@
                 </ul>
             </div>
         @endif
-        @if ($withdraws->where('status', 'Un Approved')->first())
-            <div class="alert alert-danger">
-                <span>There is a pending request. You cannot make another withdrawal request until the current one is completed.</span>
+        <div class="row bg-light py-3 mb-4">
+            <div class="col-md-12">
+                <h4>Account Actions</h4>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary mx-2" onclick="showForm('withdrawForm')">Withdraw</button>
+                    <button class="btn btn-secondary mx-2" onclick="showForm('transferForm')">Transfer</button>
+                    <button class="btn btn-success mx-2" onclick="showForm('depositForm')">Deposit</button>
+                </div>
             </div>
-        @else
-            <form action="{{ route('affiliate.withdraw') }}" method="POST" enctype="multipart/form-data">
+        </div>
+        <div id="withdrawForm" class="action-form" style="display: none;">
+            @if ($withdraws->where('status', 'Un Approved')->first())
+                <div class="alert alert-danger">
+                    <span>There is a pending request. You cannot make another withdrawal request until the current one is
+                        completed.</span>
+                </div>
+            @else
+                <form action="{{ route('affiliate.withdraw') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row bg-light py-3 mb-4">
+                        <div class="col-md-12">
+                            <h4>Withdraw Amount</h4><br>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <span style="color: red;">*</span><strong>Amount</strong>
+                                <input type="number" name="amount" class="form-control" placeholder="Amount" required>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <span style="color: red;">*</span><strong>Payment as:</strong>
+                                <select name="payment_method" class="form-control" required>
+                                    <option></option>
+                                    @foreach ($withdraw_payment_method as $payment_method)
+                                        <option value="{{ $payment_method }}"
+                                            @if (old('payment_method') == $payment_method) selected @endif>{{ $payment_method }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <span style="color: red;">*</span><strong>Account Detail</strong>
+                                <textarea name="account_detail" class="form-control" cols="20" rows="10" required>{{ old('account_detail') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Withdraw</button>
+                        </div>
+                    </div>
+                </form>
+            @endif
+            <div class="row bg-light py-3 mb-4">
+                <div class="col-md-12">
+                    <h4>Withdraw Requests</h4><br>
+                    <table class="table table-striped table-bordered album bg-light">
+                        <tr>
+                            <th>Sr#</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Payment Method</th>
+                        </tr>
+                        @if (count($withdraws) != 0)
+                            @foreach ($withdraws as $withdraw)
+                                <tr>
+                                    <td>{{ ++$i }}</td>
+                                    <td>{{ $withdraw->amount * $pkrRateValue }}</td>
+                                    <td>{{ $withdraw->status }}</td>
+                                    <td>{{ $withdraw->payment_method }}</td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="7" class="text-center">There are no Withdraw Request</td>
+                            </tr>
+                        @endif
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Transfer Form -->
+        <div id="transferForm" class="action-form" style="display: none;">
+            <form action="{{ route('affiliate.transfer') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row bg-light py-3 mb-4">
                     <div class="col-md-12">
-                        <h4>Withdraw Amount</h4><br>
+                        <h4>Transfer Amount</h4><br>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <strong>Amount</strong>
-                            <input type="number" name="amount" class="form-control" placeholder="Amount"
-                                value="{{ old('amount') }}">
+                            <span style="color: red;">*</span><strong>Amount</strong>
+                            <input type="number" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <strong>Payment as:</strong>
-                            <select name="payment_method" class="form-control">
+                            <span style="color: red;">*</span><strong>Recipient</strong>
+                            <select name="recipient_id" class="form-control" required>
                                 <option></option>
-                                @foreach ($withdraw_payment_method as $payment_method)
-                                    <option value="{{ $payment_method }}"
-                                        @if (old('payment_method') == $payment_method) selected @endif>{{ $payment_method }}</option>
+                                @foreach ($affiliates as $affiliate)
+                                    @if ($affiliate->id !== auth()->user()->id)
+                                        <option value="{{ $affiliate->id }}"
+                                            @if (old('recipient_id') == $affiliate->id) selected @endif>{{ $affiliate->name }}
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Acount Detail</strong>
-                            <textarea name="account_detail" class="form-control" cols="20" rows="10">{{ old('account_detail') }}</textarea>
-                        </div>
-                    </div>
                     <div class="col-md-12 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary"> Withdraw</button>
+                        <button type="submit" class="btn btn-secondary">Transfer</button>
                     </div>
                 </div>
             </form>
-        @endif
-        <div class="row bg-light py-3 mb-4">
-            <div class="col-md-12">
-                <h4>Withdraw Requests</h4><br>
-                <table class="table table-striped table-bordered album bg-light">
-                    <tr>
-                        <th>Sr#</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Payment Method</th>
-                    </tr>
-                    @if (count($withdraws) != 0)
-                        @foreach ($withdraws as $withdraw)
-                            <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ $withdraw->amount * $pkrRateValue }}</td>
-                                <td>{{ $withdraw->status }}</td>
-                                <td>{{ $withdraw->payment_method }}</td>
-                            </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="7" class="text-center">There are no Withdraw Request</td>
-                        </tr>
-                    @endif
-                </table>
+        </div>
 
-            </div>
+        <!-- Deposit Form -->
+        <div id="depositForm" class="action-form" style="display: none;">
+            <form action="{{ route('affiliate.deposit') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="row bg-light py-3 mb-4">
+                    <div class="col-md-12">
+                        <h4>Deposit Amount</h4><br>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Amount</strong>
+                            <input type="number" name="amount" class="form-control" placeholder="Amount" required>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Payment Method</strong>
+                            <select name="payment_method" class="form-control">
+                                <option value="Credit-Debit-Card"> Credit or Debit Card</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success">Deposit</button>
+                    </div>
+                </div>
+            </form>
         </div>
         <div class="row bg-light py-3 mb-4">
             <div class="col-md-12">
@@ -176,8 +254,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <strong>Code:</strong>
-                    <input disabled type="text" name="code" id="code" class="form-control" placeholder="Code"
-                        value="{{ $user->affiliate->code ?? null }}">
+                    <input disabled type="text" name="code" id="code" class="form-control"
+                        placeholder="Code" value="{{ $user->affiliate->code ?? null }}">
                 </div>
             </div>
             <div class="col-md-6">
@@ -214,6 +292,8 @@
                                 <td>
                                     @if ($transaction->order_id)
                                         Order ID: #{{ $transaction->order_id }}
+                                    @elseif($transaction->description)
+                                        {{ $transaction->description }}
                                     @else
                                         Paid Amount
                                     @endif
@@ -313,4 +393,12 @@
             </div>
         </div>
     </div>
+    <script>
+        function showForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.action-form').forEach(form => form.style.display = 'none');
+            // Show the selected form
+            document.getElementById(formId).style.display = 'block';
+        }
+    </script>
 @endsection

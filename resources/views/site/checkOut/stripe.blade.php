@@ -24,9 +24,6 @@
                         <form role="form" action="{{ route('stripe.post') }}" method="post" class="require-validation"
                             data-cc-on-file="false" data-stripe-publishable-key="{{ env('STRIPE_KEY') }}" id="payment-form">
                             @csrf
-                            <input type="hidden" name="order_ids" value="{{ $order_ids }}">
-                            <input type="hidden" name="comment" value="{{ $comment }}">
-                            <input type="hidden" name="customer_type" value="{{ $customer_type }}">
                             <div class='form-row'>
                                 <div class='col-12 form-group required'>
                                     <label>Card Number</label>

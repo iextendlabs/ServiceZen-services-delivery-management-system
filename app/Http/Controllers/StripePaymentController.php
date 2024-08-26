@@ -4,188 +4,183 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Site\CheckOutController;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\StaffZone;
+use App\Models\Transaction;
 use App\Models\User;
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Stripe\Charge;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Exception;
+use Carbon\Carbon;
 
 class StripePaymentController extends Controller
 {
-    /**
-     * success response method.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function stripe(Request $request)
+    public function stripe()
     {
-        $order_ids = session('order_ids');
-        $comment = session('comment');
-        $customer_type = session('customer_type');
-        return view('site.checkOut.stripe', compact('order_ids', 'comment', 'customer_type'));
+        return view('site.checkOut.stripe');
     }
 
-    /**
-     * success response method.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function stripePost(Request $request, CheckOutController $checkOutController)
     {
-        $app = $request->app ? true : false;
-        $order_ids = explode(',', $request->order_ids);
-        $orders = Order::whereIn('id', $order_ids)->get();
-        $order_total = 0;
+        $user = auth()->user();
+        $app = (bool) $request->app;
+        $order_ids = session('order_ids');
+        $deposit_amount = session('deposit_amount');
 
-        $order_total += $orders->sum(function ($order) {
-            return $order->total_amount;
-        });
+        if ($order_ids) {
+            $orders = Order::whereIn('id', explode(',', $order_ids))->get();
+            $order_total = $orders->sum('total_amount');
+            $payment_description = "New Order Payment received. Order ids: " . $order_ids;
 
-        if ($app === true) {
-            $currency = "AED";
-        } else {
-            $staffZone = StaffZone::where('name', $orders->first()->area)->first();
-            if ($staffZone && $staffZone->currency) {
-                $currency = $staffZone->currency->name;
-                $order_total *= $staffZone->currency->rate ?? 1;
-            } else {
-                $currency = "AED";
-            }
-        }
-
-        try {
-            Stripe::setApiKey(env('STRIPE_SECRET'));
-
+            $currencyData = $this->currencyCalculation($orders, $order_total, $app);
             $customerData = [
                 "email" => $orders->first()->customer_email,
                 "name" => $orders->first()->customer_name,
             ];
+        } elseif ($deposit_amount) {
+            $payment_description = "New Deposit Payment received from affiliate {$user->name}. Affiliate ID: {$user->id}";
+            $currencyData = ['currency' => 'PKR', 'amount' => $deposit_amount];
+            $customerData = [
+                "email" => $user->email,
+                "name" => $user->name,
+            ];
+        }
 
-            if ($app === false) {
-                $customerData["source"] = $request->stripeToken;
-            }
+        try {
+            $stripeResponse = $this->processStripePayment($customerData, $currencyData['amount'], $currencyData['currency'], $request, $app, $payment_description);
 
-            $customer = Customer::create($customerData);
-
-            if ($app === true) {
-                $paymentIntent = PaymentIntent::create([
-                    'amount' => $order_total * 100,
-                    'currency' => $currency,
-                    'description' => "New Order Payment from Lipslay App. Order ids are " . $request->order_ids,
-                    'customer' => $customer->id,
-                ]);
-            } elseif ($app === false) {
-                Charge::create([
-                    "amount" => $order_total * 100, // Amount in cents
-                    "currency" => $currency,
-                    "customer" => $customer->id,
-                    "description" => "New Order Payment from Lipslay web store. Order ids are " . $request->order_ids
-                ]);
-            }
-
-            if ($app === true) {
-                // Confirm payment status
-                $paymentIntent = PaymentIntent::retrieve($paymentIntent->id);
-                if ($paymentIntent->status === 'succeeded') {
-                    foreach ($order_ids as $order_id) {
-                        $order = Order::find($order_id);
-                        if ($order) {
-                            $order->status = "Pending";
-                            if ($app === false) {
-                                $order->order_comment = $request->comment;
-                                $order->payment_method = "Credit-Debit-Card";
-                            }
-                            $order->save();
-
-                            if ($app === false) {
-                                Session::forget('bookingData');
-                            }
-
-                            $customer = $order->customer;
-                            $staff = User::find($order->service_staff_id);
-                            if ($staff) {
-                                if (Carbon::now()->toDateString() == $order->date) {
-                                    $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                                    if ($staff->staff->driver) {
-                                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                                    }
-                                    try {
-                                        $checkOutController->sendOrderEmail($order->id, $customer->email);
-                                    } catch (\Throwable $th) {
-                                    }
-                                }
-                            }
-                            try {
-                                $checkOutController->sendAdminEmail($order->id, $customer->email);
-                                $checkOutController->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
-                            } catch (\Throwable $th) {
-                            }
-                        }
-                    }
-                }
+            if ($order_ids) {
+                $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), session('customer_type'), $app);
+                session()->forget(['order_ids', 'comment', 'customer_type', 'bookingData']);
             } else {
-                foreach ($order_ids as $order_id) {
-                    $order = Order::find($order_id);
-                    if ($order) {
-                        $order->status = "Pending";
-                        if ($app === false) {
-                            $order->order_comment = $request->comment;
-                            $order->payment_method = "Credit-Debit-Card";
-                        }
-                        $order->save();
-
-                        if ($app === false) {
-                            Session::forget('bookingData');
-                        }
-
-                        $customer = $order->customer;
-                        $staff = User::find($order->service_staff_id);
-                        if ($staff) {
-                            if (Carbon::now()->toDateString() == $order->date) {
-                                $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                                if ($staff->staff->driver) {
-                                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                                }
-                                try {
-                                    $checkOutController->sendOrderEmail($order->id, $customer->email);
-                                } catch (\Throwable $th) {
-                                }
-                            }
-                        }
-                        try {
-                            $checkOutController->sendAdminEmail($order->id, $customer->email);
-                            $checkOutController->sendCustomerEmail($order->customer_id, $request->customer_type, $order->id);
-                        } catch (\Throwable $th) {
-                        }
-                    }
-                }
+                $this->createDepositTransaction($deposit_amount);
+                session()->forget(['deposit_amount']);
             }
 
+            $message = "Payment successful!";
+            $redirectRoute = $order_ids ? 'checkout.success' : 'affiliate_dashboard.index';
 
-
-            if ($app === true) {
-                return response()->json([
-                    'client_secret' => $paymentIntent->client_secret,
-                    'email' => $customer->email,
-                    'name' => $customer->name,
-                ], 200);
-            } elseif ($app === false) {
-                session()->forget(['order_ids', 'comment', 'customer_type']);
-                Session::flash('success', 'Payment successful!');
-                return view('site.checkOut.success');
-            }
+            return $app ?
+                response()->json([
+                    'client_secret' => $stripeResponse['client_secret'],
+                    'email' => $stripeResponse['customer_email'],
+                    'name' => $stripeResponse['customer_name'],
+                ], 200)
+                :
+                redirect()->route($redirectRoute)->with('success', $message);
         } catch (Exception $e) {
-            if ($app === true) {
+            Session::flash('error', $e->getMessage());
+            if ($app) {
                 return response()->json(['error' => $e->getMessage()], 500);
-            } elseif ($app === false) {
+            } else {
                 Session::flash('error', $e->getMessage());
                 return back()->withErrors(['message' => $e->getMessage()]);
             }
         }
+    }
+
+    private function currencyCalculation($orders, $order_total, $app)
+    {
+        $currency = "AED";
+
+        if (!$app) {
+            $staffZone = StaffZone::where('name', $orders->first()->area)->first();
+            if ($staffZone && $staffZone->currency) {
+                $order_total *= $staffZone->currency->rate ?? 1;
+                $currency = $staffZone->currency->name;
+            }
+        }
+
+        return [
+            'currency' => $currency,
+            'amount' => $order_total
+        ];
+    }
+
+    private function processStripePayment($customerData, $amount, $currency, $request, $app, $description)
+    {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        if (!$app) {
+            $customerData["source"] = $request->stripeToken;
+        }
+
+        $customer = Customer::create($customerData);
+
+        if ($app) {
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $amount * 100,
+                'currency' => $currency,
+                'description' => $description,
+                'customer' => $customer->id,
+            ]);
+
+            return [
+                'status' => $paymentIntent->status,
+                'client_secret' => $paymentIntent->client_secret,
+                'customer_email' => $customer->email,
+                'customer_name' => $customer->name,
+            ];
+        }
+
+        Charge::create([
+            "amount" => $amount * 100,
+            "currency" => $currency,
+            "customer" => $customer->id,
+            "description" => $description
+        ]);
+
+        return ['status' => 'succeeded'];
+    }
+
+    private function updateOrderStatus($order_ids, CheckOutController $checkOutController, $comment, $customer_type, $app)
+    {
+        $order_ids = explode(',', $order_ids);
+        foreach ($order_ids as $order_id) {
+            $order = Order::find($order_id);
+            if ($order) {
+                $order->status = "Pending";
+                if ($app === false) {
+                    $order->order_comment = $comment;
+                    $order->payment_method = "Credit-Debit-Card";
+                }
+                $order->save();
+
+                $customer = $order->customer;
+                $staff = User::find($order->service_staff_id);
+                if ($staff && Carbon::now()->toDateString() == $order->date) {
+                    $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                    if ($staff->staff->driver) {
+                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                    }
+                    try {
+                        $checkOutController->sendOrderEmail($order->id, $customer->email);
+                    } catch (\Throwable $th) {
+                    }
+                }
+
+                try {
+                    $checkOutController->sendAdminEmail($order->id, $customer->email);
+                    $checkOutController->sendCustomerEmail($order->customer_id, $customer_type, $order->id);
+                } catch (\Throwable $th) {
+                }
+            }
+        }
+    }
+
+    private function createDepositTransaction($amount)
+    {
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+        Transaction::create([
+            'amount' => $amount / $pkrRateValue,
+            'user_id' => auth()->id(),
+            'type' => 'Deposit',
+            'status' => 'Approved',
+            'description' => 'Amount Deposit',
+        ]);
     }
 }

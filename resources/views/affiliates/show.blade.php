@@ -150,8 +150,10 @@
                                 <td>
                                     @if ($transaction->order_id)
                                         Order ID: #{{ $transaction->order_id }}
-                                    @else
+                                    @elseif($transaction->description)
                                         {{ $transaction->description }}
+                                    @else
+                                        Paid Amount
                                     @endif
                                 </td>
                                 <td>@currency($transaction->amount,true) (Rs.{{ $transaction->formatted_amount }})</td>
