@@ -176,16 +176,24 @@
                         <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
                             <i class="fas fa-check"></i> Confirm
                         </a>
-                        <a class="btn btn-secondary mb-2 ms-md-2"
-                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}">
-                            <i class="fas fa-calendar"></i> Todays Order
-                        </a>
 
                         @can('order-create')
                             <a class="btn btn-success mb-2 ms-md-2" href="{{ route('orders.create') }}">
                                 <i class="fas fa-plus"></i> Create Order
                             </a>
                         @endcan
+                        <a class="btn btn-secondary mb-2 ms-md-2"
+                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}">
+                            <i class="fas fa-calendar"></i> Todays Order
+                        </a>
+                        <a class="btn btn-danger mb-2 ms-md-2"
+                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Canceled">
+                            <i class="fas fa-calendar"></i> Todays Canceled Order
+                        </a>
+                        <a class="btn btn-success mb-2 ms-md-2"
+                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete">
+                            <i class="fas fa-calendar"></i> Todays Complete Order
+                        </a>
                     </div>
                 </div>
             </div>
