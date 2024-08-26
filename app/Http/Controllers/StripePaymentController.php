@@ -28,7 +28,8 @@ class StripePaymentController extends Controller
     {
         $user = auth()->user();
         $app = (bool) $request->app;
-        $order_ids = session('order_ids');
+        $order_ids = session('order_ids') ?? $request->order_ids;
+        $customer_type = session('customer_type') ?? $request->customer_type;
         $deposit_amount = session('deposit_amount');
 
         if ($order_ids) {
@@ -54,7 +55,7 @@ class StripePaymentController extends Controller
             $stripeResponse = $this->processStripePayment($customerData, $currencyData['amount'], $currencyData['currency'], $request, $app, $payment_description);
 
             if ($order_ids) {
-                $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), session('customer_type'), $app);
+                $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), $customer_type, $app);
                 session()->forget(['order_ids', 'comment', 'customer_type', 'bookingData']);
             } else {
                 $this->createDepositTransaction($deposit_amount);
