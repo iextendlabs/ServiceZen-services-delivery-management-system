@@ -270,6 +270,8 @@ class AffiliateDashboardController extends Controller
         $validator = Validator::make($request->all(), [
             'amount' => [
                 'required',
+                'numeric',
+                'min:1',
                 function ($attribute, $value, $fail) use ($total_balance) {
                     if ($value > $total_balance) {
                         $fail('Your withdraw amount is greater than your total balance.');
@@ -308,6 +310,8 @@ class AffiliateDashboardController extends Controller
         $validator = Validator::make($request->all(), [
             'amount' => [
                 'required',
+                'numeric',
+                'min:1',
                 function ($attribute, $value, $fail) use ($total_balance) {
                     if ($value > $total_balance) {
                         $fail('Your withdraw amount is greater than your total balance.');
