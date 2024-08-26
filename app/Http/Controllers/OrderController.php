@@ -188,6 +188,10 @@ class OrderController extends Controller
             $query->where('date', $request->appointment_date);
         }
 
+        if ($request->today_order) {
+            $query->where('date', $request->today_order)->where('status','!=','Complete')->where('status','!=','Canceled');
+        }
+
         if ($userRole == "Staff" || $userRole == "Supervisor") {
             if ($request->status == "Rejected") {
                 $query->where('date', '=', $currentDate);
