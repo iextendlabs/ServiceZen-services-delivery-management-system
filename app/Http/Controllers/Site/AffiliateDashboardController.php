@@ -184,10 +184,12 @@ class AffiliateDashboardController extends Controller
                 'order_count' => $request->order_count,
             ]);
 
+            $affiliates = User::role('affiliate')->get();
+
             $withdraws = Withdraw::where('user_id', auth()->user()->id)->get();
             $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
             $withdraw_payment_method = explode(',', $setting->value);
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count', 'withdraws', 'withdraw_payment_method'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count', 'withdraws', 'withdraw_payment_method','affiliates'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect()->route('customer.login')->with('error', 'Oppes! You are not Login.');
@@ -268,6 +270,8 @@ class AffiliateDashboardController extends Controller
         $validator = Validator::make($request->all(), [
             'amount' => [
                 'required',
+                'numeric',
+                'min:1',
                 function ($attribute, $value, $fail) use ($total_balance) {
                     if ($value > $total_balance) {
                         $fail('Your withdraw amount is greater than your total balance.');
@@ -294,5 +298,68 @@ class AffiliateDashboardController extends Controller
 
         return redirect()->back()
             ->with('success', 'Withdraw created successfully.');
+    }
+
+    public function internalTransfer(Request $request)
+    {
+        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+
+        $total_balance = Transaction::where('user_id', auth()->user()->id)->sum('amount');
+        $total_balance *= $pkrRateValue;
+
+        $validator = Validator::make($request->all(), [
+            'amount' => [
+                'required',
+                'numeric',
+                'min:1',
+                function ($attribute, $value, $fail) use ($total_balance) {
+                    if ($value > $total_balance) {
+                        $fail('Your withdraw amount is greater than your total balance.');
+                    }
+                },
+            ],
+            'recipient_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $input = $request->all();
+        $user = User::find($request->recipient_id);
+        
+        $input['amount'] = '-' . $request->amount / $pkrRateValue;
+        $input['user_id'] = auth()->user()->id;
+        $input['type'] = "Internal Transfer";
+        $input['status'] = "Approved";
+        $input['description'] = "Amount transfer to ". $user->name;
+        Transaction::create($input);
+
+        $input['amount'] = $request->amount / $pkrRateValue;
+        $input['user_id'] = $request->recipient_id;
+        $input['type'] = "Internal Transfer";
+        $input['status'] = "Approved";
+        $input['description'] = "Amount transfer from ". auth()->user()->name;
+        Transaction::create($input);
+
+        return redirect()->back()
+            ->with('success', 'Amount transfer successfully.');
+    }
+
+    public function deposit(Request $request)
+    {
+        request()->validate([
+            'payment_method' => 'required',
+            'amount' => 'required|numeric|min:1',
+        ]);
+        
+        session([
+            'deposit_amount' => $request->amount
+        ]);
+
+        return redirect()->route('stripe.form');
+        
     }
 }

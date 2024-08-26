@@ -11,6 +11,11 @@ public/service-images/
 public/service-category-images/
 public/staff-images/
 public/partner-images/
+public/review-images/
+public/review-videos/
+public/cash-collections-images/
+public/service-category-icons/
+public/slider-images/
 public/AppData.json
 
 # Laravel 5 & Lumen specific

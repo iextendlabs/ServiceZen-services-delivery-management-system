@@ -128,7 +128,7 @@ function mapReady() {
         var currentPath = window.location.pathname;
 
         if (
-            !["/customer-login", "/cart", "/deleteAccount", "/customer-registration"].includes(currentPath) &&
+            !["/customer-login", "/cart", "/deleteAccount", "/customer-registration", "/affiliate_dashboard", "/stripe"].includes(currentPath) &&
             !currentPath.startsWith("/staffProfile/") &&
             !currentPath.startsWith("/customerProfile/")
         ) {

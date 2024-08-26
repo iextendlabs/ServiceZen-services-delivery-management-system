@@ -204,6 +204,8 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
     Route::get('staffOrderCSV', [SiteOrdersController::class, 'downloadCSV']);
     Route::resource('siteComplaints', SiteComplaintController::class);
     Route::post('affiliateWithdraw', [AffiliateDashboardController::class, 'affiliateWithdraw'])->name('affiliate.withdraw');
+    Route::post('internalTransfer', [AffiliateDashboardController::class, 'internalTransfer'])->name('affiliate.transfer');
+    Route::post('deposit', [AffiliateDashboardController::class, 'deposit'])->name('affiliate.deposit');
 });
 
 // Backups
@@ -268,3 +270,6 @@ Route::controller(StripePaymentController::class)->group(function(){
     Route::get('stripe', 'stripe')->name('stripe.form');
     Route::post('stripe', 'stripePost')->name('stripe.post');
 });
+Route::get('/checkout-success', function () {
+    return view('site.checkOut.success');
+})->name('checkout.success');
