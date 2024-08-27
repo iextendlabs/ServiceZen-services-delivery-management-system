@@ -109,6 +109,7 @@ $packageCarousel_chunk = 3;
             <div class="col-md-12">
                 <img src="{{ asset('service-images/' . $service->image) }}" alt="Main image" height="auto" width="100%">
             </div>
+            @if($service->images)
             <div class="col-md-12 mt-3">
                 <div class="row">
                     <div class="col">
@@ -151,6 +152,7 @@ $packageCarousel_chunk = 3;
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
     
