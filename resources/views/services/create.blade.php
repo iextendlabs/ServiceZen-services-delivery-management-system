@@ -1,4 +1,11 @@
 @extends('layouts.app')
+<style>
+    .img-preview {
+        max-width: 100%;
+        height: auto;
+        max-height: 200px;
+    }
+</style>    
 @section('content')
 <div class="container">
     <div class="row">
@@ -36,6 +43,9 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Price Options</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="additionalImages-tab" data-toggle="tab" href="#additionalImages" role="tab" aria-controls="additionalImages" aria-selected="false">Additional Images</a>
             </li>
         </ul>
         <div class="tab-content" id="myTabsContent">
@@ -246,6 +256,20 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade" id="additionalImages" role="tabpanel" aria-labelledby="additionalImages-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Additional Images</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div id="image-upload-wrapper">
+                            <button type="button" id="add-image-btn" class="btn btn-primary mt-3 mb-4">Add Image</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {{-- <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
@@ -292,6 +316,38 @@
         </div>
     </form>
 </div>
+<script>
+    $(document).ready(function(){
+        let imageIndex = 1;
+
+        $('#add-image-btn').click(function(){
+            $(`
+                <div class="form-group image-upload-group p-3 border border-secondary rounded">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <input type="file" name="images[]" id="serviceImage${imageIndex}" class="form-control-file" onchange="previewImage(this, ${imageIndex})">
+                        <button type="button" class="btn btn-danger mt-3 remove-image-btn">Remove</button>
+                    </div>
+                    <img id="previewServiceImage${imageIndex}" src="#" alt="Image Preview" class="img-preview mt-3" style="display:none;">
+                </div>
+            `).insertBefore('#add-image-btn');
+            imageIndex++;
+        });
+
+        $(document).on('click', '.remove-image-btn', function(){
+            $(this).closest('.image-upload-group').remove();
+        });
+    });
+
+    function previewImage(input, index = 0) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $(`#previewServiceImage${index}`).attr('src', e.target.result).show();
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 <script>
     var option_row = 1;
     function addOptionrow(){

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceAddOn;
 use App\Models\ServiceCategory;
+use App\Models\ServiceImage;
 use App\Models\ServiceOption;
 use App\Models\ServicePackage;
 use App\Models\ServiceToUserNote;
@@ -163,6 +164,20 @@ class ServiceController extends Controller
             }
         }
 
+        if ($request->hasfile('images')) {
+            foreach ($request->file('images') as $image) {
+                if($image){
+                    $name = mt_rand() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('service-images/additional'), $name);
+        
+                    $serviceImage = new ServiceImage();
+                    $serviceImage->service_id = $service->id;
+                    $serviceImage->image = $name;
+                    $serviceImage->save();
+                }
+            }
+        }
+
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
             
@@ -313,6 +328,35 @@ class ServiceController extends Controller
             $service->save();
         }
 
+        // Handle deletion of images
+        if ($request->has('remove_images')) {
+            foreach ($request->remove_images as $imageId) {
+                $serviceImage = ServiceImage::find($imageId);
+                if ($serviceImage) {
+                    $imagePath = public_path('service-images/additional') . '/' . $serviceImage->image;
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                    $serviceImage->delete();
+                }
+            }
+        }
+
+        // Handle addition of new images
+        if ($request->hasfile('images')) {
+            foreach ($request->file('images') as $image) {
+                if ($image) {
+                    $name = mt_rand() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('service-images/additional'), $name);
+
+                    $serviceImage = new ServiceImage();
+                    $serviceImage->service_id = $service->id;
+                    $serviceImage->image = $name;
+                    $serviceImage->save();
+                }
+            }
+        }
+
         $this->appJsonData();
 
         $previousUrl = $request->url;
@@ -328,6 +372,16 @@ class ServiceController extends Controller
     public function destroy($id)
     {
         $service = Service::find($id);
+
+        // Delete additional images for the service
+        if ($service->images) {
+            foreach ($service->images as $image) {
+                $imagePath = public_path('service-images/additional') . '/' . $image->image;
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+        }
         //delete image for service 
         if ($service->image) {
             if (file_exists(public_path('service-images') . '/' . $service->image)) {
@@ -355,7 +409,16 @@ class ServiceController extends Controller
         if (!empty($selectedItems)) {
             $services = Service::whereIn('id', $selectedItems)->get();
             foreach ($services as $service) {
-
+                // Delete additional images for the service
+                if ($service->images) {
+                    foreach ($service->images as $image) {
+                        $imagePath = public_path('service-images/additional') . '/' . $image->image;
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                    }
+                }
+                //delete image for service 
                 if (!empty($service->image)) {
                     if (file_exists(public_path('service-images') . '/' . $service->image)) {
                         unlink(public_path('service-images') . '/' . $service->image);

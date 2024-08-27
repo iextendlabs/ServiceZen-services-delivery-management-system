@@ -3,7 +3,58 @@
   .box-shadow {
     background: none !important;
   }
+  #thumbnails img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 5px;
+    cursor: pointer;
+    margin: 5px;
+    border: 1px solid #000000;
+    transition: border-color 0.3s;
+    display: inline-block;
+  }
+  #thumbnails img:hover {
+    border-color: #007bff;
+  }
+  .carousel-item img {
+    height: 400px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 20px;
+    margin: auto;
+  }
+  .modal-dialog-centered {
+      max-width: 700px !important;
+      max-height: 700px !important;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .modal-content {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    max-width: 700px !important;
+    max-height: 700px !important;
+  }
+  .modal-body {
+    padding: 0;
+  }
+  .carousel-control-prev, .carousel-control-next {
+    width: 5%;
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    background-color: #000;
+    border-radius: 50%;
+    padding: 10px;
+  }
 </style>
+
 @section('content')
 
 @php
@@ -54,8 +105,55 @@ $packageCarousel_chunk = 3;
     <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
     <div class="row">
       <div class="col-md-8">
-        <img src="./service-images/{{ $service->image }}" alt="Card image cap" height="auto" width="100%">
-      </div>
+        <div class="row">
+            <div class="col-md-12">
+                <img src="{{ asset('service-images/' . $service->image) }}" alt="Main image" height="auto" width="100%">
+            </div>
+            <div class="col-md-12 mt-3">
+                <div class="row">
+                    <div class="col">
+                        <div class="d-flex justify-content-center">
+                            <div id="thumbnails" class="d-flex flex-wrap">
+                                @foreach($service->images as $index => $image)
+                                <img src="{{ asset('service-images/additional/' . $image->image) }}" alt="Thumbnail {{ $index + 1 }}" data-toggle="modal" data-target="#imageModal" data-slide-to="{{ $index }}">
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; top: 10px; right: 10px; z-index: 1050;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div class="modal-body p-0">
+                            <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    @foreach($service->images as $index => $image)
+                                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                        <img src="{{ asset('service-images/additional/' . $image->image) }}" class="d-block w-100" alt="Full image {{ $index + 1 }}">
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
       @if (isset($lowestPriceOption))
           @php ($currentLowestPrice = $lowestPriceOption->option_price)
       @else
