@@ -430,7 +430,7 @@
         $('#add-image-btn').click(function(){
             $(`<div class="form-group image-upload-group p-3 border border-secondary rounded">
                     <div class="d-flex align-items-center justify-content-between">
-                        <input type="file" name="images[]" id="serviceImage${imageIndex}" class="form-control-file" onchange="previewImage(this, ${imageIndex})">
+                        <input type="file" name="images[]" id="serviceImage${imageIndex}" class="form-control-file" onchange="previewImage(this, ${imageIndex})" accept="image/*">
                         <button type="button" class="btn btn-danger mt-3 remove-image-btn">Remove</button>
                     </div>
                     <img id="previewServiceImage${imageIndex}" src="#" alt="Image Preview" class="img-preview mt-3" style="display:none;">
