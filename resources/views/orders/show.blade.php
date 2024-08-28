@@ -449,6 +449,95 @@
                         </table>
                     </fieldset>
                 @endif
+                @if ($driver_commission)
+                    <fieldset>
+                        <legend>Driver Commission</legend>
+                        <table class="table table-striped table-bordered album bg-light">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Status</th>
+                                <th>Driver</th>
+                                <th>Order Sub Total</th>
+                                <th>Commission</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                            <form action="{{ route('transactions.store') }}" method="POST">
+                                @csrf
+                                @php
+                                    $driverTransactionStatus = $order->getTransactionStatus($order->driver_id,'Order Driver Commission');
+                                @endphp
+                                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                <input type="hidden" name="user_id" value="{{ $order->driver_id }}">
+                                <input type="hidden" name="amount" value="{{ $driver_commission }}">
+                                <input type="hidden" name="type" value="Order Driver Commission">
+                                <tr>
+                                    <td>#{{ $order->id }}</td>
+                                    <td>{{ $order->status }}</td>
+                                    <td>{{ $order->driver->name }}</td>
+                                    <td>@currency($order->order_total->sub_total,true)</td>
+                                    <td>@currency($driverTransactionStatus->amount ?? $driver_commission,true)</td>
+                                    <td class="no-print">
+                                        @if (empty($driverTransactionStatus))
+                                            @can('order-edit')
+                                                <button type="submit" class="btn btn-primary">Approve</button>
+                                            @endcan
+                                        @else
+                                            <a href="{{ route('transactions.Unapprove') }}?id={{ $driverTransactionStatus->id }}"
+                                                type="button" class="btn btn-warning">Un Approve</a>
+                                            <a href="{{ route('transactions.edit', $driverTransactionStatus->id) }}"
+                                                type="button" class="btn btn-primary">Edit</a>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </form>
+                        </table>
+                    </fieldset>
+                @endif
+                @if ($driver_affiliate_commission)
+                    <fieldset>
+                        <legend>Driver Affiliate Commission</legend>
+                        <table class="table table-striped table-bordered album bg-light">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Driver Commission</th>
+                                <th>Affiliate</th>
+                                <th>Commission</th>
+                                <th class="no-print">Action</th>
+                            </tr>
+                            <form action="{{ route('transactions.store') }}" method="POST">
+                                @csrf
+                                @php
+                                    $driverAffiliateTransactionStatus = $order->getTransactionStatus($order->driver->driver->affiliate_id,'Order Driver Affiliate Commission');
+                                @endphp
+                                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                <input type="hidden" name="user_id" value="{{ $order->driver->driver->affiliate_id }}">
+                                <input type="hidden" name="amount" value="{{ $driver_affiliate_commission }}">
+                                <input type="hidden" name="type" value="Order Driver Affiliate Commission">
+                                <tr>
+                                    <td>#{{ $order->id }}</td>
+                                    <td>{{ $driver_commission }}</td>
+                                    <td>{{ $order->driver->driver->affiliate->name }}</td>
+                                    <td>@currency($driverAffiliateTransactionStatus->amount ?? $driver_affiliate_commission,true)</td>
+                                    @if (!auth()->user()->hasRole('Staff'))
+                                        <td class="no-print">
+
+                                            @if (empty($driverAffiliateTransactionStatus))
+                                                @can('order-edit')
+                                                    <button type="submit" class="btn btn-primary">Approve</button>
+                                                @endcan
+                                            @else
+                                                <a href="{{ route('transactions.Unapprove') }}?id={{ $driverAffiliateTransactionStatus->id }}"
+                                                    type="button" class="btn btn-warning">Un Approve</a>
+                                                <a href="{{ route('transactions.edit', $driverAffiliateTransactionStatus->id) }}"
+                                                    type="button" class="btn btn-primary">Edit</a>
+                                            @endif
+                                        </td>
+                                    @endif
+                                </tr>
+                            </form>
+                        </table>
+                    </fieldset>
+                @endif
             @endif
         </div>
     </div>

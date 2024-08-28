@@ -59,6 +59,27 @@
                     <input type="tel" id="whatsapp" name="whatsapp" value="{{ isset($driver->driver->whatsapp) ? $driver->driver->whatsapp : null }}" class="form-control">
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Commission:</strong>
+                    <input type="number" name="commission" value="{{ $driver->driver->commission ?? "" }}" class="form-control" placeholder="Commission In %">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Affiliate:</strong>
+                    <select name="affiliate_id" class="form-control">
+                        <option value=""></option>
+                        @foreach ($affiliates as $affiliate)
+                            @if($affiliate->affiliate->status == 1)
+                                <option value="{{ $affiliate->id }}"
+                                    @if ($driver->driver && $driver->driver->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

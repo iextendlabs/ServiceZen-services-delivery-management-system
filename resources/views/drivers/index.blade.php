@@ -37,6 +37,8 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
+                        <th>Commission</th>
+                        <th>Affiliate</th>
                         <th width="280px">Action</th>
                     </tr>
                     @if (count($drivers))
@@ -45,6 +47,8 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $driver->name }}</td>
                                 <td>{{ $driver->email }}</td>
+                                <td>{{ $driver->driver->commission ?? "" }}</td>
+                                <td>{{ $driver->driver->affiliate ? $driver->driver->affiliate->name : "" }}</td>
 
                                 <td>
                                     <form id="deleteForm{{ $driver->id }}"

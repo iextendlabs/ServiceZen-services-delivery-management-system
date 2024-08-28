@@ -233,7 +233,7 @@ class ServiceStaffController extends Controller
         $service_ids = $serviceStaff->services()->pluck('service_id')->toArray();
         $category_ids = $serviceStaff->categories()->pluck('category_id')->toArray();
         $freelancer_join = $request->freelancer_join;
-        $affiliates = User::role('Affiliate')->latest()->get();
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
         $membership_plans = MembershipPlan::where('status', 1)
         ->where('type',"Freelancer")
         ->get();
