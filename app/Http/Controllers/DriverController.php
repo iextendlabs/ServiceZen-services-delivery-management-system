@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -58,7 +59,8 @@ class DriverController extends Controller
      */
     public function create()
     {
-        return view('drivers.create');
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
+        return view('drivers.create',compact('affiliates'));
     }
     
     /**
@@ -101,7 +103,11 @@ class DriverController extends Controller
      */
     public function show(User $driver)
     {
-        return view('drivers.show',compact('driver'));
+        $transactions = Transaction::where('user_id', $driver->id)->latest()->paginate(config('app.paginate'));
+
+        $total_balance = Transaction::where('user_id', $driver->id)->sum('amount');
+
+        return view('drivers.show',compact('driver','transactions','total_balance'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**
@@ -112,7 +118,8 @@ class DriverController extends Controller
      */
     public function edit(User $driver)
     {
-        return view('drivers.edit',compact('driver'));
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
+        return view('drivers.edit',compact('driver','affiliates'));
     }
     
     /**

@@ -59,6 +59,27 @@
                     <input type="tel" id="whatsapp" name="whatsapp" class="form-control" value="{{ old('whatsapp') }}" >
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Commission:</strong>
+                    <input type="number" name="commission" class="form-control" value="{{ old('commission') }}" placeholder="Commission In %">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Affiliate:</strong>
+                    <select name="affiliate_id" class="form-control">
+                        <option value=""></option>
+                        @foreach ($affiliates as $affiliate)
+                            @if($affiliate->affiliate->status == 1)
+                                <option value="{{ $affiliate->id }}"
+                                    @if (old('affiliate_id') == $affiliate->id) selected @endif> {{ $affiliate->name }}
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

@@ -126,6 +126,22 @@ class Order extends Model
 
     public function commissionCalculation()
     {
+        // Calculation based on this
+
+        // commission_amount = sub_total - staff_charges - transport_charges - discount;
+
+        // staff_commission = % on (staff_affiliate_commission - commission_amount);
+
+        // staff_affiliate_commission = % on staff_commission;
+
+        // affiliate_commission = % on (commission_amount - staff_commission - staff_affiliate_commission - parent_affiliate_commission ) ;
+
+        // parent_affiliate_commission = % on affiliate_commission;
+
+        // driver_commission = % on (commission_amount - staff_commission - staff_affiliate_commission - driver_affiliate_commission) ;
+
+        // driver_affiliate_commission = % on driver_commission;
+
         $userAffiliate = UserAffiliate::where('user_id', $this->customer_id)->first();
 
         $staff_commission_rate = 0;
@@ -136,12 +152,19 @@ class Order extends Model
         $affiliate_id = 0;
         $parent_affiliate_commission = 0;
         $parent_affiliate_id = 0;
+        $driver_commission = 0;
+        $driver_affiliate_commission_rate = 0;
+        $driver_affiliate_commission = 0;
 
-        if ($this->staff && $this->staff->commission) {
-            if($this->staff->affiliate){
-                $staff_affiliate_commission_rate = $this->staff->affiliate->affiliate && $this->staff->affiliate->affiliate->commission ? $this->staff->affiliate->affiliate->commission : 0;
+        $staff = $this->staff;
+        $affiliate = $this->affiliate;
+        $driver = $this->driver;
+
+        if ($staff && $staff->commission) {
+            if($staff->affiliate){
+                $staff_affiliate_commission_rate = $staff->affiliate->affiliate && $staff->affiliate->affiliate->commission ? $staff->affiliate->affiliate->commission : 0;
             }
-            $staff_commission_rate = $this->staff->commission;
+            $staff_commission_rate = $staff->commission;
         }
 
         $commission_apply_amount = $this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount;
@@ -151,9 +174,9 @@ class Order extends Model
 
         $staff_commission = $staff_commission - $staff_affiliate_commission;
 
-        if ($this->affiliate && $this->affiliate->affiliate && $this->affiliate->affiliate->commission) {
+        if ($affiliate && $affiliate->affiliate && $affiliate->affiliate->commission) {
             $affiliate_commission_rate = 0;
-            $affiliate_commission_rate = $this->affiliate->affiliate->commission ?? 0;
+            $affiliate_commission_rate = $affiliate->affiliate->commission ?? 0;
             $affiliate_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $affiliate_commission_rate) / 100;
             $affiliate_id = $this->affiliate_id;
         }elseif ($userAffiliate) {
@@ -175,10 +198,10 @@ class Order extends Model
             }
         }
 
-        if ($this->affiliate) {
-            if ($this->affiliate->affiliate && $this->affiliate->affiliate->parent_affiliate_id) {
-                $parent_affiliate_commission = ($affiliate_commission * $this->affiliate->affiliate->parent_affiliate_commission) / 100;
-                $parent_affiliate_id = $this->affiliate->affiliate->parent_affiliate_id;
+        if ($affiliate) {
+            if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id) {
+                $parent_affiliate_commission = ($affiliate_commission * $affiliate->affiliate->parent_affiliate_commission) / 100;
+                $parent_affiliate_id = $affiliate->affiliate->parent_affiliate_id;
             }
         } elseif ($userAffiliate) {
             if ($userAffiliate->expiry_date == null || $userAffiliate->expiry_date >= now()) {
@@ -190,6 +213,21 @@ class Order extends Model
         }
 
         $affiliate_commission -= $parent_affiliate_commission;
-        return [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission];
+
+        if($driver && $driver->driver){
+            if($driver->driver->commission){
+                $driver_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $driver->driver->commission) / 100;
+            }
+
+            if($driver->driver->affiliate){
+                $driver_affiliate_commission_rate = $driver->driver->affiliate->affiliate && $driver->driver->affiliate->affiliate->commission ? $driver->driver->affiliate->affiliate->commission : 0;
+
+                $driver_affiliate_commission = ($driver_commission * $driver_affiliate_commission_rate) / 100;
+            }
+        }
+        $driver_commission -= $driver_affiliate_commission;
+
+
+        return [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission,$driver_commission, $driver_affiliate_commission];
     }
 }
