@@ -779,6 +779,13 @@ class CustomerController extends Controller
                         return;
                     }
 
+                    if ($coupon->coupon_for == "customer") {
+                        if (!$coupon->customers()->where('customer_id', $request->user_id)->exists()) {
+                            $fail('The ' . $attribute . ' is not valid for you.');
+                            return;
+                        }
+                    }
+
                     if ($coupon->uses_total !== null) {
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
                         $userOrdersCount = Order::where('customer_id', $request->user_id)
@@ -787,6 +794,7 @@ class CustomerController extends Controller
 
                         if ($userOrdersCount >= $coupon->uses_total) {
                             $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
+                            return;
                         }
                     }
                 },

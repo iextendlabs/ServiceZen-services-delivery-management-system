@@ -325,12 +325,17 @@ class CustomerAuthController extends Controller
                         ->first();
 
                     if (!$coupon) {
-                        // Coupon doesn't exist or is not valid
                         cookie()->queue(cookie()->forget('coupon_code'));
-                        $fail('The ' . $attribute . ' is not valid.');
-                        return;
+                        return $fail('The ' . $attribute . ' is not valid.');
                     }
-
+        
+                    if ($coupon->coupon_for == "customer") {
+                        if (!auth()->check() || !$coupon->customers()->where('customer_id', auth()->id())->exists()) {
+                            cookie()->queue(cookie()->forget('coupon_code'));
+                            return $fail('The ' . $attribute . ' is not valid for you.');
+                        }
+                    }
+                    
                     if ($coupon->uses_total !== null && auth()->check()) {
                         $order_coupon = $coupon->couponHistory()->pluck('order_id')->toArray();
                         $userOrdersCount = Order::where('customer_id', auth()->id())
@@ -338,9 +343,8 @@ class CustomerAuthController extends Controller
                             ->count();
 
                         if ($userOrdersCount >= $coupon->uses_total) {
-                            // Exceeded maximum uses
                             cookie()->queue(cookie()->forget('coupon_code'));
-                            $fail('The ' . $attribute . ' is not valid. Exceeded maximum uses.');
+                            return $fail('The ' . $attribute . ' has been used the maximum number of times.');
                         }
                     }
                 },

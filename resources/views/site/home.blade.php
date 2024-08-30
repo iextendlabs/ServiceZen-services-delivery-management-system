@@ -199,7 +199,6 @@
                                         {{ $service->duration }}</small>
                                 </div>
 
-                                {{-- <a href="/addToCart/{{ $service->id }}"><button type="button" class="btn btn-block btn-primary"> Book Now</button></a> --}}
                                 @if(count($service->serviceOption)>0)
                                     <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $service->id }}" type="button" class="btn btn-block btn-primary">Book Now</a>
                                 @else

@@ -332,8 +332,8 @@
 
                 var couponCode = $("#coupon_code").val();
                 $("#responseMessage").html("");
-
-                if (selectedServiceIds && couponCode) {
+                
+                if (selectedServiceIds.length != 0 && couponCode) {
                     $.ajax({
                         type: "POST",
                         url: "{{ route('apply.order_coupon') }}",

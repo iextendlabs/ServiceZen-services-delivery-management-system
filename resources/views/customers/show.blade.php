@@ -133,37 +133,66 @@
     <div class="row">
         @if(isset($customer->coupons))
         <h3>Customer Coupon</h3>
-        @if(count($customer->coupons) != 0)
-        <table class="table table-striped table-bordered album bg-light">
-            <tr>
-                <th>Name</th>
-                <th>Code</th>
-                <th>Discount</th>
-                <th>Action</th>
-            </tr>
-            @foreach ($customer->coupons as $coupons)
-            <tr>
-                <td>{{ $coupons->name }}</td>
-                <td>{{ $coupons->code }}</td>
-                <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else AED {{ $coupons->discount }} @endif</td>
-                <td>
-                    <form action="{{ route('customerCoupon.destroy', $coupons->id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="customer_id" value="{{ $customer->id }}">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </table>
-        @else
-        <div class="text-center">
-            <p>There are no Coupon Assigned</p>
+        <div class="col-md-12">
+            @if(count($customer->coupons) != 0)
+            <input type="text" id="coupon-search" placeholder="Search coupon by name and code..." class="form-control">
+            <div class="scroll-div">
+                <table class="table table-striped table-bordered album bg-light coupons-table">
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Discount</th>
+                        <th>Action</th>
+                    </tr>
+                    @foreach ($customer->coupons as $coupons)
+                    <tr>
+                        <td>{{ $coupons->name }}</td>
+                        <td>{{ $coupons->code }}</td>
+                        <td>@if($coupons->type == "Percentage") {{ $coupons->discount }} % @else AED {{ $coupons->discount }} @endif</td>
+                        <td>
+                            <form action="{{ route('customerCoupon.destroy', $coupons->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </table>
+            </div>
+            @else
+            <div class="text-center">
+                <p>There are no Coupon Assigned</p>
+            </div>
+            @endif
         </div>
-        @endif
         @endif
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $("#coupon-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".coupons-table tr").hide();
+
+            $(".coupons-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+                var code = $row.find("td:first").next().next().text().toLowerCase();
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                } else if (code.indexOf(value) != -1) {
+                    $(this).show();
+                }
+
+            });
+        });
+    });
+</script>
 @endsection
