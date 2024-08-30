@@ -186,6 +186,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('currencies', CurrencyController::class);
 
     Route::resource('membershipPlans', MembershipPlanController::class);
+    Route::get('load-customers', [CouponController::class, 'loadCustomers'])->name('customers.load');
 
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
@@ -226,7 +227,6 @@ Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountM
 Route::get('deleteAccountPage', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccountPage');
 
 Route::resource('staffProfile', StaffProfileController::class);
-Route::get('addToCart/{id}', [CheckOutController::class, 'addToCart']);
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('draftOrder', [CheckOutController::class, 'draftOrder']);
 Route::resource('cart', CheckOutController::class);

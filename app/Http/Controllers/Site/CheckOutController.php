@@ -72,20 +72,6 @@ class CheckOutController extends Controller
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
-    public function addToCart(Request $request, $id)
-    {
-
-        $serviceId = $id;
-        $serviceIds = Session::get('serviceIds', []);
-
-        if (!in_array($serviceId, $serviceIds)) {
-            $serviceIds[] = $serviceId;
-            Session::put('serviceIds', $serviceIds);
-        }
-
-        return redirect()->back()->with('cart-success', 'Service Add to Cart Successfully.');
-    }
-
     public function addToCartModal(Request $request, $serviceId)
     {
         $serviceIds = [$serviceId];

@@ -335,8 +335,6 @@ $packageCarousel_chunk = 3;
                   @else
                       <button onclick="openBookingPopup('{{ $addON->service->id }}')" type="button" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></button>
                   @endif
-                  {{-- <a href="#" onclick="openBookingPopup('{{ $service->id }}')" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a> --}}
-                  {{-- <a href="/addToCart/{{ $service->id }}" style="color:white" class="btn btn-sm btn-block btn-primary float-right mt-2"><i class="fa fa-plus"></i></a> --}}
                 </div>
               </div>
             </div>
@@ -476,7 +474,6 @@ $packageCarousel_chunk = 3;
 
     $('#price').html(price);
     $('#duration').html(duration);
-    $('#add-to-cart').attr('href', '/addToCart/' + id);
   });
 </script>
 <script>

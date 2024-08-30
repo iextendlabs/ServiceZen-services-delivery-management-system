@@ -10,7 +10,7 @@ class Coupon extends Model
 
     use HasFactory;
 
-    protected $fillable = ['name','code','type','discount','date_start','date_end','status','uses_total','min_order_value'];
+    protected $fillable = ['name','code','type','discount','date_start','date_end','status','uses_total','min_order_value','coupon_for'];
     
     public function couponHistory(){
         return $this->hasMany(CouponHistory::class);
@@ -68,73 +68,91 @@ class Coupon extends Model
         return 0;
     }
 
-    public function isValidCoupon($code, $services, $user_id = null, $options = [],$zone_extra_charges = null)
+    public function isValidCoupon($code, $services, $user_id = null, $options = [], $zone_extra_charges = null)
     {
         $isValid = self::where('code', $code)
             ->where('status', 1)
             ->where('date_start', '<=', now())
             ->where('date_end', '>=', now())
             ->exists();
-        
-        if ($isValid) {
 
-            $matching_service_ids = [];
-            $category_service_ids = [];
-            $sub_total = 0;
-
-            if ($this->category()->exists()) {
-                $category_ids = $this->category->pluck('id')->toArray();
-                $category_service_ids = ServiceToCategory::whereIn('category_id', $category_ids)
-                    ->whereIn('service_id', $services->pluck('id')->toArray())
-                    ->pluck('service_id')->toArray();
-            }
-
-            if ($this->service()->exists()) {
-                $matching_service_ids = array_intersect($services->pluck('id')->toArray(), $this->service->pluck('id')->toArray());
-            }
-
-            $applicable_services = array_unique(array_merge($matching_service_ids, $category_service_ids));
-
-            if (empty($applicable_services) && ($this->category()->exists() || $this->service()->exists())) {
-                return 'Coupon is not valid for your selected service.';
-            }
-
-            if ($this->uses_total !== null) {
-                if (!auth()->check() && $user_id == null) {
-                    return 'Coupon requires login for validation.';
-                } elseif(!auth()->user()->hasRole('Admin')){
-                    $userIdToCheck = $user_id ?? auth()->id();
-
-                    $userOrdersCount = Order::where('customer_id', $userIdToCheck)
-                        ->whereHas('couponHistory', function ($query) {
-                            $query->where('coupon_id', $this->id);
-                        })
-                        ->where('status', '!=', 'Canceled')
-                        ->count();
-
-                        if ($userOrdersCount >= $this->uses_total) {
-                        // Handle the case where maximum uses exceeded
-                        return 'Coupon already used. Exceeded maximum uses.';
-                    }
-                }
-            }
-
-            $services_total = $services->sum(function ($service) use($options,$zone_extra_charges) {
-                $optionId = $options[$service->id] ?? null;
-                if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price + $zone_extra_charges ?? 0;
-                }else{
-                    return ($service->discount ?? $service->price) + ($zone_extra_charges ?? 0);
-                }
-            });
-            if( $this->min_order_value > $services_total){
-                return 'The order total must be greater than to'.$this->min_order_value;
-            }
-        } else {
+        if (!$isValid) {
             return "Coupon is either invalid or expired!";
         }
 
+        $matching_service_ids = [];
+        $category_service_ids = [];
+
+        if ($this->category()->exists()) {
+            $category_ids = $this->category->pluck('id')->toArray();
+            $category_service_ids = ServiceToCategory::whereIn('category_id', $category_ids)
+                ->whereIn('service_id', $services->pluck('id')->toArray())
+                ->pluck('service_id')
+                ->toArray();
+        }
+
+        if ($this->service()->exists()) {
+            $matching_service_ids = array_intersect($services->pluck('id')->toArray(), $this->service->pluck('id')->toArray());
+        }
+
+        $applicable_services = array_unique(array_merge($matching_service_ids, $category_service_ids));
+
+        if (empty($applicable_services) && ($this->category()->exists() || $this->service()->exists())) {
+            return 'Coupon is not valid for your selected service.';
+        }
+
+        if ($this->coupon_for == "customer") {
+            if (!auth()->check() && $user_id == null) {
+                return 'Coupon is not valid';
+            }else{
+                $userIdToCheck = $user_id ?? auth()->id();
+                if (!$this->customers()->where('customer_id', $userIdToCheck)->exists()) {
+                    return 'Coupon is not valid';
+                }
+            }
+            
+        }
+
+        if ($this->uses_total !== null) {
+            if (!auth()->check() && $user_id == null) {
+                return 'Coupon requires login for validation.';
+            }
+
+            if ($user_id || !auth()->user()->hasRole('Admin')) {
+                $userIdToCheck = $user_id ?? auth()->id();
+
+                $userOrdersCount = Order::where('customer_id', $userIdToCheck)
+                    ->whereHas('couponHistory', function ($query) {
+                        $query->where('coupon_id', $this->id);
+                    })
+                    ->where('status', '!=', 'Canceled')
+                    ->count();
+
+                if ($userOrdersCount >= $this->uses_total) {
+                    return 'Coupon already used. Exceeded maximum uses.';
+                }
+            }
+        }
+        
+        $services_total = $services->sum(function ($service) use ($options, $zone_extra_charges) {
+            $optionId = $options[$service->id] ?? null;
+            $servicePrice = $optionId !== null && $service->serviceOption->find($optionId)
+                ? $service->serviceOption->find($optionId)->option_price
+                : ($service->discount ?? $service->price);
+
+            return $servicePrice + ($zone_extra_charges ?? 0);
+        });
+
+        if ($services_total < $this->min_order_value) {
+            return 'The order total must be greater than ' . $this->min_order_value;
+        }
+
         return true;
+    }
+    
+    public function customers()
+    {
+        return $this->belongsToMany(User::class, 'customer_coupons', 'coupon_id', 'customer_id');
     }
 
 }
