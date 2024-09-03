@@ -49,7 +49,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name:</strong>
-                            <input readonly type="text" name="name" value="{{ $serviceStaff->name }}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ $serviceStaff->name }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
