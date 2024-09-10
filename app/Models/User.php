@@ -243,4 +243,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserDocument::class, 'user_id');
     }
+
+    public function affiliateCategories()
+    {
+        return $this->hasMany(AffiliateCategory::class, 'affiliate_id');
+    }
 }

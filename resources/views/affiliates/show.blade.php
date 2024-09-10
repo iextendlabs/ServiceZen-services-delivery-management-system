@@ -94,8 +94,26 @@
                 </div>
             </div>
             <hr>
+            @if(count($affiliate->affiliateCategories) != 0)
             <div class="col-md-12">
-                <h3>My Customer</h3>
+                <h3>Category base commission</h3>
+                <table class="table table-striped table-bordered album bg-light">
+                    <tr>
+                        <th>Category</th>
+                        <th>Commission</th>
+                    </tr>
+                    @foreach ($affiliate->affiliateCategories as $affiliateCategory)
+                        <tr>
+                            <td>{{ $affiliateCategory->category->title }}</td>
+                            <td>{{ $affiliateCategory->commission }}%</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+            <hr>
+            @endif
+            <div class="col-md-12">
+                <h3>Customer</h3>
                 @if (count($affiliateUser) != 0)
                     <table class="table table-striped table-bordered album bg-light">
                         <tr>
@@ -127,7 +145,7 @@
 
             <hr>
             <div class="col-md-12">
-                <h3>My Transaction</h3>
+                <h3>Transaction</h3>
                 @if (count($transactions) != 0)
                     <a href="{{ url('/affiliate/exportTransaction', ['User' => $affiliate->id]) }}"
                         class="btn btn-primary">Export

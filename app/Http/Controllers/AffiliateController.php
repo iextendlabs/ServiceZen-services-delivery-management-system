@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
+use App\Models\AffiliateCategory;
 use App\Models\MembershipPlan;
+use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
@@ -64,10 +66,11 @@ class AffiliateController extends Controller
     public function create()
     {
         $membership_plans = MembershipPlan::where('status', 1)
-            ->where('type',"Affiliate")
+            ->where('type', "Affiliate")
             ->get();
-        $affiliates = User::role('Affiliate')->latest()->get();
-        return view('affiliates.create',compact('affiliates','membership_plans'));
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
+        $categories = ServiceCategory::where("status", '1')->orderBy("title")->get();
+        return view('affiliates.create', compact('affiliates', 'membership_plans', 'categories'));
     }
 
     /**
@@ -100,9 +103,6 @@ class AffiliateController extends Controller
             'parent_affiliate_id.required' => 'A parent affiliate is required when parent affiliate commission is set.',
             'parent_affiliate_commission.required' => 'A parent affiliate commission is required when parent affiliate is set.',
         ]);
-        $this->validate($request, [
-            
-        ]);
 
         $input = $request->all();
 
@@ -121,6 +121,29 @@ class AffiliateController extends Controller
         $affiliate->assignRole('Affiliate');
 
         Affiliate::create($input);
+
+        $categories = $request->input('categories');
+        $commissions = $request->input('category_commission');
+
+        if ($categories && $commissions) {
+            $categoryCommissionPairs = array_map(null, $categories, $commissions);
+
+            $uniqueCategoryCommissionPairs = [];
+            foreach ($categoryCommissionPairs as $pair) {
+                [$categoryId, $commission] = $pair;
+                if (!isset($uniqueCategoryCommissionPairs[$categoryId])) {
+                    $uniqueCategoryCommissionPairs[$categoryId] = $commission;
+                }
+            }
+
+            foreach ($uniqueCategoryCommissionPairs as $categoryId => $commission) {
+                AffiliateCategory::create([
+                    'affiliate_id' => $affiliate->id,
+                    'category_id' => $categoryId,
+                    'commission' => $commission
+                ]);
+            }
+        }
 
         return redirect()->route('affiliates.index')
             ->with('success', 'Affiliate created successfully.');
@@ -158,7 +181,7 @@ class AffiliateController extends Controller
             ->where('created_at', '>=', $currentMonth)
             ->where('user_id', $affiliate->id)
             ->sum('amount');
-            
+
         $affiliateUser = [];
 
         if ($affiliate->affiliate) {
@@ -181,13 +204,15 @@ class AffiliateController extends Controller
     {
 
         $membership_plans = MembershipPlan::where('status', 1)
-            ->where('type',"Affiliate")
+            ->where('type', "Affiliate")
             ->get();
 
-        $affiliates = User::role('Affiliate')->latest()->get();
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
         $affiliate_join = $request->affiliate_join;
         $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->get();
-        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join','affiliates','membership_plans'));
+
+        $categories = ServiceCategory::where("status", '1')->orderBy("title")->get();
+        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join', 'affiliates', 'membership_plans', 'categories'));
     }
 
     /**
@@ -270,6 +295,33 @@ class AffiliateController extends Controller
         $user->assignRole('Affiliate');
 
         $user->update($input);
+
+        $categories = $request->input('categories');
+        $commissions = $request->input('category_commission');
+        
+        AffiliateCategory::where('affiliate_id', $id)->delete();
+
+        if ($categories && $commissions) {
+            $categoryCommissionPairs = array_map(null, $categories, $commissions);
+
+            $uniqueCategoryCommissionPairs = [];
+            foreach ($categoryCommissionPairs as $pair) {
+                [$categoryId, $commission] = $pair;
+                if (!isset($uniqueCategoryCommissionPairs[$categoryId])) {
+                    $uniqueCategoryCommissionPairs[$categoryId] = $commission;
+                }
+            }
+
+            foreach ($uniqueCategoryCommissionPairs as $categoryId => $commission) {
+                AffiliateCategory::create([
+                    'affiliate_id' => $id,
+                    'category_id' => $categoryId,
+                    'commission' => $commission
+                ]);
+            }
+        }
+
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Affiliate updated successfully');

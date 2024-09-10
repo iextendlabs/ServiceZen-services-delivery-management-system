@@ -1,4 +1,8 @@
-@extends('layouts.app') @section('content')
+@extends('layouts.app') 
+@php
+    $category_row = 0;
+@endphp
+@section('content')
     <div class="container">
         <div class="row">
             <div class="col-md-12 margin-tb">
@@ -137,6 +141,55 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Categories:</strong>
+                        <table id="categoryTable" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Commission</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if($affiliate->affiliateCategories)
+                                @foreach ($affiliate->affiliateCategories as $affiliateCategory)
+                                <tr>
+                                    <td>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <select name='categories[{{ $category_row }}]' class="form-control" required>
+                                                    <option></option>
+                                                    @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}" @if($affiliateCategory->category_id == $category->id) selected @endif >{{ $category->title }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <input type="number" name="category_commission[{{ $category_row }}]" value="{{ $affiliateCategory->commission }}" class="form-control" placeholder="Commission in %" required min="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                                    </td>
+                                </tr>
+                                @php
+                                    $category_row++;
+                                @endphp
+                                @endforeach
+                                @endif
+                                
+                            </tbody>
+                        </table>
+                        <button id="addCategoryBtn" onclick="addCategoryrow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                    </div>
+                </div>
                 {{-- <div class="col-md-12">
                     <div class="form-group">
                         <strong>Expiry Date:</strong>
@@ -216,6 +269,43 @@
             </div>
         </form>
     </div>
+    <script>
+        var category_row = {{ $category_row }};
+        function addCategoryrow(){
+            var newRow = `
+                <tr>
+                    <td>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <select name='categories[${category_row}]' class="form-control" required>
+                                    <option></option>
+                                    @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="number" name="category_commission[${category_row}]" class="form-control" placeholder="Commission in %" required min="1">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                    </td>
+                </tr>
+            `;
+            $('#categoryTable tbody').append(newRow);
+            category_row++
+        }
+    
+        $(document).on('click', '.remove-category', function() {
+            $(this).closest('tr').remove();
+        });
+    </script>
     <script>
         $(document).ready(function() {
             if ($('.selected-customer-table tr').length > 6) {

@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@php
+    $category_row = 0;
+@endphp
 @section('content')
     <div class="container">
         <div class="row">
@@ -138,10 +141,66 @@
                         <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ old('expiry_date') }}>
                     </div>
                 </div> --}}
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Categories:</strong>
+                        <table id="categoryTable" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Commission</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                        <button id="addCategoryBtn" onclick="addCategoryrow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                    </div>
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>
     </div>
+    <script>
+        var category_row = {{ $category_row }};
+        function addCategoryrow(){
+            var newRow = `
+                <tr>
+                    <td>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <select name='categories[${category_row}]' class="form-control" required>
+                                    <option></option>
+                                    @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="number" name="category_commission[${category_row}]" class="form-control" placeholder="Commission in %" required min="1">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                    </td>
+                </tr>
+            `;
+            $('#categoryTable tbody').append(newRow);
+            category_row++
+        }
+    
+        $(document).on('click', '.remove-category', function() {
+            $(this).closest('tr').remove();
+        });
+    </script> 
 @endsection
