@@ -109,11 +109,8 @@ class ServiceStaffController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
-            'address_proof' => 'required',
             'id_card' => 'required',
             'passport' => 'required',
-            'driving_license' => 'required',
-            'education' => 'required',
         ]);
 
         $input = $request->all();
@@ -367,6 +364,34 @@ class ServiceStaffController extends Controller
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Service Staff updated successfully');
+    }
+
+    public function uploadDocument(Request $request, $id)
+    {
+        $documentFields = $this->documents;
+        
+        $userDocuments = UserDocument::where('user_id', $id)->first() ?? new UserDocument();
+
+        foreach ($documentFields as $fileField => $dbField) {
+            if ($request->hasFile($fileField)) {
+                $filename = mt_rand(1000, 9999) . '.' . $request->$fileField->getClientOriginalExtension();
+                $request->$fileField->move(public_path('staff-document'), $filename);
+
+                if ($userDocuments->$fileField) {
+                    $oldFile = public_path('staff-document/' . $userDocuments->$fileField);
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+
+                $userDocuments->$fileField = $filename;
+            }
+        }
+
+        $userDocuments->user_id = $id;
+        $userDocuments->save();
+
+        return response()->json(['success' => true]);
     }
 
     /**

@@ -77,6 +77,20 @@ class Order extends Model
         return $this->hasMany(OrderComment::class);
     }
 
+    public function getCommentsTextAttribute()
+    {
+        $comments = $this->comments->sortByDesc('created_at')->pluck('comment');
+        $comments->prepend($this->order_comment);
+        return $comments->toArray();
+    }
+    public function getServicesAttribute()
+    {
+        return $this->orderServices->sortByDesc('service_name')->map(function ($orderService) {
+            $serviceNameWithTimeAndPrice = $orderService->service_name . '-' . $orderService->duration . '-' . $orderService->price . ' AED';
+            return $serviceNameWithTimeAndPrice;
+        })->values()->toArray();
+    }
+    
     public function getTransactionStatus($id, $type)
     {
         $transaction = Transaction::where('user_id', $id)->where('order_id', $this->id)->where('type', $type)->first();
