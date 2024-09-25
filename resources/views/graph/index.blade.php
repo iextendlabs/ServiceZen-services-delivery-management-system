@@ -66,7 +66,7 @@
         <form method="get" action="{{ route('rota') }}">
             @csrf
             <label for="date">Select Date:</label>
-            <input type="date" id="date" name="date" value="{{ $date }}" required>
+            <input type="date" id="date" name="date" value="{{ old('date',$date) }}" required>
             <button type="submit">Submit</button>
         </form>
     </div>

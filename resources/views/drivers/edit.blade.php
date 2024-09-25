@@ -26,13 +26,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $driver->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name' , $driver->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $driver->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ 'email', $driver->email }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -62,7 +62,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Commission:</strong>
-                    <input type="number" name="commission" value="{{ $driver->driver->commission ?? "" }}" class="form-control" placeholder="Commission In %">
+                    <input type="number" name="commission" value="{{ old( 'commission',$driver->driver->commission ?? "" )}}" class="form-control" placeholder="Commission In %">
                 </div>
             </div>
             <div class="col-md-12">
@@ -73,7 +73,7 @@
                         @foreach ($affiliates as $affiliate)
                             @if($affiliate->affiliate->status == 1)
                                 <option value="{{ $affiliate->id }}"
-                                    @if ($driver->driver && $driver->driver->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
+                                    @if (old('affiliate_id')  == $affiliate->id  || $driver->driver && $driver->driver->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
                                 </option>
                             @endif
                         @endforeach

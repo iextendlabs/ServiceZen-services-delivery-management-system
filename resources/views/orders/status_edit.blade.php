@@ -38,7 +38,7 @@
                                 @if($status == $order->status)
                                 <option value="{{ $status }}" selected>{{ $status }}</option>
                                 @else
-                                <option value="{{ $status }}">{{ $status }}</option>
+                                <option value="{{ $status }}" {{ old('status' ) == $status ? 'selected' : '' }}>{{ $status }}</option>
                                 @endif
                                 @endforeach
                             </select>

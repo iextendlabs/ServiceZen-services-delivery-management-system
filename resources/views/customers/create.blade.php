@@ -49,8 +49,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status:</strong>
                     <select name="status" class="form-control">
-                        <option value="1"> Enable</option>
-                        <option value="0"> Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}> Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}> Disable</option>
                     </select>
                 </div>
             </div>

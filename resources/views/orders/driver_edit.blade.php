@@ -37,7 +37,7 @@
                                 <option></option>
                                 @foreach ($drivers as $driver)
                                
-                                <option value="{{ $driver->id }}"  @if($driver->id == $order->driver_id) selected @endif>{{ $driver->name }}</option>
+                                <option value="{{ $driver->id }}"  @if(old('driver_id') == $driver->id || $driver->id == $order->driver_id) selected @endif>{{ $driver->name }}</option>
                                 @endforeach
                             </select>
                         </div>

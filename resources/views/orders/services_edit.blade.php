@@ -62,7 +62,7 @@
                                 @if ($service->status)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" @if(in_array($service->id,$serviceIds)) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                        <input type="checkbox" @if(in_array($service->id,old('service_ids',$serviceIds))) checked @endif class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
                                     </td>
                                     <td>{{ $service->name }}</td>
                                     <td><span class="price">{{ isset($service->discount) ? $service->discount : $service->price }}</span></td>
@@ -93,7 +93,7 @@
                                 @foreach ($selectedServices as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
+                                        <input type="checkbox" checked class="selected-service-checkbox" name="selected_service_ids[]" @if(in_array('selected_service_ids', [])) checked @endif  value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" data-category="{{ $service->category_id }}">
                                     </td>
                                     <td>{{ $service->name }}</td>
                                     <td><span class="price">{{ isset($service->discount) ? $service->discount : $service->price }}</td>

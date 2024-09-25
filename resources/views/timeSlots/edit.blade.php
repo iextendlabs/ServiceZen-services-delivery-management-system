@@ -24,7 +24,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{$time_slot->name}}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name',$time_slot->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
@@ -32,11 +32,11 @@
                     <strong for="image">Type</strong>
                     <select name="type" class="form-control">
                         @if($time_slot->type == "General")
-                        <option value="General" selected>General</option>
-                        <option value="Specific">Specific</option>
+                        <option value="General" selected {{ old('type') == 'General' ? 'selected' : ''}}>General</option>
+                        <option value="Specific" {{ old('type') == 'Specific' ? 'selected' : ''}}>Specific</option>
                         @elseif($time_slot->type == "Specific")
-                        <option value="General">General</option>
-                        <option value="Specific" selected>Specific</option>
+                        <option value="General" {{ old('type') == 'General' ? 'selected' : ''}}>General</option>
+                        <option value="Specific" selected {{ old('type') == 'Specific' ? 'selected' : ''}}>Specific</option>
                         @endif
                     </select>
                 </div>
@@ -56,13 +56,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>No. of Seats:</strong>
-                    <input type="number" name="seat" value="{{$time_slot->seat}}" class="form-control">
+                    <input type="number" name="seat" value="{{old('seat',$time_slot->seat)}}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12" id="date" style="display: none;">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>
-                    <input type="date" name="date" value="{{$time_slot->date}}" class="form-control" placeholder="Date">
+                    <input type="date" name="date" value="{{old('date',$time_slot->date)}}" class="form-control" placeholder="Date">
                 </div>
             </div>
             <div class="col-md-12">
@@ -73,8 +73,8 @@
                         <option value="1" selected>Enable</option>
                         <option value="0">Disable</option>
                         @else
-                        <option value="1">Enable</option>
-                        <option value="0" selected>Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : ''}}>Enable</option>
+                        <option value="0" selected {{ old('status') == '1' ? 'selected' : ''}}>Disable</option>
                         @endif
                     </select>
                 </div>
@@ -87,7 +87,7 @@
                     @if($time_slot->group_id == $staff_group->id)
                     <option value="{{$staff_group->id}}" selected>{{$staff_group->name}}</option>
                     @else
-                    <option value="{{$staff_group->id}}">{{$staff_group->name}}</option>
+                    <option value="{{$staff_group->id}}" {{ old('group_id') == $staff_group->id ? 'selected' : ''}}>{{$staff_group->name}}</option>
                     @endif
                     @endforeach
                 </select>
@@ -107,9 +107,9 @@
                             <tr>
                                 <td>
                                     @if(in_array($staff->id,$selected_staff))
-                                    <input type="checkbox" checked name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                    <input type="checkbox" checked name="ids[{{ ++$i }}]" value="{{ $staff->id }}" @if(in_array($staff->id, old('ids', $selected_staff)) || $staff->id == $selected_staff) checked @endif>
                                     @else
-                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}" @if(in_array($staff->id, old('ids', $selected_staff)) || $staff->id == $selected_staff) checked @endif>
                                     @endif
                                 </td>
                                 <td>{{ $staff->name }}</td>

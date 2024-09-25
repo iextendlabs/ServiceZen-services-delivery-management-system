@@ -24,7 +24,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Question:</strong>
-                    <input type="text" name="question" value="{{$FAQ->question}}" class="form-control" placeholder="Question">
+                    <input type="text" name="question" value="{{ old( 'question' ,$FAQ->question ) }}" class="form-control" placeholder="Question">
                 </div>
             </div>
             <div class="col-md-12">
@@ -40,9 +40,9 @@
                         <option></option>
                         @foreach($categories as $category)
                         @if($category->id == $FAQ->category_id)
-                        <option value="{{$category->id}}" selected>{{$category->title}}</option>
+                        <option value="{{$category->id}}"  selected>{{$category->title}}</option>
                         @else
-                        <option value="{{$category->id}}">{{$category->title}}</option>
+                        <option value="{{$category->id}}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{$category->title}}</option>
                         @endif
                         @endforeach
                     </select>
@@ -57,7 +57,7 @@
                         @if($service->id == $FAQ->service_id)
                         <option value="{{$service->id}}" selected>{{$service->name}}</option>
                         @else
-                        <option value="{{$service->id}}">{{$service->name}}</option>
+                        <option value="{{$service->id}}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{$service->name}}</option>
                         @endif
                         @endforeach
                     </select>
@@ -67,8 +67,8 @@
                     <div class="form-group">
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1" @if($FAQ->status == 1) selected @endif>Enable</option>
-                            <option value="0" @if($FAQ->status == 0) selected @endif>Disable</option>
+                            <option value="1"  @if( old('status') == '1' || $FAQ->status == 1) selected @endif>Enable</option>
+                            <option value="0" @if(old('status') == '0'  || $FAQ->status == 0) selected @endif>Disable</option>
                         </select>
                     </div>
                 </div>

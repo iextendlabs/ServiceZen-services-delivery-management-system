@@ -69,8 +69,8 @@
                     <div class="form-group">
                         <strong>Position:</strong>
                         <select name="position" class="form-control">
-                            <option value="Top Menu">Top Menu</option>
-                            <option value="Bottom Footer">Bottom Footer</option>
+                            <option value="Top Menu"  {{ old('position') == "Top Menu" ? 'selected' : '' }}>Top Menu</option>
+                            <option value="Bottom Footer" {{ old('position') == "Bottom Footer" ? 'selected' : '' }}>Bottom Footer</option>
                         </select>
                     </div>
                 </div>

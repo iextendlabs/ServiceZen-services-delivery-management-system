@@ -51,8 +51,8 @@
                     <div class="form-group">
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1">Enable</option>
-                            <option value="0">Disable</option>
+                            <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>
@@ -107,9 +107,12 @@
                         <select name="parent_affiliate_id" class="form-control">
                             <option value=""></option>
                             @foreach ($affiliates as $affiliate)
-                            @if($affiliate->affiliate->status == 1)
-                                <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
-                            @endif
+                                @if($affiliate->affiliate->status == 1)
+                                    <option value="{{ $affiliate->id }}" 
+                                        {{ old('parent_affiliate_id') == $affiliate->id ? 'selected' : '' }}>
+                                        {{ $affiliate->name }}
+                                    </option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -127,7 +130,7 @@
                         <select name="membership_plan_id" class="form-control">
                             <option value=""></option>
                             @foreach ($membership_plans as $membership_plan)
-                                <option value="{{ $membership_plan->id }}">{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id') == $membership_plan->id ? 'selected' : '' }}>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
                             @endforeach
                         </select>
                     </div>

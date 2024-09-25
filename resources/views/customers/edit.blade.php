@@ -26,13 +26,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $customer->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name', $customer->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $customer->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ 'email', $customer->email }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -49,8 +49,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status:</strong>
                     <select name="status" class="form-control">
-                        <option value="1" @if($customer->status == 1) selected @endif > Enable</option>
-                        <option value="0" @if($customer->status == 0) selected @endif > Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }} @if($customer->status == 1) selected @endif > Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }} @if($customer->status == 0) selected @endif > Disable</option>
                     </select>
                 </div>
             </div>
@@ -58,11 +58,11 @@
             <h4><strong> Affiliate Session</strong></h4>
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate:</strong>
-                    <select name="affiliate_id" class="form-control">
+                    <select name="{{ old('status') == '1' ? 'selected' : '' }}" class="form-control">
                         <option></option>
                         @foreach ($affiliates as $affiliate)
                         @if($affiliate->affiliate->status == 1)
-                            <option value="{{ $affiliate->id }}" @if($customer->userAffiliate && $customer->userAffiliate->affiliate_id == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
+                            <option value="{{ $affiliate->id }}" {{ old('{{ old('status') == $affiliate->id ? 'selected' : '' }}') == '1' ? 'selected' : '' }} @if($customer->userAffiliate && $customer->userAffiliate->affiliate_id == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
                         @endif
                         @endforeach
                     </select>
@@ -72,19 +72,28 @@
                 <div class="form-group"><strong>Affiliate Commission type:</strong>
                     <select name="type" class="form-control">
                         <option></option>
-                        <option @if($customer->userAffiliate && $customer->userAffiliate->type == "F") selected @endif value="F">Fix</option>
-                        <option @if($customer->userAffiliate && $customer->userAffiliate->type == "P") selected @endif value="P">Persentage</option>
+                        <option value="F" 
+                            @if (old('type') == "F" || ($customer->userAffiliate && $customer->userAffiliate->type == "F")) 
+                                selected 
+                            @endif>Fix
+                        </option>
+                        <option value="P" 
+                            @if (old('type') == "P" || ($customer->userAffiliate && $customer->userAffiliate->type == "P")) 
+                                selected 
+                            @endif>Percentage
+                        </option>
                     </select>
+                    
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate Commission:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value={{ $customer->userAffiliate ? $customer->userAffiliate->commission : null }}>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value={{ old('commission', $customer->userAffiliate ? $customer->userAffiliate->commission : null) }}>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group"><strong>Expiry Date:</strong>
-                    <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $customer->userAffiliate ? $customer->userAffiliate->expiry_date : null }}>
+                    <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ old('expiry_date', $customer->userAffiliate ? $customer->userAffiliate->expiry_date : null) }}>
                 </div>
             </div>
             <div class="col-md-12 text-center">

@@ -46,49 +46,49 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Building Name:</strong>
                         <input required type="text" name="buildingName" id="buildingName" class="form-control"
-                            placeholder="Building Name" value="{{ $user->customerProfile->buildingName ?? null }}">
+                            placeholder="Building Name" value="{{ old('buildingName',$user->customerProfile->buildingName ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Flat / Villa:</strong>
                         <input required type="text" name="flatVilla" id="flatVilla" class="form-control"
-                            placeholder="Flat / Villa" value="{{ $user->customerProfile->flatVilla ?? null }}">
+                            placeholder="Flat / Villa" value="{{ old('flatVilla',$user->customerProfile->flatVilla ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Street:</strong>
                         <input required type="text" name="street" id="street" class="form-control"
-                            placeholder="Street" value="{{ $user->customerProfile->street ?? null }}">
+                            placeholder="Street" value="{{ old('street', $user->customerProfile->street ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>District:</strong>
                         <input required type="text" name="district" id="district" class="form-control"
-                            placeholder="District" value="{{ $user->customerProfile->district ?? null }}">
+                            placeholder="District" value="{{ old('district',$user->customerProfile->district ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Area:</strong>
                         <input required type="text" name="area" class="form-control" placeholder="Area"
-                            value="{{ $user->customerProfile->area ?? null }}">
+                            value="{{ old('area',$user->customerProfile->area ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Landmark:</strong>
                         <input required type="text" name="landmark" id="landmark" class="form-control"
-                            placeholder="Landmark" value="{{ $user->customerProfile->landmark ?? null }}">
+                            placeholder="Landmark" value="{{ old('landmark',$user->customerProfile->landmark ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>City:</strong>
                         <input required type="text" name="city" id="city" class="form-control" placeholder="City"
-                            value="{{ $user->customerProfile->city ?? null }}">
+                            value="{{ old('city',$user->customerProfile->city ?? null) }}">
                     </div>
                 </div>
             </div>
@@ -102,14 +102,14 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Name:</strong>
                         <input required type="text" name="name" id="name" class="form-control" placeholder="Name"
-                            value="{{ $user->name }}">
+                            value="{{ old('name',$user->name) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Email:</strong>
                         <input required type="email" name="email" id="email" class="form-control"
-                            placeholder="abc@gmail.com" value="{{ $user->email }}">
+                            placeholder="abc@gmail.com" value="{{ old('email',$user->email) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -128,7 +128,7 @@
                         <span style="color: red;">*</span><strong>Phone Number:</strong>
                         <input id="number_country_code" type="hidden" name="number_country_code" />
                         <input id="number" type="tel" name="number" class="form-control"
-                            value="{{ $user->customerProfile->number ?? null }}" />
+                            value="{{ old('number',$user->customerProfile->number ?? null) }}" />
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -136,7 +136,7 @@
                         <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                         <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
                         <input required type="tel" name="whatsapp" id="whatsapp" class="form-control"
-                            value="{{ $user->customerProfile->whatsapp ?? null }}">
+                            value="{{ old('whatsapp',$user->customerProfile->whatsapp ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -144,13 +144,13 @@
                         <span style="color: red;">*</span><strong>Gender:</strong><br>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="gender" id="genderMale"
-                                value="Male"
+                                value="Male" {{ old('gender') }}
                                 {{ $user->customerProfile && $user->customerProfile->gender == 'Male' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderMale">Male</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="gender" id="genderFemale"
-                                value="Female"
+                                value="Female" {{ old('gender') }}
                                 {{ $user->customerProfile && $user->customerProfile->gender == 'Female' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderFemale">Female</label>
                         </div>

@@ -76,8 +76,8 @@
                         <div class="form-group">
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
-                                <option value="1">Enable</option>
-                                <option value="0">Disable</option>
+                                <option value="1"  {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0"  {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                             </select>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                                 <option></option>
                                 @foreach ($users as $driver)
                                 @if($driver->hasRole("Driver"))
-                                <option value="{{ $driver->id }}">{{ $driver->name }}</option>
+                                <option value="{{ $driver->id }}"  {{ old('driver_id') == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
                                 @endif
                                 @endforeach
                             </select>
@@ -166,7 +166,7 @@
                                 @if($user->hasRole("Supervisor"))
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="ids[]" value="{{ $user->id }}">
+                                        <input type="checkbox" name="ids[]" value="{{ $user->id }}" @if (in_array($user->id, old('ids', []))) checked @endif >
                                     </td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
@@ -279,15 +279,17 @@
                                 <tr>
                                     <td>
 
-                                        <input type="checkbox" class="category-checkbox" name="category" value="all">
+                                        <input type="checkbox" class="category-checkbox"  name="category" value="all">
                                     </td>
                                     <td>All</td>
                                 </tr>
                                 @foreach ($categories as $category)
                                 <tr>
                                     <td>
-
-                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}">
+                                        <input type="checkbox" class="category-checkbox" 
+                                               name="category_ids[]" 
+                                               value="{{ $category->id }}" 
+                                               @if(is_array(old('category_ids')) && in_array($category->id, old('category_ids'))) checked @endif>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>
@@ -317,7 +319,7 @@
                                 @foreach ($services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}">
+                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" @if(is_array(old('service_ids')) && in_array($service->id, old('service_ids'))) checked @endif value="{{ $service->id }}" data-category="{{ $service->category_id }}">
                                     </td>
                                     <td>{{ $service->name }}</td>
 

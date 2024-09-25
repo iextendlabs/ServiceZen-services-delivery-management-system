@@ -22,7 +22,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Title:</strong>
-                    <input type="text" name="title" class="form-control">
+                    <input type="text" name="title" value="{{ old('title') }}" class="form-control">
                 </div>
             </div>
         </div>
@@ -30,7 +30,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Body:</strong>
-                    <textarea name="body" class="form-control" cols="30" rows="7"></textarea>
+                    <textarea name="body" class="form-control" cols="30" rows="7">{{ old('body') }}</textarea>
                 </div>
             </div>
             <div class="col-md-12 text-center">

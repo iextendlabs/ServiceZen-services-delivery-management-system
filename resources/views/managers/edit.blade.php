@@ -26,13 +26,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $manager->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name' ,$manager->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $manager->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ old('email' ,$manager->email) }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">

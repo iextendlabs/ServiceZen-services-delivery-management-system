@@ -52,7 +52,7 @@
                         <option></option>
                         @foreach($supervisors as $supervisor)
                         @if($supervisor->hasRole("Supervisor"))
-                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
                         @endif
                         @endforeach
                     </select>

@@ -62,11 +62,11 @@
                                 <div class="form-group">
                                     <strong>Notify to:</strong>
                                     <div class="mb-3 form-check">
-                                        <input type="checkbox" class="form-check-input" id="staff" name="staff" checked>
+                                        <input type="checkbox" class="form-check-input" id="staff" name="staff" value="{{ old('staff') }}" checked>
                                         <label class="form-check-label" for="staff">Staff</label>
                                     </div>
                                     <div class="mb-3 form-check">
-                                        <input type="checkbox" class="form-check-input" id="driver" name="driver" checked>
+                                        <input type="checkbox" class="form-check-input" id="driver" name="driver" value="{{ old('driver') }}" checked>
                                         <label class="form-check-label" for="driver">Driver</label>
                                     </div>
                                 </div>

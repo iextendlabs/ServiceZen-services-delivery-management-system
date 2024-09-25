@@ -208,11 +208,11 @@
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Type:</strong>
                                 <select name="type" class="form-control">
-                                    <option value="Credit">Credit</option>
-                                    <option value="Debit">Debit</option>
-                                    <option value="Product Sale">Product Sale</option>
-                                    <option value="Bonus">Bonus</option>
-                                    <option value="Pay Salary">Pay Salary</option>
+                                    <option value="Credit" {{ old('type') == "Credit" ? 'selected' : '' }}>Credit</option>
+                                    <option value="Debit" {{ old('type') == "Debit" ? 'selected' : '' }}>Debit</option>
+                                    <option value="Product Sale" {{ old('type') == "Product Sale" ? 'selected' : '' }}>Product Sale</option>
+                                    <option value="Bonus" {{ old('type') == "Bonus" ? 'selected' : '' }}>Bonus</option>
+                                    <option value="Pay Salary" {{ old('type') == "Pay Salary" ? 'selected' : '' }}>Pay Salary</option>
                                 </select>
                             </div>
                         </div>

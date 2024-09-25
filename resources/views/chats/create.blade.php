@@ -32,7 +32,7 @@
                         @foreach ($users as $user)
                         <tr>
                             <td>
-                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $user->id }}">
+                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $user->id }}" @if (in_array($user->id, old('ids', []))) checked @endif>
                             </td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
@@ -45,7 +45,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Message:</strong>
-                    <textarea name="text" class="form-control" cols="30" rows="7"></textarea>
+                    <textarea name="text" class="form-control" cols="30" rows="7">{{ old('text') }}</textarea>
                 </div>
             </div>
             <div class="col-md-12 text-center">

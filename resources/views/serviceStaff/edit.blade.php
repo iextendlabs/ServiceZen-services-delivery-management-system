@@ -49,33 +49,33 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name:</strong>
-                            <input type="text" name="name" value="{{ $serviceStaff->name }}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ old('name',$serviceStaff->name) }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Sub Title / Designation</strong>
-                            <input type="text" name="sub_title" class="form-control" value="{{ $serviceStaff->staff->sub_title ?? "" }}" placeholder="Sub Title">
+                            <input type="text" name="sub_title" class="form-control" value="{{ old('sub_title', $serviceStaff->staff->sub_title ?? "") }}" placeholder="Sub Title">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Email:</strong>
-                            <input type="email" name="email" value="{{ $serviceStaff->email }}" class="form-control" placeholder="abc@gmail.com">
+                            <input type="email" name="email" value="{{ old('email',$serviceStaff->email) }}" class="form-control" placeholder="abc@gmail.com">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Phone Number:</strong>
                             <input id="number_country_code" type="hidden" name="number_country_code" />
-                            <input type="tel" id="number" name="phone" value="{{ $serviceStaff->staff->phone ?? "" }}" class="form-control">
+                            <input type="tel" id="number" name="phone" value="{{ old('phone',$serviceStaff->staff->phone ?? "") }}" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                             <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                            <input type="tel" id="whatsapp" name="whatsapp" value="{{ $serviceStaff->staff->whatsapp ?? "" }}" class="form-control">
+                            <input type="tel" id="whatsapp" name="whatsapp" value="{{ old('whatsapp',$serviceStaff->staff->whatsapp ?? "") }}" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -83,15 +83,15 @@
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
 
-                                <option value="1" @if($serviceStaff->staff && $serviceStaff->staff->status == 1) selected @endif>Enable</option>
-                                <option value="0" @if($serviceStaff->staff && $serviceStaff->staff->status == 0) selected @endif>Disable</option>
+                                <option value="1"  {{ old('status') == '1' ? 'selected' : '' }} @if($serviceStaff->staff && $serviceStaff->staff->status == 1) selected @endif>Enable</option>
+                                <option value="0"  {{ old('status') == '0' ? 'selected' : '' }} @if($serviceStaff->staff && $serviceStaff->staff->status == 0) selected @endif>Disable</option>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>About:</strong>
-                            <textarea name="about" id="summernote" class="form-control">{{ $serviceStaff->staff->about ?? "" }}</textarea>
+                            <textarea name="about" id="summernote" class="form-control">{{ old('about',$serviceStaff->staff->about ?? "") }}</textarea>
                             <script>
                                 (function($) {
                                     $('#summernote').summernote({
@@ -173,7 +173,7 @@
                                 @if($user->hasRole("Supervisor"))
                                 <tr>
                                     <td>
-                                        <input type="checkbox" @if(in_array($user->id,$supervisor_ids)) checked @endif name="ids[]" value="{{ $user->id }}">
+                                        <input type="checkbox" @if(in_array($user->id,old('ids',$supervisor_ids))) checked @endif name="ids[]" value="{{ $user->id }}">
                                     </td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
@@ -186,25 +186,25 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Commission:</strong>
-                            <input type="number" name="commission" value="{{ $serviceStaff->staff->commission ?? "" }}" class="form-control" placeholder="Commission In %">
+                            <input type="number" name="commission" value="{{ old('commission',$serviceStaff->staff->commission ?? "") }}" class="form-control" placeholder="Commission In %">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Additional Charges:</strong>
-                            <input type="number" name="charges" value="{{ $serviceStaff->staff->charges ?? "" }}" class="form-control" placeholder="Additional Charges">
+                            <input type="number" name="charges" value="{{ old('charges',$serviceStaff->staff->charges ?? "") }}" class="form-control" placeholder="Additional Charges">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Commission Salary:</strong>
-                            <input type="number" name="fix_salary" class="form-control" value="{{ $serviceStaff->staff->fix_salary ?? "" }}" placeholder="Commission Salary">
+                            <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary',$serviceStaff->staff->fix_salary ?? "") }}" placeholder="Commission Salary">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Minmum Order Value:</strong>
-                            <input type="number" name="min_order_value" class="form-control" value="{{ $serviceStaff->staff->min_order_value ?? "" }}" placeholder="Minmum Order Value">
+                            <input type="number" name="min_order_value" class="form-control" value="{{ old('min_order_value',$serviceStaff->staff->min_order_value ?? "") }}" placeholder="Minmum Order Value">
                         </div>
                     </div>
                     @if($freelancer_join)
@@ -214,7 +214,7 @@
                             <select name="membership_plan_id" class="form-control">
                                 <option value=""></option>
                                 @foreach ($membership_plans as $membership_plan)
-                                    <option value="{{ $membership_plan->id }}" @if($serviceStaff->staff && $serviceStaff->staff->membership_plan_id && $membership_plan->id == $serviceStaff->staff->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                    <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id') == $membership_plan->id ? 'selected' : '' }} @if($serviceStaff->staff && $serviceStaff->staff->membership_plan_id && $membership_plan->id == $serviceStaff->staff->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -232,7 +232,7 @@
                                 <option value=""></option>
                                 @foreach ($affiliates as $affiliate)
                                     @if($affiliate->affiliate->status == 1)
-                                        <option value="{{ $affiliate->id }}"
+                                        <option value="{{ $affiliate->id }}" {{ old('affiliate_id') == $affiliate->id ? 'selected' : '' }}
                                             @if ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
                                         </option>
                                     @endif
@@ -249,31 +249,31 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Instagram <i class="fa fa-instagram"></i>:</strong>
-                            <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ $serviceStaff->staff->instagram ?? "" }}">
+                            <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ old('instagram',$serviceStaff->staff->instagram ?? "") }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Snapchat:</strong>
-                            <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ $serviceStaff->staff->snapchat ?? "" }}">
+                            <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ old('snapchat',$serviceStaff->staff->snapchat ?? "") }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Facebook:</strong>
-                            <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ $serviceStaff->staff->facebook ?? "" }}">
+                            <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ old('facebook', $serviceStaff->staff->facebook ?? "") }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Youtube:</strong>
-                            <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ $serviceStaff->staff->youtube ?? "" }}">
+                            <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ old('youtube',$serviceStaff->staff->youtube ?? "") }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Tiktok:</strong>
-                            <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ $serviceStaff->staff->tiktok ?? "" }}">
+                            <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ old('tiktok',$serviceStaff->staff->tiktok ?? "") }}">
                         </div>
                     </div>
                 </div>
@@ -346,7 +346,7 @@
                                 <tr>
                                     <td>
 
-                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" @if(in_array($category->id,$category_ids)) checked @endif>
+                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" @if(in_array($category->id,old('category_ids',$category_ids))) checked @endif>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>
@@ -376,7 +376,7 @@
                                 @foreach ($services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" @if(in_array($service->id,$service_ids)) checked @endif>
+                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" @if(in_array($service->id,old('service_ids',$service_ids))) checked @endif>
                                     </td>
                                     <td>{{ $service->name }}</td>
 

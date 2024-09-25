@@ -141,12 +141,12 @@
             <div class="col-md-6 offset-md-3">
                 <form action="{{ route('order.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="total_amount" value="{{ $order->total_amount }}"/>
+                    <input type="hidden" name="total_amount" value="{{ old('total_amount',$order->total_amount) }}"/>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <strong>Comment:</strong>
-                                <textarea name="order_comment" class="form-control" cols="30" rows="5"></textarea>
+                                <textarea name="order_comment"  class="form-control" cols="30" rows="5"></textarea>
                             </div>
                         </div>
                         <div class="col-md-12 text-center">

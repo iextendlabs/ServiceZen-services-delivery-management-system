@@ -38,13 +38,13 @@
                         <option></option>
                         @if(isset($category_id))
                         @foreach($categories as $category)
-                        @if($category->id == $category_id)
+                        @if(old('category_id') == $category->id || $category->id == $category_id)
                         <option value="{{ $category->id }}" selected>{{ $category->title }}</option>
                         @endif
                         @endforeach
                         @else
                         @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->title }}</option>
+                        <option value="{{ $category->id }} " {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->title }}</option>
                         @endforeach
                         @endif
                     </select>
@@ -58,13 +58,13 @@
                         <option></option>
                         @if(isset($service_id))
                         @foreach($services as $service)
-                        @if($service->id == $service_id)
+                        @if(old('service_id') == $service->id  || $service->id == $service_id)
                         <option value="{{ $service->id }}" selected>{{ $service->name }}</option>
                         @endif
                         @endforeach
                         @else
                         @foreach($services as $service)
-                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                        <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{ $service->name }}</option>
                         @endforeach
                         @endif
                     </select>
@@ -74,8 +74,8 @@
                 <div class="form-group">
                     <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1">Enable</option>
-                            <option value="0">Disable</option>
+                            <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                 </div>
             </div>
