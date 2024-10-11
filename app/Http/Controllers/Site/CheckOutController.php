@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
+use App\Models\CustomerProfile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cookie;
 
@@ -125,34 +126,44 @@ class CheckOutController extends Controller
 
     public function addToCartServicesStaff(Request $request)
     {
-        $addressCookie = json_decode(request()->cookie('address'), true);
+        $address = [
+            'buildingName' => "",
+            'district' => "",
+            'area' => $request->zone,
+            'flatVilla' => '',
+            'street' => '',
+            'landmark' => '',
+            'city' => '',
+            'searchField' => '',
+            'update_profile' => '',
+            'latitude' => '',
+            'longitude' => ''
+        ];
 
-        if ($addressCookie) {
-            $addressCookie['area'] = $request->zone;
+        if (Auth::check()) {
+            $user = Auth::user();
 
-            $updatedAddressCookie = json_encode($addressCookie);
+            if ($user->customerProfiles->isNotEmpty()) {
+                $customerProfile = $user->customerProfiles->where('area', $request->zone)->first();
 
-            cookie()->queue('address', $updatedAddressCookie, 5256000);
-        } else {
-            $address['buildingName'] = "";
-            $address['district'] = "";
-            $address['area'] = $request->zone;
-            $address['flatVilla'] = '';
-            $address['street'] = '';
-            $address['landmark'] = '';
-            $address['city'] = '';
-            $address['number'] = '';
-            $address['whatsapp'] = '';
-            $address['email'] = '';
-            $address['name'] = '';
-            $address['searchField'] = '';
-            $address['update_profile'] = '';
-            $address['gender'] = '';
-            $address['latitude'] = '';
-            $address['longitude'] = '';
-
-            cookie()->queue('address', json_encode($address), 5256000);
+                if ($customerProfile) {
+                    $address = [
+                        'buildingName' => $customerProfile->buildingName,
+                        'district' => $customerProfile->district,
+                        'area' => $customerProfile->area,
+                        'flatVilla' => $customerProfile->flatVilla,
+                        'street' => $customerProfile->street,
+                        'landmark' => $customerProfile->landmark,
+                        'city' => $customerProfile->city,
+                        'latitude' => $customerProfile->latitude,
+                        'longitude' => $customerProfile->longitude,
+                        'searchField' => $customerProfile->searchField
+                    ]; 
+                }
+            }
         }
+
+        cookie()->queue('address', json_encode($address), 5256000);
         
         if (!$request->time_slot_id || !isset($request->time_slot_id[$request->service_staff_id])) {
             return back()->with('error', 'please select available staff and time slot first ');  
@@ -550,12 +561,21 @@ class CheckOutController extends Controller
             $customer_id = $user->id;
         }
 
-        if (isset($user->customerProfile)) {
-            if ($input['update_profile'] == "on") {
-                $user->customerProfile->update($input);
+        $input['number'] = $input['number_country_code'] . ltrim($input['number'], '0');
+        $input['whatsapp'] = $input['whatsapp_country_code'] . ltrim($input['whatsapp'], '0');
+
+        if (isset($input['update_profile']) && $input['update_profile'] == "on") {
+            
+            if(!isset($input['selectedAddress'])){
+                $input['user_id'] = $user->id;
+                CustomerProfile::create($input);
             }
-        } else {
-            $user->customerProfile()->create($input);
+
+            CustomerProfile::where('user_id',auth()->user()->id)->update([
+                'number' => $input['number'],
+                'whatsapp' => $input['whatsapp'],
+                'gender' => $input['gender']
+            ]);
         }
 
         return [$customer_type,$customer_id];
@@ -594,13 +614,8 @@ class CheckOutController extends Controller
         $address['street'] = $input['street'];
         $address['landmark'] = $input['landmark'];
         $address['city'] = $input['city'];
-        $address['number'] = $input['number_country_code'] . ltrim($input['number'], '0');
-        $address['whatsapp'] = $input['whatsapp_country_code'] . ltrim($input['whatsapp'], '0');
-        $address['email'] = $input['email'];
-        $address['name'] = $input['name'];
+        
         $address['searchField'] = "";
-        $address['update_profile'] = $input['update_profile'];
-        $address['gender'] = $input['gender'];
         if ($input['custom_location'] && strpos($input['custom_location'], ",") != FALSE) {
             [$latitude, $longitude] = explode(",", $input['custom_location']);
             $address['latitude'] = $latitude;
@@ -611,6 +626,15 @@ class CheckOutController extends Controller
         }
 
         cookie()->queue('address', json_encode($address), 5256000);
+
+        $customer_info['number'] = $input['number_country_code'] . ltrim($input['number'], '0');
+        $customer_info['whatsapp'] = $input['whatsapp_country_code'] . ltrim($input['whatsapp'], '0');
+        $customer_info['email'] = $input['email'];
+        $customer_info['name'] = $input['name'];
+        $customer_info['gender'] = $input['gender'];
+
+        cookie()->queue('customer_info', json_encode($customer_info), 5256000);
+
     }
 
     private function formattingBookingData($bookingData)
@@ -660,6 +684,21 @@ class CheckOutController extends Controller
         } catch (\Throwable $th) {
         }
 
+        $customer_info = NULL;
+
+        try {
+            $customer_info = json_decode($request->cookie('customer_info'), true);
+        } catch (\Throwable $th) {
+        }
+
+        $personal_info = [
+            'number' => $customer_info['number'] ?? '',
+            'whatsapp' => $customer_info['whatsapp'] ?? '',
+            'email' => $customer_info['email'] ?? '',
+            'name' => $customer_info['name'] ?? '',
+            'gender' => $customer_info['gender'] ?? '',
+        ];
+
         $addresses = [
             'buildingName' => $address['buildingName'] ?? '',
             'district' => $address['district'] ?? '',
@@ -668,14 +707,9 @@ class CheckOutController extends Controller
             'street' => $address['street'] ?? '',
             'landmark' => $address['landmark'] ?? '',
             'city' => $address['city'] ?? '',
-            'number' => $address['number'] ?? '',
-            'whatsapp' => $address['whatsapp'] ?? '',
-            'email' => $address['email'] ?? '',
-            'name' => $address['name'] ?? '',
             'latitude' => $address['latitude'] ?? '',
             'longitude' => $address['longitude'] ?? '',
             'searchField' => $address['searchField'] ?? '',
-            'gender' => $address['gender'] ?? '',
         ];
 
         if (session()->has('serviceIds')) {
@@ -703,8 +737,8 @@ class CheckOutController extends Controller
             $email = Auth::user()->email;
             $name = Auth::user()->name;
         } else {
-            $email = $addresses['email'];
-            $name = $addresses['name'];
+            $email = $personal_info['email'];
+            $name = $personal_info['name'];
         }
 
         $date = date('Y-m-d');
@@ -733,7 +767,9 @@ class CheckOutController extends Controller
 
         [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
 
-        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings','groupedBookingOption','isAdmin'));
+        $customerProfiles = CustomerProfile::where('user_id',auth()->user()->id)->where('area',$area)->get();
+
+        return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses','personal_info', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings','groupedBookingOption','isAdmin','customerProfiles'));
     }
 
     public function confirmStep(Request $request)

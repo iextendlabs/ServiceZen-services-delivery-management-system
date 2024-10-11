@@ -175,21 +175,23 @@ class AffiliateDashboardController extends Controller
 
 
                     $affiliateUser = $affiliateUserQuery->paginate(config('app.paginate'));
+
+                    $affiliateUser->appends([
+                        'date_from' => $request->date_from,
+                        'date_to' => $request->date_to,
+                        'order_count' => $request->order_count,
+                    ]);
                 }
             }
 
-            $affiliateUser->appends([
-                'date_from' => $request->date_from,
-                'date_to' => $request->date_to,
-                'order_count' => $request->order_count,
-            ]);
+            
 
             $affiliates = User::role('affiliate')->get();
 
             $withdraws = Withdraw::where('user_id', auth()->user()->id)->get();
             $setting = Setting::where('key', 'Affiliate Withdraw Payment Method')->first();
             $withdraw_payment_method = explode(',', $setting->value);
-            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count', 'withdraws', 'withdraw_payment_method','affiliates'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('site.affiliate_dashboard.index', compact('transactions', 'user', 'pkrRateValue', 'total_balance', 'product_sales', 'bonus', 'order_commission', 'other_income', 'affiliateUser', 'filter_date_to', 'filter_date_from', 'filter_order_count', 'withdraws', 'withdraw_payment_method', 'affiliates'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
 
         return redirect()->route('customer.login')->with('error', 'Oppes! You are not Login.');
@@ -211,9 +213,7 @@ class AffiliateDashboardController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-    }
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
@@ -318,7 +318,8 @@ class AffiliateDashboardController extends Controller
                     }
                 },
             ],
-            'recipient_id' => 'required',
+            'recipient_name' => 'required',
+            'recipient_code' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -328,20 +329,28 @@ class AffiliateDashboardController extends Controller
         }
 
         $input = $request->all();
-        $user = User::find($request->recipient_id);
-        
+        $recipient = User::where('name', 'like', '%' . $request->recipient_name . '%')
+            ->whereHas('affiliate', function ($query) use ($request) {
+                $query->where('code', $request->recipient_code);
+            })
+            ->first();
+        if ($recipient == null) {
+            return redirect()->back()
+                ->with('error', 'There is no affiliate with this name and code. Please enter the correct name and code.');
+        }
+
         $input['amount'] = '-' . $request->amount / $pkrRateValue;
         $input['user_id'] = auth()->user()->id;
         $input['type'] = "Internal Transfer";
         $input['status'] = "Approved";
-        $input['description'] = "Amount transfer to ". $user->name;
+        $input['description'] = "Amount transfer to " . $recipient->name;
         Transaction::create($input);
 
         $input['amount'] = $request->amount / $pkrRateValue;
-        $input['user_id'] = $request->recipient_id;
+        $input['user_id'] = $recipient->id;
         $input['type'] = "Internal Transfer";
         $input['status'] = "Approved";
-        $input['description'] = "Amount transfer from ". auth()->user()->name;
+        $input['description'] = "Amount transfer from " . auth()->user()->name;
         Transaction::create($input);
 
         return redirect()->back()
@@ -354,12 +363,11 @@ class AffiliateDashboardController extends Controller
             'payment_method' => 'required',
             'amount' => 'required|numeric|min:1',
         ]);
-        
+
         session([
             'deposit_amount' => $request->amount
         ]);
 
         return redirect()->route('stripe.form');
-        
     }
 }

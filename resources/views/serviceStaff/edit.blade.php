@@ -396,7 +396,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <strong>{{ $label }}:</strong>
-                                <input type="file" name="{{ $field }}" class="form-control">
+                                <input type="file" name="{{ $field }}" class="form-control document-upload" data-field="{{ $field }}">
                                 @if($serviceStaff->document && $serviceStaff->document->$field)
                                 <p>Current File: <a href="{{ asset('staff-document/' .$serviceStaff->document->$field) }}" target="_blank">{{ $serviceStaff->document->$field }}</a></p>
                                 @endif
@@ -536,6 +536,31 @@
                     $(this).show();
                 } else if (email.indexOf(value) != -1) {
                     $(this).show();
+                }
+            });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('.document-upload').on('change', function() {
+            var field = $(this).data('field');
+            var formData = new FormData();
+            formData.append(field, this.files[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                url: '{{ route("serviceStaff.upload.document", $serviceStaff->id) }}',
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    alert('File uploaded successfully');
+                    // Optionally, update the UI with the new file info
+                },
+                error: function(xhr) {
+                    alert('An error occurred while uploading the file');
                 }
             });
         });

@@ -72,7 +72,7 @@ class CashCollectionController extends Controller
                 fputcsv($output, $header);
     
                 foreach ($cash_collections as $key => $row) {
-                    $csvRow = array(++$key, $row->id, $row->staff_name, $row->amount, $row->order->customer->name, $row->order->total_amount, $row->description, $row->order->comment, $row->status, $row->created_at);
+                    $csvRow = array(++$key, $row->id, $row->staff_name, $row->amount, $row->order->customer_name, $row->order->total_amount, $row->description, $row->order->comment, $row->status, $row->created_at);
     
                     // Write the CSV data row
                     fputcsv($output, $csvRow);
