@@ -37,7 +37,7 @@
                         @foreach ($staff_zones as $staff_zone)
                         <tr>
                             <td>
-                                <input type="checkbox" name="staff_zone_ids[{{ ++$i }}]" value="{{ $staff_zone->id }}">
+                                <input type="checkbox" name="staff_zone_ids[{{ ++$i }}]" value="{{ $staff_zone->id }}" @if(in_array($staff_zone->id, old('staff_zone_ids', []))) checked @endif>
                             </td>
                             <td>{{ $staff_zone->name }}</td>
                         </tr>
@@ -59,7 +59,7 @@
                         @if($staff->hasRole("Staff"))
                         <tr>
                             <td>
-                                <input type="checkbox" name="staffIds[{{ ++$i }}]" value="{{ $staff->id }}">
+                                <input type="checkbox" name="staffIds[{{ ++$i }}]" value="{{ $staff->id }}" @if(in_array($staff->id, old('staffIds', []))) checked @endif>
                             </td>
                             <td>{{ $staff->name }}</td>
                             <td>{{ $staff->email }}</td>

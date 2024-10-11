@@ -70,8 +70,8 @@
                         <div class="form-group">
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
-                                <option value="1">Enable</option>
-                                <option value="0">Disable</option>
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                             </select>
                         </div>
                     </div>
@@ -151,7 +151,7 @@
                                 @foreach ($service_categories as $category)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}">
+                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if (in_array($category->id, old('categoriesId', []))) checked @endif>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>

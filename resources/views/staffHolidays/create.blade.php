@@ -28,7 +28,7 @@
             <div class="col-md-12">
                 <div class="form-group scroll-div">
                     <span style="color: red;">*</span><strong>Staffs:</strong>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
+                    <input type="text" name="search" id="search"  class="form-control" placeholder="Search Staff By Name And Email">
                     <table class="table table-striped table-bordered">
                         <tr>
                             <th></th>
@@ -40,9 +40,9 @@
                         <tr>
                             <td>
                                 @if($staff->id == $staff_id)
-                                <input type="checkbox" name="ids[{{ ++$i }}]" checked value="{{ $staff->id }}">
+                                <input type="checkbox" name="ids[{{ ++$i }}]" checked value="{{ $staff->id }}" @if(in_array($staff->id, old('ids', [])) || $staff->id == $staff_id) checked @endif>
                                 @else
-                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
+                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}" @if(in_array($staff->id, old('ids', [])) || $staff->id == $staff_id) checked @endif>
                                 @endif
                             </td>
                             <td>{{ $staff->name }}</td>

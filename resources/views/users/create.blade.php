@@ -49,7 +49,7 @@
                     <strong>Role:</strong>
                     <select name="roles[]" class="form-control" multiple>
                         @foreach($roles as $role)
-                            <option value="{{ $role }}">{{ $role }}</option>
+                            <option value="{{ $role }}" >{{ $role }}</option>
                         @endforeach
                     </select>
                 </div>

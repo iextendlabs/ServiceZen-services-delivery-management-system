@@ -24,13 +24,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $user->name }}" placeholder="Name" class="form-control">
+                    <input type="text" name="name" value="{{ old('name',$user->name) }}" placeholder="Name" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Email:</strong>
-                    <input type="text" name="email" value="{{ $user->email }}" placeholder="Email" class="form-control">
+                    <input type="text" name="email" value="{{ old('email',$user->email) }}" placeholder="Email" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">

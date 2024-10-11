@@ -35,8 +35,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Type</strong>
                     <select name="type" class="form-control">
-                        <option value="Percentage">Percentage</option>
-                        <option value="Fixed Amount">Fixed Amount</option>
+                        <option value="Percentage" {{ old('type') == 'Percentage' ? 'selected' : '' }} >Percentage</option>
+                        <option value="Fixed Amount" {{ old('type') == 'Fixed Amount' ? 'selected' : '' }}>Fixed Amount</option>
                     </select>
                 </div>
             </div>
@@ -74,8 +74,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status</strong>
                     <select name="status" class="form-control">
-                        <option value="1">Enable</option>
-                        <option value="0">Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -129,8 +129,10 @@
                         @foreach ($categories as $category)
                         <tr>
                             <td>
-                                <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}">
+                                <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}"
+                                    @if(is_array(old('categoriesId')) && in_array($category->id, old('categoriesId'))) checked @endif>
                             </td>
+                            
                             <td>{{ $category->title }}</td>
                         </tr>
                         @endforeach
@@ -150,8 +152,10 @@
                         @foreach ($services as $service)
                         <tr>
                             <td>
-                                <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}">
+                                <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}"
+                                    @if(is_array(old('servicesId')) && in_array($service->id, old('servicesId'))) checked @endif>
                             </td>
+                            
                             <td>{{ $service->name }}</td>
                             <td>{{ $service->price }}</td>
                         </tr>

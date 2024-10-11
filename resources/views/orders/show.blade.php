@@ -230,7 +230,7 @@
                             @csrf
                             @method('POST')
                             <div class="input-group me-2 col-4 float-end">
-                                <input type="number" required name="discount" placeholder="AED" class="form-control">
+                                <input type="number" required name="discount" value='{{ old('discount') }}' placeholder="AED" class="form-control">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">Add Discount</button>
                                 </div>

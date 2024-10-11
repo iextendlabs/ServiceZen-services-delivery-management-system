@@ -33,11 +33,11 @@
                         </select>
                     </div>
                 </div>
-                <input type="hidden" name="user_name" id="user_name" value="{{ $withdraw->user_name}}">
+                <input type="hidden" name="user_name" id="user_name" value="{{ old('user_name',$withdraw->user_name)}}">
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Amount:</strong>
-                        <input type="number" name="amount" value="{{ $withdraw->amount }}" class="form-control"
+                        <input type="number" name="amount" value="{{ old('amount',$withdraw->amount) }}" class="form-control"
                             placeholder="Amount">
                     </div>
                 </div>
@@ -45,9 +45,9 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="Approved" @if ($withdraw->status === 'Approved') selected @endif>
+                            <option value="Approved" {{ old('status') == 'Approved' ? 'selected' : '' }} @if ($withdraw->status === 'Approved') selected @endif>
                                 Approved</option>
-                            <option value="Un Approved" @if ($withdraw->status === 'Un Approved') selected @endif>
+                            <option value="Un Approved" {{ old('status') == 'Un Approved' ? 'selected' : '' }} @if ($withdraw->status === 'Un Approved') selected @endif>
                                 Un Approved</option>
                         </select>
                     </div>
@@ -58,7 +58,7 @@
                         <select name="payment_method" class="form-control">
                             <option></option>
                             @foreach ($payment_methods as $payment_method)
-                                <option value="{{ $payment_method }}" @if ($withdraw->payment_method == $payment_method) selected @endif>
+                                <option value="{{ $payment_method }}" {{ old('payment_method') == $payment_method ? 'selected' : '' }} @if ($withdraw->payment_method == $payment_method) selected @endif>
                                     {{ $payment_method }}</option>
                             @endforeach
                         </select>
@@ -67,7 +67,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Account Detail:</strong>
-                        <textarea class="form-control" style="height:150px" name="account_detail" placeholder="Account Detail">{{ $withdraw->account_detail }}</textarea>
+                        <textarea class="form-control" style="height:150px" name="account_detail" placeholder="Account Detail">{{ old('account_detail',$withdraw->account_detail) }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12 text-center">

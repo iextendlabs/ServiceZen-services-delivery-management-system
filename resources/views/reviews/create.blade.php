@@ -31,7 +31,7 @@
                 <select name="service_id" class="form-control">
                     <option></option>
                     @foreach($services as $service)
-                    <option value="{{ $service->id }}">{{ $service->name }}</option>
+                    <option value="{{ $service->id }}" {{ old('service_id' ) == $service->id ? 'selected' : '' }}>{{ $service->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -45,7 +45,7 @@
                     @else
                     <option></option>
                     @foreach($staffs as $staff)
-                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                    <option value="{{ $staff->id }}" {{ old('staff_id' ) == $staff->id ? 'selected' : '' }}>{{ $staff->name }}</option>
                     @endforeach
                     @endif
                 </select>

@@ -22,7 +22,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Name:</strong>
-                        <input type="text" name="name" value="{{ $information->name }}" class="form-control"
+                        <input type="text" name="name" value="{{ old('name' ,$information->name) }}" class="form-control"
                             placeholder="Name" />
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Description:</strong>
                         <textarea class="form-control" id="summernote" name="description"
-                            placeholder="Description">{{ $information->description }}</textarea>
+                            placeholder="Description">{{ old( 'description' ,$information->description ) }}</textarea>
                             <script>
                                 (function($) {
                                     $('#summernote').summernote({
@@ -70,11 +70,12 @@
                     <div class="form-group">
                         <strong>Position:</strong>
                         <select name="position" class="form-control">
-                            <option value="Top Menu" @if ($information->position == 'Top Menu') selected @endif>Top Menu
+                            <option value="Top Menu" {{ old('position', $information->position) == 'Top Menu' ? 'selected' : '' }}>Top Menu
                             </option>
-                            <option value="Bottom Footer" @if ($information->position == 'Bottom Footer') selected @endif>Bottom Footer
+                            <option value="Bottom Footer" {{ old('position', $information->position) == 'Bottom Footer' ? 'selected' : '' }}>Bottom Footer
                             </option>
                         </select>
+                        
                     </div>
                 </div>
                 <div class="col-md-12 text-center">

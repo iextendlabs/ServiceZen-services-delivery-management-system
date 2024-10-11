@@ -33,13 +33,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name</strong>
-                            <input type="text" name="name" value="{{ $coupon->name }}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ old('name', $coupon->name) }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Code</strong>
-                            <input type="text" name="code" value="{{ $coupon->code }}" class="form-control" placeholder="Code">
+                            <input type="text" name="code" value="{{ 'code', $coupon->code }}" class="form-control" placeholder="Code">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -47,11 +47,11 @@
                             <span style="color: red;">*</span><strong>Type</strong>
                             <select name="type" class="form-control">
                                 @if($coupon->type == "Percentage")
-                                <option value="Percentage" selected>Percentage</option>
-                                <option value="Fixed Amount">Fixed Amount</option>
+                                <option value="Percentage" {{ old('type') == 'Percentage' ? 'selected' : '' }} selected>Percentage</option>
+                                <option value="Fixed Amount" {{ old('type') == 'Fixed Amount' ? 'selected' : '' }}>Fixed Amount</option>
                                 @elseif($coupon->type == "Fixed Amount")
-                                <option value="Percentage">Percentage</option>
-                                <option value="Fixed Amount" selected>Fixed Amount</option>
+                                <option value="Percentage" {{ old('type') == 'Percentage' ? 'selected' : '' }}>Percentage</option>
+                                <option value="Fixed Amount" {{ old('type') == 'Fixed Amount' ? 'selected' : '' }} selected>Fixed Amount</option>
                                 @endif
                             </select>
                         </div>
@@ -59,31 +59,31 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Discount</strong>
-                            <input type="number" name="discount" value="{{ $coupon->discount }}" class="form-control" placeholder="Discount">
+                            <input type="number" name="discount" value="{{ old('discount', $coupon->discount) }}" class="form-control" placeholder="Discount">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Minimum Order</strong>
-                            <input type="text" name="min_order_value" value="{{ $coupon->min_order_value }}" class="form-control" placeholder="Minimum Order">
+                            <input type="text" name="min_order_value" value="{{ old( 'min_order_value', $coupon->min_order_value ) }}" class="form-control" placeholder="Minimum Order">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Date Start</strong>
-                            <input type="date" name="date_start" value="{{ $coupon->date_start }}" class="form-control" placeholder="Date Start">
+                            <input type="date" name="date_start" value="{{ old( 'date_start', $coupon->date_start ) }}" class="form-control" placeholder="Date Start">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Date End</strong>
-                            <input type="date" name="date_end" value="{{ $coupon->date_end }}" class="form-control" placeholder="Date End">
+                            <input type="date" name="date_end" value="{{ old( 'date_end', $coupon->date_end ) }}" class="form-control" placeholder="Date End">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Uses Per Coupon</strong>
-                            <input type="text" name="uses_total" value="{{ $coupon->uses_total }}" class="form-control" placeholder="Uses Per Coupon">
+                            <input type="text" name="uses_total" value="{{ old( 'uses_total',$coupon->uses_total) }}" class="form-control" placeholder="Uses Per Coupon">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -91,11 +91,11 @@
                             <span style="color: red;">*</span><strong>Status</strong>
                             <select name="status" class="form-control">
                                 @if($coupon->status == 1)
-                                <option value="1" selected>Enable</option>
-                                <option value="0">Disable</option>
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}selected>Enable</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                                 @elseif($coupon->status == 0)
-                                <option value="1">Enable</option>
-                                <option value="0" selected>Disable</option>
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }} selected>Disable</option>
                                 @endif
                             </select>
                         </div>
@@ -140,7 +140,7 @@
                     <div class="col-md-12">
                         <div class="form-group scroll-div">
                             <span style="color: red;">*</span><strong>Category:</strong>
-                            <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
+                            <input type="text" name="categories-search" {{ old('categories-search') }} id="categories-search" class="form-control" placeholder="Search Category By Name">
                             <table class="table table-striped table-bordered categories-table">
                                 <tr>
                                     <th></th>
@@ -149,7 +149,7 @@
                                 @foreach ($categories as $category)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if(in_array($category->id,$category_ids)) checked @endif>
+                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if(in_array($category->id, old( 'categoriesId',$category_ids))) checked @endif>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>
@@ -170,7 +170,7 @@
                                 @foreach ($services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}" @if(in_array($service->id,$service_ids)) checked @endif>
+                                        <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}"   @if(in_array($service->id, old('servicesId', $service_ids))) checked @endif>
                                     </td>
                                     <td>{{ $service->name }}</td>
                                     <td>{{ $service->price }}</td>

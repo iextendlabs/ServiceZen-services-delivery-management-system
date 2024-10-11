@@ -40,7 +40,7 @@
                                 @if($affiliate->id == $order->affiliate_id)
                                 <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
                                 @else
-                                <option value="{{ $affiliate->id }}">{{ $affiliate->name }}</option>
+                                <option value="{{ $affiliate->id }}" {{ old('affiliate_id') == $affiliate->id ? 'selected' : '' }}>{{ $affiliate->name }}</option>
                                 @endif
                                 @endif
                                 @endforeach

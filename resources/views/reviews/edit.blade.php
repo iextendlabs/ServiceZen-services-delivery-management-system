@@ -23,7 +23,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Your Name:</strong>
-                <input type="text" name="user_name" value="{{ $review->user_name }}" class="form-control">
+                <input type="text" name="user_name" value="{{ old('user_name' ,$review->user_name) }}" class="form-control">
             </div>
         </div>
         <div class="col-md-12">
@@ -32,7 +32,7 @@
                 <select name="service_id" class="form-control">
                     <option></option>
                     @foreach($services as $service)
-                    <option value="{{ $service->id }}" @if($service->id == $review->service_id) selected @endif>{{ $service->name }}</option>
+                    <option value="{{ $service->id }}" @if(old('service_id') == $service->id ||  $service->id == $review->service_id) selected @endif>{{ $service->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -46,7 +46,7 @@
                     @else
                     <option></option>
                     @foreach($staffs as $staff)
-                    <option value="{{ $staff->id }}" @if($staff->id == $review->staff_id) selected @endif>{{ $staff->name }}</option>
+                    <option value="{{ $staff->id }}" @if(old('staff_id') == $staff->id || $staff->id == $review->staff_id) selected @endif>{{ $staff->name }}</option>
                     @endforeach
                     @endif
                 </select>
@@ -55,7 +55,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Review:</strong>
-                <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{ $review->content }}</textarea>
+                <textarea class="form-control" style="height:150px" name="content" placeholder="Review">{{ old("content",$review->content) }}</textarea>
             </div>
         </div>
         <div class="col-md-12">
@@ -100,11 +100,14 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="rating">Rating</label><br>
-                @for($i = 1; $i <= 5; $i++) <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" {{ $review->rating == $i ? 'checked' : '' }}>
-                    <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
-            </div>
-            @endfor
+                @for($i = 1; $i <= 5; $i++) 
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="rating" id="rating{{ $i }}" value="{{ $i }}" 
+                            {{ old('rating', $review->rating) == $i ? 'checked' : '' }}>
+                        <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                    </div>
+                @endfor
+                
         </div>
     </div>
     <div class="col-md-12 text-center">

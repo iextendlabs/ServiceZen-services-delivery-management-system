@@ -216,7 +216,7 @@
                         <div class="form-group">
                             <strong>Coupon Code:</strong>
                             <div class="input-group">
-                                <input type="text" name="coupon_code" id="coupon_code" class="form-control"
+                                <input type="text" name="coupon_code" value="{{ old('coupon_code') }}" id="coupon_code" class="form-control"
                                     placeholder="Coupon Code">
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply
@@ -230,14 +230,14 @@
                         <div class="form-group">
                             <strong>Payment Method:</strong>
                             <select name="payment_method" class="form-control">
-                                <option value="Cash-On-Delivery">Cash On Delivery</option>
+                                <option value="Cash-On-Delivery" >Cash On Delivery</option>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <strong>Comment:</strong>
-                            <textarea name="order_comment" class="form-control" cols="30" rows="5"></textarea>
+                            <textarea name="order_comment" class="form-control" value="{{ old('order_comment') }}" cols="30" rows="5"></textarea>
                         </div>
                     </div>
                     <div class="col-md-6 mt-3 mt-3 offset-md-3 ">

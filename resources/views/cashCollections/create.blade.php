@@ -43,7 +43,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Amount:</strong>
-                    <input type="number" name="amount" class="form-control" value="{{$order->total_amount}}" placeholder="Amount">
+                    <input type="number" name="amount" class="form-control" value="{{ old('amount', $order->total_amount) }}" placeholder="Amount">
                 </div>
             </div>
             <div class="col-md-12 text-center">

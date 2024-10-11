@@ -35,7 +35,7 @@
                             <strong>Status:</strong>
                             <select name="driver_status" class="form-control">
                                 @foreach ($driver_statuses as $status)
-                                <option value="{{ $status }}" @if($status==$order->driver_status) selected @endif>{{ $status }}</option>
+                                <option value="{{ $status }}" @if(old('driver_status') == $status || $status==$order->driver_status) selected @endif>{{ $status }}</option>
                                 @endforeach
                             </select>
                         </div>

@@ -45,8 +45,8 @@
                 <div class="form-group">
                     <strong>Status:</strong>
                     <select name="status" class="form-control">
-                        <option value="1">Enable</option>
-                        <option value="0">Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -60,9 +60,9 @@
                 <div class="form-group">
                     <strong>Type:</strong>
                     <select name="type" class="form-control">
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Both">Both</option>
+                        <option value="Male" {{ old('type') == 'Male' ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('type') == 'Female' ? 'selected' : '' }}>Female</option>
+                        <option value="Both" {{ old('type') == 'Both' ? 'selected' : '' }}>Both</option>
                     </select>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                     <select name="parent_id" class="form-control">
                         <option></option>
                         @foreach($categories as $category)
-                        <option value="{{$category->id}}">{{$category->title}}</option>
+                        <option value="{{$category->id}}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>{{$category->title}}</option>
                         @endforeach
                     </select>
                 </div>

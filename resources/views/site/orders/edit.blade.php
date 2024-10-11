@@ -46,7 +46,7 @@ $transport_charges = 0;
                             @if($status == $order->status)
                             <option value="{{ $status }}" selected>{{ $status }}</option>
                             @else
-                            <option value="{{ $status }}">{{ $status }}</option>
+                            <option value="{{ $status }}" {{ old('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
                             @endif
                             @endforeach
                         </select>
@@ -64,19 +64,19 @@ $transport_charges = 0;
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Building Name:</strong>
-                        <input required type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ $order->buildingName ?? null }}">
+                        <input required type="text" name="buildingName" id="buildingName" class="form-control" placeholder="Building Name" value="{{ old('buildingName',$order->buildingName ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Flat / Villa:</strong>
-                        <input required type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ $order->flatVilla ?? null }}">
+                        <input required type="text" name="flatVilla" id="flatVilla" class="form-control" placeholder="Flat / Villa" value="{{ old('flatVilla',$order->flatVilla ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Street:</strong>
-                        <input required type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ $order->street ?? null }}">
+                        <input required type="text" name="street" id="street" class="form-control" placeholder="Street" value="{{ old('street',$order->street ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -96,13 +96,13 @@ $transport_charges = 0;
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Landmark:</strong>
-                        <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ $order->landmark ?? null }}">
+                        <input required type="text" name="landmark" id="landmark" class="form-control" placeholder="Landmark" value="{{ old('landmark',$order->landmark ?? null) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>City:</strong>
-                        <input required type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ $order->city ?? null }}">
+                        <input required type="text" name="city" id="city" class="form-control" placeholder="City" value="{{ old('city',$order->city ?? null) }}">
                     </div>
                 </div>
             </div>
@@ -151,10 +151,10 @@ $transport_charges = 0;
                                 <td>
                                     @if(in_array($service->id,$order_service))
                                     <input type="checkbox" class="service-checkbox checkout-services" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
-                                 $service->discount : $service->price }}">
+                                 $service->discount : $service->price }}" @if(in_array($service->id, old('service_ids', $order_service))) checked @endif>
                                     @else
                                     <input type="checkbox" class="service-checkbox checkout-services" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
-                                 $service->discount : $service->price }}">
+                                 $service->discount : $service->price }}" @if(in_array($service->id, old('service_ids', $order_service))) checked @endif>
                                     @endif
                                 </td>
                                 <td>{{ $service->name }}</td>
@@ -170,7 +170,7 @@ $transport_charges = 0;
                 <div class="col-md-6">
                     <div class="form-group">
                         <strong>Comment:</strong>
-                        <textarea name="order_comment" class="form-control" cols="30" rows="5">{{ $order->order_comment }}</textarea>
+                        <textarea name="order_comment" class="form-control" cols="30" rows="5">{{ old('order_comment',$order->order_comment) }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6 mt-3 mt-3 offset-md-3 ">

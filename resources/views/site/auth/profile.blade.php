@@ -129,14 +129,14 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Name:</strong>
                         <input required type="text" name="name" id="name" class="form-control" placeholder="Name"
-                            value="{{ $user->name }}">
+                            value="{{ old('name',$user->name) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Email:</strong>
                         <input required type="email" name="email" id="email" class="form-control"
-                            placeholder="abc@gmail.com" value="{{ $user->email }}">
+                            placeholder="abc@gmail.com" value="{{ old('email',$user->email) }}">
                     </div>
                 </div>
                 <div class="col-md-6">

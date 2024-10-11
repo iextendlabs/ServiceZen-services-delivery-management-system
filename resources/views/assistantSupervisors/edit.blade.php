@@ -25,13 +25,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $assistant_supervisor->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name', $assistant_supervisor->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $assistant_supervisor->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ old('email', $assistant_supervisor->email) }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -56,13 +56,13 @@
                         @if(count($assistant_supervisor->AssistantSupervisorToSupervisor))
                         @foreach($assistant_supervisor->AssistantSupervisorToSupervisor as $assistantSupervisorToSupervisor)
                         @if($supervisor->id == $assistantSupervisorToSupervisor->supervisor_id)
-                        <option value="{{ $supervisor->id }}" selected>{{ $supervisor->name }}</option>
+                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }} selected>{{ $supervisor->name }}</option>
                         @else
-                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
                         @endif
                         @endforeach
                         @else
-                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
                         @endif
                         @endif
                         @endforeach

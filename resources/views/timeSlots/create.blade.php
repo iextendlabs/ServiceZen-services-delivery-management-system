@@ -29,8 +29,8 @@
                 <div class="form-group">
                     <strong for="image">Type</strong>
                     <select name="type" class="form-control">
-                        <option value="General">General</option>
-                        <option value="Specific">Specific</option>
+                        <option value="General" {{ old('type') == 'General' ? 'selected' : ''}}>General</option>
+                        <option value="Specific"  {{ old('type') == 'Specific' ? 'selected' : ''}}>Specific</option>
                     </select>
                 </div>
             </div>
@@ -62,8 +62,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status:</strong>
                     <select name="status" class="form-control">
-                        <option value="1">Enable</option>
-                        <option value="0">Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : ''}}> Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : ''}}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                 <select name="group_id" class="form-control">
                     <option></option>
                     @foreach($staff_groups as $staff_group )
-                    <option value="{{$staff_group->id}}">{{$staff_group->name}}</option>
+                    <option value="{{$staff_group->id}}" {{ old('group_id') == $staff_group->id ? 'selected' : ''}}>{{$staff_group->name}}</option>
                     @endforeach
                 </select>
             </div>

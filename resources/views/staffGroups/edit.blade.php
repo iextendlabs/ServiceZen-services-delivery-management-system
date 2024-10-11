@@ -23,7 +23,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{$staffGroup->name}}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{old('name',$staffGroup->name)}}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
@@ -39,9 +39,9 @@
                         <tr>
                             <td>
                                 @if(in_array($staff_zone->id,$staff_zones_ids))
-                                <input type="checkbox" name="staff_zone_ids[]" checked value="{{ $staff_zone->id }}">
+                                <input type="checkbox" name="staff_zone_ids[]" checked value="{{ $staff_zone->id }}" @if(in_array($staff_zone->id, old('staff_zone_ids', $staff_zones_ids))) checked @endif>
                                 @else
-                                <input type="checkbox" name="staff_zone_ids[]" value="{{ $staff_zone->id }}">
+                                <input type="checkbox" name="staff_zone_ids[]" value="{{ $staff_zone->id }}" @if(in_array($staff_zone->id, old('staff_zone_ids', $staff_zones_ids))) checked @endif>
                                 @endif
                             </td>
                             <td>{{ $staff_zone->name }}</td>
@@ -65,9 +65,9 @@
                         <tr>
                             <td>
                                 @if(in_array($staff->id,$staff_ids))
-                                <input type="checkbox" checked name="staffIds[]" value="{{ $staff->id }}">
+                                <input type="checkbox" checked name="staffIds[]" value="{{ $staff->id }}" @if(in_array($staff->id, old('staffIds',$staff_ids))) checked @endif>
                                 @else
-                                <input type="checkbox" name="staffIds[]" value="{{ $staff->id }}">
+                                <input type="checkbox" name="staffIds[]" value="{{ $staff->id }}" @if(in_array($staff->id, old('staffIds', $staff_ids))) checked @endif>
                                 @endif
                             </td>
                             <td>{{ $staff->name }}</td>
