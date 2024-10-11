@@ -60,8 +60,8 @@
                     <th>Area</th>
                     <th>Landmark</th>
                     <th>Flat Villa</th>
-                    <th>Street</th>
                     <th>City</th>
+                    <th>Street</th>
                     <th>District</th>
                 </tr>
                 @if(count($customer->customerProfiles) > 0)
@@ -72,7 +72,7 @@
                     <td>{{ $customerProfile->landmark ?? "" }}</td>
                     <td>{{ $customerProfile->flatVilla ?? "" }}</td>
                     <td>{{ $customerProfile->city ?? "" }}</td>
-                    <td>{{ $customerProfile->flatVilla ?? "" }}</td>
+                    <td>{{ $customerProfile->street ?? "" }}</td>
                     <td>{{ $customerProfile->district ?? "" }}</td>
                 </tr>
                 @endforeach
