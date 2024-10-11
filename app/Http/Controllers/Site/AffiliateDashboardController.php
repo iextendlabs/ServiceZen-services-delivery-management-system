@@ -175,14 +175,16 @@ class AffiliateDashboardController extends Controller
 
 
                     $affiliateUser = $affiliateUserQuery->paginate(config('app.paginate'));
+
+                    $affiliateUser->appends([
+                        'date_from' => $request->date_from,
+                        'date_to' => $request->date_to,
+                        'order_count' => $request->order_count,
+                    ]);
                 }
             }
 
-            $affiliateUser->appends([
-                'date_from' => $request->date_from,
-                'date_to' => $request->date_to,
-                'order_count' => $request->order_count,
-            ]);
+            
 
             $affiliates = User::role('affiliate')->get();
 

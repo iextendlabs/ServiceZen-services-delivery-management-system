@@ -186,26 +186,49 @@ class CustomerAuthController extends Controller
                     if (Auth::check()) {
 
                         $user = Auth::user();
-                        if (isset($user->customerProfile) ) {
+                        if ($user->customerProfiles->isNotEmpty()) {
                             $address = [];
+                            $customerProfiles = $user->customerProfiles;
+                        
+                            $addressCookie = json_decode(request()->cookie('address'), true);
+                        
+                            $populateAddress = function($customerProfile) use (&$address) {
+                                $address['buildingName'] = $customerProfile->buildingName;
+                                $address['district'] = $customerProfile->district;
+                                $address['area'] = $customerProfile->area;
+                                $address['flatVilla'] = $customerProfile->flatVilla;
+                                $address['street'] = $customerProfile->street;
+                                $address['landmark'] = $customerProfile->landmark;
+                                $address['city'] = $customerProfile->city;
+                                $address['latitude'] = $customerProfile->latitude;
+                                $address['longitude'] = $customerProfile->longitude;
+                                $address['searchField'] = $customerProfile->searchField;
+                            };
+                        
+                            $customerProfile = $addressCookie 
+                                ? $customerProfiles->where('area', $addressCookie['area'])->first() 
+                                : null;
 
-                            $address['buildingName'] = $user->customerProfile->buildingName;
-                            $address['district'] = $user->customerProfile->district;
-                            $address['area'] = $user->customerProfile->area;
-                            $address['flatVilla'] = $user->customerProfile->flatVilla;
-                            $address['street'] = $user->customerProfile->street;
-                            $address['landmark'] = $user->customerProfile->landmark;
-                            $address['city'] = $user->customerProfile->city;
-                            $address['number'] = $user->customerProfile->number;
-                            $address['whatsapp'] = $user->customerProfile->whatsapp;
-                            $address['email'] = $user->email;
-                            $address['name'] = $user->name;
-                            $address['latitude'] = $user->customerProfile->latitude;
-                            $address['longitude'] = $user->customerProfile->longitude;
-                            $address['searchField'] = $user->customerProfile->searchField;
-                            $address['gender'] = $user->customerProfile->gender;
+                            if (!$customerProfile && $customerProfiles->count() === 1) {
+                                $customerProfile = $customerProfiles->first();
+                            }
 
-                            cookie()->queue('address', json_encode($address), 5256000);
+                            if ($customerProfile) {
+                                $populateAddress($customerProfile);
+                            }
+                            if(!empty($address)){
+                                cookie()->queue('address', json_encode($address), 5256000);
+                            }
+
+                            $customer_info = [];
+
+                            $customer_info['gender'] = optional($customerProfiles->first())->gender;
+                            $customer_info['number'] = optional($customerProfiles->first())->number;
+                            $customer_info['whatsapp'] = optional($customerProfiles->first())->whatsapp;
+                            $customer_info['email'] = $user->email;
+                            $customer_info['name'] = $user->name;
+
+                            cookie()->queue('customer_info', json_encode($customer_info), 5256000);
                         }
                     }
                     return redirect('/')->with('success', 'You have Successfully loggedin');
@@ -239,12 +262,7 @@ class CustomerAuthController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
-            'buildingName' => 'required',
-            'area' => 'required',
-            'flatVilla' => 'required',
-            'street' => 'required',
-            'city' => 'required',
-            'landmark' => 'required',
+            'addresses' => 'required|array',
             'number' => 'required',
             'whatsapp' => 'required',
             'gender' => 'required',
@@ -259,34 +277,72 @@ class CustomerAuthController extends Controller
 
         $input['number'] =$request->number_country_code . $request->number;
         $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
-        $input['user_id'] = $id;
 
         $user = User::find($id);
         $user->update($input);
-        if ($user->customerProfile) {
-            $user->customerProfile->update($input);
-        } else {
-            CustomerProfile::create($input);
+
+        $addresses = $request->addresses;
+        if($addresses){
+            $user->customerProfiles()->delete();
+            
+            foreach ($addresses as $address) {
+                $decodedAddress = json_decode($address, true);
+    
+                if ($decodedAddress) {
+                    CustomerProfile::create([
+                        'user_id' => $id,
+                        'buildingName' => trim($decodedAddress['buildingName']),
+                        'area' => trim($decodedAddress['area']),
+                        'flatVilla' => trim($decodedAddress['flatVilla']),
+                        'street' => trim($decodedAddress['street']),
+                        'landmark' => trim($decodedAddress['landmark']),
+                        'city' => trim($decodedAddress['city']),
+                        'latitude' => $decodedAddress['latitude'] ?? null,
+                        'longitude' => $decodedAddress['longitude'] ?? null,
+                        'district' => trim($decodedAddress['district']),
+                        'gender' => trim($request['gender']),
+                        'number' => trim($input['number']),
+                        'whatsapp' => trim($input['whatsapp'])
+                    ]);
+                }
+            }
+        }
+        
+        if ($user->customerProfiles->isNotEmpty()) {
+            $address = [];
+            $customerProfiles = $user->customerProfiles;
+                
+            $populateAddress = function($customerProfile) use (&$address) {
+                $address['buildingName'] = $customerProfile->buildingName;
+                $address['district'] = $customerProfile->district;
+                $address['area'] = $customerProfile->area;
+                $address['flatVilla'] = $customerProfile->flatVilla;
+                $address['street'] = $customerProfile->street;
+                $address['landmark'] = $customerProfile->landmark;
+                $address['city'] = $customerProfile->city;
+                $address['latitude'] = $customerProfile->latitude;
+                $address['longitude'] = $customerProfile->longitude;
+                $address['searchField'] = $customerProfile->searchField;
+            };
+        
+            $customerProfile = $customerProfiles->last();
+
+            if ($customerProfile) {
+                $populateAddress($customerProfile);
+            }
+
+            if(!empty($address)){
+                cookie()->queue('address', json_encode($address), 5256000);
+            }
         }
 
-        $address = [];
-
-        $address['buildingName'] = $request->buildingName;
-        $address['area'] = $request->area;
-        $address['flatVilla'] = $request->flatVilla;
-        $address['street'] = $request->street;
-        $address['landmark'] = $request->landmark;
-        $address['city'] = $request->city;
-        $address['number'] =$request->number_country_code . $request->number;
-        $address['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
-        $address['email'] = $request->email;
-        $address['name'] = $request->name;
-        $address['latitude'] = $request->latitude;
-        $address['longitude'] = $request->longitude;
-        $address['searchField'] = $request->searchField;
-        $address['gender'] = $request->gender;
-
-        cookie()->queue('address', json_encode($address), 5256000);
+        $customer_info['number'] = $input['number'];
+        $customer_info['whatsapp'] = $input['whatsapp'];
+        $customer_info['email'] = $request->email;
+        $customer_info['name'] = $request->name;
+        $customer_info['gender'] = $request->gender;
+        
+        cookie()->queue('customer_info', json_encode($customer_info), 5256000);
 
         return redirect()->back()
             ->with('success', 'Your Profile updated successfully');
