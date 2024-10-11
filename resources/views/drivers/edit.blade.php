@@ -32,7 +32,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ 'email', $driver->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ old('email', $driver->email) }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -72,9 +72,10 @@
                         <option value=""></option>
                         @foreach ($affiliates as $affiliate)
                             @if($affiliate->affiliate->status == 1)
-                                <option value="{{ $affiliate->id }}"
-                                    @if (old('affiliate_id')  == $affiliate->id  || $driver->driver && $driver->driver->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
-                                </option>
+                            <option value="{{ $affiliate->id }}"
+                                {{ old('affiliate_id') == $affiliate->id || ($driver->driver && $driver->driver->affiliate_id == $affiliate->id) ? 'selected' : '' }}>
+                                {{ $affiliate->name }}
+                            </option>                            
                             @endif
                         @endforeach
                     </select>

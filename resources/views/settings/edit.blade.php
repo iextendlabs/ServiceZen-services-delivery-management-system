@@ -46,9 +46,9 @@
 
                     @if ($setting->key === 'Gender Permission')
                     <select name="value" class="form-control">
-                        <option value="Male" {{ old('value') == 'Male' ? 'selected' : '' }} @if($setting->value === "Male") selected @endif>Male</option>
-                        <option value="Female" {{ old('value') == 'Female' ? 'selected' : '' }} @if($setting->value === "Female") selected @endif>Female</option>
-                        <option value="Both" {{ old('value') == 'Both' ? 'selected' : '' }} @if($setting->value === "Both") selected @endif>Both</option>
+                        <option value="Male" {{ old('value', $setting->value) === 'Male' ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('value', $setting->value) === 'Female' ? 'selected' : '' }}>Female</option>
+                        <option value="Both" {{ old('value', $setting->value) === 'Both' ? 'selected' : '' }}>Both</option>
                     </select>
                     @elseif ($setting->key === 'Slider Image' || $setting->key === 'Slider Image For App')
                     <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions @if ($setting->key === 'Slider Image' ) 1140 × 504px. @else 325 x 200px. @endif Thank you!</p>
@@ -114,7 +114,6 @@
                     <button id="addImageBtn" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
                     @elseif($setting->key === 'Social Links of Staff')
                     <select name="value" class="form-control">
-
                         <option value="1" @if($setting->value == 1) selected @endif>Enable</option>
                         <option value="0" @if($setting->value == 0) selected @endif>Disable</option>
                     </select>

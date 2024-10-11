@@ -22,7 +22,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Date Start:</strong>
-                <input type="date" name="date_start" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Date Start" min="{{ date('Y-m-d') }}">
+                <input type="date" name="date_start" value="{{ old('date_start') }}" class="form-control" placeholder="Date Start" min="{{ date('Y-m-d') }}">
             </div>
         </div>
         <div class="col-md-6">

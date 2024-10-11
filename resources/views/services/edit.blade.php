@@ -79,8 +79,8 @@
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
 
-                            <option value="1"  {{ old('status') == '1' ? 'selected' : '' }} @if($service->status == 1) selected @endif>Enable</option>
-                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }} @if($service->status == 0) selected @endif>Disable</option>
+                            <option value="1"  {{ old('status', $service->status) == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status', $service->status) == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>

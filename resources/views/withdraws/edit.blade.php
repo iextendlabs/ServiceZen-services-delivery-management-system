@@ -45,9 +45,9 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="Approved" {{ old('status') == 'Approved' ? 'selected' : '' }} @if ($withdraw->status === 'Approved') selected @endif>
+                            <option value="Approved" {{ old('status', $withdraw->status) == 'Approved' ? 'selected' : '' }} >
                                 Approved</option>
-                            <option value="Un Approved" {{ old('status') == 'Un Approved' ? 'selected' : '' }} @if ($withdraw->status === 'Un Approved') selected @endif>
+                            <option value="Un Approved" {{ old('status', $withdraw->status) == 'Un Approved' ? 'selected' : '' }}>
                                 Un Approved</option>
                         </select>
                     </div>
@@ -58,7 +58,7 @@
                         <select name="payment_method" class="form-control">
                             <option></option>
                             @foreach ($payment_methods as $payment_method)
-                                <option value="{{ $payment_method }}" {{ old('payment_method') == $payment_method ? 'selected' : '' }} @if ($withdraw->payment_method == $payment_method) selected @endif>
+                                <option value="{{ $payment_method }}" {{ old('payment_method', $withdraw->payment_method) == $payment_method ? 'selected' : '' }}>
                                     {{ $payment_method }}</option>
                             @endforeach
                         </select>

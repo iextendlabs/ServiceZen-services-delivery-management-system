@@ -38,8 +38,8 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="Open" {{ old( 'status') == 'open' ? 'selected' : '' }} @if ($complaint->status === 'Open') selected @endif>Open</option>
-                            <option value="Close" {{ old( 'status') == 'close' ? 'selected' : '' }} @if ($complaint->status === 'Close') selected @endif>Close</option>
+                            <option value="Open" {{ old('status', $complaint->status) == 'Open' ? 'selected' : '' }}>Open</option>
+                            <option value="Close" {{ old('status', $complaint->status) == 'Close' ? 'selected' : '' }}>Close</option>
                         </select>
                     </div>
                 </div>
@@ -49,8 +49,10 @@
                         <select name="user_id" class="form-control">
                             <option></option>
                             @foreach ($users as $user)
-                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }} @if ($complaint->user_id == $user->id) selected @endif>
-                                    {{ $user->name }} | {{ $user->email }}</option>
+                                <option value="{{ $user->id }}" 
+                                    {{ old('user_id', $complaint->user_id) == $user->id ? 'selected' : '' }}>
+                                    {{ $user->name }} | {{ $user->email }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

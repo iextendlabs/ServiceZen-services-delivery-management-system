@@ -39,20 +39,15 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Code</strong>
-                            <input type="text" name="code" value="{{ 'code', $coupon->code }}" class="form-control" placeholder="Code">
+                            <input type="text" name="code" value="{{ old('code', $coupon->code) }}" class="form-control" placeholder="Code">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Type</strong>
                             <select name="type" class="form-control">
-                                @if($coupon->type == "Percentage")
-                                <option value="Percentage" {{ old('type') == 'Percentage' ? 'selected' : '' }} selected>Percentage</option>
-                                <option value="Fixed Amount" {{ old('type') == 'Fixed Amount' ? 'selected' : '' }}>Fixed Amount</option>
-                                @elseif($coupon->type == "Fixed Amount")
-                                <option value="Percentage" {{ old('type') == 'Percentage' ? 'selected' : '' }}>Percentage</option>
-                                <option value="Fixed Amount" {{ old('type') == 'Fixed Amount' ? 'selected' : '' }} selected>Fixed Amount</option>
-                                @endif
+                                <option value="Percentage" {{ old('type', $coupon->type) == 'Percentage' ? 'selected' : '' }}>Percentage</option>
+                                <option value="Fixed Amount" {{ old('type', $coupon->type) == 'Fixed Amount' ? 'selected' : '' }}>Fixed Amount</option>
                             </select>
                         </div>
                     </div>

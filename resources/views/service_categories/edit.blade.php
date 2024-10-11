@@ -46,9 +46,8 @@
                 <div class="form-group">
                     <strong>Status:</strong>
                     <select name="status" class="form-control">
-
-                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }} @if($service_category->status == 1) selected @endif>Enable</option>
-                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }} @if($service_category->status == 0) selected @endif>Disable</option>
+                        <option value="1" {{ old('status', $service_category->status ) == '1' ? 'selected' : '' }}>Enable</option>
+                        <option value="0" {{ old('status', $service_category->status ) == '0' ? 'selected' : '' }}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -62,9 +61,9 @@
                 <div class="form-group">
                     <strong>Type:</strong>
                     <select name="type" class="form-control">
-                        <option value="Male" {{ old('type') == 'Male' ? 'selected' : '' }} @if($service_category->type === "Male") selected @endif>Male</option>
-                        <option value="Female" {{ old('type') == 'Female' ? 'selected' : '' }} @if($service_category->type === "Female") selected @endif>Female</option>
-                        <option value="Both" {{ old('type') == 'Both' ? 'selected' : '' }} @if($service_category->type === "Both") selected @endif>Both</option>
+                        <option value="Male" {{ old('type', $service_category->type) === 'Male' ? 'selected' : '' }} >Male</option>
+                        <option value="Female" {{ old('type', $service_category->type) === 'Female' ? 'selected' : '' }} >Female</option>
+                        <option value="Both" {{ old('type', $service_category->type) === 'Both' ? 'selected' : '' }}>Both</option>
                     </select>
                 </div>
             </div>

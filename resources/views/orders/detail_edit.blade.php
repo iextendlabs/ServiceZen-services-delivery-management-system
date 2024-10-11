@@ -96,8 +96,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Email:</strong>
-                                <input required type="email" name="customer_email" id="customer_email" value="{{ 'customer_email',$order->customer_email }}" class="form-control" placeholder="Customer Email">
-                            </div>
+                                <input required type="email" name="customer_email" id="customer_email" value="{{ old('customer_email',$order->customer_email) }}" class="form-control" placeholder="old(Customer Email">
+                            </div>)
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
@@ -110,7 +110,7 @@
                             <div class="form-group">
                                 <strong>Whatsapp Number:</strong>
                                 <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                <input required type="tel" name="whatsapp" id="whatsapp" value="{{ 'whatsapp',$order->whatsapp }}" class="form-control">
+                                <input required type="tel" name="whatsapp" id="whatsapp" value="{{ old('whatsapp',$order->whatsapp) }}" class="form-control">
                             </div>
                         </div>
                     </div>

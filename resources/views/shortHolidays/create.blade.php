@@ -22,13 +22,13 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>
-                    <input type="date" name="date" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Date">
+                    <input type="date" name="date" value="{{ old('date') }}" class="form-control" placeholder="Date">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Time Start:</strong>
-                    <input type="time" name="time_start" value="{{ date('Y-m-d') }}" class="form-control" placeholder="TIme Start">
+                    <input type="time" name="time_start" value="{{ old('time_start') }}" class="form-control" placeholder="TIme Start">
                 </div>
             </div>
             <div class="col-md-4">

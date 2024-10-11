@@ -32,7 +32,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ 'email', $customer->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ old('email', $customer->email) }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -49,8 +49,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status:</strong>
                     <select name="status" class="form-control">
-                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }} @if($customer->status == 1) selected @endif > Enable</option>
-                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }} @if($customer->status == 0) selected @endif > Disable</option>
+                        <option value="1" {{ old('status', $customer->status) == 1 ? 'selected' : '' }} > Enable</option>
+                        <option value="0" {{ old('status', $customer->status) == 0 ? 'selected' : '' }} > Disable</option>
                     </select>
                 </div>
             </div>
@@ -58,12 +58,16 @@
             <h4><strong> Affiliate Session</strong></h4>
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate:</strong>
-                    <select name="{{ old('status') == '1' ? 'selected' : '' }}" class="form-control">
+                    <select name="affiliate_id" class="form-control">
                         <option></option>
                         @foreach ($affiliates as $affiliate)
-                        @if($affiliate->affiliate->status == 1)
-                            <option value="{{ $affiliate->id }}" {{ old('{{ old('status') == $affiliate->id ? 'selected' : '' }}') == '1' ? 'selected' : '' }} @if($customer->userAffiliate && $customer->userAffiliate->affiliate_id == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
-                        @endif
+                            @if($affiliate->affiliate->status == 1)
+                                <option value="{{ $affiliate->id }}" 
+                                    {{ old('status', $customer->userAffiliate->affiliate_id ?? null) == $affiliate->id ? 'selected' : '' }}>
+                                    {{ $affiliate->name }} 
+                                    @if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif
+                                </option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -71,19 +75,16 @@
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate Commission type:</strong>
                     <select name="type" class="form-control">
-                        <option></option>
+                        <option value=""></option>
                         <option value="F" 
-                            @if (old('type') == "F" || ($customer->userAffiliate && $customer->userAffiliate->type == "F")) 
-                                selected 
-                            @endif>Fix
+                            {{ old('type', $customer->userAffiliate->type ?? null) == "F" ? 'selected' : '' }}>
+                            Fix
                         </option>
                         <option value="P" 
-                            @if (old('type') == "P" || ($customer->userAffiliate && $customer->userAffiliate->type == "P")) 
-                                selected 
-                            @endif>Percentage
+                            {{ old('type', $customer->userAffiliate->type ?? null) == "P" ? 'selected' : '' }}>
+                            Percentage
                         </option>
                     </select>
-                    
                 </div>
             </div>
             <div class="col-md-12">

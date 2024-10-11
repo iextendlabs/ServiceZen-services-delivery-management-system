@@ -62,7 +62,7 @@
                         @endif
                         @endforeach
                         @else
-                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
+                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}   {{ $isAssignedSupervisor ? 'selected' : '' }}>{{ $supervisor->name }}</option>
                         @endif
                         @endif
                         @endforeach

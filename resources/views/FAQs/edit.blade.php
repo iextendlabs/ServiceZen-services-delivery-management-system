@@ -30,7 +30,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Answer:</strong>
-                    <textarea class="form-control" style="height:150px" name="answer" placeholder="Answer">{{$FAQ->answer}}</textarea>
+                    <textarea class="form-control" style="height:150px" name="answer" placeholder="Answer">{{ old('answer', $FAQ->answer) }}</textarea>
                 </div>
             </div>
             <div class="col-md-12">
@@ -39,11 +39,10 @@
                     <select name="category_id" class="form-control">
                         <option></option>
                         @foreach($categories as $category)
-                        @if($category->id == $FAQ->category_id)
-                        <option value="{{$category->id}}"  selected>{{$category->title}}</option>
-                        @else
-                        <option value="{{$category->id}}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{$category->title}}</option>
-                        @endif
+                        <option value="{{ $category->id }}" 
+                            {{ old('category_id', $FAQ->category_id ?? '') == $category->id ? 'selected' : '' }}>
+                            {{ $category->title }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -67,8 +66,8 @@
                     <div class="form-group">
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1"  @if( old('status') == '1' || $FAQ->status == 1) selected @endif>Enable</option>
-                            <option value="0" @if(old('status') == '0'  || $FAQ->status == 0) selected @endif>Disable</option>
+                            <option value="1"  {{old('status', $FAQ->status) == '1' ? 'selected' : ''}}>Enable</option>
+                            <option value="0" {{old('status', $FAQ->status) == '0' ? 'selected' : ''}}>Disable</option>
                         </select>
                     </div>
                 </div>

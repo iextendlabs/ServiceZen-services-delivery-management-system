@@ -74,7 +74,7 @@
                         <option value="0">Disable</option>
                         @else
                         <option value="1" {{ old('status') == '1' ? 'selected' : ''}}>Enable</option>
-                        <option value="0" selected {{ old('status') == '1' ? 'selected' : ''}}>Disable</option>
+                        <option value="0" selected {{ old('status') == '0' ? 'selected' : ''}}>Disable</option>
                         @endif
                     </select>
                 </div>

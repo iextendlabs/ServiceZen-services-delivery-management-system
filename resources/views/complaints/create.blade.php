@@ -40,7 +40,7 @@
                         <select name="status" class="form-control">
                             <option></option>
                             <option value="Open" @if (old('status') === 'Open') selected @endif>Open</option>
-                            <option value="Close" @if (old('status') === '0') selected @endif>Close</option>
+                            <option value="Close" @if (old('status') === 'Close') selected @endif>Close</option>
                         </select>
                     </div>
                 </div>

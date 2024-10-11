@@ -82,9 +82,14 @@
                         <div class="form-group">
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
-
-                                <option value="1"  {{ old('status') == '1' ? 'selected' : '' }} @if($serviceStaff->staff && $serviceStaff->staff->status == 1) selected @endif>Enable</option>
-                                <option value="0"  {{ old('status') == '0' ? 'selected' : '' }} @if($serviceStaff->staff && $serviceStaff->staff->status == 0) selected @endif>Disable</option>
+                                <option value="1" 
+                                    {{ (old('status') == '1' || ($serviceStaff->staff && $serviceStaff->staff->status == 1)) ? 'selected' : '' }}>
+                                    Enable
+                                </option>
+                                <option value="0" 
+                                    {{ (old('status') == '0' || ($serviceStaff->staff && $serviceStaff->staff->status == 0)) ? 'selected' : '' }}>
+                                    Disable
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -214,7 +219,11 @@
                             <select name="membership_plan_id" class="form-control">
                                 <option value=""></option>
                                 @foreach ($membership_plans as $membership_plan)
-                                    <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id') == $membership_plan->id ? 'selected' : '' }} @if($serviceStaff->staff && $serviceStaff->staff->membership_plan_id && $membership_plan->id == $serviceStaff->staff->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                    <option value="{{ $membership_plan->id }}" 
+                                        {{ (old('membership_plan_id') == $membership_plan->id || 
+                                        ($serviceStaff->staff && $serviceStaff->staff->membership_plan_id == $membership_plan->id)) ? 'selected' : '' }}>
+                                        {{ $membership_plan->plan_name }} (AED{{ $membership_plan->membership_fee }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -232,9 +241,11 @@
                                 <option value=""></option>
                                 @foreach ($affiliates as $affiliate)
                                     @if($affiliate->affiliate->status == 1)
-                                        <option value="{{ $affiliate->id }}" {{ old('affiliate_id') == $affiliate->id ? 'selected' : '' }}
-                                            @if ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
-                                        </option>
+                                    <option value="{{ $affiliate->id }}" 
+                                        {{ (old('affiliate_id') == $affiliate->id || 
+                                           ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id)) ? 'selected' : '' }}>
+                                        {{ $affiliate->name }}
+                                    </option>                                    
                                     @endif
                                 @endforeach
                             </select>

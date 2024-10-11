@@ -77,6 +77,8 @@ class LongHolidayController extends Controller
      */
     public function store(Request $request)
     {
+
+
         request()->validate([
             'date_start' => 'required|date',
             'date_end' => 'required|date|after:date_start',

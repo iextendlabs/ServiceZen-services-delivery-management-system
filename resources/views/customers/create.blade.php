@@ -72,8 +72,8 @@
                 <div class="form-group"><strong>Affiliate Commission type:</strong>
                     <select name="type" class="form-control">
                         <option></option>
-                        <option @if(old('type') == "F") selected @endif value="F">Fix</option>
-                        <option @if(old('type') == "P") selected @endif value="P">Persentage</option>
+                        <option value="F" {{ old('type') == "F" ? 'selected' : '' }}>Fix</option>
+                        <option value="P" {{ old('type') == "P" ? 'selected' : '' }}>Percentage</option>                        
                     </select>
                 </div>
             </div>

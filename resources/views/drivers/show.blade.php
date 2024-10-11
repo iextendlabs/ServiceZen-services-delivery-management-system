@@ -126,11 +126,11 @@
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Type:</strong>
                             <select name="type" class="form-control">
-                                <option value="Credit" @if(old('type') == 'Credit') selected @endif>Credit</option>
-                                <option value="Debit" @if(old('type') == 'Debit') selected @endif>Debit</option>
-                                <option value="Product Sale" @if(old('type') == 'Product Sale') selected @endif>Product Sale</option>
-                                <option value="Bonus" @if(old('type') == 'Bonus') selected @endif>Bonus</option>
-                                <option value="Pay Salary" @if(old('type') == 'Pay Salary') selected @endif>Pay Salary</option>
+                                <option value="Credit" {{ old('type') == 'Credit' ? 'selected' : '' }}>Credit</option>
+                                <option value="Debit" {{ old('type') == 'Debit' ? 'selected' : '' }}>Debit</option>
+                                <option value="Product Sale" {{ old('type') == 'Product Sale' ? 'selected' : '' }}>Product Sale</option>
+                                <option value="Bonus" {{ old('type') == 'Bonus' ? 'selected' : '' }}>Bonus</option>
+                                <option value="Pay Salary"{{ old('type') == 'Pay Salary' ? 'selected' : '' }}>Pay Salary</option>
                             </select>
                             
                         </div>

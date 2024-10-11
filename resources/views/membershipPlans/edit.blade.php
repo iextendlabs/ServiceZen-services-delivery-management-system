@@ -47,8 +47,8 @@
                         <span style="color: red;">*</span><strong>Type:</strong>
                         <select name="type" class="form-control">
                             <option></option>
-                            <option value="Affiliate" @if (old('type') == 'Affiliate' || $membership_plan->type == 'Affiliate') selected @endif>Affiliate</option>
-                            <option value="Freelancer" @if (old('type') == 'Freelancer' || $membership_plan->type == 'Freelancer') selected @endif>Freelancer</option>
+                            <option value="Affiliate" {{ old('type', $membership_plan->type) == 'Affiliate' ? 'selected' : '' }}>Affiliate</option>
+                            <option value="Freelancer" {{ old('type', $membership_plan->type) == 'Freelancer' ? 'selected' : '' }}>Freelancer</option>                            
                         </select>
                     </div>
                 </div>
@@ -57,8 +57,8 @@
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
                             <option></option>
-                            <option value="1"  @if (old('status') == '1'  || $membership_plan->status == '1') selected @endif>Enable</option>
-                            <option value="0" @if (old('status') == '0' || $membership_plan->status == '0') selected @endif>Disable</option>
+                            <option value="1" {{ old('status', $membership_plan->status) == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status', $membership_plan->status) == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>

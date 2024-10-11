@@ -37,7 +37,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Email:</strong>
-                        <input type="email" name="email" value="{{ 'email', $affiliate->email }}" class="form-control"
+                        <input type="email" name="email" value="{{ old('email', $affiliate->email) }}" class="form-control"
                             placeholder="abc@gmail.com" />
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                     <div class="form-group">
                         <strong>Expire after days:</strong>
                         <input type="number" name="expire" class="form-control"
-                            value="{{ old( 'number' , $affiliate->affiliate->expire ?? '') }}" placeholder="Enter days like 20" />
+                            value="{{ old( 'expire' , $affiliate->affiliate->expire ?? '') }}" placeholder="Enter days like 20" />
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -116,9 +116,9 @@
                             @foreach ($affiliates as $single_affiliate)
                                 @if ($single_affiliate->affiliate->status == 1 && $single_affiliate->id !== $affiliate->id)
                                     <option value="{{ $single_affiliate->id }}"
-                                        {{ old('parent_affiliate_id') == $single_affiliate->id ? 'selected' : '' }}
-                                        @if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id == $single_affiliate->id) selected @endif> {{ $single_affiliate->name }}
-                                    </option>
+                                        {{ old('parent_affiliate_id', $affiliate->affiliate->parent_affiliate_id ?? null) == $single_affiliate->id ? 'selected' : '' }}>
+                                        {{ $single_affiliate->name }}
+                                    </option>                                
                                 @endif
                             @endforeach
                         </select>
@@ -137,7 +137,10 @@
                         <select name="membership_plan_id" class="form-control">
                             <option value=""></option>
                             @foreach ($membership_plans as $membership_plan)
-                                <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id') == $membership_plan->id ? 'selected' : ''}} @if($affiliate->affiliate && $affiliate->affiliate->membership_plan_id && $membership_plan->id == $affiliate->affiliate->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                <option value="{{ $membership_plan->id }}" 
+                                    {{ old('membership_plan_id', optional($affiliate->affiliate)->membership_plan_id) == $membership_plan->id ? 'selected' : '' }}>
+                                    {{ $membership_plan->plan_name }} (AED{{ $membership_plan->membership_fee }})
+                                </option>
                             @endforeach
                         </select>
                     </div>
