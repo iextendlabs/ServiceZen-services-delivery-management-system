@@ -10,7 +10,6 @@ use App\Mail\OrderCustomerEmail;
 use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CouponHistory;
-use App\Models\CustomerProfile;
 use App\Models\Order;
 use App\Models\OrderService;
 use App\Models\User;

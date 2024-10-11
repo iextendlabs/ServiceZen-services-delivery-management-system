@@ -145,9 +145,9 @@
                             {{ $order->customer_name }}
                         @endif
                         <br>
-                        {{ $order->customer->customerProfile->number ?? '' }}
+                        {{ $order->number ?? '' }}
                         <br>
-                        {{ $order->customer->customerProfile->whatsapp ?? '' }}
+                        {{ $order->whatsapp ?? '' }}
                     </td>
                     <td>
                         @currency($order->total_amount,true)

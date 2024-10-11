@@ -42,7 +42,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Status</th>
-                        <th>Address</th>
+                        <th>Addresses</th>
                         <th>District</th>
                         <th>Number</th>
                         <th>Whatsapp</th>
@@ -61,10 +61,29 @@
                         <td>{{ $customer->name }}</td>
                         <td>{{ $customer->email }}</td>
                         <td>@if($customer->status == 1) Enabled @else Disabled @endif</td>
-                        <td>{{ $customer->customerProfile->buildingName ?? '' }} {{ $customer->customerProfile->flatVilla ?? '' }} {{ $customer->customerProfile->street ?? '' }} {{ $customer->customerProfile->area ?? '' }} {{ $customer->customerProfile->city ?? '' }}</td>
-                        <td>{{ $customer->customerProfile->district ?? '' }}</td>
-                        <td>{{ $customer->customerProfile->number ?? '' }}</td>
-                        <td>{{ $customer->customerProfile->whatsapp ?? '' }}</td>
+                        <td>
+                            @foreach($customer->customerProfiles as $customerProfile)
+                                <div>
+                                    {{ $customerProfile->buildingName ?? '' }} {{ $customerProfile->flatVilla ?? '' }},
+                                    {{ $customerProfile->street ?? '' }},
+                                    {{ $customerProfile->area ?? '' }},
+                                    {{ $customerProfile->city ?? '' }}
+                                </div>
+                                @if(!$loop->last)
+                                    <hr>
+                                @endif
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach($customer->customerProfiles as $customerProfile)
+                                <div>{{ $customerProfile->district ?? '' }}</div>
+                                @if(!$loop->last)
+                                    <hr>
+                                @endif
+                            @endforeach
+                        </td>
+                        <td>{{optional($customer->customerProfiles->first())->number }}</td>
+                        <td>{{ optional($customer->customerProfiles->first())->whatsapp }}</td>
                         <td>{{ $customer->created_at }}</td>
                         <td>
                             {{ $customer->userAffiliate->affiliateUser->name ?? "" }} <br>

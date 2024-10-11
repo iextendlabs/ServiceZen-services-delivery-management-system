@@ -176,7 +176,7 @@ class CustomerController extends Controller
 
             $callback = function () use ($customers) {
                 $output = fopen('php://output', 'w');
-                $header = array('SR#', 'ID', 'Name', 'Email', 'Status', 'Building Name', 'Area', 'Landmark', 'Flat/Villa', 'Street', 'City', 'District', 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name', 'Affiliate Code', 'Coupons');
+                $header = array('SR#', 'ID', 'Name', 'Email', 'Status', 'Address', 'District' , 'Number', 'Whatsapp', 'Date Added', 'Affiliate Name', 'Affiliate Code', 'Coupons');
 
                 fputcsv($output, $header);
 
@@ -188,21 +188,38 @@ class CustomerController extends Controller
                         }
                     }
 
+                    $addressString = '';
+                    foreach ($row->customerProfiles as $customerProfile) {
+                        $addressString .= $customerProfile->buildingName ?? '';
+                        $addressString .= $customerProfile->flatVilla ? ' ' . $customerProfile->flatVilla : '';
+                        $addressString .= ', ' . ($customerProfile->street ?? '');
+                        $addressString .= ', ' . ($customerProfile->area ?? '');
+                        $addressString .= ', ' . ($customerProfile->city ?? '');
+                        $addressString .= "\n";
+                    }
+
+                    $districtString = '';
+                    $totalProfiles = count($row->customerProfiles);
+                    $currentProfileIndex = 0;
+
+                    foreach ($row->customerProfiles as $customerProfile) {
+                        $districtString .= $customerProfile->district ?? '';
+                        $currentProfileIndex++;
+                        if ($currentProfileIndex < $totalProfiles) {
+                            $districtString .= "\n"; 
+                        }
+                    }
+
                     $csvRow = [
                         ++$key,
                         $row->id,
                         $row->name,
                         $row->email,
                         $row->status && $row->status == 1 ? "Enabled" : "Disabled",
-                        $row->customerProfile->buildingName ?? "",
-                        $row->customerProfile->area ?? "",
-                        $row->customerProfile->landmark ?? "",
-                        $row->customerProfile->flatVilla ?? "",
-                        $row->customerProfile->street ?? "",
-                        $row->customerProfile->city ?? "",
-                        $row->customerProfile->district ?? "",
-                        $row->customerProfile->number ?? "",
-                        $row->customerProfile->whatsapp ?? "",
+                        rtrim($addressString),
+                        rtrim($districtString),
+                        optional($row->customerProfiles->first())->number,
+                        optional($row->customerProfiles->first())->whatsapp,
                         $row->created_at,
                         $row->userAffiliate->affiliateUser->name ?? "",
                         isset($row->userAffiliate->affiliate) ? "'" . $row->userAffiliate->affiliate->code : "",
