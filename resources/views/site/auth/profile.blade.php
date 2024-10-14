@@ -76,7 +76,14 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="customerArea">Area</label>
-                        <input type="text" class="form-control" id="customerArea" placeholder="Area">
+                        <select class="form-control" id="customerArea">
+                            <option value="">-- Select Zone -- </option>
+                            @foreach ($zones as $zone)
+                                <option value="{{ $zone }}">
+                                    {{ $zone }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-6">
