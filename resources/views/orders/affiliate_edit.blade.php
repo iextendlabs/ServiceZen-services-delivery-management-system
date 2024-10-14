@@ -37,11 +37,7 @@
                                 <option></option>
                                 @foreach ($affiliates as $affiliate)
                                 @if($affiliate->affiliate->status == 1)
-                                @if($affiliate->id == $order->affiliate_id)
-                                <option value="{{ $affiliate->id }}" selected>{{ $affiliate->name }}</option>
-                                @else
-                                <option value="{{ $affiliate->id }}" {{ old('affiliate_id') == $affiliate->id ? 'selected' : '' }}>{{ $affiliate->name }}</option>
-                                @endif
+                                <option value="{{ $affiliate->id }}" {{ old('affiliate_id', $order->affiliate_id) == $affiliate->id ? 'selected' : '' }}>{{ $affiliate->name }}</option>
                                 @endif
                                 @endforeach
                             </select>

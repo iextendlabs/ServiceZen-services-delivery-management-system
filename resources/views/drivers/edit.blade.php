@@ -49,22 +49,22 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Phone Number:</strong>
                     <input id="number_country_code" type="hidden" name="number_country_code" />
-                    <input type="tel" id="number" name="phone" value="{{ isset($driver->driver->phone) ? ($driver->driver->phone) : null }}" class="form-control">
+                    <input type="tel" id="number" name="phone" value="{{ old('phone', $driver->driver->phone ?? '') }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                     <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                    <input type="tel" id="whatsapp" name="whatsapp" value="{{ isset($driver->driver->whatsapp) ? $driver->driver->whatsapp : null }}" class="form-control">
+                    <input type="tel" id="whatsapp" name="whatsapp" value="{{ old('whatsapp', $driver->driver->whatsapp ?? '') }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Commission:</strong>
                     <input type="number" name="commission" value="{{ old( 'commission',$driver->driver->commission ?? "" )}}" class="form-control" placeholder="Commission In %">
-                </div>
-            </div>
+
+            </div>                </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Affiliate:</strong>
@@ -73,7 +73,7 @@
                         @foreach ($affiliates as $affiliate)
                             @if($affiliate->affiliate->status == 1)
                             <option value="{{ $affiliate->id }}"
-                                {{ old('affiliate_id') == $affiliate->id || ($driver->driver && $driver->driver->affiliate_id == $affiliate->id) ? 'selected' : '' }}>
+                                {{ old('affiliate_id', $driver->driver->affiliate_id ?? '') == $affiliate->id ? 'selected' : '' }}>
                                 {{ $affiliate->name }}
                             </option>                            
                             @endif

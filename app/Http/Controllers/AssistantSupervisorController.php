@@ -53,8 +53,8 @@ class AssistantSupervisorController extends Controller
      */
     public function create()
     {
-        $supervisors = User::all();
-
+        $supervisors = User::role('Supervisor')->orderBy('name')->get();
+        
         return view('assistantSupervisors.create',compact('supervisors'));
     }
     
@@ -112,7 +112,7 @@ class AssistantSupervisorController extends Controller
     {
         $assistant_supervisor = User::find($id);
 
-        $supervisors = User::all();
+        $supervisors = User::role('Supervisor')->orderBy('name')->get();
 
         return view('assistantSupervisors.edit',compact('assistant_supervisor','supervisors'));
     }

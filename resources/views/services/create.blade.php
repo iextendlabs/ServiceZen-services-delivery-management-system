@@ -54,7 +54,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name:</strong>
-                            <input type="text" name="name" value="{{old('name') }}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -124,19 +124,19 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Price:</strong>
-                            <input type="number" value="{{old('price') }}" name="price" class="form-control" placeholder="Price">
+                            <input type="number" value="{{ old('price') }}" name="price" class="form-control" placeholder="Price">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Discount Price:</strong>
-                            <input type="number" value="{{old('discount') }}" name="discount" class="form-control" placeholder="Discount Price">
+                            <input type="number" value="{{ old('discount') }}" name="discount" class="form-control" placeholder="Discount Price">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Duration:</strong>
-                            <input type="text" value="{{old('duration') }}" name="duration" class="form-control" placeholder="Duration">
+                            <input type="text" value="{{ old('duration') }}" name="duration" class="form-control" placeholder="Duration">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -151,7 +151,7 @@
                                 @foreach ($service_categories as $category)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if (in_array($category->id, old('categoriesId', []))) checked @endif>
+                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" {{ in_array($category->id, old('categoriesId', [])) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>
@@ -187,7 +187,7 @@
                                 @foreach ($all_services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="packageId[{{ ++$i }}]" value="{{ $service->id }}">
+                                        <input type="checkbox" name="packageId[{{ ++$i }}]" value="{{ $service->id }}" {{ in_array($service->id, old('packageId', [])) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $service->name }}</td>
                                     <td>{{ $service->price }}</td>
@@ -213,7 +213,7 @@
                                 @foreach ($all_services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="addONsId[{{ ++$i }}]" value="{{ $service->id }}">
+                                        <input type="checkbox" name="addONsId[{{ ++$i }}]" value="{{ $service->id }}" {{ in_array($service->id, old('addONsId', [])) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $service->name }}</td>
                                     <td>{{ $service->price }}</td>

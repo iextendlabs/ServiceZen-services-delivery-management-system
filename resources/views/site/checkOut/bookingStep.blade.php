@@ -272,14 +272,14 @@
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Name:</strong>
                                 <input required type="text" name="name" id="name" class="form-control"
-                                    placeholder="Name" value="{{ old('name') ? old('name') : $name }}">
+                                    placeholder="Name" value="{{ old('name', $name) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Email:</strong>
                                 <input required type="email" name="email" id="email" class="form-control"
-                                    placeholder="abc@gmail.com" value="{{ old('email') ? old('email') : $email }}">
+                                    placeholder="abc@gmail.com" value="{{ old('email', $email) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -287,7 +287,7 @@
                                 <span style="color: red;">*</span><strong>Phone Number:</strong>
                                 <input id="number_country_code" type="hidden" name="number_country_code" />
                                 <input required type="tel" name="number" id="number" class="form-control"
-                                    value="{{ old('number') ? old('number') : $personal_info['number'] }}">
+                                    value="{{ old('number', $personal_info['number']) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -295,7 +295,7 @@
                                 <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                                 <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
                                 <input required type="tel" name="whatsapp" id="whatsapp" class="form-control"
-                                    value="{{ old('whatsapp') ? old('whatsapp') : $personal_info['whatsapp'] }}">
+                                    value="{{ old('whatsapp', $personal_info['whatsapp']) }}">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -304,13 +304,13 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="gender" id="genderMale"
                                         value="Male"
-                                        {{ old('gender') == 'Male' || $personal_info['gender'] == 'Male' ? 'checked' : '' }}>
+                                        {{ old('gender', $personal_info['gender']) == 'Male' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="genderMale">Male</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="gender" id="genderFemale"
                                         value="Female"
-                                        {{ old('gender') == 'Female' || $personal_info['gender'] == 'Female' ? 'checked' : '' }}>
+                                        {{ old('gender', $personal_info['gender']) == 'Female' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="genderFemale">Female</label>
                                 </div>
                             </div>
@@ -321,7 +321,7 @@
                                 <strong>Affiliate Code:</strong>
                                 <input type="text" name="affiliate_code" id="affiliate_code" class="form-control"
                                     placeholder="Affiliate Code" {{ $affiliate_code ? 'readonly' : null }}
-                                    value="{{ $affiliate_code ?? old('affiliate_code') }}">
+                                    value="{{ $affiliate_code }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -330,7 +330,7 @@
                                 <div class="input-group">
                                     <input type="text" name="coupon_code" id="coupon_code" class="form-control"
                                         placeholder="Coupon Code"
-                                        value="{{ old('coupon_code') ? old('coupon_code') : $coupon_code }}">
+                                        value="{{ $coupon_code }}">
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply
                                             Coupon</button>

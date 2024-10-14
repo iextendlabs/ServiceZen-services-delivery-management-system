@@ -136,6 +136,7 @@ class CashCollectionController extends Controller
             'staff_id' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'order_id' => 'required',
+            'amount' => 'required',
         ]);
 
         $input = $request->all();

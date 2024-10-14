@@ -61,13 +61,9 @@
                     <select name="affiliate_id" class="form-control">
                         <option></option>
                         @foreach ($affiliates as $affiliate)
-                            @if($affiliate->affiliate->status == 1)
-                                <option value="{{ $affiliate->id }}" 
-                                    {{ old('status', $customer->userAffiliate->affiliate_id ?? null) == $affiliate->id ? 'selected' : '' }}>
-                                    {{ $affiliate->name }} 
-                                    @if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif
-                                </option>
-                            @endif
+                        @if($affiliate->affiliate->status == 1)
+                            <option value="{{ $affiliate->id }}" {{ (old('affiliate_id', $customer->userAffiliate->affiliate_id ?? '') == $affiliate->id) ? 'selected' : '' }}>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
@@ -89,12 +85,12 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group"><strong>Affiliate Commission:</strong>
-                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value={{ old('commission', $customer->userAffiliate ? $customer->userAffiliate->commission : null) }}>
+                    <input type="number" name="commission" class="form-control" placeholder="Affiliate Commission" value="{{ old('commission', $customer->userAffiliate->commission ?? '') }}">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group"><strong>Expiry Date:</strong>
-                    <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ old('expiry_date', $customer->userAffiliate ? $customer->userAffiliate->expiry_date : null) }}>
+                    <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ old('expiry_date', $customer->userAffiliate->expiry_date ?? '') }}>
                 </div>
             </div>
             <div class="col-md-12 text-center">

@@ -37,7 +37,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Description:</strong>
-                    <textarea name="description" class="form-control" cols="10" rows="5"></textarea>
+                    <textarea name="description" class="form-control" cols="10" rows="5">{{ old('description') }}</textarea>
                 </div>
             </div>
             <div class="col-md-12">

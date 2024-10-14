@@ -26,7 +26,7 @@
                             <option></option>
                             @foreach ($users as $user)
                             @if($user->affiliate->status == 1)
-                                <option value="{{ $user->id }}" @if (old('user_id') == $user->id) selected @endif>
+                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
                                     {{ $user->name }}</option>
                             @endif
                             @endforeach
@@ -45,9 +45,9 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="Approved" @if (old('status') === 'Approved') selected @endif>
+                            <option value="Approved" {{ old('status') === 'Approved' ? 'selected' : '' }}>
                                 Approved</option>
-                            <option value="Un Approved" @if (old('status') === 'Un Approved') selected @endif>
+                            <option value="Un Approved" {{ old('status') === 'Un Approved' ? 'selected' : '' }}>
                                 Un Approved</option>
                         </select>
                     </div>
@@ -58,7 +58,7 @@
                         <select name="payment_method" class="form-control">
                             <option></option>
                             @foreach ($payment_methods as $payment_method)
-                                <option value="{{ $payment_method }}" @if (old('payment_method') == $payment_method) selected @endif>
+                                <option value="{{ $payment_method }}" {{ old('payment_method') == $payment_method ? 'selected' : '' }}>
                                     {{ $payment_method }}</option>
                             @endforeach
                         </select>
@@ -74,7 +74,7 @@
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
-        </form>
+        </form> 
     </div>
     <script>
         $(document).ready(function() {

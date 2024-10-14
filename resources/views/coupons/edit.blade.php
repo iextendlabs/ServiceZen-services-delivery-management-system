@@ -85,13 +85,8 @@
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Status</strong>
                             <select name="status" class="form-control">
-                                @if($coupon->status == 1)
-                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}selected>Enable</option>
-                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
-                                @elseif($coupon->status == 0)
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
-                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }} selected>Disable</option>
-                                @endif
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                             </select>
                         </div>
                     </div>
@@ -135,7 +130,7 @@
                     <div class="col-md-12">
                         <div class="form-group scroll-div">
                             <span style="color: red;">*</span><strong>Category:</strong>
-                            <input type="text" name="categories-search" {{ old('categories-search') }} id="categories-search" class="form-control" placeholder="Search Category By Name">
+                            <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
                             <table class="table table-striped table-bordered categories-table">
                                 <tr>
                                     <th></th>
@@ -144,7 +139,8 @@
                                 @foreach ($categories as $category)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if(in_array($category->id, old( 'categoriesId',$category_ids))) checked @endif>
+                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" 
+                                            {{ in_array($category->id, old('categoriesId', $category_ids ?? [])) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>
@@ -165,7 +161,8 @@
                                 @foreach ($services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}"   @if(in_array($service->id, old('servicesId', $service_ids))) checked @endif>
+                                        <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}" 
+                                            {{ in_array($service->id, old('servicesId', $service_ids ?? [])) ? 'checked' : '' }}> 
                                     </td>
                                     <td>{{ $service->name }}</td>
                                     <td>{{ $service->price }}</td>

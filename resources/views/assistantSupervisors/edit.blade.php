@@ -52,19 +52,10 @@
                     <select name="supervisor_id" class="form-control">
                         <option></option>
                         @foreach($supervisors as $supervisor)
-                        @if($supervisor->hasRole("Supervisor"))
-                        @if(count($assistant_supervisor->AssistantSupervisorToSupervisor))
-                        @foreach($assistant_supervisor->AssistantSupervisorToSupervisor as $assistantSupervisorToSupervisor)
-                        @if($supervisor->id == $assistantSupervisorToSupervisor->supervisor_id)
-                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }} selected>{{ $supervisor->name }}</option>
-                        @else
-                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
-                        @endif
-                        @endforeach
-                        @else
-                        <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}   {{ $isAssignedSupervisor ? 'selected' : '' }}>{{ $supervisor->name }}</option>
-                        @endif
-                        @endif
+                            <option value="{{ $supervisor->id }}"
+                                {{ old('supervisor_id', $assistant_supervisor->AssistantSupervisorToSupervisor->contains('supervisor_id', $supervisor->id) ? $supervisor->id : '') == $supervisor->id ? 'selected' : '' }}>
+                                {{ $supervisor->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>

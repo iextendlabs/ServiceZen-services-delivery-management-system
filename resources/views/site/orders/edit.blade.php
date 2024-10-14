@@ -43,11 +43,7 @@ $transport_charges = 0;
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
                             @foreach ($statuses as $status)
-                            @if($status == $order->status)
-                            <option value="{{ $status }}" selected>{{ $status }}</option>
-                            @else
-                            <option value="{{ $status }}" {{ old('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
-                            @endif
+                            <option value="{{ $status }}" {{ old('status',$order->status) == $status ? 'selected' : '' }}>{{ $status }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -86,7 +82,7 @@ $transport_charges = 0;
                             <option value="">-- Select Zone -- </option>
                             <!-- Loop through the $zones array to generate options -->
                             @foreach ($zones as $zone)
-                            <option @if (old('area')==$zone || $order->area ==$zone) selected @endif value="{{ $zone }}">
+                            <option {{ old('area',$order->area) == $zone ? 'selected' : '' }} value="{{ $zone }}">
                                 {{ $zone }}
                             </option>
                             @endforeach
@@ -149,13 +145,7 @@ $transport_charges = 0;
                             @foreach ($services as $service)
                             <tr>
                                 <td>
-                                    @if(in_array($service->id,$order_service))
-                                    <input type="checkbox" class="service-checkbox checkout-services" checked name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
-                                 $service->discount : $service->price }}" @if(in_array($service->id, old('service_ids', $order_service))) checked @endif>
-                                    @else
-                                    <input type="checkbox" class="service-checkbox checkout-services" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? 
-                                 $service->discount : $service->price }}" @if(in_array($service->id, old('service_ids', $order_service))) checked @endif>
-                                    @endif
+                                    <input type="checkbox" class="service-checkbox checkout-services" name="service_ids[]" value="{{ $service->id }}" data-price="{{ isset($service->discount) ? $service->discount : $service->price }}" {{ in_array($service->id, old('service_ids', $order_service)) ? 'checked' : '' }}>
                                 </td>
                                 <td>{{ $service->name }}</td>
 

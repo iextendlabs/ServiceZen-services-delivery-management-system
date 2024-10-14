@@ -38,7 +38,7 @@
                         <option></option>
                         @if(isset($category_id))
                         @foreach($categories as $category)
-                        <option  {{ old('category_id', $category_id) == $category->id ? 'selected' : '' }} value="{{ $category->id }}" selected>{{ $category->title }}</option>
+                        <option  {{ old('category_id', $category_id) == $category->id ? 'selected' : '' }} value="{{ $category->id }}">{{ $category->title }}</option>
                         @endforeach
                         @else
                         @foreach($categories as $category)
@@ -56,7 +56,7 @@
                         <option></option>
                         @if(isset($service_id))
                         @foreach($services as $service)
-                        <option value="{{ $service->id }}" {{ old('service_id') == $service->id  || $service->id == $service_id }} selected>{{ $service->name }}</option>
+                        <option value="{{ $service->id }}" {{ old('service_id',$service_id) == $service->id ? 'selected' : '' }}>{{ $service->name }}</option>
                         @endforeach
                         @else
                         @foreach($services as $service)

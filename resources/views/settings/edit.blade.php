@@ -34,7 +34,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Key:</strong>
-                    <input type="text" name="key" value="{{ old('key',$setting->key) }}" class="form-control" placeholder="key" disabled>
+                    <input type="text" name="key" value="{{ $setting->key }}" class="form-control" placeholder="key" disabled>
                 </div>
             </div>
             <div class="col-md-12">
@@ -46,9 +46,9 @@
 
                     @if ($setting->key === 'Gender Permission')
                     <select name="value" class="form-control">
-                        <option value="Male" {{ old('value', $setting->value) === 'Male' ? 'selected' : '' }}>Male</option>
-                        <option value="Female" {{ old('value', $setting->value) === 'Female' ? 'selected' : '' }}>Female</option>
-                        <option value="Both" {{ old('value', $setting->value) === 'Both' ? 'selected' : '' }}>Both</option>
+                        <option value="Male" @if($setting->value === "Male") selected @endif>Male</option>
+                        <option value="Female" @if($setting->value === "Female") selected @endif>Female</option>
+                        <option value="Both" @if($setting->value === "Both") selected @endif>Both</option>
                     </select>
                     @elseif ($setting->key === 'Slider Image' || $setting->key === 'Slider Image For App')
                     <p class="text-danger"><strong>Note: </strong>For optimal slider appearance, kindly upload an image with dimensions @if ($setting->key === 'Slider Image' ) 1140 × 504px. @else 325 x 200px. @endif Thank you!</p>
@@ -77,7 +77,7 @@
                                                     <strong class="float-start mb-2">Select Category or Service for Link</strong>
                                                     <select name="link_type[]" class="form-control col-9 link-type" disabled>
                                                         <option></option>
-                                                        <option value="category"  {{ $type === 'category' ? 'selected' : '' }}>Categories</option>
+                                                        <option value="category" {{ $type === 'category' ? 'selected' : '' }}>Categories</option>
                                                         <option value="service" {{ $type === 'service' ? 'selected' : '' }}>Services</option>
                                                         <option value="customLink" {{ $type === 'customLink' ? 'selected' : '' }}>Custom Link</option>
                                                     </select>
@@ -114,6 +114,7 @@
                     <button id="addImageBtn" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
                     @elseif($setting->key === 'Social Links of Staff')
                     <select name="value" class="form-control">
+
                         <option value="1" @if($setting->value == 1) selected @endif>Enable</option>
                         <option value="0" @if($setting->value == 0) selected @endif>Disable</option>
                     </select>

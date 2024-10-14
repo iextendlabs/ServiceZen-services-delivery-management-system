@@ -45,8 +45,7 @@
                         <option></option>
                         @foreach ($currencies as $currency)
                             <option value="{{ $currency->id }}" 
-                                {{ (old('currency_id') == $currency->id || 
-                                ($staffZone->currency && $staffZone->currency->id == $currency->id)) ? 'selected' : '' }}>
+                                {{ old('currency_id', $staffZone->currency->id ?? null) == $currency->id ? 'selected' : '' }}>
                                 {{ $currency->name }}
                             </option>                        
                         @endforeach

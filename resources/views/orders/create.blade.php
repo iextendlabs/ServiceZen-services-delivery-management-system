@@ -216,7 +216,7 @@
                         <div class="form-group">
                             <strong>Coupon Code:</strong>
                             <div class="input-group">
-                                <input type="text" name="coupon_code" value="{{ old('coupon_code') }}" id="coupon_code" class="form-control"
+                                <input type="text" name="coupon_code" id="coupon_code" class="form-control"
                                     placeholder="Coupon Code">
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply

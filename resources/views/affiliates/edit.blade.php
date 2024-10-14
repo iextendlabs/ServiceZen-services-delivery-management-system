@@ -58,8 +58,8 @@
                     <div class="form-group">
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1" {{ old('status') == "1" ? 'selected' : "" }} @if($affiliate->affiliate && $affiliate->affiliate->status == 1) selected @endif>Enable</option>
-                            <option value="0"  {{ old('status') == "0" ? 'selected' : "" }} @if($affiliate->affiliate && $affiliate->affiliate->status == 0) selected @endif>Disable</option>
+                            <option value="1" {{ old('status', $affiliate->affiliate->status ?? '') == "1" ? 'selected' : '' }}>Enable</option>
+                            <option value="0"  {{ old('status', $affiliate->affiliate->status ?? '') == "0" ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
                             @foreach ($affiliates as $single_affiliate)
                                 @if ($single_affiliate->affiliate->status == 1 && $single_affiliate->id !== $affiliate->id)
                                     <option value="{{ $single_affiliate->id }}"
-                                        {{ old('parent_affiliate_id', $affiliate->affiliate->parent_affiliate_id ?? null) == $single_affiliate->id ? 'selected' : '' }}>
+                                        {{ old('parent_affiliate_id', $affiliate->affiliate->parent_affiliate_id ?? '') == $single_affiliate->id ? 'selected' : '' }}>
                                         {{ $single_affiliate->name }}
                                     </option>                                
                                 @endif
@@ -204,11 +204,11 @@
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Customer Display:</strong>
                         <select name="display_type" id="display_type" class="form-control">
-                            <option value="1" {{ old('display_type') == '1' ? 'selected' : '' }} @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable
+                            <option value="1" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable
                             </option>
-                            <option value="0" {{ old('display_type') == '0' ? 'selected' : '' }} @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 0) selected @endif>Disable
+                            <option value="0" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 0) selected @endif>Disable
                             </option>
-                            <option value="2" {{ old('display_type') == '2' ? 'selected' : '' }} @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 2) selected @endif>Selected Customer
+                            <option value="2" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 2) selected @endif>Selected Customer
                             </option>
                         </select>
                     </div>
@@ -230,7 +230,7 @@
                                         <td>
                                             <input type="checkbox" class="customer_checkbox"
                                                 @if ($user->display == '1') checked @endif name="customerId[]"
-                                                value="{{ $user->user_id }}" @if (in_array($user->user_id, old('customerId', [])) || $user->display == '1') checked @endif  />
+                                                value="{{ $user->user_id }}"/>
                                         </td>
                                         <td>{{ $user->customer->name }}</td>
                                         <td>{{ $user->customer->email }}</td>
@@ -252,7 +252,7 @@
                                             <tr>
                                                 <td>
                                                     <input type="checkbox" class="selected_customer_checkbox" checked
-                                                        name="selectedCustomerId[]" value="{{ $user->user_id }}"  @if (in_array($user->user_id, old('selectedCustomerId', [])) || $user->display == 1) checked @endif />
+                                                        name="selectedCustomerId[]" value="{{ $user->user_id }}"/>
                                                 </td>
                                                 <td>{{ $user->customer->name }}</td>
                                                 <td>{{ $user->customer->email }}</td>

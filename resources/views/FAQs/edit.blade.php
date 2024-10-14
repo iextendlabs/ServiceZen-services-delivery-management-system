@@ -53,11 +53,7 @@
                     <select name="service_id" class="form-control">
                         <option></option>
                         @foreach($services as $service)
-                        @if($service->id == $FAQ->service_id)
-                        <option value="{{$service->id}}" selected>{{$service->name}}</option>
-                        @else
-                        <option value="{{$service->id}}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{$service->name}}</option>
-                        @endif
+                        <option value="{{$service->id}}" {{ old('service_id', $FAQ->service_id) == $service->id ? 'selected' : '' }}>{{$service->name}}</option>
                         @endforeach
                     </select>
                 </div>

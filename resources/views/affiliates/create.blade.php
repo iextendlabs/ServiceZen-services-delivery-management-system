@@ -63,17 +63,15 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Phone Number:</strong>
-                        <input id="number_country_code" type="hidden" name="number_country_code" />
-                        <input type="tel" id="number" name="number" class="form-control"
-                            value="{{ old('phone') }}">
+                        <input id="number_country_code" type="hidden" name="number_country_code"/>
+                        <input type="tel" id="number" name="number" class="form-control" value="{{ old('number') }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Whatsapp Number:</strong>
-                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                        <input type="tel" id="whatsapp" name="whatsapp" class="form-control"
-                            value="{{ old('whatsapp') }}">
+                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code"/>
+                        <input type="tel" id="whatsapp" name="whatsapp" class="form-control" value="{{ old('whatsapp') }}">
                     </div>
                 </div>
                 <div class="col-md-12">

@@ -82,12 +82,10 @@
                         <div class="form-group">
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
-                                <option value="1" 
-                                    {{ (old('status') == '1' || ($serviceStaff->staff && $serviceStaff->staff->status == 1)) ? 'selected' : '' }}>
+                                <option value="1" {{ old('status', $serviceStaff->staff->status ?? null) == '1' ? 'selected' : '' }}>
                                     Enable
                                 </option>
-                                <option value="0" 
-                                    {{ (old('status') == '0' || ($serviceStaff->staff && $serviceStaff->staff->status == 0)) ? 'selected' : '' }}>
+                                <option value="0" {{ old('status', $serviceStaff->staff->status ?? null) == '0' ? 'selected' : '' }}>
                                     Disable
                                 </option>
                             </select>
@@ -158,7 +156,7 @@
                                 <option></option>
                                 @foreach ($users as $driver)
                                 @if($driver->hasRole("Driver"))
-                                <option value="{{ $driver->id }}" @if($serviceStaff->staff && $serviceStaff->staff->driver_id == $driver->id) selected @endif>{{ $driver->name }}</option>
+                                <option value="{{ $driver->id }}" {{ old('driver_id', $serviceStaff->staff->driver_id ?? null) == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
                                 @endif
                                 @endforeach
                             </select>
@@ -178,7 +176,7 @@
                                 @if($user->hasRole("Supervisor"))
                                 <tr>
                                     <td>
-                                        <input type="checkbox" @if(in_array($user->id,old('ids',$supervisor_ids))) checked @endif name="ids[]" value="{{ $user->id }}">
+                                        <input type="checkbox" {{ in_array($user->id, old('ids', $supervisor_ids)) ? 'checked' : '' }} name="ids[]" value="{{ $user->id }}">
                                     </td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
@@ -220,8 +218,7 @@
                                 <option value=""></option>
                                 @foreach ($membership_plans as $membership_plan)
                                     <option value="{{ $membership_plan->id }}" 
-                                        {{ (old('membership_plan_id') == $membership_plan->id || 
-                                        ($serviceStaff->staff && $serviceStaff->staff->membership_plan_id == $membership_plan->id)) ? 'selected' : '' }}>
+                                        {{ old('membership_plan_id', $serviceStaff->staff->membership_plan_id ?? null) == $membership_plan->id ? 'selected' : '' }}>
                                         {{ $membership_plan->plan_name }} (AED{{ $membership_plan->membership_fee }})
                                     </option>
                                 @endforeach
@@ -231,7 +228,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Expiry Date:</strong>
-                            <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $serviceStaff->staff->expiry_date ?? "" }}>
+                            <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value="{{ old('expiry_date', $serviceStaff->staff->expiry_date ?? '') }}">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -242,8 +239,7 @@
                                 @foreach ($affiliates as $affiliate)
                                     @if($affiliate->affiliate->status == 1)
                                     <option value="{{ $affiliate->id }}" 
-                                        {{ (old('affiliate_id') == $affiliate->id || 
-                                           ($serviceStaff->staff && $serviceStaff->staff->affiliate_id == $affiliate->id)) ? 'selected' : '' }}>
+                                        {{ (old('affiliate_id', $serviceStaff->staff->affiliate_id ?? '') == $affiliate->id) ? 'selected' : '' }}>
                                         {{ $affiliate->name }}
                                     </option>                                    
                                     @endif
@@ -357,7 +353,7 @@
                                 <tr>
                                     <td>
 
-                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" @if(in_array($category->id,old('category_ids',$category_ids))) checked @endif>
+                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" {{ in_array($category->id, old('category_ids', $category_ids)) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $category->title }}</td>
                                 </tr>
@@ -387,7 +383,7 @@
                                 @foreach ($services as $service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" @if(in_array($service->id,old('service_ids',$service_ids))) checked @endif>
+                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" {{ in_array($service->id, old('service_ids', $service_ids)) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $service->name }}</td>
 

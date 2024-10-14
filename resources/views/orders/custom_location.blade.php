@@ -33,7 +33,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Custom Location:</strong>
-                            <input type="text" name="custom_location" value="{{ old('custom_location') }}" class="form-control" value="{{ $order->latitude }}, {{ $order->longitude }}">
+                            <input type="text" name="custom_location" class="form-control" value="{{ $order->latitude }}, {{ $order->longitude }}">
                         </div>
                     </div>
 

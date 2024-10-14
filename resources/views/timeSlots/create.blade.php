@@ -72,7 +72,7 @@
                 <select name="group_id" class="form-control">
                     <option></option>
                     @foreach($staff_groups as $staff_group )
-                    <option value="{{$staff_group->id}}" {{ old('group_id') == $staff_group->id ? 'selected' : ''}}>{{$staff_group->name}}</option>
+                    <option value="{{$staff_group->id}}" >{{$staff_group->name}}</option>
                     @endforeach
                 </select>
             </div>

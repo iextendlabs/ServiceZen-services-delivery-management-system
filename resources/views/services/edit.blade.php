@@ -162,7 +162,7 @@
                                     <input type="checkbox" 
                                            name="categoriesId[{{ $i++ }}]" 
                                            value="{{ $category->id }}" 
-                                           @if(in_array($category->id, old('categoriesId', $category_ids))) checked @endif>
+                                           {{ in_array($category->id, old('categoriesId', $category_ids)) ? 'checked' : '' }}>
                                 </td>
                                 <td>{{ $category->title }}</td>
                             </tr>
@@ -202,11 +202,7 @@
                             @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($single_service->id,$package_services))
-                                    <input type="checkbox" checked name="packageId[{{ ++$i }}]" @if(in_array($single_service->id, old('packageId', $package_services))) checked @endif value="{{ $single_service->id }}">
-                                    @else
-                                    <input type="checkbox" name="packageId[{{ ++$i }}]" @if(in_array($single_service->id, old('packageId', $package_services))) checked @endif value="{{ $single_service->id }}">
-                                    @endif
+                                    <input type="checkbox" name="packageId[{{ ++$i }}]"  {{ in_array($single_service->id, old('packageId', $package_services)) ? 'checked' : '' }} value="{{ $single_service->id }}">
                                 </td>
                                 <td>{{ $single_service->name }}</td>
                                 <td>{{ $single_service->price }}</td>
@@ -233,11 +229,7 @@
                             @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($single_service->id,$add_on_services))
-                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" checked value="{{ $single_service->id }}" @if(in_array($single_service->id, old('addONsId', $add_on_services))) checked @endif>
-                                    @else
-                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" value="{{ $single_service->id }}" @if(in_array($single_service->id, old('addONsId', $add_on_services))) checked @endif>
-                                    @endif
+                                    <input type="checkbox" name="addONsId[{{ ++$i }}]"  {{ in_array($single_service->id, old('addONsId', $add_on_services)) ? 'checked' : '' }} value="{{ $single_service->id }}">
                                 </td>
                                 <td>{{ $single_service->name }}</td>
                                 <td>{{ $single_service->price }}</td>
@@ -283,11 +275,7 @@
                             @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($single_service->id,$variant_services))
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" checked value="{{ $single_service->id }}" @if(in_array($single_service->id, old('variantId', $variant_services))) checked @endif>
-                                    @else
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $single_service->id }}" @if(in_array($single_service->id, old('variantId', $variant_services))) checked @endif>
-                                    @endif
+                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $single_service->id }}" {{ in_array($single_service->id, old('variantId', $variant_services)) ? 'checked' : '' }}>
                                 </td>
                                 <td>{{ $single_service->name }}</td>
                                 <td>{{ $single_service->price }}</td>
@@ -330,14 +318,14 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" required name="option_name[{{ $option_row }}]" class="form-control" value="{{ $option->option_name }}" placeholder="Option Name">
+                                                    <input type="text" required name="option_name[{{ $option_row }}]" class="form-control" value="{{ old('option_name.'.$option_row, $option->option_name) }}"  placeholder="Option Name">
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control" value="{{ $option->option_price }}" placeholder="Option Price">
+                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control"  value="{{ old('option_price.'.$option_row, $option->option_price) }}"  placeholder="Option Price">
                                                 </div>
                                             </div>
                                         </td>

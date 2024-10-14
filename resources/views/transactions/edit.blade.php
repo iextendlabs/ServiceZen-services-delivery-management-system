@@ -24,21 +24,21 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Order Id:</strong>
-                        <input type="text" name="order_id" value="{{ old('order_id',$transaction->order_id) }}" class="form-control"
+                        <input type="text" name="order_id" value="{{ $transaction->order_id }}" class="form-control"
                             disabled>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>User:</strong>
-                        <input type="text" name="user_id" value="{{ old('user_id',$transaction->user->name) }}" class="form-control"
+                        <input type="text" name="user_id" value="{{ $transaction->user->name }}" class="form-control"
                             disabled>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Type:</strong>
-                        <input type="text" name="type" value="{{ old('type',$transaction->type) }}" class="form-control" disabled>
+                        <input type="text" name="type" value="{{ $transaction->type }}" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-md-12">

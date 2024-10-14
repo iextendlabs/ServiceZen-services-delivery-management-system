@@ -49,8 +49,7 @@
                         <select name="user_id" class="form-control">
                             <option></option>
                             @foreach ($users as $user)
-                                <option value="{{ $user->id }}" 
-                                    {{ old('user_id', $complaint->user_id) == $user->id ? 'selected' : '' }}>
+                                <option value="{{ $user->id }}" {{ old('user_id', $complaint->user_id) == $user->id ? 'selected' : '' }}>
                                     {{ $user->name }} | {{ $user->email }}
                                 </option>
                             @endforeach

@@ -35,11 +35,7 @@
                             <strong>Status:</strong>
                             <select name="status" class="form-control">
                                 @foreach ($statuses as $status)
-                                @if($status == $order->status)
-                                <option value="{{ $status }}" selected>{{ $status }}</option>
-                                @else
-                                <option value="{{ $status }}" {{ old('status' ) == $status ? 'selected' : '' }}>{{ $status }}</option>
-                                @endif
+                                <option value="{{ $status }}" {{ old('status', $order->status) == $status ? 'selected' : '' }}>{{ $status }}</option>
                                 @endforeach
                             </select>
                         </div>

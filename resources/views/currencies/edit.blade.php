@@ -27,7 +27,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Name:</strong>
-                        <input type="text" name="name" class="form-control" value="{{ old( 'name',$currency->name) }}"
+                        <input type="text" name="name" class="form-control" value="{{ old( 'name', $currency->name) }}"
                             placeholder="Name">
                     </div>
                 </div>

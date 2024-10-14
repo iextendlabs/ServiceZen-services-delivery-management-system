@@ -128,7 +128,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Amount</strong>
-                                <input type="number" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Amount" required>
+                                <input type="number" name="amount" class="form-control" placeholder="Amount" required>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -197,7 +197,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Amount</strong>
-                            <input type="number" name="amount" class="form-control" value="{{ old('amount') }}" placeholder="Amount" required>
+                            <input type="number" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -232,14 +232,14 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Amount</strong>
-                            <input type="number" name="amount" value="{{ old('amount') }}" class="form-control" placeholder="Amount" required>
+                            <input type="number" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Payment Method</strong>
                             <select name="payment_method" class="form-control">
-                                <option value="Credit-Debit-Card" {{ old('payment_method') }}> Credit or Debit Card</option>
+                                <option value="Credit-Debit-Card"> Credit or Debit Card</option>
                             </select>
                         </div>
                     </div>
@@ -258,14 +258,14 @@
                 <div class="form-group">
                     <strong>Code:</strong>
                     <input disabled type="text" name="code" id="code" class="form-control"
-                        placeholder="Code" value="{{ old('code',$user->affiliate->code ?? null) }}">
+                        placeholder="Code" value="{{ $user->affiliate->code ?? null }}">
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <strong>Commission:</strong>
                     <input disabled type="text" name="commission" id="commission" class="form-control"
-                        placeholder="Commission" value="{{ old('commission',$user->affiliate->commission ?? null) }}">
+                        placeholder="Commission" value="{{ $user->affiliate->commission ?? null }}">
                 </div>
             </div>
             <div class="col-md-6">
@@ -273,7 +273,7 @@
                     <strong>Fix Salary:</strong>
                     <input disabled type="text" name="fix_salary" id="fix_salary" class="form-control"
                         placeholder="Fix Salary"
-                        value="{{ old('fix_salary','Rs.' . $user->affiliate->fix_salary * $pkrRateValue ?? null) }}">
+                        value="{{ 'Rs.' . $user->affiliate->fix_salary * $pkrRateValue ?? null }}">
                 </div>
             </div>
             <div class="col-md-12">

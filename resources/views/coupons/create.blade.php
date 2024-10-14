@@ -43,31 +43,31 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Discount</strong>
-                    <input type="number" name="discount" value="{{old('discount')}}" class="form-control" placeholder="Discount">
+                    <input type="number" name="discount" value="{{ old('discount') }}" class="form-control" placeholder="Discount">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Minimum Order</strong>
-                    <input type="number" name="min_order_value" value="{{old('min_order_value')}}" class="form-control" placeholder="Minimum Order">
+                    <input type="number" name="min_order_value" value="{{ old('min_order_value') }}" class="form-control" placeholder="Minimum Order">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date Start</strong>
-                    <input type="date" name="date_start" value="{{old('date_start')}}" class="form-control" placeholder="Date Start">
+                    <input type="date" name="date_start" value="{{ old('date_start') }}" class="form-control" placeholder="Date Start">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date End</strong>
-                    <input type="date" name="date_end" value="{{old('date_end')}}" class="form-control" placeholder="Date End">
+                    <input type="date" name="date_end" value="{{ old('date_end') }}" class="form-control" placeholder="Date End">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Uses Per Coupon</strong>
-                    <input type="text" name="uses_total" value="{{old('uses_total')}}" class="form-control" placeholder="Uses Per Coupon">
+                    <input type="text" name="uses_total" value="{{ old('uses_total') }}" class="form-control" placeholder="Uses Per Coupon">
                 </div>
             </div>
             <div class="col-md-12">
@@ -130,7 +130,7 @@
                         <tr>
                             <td>
                                 <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}"
-                                    @if(is_array(old('categoriesId')) && in_array($category->id, old('categoriesId'))) checked @endif>
+                                    {{ in_array($category->id, old('categoriesId', [])) ? 'checked' : '' }}>
                             </td>
                             
                             <td>{{ $category->title }}</td>
@@ -153,7 +153,7 @@
                         <tr>
                             <td>
                                 <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}"
-                                    @if(is_array(old('servicesId')) && in_array($service->id, old('servicesId'))) checked @endif>
+                                    {{ in_array($service->id, old('servicesId', [])) ? 'checked' : '' }}>  
                             </td>
                             
                             <td>{{ $service->name }}</td>

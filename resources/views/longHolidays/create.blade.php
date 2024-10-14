@@ -37,11 +37,7 @@
                 <select name="staff_id" class="form-control">
                     @foreach ($staffs as $staff)
                     @if($staff->hasRole("Staff"))
-                    @if($staff->id == $staff_id)
-                    <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
-                    @else
                     <option value="{{ $staff->id }}" {{ old('staff_id') == $staff->id ? 'selected' : '' }}>{{ $staff->name }}</option>
-                    @endif
                     @endif
                     @endforeach
                 </select>
