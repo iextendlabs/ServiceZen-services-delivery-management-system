@@ -63,8 +63,8 @@
                 <div class="form-group">
                     <strong>Commission:</strong>
                     <input type="number" name="commission" value="{{ old( 'commission',$driver->driver->commission ?? "" )}}" class="form-control" placeholder="Commission In %">
-
-            </div>                </div>
+                </div>                
+            </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Affiliate:</strong>
