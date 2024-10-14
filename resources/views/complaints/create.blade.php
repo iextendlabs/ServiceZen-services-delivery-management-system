@@ -39,8 +39,8 @@
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
                             <option></option>
-                            <option value="Open" {{ old('status', $status ?? '') === 'Open' ? 'selected' : '' }}>Open</option>
-                            <option value="Close" {{ old('status', $status ?? '') === 'Close' ? 'selected' : '' }}>Close</option>
+                            <option value="Open" {{ old('status') === 'Open' ? 'selected' : '' }}>Open</option>
+                            <option value="Close" {{ old('status') === 'Close' ? 'selected' : '' }}>Close</option>
                         </select>
                     </div>
                 </div>
