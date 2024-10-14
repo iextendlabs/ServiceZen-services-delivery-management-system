@@ -39,8 +39,8 @@
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
                             <option></option>
-                            <option value="Open" @if (old('status') === 'Open') selected @endif>Open</option>
-                            <option value="Close" @if (old('status') === '0') selected @endif>Close</option>
+                            <option value="Open" {{ old('status') === 'Open' ? 'selected' : '' }}>Open</option>
+                            <option value="Close" {{ old('status') === 'Close' ? 'selected' : '' }}>Close</option>
                         </select>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                         <select name="user_id" class="form-control">
                             <option></option>
                             @foreach ($users as $user)
-                                <option value="{{ $user->id }}" @if (old('user_id') == $user->id) selected @endif>
+                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
                                     {{ $user->name }} | {{ $user->email }}</option>
                             @endforeach
                         </select>

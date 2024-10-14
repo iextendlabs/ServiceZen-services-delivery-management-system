@@ -26,13 +26,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $driver->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name' , $driver->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $driver->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ old('email', $driver->email) }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -49,21 +49,21 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Phone Number:</strong>
                     <input id="number_country_code" type="hidden" name="number_country_code" />
-                    <input type="tel" id="number" name="phone" value="{{ isset($driver->driver->phone) ? ($driver->driver->phone) : null }}" class="form-control">
+                    <input type="tel" id="number" name="phone" value="{{ old('phone', $driver->driver->phone ?? '') }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                     <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                    <input type="tel" id="whatsapp" name="whatsapp" value="{{ isset($driver->driver->whatsapp) ? $driver->driver->whatsapp : null }}" class="form-control">
+                    <input type="tel" id="whatsapp" name="whatsapp" value="{{ old('whatsapp', $driver->driver->whatsapp ?? '') }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Commission:</strong>
-                    <input type="number" name="commission" value="{{ $driver->driver->commission ?? "" }}" class="form-control" placeholder="Commission In %">
-                </div>
+                    <input type="number" name="commission" value="{{ old( 'commission',$driver->driver->commission ?? "" )}}" class="form-control" placeholder="Commission In %">
+                </div>                
             </div>
             <div class="col-md-12">
                 <div class="form-group">
@@ -72,9 +72,10 @@
                         <option value=""></option>
                         @foreach ($affiliates as $affiliate)
                             @if($affiliate->affiliate->status == 1)
-                                <option value="{{ $affiliate->id }}"
-                                    @if ($driver->driver && $driver->driver->affiliate_id == $affiliate->id) selected @endif> {{ $affiliate->name }}
-                                </option>
+                            <option value="{{ $affiliate->id }}"
+                                {{ old('affiliate_id', $driver->driver->affiliate_id ?? '') == $affiliate->id ? 'selected' : '' }}>
+                                {{ $affiliate->name }}
+                            </option>                            
                             @endif
                         @endforeach
                     </select>

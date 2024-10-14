@@ -13,7 +13,7 @@ class TimeSlot extends Model
 
     protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status', 'start_time_to_sec', 'end_time_to_sec', 'seat'];
 
-    public $space_availability;
+    public $space_availability = 0;
 
     public $booked_staff;
 

@@ -1,4 +1,8 @@
-@extends('layouts.app') @section('content')
+@extends('layouts.app') 
+@php
+    $category_row = 0;
+@endphp
+@section('content')
     <div class="container">
         <div class="row">
             <div class="col-md-12 margin-tb">
@@ -26,14 +30,14 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Name:</strong>
-                        <input type="text" name="name" value="{{ $affiliate->name }}" class="form-control"
+                        <input type="text" name="name" value="{{ old( 'name', $affiliate->name ) }}" class="form-control"
                             placeholder="Name" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Email:</strong>
-                        <input type="email" name="email" value="{{ $affiliate->email }}" class="form-control"
+                        <input type="email" name="email" value="{{ old('email', $affiliate->email) }}" class="form-control"
                             placeholder="abc@gmail.com" />
                     </div>
                 </div>
@@ -54,8 +58,8 @@
                     <div class="form-group">
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1" @if($affiliate->affiliate && $affiliate->affiliate->status == 1) selected @endif>Enable</option>
-                            <option value="0" @if($affiliate->affiliate && $affiliate->affiliate->status == 0) selected @endif>Disable</option>
+                            <option value="1" {{ old('status', $affiliate->affiliate->status ?? '') == "1" ? 'selected' : '' }}>Enable</option>
+                            <option value="0"  {{ old('status', $affiliate->affiliate->status ?? '') == "0" ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>
@@ -64,7 +68,7 @@
                     <div class="form-group">
                         <strong>Phone Number:</strong>
                         <input id="number_country_code" type="hidden" name="number_country_code" />
-                        <input type="tel" id="number" name="number" value="{{ $affiliate->affiliate->number ?? '' }}"
+                        <input type="tel" id="number" name="number" value="{{ old( 'number' ,$affiliate->affiliate->number ?? '' ) }}"
                             class="form-control">
                     </div>
                 </div>
@@ -73,20 +77,20 @@
                         <strong>Whatsapp Number:</strong>
                         <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
                         <input type="tel" id="whatsapp" name="whatsapp"
-                            value="{{ $affiliate->affiliate->whatsapp ?? '' }}" class="form-control">
+                            value="{{ old('whatsapp', $affiliate->affiliate->whatsapp ?? '') }}" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Code:</strong>
-                        <input type="text" name="code" value="{{ $affiliate->affiliate->code ?? '' }}"
+                        <input type="text" name="code" value="{{ old( 'code', $affiliate->affiliate->code ?? '' ) }}"
                             class="form-control" placeholder="Code" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Commission:</strong>
-                        <input type="number" name="commission" value="{{ $affiliate->affiliate->commission ?? '' }}"
+                        <input type="number" name="commission" value="{{ old( 'commission' , $affiliate->affiliate->commission ?? '' )  }}"
                             class="form-control" placeholder="Commission In %" />
                     </div>
                 </div>
@@ -94,13 +98,13 @@
                     <div class="form-group">
                         <strong>Expire after days:</strong>
                         <input type="number" name="expire" class="form-control"
-                            value="{{ $affiliate->affiliate->expire ?? '' }}" placeholder="Enter days like 20" />
+                            value="{{ old( 'expire' , $affiliate->affiliate->expire ?? '') }}" placeholder="Enter days like 20" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Fix Salary:</strong>
-                        <input type="number" name="fix_salary" value="{{ $affiliate->affiliate->fix_salary ?? '' }}"
+                        <input type="number" name="fix_salary" value="{{ old( 'fix_salary' , $affiliate->affiliate->fix_salary ?? '' ) }}"
                             class="form-control" placeholder="Fix Salary" />
                     </div>
                 </div>
@@ -112,8 +116,9 @@
                             @foreach ($affiliates as $single_affiliate)
                                 @if ($single_affiliate->affiliate->status == 1 && $single_affiliate->id !== $affiliate->id)
                                     <option value="{{ $single_affiliate->id }}"
-                                        @if ($affiliate->affiliate && $affiliate->affiliate->parent_affiliate_id == $single_affiliate->id) selected @endif> {{ $single_affiliate->name }}
-                                    </option>
+                                        {{ old('parent_affiliate_id', $affiliate->affiliate->parent_affiliate_id ?? '') == $single_affiliate->id ? 'selected' : '' }}>
+                                        {{ $single_affiliate->name }}
+                                    </option>                                
                                 @endif
                             @endforeach
                         </select>
@@ -122,7 +127,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Parent Affiliate Commission:</strong>
-                        <input type="number" name="parent_affiliate_commission" value="{{ $affiliate->affiliate->parent_affiliate_commission ?? '' }}"
+                        <input type="number" name="parent_affiliate_commission" value="{{ old('parent_affiliate_commission', $affiliate->affiliate->parent_affiliate_commission ?? '') }}"
                             class="form-control" placeholder="Parent Affiliate Commission In %" />
                     </div>
                 </div>
@@ -132,9 +137,61 @@
                         <select name="membership_plan_id" class="form-control">
                             <option value=""></option>
                             @foreach ($membership_plans as $membership_plan)
-                                <option value="{{ $membership_plan->id }}" @if($affiliate->affiliate && $affiliate->affiliate->membership_plan_id && $membership_plan->id == $affiliate->affiliate->membership_plan_id) selected @endif>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                <option value="{{ $membership_plan->id }}" 
+                                    {{ old('membership_plan_id', optional($affiliate->affiliate)->membership_plan_id) == $membership_plan->id ? 'selected' : '' }}>
+                                    {{ $membership_plan->plan_name }} (AED{{ $membership_plan->membership_fee }})
+                                </option>
                             @endforeach
                         </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Categories:</strong>
+                        <table id="categoryTable" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Commission</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if($affiliate->affiliateCategories)
+                                @foreach ($affiliate->affiliateCategories as $affiliateCategory)
+                                <tr>
+                                    <td>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <select name='categories[{{ $category_row }}]' class="form-control" required>
+                                                    <option></option>
+                                                    @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}" @if($affiliateCategory->category_id == $category->id) selected @endif >{{ $category->title }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <input type="number" name="category_commission[{{ $category_row }}]" value="{{ $affiliateCategory->commission }}" class="form-control" placeholder="Commission in %" required min="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                                    </td>
+                                </tr>
+                                @php
+                                    $category_row++;
+                                @endphp
+                                @endforeach
+                                @endif
+                                
+                            </tbody>
+                        </table>
+                        <button id="addCategoryBtn" onclick="addCategoryrow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
                     </div>
                 </div>
                 {{-- <div class="col-md-12">
@@ -173,7 +230,7 @@
                                         <td>
                                             <input type="checkbox" class="customer_checkbox"
                                                 @if ($user->display == '1') checked @endif name="customerId[]"
-                                                value="{{ $user->user_id }}" />
+                                                value="{{ $user->user_id }}"/>
                                         </td>
                                         <td>{{ $user->customer->name }}</td>
                                         <td>{{ $user->customer->email }}</td>
@@ -190,18 +247,18 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                 </tr>
-                                @if ($affiliateUser->where('display', 1)->count() > 0)
-                                    @foreach ($affiliateUser->where('display', 1) as $user)
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" class="selected_customer_checkbox" checked
-                                                    name="selectedCustomerId[]" value="{{ $user->user_id }}" />
-                                            </td>
-                                            <td>{{ $user->customer->name }}</td>
-                                            <td>{{ $user->customer->email }}</td>
-                                        </tr>
-                                    @endforeach
-                                @endif
+                                    @if ($affiliateUser->where('display', 1)->count() > 0)
+                                        @foreach ($affiliateUser->where('display', 1) as $user)
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="selected_customer_checkbox" checked
+                                                        name="selectedCustomerId[]" value="{{ $user->user_id }}"/>
+                                                </td>
+                                                <td>{{ $user->customer->name }}</td>
+                                                <td>{{ $user->customer->email }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
                             </table>
                         </div>
                     @else
@@ -216,6 +273,43 @@
             </div>
         </form>
     </div>
+    <script>
+        var category_row = {{ $category_row }};
+        function addCategoryrow(){
+            var newRow = `
+                <tr>
+                    <td>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <select name='categories[${category_row}]' class="form-control" required>
+                                    <option></option>
+                                    @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="number" name="category_commission[${category_row}]" class="form-control" placeholder="Commission in %" required min="1">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-category"><i class="fa fa-minus-circle"></i></button>
+                    </td>
+                </tr>
+            `;
+            $('#categoryTable tbody').append(newRow);
+            category_row++
+        }
+    
+        $(document).on('click', '.remove-category', function() {
+            $(this).closest('tr').remove();
+        });
+    </script>
     <script>
         $(document).ready(function() {
             if ($('.selected-customer-table tr').length > 6) {

@@ -32,64 +32,98 @@
                 </ul>
             </div>
         @endif
-        <form action="{{ route('customerProfile.update', auth()->user()->id) }}" method="POST">
+        <form action="{{ route('customerProfile.update', auth()->user()->id) }}" method="POST" id="customer-form">
             @csrf
             @method('PUT')
-            <div class="row bg-light py-3 mb-4">
+            <div class="row bg-light">
                 <div class="col-md-12 text-center">
                     <br>
-                    <h3><strong>Address</strong></h3>
+                    <h3><strong>Addresses</strong></h3>
                     <hr>
                 </div>
-                
+                <div class="col-md-12">
+                    <table class="table table-striped table-bordered" id="address-table">
+                        <thead>
+                            <tr>
+                                <th>Building Name</th>
+                                <th>Area</th>
+                                <th>Landmark</th>
+                                <th>Flat Villa</th>
+                                <th>Street</th>
+                                <th>City</th>
+                                <th>District</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="address-body">
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        
+            <div class="row bg-light" id="address-input-section" style="display:none;">
+                <div class="col-md-12 text-center">
+                    <h3><strong>Address Input</strong></h3>
+                    <hr>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Building Name:</strong>
-                        <input required type="text" name="buildingName" id="buildingName" class="form-control"
-                            placeholder="Building Name" value="{{ $user->customerProfile->buildingName ?? null }}">
+                        <label for="buildingName">Building Name</label>
+                        <input type="text" class="form-control" id="buildingName" placeholder="Building Name">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Flat / Villa:</strong>
-                        <input required type="text" name="flatVilla" id="flatVilla" class="form-control"
-                            placeholder="Flat / Villa" value="{{ $user->customerProfile->flatVilla ?? null }}">
+                        <label for="customerArea">Area</label>
+                        <select class="form-control" id="customerArea">
+                            <option value="">-- Select Zone -- </option>
+                            @foreach ($zones as $zone)
+                                <option value="{{ $zone }}">
+                                    {{ $zone }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Street:</strong>
-                        <input required type="text" name="street" id="street" class="form-control"
-                            placeholder="Street" value="{{ $user->customerProfile->street ?? null }}">
+                        <label for="landmark">Landmark</label>
+                        <input type="text" class="form-control" id="landmark" placeholder="Landmark">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>District:</strong>
-                        <input required type="text" name="district" id="district" class="form-control"
-                            placeholder="District" value="{{ $user->customerProfile->district ?? null }}">
+                        <label for="flatVilla">Flat / Villa</label>
+                        <input type="text" class="form-control" id="flatVilla" placeholder="Flat / Villa">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Area:</strong>
-                        <input required type="text" name="area" class="form-control" placeholder="Area"
-                            value="{{ $user->customerProfile->area ?? null }}">
+                        <label for="street">Street</label>
+                        <input type="text" class="form-control" id="street" placeholder="Street">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Landmark:</strong>
-                        <input required type="text" name="landmark" id="landmark" class="form-control"
-                            placeholder="Landmark" value="{{ $user->customerProfile->landmark ?? null }}">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" placeholder="City">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>City:</strong>
-                        <input required type="text" name="city" id="city" class="form-control" placeholder="City"
-                            value="{{ $user->customerProfile->city ?? null }}">
+                        <label for="district">District</label>
+                        <input type="text" class="form-control" id="district" placeholder="District">
                     </div>
+                </div>
+                <div class="col-md-12 text-right py-3">
+                    <button type="button" class="btn btn-success" id="save-address-btn"><i class="fas fa-save"></i></button>
+                    <button type="button" class="btn btn-secondary" id="cancel-btn"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="row bg-light">
+                <div class="col-md-12 text-right">
+                    <button type="button" class="btn btn-primary" id="add-address-btn"><i class="fas fa-plus"></i></button>
                 </div>
             </div>
             <div class="row bg-light py-3 mb-4">
@@ -102,14 +136,14 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Name:</strong>
                         <input required type="text" name="name" id="name" class="form-control" placeholder="Name"
-                            value="{{ $user->name }}">
+                            value="{{ old('name',$user->name) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Email:</strong>
                         <input required type="email" name="email" id="email" class="form-control"
-                            placeholder="abc@gmail.com" value="{{ $user->email }}">
+                            placeholder="abc@gmail.com" value="{{ old('email',$user->email) }}">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -127,8 +161,8 @@
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Phone Number:</strong>
                         <input id="number_country_code" type="hidden" name="number_country_code" />
-                        <input id="number" type="tel" name="number" class="form-control"
-                            value="{{ $user->customerProfile->number ?? null }}" />
+                        <input id="number" required type="tel" name="number" class="form-control" 
+                            value="{{ optional($user->customerProfiles->first())->number ?? '' }}" />
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -136,22 +170,22 @@
                         <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                         <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
                         <input required type="tel" name="whatsapp" id="whatsapp" class="form-control"
-                            value="{{ $user->customerProfile->whatsapp ?? null }}">
+                            value="{{ optional($user->customerProfiles->first())->whatsapp ?? null }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Gender:</strong><br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="gender" id="genderMale"
+                            <input class="form-check-input" type="radio" name="gender" id="genderMale" required
                                 value="Male"
-                                {{ $user->customerProfile && $user->customerProfile->gender == 'Male' ? 'checked' : '' }}>
+                                {{ optional($user->customerProfiles->first())->gender === 'Male' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderMale">Male</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="gender" id="genderFemale"
+                            <input class="form-check-input" type="radio" name="gender" id="genderFemale" required
                                 value="Female"
-                                {{ $user->customerProfile && $user->customerProfile->gender == 'Female' ? 'checked' : '' }}>
+                                {{ optional($user->customerProfiles->first())->gender === 'Female' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderFemale">Female</label>
                         </div>
                     </div>
@@ -234,6 +268,117 @@
             </div>
         </div>
     </div>
+    <script>
+        let addresses = [];
+    
+        @foreach ($user->customerProfiles as $customerProfile)
+        addresses.push({
+            buildingName: '{{ $customerProfile->buildingName }}',
+            area: '{{ $customerProfile->area }}',
+            landmark: '{{ $customerProfile->landmark }}',
+            flatVilla: '{{ $customerProfile->flatVilla }}',
+            street: '{{ $customerProfile->street }}',
+            city: '{{ $customerProfile->city }}',
+            district: '{{ $customerProfile->district }}'
+        });
+        @endforeach
+    
+        $(document).ready(function() {
+            if (addresses.length === 0) {
+                $('#address-input-section').show();
+                $('#add-address-btn').hide();
+                $('#cancel-btn').hide();
+            } else {
+                addresses.forEach(function(address) {
+                    addAddressToTable(address);
+                });
+            }
+        });
+    
+        $('#add-address-btn').on('click', function() {
+            $('#address-input-section').show();
+                $('#cancel-btn').show();
+                $('#add-address-btn').hide();
+            clearAddressInputs();
+        });
+    
+        $('#cancel-btn').on('click', function() {
+            $('#address-input-section').hide();
+            $('#add-address-btn').show();
+            clearAddressInputs();
+        });
+    
+        function saveAddress() {
+            const address = {
+                buildingName: $('#buildingName').val(),
+                area: $('#customerArea').val(),
+                landmark: $('#landmark').val(),
+                flatVilla: $('#flatVilla').val(),
+                street: $('#street').val(),
+                city: $('#city').val(),
+                district: $('#district').val()
+            };
+    
+            if (!address.buildingName || !address.area || !address.landmark || !address.flatVilla || !address.street || !address.city || !address.district) {
+                alert("All fields are required!");
+                return false;
+            }
+    
+            addresses.push(address);
+            addAddressToTable(address);
+    
+            $('#address-input-section').hide();
+            $('#add-address-btn').show();
+            clearAddressInputs();
+            return true;
+        }
+    
+        $('#save-address-btn').on('click', function() {
+            saveAddress();
+        });
+    
+        function addAddressToTable(address) {
+            const row = `<tr>
+                            <td>${address.buildingName}</td>
+                            <td>${address.area}</td>
+                            <td>${address.landmark}</td>
+                            <td>${address.flatVilla}</td>
+                            <td>${address.street}</td>
+                            <td>${address.city}</td>
+                            <td>${address.district}</td>
+                            <td><button type="button" class="btn btn-danger remove-btn">Remove</button></td>
+                            <input type="hidden" name="addresses[]" value='${JSON.stringify(address)}'>
+                        </tr>`;
+    
+            $('#address-body').append(row);
+        }
+    
+        $('#address-body').on('click', '.remove-btn', function() {
+            const rowIndex = $(this).closest('tr').index();
+            addresses.splice(rowIndex, 1);
+            $(this).closest('tr').remove();
+        });
+    
+        function clearAddressInputs() {
+            $('#buildingName').val('');
+            $('#customerArea').val('');
+            $('#landmark').val('');
+            $('#flatVilla').val('');
+            $('#street').val('');
+            $('#city').val('');
+            $('#district').val('');
+        }
+    
+        $('#customer-form').on('submit', function(e) {
+            if ($('#address-input-section').is(':visible')) {
+                const success = saveAddress();
+                if (!success) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+    </script>
     <script>
         $(document).ready(function() {
             $("#applyAffiliateBtn").click(function() {

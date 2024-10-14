@@ -22,13 +22,13 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>
-                    <input type="date" name="date" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Date">
+                    <input type="date" name="date" value="{{ old('date',date('Y-m-d')) }}" class="form-control" placeholder="Date">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group scroll-div">
                     <span style="color: red;">*</span><strong>Staffs:</strong>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
+                    <input type="text" name="search" id="search"  class="form-control" placeholder="Search Staff By Name And Email">
                     <table class="table table-striped table-bordered">
                         <tr>
                             <th></th>
@@ -39,11 +39,7 @@
                         @if($staff->hasRole("Staff"))
                         <tr>
                             <td>
-                                @if($staff->id == $staff_id)
-                                <input type="checkbox" name="ids[{{ ++$i }}]" checked value="{{ $staff->id }}">
-                                @else
-                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                @endif
+                                <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}" {{ in_array($staff->id, old('ids', [])) || $staff->id == $staff_id ? 'checked' : '' }}>
                             </td>
                             <td>{{ $staff->name }}</td>
                             <td>{{ $staff->email }}</td>

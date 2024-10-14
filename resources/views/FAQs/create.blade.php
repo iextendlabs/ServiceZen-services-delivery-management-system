@@ -36,17 +36,9 @@
                     <strong>Category:</strong>
                     <select name="category_id" class="form-control">
                         <option></option>
-                        @if(isset($category_id))
                         @foreach($categories as $category)
-                        @if($category->id == $category_id)
-                        <option value="{{ $category->id }}" selected>{{ $category->title }}</option>
-                        @endif
+                        <option  {{ old('category_id', $category_id) == $category->id ? 'selected' : '' }} value="{{ $category->id }}">{{ $category->title }}</option>
                         @endforeach
-                        @else
-                        @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->title }}</option>
-                        @endforeach
-                        @endif
                     </select>
                 </div>
             </div>
@@ -56,17 +48,9 @@
                     <strong>Service:</strong>
                     <select name="service_id" class="form-control">
                         <option></option>
-                        @if(isset($service_id))
                         @foreach($services as $service)
-                        @if($service->id == $service_id)
-                        <option value="{{ $service->id }}" selected>{{ $service->name }}</option>
-                        @endif
+                        <option value="{{ $service->id }}" {{ old('service_id',$service_id) == $service->id ? 'selected' : '' }}>{{ $service->name }}</option>
                         @endforeach
-                        @else
-                        @foreach($services as $service)
-                        <option value="{{ $service->id }}">{{ $service->name }}</option>
-                        @endforeach
-                        @endif
                     </select>
                 </div>
             </div>
@@ -74,8 +58,8 @@
                 <div class="form-group">
                     <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1">Enable</option>
-                            <option value="0">Disable</option>
+                            <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                 </div>
             </div>

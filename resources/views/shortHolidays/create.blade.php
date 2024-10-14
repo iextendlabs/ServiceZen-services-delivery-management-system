@@ -22,27 +22,27 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>
-                    <input type="date" name="date" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Date">
+                    <input type="date" name="date" value="{{ old('date') }}" class="form-control" placeholder="Date">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Time Start:</strong>
-                    <input type="time" name="time_start" value="{{ date('Y-m-d') }}" class="form-control" placeholder="TIme Start">
+                    <input type="time" name="time_start" value="{{ old('time_start') }}" class="form-control" placeholder="TIme Start">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Hours:</strong>
-                    <input type="number" name="hours" class="form-control" placeholder="Hours">
+                    <input type="number" name="hours" value="{{ old('hours') }}" class="form-control" placeholder="Hours">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="1">Enable</option>
-                            <option value="0">Disable</option>
+                            <option value="1"  {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0"  {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                 </div>
             </div>
@@ -52,11 +52,7 @@
                     <select name="staff_id" class="form-control">
                         @foreach ($staffs as $staff)
                         @if($staff->hasRole("Staff"))
-                        @if($staff->id == $staff_id)
-                        <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
-                        @else
-                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                        @endif
+                        <option value="{{ $staff->id }}"  {{ old('staff_id') == $staff->id ? 'selected' : '' }}>{{ $staff->name }}</option>
                         @endif
                         @endforeach
                     </select>

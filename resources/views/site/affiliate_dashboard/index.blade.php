@@ -2,6 +2,30 @@
 
 @section('content')
     <div class="container">
+        <div class="row mt-3">
+            <div class="col-12">
+                @if ($message = Session::get('success'))
+                    <div class="alert alert-success">
+                        <span>{{ $message }}</span>
+                    </div>
+                @endif
+                @if ($message = Session::get('error'))
+                    <div class="alert alert-danger">
+                        <span>{{ $message }}</span>
+                    </div>
+                @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
+        </div>
         <div class="row bg-light py-5 mb-4">
             <div class="col-md-6 d-flex align-items-center">
                 <h2>Dashboard</h2>
@@ -78,26 +102,6 @@
                 </div>
             @endif
         </div>
-        @if ($message = Session::get('success'))
-            <div class="alert alert-success">
-                <span>{{ $message }}</span>
-            </div>
-        @endif
-        @if ($message = Session::get('error'))
-            <div class="alert alert-danger">
-                <span>{{ $message }}</span>
-            </div>
-        @endif
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
         <div class="row bg-light py-3 mb-4">
             <div class="col-md-12">
                 <h4>Account Actions</h4>
@@ -133,7 +137,7 @@
                                 <select name="payment_method" class="form-control" required>
                                     <option></option>
                                     @foreach ($withdraw_payment_method as $payment_method)
-                                        <option value="{{ $payment_method }}"
+                                        <option value="{{ $payment_method }}" 
                                             @if (old('payment_method') == $payment_method) selected @endif>{{ $payment_method }}
                                         </option>
                                     @endforeach
@@ -198,17 +202,16 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <span style="color: red;">*</span><strong>Recipient</strong>
-                            <select name="recipient_id" class="form-control" required>
-                                <option></option>
-                                @foreach ($affiliates as $affiliate)
-                                    @if ($affiliate->id !== auth()->user()->id)
-                                        <option value="{{ $affiliate->id }}"
-                                            @if (old('recipient_id') == $affiliate->id) selected @endif>{{ $affiliate->name }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </select>
+                            <span style="color: red;">*</span><strong>Recipient Name</strong>
+                            <input type="text" name="recipient_name" class="form-control"
+                                placeholder="Recipient Name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red;">*</span><strong>Recipient Code</strong>
+                            <input type="text" name="recipient_code" class="form-control"
+                                placeholder="Recipient Code" required>
                         </div>
                     </div>
                     <div class="col-md-12 d-flex justify-content-end">
@@ -377,9 +380,10 @@
                                 <td>{{ $user->customer->name ?? '' }}</td>
                                 <td>{{ $user->customer->email ?? '' }}</td>
                                 <td>{{ $user->order_count }}</td>
-                                <td>{{ $user->customer->customerProfile->number ?? '' }}</td>
-                                <td>{{ $user->customer->customerProfile->whatsapp ?? '' }}</td>
-                                <td>{{ $user->customer->customerProfile->area ?? '' }}</td>
+                                <td>{{ optional($user->customer->customerProfiles->first())->number ?? '' }}</td>
+                                <td>{{ optional($user->customer->customerProfiles->first())->whatsapp ?? '' }}</td>
+                                <td>{{ $user->customer->customerProfiles->pluck('area')->filter()->implode(', ') ?? '' }}</td>
+
                             </tr>
                         @endforeach
                     @else
@@ -388,7 +392,9 @@
                         </tr>
                     @endif
                 </table>
-                {!! $affiliateUser->links() !!}
+                @if (count($affiliateUser) != 0)
+                    {!! $affiliateUser->links() !!}
+                @endif
 
             </div>
         </div>

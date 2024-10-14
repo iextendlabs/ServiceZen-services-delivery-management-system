@@ -94,8 +94,26 @@
                 </div>
             </div>
             <hr>
+            @if(count($affiliate->affiliateCategories) != 0)
             <div class="col-md-12">
-                <h3>My Customer</h3>
+                <h3>Category base commission</h3>
+                <table class="table table-striped table-bordered album bg-light">
+                    <tr>
+                        <th>Category</th>
+                        <th>Commission</th>
+                    </tr>
+                    @foreach ($affiliate->affiliateCategories as $affiliateCategory)
+                        <tr>
+                            <td>{{ $affiliateCategory->category->title }}</td>
+                            <td>{{ $affiliateCategory->commission }}%</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+            <hr>
+            @endif
+            <div class="col-md-12">
+                <h3>Customer</h3>
                 @if (count($affiliateUser) != 0)
                     <table class="table table-striped table-bordered album bg-light">
                         <tr>
@@ -111,9 +129,9 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->customer->name ?? '' }}</td>
                                 <td>{{ $user->customer->email ?? '' }}</td>
-                                <td>{{ $user->customer->customerProfile->number ?? '' }}</td>
-                                <td>{{ $user->customer->customerProfile->whatsapp ?? '' }}</td>
-                                <td>{{ $user->customer->customerProfile->area ?? '' }}</td>
+                                <td>{{ optional($user->customer->customerProfiles->first())->number }}</td>
+                                <td>{{ optional($user->customer->customerProfiles->first())->whatsapp ?? '' }}</td>
+                                <td>{{ $user->customer->customerProfiles->pluck('area')->filter()->implode(', ') ?? '' }}</td>
                             </tr>
                         @endforeach
                     </table>
@@ -127,7 +145,7 @@
 
             <hr>
             <div class="col-md-12">
-                <h3>My Transaction</h3>
+                <h3>Transaction</h3>
                 @if (count($transactions) != 0)
                     <a href="{{ url('/affiliate/exportTransaction', ['User' => $affiliate->id]) }}"
                         class="btn btn-primary">Export
@@ -208,11 +226,11 @@
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Type:</strong>
                                 <select name="type" class="form-control">
-                                    <option value="Credit">Credit</option>
-                                    <option value="Debit">Debit</option>
-                                    <option value="Product Sale">Product Sale</option>
-                                    <option value="Bonus">Bonus</option>
-                                    <option value="Pay Salary">Pay Salary</option>
+                                    <option value="Credit" {{ old('type') == "Credit" ? 'selected' : '' }}>Credit</option>
+                                    <option value="Debit" {{ old('type') == "Debit" ? 'selected' : '' }}>Debit</option>
+                                    <option value="Product Sale" {{ old('type') == "Product Sale" ? 'selected' : '' }}>Product Sale</option>
+                                    <option value="Bonus" {{ old('type') == "Bonus" ? 'selected' : '' }}>Bonus</option>
+                                    <option value="Pay Salary" {{ old('type') == "Pay Salary" ? 'selected' : '' }}>Pay Salary</option>
                                 </select>
                             </div>
                         </div>

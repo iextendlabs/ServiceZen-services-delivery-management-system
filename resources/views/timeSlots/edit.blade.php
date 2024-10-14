@@ -24,58 +24,48 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{$time_slot->name}}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name',$time_slot->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong for="image">Type</strong>
                     <select name="type" class="form-control">
-                        @if($time_slot->type == "General")
-                        <option value="General" selected>General</option>
-                        <option value="Specific">Specific</option>
-                        @elseif($time_slot->type == "Specific")
-                        <option value="General">General</option>
-                        <option value="Specific" selected>Specific</option>
-                        @endif
+                        <option value="General" {{ old('type') == 'General' ? 'selected' : ''}}>General</option>
+                        <option value="Specific" {{ old('type') == 'Specific' ? 'selected' : ''}}>Specific</option>
                     </select>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Time Start:</strong>
-                    <input type="time" name="time_start" value="{{ \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_start)->format('H:i') }}" class="form-control" placeholder="Time Start">
+                    <input type="time" name="time_start" value="{{ old('time_start', \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_start)->format('H:i')) }}" class="form-control" placeholder="Time Start">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Time End:</strong>
-                    <input type="time" name="time_end" value="{{ \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_end)->format('H:i') }}" class="form-control" placeholder="Time End">
+                    <input type="time" name="time_end" value="{{ old('time_start', \Carbon\Carbon::createFromFormat('H:i:s', $time_slot->time_end)->format('H:i')) }}" class="form-control" placeholder="Time End">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>No. of Seats:</strong>
-                    <input type="number" name="seat" value="{{$time_slot->seat}}" class="form-control">
+                    <input type="number" name="seat" value="{{ old('seat',$time_slot->seat) }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12" id="date" style="display: none;">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date:</strong>
-                    <input type="date" name="date" value="{{$time_slot->date}}" class="form-control" placeholder="Date">
+                    <input type="date" name="date" value="{{ old('date',$time_slot->date) }}" class="form-control" placeholder="Date">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status:</strong>
                     <select name="status" class="form-control">
-                        @if($time_slot->status == 1)
-                        <option value="1" selected>Enable</option>
-                        <option value="0">Disable</option>
-                        @else
-                        <option value="1">Enable</option>
-                        <option value="0" selected>Disable</option>
-                        @endif
+                        <option value="1" {{ old('status') == '1' ? 'selected' : ''}}>Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : ''}}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -84,11 +74,7 @@
                 <select name="group_id" class="form-control">
                     <option></option>
                     @foreach($staff_groups as $staff_group )
-                    @if($time_slot->group_id == $staff_group->id)
-                    <option value="{{$staff_group->id}}" selected>{{$staff_group->name}}</option>
-                    @else
-                    <option value="{{$staff_group->id}}">{{$staff_group->name}}</option>
-                    @endif
+                    <option value="{{$staff_group->id}}" {{ old('group_id', $time_slot->group_id ) == $staff_group->id ? 'selected' : ''}}>{{$staff_group->name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -106,11 +92,7 @@
                             @foreach ($staffs as $staff)
                             <tr>
                                 <td>
-                                    @if(in_array($staff->id,$selected_staff))
-                                    <input type="checkbox" checked name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                    @else
-                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                                    @endif
+                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}" {{ in_array($staff->id, old('ids', $selected_staff)) ? 'checked' : ''}}>
                                 </td>
                                 <td>{{ $staff->name }}</td>
                                 <td>{{ $staff->email }}</td>

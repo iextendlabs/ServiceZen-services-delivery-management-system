@@ -43,13 +43,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Name:</strong>
-                            <input type="text" name="name" value="{{ $user->name }}" class="form-control" placeholder="Name">
+                            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="form-control" placeholder="Name">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Email:</strong>
-                            <input type="email" name="email" value="{{ $user->email }}" class="form-control" placeholder="abc@gmail.com">
+                            <input type="email" name="email" value="{{ old('email' ,$user->email) }}" class="form-control" placeholder="abc@gmail.com">
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -114,31 +114,31 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Instagram <i class="fa fa-instagram"></i>:</strong>
-                            <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ $user->staff->instagram }}">
+                            <input type="text" name="instagram" class="form-control" placeholder="Instagram" value="{{ old('instagram' ,$user->staff->instagram) }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Snapchat:</strong>
-                            <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ $user->staff->snapchat }}">
+                            <input type="text" name="snapchat" class="form-control" placeholder="Snapchat" value="{{ old('snapchat' , $user->staff->snapchat) }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Facebook:</strong>
-                            <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ $user->staff->facebook }}">
+                            <input type="text" name="facebook" class="form-control" placeholder="Facebook" value="{{ old( 'facebook' ,$user->staff->facebook) }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Youtube:</strong>
-                            <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ $user->staff->youtube }}">
+                            <input type="text" name="youtube" class="form-control" placeholder="Youtube" value="{{ old( 'youtube' ,$user->staff->youtube ) }}">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Tiktok:</strong>
-                            <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ $user->staff->tiktok }}">
+                            <input type="text" name="tiktok" class="form-control" placeholder="Tiktok" value="{{ old( 'tiktok', $user->staff->tiktok ) }}">
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                         @if(count($user->staffYoutubeVideo))
                         @foreach($user->staffYoutubeVideo as $staffYoutubeVideo)
                         <div class="form-group">
-                            <input type="text" name="youtube_video[]" class="form-control" placeholder="Youtube Video" value="{{ $staffYoutubeVideo->youtube_video }}">
+                            <input type="text" name="youtube_video[]" class="form-control" placeholder="Youtube Video" value="{{ old( 'youtube_video[]' , $staffYoutubeVideo->youtube_video) }}">
                         </div>
                         @endforeach
                         @endif

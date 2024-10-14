@@ -49,8 +49,8 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status:</strong>
                     <select name="status" class="form-control">
-                        <option value="1"> Enable</option>
-                        <option value="0"> Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}> Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}> Disable</option>
                     </select>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                         <option></option>
                         @foreach ($affiliates as $affiliate)
                         @if($affiliate->affiliate->status == 1)
-                            <option value="{{ $affiliate->id }}" @if(old('affiliate_id') == $affiliate->id) selected @endif>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
+                            <option value="{{ $affiliate->id }}" {{ old('affiliate_id') == $affiliate->id ? 'selected' : '' }}>{{ $affiliate->name }}@if($affiliate->affiliate->code)({{ $affiliate->affiliate->code }}) @endif</option>
                         @endif
                         @endforeach
                     </select>
@@ -72,8 +72,8 @@
                 <div class="form-group"><strong>Affiliate Commission type:</strong>
                     <select name="type" class="form-control">
                         <option></option>
-                        <option @if(old('type') == "F") selected @endif value="F">Fix</option>
-                        <option @if(old('type') == "P") selected @endif value="P">Persentage</option>
+                        <option value="F" {{ old('type') == "F" ? 'selected' : '' }}>Fix</option>
+                        <option value="P" {{ old('type') == "P" ? 'selected' : '' }}>Percentage</option>                        
                     </select>
                 </div>
             </div>

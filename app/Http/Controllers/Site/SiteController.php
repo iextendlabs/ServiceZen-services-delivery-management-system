@@ -163,14 +163,9 @@ class SiteController extends Controller
             $address['street'] = $request->street;
             $address['landmark'] = $request->landmark;
             $address['city'] = $request->city;
-            $address['number'] = $request->number;
-            $address['whatsapp'] = $request->whatsapp;
-            $address['email'] = $request->email;
-            $address['name'] = $request->name;
             $address['latitude'] = $request->latitude;
             $address['longitude'] = $request->longitude;
             $address['searchField'] = $request->searchField;
-            $address['gender'] = $request->gender;
 
             cookie()->queue('address', json_encode($address), 5256000);
 
@@ -181,29 +176,46 @@ class SiteController extends Controller
 
     public function updateZone(Request $request)
     {
-        if ($request->zone) {
-            $address = [];
+        $address = [
+            'buildingName' => "",
+            'district' => "",
+            'area' => $request->zone,
+            'flatVilla' => '',
+            'street' => '',
+            'landmark' => '',
+            'city' => '',
+            'searchField' => '',
+            'update_profile' => '',
+            'latitude' => '',
+            'longitude' => ''
+        ];
 
-            $address['buildingName'] = '';
-            $address['area'] = $request->zone;
-            $address['district'] = '';
-            $address['flatVilla'] = '';
-            $address['street'] = '';
-            $address['landmark'] = '';
-            $address['city'] = '';
-            $address['number'] = '';
-            $address['whatsapp'] = '';
-            $address['email'] = '';
-            $address['name'] = '';
-            $address['latitude'] = '';
-            $address['longitude'] = '';
-            $address['searchField'] = '';
-            $address['gender'] = '';
+        if (Auth::check()) {
+            $user = Auth::user();
 
-            cookie()->queue('address', json_encode($address), 5256000);
+            if ($user->customerProfiles->isNotEmpty()) {
+                $customerProfile = $user->customerProfiles->where('area', $request->zone)->first();
 
-            return redirect('/');
+                if ($customerProfile) {
+                    $address = [
+                        'buildingName' => $customerProfile->buildingName,
+                        'district' => $customerProfile->district,
+                        'area' => $customerProfile->area,
+                        'flatVilla' => $customerProfile->flatVilla,
+                        'street' => $customerProfile->street,
+                        'landmark' => $customerProfile->landmark,
+                        'city' => $customerProfile->city,
+                        'latitude' => $customerProfile->latitude,
+                        'longitude' => $customerProfile->longitude,
+                        'searchField' => $customerProfile->searchField
+                    ];
+                }
+            }
         }
+
+        cookie()->queue('address', json_encode($address), 5256000);
+
+        return redirect('/');
     }
 
 

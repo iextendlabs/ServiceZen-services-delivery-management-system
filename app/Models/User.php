@@ -132,6 +132,11 @@ class User extends Authenticatable
         return $this->hasOne(UserAffiliate::class,'user_id');
     }
 
+    public function customerProfiles()
+    {
+        return $this->hasMany(CustomerProfile::class);
+    }
+
     public function customerProfile()
     {
         return $this->hasOne(CustomerProfile::class);
@@ -242,5 +247,10 @@ class User extends Authenticatable
     public function document()
     {
         return $this->hasOne(UserDocument::class, 'user_id');
+    }
+
+    public function affiliateCategories()
+    {
+        return $this->hasMany(AffiliateCategory::class, 'affiliate_id');
     }
 }

@@ -35,20 +35,20 @@
                         <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Inprogress">
                             <i class="fas fa-hourglass-split"></i> Inprogress
                         </a>
+                        <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
+                            <i class="fas fa-check"></i> Complete
+                        </a>
+                        <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Accepted">
+                            <i class="fas fa-check"></i> Accepted
+                        </a>
+                        <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
+                            <i class="fas fa-check"></i> Confirm
+                        </a>
+                        <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('log.show') }}">
+                            Order request log
+                        </a>
                     @endif
-
-                    <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
-                        <i class="fas fa-check"></i> Complete
-                    </a>
-                    <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Accepted">
-                        <i class="fas fa-check"></i> Accepted
-                    </a>
-                    <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
-                        <i class="fas fa-check"></i> Confirm
-                    </a>
-                    <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('log.show') }}">
-                        Order request log
-                    </a>
+                    
                     <a class="btn btn-secondary mb-2 ms-md-2"
                         href="{{ route('orders.index') }}?today_order={{ date('Y-m-d') }}">
                         <i class="fas fa-calendar"></i> Todays Order

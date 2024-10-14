@@ -35,47 +35,47 @@
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Type</strong>
                     <select name="type" class="form-control">
-                        <option value="Percentage">Percentage</option>
-                        <option value="Fixed Amount">Fixed Amount</option>
+                        <option value="Percentage" {{ old('type') == 'Percentage' ? 'selected' : '' }} >Percentage</option>
+                        <option value="Fixed Amount" {{ old('type') == 'Fixed Amount' ? 'selected' : '' }}>Fixed Amount</option>
                     </select>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Discount</strong>
-                    <input type="number" name="discount" value="{{old('discount')}}" class="form-control" placeholder="Discount">
+                    <input type="number" name="discount" value="{{ old('discount') }}" class="form-control" placeholder="Discount">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Minimum Order</strong>
-                    <input type="number" name="min_order_value" value="{{old('min_order_value')}}" class="form-control" placeholder="Minimum Order">
+                    <input type="number" name="min_order_value" value="{{ old('min_order_value') }}" class="form-control" placeholder="Minimum Order">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date Start</strong>
-                    <input type="date" name="date_start" value="{{old('date_start')}}" class="form-control" placeholder="Date Start">
+                    <input type="date" name="date_start" value="{{ old('date_start') }}" class="form-control" placeholder="Date Start">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Date End</strong>
-                    <input type="date" name="date_end" value="{{old('date_end')}}" class="form-control" placeholder="Date End">
+                    <input type="date" name="date_end" value="{{ old('date_end') }}" class="form-control" placeholder="Date End">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Uses Per Coupon</strong>
-                    <input type="text" name="uses_total" value="{{old('uses_total')}}" class="form-control" placeholder="Uses Per Coupon">
+                    <input type="text" name="uses_total" value="{{ old('uses_total') }}" class="form-control" placeholder="Uses Per Coupon">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Status</strong>
                     <select name="status" class="form-control">
-                        <option value="1">Enable</option>
-                        <option value="0">Disable</option>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -129,8 +129,10 @@
                         @foreach ($categories as $category)
                         <tr>
                             <td>
-                                <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}">
+                                <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}"
+                                    {{ in_array($category->id, old('categoriesId', [])) ? 'checked' : '' }}>
                             </td>
+                            
                             <td>{{ $category->title }}</td>
                         </tr>
                         @endforeach
@@ -150,8 +152,10 @@
                         @foreach ($services as $service)
                         <tr>
                             <td>
-                                <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}">
+                                <input type="checkbox" name="servicesId[{{ ++$i }}]" value="{{ $service->id }}"
+                                    {{ in_array($service->id, old('servicesId', [])) ? 'checked' : '' }}>  
                             </td>
+                            
                             <td>{{ $service->name }}</td>
                             <td>{{ $service->price }}</td>
                         </tr>

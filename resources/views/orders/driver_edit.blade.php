@@ -36,8 +36,7 @@
                             <select name="driver_id" class="form-control">
                                 <option></option>
                                 @foreach ($drivers as $driver)
-                               
-                                <option value="{{ $driver->id }}"  @if($driver->id == $order->driver_id) selected @endif>{{ $driver->name }}</option>
+                                <option value="{{ $driver->id }}" {{ old('driver_id', $order->driver_id) == $driver->id  ? 'selected' : '' }}>{{ $driver->name }}</option>
                                 @endforeach
                             </select>
                         </div>

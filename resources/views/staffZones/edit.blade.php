@@ -23,19 +23,19 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{$staffZone->name}}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name',$staffZone->name )}}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Description:</strong>
-                    <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{$staffZone->description}}</textarea>
+                    <textarea class="form-control" style="height:150px" name="description" placeholder="Description">{{old('description',$staffZone->description)}}</textarea>
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Transport Charges:</strong>
-                    <input type="number" name="transport_charges" value="{{$staffZone->transport_charges}}" class="form-control" placeholder="Transport Charges">
+                    <input type="number" name="transport_charges" value="{{old('transport_charges',$staffZone->transport_charges )}}" class="form-control" placeholder="Transport Charges">
                 </div>
             </div>
             <div class="col-md-12">
@@ -44,7 +44,10 @@
                     <select name="currency_id" class="form-control">
                         <option></option>
                         @foreach ($currencies as $currency)
-                            <option value="{{ $currency->id }}" @if( $staffZone->currency && $staffZone->currency->id == $currency->id) selected @endif>{{ $currency->name }}</option>
+                            <option value="{{ $currency->id }}" 
+                                {{ old('currency_id', $staffZone->currency->id ?? null) == $currency->id ? 'selected' : '' }}>
+                                {{ $currency->name }}
+                            </option>                        
                         @endforeach
                     </select>
                 </div>
@@ -56,7 +59,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">AED</span>
                         </div>
-                        <input type="number" name="extra_charges" value="{{$staffZone->extra_charges}}" class="form-control" placeholder="Extra Charges">
+                        <input type="number" name="extra_charges" value="{{old('extra_charges',$staffZone->extra_charges)}}" class="form-control" placeholder="Extra Charges">
                     </div>
                 </div>
             </div>

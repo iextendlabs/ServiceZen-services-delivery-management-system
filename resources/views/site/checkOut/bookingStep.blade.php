@@ -110,17 +110,79 @@
                         </table>
                     </div>
                 </div>
+                <div class="col-md-12 d-flex justify-content-end align-items-center">
+                    <a href="{{route('checkBooking')}}" class="btn btn-primary">Add More Services</a>
+                </div>
             </div>
             <div id="booking-step">
                 <form id="booking-form" action="draftOrder" method="POST">
                     @csrf
-                    <div class="row">
-                        <div class="col-md-12 d-flex justify-content-end align-items-center">
-                            <a href="{{route('checkBooking')}}" class="btn btn-primary">Add More Services</a>
+                    @if(count($customerProfiles) > 0)
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <br>
+                                <h3><strong>Existing Address</strong></h3>
+                                <hr>
+                            </div>
+                            <div class="col-md-12">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="40px"></th>
+                                            <th>Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($customerProfiles as $customerProfile)
+                                            <tr>
+                                                <td>
+                                                    <input type="radio" name="selectedAddress" value="{{ $customerProfile->id }}"
+                                                        data-building-name="{{ $customerProfile->buildingName }}"
+                                                        data-flat-villa="{{ $customerProfile->flatVilla }}"
+                                                        data-street="{{ $customerProfile->street }}"
+                                                        data-area="{{ $customerProfile->area }}"
+                                                        data-district="{{ $customerProfile->district }}"
+                                                        data-landmark="{{ $customerProfile->landmark }}"
+                                                        data-city="{{ $customerProfile->city }}"
+                                                        data-latitude="{{ $customerProfile->latitude }}"
+                                                        data-longitude="{{ $customerProfile->longitude }}"
+                                                        {{ $addresses['area'] == $customerProfile->area && $addresses['city'] == $customerProfile->city ? 'checked' : '' }}>
+                                                </td>
+                                                <td>
+                                                    {{ $customerProfile->buildingName ?? '' }} {{ $customerProfile->flatVilla ?? '' }},
+                                                    {{ $customerProfile->street ?? '' }},
+                                                    {{ $customerProfile->area ?? '' }},
+                                                    {{ $customerProfile->city ?? '' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-end align-items-center">
+                                <button type="button" id="newAddressBtn" class="btn btn-primary">New Address</button>
+                            </div>
                         </div>
+                    @else
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="text-center" style="margin-bottom: 20px;">
+                                    <span class="alert alert-danger" role="alert">
+                                        <strong>No address has been saved for the selected zone.</strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            $(document).ready(function() {
+                                $('#address-form').show();
+                            });
+                        </script>
+                    @endif
+                    <div class="row" id="address-form" style="display: none;">
                         <div class="col-md-12 text-center">
                             <br>
-                            <h3><strong>Address</strong></h3>
+                            <h3><strong>New Address</strong></h3>
                             <hr>
                         </div>
                         <div class="col-md-6">
@@ -128,7 +190,7 @@
                                 <span style="color: red;">*</span><strong>Building Name:</strong>
                                 <input required type="text" name="buildingName" id="buildingName" class="form-control"
                                     placeholder="Building Name"
-                                    value="{{ old('buildingName') ? old('buildingName') : $addresses['buildingName'] }}">
+                                    value="{{ old('buildingName') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -136,7 +198,7 @@
                                 <span style="color: red;">*</span><strong>Flat / Villa:</strong>
                                 <input required type="text" name="flatVilla" id="flatVilla" class="form-control"
                                     placeholder="Flat / Villa"
-                                    value="{{ old('flatVilla') ? old('flatVilla') : $addresses['flatVilla'] }}">
+                                    value="{{ old('flatVilla') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -144,18 +206,17 @@
                                 <span style="color: red;">*</span><strong>Street:</strong>
                                 <input required type="text" name="street" id="street" class="form-control"
                                     placeholder="Street"
-                                    value="{{ old('street') ? old('street') : $addresses['street'] }}">
+                                    value="{{ old('street') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Area:</strong>
 
-                                <select readonly required class="form-control" name="area">
+                                <select required readonly class="form-control" name="area">
                                     <option value="">-- Select Zone -- </option>
-                                    <!-- Loop through the $zones array to generate options -->
                                     @foreach ($zones as $zone)
-                                        <option @if (old('area') == $zone || $addresses['area'] == $zone || (session('address') && session('address')['area'] == $zone)) selected @endif
+                                        <option @if (old('area') == $zone || $addresses['area'] == $zone) selected @endif
                                             value="{{ $zone }}">
                                             {{ $zone }}
                                         </option>
@@ -169,7 +230,7 @@
                                 <span style="color: red;">*</span><strong>District:</strong>
                                 <input required type="text" name="district" id="district" class="form-control"
                                     placeholder="District"
-                                    value="{{ old('district') ? old('district') : $addresses['district'] }}">
+                                    value="{{ old('district') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -177,14 +238,14 @@
                                 <span style="color: red;">*</span><strong>Landmark:</strong>
                                 <input required type="text" name="landmark" id="landmark" class="form-control"
                                     placeholder="Landmark"
-                                    value="{{ old('landmark') ? old('landmark') : $addresses['landmark'] }}">
+                                    value="{{ old('landmark') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>City:</strong>
                                 <input required type="text" name="city" id="city" class="form-control"
-                                    placeholder="City" value="{{ old('city') ? old('city') : $addresses['city'] }}">
+                                    placeholder="City" value="{{ old('city') }}">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -196,12 +257,11 @@
                         </div>
                         <input type="hidden" name="latitude" id="latitude" class="form-control"
                             placeholder="latitude"
-                            value="{{ old('latitude') ? old('latitude') : $addresses['latitude'] }}">
+                            value="{{ old('latitude') }}">
                         <input type="hidden" name="longitude" id="longitude" class="form-control"
                             placeholder="longitude"
-                            value="{{ old('longitude') ? old('longitude') : $addresses['longitude'] }}">
-                    </div>
-
+                            value="{{ old('longitude') }}">
+                    </div>            
                     <div class="row">
                         <div class="col-md-12 text-center">
                             <br>
@@ -212,14 +272,14 @@
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Name:</strong>
                                 <input required type="text" name="name" id="name" class="form-control"
-                                    placeholder="Name" value="{{ old('name') ? old('name') : $name }}">
+                                    placeholder="Name" value="{{ old('name', $name) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Email:</strong>
                                 <input required type="email" name="email" id="email" class="form-control"
-                                    placeholder="abc@gmail.com" value="{{ old('email') ? old('email') : $email }}">
+                                    placeholder="abc@gmail.com" value="{{ old('email', $email) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -227,7 +287,7 @@
                                 <span style="color: red;">*</span><strong>Phone Number:</strong>
                                 <input id="number_country_code" type="hidden" name="number_country_code" />
                                 <input required type="tel" name="number" id="number" class="form-control"
-                                    value="{{ old('number') ? old('number') : $addresses['number'] }}">
+                                    value="{{ old('number', $personal_info['number']) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -235,7 +295,7 @@
                                 <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
                                 <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
                                 <input required type="tel" name="whatsapp" id="whatsapp" class="form-control"
-                                    value="{{ old('whatsapp') ? old('whatsapp') : $addresses['whatsapp'] }}">
+                                    value="{{ old('whatsapp', $personal_info['whatsapp']) }}">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -244,13 +304,13 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="gender" id="genderMale"
                                         value="Male"
-                                        {{ old('gender') == 'Male' || $addresses['gender'] == 'Male' ? 'checked' : '' }}>
+                                        {{ old('gender', $personal_info['gender']) == 'Male' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="genderMale">Male</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="gender" id="genderFemale"
                                         value="Female"
-                                        {{ old('gender') == 'Female' || $addresses['gender'] == 'Female' ? 'checked' : '' }}>
+                                        {{ old('gender', $personal_info['gender']) == 'Female' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="genderFemale">Female</label>
                                 </div>
                             </div>
@@ -261,7 +321,7 @@
                                 <strong>Affiliate Code:</strong>
                                 <input type="text" name="affiliate_code" id="affiliate_code" class="form-control"
                                     placeholder="Affiliate Code" {{ $affiliate_code ? 'readonly' : null }}
-                                    value="{{ $affiliate_code ?? old('affiliate_code') }}">
+                                    value="{{ $affiliate_code }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -270,7 +330,7 @@
                                 <div class="input-group">
                                     <input type="text" name="coupon_code" id="coupon_code" class="form-control"
                                         placeholder="Coupon Code"
-                                        value="{{ old('coupon_code') ? old('coupon_code') : $coupon_code }}">
+                                        value="{{ $coupon_code }}">
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply
                                             Coupon</button>
@@ -284,8 +344,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="checkbox" name="update_profile" id="update-profile" checked
-                                    {{ old('update_profile') ? 'checked' : '' }}>
+                                <input type="checkbox" name="update_profile" id="update-profile" checked>
 
                                 <label for="update-profile">
                                     Save Data in Profile
@@ -366,45 +425,83 @@
             </div>
         </div>
     </div>
-
-    <script>
-    $(document).ready(function() {
-        $("#applyCouponBtn").click(function() {
-            var couponCode = $("#coupon_code").val();
-
-            $("#responseMessage").html("");
-            if(couponCode){
-                $.ajax({
-                    type: "POST",
-                    url: "{{ route('apply.coupon') }}",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        coupon_code: couponCode,
-                    },
-                    success: function(response) {
-                        if(response.error){
-                            $("#coupon_code").val("");
-                            $("#responseMessage").append('<p class="coupon-message alert alert-danger">' + response.error + '</p>');
-                        }else{
-                            $("#responseMessage").append('<p class="coupon-message alert alert-success">' + response.message + '</p>');
-                        }
-                    },
-                    error: function(error) {
-                        console.log("Error:", error);
-                    }
-                });
-            }else{
-                $("#responseMessage").append('<p class="coupon-message alert alert-danger">Please enter coupon code.</p>');
-            }
-            setTimeout(function() {
-                $(".coupon-message").css('display', 'none');
-            },6000);
-
-        });
-    });
-    </script>
     <script>
         $(document).ready(function() {
+            function fillAddressForm() {
+                var selected = $('input[name="selectedAddress"]:checked');
+                if (selected.length) {
+                    $('#buildingName').val(selected.data('building-name'));
+                    $('#flatVilla').val(selected.data('flat-villa'));
+                    $('#street').val(selected.data('street'));
+                    $('select[name="area"]').val(selected.data('area'));
+                    $('#district').val(selected.data('district'));
+                    $('#landmark').val(selected.data('landmark'));
+                    $('#city').val(selected.data('city'));
+                    $('#latitude').val(selected.data('latitude'));
+                    $('#longitude').val(selected.data('longitude'));
+                }
+            }
+
+            function clearAddressForm() {
+                $('#buildingName').val('');
+                $('#flatVilla').val('');
+                $('#street').val('');
+                $('#district').val('');
+                $('#landmark').val('');
+                $('#city').val('');
+                $('#latitude').val('');;
+                $('#longitude').val('');
+            }
+
+            $('#newAddressBtn').click(function() {
+                $('#address-form').show();
+                $('input[name="selectedAddress"]').prop('checked', false);
+
+                clearAddressForm();
+            });
+    
+            $('input[name="selectedAddress"]').change(function() {
+
+                fillAddressForm();
+
+                $('#address-form').hide();
+            });
+
+            fillAddressForm(); 
+
+            $("#applyCouponBtn").click(function() {
+                var couponCode = $("#coupon_code").val();
+
+                $("#responseMessage").html("");
+                if(couponCode){
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ route('apply.coupon') }}",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            coupon_code: couponCode,
+                        },
+                        success: function(response) {
+                            if(response.error){
+                                $("#coupon_code").val("");
+                                $("#responseMessage").append('<p class="coupon-message alert alert-danger">' + response.error + '</p>');
+                            }else{
+                                $("#responseMessage").append('<p class="coupon-message alert alert-success">' + response.message + '</p>');
+                            }
+                        },
+                        error: function(error) {
+                            console.log("Error:", error);
+                        }
+                    });
+                }else{
+                    $("#responseMessage").append('<p class="coupon-message alert alert-danger">Please enter coupon code.</p>');
+                }
+                setTimeout(function() {
+                    $(".coupon-message").css('display', 'none');
+                },6000);
+
+            });
+
             $("#booking-form").submit(function(event) {
                 event.preventDefault();
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');

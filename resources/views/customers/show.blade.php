@@ -37,67 +37,55 @@
                 @endif
             </div>
         </div>
-        @if(isset($customer->customerProfile))
+        @if(isset($customer->customerProfiles))
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Number:</strong>
-                {{ $customer->customerProfile->number }}
+                {{optional($customer->customerProfiles->first())->number }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Whatsapp:</strong>
-                {{ $customer->customerProfile->whatsapp }}
+                {{optional($customer->customerProfiles->first())->whatsapp }}
             </div>
         </div>
+    </div>
+    <div class="row">
         <hr><h2> Address</h2>
         <div class="col-md-12">
-            <div class="form-group">
-                <strong>Building Name:</strong>
-                {{ $customer->customerProfile->buildingName }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Area:</strong>
-                {{ $customer->customerProfile->area }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Landmark:</strong>
-                {{ $customer->customerProfile->landmark }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Flat Villa:</strong>
-                {{ $customer->customerProfile->flatVilla }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Street:</strong>
-                {{ $customer->customerProfile->street }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>City:</strong>
-                {{ $customer->customerProfile->city }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>District:</strong>
-                {{ $customer->customerProfile->district }}
-            </div>
+            <table class="table table-striped table-bordered album bg-light">
+                <tr>
+                    <th>Building Name</th>
+                    <th>Area</th>
+                    <th>Landmark</th>
+                    <th>Flat Villa</th>
+                    <th>City</th>
+                    <th>Street</th>
+                    <th>District</th>
+                </tr>
+                @if(count($customer->customerProfiles) > 0)
+                @foreach ($customer->customerProfiles as $customerProfile)
+                <tr>
+                    <td>{{ $customerProfile->buildingName ?? "" }}</td>
+                    <td>{{ $customerProfile->area ?? "" }}</td>
+                    <td>{{ $customerProfile->landmark ?? "" }}</td>
+                    <td>{{ $customerProfile->flatVilla ?? "" }}</td>
+                    <td>{{ $customerProfile->city ?? "" }}</td>
+                    <td>{{ $customerProfile->street ?? "" }}</td>
+                    <td>{{ $customerProfile->district ?? "" }}</td>
+                </tr>
+                @endforeach
+                @else
+                <tr>
+                    <td colspan="7" class="text-center">There is no Customer Address</td>
+                </tr>
+                @endif
+            </table>
         </div>
         @endif
     </div>
-    
     @if(isset($customer->userAffiliate->affiliateUser))
-    <hr>
     <div class="row">
         <h3>Affiliate</h3>
         <table class="table table-striped table-bordered album bg-light">
@@ -129,7 +117,6 @@
     </div>
     @endif
 
-    <hr>
     <div class="row">
         @if(isset($customer->coupons))
         <h3>Customer Coupon</h3>

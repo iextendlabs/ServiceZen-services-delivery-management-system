@@ -62,7 +62,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Name:</strong>
-                        <input type="text" name="name" value="{{$service->name}}" class="form-control" placeholder="Name">
+                        <input type="text" name="name" value="{{ old('name',$service->name) }}" class="form-control" placeholder="Name">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -79,15 +79,15 @@
                         <strong>Status:</strong>
                         <select name="status" class="form-control">
 
-                            <option value="1" @if($service->status == 1) selected @endif>Enable</option>
-                            <option value="0" @if($service->status == 0) selected @endif>Disable</option>
+                            <option value="1"  {{ old('status', $service->status) == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status', $service->status) == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Description:</strong>
-                        <textarea class="form-control" id="summernote" name="description" placeholder="Description">{{$service->description}}</textarea>
+                        <textarea class="form-control" id="summernote" name="description" placeholder="Description">{{old('description',$service->description)}}</textarea>
                         <script>
                             (function($) {
                                 $('#summernote').summernote({
@@ -126,25 +126,25 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Short Description:</strong>
-                        <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{$service->short_description}}</textarea>
+                        <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{old('short_description',$service->short_description)}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Price:</strong>
-                        <input type="number" value="{{$service->price}}" name="price" class="form-control" placeholder="Price">
+                        <input type="number" value="{{ old('price',$service->price) }}" name="price" class="form-control" placeholder="Price">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Discount Price:</strong>
-                        <input type="number" value="{{$service->discount}}" name="discount" class="form-control" placeholder="Discount Price">
+                        <input type="number" value="{{ old('discount', $service->discount) }}" name="discount" class="form-control" placeholder="Discount Price">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Duration:</strong>
-                        <input type="text" value="{{$service->duration}}" name="duration" class="form-control" placeholder="Duration">
+                        <input type="text" value="{{old('duration',$service->duration)}}" name="duration" class="form-control" placeholder="Duration">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -159,7 +159,10 @@
                             @foreach ($service_categories as $category)
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" @if(in_array($category->id,$category_ids)) checked @endif>
+                                    <input type="checkbox" 
+                                           name="categoriesId[{{ $i++ }}]" 
+                                           value="{{ $category->id }}" 
+                                           {{ in_array($category->id, old('categoriesId', $category_ids)) ? 'checked' : '' }}>
                                 </td>
                                 <td>{{ $category->title }}</td>
                             </tr>
@@ -199,11 +202,7 @@
                             @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($single_service->id,$package_services))
-                                    <input type="checkbox" checked name="packageId[{{ ++$i }}]" value="{{ $single_service->id }}">
-                                    @else
-                                    <input type="checkbox" name="packageId[{{ ++$i }}]" value="{{ $single_service->id }}">
-                                    @endif
+                                    <input type="checkbox" name="packageId[{{ ++$i }}]"  {{ in_array($single_service->id, old('packageId', $package_services)) ? 'checked' : '' }} value="{{ $single_service->id }}">
                                 </td>
                                 <td>{{ $single_service->name }}</td>
                                 <td>{{ $single_service->price }}</td>
@@ -230,11 +229,7 @@
                             @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($single_service->id,$add_on_services))
-                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" checked value="{{ $single_service->id }}">
-                                    @else
-                                    <input type="checkbox" name="addONsId[{{ ++$i }}]" value="{{ $single_service->id }}">
-                                    @endif
+                                    <input type="checkbox" name="addONsId[{{ ++$i }}]"  {{ in_array($single_service->id, old('addONsId', $add_on_services)) ? 'checked' : '' }} value="{{ $single_service->id }}">
                                 </td>
                                 <td>{{ $single_service->name }}</td>
                                 <td>{{ $single_service->price }}</td>
@@ -253,13 +248,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>New Variant:</strong>
-                            <input type="text" name="new_variant" class="form-control" placeholder="New Variant">
+                            <input type="text" name="new_variant" class="form-control" value="{{ old('new_variant') }}" placeholder="New Variant">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Price:</strong>
-                            <input type="number" name="new_variant_price" class="form-control" placeholder="Price">
+                            <input type="number" name="new_variant_price" value="{{ old('new_variant_price') }}" class="form-control" placeholder="Price">
                         </div>
                     </div>
                     <div class="col-md-12 text-center">
@@ -280,11 +275,7 @@
                             @foreach ($all_services as $single_service)
                             <tr>
                                 <td>
-                                    @if(in_array($single_service->id,$variant_services))
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" checked value="{{ $single_service->id }}">
-                                    @else
-                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $single_service->id }}">
-                                    @endif
+                                    <input type="checkbox" name="variantId[{{ ++$i }}]" value="{{ $single_service->id }}" {{ in_array($single_service->id, old('variantId', $variant_services)) ? 'checked' : '' }}>
                                 </td>
                                 <td>{{ $single_service->name }}</td>
                                 <td>{{ $single_service->price }}</td>
@@ -327,14 +318,14 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" required name="option_name[{{ $option_row }}]" class="form-control" value="{{ $option->option_name }}" placeholder="Option Name">
+                                                    <input type="text" required name="option_name[{{ $option_row }}]" class="form-control" value="{{ old('option_name.'.$option_row, $option->option_name) }}"  placeholder="Option Name">
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control" value="{{ $option->option_price }}" placeholder="Option Price">
+                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control"  value="{{ old('option_price.'.$option_row, $option->option_price) }}"  placeholder="Option Price">
                                                 </div>
                                             </div>
                                         </td>

@@ -23,7 +23,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Title:</strong>
-                    <input type="text" name="title" value="{{$service_category->title}}" class="form-control" placeholder="Title">
+                    <input type="text" name="title" value="{{ old('title',$service_category->title) }}" class="form-control" placeholder="Title">
                 </div>
             </div>
             <div class="col-md-12">
@@ -46,9 +46,8 @@
                 <div class="form-group">
                     <strong>Status:</strong>
                     <select name="status" class="form-control">
-
-                        <option value="1" @if($service_category->status == 1) selected @endif>Enable</option>
-                        <option value="0" @if($service_category->status == 0) selected @endif>Disable</option>
+                        <option value="1" {{ old('status', $service_category->status ) == '1' ? 'selected' : '' }}>Enable</option>
+                        <option value="0" {{ old('status', $service_category->status ) == '0' ? 'selected' : '' }}>Disable</option>
                     </select>
                 </div>
             </div>
@@ -62,9 +61,9 @@
                 <div class="form-group">
                     <strong>Type:</strong>
                     <select name="type" class="form-control">
-                        <option value="Male" @if($service_category->type === "Male") selected @endif>Male</option>
-                        <option value="Female" @if($service_category->type === "Female") selected @endif>Female</option>
-                        <option value="Both" @if($service_category->type === "Both") selected @endif>Both</option>
+                        <option value="Male" {{ old('type', $service_category->type) === 'Male' ? 'selected' : '' }} >Male</option>
+                        <option value="Female" {{ old('type', $service_category->type) === 'Female' ? 'selected' : '' }} >Female</option>
+                        <option value="Both" {{ old('type', $service_category->type) === 'Both' ? 'selected' : '' }}>Both</option>
                     </select>
                 </div>
             </div>
@@ -77,7 +76,7 @@
                         @if($category->id == $service_category->parent_id)
                         <option value="{{$category->id}}" selected>{{$category->title}}</option>
                         @else
-                        <option value="{{$category->id}}">{{$category->title}}</option>
+                        <option value="{{$category->id}}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>{{$category->title}}</option>
                         @endif
                         @endforeach
                     </select>

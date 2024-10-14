@@ -34,7 +34,7 @@
                         <div class="form-group">
                             <strong>Transport Charges:</strong>
                             <div class="input-group mb-3">
-                                <input type="text" name="transport_charges" id="transport_charges" value="{{ $order->order_total->transport_charges }}" class="form-control" placeholder="Transport Charges">
+                                <input type="text" name="transport_charges" id="transport_charges" value="{{ old( 'transport_charges',$order->order_total->transport_charges) }}" class="form-control" placeholder="Transport Charges">
                             </div>
                         </div>
                     </div>
@@ -44,43 +44,43 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Building Name:</strong>
-                                <input required type="text" name="buildingName" id="buildingName" value="{{ $order->buildingName }}" class="form-control" placeholder="Building Name">
+                                <input required type="text" name="buildingName" id="buildingName" value="{{ old('buildingName',$order->buildingName) }}" class="form-control" placeholder="Building Name">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Flat / Villa:</strong>
-                                <input required type="text" name="flatVilla" id="flatVilla" value="{{ $order->flatVilla }}" class="form-control" placeholder="Flat / Villa">
+                                <input required type="text" name="flatVilla" id="flatVilla" value="{{ old('flatVilla',$order->flatVilla) }}" class="form-control" placeholder="Flat / Villa">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Street:</strong>
-                                <input required type="text" name="street" id="street" value="{{ $order->street }}" class="form-control" placeholder="Street">
+                                <input required type="text" name="street" id="street" value="{{ old('street',$order->street) }}" class="form-control" placeholder="Street">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>District:</strong>
-                                <input required type="text" name="district" id="district" value="{{ $order->district }}" class="form-control" placeholder="District">
+                                <input required type="text" name="district" id="district" value="{{ old('district',$order->district) }}" class="form-control" placeholder="District">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Area:</strong>
-                                <input required type="text" name="area" value="{{ $order->area }}" class="form-control" placeholder="Area">
+                                <input required type="text" name="area" value="{{ old('area',$order->area) }}" class="form-control" placeholder="Area">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Landmark:</strong>
-                                <input required type="text" name="landmark" id="landmark" value="{{ $order->landmark }}" class="form-control" placeholder="Landmark">
+                                <input required type="text" name="landmark" id="landmark" value="{{ old('landmark',$order->landmark) }}" class="form-control" placeholder="Landmark">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>City:</strong>
-                                <input required type="text" name="city" id="city" value="{{ $order->city }}" class="form-control" placeholder="City">
+                                <input required type="text" name="city" id="city" value="{{ old('city',$order->city) }}" class="form-control" placeholder="City">
                             </div>
                         </div>
                     </div>
@@ -90,27 +90,27 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Name:</strong>
-                                <input required type="text" name="customer_name" id="customer_name" value="{{ $order->customer_name }}" class="form-control" placeholder="Customer Name">
+                                <input required type="text" name="customer_name" id="customer_name" value="{{ old('customer_name',$order->customer_name) }}" class="form-control" placeholder="Customer Name">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Customer Email:</strong>
-                                <input required type="email" name="customer_email" id="customer_email" value="{{ $order->customer_email }}" class="form-control" placeholder="Customer Email">
-                            </div>
+                                <input required type="email" name="customer_email" id="customer_email" value="{{ old('customer_email',$order->customer_email) }}" class="form-control" placeholder="old(Customer Email">
+                            </div>)
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Phone Number:</strong>
                                 <input id="number_country_code" type="hidden" name="number_country_code" />
-                                <input required type="tel" name="number" id="number" value="{{ $order->number }}" class="form-control">
+                                <input required type="tel" name="number" id="number" value="{{ old('number',$order->number) }}" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <strong>Whatsapp Number:</strong>
                                 <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                <input required type="tel" name="whatsapp" id="whatsapp" value="{{ $order->whatsapp }}" class="form-control">
+                                <input required type="tel" name="whatsapp" id="whatsapp" value="{{ old('whatsapp',$order->whatsapp) }}" class="form-control">
                             </div>
                         </div>
                     </div>

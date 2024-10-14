@@ -26,13 +26,13 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Name:</strong>
-                    <input type="text" name="name" value="{{ $supervisor->name }}" class="form-control" placeholder="Name">
+                    <input type="text" name="name" value="{{ old('name',$supervisor->name) }}" class="form-control" placeholder="Name">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Email:</strong>
-                    <input type="email" name="email" value="{{ $supervisor->email }}" class="form-control" placeholder="abc@gmail.com">
+                    <input type="email" name="email" value="{{ old('email',$supervisor->email) }}" class="form-control" placeholder="abc@gmail.com">
                 </div>
             </div>
             <div class="col-md-12">
@@ -54,11 +54,7 @@
                         <option></option>
                         @foreach($managers as $manager)
                         @if($manager->hasRole("Manager"))
-                        @if($supervisor->SupervisorToManager && $manager->id == $supervisor->SupervisorToManager->manager_id)
-                        <option value="{{ $manager->id }}" selected>{{ $manager->name }}</option>
-                        @else
-                        <option value="{{ $manager->id }}">{{ $manager->name }}</option>
-                        @endif
+                        <option value="{{ $manager->id }}" {{ old('manager_id',$supervisor->SupervisorToManager->manager_id ?? "") == $manager->id ? 'selected' : ''}}>{{ $manager->name }}</option>
                         @endif
                         @endforeach
                     </select>

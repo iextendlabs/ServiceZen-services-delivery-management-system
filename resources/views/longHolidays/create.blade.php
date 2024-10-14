@@ -22,13 +22,13 @@
         <div class="col-md-6">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Date Start:</strong>
-                <input type="date" name="date_start" value="{{ date('Y-m-d') }}" class="form-control" placeholder="Date Start" min="{{ date('Y-m-d') }}">
+                <input type="date" name="date_start" value="{{ old('date_start') }}" class="form-control" placeholder="Date Start" min="{{ date('Y-m-d') }}">
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Date End:</strong>
-                <input type="date" name="date_end" value="" class="form-control" placeholder="Date End" min="{{ date('Y-m-d') }}">
+                <input type="date" name="date_end" value="{{ old('date_end') }}" class="form-control" placeholder="Date End" min="{{ date('Y-m-d') }}">
             </div>
         </div>
         <div class="col-md-12">
@@ -37,11 +37,7 @@
                 <select name="staff_id" class="form-control">
                     @foreach ($staffs as $staff)
                     @if($staff->hasRole("Staff"))
-                    @if($staff->id == $staff_id)
-                    <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
-                    @else
-                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                    @endif
+                    <option value="{{ $staff->id }}" {{ old('staff_id') == $staff->id ? 'selected' : '' }}>{{ $staff->name }}</option>
                     @endif
                     @endforeach
                 </select>

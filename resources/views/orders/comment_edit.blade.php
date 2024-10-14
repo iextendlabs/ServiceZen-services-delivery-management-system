@@ -33,7 +33,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Comment:</strong>
-                            <textarea name="order_comment" cols="30" rows="8" class="form-control">{{ isset($order->order_comment) ? $order->order_comment : old('order_comment') }}</textarea>
+                            <textarea name="order_comment" cols="30" rows="8" class="form-control">{{ old('order_comment', $order->order_comment ?? '') }}</textarea>
                         </div>
                     </div>
 

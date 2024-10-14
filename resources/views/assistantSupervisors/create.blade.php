@@ -51,9 +51,7 @@
                     <select name="supervisor_id" class="form-control">
                         <option></option>
                         @foreach($supervisors as $supervisor)
-                        @if($supervisor->hasRole("Supervisor"))
-                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
-                        @endif
+                            <option value="{{ $supervisor->id }}" {{ old('supervisor_id') == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
                         @endforeach
                     </select>
                 </div>

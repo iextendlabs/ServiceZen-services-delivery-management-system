@@ -24,21 +24,21 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Plan Name:</strong>
-                        <input type="text" name="plan_name" class="form-control" value="{{ $membership_plan->plan_name }}"
+                        <input type="text" name="plan_name" class="form-control" value="{{ old('plan_name' ,$membership_plan->plan_name ) }}"
                             placeholder="Plan Name">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Membership Fee:</strong>
-                        <input type="number" name="membership_fee" class="form-control" value="{{ $membership_plan->membership_fee }}"
+                        <input type="number" name="membership_fee" class="form-control" value="{{ old('membership_fee',$membership_plan->membership_fee) }}"
                             placeholder="membership_fee">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Expire after days:</strong>
-                        <input type="number" name="expire" class="form-control" value="{{ $membership_plan->expire }}"
+                        <input type="number" name="expire" class="form-control" value="{{ old('expire' ,$membership_plan->expire ) }}"
                             placeholder="Enter days like 20">
                     </div>
                 </div>
@@ -47,8 +47,8 @@
                         <span style="color: red;">*</span><strong>Type:</strong>
                         <select name="type" class="form-control">
                             <option></option>
-                            <option value="Affiliate" @if ($membership_plan->type == 'Affiliate') selected @endif>Affiliate</option>
-                            <option value="Freelancer" @if ($membership_plan->type == 'Freelancer') selected @endif>Freelancer</option>
+                            <option value="Affiliate" {{ old('type', $membership_plan->type) == 'Affiliate' ? 'selected' : '' }}>Affiliate</option>
+                            <option value="Freelancer" {{ old('type', $membership_plan->type) == 'Freelancer' ? 'selected' : '' }}>Freelancer</option>                            
                         </select>
                     </div>
                 </div>
@@ -57,8 +57,8 @@
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
                             <option></option>
-                            <option value="1" @if ($membership_plan->status == '1') selected @endif>Enable</option>
-                            <option value="0" @if ($membership_plan->status == '0') selected @endif>Disable</option>
+                            <option value="1" {{ old('status', $membership_plan->status) == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('status', $membership_plan->status) == '0' ? 'selected' : '' }}>Disable</option>
                         </select>
                     </div>
                 </div>

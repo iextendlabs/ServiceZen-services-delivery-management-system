@@ -22,7 +22,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <strong>Name:</strong>
-                    <input type="text" name="name" placeholder="Name" class="form-control">
+                    <input type="text" name="name" placeholder="Name" value="{{ old('name') }}" class="form-control">
                 </div>
             </div>
             <div class="col-md-12">
@@ -31,7 +31,7 @@
                     <br />
                     @foreach($permission as $value)
                         <label>
-                            <input type="checkbox" name="permission[]" value="{{ $value->id }}" class="name">
+                            <input type="checkbox" name="permission[]" value="{{ $value->id }}" {{ in_array($value->id, old('permission', [])) ? 'checked' : '' }} class="name">
                             {{ $value->name }}
                         </label>
                         <br />

@@ -24,22 +24,22 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red">*</span><strong>Title:</strong>
-                        <input type="text" name="title" value="{{ $complaint->title }}" class="form-control"
+                        <input type="text" name="title" value="{{ old('title', $complaint->title ) }}" class="form-control"
                             placeholder="Title" />
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Description:</strong>
-                        <textarea name="description" cols="30" rows="10" style="height:150px" class="form-control">{{ $complaint->description }}</textarea>
+                        <textarea name="description" cols="30" rows="10" style="height:150px" class="form-control">{{ old('description',$complaint->description) }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Status:</strong>
                         <select name="status" class="form-control">
-                            <option value="Open" @if ($complaint->status === 'Open') selected @endif>Open</option>
-                            <option value="Close" @if ($complaint->status === 'Close') selected @endif>Close</option>
+                            <option value="Open" {{ old('status', $complaint->status) == 'Open' ? 'selected' : '' }}>Open</option>
+                            <option value="Close" {{ old('status', $complaint->status) == 'Close' ? 'selected' : '' }}>Close</option>
                         </select>
                     </div>
                 </div>
@@ -49,8 +49,9 @@
                         <select name="user_id" class="form-control">
                             <option></option>
                             @foreach ($users as $user)
-                                <option value="{{ $user->id }}" @if ($complaint->user_id == $user->id) selected @endif>
-                                    {{ $user->name }} | {{ $user->email }}</option>
+                                <option value="{{ $user->id }}" {{ old('user_id', $complaint->user_id) == $user->id ? 'selected' : '' }}>
+                                    {{ $user->name }} | {{ $user->email }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

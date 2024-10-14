@@ -44,7 +44,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <span style="color: red;">*</span><strong>Amount:</strong>
-                        <input type="text" name="amount" value="{{ $transaction->amount }}" class="form-control"
+                        <input type="text" name="amount" value="{{ old('amount',$transaction->amount) }}" class="form-control"
                             placeholder="Amount">
                     </div>
                 </div>

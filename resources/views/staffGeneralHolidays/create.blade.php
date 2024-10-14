@@ -32,7 +32,7 @@
 
                     <tr>
                         <td>
-                            <input type="checkbox" name="days[{{ ++$i }}]" value="{{ $day }}">
+                            <input type="checkbox" name="days[{{ ++$i }}]" value="{{ $day }}" {{ in_array($day, old('days', [])) ? 'checked' : '' }}>
                         </td>
                         <td>{{ $day }}</td>
                     </tr>
@@ -55,11 +55,7 @@
                     @if($staff->hasRole("Staff"))
                     <tr>
                         <td>
-                            @if($staff->id == $staff_id)
-                            <input type="checkbox" name="ids[{{ ++$i }}]" checked value="{{ $staff->id }}">
-                            @else
-                            <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}">
-                            @endif
+                            <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}"  @if(in_array($staff->id, old('ids', [])) || $staff->id == $staff_id) checked @endif>
                         </td>
                         <td>{{ $staff->name }}</td>
                         <td>{{ $staff->email }}</td>
