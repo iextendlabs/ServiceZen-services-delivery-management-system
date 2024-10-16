@@ -50,7 +50,9 @@ class SiteInformationController extends Controller
     public function show($id)
     {
         $information = Information::find($id);
-
+        if (!$information) {
+            return redirect()->back()->with('error', 'Information not found.');
+        }
         return view('site.information.show', compact('information'));
     }
 
