@@ -798,7 +798,9 @@ class OrderController extends Controller
     {
 
         $order = Order::find($id);
-        $order->delete();
+        if($order){
+            $order->delete();
+        }
         $previousUrl = url()->previous();
 
         return redirect($previousUrl)->with('success', 'Order deleted successfully');
