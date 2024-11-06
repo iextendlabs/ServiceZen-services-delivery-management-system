@@ -570,12 +570,13 @@ class CheckOutController extends Controller
                 $input['user_id'] = $user->id;
                 CustomerProfile::create($input);
             }
-
-            CustomerProfile::where('user_id',auth()->user()->id)->update([
-                'number' => $input['number'],
-                'whatsapp' => $input['whatsapp'],
-                'gender' => $input['gender']
-            ]);
+            if (Auth::check()) {
+                CustomerProfile::where('user_id',auth()->user()->id)->update([
+                    'number' => $input['number'],
+                    'whatsapp' => $input['whatsapp'],
+                    'gender' => $input['gender']
+                ]);
+            }
         }
 
         return [$customer_type,$customer_id];
@@ -766,8 +767,11 @@ class CheckOutController extends Controller
         }
 
         [$formattedBookings,$groupedBookingOption] = $this->formattingBookingData($bookingData);
-
-        $customerProfiles = CustomerProfile::where('user_id',auth()->user()->id)->where('area',$area)->get();
+        if (Auth::check()) {
+            $customerProfiles = CustomerProfile::where('user_id',auth()->user()->id)->where('area',$area)->get();
+        } else {
+            $customerProfiles = [];
+        }
 
         return view('site.checkOut.bookingStep', compact('timeSlots', 'city', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'email', 'name', 'addresses','personal_info', 'affiliate_code', 'coupon_code', 'selectedServices', 'servicesCategories', 'services', 'serviceIds', 'formattedBookings','groupedBookingOption','isAdmin','customerProfiles'));
     }
