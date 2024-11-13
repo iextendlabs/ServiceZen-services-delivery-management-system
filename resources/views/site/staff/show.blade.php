@@ -44,7 +44,7 @@ $reviewsCarousel_chunk = 3;
                 <hr>
             </div>
             <div class="col-md-4 text-center">
-                <img src="./staff-images/{{ $user->staff->image }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
+                <img src="./staff-images/{{ $user->staff->image ?? "" }}" alt="{{ $user->name }}" class="img-fluid rounded-circle mb-3 card-img-top">
             </div>
 
             <div class="col-md-8">

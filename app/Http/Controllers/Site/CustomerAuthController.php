@@ -167,18 +167,18 @@ class CustomerAuthController extends Controller
 
                         $affiliate = Affiliate::where('user_id', Auth::user()->userAffiliate->affiliate_id)->where('status',1)->first();
                         
-                        $affiliate_code = $affiliate ? $affiliate->code : "";
-
-                        if ($affiliate->expire) {
-                            $expireInDays = $affiliate->expire - $daysSinceCreation;
-                            if ($expireInDays > 0) {
-                                $expire = $expireInDays * 24 * 60; 
-                                cookie()->queue('affiliate_code', $affiliate_code, $expire);
+                        if ($affiliate) {
+                            if ($affiliate->expire) {
+                                $expireInDays = $affiliate->expire - $daysSinceCreation;
+                                if ($expireInDays > 0) {
+                                    $expire = $expireInDays * 24 * 60; 
+                                    cookie()->queue('affiliate_code', $affiliate->code, $expire);
+                                } else {
+                                    Cookie::queue(Cookie::forget('affiliate_code'));
+                                }
                             } else {
-                                Cookie::queue(Cookie::forget('affiliate_code'));
+                                cookie()->queue('affiliate_code', $affiliate->code);
                             }
-                        } else {
-                            cookie()->queue('affiliate_code', $affiliate_code);
                         }
 
                     }
