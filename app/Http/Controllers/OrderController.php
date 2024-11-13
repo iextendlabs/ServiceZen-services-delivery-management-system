@@ -72,6 +72,8 @@ class OrderController extends Controller
             'zone' => $request->zone,
             'date_to' => $request->date_to,
             'date_from' => $request->date_from,
+            'time_start' => $request->time_start,
+            'time_end' => $request->time_end,
             'category_id' => $request->category_id,
         ];
         $currentUser = Auth::user();
@@ -172,6 +174,18 @@ class OrderController extends Controller
             }
         }
 
+        if ($request->time_start && $request->time_end) {
+            $query->whereBetween('time_start', [$request->time_start, $request->time_end]);
+        } else {
+            if ($request->time_start) {
+                $query->whereTime('time_start', '=', $request->time_start);
+            }
+
+            if ($request->time_end) {
+                $query->whereTime('time_end', '=', $request->time_end);
+            }
+        }
+
         if ($request->staff_id) {
             $query->where('service_staff_id', '=', $request->staff_id);
         }
@@ -261,7 +275,7 @@ class OrderController extends Controller
             return view('orders.print', compact('orders'));
         } else {
 
-            $filters = $request->only(['date_from', 'date_to', 'zone', 'order_id', 'appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id', 'category_id']);
+            $filters = $request->only(['time_start','time_end','date_from', 'date_to', 'zone', 'order_id', 'appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id', 'category_id']);
             $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
             return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
@@ -577,6 +591,8 @@ class OrderController extends Controller
         $staff_id = $input['service_staff_id'] = $request->service_staff_id;
         $time_slot = TimeSlot::find($input['time_slot_id']);
         $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+        $input['time_start'] = $time_slot->time_start;
+        $input['time_end'] = $time_slot->time_end;
         $staff = User::find($staff_id);
         $input['staff_name'] = $staff->name;
         
