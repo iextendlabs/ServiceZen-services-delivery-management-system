@@ -504,8 +504,9 @@ class OrderController extends Controller
         [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id,$staff_affiliate_commission,$driver_commission, $driver_affiliate_commission] = $order->commissionCalculation();
 
         $affiliate = User::find($affiliate_id);
+        $parentAffiliate = User::find($parent_affiliate_id);
         $statuses = config('app.order_statuses');
-        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission', 'affiliate', 'affiliate_id', 'parent_affiliate_commission', 'parent_affiliate_id','staff_affiliate_commission','driver_commission','driver_affiliate_commission'));
+        return view('orders.show', compact('order', 'statuses', 'staff_commission', 'affiliate_commission', 'affiliate', 'affiliate_id', 'parent_affiliate_commission', 'parent_affiliate_id','staff_affiliate_commission','driver_commission','driver_affiliate_commission','parentAffiliate'));
     }
 
     public function edit($id, Request $request)

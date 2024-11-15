@@ -430,7 +430,7 @@
                                 <tr>
                                     <td>#{{ $order->id }}</td>
                                     <td>@currency($affiliate_commission,true)</td>
-                                    <td>{{ $affiliate->affiliate->parentAffiliate->name }}</td>
+                                    <td>{{ $parentAffiliate->name }}</td>
                                     <td>@currency($parentAffiliateTransactionStatus->amount ?? $parent_affiliate_commission,true)</td>
                                     <td class="no-print">
                                         @can('order-edit')
