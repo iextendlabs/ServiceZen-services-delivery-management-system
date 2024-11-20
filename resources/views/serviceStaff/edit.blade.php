@@ -151,15 +151,73 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <span style="color: red;">*</span><strong>Drivers:</strong>
-                            <select name="driver_id" class="form-control">
-                                <option></option>
-                                @foreach ($users as $driver)
-                                @if($driver->hasRole("Driver"))
-                                <option value="{{ $driver->id }}" {{ old('driver_id', $serviceStaff->staff->driver_id ?? null) == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
-                                @endif
-                                @endforeach
-                            </select>
+                            <strong>Assign Drivers for Each Day:</strong>
+                            <table id="weekly-drivers" class="table table-bordered supervisor-table" style="width: 100%; margin-bottom: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Driver</th>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                                        @php
+                                            $driversForDay = $assignedDrivers[$day] ?? []; 
+                                            $firstRow = true;
+                                        @endphp
+                                        @foreach($driversForDay as $index => $driverData )
+                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}">
+                                                @if($firstRow)
+                                                    <td rowspan="{{ count($driversForDay) }}" class="day-name">{{ $day }}</td>
+                                                    @php $firstRow = false; @endphp
+                                                @endif
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][{{ $index }}][driver_id]" class="form-control" required>
+                                                        @foreach ($users as $driver)
+                                                            @if ($driver->hasRole("Driver"))
+                                                                <option value="{{ $driver->id }}" {{ $driverData['driver_id'] == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td><input type="time" name="drivers[{{ $day }}][{{ $index }}][start_time]" value="{{ $driverData['start_time'] }}" class="form-control" required></td>
+                                                <td><input type="time" name="drivers[{{ $day }}][{{ $index }}][end_time]" value="{{ $driverData['end_time'] }}" class="form-control" required></td>
+                                                <td>
+                                                    @if($index == 0)
+                                                    <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
+                                                    @endif
+                                                    @if($index > 0)
+                                                    <button type="button" class="btn btn-danger remove-button">Remove</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        @if(count($driversForDay) === 0)
+                                            <!-- If no drivers for the day, create an empty row -->
+                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}">
+                                                <td rowspan="1" class="day-name">{{ $day }}</td>
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][0][driver_id]" class="form-control" required>
+                                                        @foreach ($users as $driver)
+                                                            @if ($driver->hasRole("Driver"))
+                                                                <option value="{{ $driver->id }}">{{ $driver->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td><input type="time" name="drivers[{{ $day }}][0][start_time]" class="form-control" required></td>
+                                                <td><input type="time" name="drivers[{{ $day }}][0][end_time]" class="form-control" required></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -419,6 +477,61 @@
     </form>
 </div>
 <script>
+    let rowCounts = {
+        Monday: $("tr[data-day='Monday']").length,
+        Tuesday: $("tr[data-day='Tuesday']").length,
+        Wednesday: $("tr[data-day='Wednesday']").length,
+        Thursday: $("tr[data-day='Thursday']").length,
+        Friday: $("tr[data-day='Friday']").length,
+        Saturday: $("tr[data-day='Saturday']").length,
+        Sunday: $("tr[data-day='Sunday']").length
+    };
+
+    function addDriverRow(day) {
+        rowCounts[day]++;
+
+        const newRow = $(`
+            <tr data-day="${day}" class="driver-row">
+                <td>
+                    <select name="drivers[${day}][${rowCounts[day] - 1}][driver_id]" class="form-control" required>
+                        ${generateDriverOptions()}
+                    </select>
+                </td>
+                <td><input type="time" name="drivers[${day}][${rowCounts[day] - 1}][start_time]" class="form-control" required></td>
+                <td><input type="time" name="drivers[${day}][${rowCounts[day] - 1}][end_time]" class="form-control" required></td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-button">Remove</button>
+                </td>
+            </tr>
+        `);
+
+        $(`tr[data-day="${day}"]:last`).after(newRow);
+
+        $(`#${day}-first-row .day-name`).attr('rowspan', rowCounts[day]);
+    }
+
+    function generateDriverOptions() {
+        let options = '';
+        @foreach ($users as $driver)
+            @if ($driver->hasRole("Driver"))
+                options += `<option value="{{ $driver->id }}">{{ $driver->name }}</option>`;
+            @endif
+        @endforeach
+        return options;
+    }
+
+    // Event delegation for dynamically and pre-existing "Remove" buttons
+    $("#weekly-drivers").on("click", ".remove-button", function () {
+        const row = $(this).closest("tr");
+        const day = row.data("day");
+
+        row.remove();
+
+        rowCounts[day]--;
+
+        $(`#${day}-first-row .day-name`).attr("rowspan", rowCounts[day]);
+    });
+
     $("#search-services").keyup(function() {
         let value = $(this).val().toLowerCase();
 

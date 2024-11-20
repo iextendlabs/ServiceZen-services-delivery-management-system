@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Models\StaffDriver;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -175,6 +176,8 @@ class DriverController extends Controller
         $driver->delete();
     
         $previousUrl = url()->previous();
+
+        StaffDriver::where('driver_id',$driver->id)->delete();
 
         return redirect($previousUrl)
                         ->with('success','Driver deleted successfully');

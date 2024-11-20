@@ -389,7 +389,6 @@ class OrderController extends Controller
                     $input['driver_status'] = "Pending";
                     $input['staff_name'] = $staff->name;
                     $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
-                    $input['driver_id'] = $staff->staff ? $staff->staff->driver_id : null;
 
                     $time_slot = TimeSlot::find($input['time_slot_id']);
 
@@ -428,6 +427,8 @@ class OrderController extends Controller
                         $input['time_start'] = $time_slot->time_start;
                         $input['time_end'] = $time_slot->time_end;
 
+                        $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($request->date, $time_slot->time_start, $time_slot->time_end) : null;
+                        
                         $order = Order::create($input);
 
                         $input['order_id'] = $order->id;

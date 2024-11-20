@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffHoliday;
 use App\Models\StaffImages;
+use App\Models\StaffDriver;
 use App\Models\StaffYoutubeVideo;
 use App\Models\Transaction;
 use App\Models\User;
@@ -101,6 +102,7 @@ class ServiceStaffController extends Controller
      */
     public function store(Request $request)
     {
+
         $this->validate($request, [
             'name' => 'required',
             'phone' => 'required',
@@ -111,6 +113,7 @@ class ServiceStaffController extends Controller
             'commission' => 'required',
             'id_card' => 'required',
             'passport' => 'required',
+            'drivers' => 'required|array',
         ]);
 
         $input = $request->all();
@@ -178,6 +181,19 @@ class ServiceStaffController extends Controller
         }
         
         UserDocument::create($input);
+        
+        // Assigning driver
+        foreach ($request->drivers as $day=>$drivers) {
+            foreach($drivers as $driver){
+                StaffDriver::create([
+                    'staff_id' => $user_id,
+                    'driver_id' => $driver['driver_id'],
+                    'day' => $day,
+                    'start_time' => $driver['start_time'],
+                    'end_time' => $driver['end_time'],
+                ]);
+            }
+        }
 
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
@@ -211,7 +227,11 @@ class ServiceStaffController extends Controller
 
         $documents = $this->documents;
 
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
+        ->get()
+        ->groupBy('day');
+        
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents','assignedDrivers'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -236,7 +256,11 @@ class ServiceStaffController extends Controller
         ->get();
         $documents = $this->documents;
 
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents'));
+        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
+        ->get()
+        ->groupBy('day');
+
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers'));
     }
 
     /**
@@ -255,7 +279,8 @@ class ServiceStaffController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
-            'commission' => 'required'
+            'commission' => 'required',
+            'drivers' => 'required|array',
         ];
     
         if ($request->freelancer_join == 1) {
@@ -360,6 +385,20 @@ class ServiceStaffController extends Controller
             $input['user_id'] = $id;
             UserDocument::create($input);
         }
+
+        StaffDriver::where('staff_id', $id)->delete();
+
+        foreach ($request->drivers as $day=>$drivers) {
+            foreach($drivers as $driver){
+                StaffDriver::create([
+                    'staff_id' => $id,
+                    'driver_id' => $driver['driver_id'],
+                    'day' => $day,
+                    'start_time' => $driver['start_time'],
+                    'end_time' => $driver['end_time'],
+                ]);
+            }
+        }
         
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -430,6 +469,8 @@ class ServiceStaffController extends Controller
         $serviceStaff->delete();
 
         $previousUrl = url()->previous();
+
+        StaffDriver::where('staff_id',$serviceStaff->id)->delete();
 
         return redirect($previousUrl)
             ->with('success', 'Service Staff deleted successfully');

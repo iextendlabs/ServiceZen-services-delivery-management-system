@@ -108,7 +108,44 @@
         </div>
         @endif
     </div>
-
+    <hr>
+    <div class="row">
+        <h4>Weekly Driver Assignments</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Driver Name</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                    @php
+                        $driversForDay = $assignedDrivers[$day] ?? [];
+                    @endphp
+                    @if(count($driversForDay) > 0)
+                        @foreach($driversForDay as $index => $driverData)
+                            <tr>
+                                @if($index === 0)
+                                    <td rowspan="{{ count($driversForDay) }}" class="align-middle text-center">{{ $day }}</td>
+                                @endif
+                                <td>{{ $driverData->driver->name ?? 'N/A' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($driverData['start_time'])->format('h:i A') ?? 'N/A' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($driverData['end_time'])->format('h:i A') ?? 'N/A' }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td class="text-center">{{ $day }}</td>
+                            <td colspan="3" class="text-center">No Drivers Assigned</td>
+                        </tr>
+                    @endif
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     <hr>
     <div class="row">
         <p>Current balance is: <b>@currency($total_balance,true)</b></p>
