@@ -493,7 +493,6 @@ class CheckOutController extends Controller
             }
 
             $input['staff_name'] = $staff->name;
-            $input['driver_id'] = $staff->staff->driver_id;
 
             $time_slot = TimeSlot::find($input['time_slot_id']);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
@@ -501,6 +500,8 @@ class CheckOutController extends Controller
             $input['time_start'] = $time_slot->time_start;
             $input['time_end'] = $time_slot->time_end;
             $input['payment_method'] = "Cash-On-Delivery";
+
+            $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $time_slot->time_start, $time_slot->time_end) : null;
 
             $order = Order::create($input);
             $order_ids[] = $order->id;

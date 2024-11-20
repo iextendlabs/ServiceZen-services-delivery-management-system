@@ -46,7 +46,7 @@
                         </th>
 
                         <th>Sub Title / Designation</th>
-                        <th>Driver</th>
+                        {{-- <th>Driver</th> --}}
                         <th width="280px">Action</th>
                     </tr>
                     @if (count($serviceStaff))
@@ -63,11 +63,11 @@
                                     @endif
                                 </td>
                                 <td>{{ $staff->staff->sub_title }}</td>
-                                <td>
+                                {{-- <td>
                                     @if($staff->staff->driver)
                                         <a href="{{ route('drivers.index', ['id' => $staff->staff->driver->id]) }}">{{ $staff->staff->driver ? $staff->staff->driver->name : '' }}</a>
                                     @endif
-                                </td>
+                                </td> --}}
                                 <td>
                                     <form id="deleteForm{{ $staff->id }}"
                                         action="{{ route('serviceStaff.destroy', $staff->id) }}" method="POST">

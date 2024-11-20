@@ -514,7 +514,6 @@ class CustomerController extends Controller
                     $input['driver_status'] = "Pending";
                     $input['staff_name'] = $staff->name;
                     $input['time_slot_id'] = $input['time_slot_id'];
-                    $input['driver_id'] = $staff->staff->driver_id;
 
                     $user = User::where('email', $input['email'])->first();
 
@@ -558,6 +557,7 @@ class CustomerController extends Controller
                             $input['payment_method'] = "Cash-On-Delivery";
                             $input['customer_name'] = $input['name'];
                             $input['customer_email'] = $input['email'];
+                            $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $time_slot->time_start, $time_slot->time_end) : null;
             
                             $order = Order::create($input);
             
@@ -1644,14 +1644,14 @@ class CustomerController extends Controller
             }
 
             $input['staff_name'] = $staff->name;
-            $input['driver_id'] = $staff->staff->driver_id;
-
+  
             $time_slot = TimeSlot::find($input['time_slot_id']);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
             $input['time_start'] = $time_slot->time_start;
             $input['time_end'] = $time_slot->time_end;
             $input['payment_method'] = $input['payment_method'] ?? "Cash-On-Delivery";
+            $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $time_slot->time_start, $time_slot->time_end) : null;
 
             $order = Order::create($input);
             $order_ids[] = $order->id;

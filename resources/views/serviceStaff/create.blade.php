@@ -123,7 +123,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong for="image">Upload Image</strong>
-                            <input type="file" name="image" class="form-control image-input" accept="image/*">
+                            <input type="file" name="image" class="class="form-control" image-input" accept="image/*">
                             <img class="image-preview" height="130px">
                         </div>
                     </div>
@@ -141,15 +141,39 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <span style="color: red;">*</span><strong>Drivers:</strong>
-                            <select name="driver_id" class="form-control">
-                                <option></option>
-                                @foreach ($users as $driver)
-                                @if($driver->hasRole("Driver"))
-                                <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
-                                @endif
-                                @endforeach
-                            </select>
+                            <strong>Assign Drivers for Each Day:</strong>
+                            <table id="weekly-drivers" class="table table-bordered supervisor-table" style="width: 100%; margin-bottom: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Driver</th>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                                        <tr id="{{ $day }}-first-row" data-day="{{ $day }}">
+                                            <td rowspan="1" class="day-name">{{ $day }}</td>
+                                            <td>
+                                                <select name="drivers[{{ $day }}][0][driver_id]" class="form-control" required>
+                                                    @foreach ($users as $driver)
+                                                        @if ($driver->hasRole("Driver"))
+                                                            <option value="{{ $driver->id }}">{{ $driver->name }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td><input type="time" name="drivers[{{ $day }}][0][start_time]" class="form-control" required></td>
+                                            <td><input type="time" name="drivers[{{ $day }}][0][end_time]" class="form-control" required></td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div class="col-md-12">
@@ -350,6 +374,61 @@
     </form>
 </div>
 <script>
+    let rowCounts = {
+        Monday: 1,
+        Tuesday: 1,
+        Wednesday: 1,
+        Thursday: 1,
+        Friday: 1,
+        Saturday: 1,
+        Sunday: 1
+    };
+    
+    function addDriverRow(day) {
+        const tableBody = document.querySelector(`#weekly-drivers tbody`);
+        rowCounts[day]++;
+    
+        const newRow = document.createElement('tr');
+        newRow.classList.add('driver-row');
+        newRow.setAttribute('data-day', day);
+    
+        newRow.innerHTML = `
+            <td>
+                <select name="drivers[${day}][${rowCounts[day]}][driver_id]" class="form-control" required>
+                    @foreach ($users as $driver)
+                        @if ($driver->hasRole("Driver"))
+                            <option value="{{ $driver->id }}">{{ $driver->name }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </td>
+            <td><input type="time" name="drivers[${day}][${rowCounts[day]}][start_time]" class="form-control" required></td>
+            <td><input type="time" name="drivers[${day}][${rowCounts[day]}][end_time]" class="form-control" required></td>
+            <td>
+                <button type="button" class="btn btn-danger" onclick="removeDriverRow(this)">Remove</button>
+            </td>
+        `;
+    
+        // Append the new row after the last row of the day
+        const dayRows = Array.from(tableBody.querySelectorAll(`tr[data-day="${day}"]`));
+        const lastDayRow = dayRows[dayRows.length - 1];
+        lastDayRow.insertAdjacentElement('afterend', newRow);
+    
+        // Adjust the rowspan for the day cell
+        const dayCell = document.querySelector(`#${day}-first-row .day-name`);
+        dayCell.setAttribute('rowspan', rowCounts[day]);
+    }
+    
+    function removeDriverRow(button) {
+        const row = button.closest('tr');
+        const day = row.getAttribute('data-day');
+        row.remove();
+    
+        // Decrease the rowspan count for the day cell
+        rowCounts[day]--;
+        const dayCell = document.querySelector(`#${day}-first-row .day-name`);
+        dayCell.setAttribute('rowspan', rowCounts[day]);
+    }
     $("#search-services").keyup(function() {
         let value = $(this).val().toLowerCase();
 
@@ -406,7 +485,7 @@
             $("#imageTable tbody").append(`
                 <tr>
                     <td>
-                        <input type="file" name="gallery_images[]" class="form-control image-input" accept="image/*">
+                        <input type="file" name="gallery_images[]" class="class="form-control" image-input" accept="image/*">
                         <img class="image-preview" height="130px">
                     </td>
                     <td>
