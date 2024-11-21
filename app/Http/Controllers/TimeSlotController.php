@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Holiday;
 use App\Models\Order;
 use App\Models\Staff;
+use App\Models\StaffDriver;
 use App\Models\StaffGroup;
 use App\Models\StaffGroupToStaff;
 use App\Models\TimeSlot;
@@ -239,6 +240,8 @@ class TimeSlotController extends Controller
         $time_slot = TimeSlot::find($id);
 
         $time_slot->delete();
+
+        StaffDriver::where('time_slot_id',$id)->delete();
 
         $previousUrl = url()->previous();
 

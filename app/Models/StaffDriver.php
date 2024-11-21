@@ -9,7 +9,7 @@ class StaffDriver extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['driver_id', 'staff_id','day','start_time','end_time'];
+    protected $fillable = ['driver_id', 'staff_id','day','time_slot_id'];
 
     public function driver()
     {

@@ -18,8 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('staff_id');
             $table->unsignedBigInteger('driver_id');
             $table->string('day');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->unsignedBigInteger('time_slot_id');
             $table->timestamps();
 
             $table->foreign('staff_id')
@@ -30,6 +29,11 @@ return new class extends Migration
             $table->foreign('driver_id')
                 ->references('id')
                 ->on('users')
+                ->onDelete('CASCADE');
+
+            $table->foreign('time_slot_id')
+                ->references('id')
+                ->on('time_slots')
                 ->onDelete('CASCADE');
         });
     }

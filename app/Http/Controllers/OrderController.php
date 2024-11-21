@@ -427,7 +427,7 @@ class OrderController extends Controller
                         $input['time_start'] = $time_slot->time_start;
                         $input['time_end'] = $time_slot->time_end;
 
-                        $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($request->date, $time_slot->time_start, $time_slot->time_end) : null;
+                        $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($request->date, $input['time_slot_id']) : null;
                         
                         $order = Order::create($input);
 
