@@ -11,6 +11,7 @@ use App\Models\StaffHoliday;
 use App\Models\StaffImages;
 use App\Models\StaffDriver;
 use App\Models\StaffYoutubeVideo;
+use App\Models\TimeSlot;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserDocument;
@@ -102,7 +103,6 @@ class ServiceStaffController extends Controller
      */
     public function store(Request $request)
     {
-
         $this->validate($request, [
             'name' => 'required',
             'phone' => 'required',
@@ -113,7 +113,6 @@ class ServiceStaffController extends Controller
             'commission' => 'required',
             'id_card' => 'required',
             'passport' => 'required',
-            'drivers' => 'required|array',
         ]);
 
         $input = $request->all();
@@ -182,19 +181,6 @@ class ServiceStaffController extends Controller
         
         UserDocument::create($input);
         
-        // Assigning driver
-        foreach ($request->drivers as $day=>$drivers) {
-            foreach($drivers as $driver){
-                StaffDriver::create([
-                    'staff_id' => $user_id,
-                    'driver_id' => $driver['driver_id'],
-                    'day' => $day,
-                    'start_time' => $driver['start_time'],
-                    'end_time' => $driver['end_time'],
-                ]);
-            }
-        }
-
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -231,7 +217,9 @@ class ServiceStaffController extends Controller
         ->get()
         ->groupBy('day');
         
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents','assignedDrivers'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $timeSlots = TimeSlot::get();
+
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents','assignedDrivers','timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -259,8 +247,12 @@ class ServiceStaffController extends Controller
         $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
         ->get()
         ->groupBy('day');
-
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers'));
+        $staffId = $serviceStaff->id;
+        $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($staffId) {
+            $q->where('staff_id', $staffId);
+        })->get();
+        
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers','timeSlots'));
     }
 
     /**
@@ -394,8 +386,7 @@ class ServiceStaffController extends Controller
                     'staff_id' => $id,
                     'driver_id' => $driver['driver_id'],
                     'day' => $day,
-                    'start_time' => $driver['start_time'],
-                    'end_time' => $driver['end_time'],
+                    'time_slot_id' => $driver['time_slot_id'],
                 ]);
             }
         }

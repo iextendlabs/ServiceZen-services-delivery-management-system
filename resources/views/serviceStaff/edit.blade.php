@@ -152,24 +152,40 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Assign Drivers for Each Day:</strong>
+                            @if (count($timeSlots) <= 0)
+                                <div class="alert alert-danger">
+                                    This staff member doesn't have any assigned time slots. Please assign time slots first before assigning a driver.
+                                </div>
+                            @endif
                             <table id="weekly-drivers" class="table table-bordered supervisor-table" style="width: 100%; margin-bottom: 20px;">
                                 <thead>
                                     <tr>
                                         <th>Day</th>
                                         <th>Driver</th>
-                                        <th>Start Time</th>
-                                        <th>End Time</th>
+                                        <th>Time Slot</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                                    @php
+                                        $dayColors = [
+                                            'Monday' => '#f8d7da',
+                                            'Tuesday' => '#d4edda',
+                                            'Wednesday' => '#d1ecf1',
+                                            'Thursday' => '#fff3cd',
+                                            'Friday' => '#cce5ff',
+                                            'Saturday' => '#e2e3e5',
+                                            'Sunday' => '#f5c6cb',
+                                        ];
+                                        $backgroundColor = $dayColors[$day] ?? '#ffffff';
+                                    @endphp
                                         @php
                                             $driversForDay = $assignedDrivers[$day] ?? []; 
                                             $firstRow = true;
                                         @endphp
                                         @foreach($driversForDay as $index => $driverData )
-                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}">
+                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}" style="background-color: {{ $dayColors[$day] ?? '#ffffff' }}">
                                                 @if($firstRow)
                                                     <td rowspan="{{ count($driversForDay) }}" class="day-name">{{ $day }}</td>
                                                     @php $firstRow = false; @endphp
@@ -183,8 +199,17 @@
                                                         @endforeach
                                                     </select>
                                                 </td>
-                                                <td><input type="time" name="drivers[{{ $day }}][{{ $index }}][start_time]" value="{{ $driverData['start_time'] }}" class="form-control" required></td>
-                                                <td><input type="time" name="drivers[{{ $day }}][{{ $index }}][end_time]" value="{{ $driverData['end_time'] }}" class="form-control" required></td>
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][{{ $index }}][time_slot_id]" class="form-control" required>
+                                                        <option value="" disabled>Select Time Slot</option>
+                                                        @foreach ($timeSlots as $slot)
+                                                            <option value="{{ $slot['id'] }}" {{ $driverData['time_slot_id'] == $slot['id'] ? 'selected' : '' }}>
+                                                                {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
+                                                                {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
                                                 <td>
                                                     @if($index == 0)
                                                     <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
@@ -196,8 +221,7 @@
                                             </tr>
                                         @endforeach
                                         @if(count($driversForDay) === 0)
-                                            <!-- If no drivers for the day, create an empty row -->
-                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}">
+                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}" style="background-color: {{ $dayColors[$day] ?? '#ffffff' }}">
                                                 <td rowspan="1" class="day-name">{{ $day }}</td>
                                                 <td>
                                                     <select name="drivers[{{ $day }}][0][driver_id]" class="form-control" required>
@@ -208,8 +232,17 @@
                                                         @endforeach
                                                     </select>
                                                 </td>
-                                                <td><input type="time" name="drivers[{{ $day }}][0][start_time]" class="form-control" required></td>
-                                                <td><input type="time" name="drivers[{{ $day }}][0][end_time]" class="form-control" required></td>
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][0][time_slot_id]" class="form-control" required>
+                                                        <option value="" disabled>Select Time Slot</option>
+                                                        @foreach ($timeSlots as $slot)
+                                                            <option value="{{ $slot['id'] }}">
+                                                                {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
+                                                                {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
                                                 <td>
                                                     <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
                                                 </td>
@@ -219,7 +252,7 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </div>         
                     <div class="col-md-12">
                         <div class="form-group scroll-div">
                             <strong>Supervisor:</strong>
@@ -477,6 +510,7 @@
     </form>
 </div>
 <script>
+    // Initialize row counts based on the existing table
     let rowCounts = {
         Monday: $("tr[data-day='Monday']").length,
         Tuesday: $("tr[data-day='Tuesday']").length,
@@ -487,18 +521,33 @@
         Sunday: $("tr[data-day='Sunday']").length
     };
 
+    const dayColors = {
+        Monday: '#f8d7da',
+        Tuesday: '#d4edda',
+        Wednesday: '#d1ecf1',
+        Thursday: '#fff3cd',
+        Friday: '#cce5ff',
+        Saturday: '#e2e3e5',
+        Sunday: '#f5c6cb',
+    };
+
+    // Add a new driver row for the selected day
     function addDriverRow(day) {
         rowCounts[day]++;
 
         const newRow = $(`
-            <tr data-day="${day}" class="driver-row">
+            <tr data-day="${day}" class="driver-row" style="background-color: ${dayColors[day] || '#ffffff'};">
                 <td>
                     <select name="drivers[${day}][${rowCounts[day] - 1}][driver_id]" class="form-control" required>
                         ${generateDriverOptions()}
                     </select>
                 </td>
-                <td><input type="time" name="drivers[${day}][${rowCounts[day] - 1}][start_time]" class="form-control" required></td>
-                <td><input type="time" name="drivers[${day}][${rowCounts[day] - 1}][end_time]" class="form-control" required></td>
+                <td>
+                    <select name="drivers[${day}][${rowCounts[day] - 1}][time_slot_id]" class="form-control" required>
+                        <option value="" disabled selected>Select Time Slot</option>
+                        ${generateTimeSlotOptions()}
+                    </select>
+                </td>
                 <td>
                     <button type="button" class="btn btn-danger remove-button">Remove</button>
                 </td>
@@ -507,9 +556,11 @@
 
         $(`tr[data-day="${day}"]:last`).after(newRow);
 
+        // Update rowspan for the day header cell
         $(`#${day}-first-row .day-name`).attr('rowspan', rowCounts[day]);
     }
 
+    // Generate driver options
     function generateDriverOptions() {
         let options = '';
         @foreach ($users as $driver)
@@ -520,7 +571,19 @@
         return options;
     }
 
-    // Event delegation for dynamically and pre-existing "Remove" buttons
+    // Generate time slot options
+    function generateTimeSlotOptions() {
+        let options = '';
+        @foreach ($timeSlots as $slot)
+            options += `<option value="{{ $slot['id'] }}">
+                            {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
+                            {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
+                        </option>`;
+        @endforeach
+        return options;
+    }
+
+    // Remove a driver row
     $("#weekly-drivers").on("click", ".remove-button", function () {
         const row = $(this).closest("tr");
         const day = row.data("day");
@@ -529,6 +592,7 @@
 
         rowCounts[day]--;
 
+        // Update rowspan for the day header cell
         $(`#${day}-first-row .day-name`).attr("rowspan", rowCounts[day]);
     });
 

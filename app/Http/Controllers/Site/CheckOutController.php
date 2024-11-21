@@ -501,7 +501,7 @@ class CheckOutController extends Controller
             $input['time_end'] = $time_slot->time_end;
             $input['payment_method'] = "Cash-On-Delivery";
 
-            $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $time_slot->time_start, $time_slot->time_end) : null;
+            $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
 
             $order = Order::create($input);
             $order_ids[] = $order->id;

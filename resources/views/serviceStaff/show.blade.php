@@ -116,24 +116,40 @@
                 <tr>
                     <th>Day</th>
                     <th>Driver Name</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
+                    <th>Time Slot</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
                     @php
+                        $dayColors = [
+                            'Monday' => '#f8d7da',
+                            'Tuesday' => '#d4edda',
+                            'Wednesday' => '#d1ecf1',
+                            'Thursday' => '#fff3cd',
+                            'Friday' => '#cce5ff',
+                            'Saturday' => '#e2e3e5',
+                            'Sunday' => '#f5c6cb',
+                        ];
+                        $backgroundColor = $dayColors[$day] ?? '#ffffff';
+                    @endphp
+                    @php
                         $driversForDay = $assignedDrivers[$day] ?? [];
                     @endphp
                     @if(count($driversForDay) > 0)
                         @foreach($driversForDay as $index => $driverData)
-                            <tr>
+                            @php
+                                $timeSlot = $timeSlots->firstWhere('id', $driverData['time_slot_id']);
+                            @endphp
+                            <tr style="background-color: {{ $dayColors[$day] ?? '#ffffff' }}">
                                 @if($index === 0)
                                     <td rowspan="{{ count($driversForDay) }}" class="align-middle text-center">{{ $day }}</td>
                                 @endif
                                 <td>{{ $driverData->driver->name ?? 'N/A' }}</td>
-                                <td>{{ \Carbon\Carbon::parse($driverData['start_time'])->format('h:i A') ?? 'N/A' }}</td>
-                                <td>{{ \Carbon\Carbon::parse($driverData['end_time'])->format('h:i A') ?? 'N/A' }}</td>
+                                <td>
+                                    {{ $timeSlot ? \Carbon\Carbon::parse($timeSlot->time_start)->format('h:i A') . ' - ' . \Carbon\Carbon::parse($timeSlot->time_end)->format('h:i A') : 'No Time Slot Assigned' }}
+                                </td>
+                                
                             </tr>
                         @endforeach
                     @else
