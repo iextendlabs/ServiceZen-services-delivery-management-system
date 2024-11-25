@@ -223,6 +223,16 @@
                                     value="{{ $filter['date_to'] }}">
                             </div>
                             <div class="col-md-4">
+                                <strong>Time Start:</strong>
+                                <input type="time" name="time_start" class="form-control"
+                                    value="{{ $filter['time_start'] }}">
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Time End:</strong>
+                                <input type="time" name="time_end" class="form-control"
+                                    value="{{ $filter['time_end'] }}">
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>Payment Method:</strong>
                                     <select name="payment_method" class="form-control">

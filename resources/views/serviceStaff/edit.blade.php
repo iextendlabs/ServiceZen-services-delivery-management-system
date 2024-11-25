@@ -151,17 +151,108 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <span style="color: red;">*</span><strong>Drivers:</strong>
-                            <select name="driver_id" class="form-control">
-                                <option></option>
-                                @foreach ($users as $driver)
-                                @if($driver->hasRole("Driver"))
-                                <option value="{{ $driver->id }}" {{ old('driver_id', $serviceStaff->staff->driver_id ?? null) == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
-                                @endif
-                                @endforeach
-                            </select>
+                            <strong>Assign Drivers for Each Day:</strong>
+                            @if (count($timeSlots) <= 0)
+                                <div class="alert alert-danger">
+                                    This staff member doesn't have any assigned time slots. Please assign time slots first before assigning a driver.
+                                </div>
+                            @endif
+                            <table id="weekly-drivers" class="table table-bordered supervisor-table" style="width: 100%; margin-bottom: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Driver</th>
+                                        <th>Time Slot</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
+                                    @php
+                                        $dayColors = [
+                                            'Monday' => '#f8d7da',
+                                            'Tuesday' => '#d4edda',
+                                            'Wednesday' => '#d1ecf1',
+                                            'Thursday' => '#fff3cd',
+                                            'Friday' => '#cce5ff',
+                                            'Saturday' => '#e2e3e5',
+                                            'Sunday' => '#f5c6cb',
+                                        ];
+                                        $backgroundColor = $dayColors[$day] ?? '#ffffff';
+                                    @endphp
+                                        @php
+                                            $driversForDay = $assignedDrivers[$day] ?? []; 
+                                            $firstRow = true;
+                                        @endphp
+                                        @foreach($driversForDay as $index => $driverData )
+                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}" style="background-color: {{ $dayColors[$day] ?? '#ffffff' }}">
+                                                @if($firstRow)
+                                                    <td rowspan="{{ count($driversForDay) }}" class="day-name">{{ $day }}</td>
+                                                    @php $firstRow = false; @endphp
+                                                @endif
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][{{ $index }}][driver_id]" class="form-control" required>
+                                                        @foreach ($users as $driver)
+                                                            @if ($driver->hasRole("Driver"))
+                                                                <option value="{{ $driver->id }}" {{ $driverData['driver_id'] == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][{{ $index }}][time_slot_id]" class="form-control" required>
+                                                        <option value="" disabled>Select Time Slot</option>
+                                                        @foreach ($timeSlots as $slot)
+                                                            <option value="{{ $slot['id'] }}" {{ $driverData['time_slot_id'] == $slot['id'] ? 'selected' : '' }}>
+                                                                {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
+                                                                {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    @if($index == 0)
+                                                    <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
+                                                    @endif
+                                                    @if($index > 0)
+                                                    <button type="button" class="btn btn-danger remove-button">Remove</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        @if(count($driversForDay) === 0)
+                                            <tr id="{{ $day }}-first-row" data-day="{{ $day }}" style="background-color: {{ $dayColors[$day] ?? '#ffffff' }}">
+                                                <td rowspan="1" class="day-name">{{ $day }}</td>
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][0][driver_id]" class="form-control" required>
+                                                        @foreach ($users as $driver)
+                                                            @if ($driver->hasRole("Driver"))
+                                                                <option value="{{ $driver->id }}">{{ $driver->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select name="drivers[{{ $day }}][0][time_slot_id]" class="form-control" required>
+                                                        <option value="" disabled>Select Time Slot</option>
+                                                        @foreach ($timeSlots as $slot)
+                                                            <option value="{{ $slot['id'] }}">
+                                                                {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
+                                                                {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-primary" onclick="addDriverRow('{{ $day }}')">Add</button>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
+                    </div>         
                     <div class="col-md-12">
                         <div class="form-group scroll-div">
                             <strong>Supervisor:</strong>
@@ -419,6 +510,92 @@
     </form>
 </div>
 <script>
+    // Initialize row counts based on the existing table
+    let rowCounts = {
+        Monday: $("tr[data-day='Monday']").length,
+        Tuesday: $("tr[data-day='Tuesday']").length,
+        Wednesday: $("tr[data-day='Wednesday']").length,
+        Thursday: $("tr[data-day='Thursday']").length,
+        Friday: $("tr[data-day='Friday']").length,
+        Saturday: $("tr[data-day='Saturday']").length,
+        Sunday: $("tr[data-day='Sunday']").length
+    };
+
+    const dayColors = {
+        Monday: '#f8d7da',
+        Tuesday: '#d4edda',
+        Wednesday: '#d1ecf1',
+        Thursday: '#fff3cd',
+        Friday: '#cce5ff',
+        Saturday: '#e2e3e5',
+        Sunday: '#f5c6cb',
+    };
+
+    // Add a new driver row for the selected day
+    function addDriverRow(day) {
+        rowCounts[day]++;
+
+        const newRow = $(`
+            <tr data-day="${day}" class="driver-row" style="background-color: ${dayColors[day] || '#ffffff'};">
+                <td>
+                    <select name="drivers[${day}][${rowCounts[day] - 1}][driver_id]" class="form-control" required>
+                        ${generateDriverOptions()}
+                    </select>
+                </td>
+                <td>
+                    <select name="drivers[${day}][${rowCounts[day] - 1}][time_slot_id]" class="form-control" required>
+                        <option value="" disabled selected>Select Time Slot</option>
+                        ${generateTimeSlotOptions()}
+                    </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-button">Remove</button>
+                </td>
+            </tr>
+        `);
+
+        $(`tr[data-day="${day}"]:last`).after(newRow);
+
+        // Update rowspan for the day header cell
+        $(`#${day}-first-row .day-name`).attr('rowspan', rowCounts[day]);
+    }
+
+    // Generate driver options
+    function generateDriverOptions() {
+        let options = '';
+        @foreach ($users as $driver)
+            @if ($driver->hasRole("Driver"))
+                options += `<option value="{{ $driver->id }}">{{ $driver->name }}</option>`;
+            @endif
+        @endforeach
+        return options;
+    }
+
+    // Generate time slot options
+    function generateTimeSlotOptions() {
+        let options = '';
+        @foreach ($timeSlots as $slot)
+            options += `<option value="{{ $slot['id'] }}">
+                            {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
+                            {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
+                        </option>`;
+        @endforeach
+        return options;
+    }
+
+    // Remove a driver row
+    $("#weekly-drivers").on("click", ".remove-button", function () {
+        const row = $(this).closest("tr");
+        const day = row.data("day");
+
+        row.remove();
+
+        rowCounts[day]--;
+
+        // Update rowspan for the day header cell
+        $(`#${day}-first-row .day-name`).attr("rowspan", rowCounts[day]);
+    });
+
     $("#search-services").keyup(function() {
         let value = $(this).val().toLowerCase();
 

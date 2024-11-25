@@ -9,7 +9,9 @@ use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffHoliday;
 use App\Models\StaffImages;
+use App\Models\StaffDriver;
 use App\Models\StaffYoutubeVideo;
+use App\Models\TimeSlot;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserDocument;
@@ -178,7 +180,7 @@ class ServiceStaffController extends Controller
         }
         
         UserDocument::create($input);
-
+        
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -211,7 +213,13 @@ class ServiceStaffController extends Controller
 
         $documents = $this->documents;
 
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
+        ->get()
+        ->groupBy('day');
+        
+        $timeSlots = TimeSlot::get();
+
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents','assignedDrivers','timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -236,7 +244,15 @@ class ServiceStaffController extends Controller
         ->get();
         $documents = $this->documents;
 
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents'));
+        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
+        ->get()
+        ->groupBy('day');
+        $staffId = $serviceStaff->id;
+        $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($staffId) {
+            $q->where('staff_id', $staffId);
+        })->get();
+        
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers','timeSlots'));
     }
 
     /**
@@ -255,7 +271,8 @@ class ServiceStaffController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
-            'commission' => 'required'
+            'commission' => 'required',
+            'drivers' => 'required|array',
         ];
     
         if ($request->freelancer_join == 1) {
@@ -360,6 +377,19 @@ class ServiceStaffController extends Controller
             $input['user_id'] = $id;
             UserDocument::create($input);
         }
+
+        StaffDriver::where('staff_id', $id)->delete();
+
+        foreach ($request->drivers as $day=>$drivers) {
+            foreach($drivers as $driver){
+                StaffDriver::create([
+                    'staff_id' => $id,
+                    'driver_id' => $driver['driver_id'],
+                    'day' => $day,
+                    'time_slot_id' => $driver['time_slot_id'],
+                ]);
+            }
+        }
         
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -430,6 +460,8 @@ class ServiceStaffController extends Controller
         $serviceStaff->delete();
 
         $previousUrl = url()->previous();
+
+        StaffDriver::where('staff_id',$serviceStaff->id)->delete();
 
         return redirect($previousUrl)
             ->with('success', 'Service Staff deleted successfully');

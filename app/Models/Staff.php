@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp','min_order_value','expiry_date','affiliate_id','membership_plan_id'];
+    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp', 'min_order_value', 'expiry_date', 'affiliate_id', 'membership_plan_id'];
 
     public function appointments()
     {
@@ -43,6 +45,16 @@ class Staff extends Model
 
     public function membershipPlan()
     {
-        return $this->hasOne(MembershipPlan::class,'id','membership_plan_id');
+        return $this->hasOne(MembershipPlan::class, 'id', 'membership_plan_id');
+    }
+
+    public function getDriverForTimeSlot($date, $time_slot_id)
+    {
+        $day = Carbon::parse($date)->format('l');
+
+        $driver = StaffDriver::where('staff_id', $this->user_id)
+            ->where('day', $day)->where('time_slot_id',$time_slot_id)->first();
+
+        return $driver ? $driver->driver_id : ($this->driver_id ?? null);
     }
 }
