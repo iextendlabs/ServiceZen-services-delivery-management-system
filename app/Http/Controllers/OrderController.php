@@ -121,23 +121,13 @@ class OrderController extends Controller
         }
 
         if ($userRole == "Staff") {
-            if ($request->status) {
-                $query->where('status', '=', $request->status);
-            } else {
+            if (!$request->status) {
                 $query->whereNotIn('status', ['Rejected', 'Canceled']);
-            }
-        } else {
-            if ($request->status) {
-                $query->where('status', '=', $request->status);
             }
         }
 
-        if ($request->driver_status) {
-            $query->where('driver_status', '=', $request->driver_status);
-        } else {
-            if ($request->status) {
-                $query->where('status', '=', $request->status);
-            }
+        if ($request->status) {
+            $query->where('status', '=', $request->status);
         }
 
         if ($request->driver_status) {
@@ -203,7 +193,7 @@ class OrderController extends Controller
         }
 
         if ($request->today_order) {
-            $query->where('date', $request->today_order)->where('status','!=','Complete')->where('status','!=','Canceled');
+            $query->where('date', $request->today_order)->where('driver_status','!=','Dropped')->where('status','!=','Complete')->where('status','!=','Canceled');
         }
 
         if ($userRole == "Staff" || $userRole == "Supervisor") {
