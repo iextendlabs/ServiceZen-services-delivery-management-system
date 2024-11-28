@@ -192,6 +192,7 @@
                                                 @endif
                                                 <td>
                                                     <select name="drivers[{{ $day }}][{{ $index }}][driver_id]" class="form-control" required>
+                                                        <option value="">Select Driver</option>
                                                         @foreach ($users as $driver)
                                                             @if ($driver->hasRole("Driver"))
                                                                 <option value="{{ $driver->id }}" {{ $driverData['driver_id'] == $driver->id ? 'selected' : '' }}>{{ $driver->name }}</option>
@@ -201,7 +202,7 @@
                                                 </td>
                                                 <td>
                                                     <select name="drivers[{{ $day }}][{{ $index }}][time_slot_id]" class="form-control" required>
-                                                        <option value="" disabled>Select Time Slot</option>
+                                                        <option value="">Select Time Slot</option>
                                                         @foreach ($timeSlots as $slot)
                                                             <option value="{{ $slot['id'] }}" {{ $driverData['time_slot_id'] == $slot['id'] ? 'selected' : '' }}>
                                                                 {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
@@ -225,6 +226,7 @@
                                                 <td rowspan="1" class="day-name">{{ $day }}</td>
                                                 <td>
                                                     <select name="drivers[{{ $day }}][0][driver_id]" class="form-control" required>
+                                                        <option value="">Select Driver</option>
                                                         @foreach ($users as $driver)
                                                             @if ($driver->hasRole("Driver"))
                                                                 <option value="{{ $driver->id }}">{{ $driver->name }}</option>
@@ -234,7 +236,7 @@
                                                 </td>
                                                 <td>
                                                     <select name="drivers[{{ $day }}][0][time_slot_id]" class="form-control" required>
-                                                        <option value="" disabled>Select Time Slot</option>
+                                                        <option value="">Select Time Slot</option>
                                                         @foreach ($timeSlots as $slot)
                                                             <option value="{{ $slot['id'] }}">
                                                                 {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
