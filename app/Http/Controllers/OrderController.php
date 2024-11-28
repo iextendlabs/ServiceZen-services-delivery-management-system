@@ -130,6 +130,10 @@ class OrderController extends Controller
             $query->where('status', '=', $request->status);
         }
 
+        if ($request->driver_dropped) {
+            $query->where('driver_status', '=', "Dropped")->where('status','!=','Complete');
+        }
+
         if ($request->driver_status) {
             $query->where('driver_status', '=', $request->driver_status);
         }

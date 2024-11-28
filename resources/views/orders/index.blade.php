@@ -53,8 +53,8 @@
                         href="{{ route('orders.index') }}?today_order={{ date('Y-m-d') }}">
                         <i class="fas fa-calendar"></i> Todays Order
                     </a>
-                    <a class="btn btn-secondary mb-2 ms-md-2"
-                        href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_status=Dropped">
+                    <a class="btn btn-warning mb-2 ms-md-2"
+                        href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
                         <i class="fas fa-calendar"></i> Todays Drop Order
                     </a>
                     <a class="btn btn-danger mb-2 ms-md-2"
