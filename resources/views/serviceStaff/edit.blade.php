@@ -541,6 +541,7 @@
             <tr data-day="${day}" class="driver-row" style="background-color: ${dayColors[day] || '#ffffff'};">
                 <td>
                     <select name="drivers[${day}][${rowCounts[day] - 1}][driver_id]" class="form-control" required>
+                        <option value="" disabled selected>Select Driver</option>
                         ${generateDriverOptions()}
                     </select>
                 </td>
