@@ -639,15 +639,17 @@ class OrderController extends Controller
     public function custom_location(Request $request, $id)
     {
         $request->validate([
-            'custom_location' => 'required',
+            'custom_location' => ['required', 'regex:/^\d+\s*,\s*\d+$/'],
+        ], [
+            'custom_location.regex' => 'The custom location must be in the format: 12345,67890 (without extra spaces)',
         ]);
 
         $input = $request->all();
         $order = Order::findOrFail($id);
 
         [$latitude, $longitude] = explode(",", $request->custom_location);
-        $input['latitude'] = $latitude;
-        $input['longitude'] = $longitude;
+        $input['latitude'] = trim($latitude);
+        $input['longitude'] = trim($longitude);
         $order->update($input);
 
         $previousUrl = $request->url;
