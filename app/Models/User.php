@@ -9,6 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Exception;
+use Google\Client;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -129,7 +132,7 @@ class User extends Authenticatable
 
     public function userAffiliate()
     {
-        return $this->hasOne(UserAffiliate::class,'user_id');
+        return $this->hasOne(UserAffiliate::class, 'user_id');
     }
 
     public function customerProfiles()
@@ -165,62 +168,69 @@ class User extends Authenticatable
     public function notifyOnMobile($title, $body, $order_id = null)
     {
         if ($this->device_token) {
-
             Notification::create([
                 'order_id' => $order_id,
                 'user_id' => $this->id,
                 'title' => $title,
-                'body' =>  $body
+                'body' => $body
             ]);
-            
+
             try {
-                $SERVER_API_KEY = env('FCM_SERVER_KEY');
+                $serviceAccountFile = storage_path('app/firebase/firebase-service-account.json');
+
+                $client = new Client();
+                $client->setAuthConfig($serviceAccountFile);
+                $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+
+                $accessToken = $client->fetchAccessTokenWithAssertion()['access_token'];
+                // FCM HTTP v1 API endpoint
+                $url = "https://fcm.googleapis.com/v1/projects/sallon-9a41d/messages:send";
 
                 $data = [
-                    "to" => $this->device_token,
-                    "notification" => [
-                        "body" => $body,
-                        "title" => $title,
-                        "content_available" => true,
-                        "priority" => "high"
+                    "message" => [
+                        "token" => $this->device_token,
+                        "notification" => [
+                            "title" => $title,
+                            "body" => $body,
+                        ],
+                        "apns" => [
+                            "payload" => [
+                                "aps" => [
+                                    "content-available" => 1,
+                                    "priority" => "high"
+                                ]
+                            ]
+                        ],
+                        "android" => [
+                            "priority" => "high"
+                        ]
                     ]
                 ];
 
-                $dataString = json_encode($data);
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type' => 'application/json',
+                ])->post($url, $data);
 
-                $headers = [
-                    'Authorization: key=' . $SERVER_API_KEY,
-                    'Content-Type: application/json',
-                ];
-
-                $ch = curl_init();
-
-                curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-
-                $response = curl_exec($ch);
-
-                if ($response === false) {
-                    throw new Exception(curl_error($ch));
+                if ($response->successful()) {
+                    return "Notification sent successfully.";
+                } else {
+                    Log::error('FCM Notification Error', [
+                        'response' => $response->json(),
+                        'status' => $response->status(),
+                    ]);
+                    return "Failed to send notification. FCM Response: " . $response->body();
                 }
-
-                // Handle the response here if needed
-
-                $msg = "Notification sent successfully.";
-                return $msg;
-            } catch (Exception $e) {
-                // Handle the exception, log it, or return an error message
-                $error_msg = "Error: " . $e->getMessage();
-                return $error_msg;
-            } finally {
-                // Close the cURL handle regardless of success or failure
-                curl_close($ch);
+            } catch (\Exception $e) {
+                Log::error('FCM Notification Exception', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return "Error sending notification: " . $e->getMessage();
             }
         }
+
+        return "No device token provided.";
     }
 
     public function services()
