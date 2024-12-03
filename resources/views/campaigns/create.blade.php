@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
-            <h2>New Company</h2>
+            <h2>New Campaign</h2>
         </div>
     </div>
     @if ($errors->any())
@@ -16,7 +16,7 @@
         </ul>
     </div>
     @endif
-    <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('campaigns.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="row">
             <div class="col-md-6">

@@ -119,9 +119,9 @@
                             </div>
                         </li>
                         @endif
-                        @can('company-list')
+                        @can('campaign-list')
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('companies.index')}}">Companies</a>
+                            <a class="nav-link" aria-current="page" href="{{ route('campaigns.index')}}">Campaigns</a>
                         </li>
                         @endcan
                         @can('chat-list')
