@@ -183,9 +183,8 @@ class User extends Authenticatable
                 $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
 
                 $accessToken = $client->fetchAccessTokenWithAssertion()['access_token'];
-                $fcm_project_id = env("FCM_PROJECT_ID ");
                 // FCM HTTP v1 API endpoint
-                $url = "https://fcm.googleapis.com/v1/projects/".$fcm_project_id."/messages:send";
+                $url = "https://fcm.googleapis.com/v1/projects/sallon-9a41d/messages:send";
 
                 $data = [
                     "message" => [
