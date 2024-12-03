@@ -456,8 +456,8 @@ class OrderController extends Controller
 
                         if (Carbon::now()->toDateString() == $request->date) {
                             $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                            if ($staff->staff && $staff->staff->driver) {
-                                $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            if ($order->driver) {
+                                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                             }
                             try {
                                 $checkOutController->sendOrderEmail($input['order_id'], $request->email);
@@ -580,7 +580,6 @@ class OrderController extends Controller
         ]);
 
         $input = $request->all();
-
         $order = Order::findOrFail($id);
 
         $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
@@ -601,6 +600,8 @@ class OrderController extends Controller
                 Transaction::where('order_id', $order->id)->where('user_id',$order->staff->affiliate_id)->where('type','Order Staff Affiliate Commission')->delete();
             }
         }
+
+        $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
         
         $order->update($input);
 

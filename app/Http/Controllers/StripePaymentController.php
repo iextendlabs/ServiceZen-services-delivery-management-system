@@ -155,8 +155,8 @@ class StripePaymentController extends Controller
                 $staff = User::find($order->service_staff_id);
                 if ($staff && Carbon::now()->toDateString() == $order->date) {
                     $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
-                    if ($staff->staff->driver) {
-                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                    if ($order->driver) {
+                        $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
                     }
                     try {
                         $checkOutController->sendOrderEmail($order->id, $customer->email);

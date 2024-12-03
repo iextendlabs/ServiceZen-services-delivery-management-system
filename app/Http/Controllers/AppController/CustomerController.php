@@ -586,8 +586,8 @@ class CustomerController extends Controller
             
                             if (Carbon::now()->toDateString() == $input['date']) {
                                 $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                                if ($staff->staff->driver) {
-                                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                                if ($order->driver) {
+                                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                                 }
                                 try {
                                     $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
@@ -1692,8 +1692,8 @@ class CustomerController extends Controller
             if(isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery"){
                 if (Carbon::now()->toDateString() == $input['date']) {
                     $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                    if ($staff->staff->driver) {
-                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    if ($order->driver) {
+                        $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                     }
                     try {
                         $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
