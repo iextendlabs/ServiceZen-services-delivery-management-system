@@ -66,17 +66,19 @@ class CampaignController extends Controller
             $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
 
             $accessToken = $client->fetchAccessTokenWithAssertion()['access_token'];
+        
+            $url = "https://fcm.googleapis.com/v1/projects/sallon-9a41d/messages:send";
 
-            $fcm_project_id = env("FCM_PROJECT_ID ");
-
-            $url = "https://fcm.googleapis.com/v1/projects/".$fcm_project_id."/messages:send";
-
+            $topic = "lipslay";
             $data = [
                 "message" => [
-                    "topic" => "lipslay",
+                    "topic" => $topic,
                     "notification" => [
                         "title" => $request->title,
                         "body" => $request->body,
+                    ],
+                    "android" => [
+                        "priority" => "high"
                     ],
                     "apns" => [
                         "payload" => [
@@ -86,8 +88,8 @@ class CampaignController extends Controller
                             ]
                         ]
                     ],
-                    "android" => [
-                        "priority" => "high"
+                    "data" => [
+                        "custom_key" => "custom_value",
                     ]
                 ]
             ];
@@ -102,7 +104,7 @@ class CampaignController extends Controller
                 $msg = "Campaign Sent successfully.";
                 $success = true;
             } else {
-                Log::error('FCM Notification Error', [
+                Log::error('FCM Campaign Notification Error', [
                     'response' => $response->json(),
                     'status' => $response->status(),
                 ]);
@@ -110,7 +112,7 @@ class CampaignController extends Controller
                 $success = false;
             }
         } catch (\Exception $e) {
-            Log::error('FCM Notification Exception', [
+            Log::error('FCM Campaign Notification Exception', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
