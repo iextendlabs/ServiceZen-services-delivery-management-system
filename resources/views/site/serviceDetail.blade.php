@@ -18,13 +18,13 @@
   #thumbnails img:hover {
     border-color: #007bff;
   }
-  .carousel-item img {
+  /* .carousel-item img {
     height: 400px;
     object-fit: contain;
     background-color: #fff;
     padding: 20px;
     margin: auto;
-  }
+  } */
   .modal-dialog-centered {
       max-width: 700px !important;
       max-height: 700px !important;
