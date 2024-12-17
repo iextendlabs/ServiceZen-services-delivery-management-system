@@ -78,12 +78,24 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Description:</strong>
-                            <textarea class="form-control" id="summernote" name="description" placeholder="Description">{{ old('description') }}</textarea>
+                            <textarea class="form-control" id="description_summernote" name="description" placeholder="Description">{{ old('description') }}</textarea>
                             <script>
                                 (function($) {
-                                    $('#summernote').summernote({
+                                    $('#description_summernote').summernote({
                                         tabsize: 2,
                                         height: 250,
+                                        toolbar: [
+                                            ['style', ['style']],
+                                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                                            ['fontname', ['fontname']],
+                                            ['fontsize', ['fontsize']],
+                                            ['color', ['color']],
+                                            ['para', ['ul', 'ol', 'paragraph']],
+                                            ['height', ['height']],
+                                            ['insert', ['picture', 'link', 'video', 'table']],
+                                            ['misc', ['undo', 'redo']], 
+                                            ['view', ['fullscreen', 'codeview', 'help']]
+                                        ],
                                         callbacks: {
                                             onImageUpload: function(files) {
                                                 uploadImage(files[0]);
@@ -103,7 +115,7 @@
                                             processData: false,
                                             contentType: false,
                                             success: function(response) {
-                                                $('#summernote').summernote('insertImage', response.url);
+                                                $('#description_summernote').summernote('insertImage', response.url);
                                             },
                                             error: function(response) {
                                                 console.error(response);
@@ -118,7 +130,52 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Short Description:</strong>
-                            <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{old('short_description') }}</textarea>
+                            <textarea class="form-control" style="height:150px" id="short_description_summernote" name="short_description" placeholder="Short Description">{{old('short_description') }}</textarea>
+                            <script>
+                                (function($) {
+                                    $('#short_description_summernote').summernote({
+                                        tabsize: 2,
+                                        height: 250,
+                                        toolbar: [
+                                            ['style', ['style']],
+                                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                                            ['fontname', ['fontname']],
+                                            ['fontsize', ['fontsize']],
+                                            ['color', ['color']],
+                                            ['para', ['ul', 'ol', 'paragraph']],
+                                            ['height', ['height']],
+                                            ['insert', ['picture', 'link', 'video', 'table']],
+                                            ['misc', ['undo', 'redo']], 
+                                            ['view', ['fullscreen', 'codeview', 'help']]
+                                        ],
+                                        callbacks: {
+                                            onImageUpload: function(files) {
+                                                uploadImage(files[0]);
+                                            }
+                                        }
+                                    });
+    
+                                    function uploadImage(file) {
+                                        let data = new FormData();
+                                        data.append("file", file);
+                                        data.append("_token", "{{ csrf_token() }}");
+    
+                                        $.ajax({
+                                            url: "{{ route('summerNote.upload') }}",
+                                            method: "POST",
+                                            data: data,
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                $('#short_description_summernote').summernote('insertImage', response.url);
+                                            },
+                                            error: function(response) {
+                                                console.error(response);
+                                            }
+                                        });
+                                    }
+                                })(jQuery);
+                            </script>
                         </div>
                     </div>
                     <div class="col-md-12">

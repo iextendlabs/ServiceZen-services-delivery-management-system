@@ -35,6 +35,18 @@
                                 $('#summernote').summernote({
                                     tabsize: 2,
                                     height: 250,
+                                    toolbar: [
+                                        ['style', ['style']],
+                                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                                        ['fontname', ['fontname']],
+                                        ['fontsize', ['fontsize']],
+                                        ['color', ['color']],
+                                        ['para', ['ul', 'ol', 'paragraph']],
+                                        ['height', ['height']],
+                                        ['insert', ['picture', 'link', 'video', 'table']],
+                                        ['misc', ['undo', 'redo']], 
+                                        ['view', ['fullscreen', 'codeview', 'help']]
+                                    ],
                                     callbacks: {
                                         onImageUpload: function(files) {
                                             uploadImage(files[0]);
