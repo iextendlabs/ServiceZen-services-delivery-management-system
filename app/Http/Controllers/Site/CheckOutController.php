@@ -51,16 +51,7 @@ class CheckOutController extends Controller
                 $option = [];
             }
 
-            $totalDuration = 0;
-
-            if ($option) {
-                foreach ($option as $opt) {
-                    if (!empty($opt->option_duration)) {
-                        preg_match('/\d+/', $opt->option_duration, $matches);
-                        $totalDuration += isset($matches[0]) ? (int)$matches[0] : 0;
-                    }
-                }
-            }
+            $formattedDuration = $this->calculateTotalDuration($option);
 
             if ($service && $staff && $slot) {
                 $formattedBooking = [
@@ -70,7 +61,7 @@ class CheckOutController extends Controller
                     'slot' => date('h:i A', strtotime($slot->time_start)) . '-- ' . date('h:i A', strtotime($slot->time_end)),
                     'option' => $option,
                     'option_total_price' =>$option ? $option->sum('option_price') : 0,
-                    'option_total_duration' => $totalDuration > 0 ? $totalDuration . ' MINS' : null
+                    'option_total_duration' => $formattedDuration ? $formattedDuration : null
                 ];
 
                 $formattedBookings[] = $formattedBooking;
@@ -657,23 +648,14 @@ class CheckOutController extends Controller
 
             if (isset($booking['option_id']) && is_array($booking['option_id']) && count($booking['option_id']) > 0) {
                 $options = ServiceOption::whereIn('id', $booking['option_id'])->get();
+    
+                $formattedDuration = $this->calculateTotalDuration($options);
                 
-                $totalDuration = 0;
-
-                if ($options) {
-                    foreach ($options as $opt) {
-                        if (!empty($opt->option_duration)) {
-                            preg_match('/\d+/', $opt->option_duration, $matches);
-                            $totalDuration += isset($matches[0]) ? (int)$matches[0] : 0;
-                        }
-                    }
-                }
-
                 $totalPrice = $options->sum('option_price');
                 $groupedBookingOption[$booking['service_id']] = [
                     'options' => $options,
                     'total_price' => $totalPrice,
-                    'total_duration' => $totalDuration > 0 ? $totalDuration . ' MINS' : null
+                    'total_duration' => $formattedDuration > 0 ? $formattedDuration : null
                 ];
             } else {
                 $groupedBookingOption[$booking['service_id']] = [
@@ -701,6 +683,49 @@ class CheckOutController extends Controller
         }
 
         return [$formattedBookings,$groupedBookingOption,$groupedBooking];
+    }
+
+    public function calculateTotalDuration($options){
+        $totalDuration = 0;
+
+        foreach ($options as $opt) {
+            if (!empty($opt->option_duration)) {
+                // Normalize the string to lowercase for easier handling
+                $durationStr = strtolower($opt->option_duration);
+    
+                // Match the numeric value and the unit (if any)
+                if (preg_match('/(\d+)\s*(hour|hours|hr|h|min|mins|mints|minute|minutes|m|mint)?/i', $durationStr, $matches)) {
+                    $value = (int)$matches[1];
+                    $unit = isset($matches[2]) ? $matches[2] : 'min';
+    
+                    // Convert to minutes based on the unit
+                    switch ($unit) {
+                        case 'hour':
+                        case 'hours':
+                        case 'hr':
+                        case 'h':
+                            $totalDuration += $value * 60; // Convert hours to minutes
+                            break;
+                        case 'min':
+                        case 'mins':
+                        case 'mints':
+                        case 'minute':
+                        case 'minutes':
+                        case 'm':
+                        case 'mint':
+                        default:
+                            $totalDuration += $value; // Already in minutes
+                            break;
+                    }
+                }
+            }
+        }
+    
+        $hours = intdiv($totalDuration, 60);
+        $minutes = $totalDuration % 60;
+
+        $formattedDuration = $hours && $minutes ? sprintf('%d hours %d minutes', $hours, $minutes) : 0;
+        return $formattedDuration;
     }
 
     public function bookingStep(Request $request)

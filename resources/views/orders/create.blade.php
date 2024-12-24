@@ -292,16 +292,21 @@
                     totalDuration += parseDuration($(this).data('duration'));
                 });
 
+                const hours = Math.floor(totalDuration / 60);
+                const minutes = totalDuration % 60;
+
+                const formattedDuration = `${hours > 0 ? hours + ' hours ' : ''}${minutes > 0 ? minutes + ' minutes' : ''}`;
+
                 if (totalPrice > 0) {
                     servicePriceElement.text("AED " +totalPrice.toFixed(2));
                 } else {
                     servicePriceElement.text("AED " +servicePrice.toFixed(2));
                 }
 
-                if (totalDuration == 0) {
-                    serviceDurationElement.text(serviceDuration);
+                if (formattedDuration) {
+                    serviceDurationElement.text(formattedDuration);
                 } else {
-                    serviceDurationElement.text(`${totalDuration} MINS`);
+                    serviceDurationElement.text(serviceDuration);
                 }
 
                 $('#coupon-discount').text(0);
@@ -311,14 +316,32 @@
             });
 
             function parseDuration(durationStr) {
-                let duration = 0;
-                if (durationStr) {
-                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT|MINS)/i);
-                    if (minMatch) {
-                        duration = parseInt(minMatch[1], 10);
-                    }
+                if (!durationStr) return 0;
+
+                durationStr = durationStr.toLowerCase();
+
+                const match = durationStr.match(/(\d+)\s*(hour|hours|hr|h|min|mins|mints|minute|minutes|m|mint)?/i);
+                if (!match) return 0;
+
+                const value = parseInt(match[1], 10);
+                const unit = match[2] || 'min';
+
+                switch (unit) {
+                    case 'hour':
+                    case 'hours':
+                    case 'hr':
+                    case 'h':
+                        return value * 60;
+                    case 'min':
+                    case 'mins':
+                    case 'mints':
+                    case 'minute':
+                    case 'minutes':
+                    case 'm':
+                    case 'mint':
+                    default:
+                        return value;
                 }
-                return duration;
             }
 
             function updateTotal() {

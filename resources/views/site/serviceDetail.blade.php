@@ -519,14 +519,32 @@
             }
 
             function parseDuration(durationStr) {
-                let duration = 0;
-                if (durationStr) {
-                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT|MINS)/i);
-                    if (minMatch) {
-                        duration = parseInt(minMatch[1], 10);
-                    }
+                if (!durationStr) return 0;
+
+                durationStr = durationStr.toLowerCase();
+
+                const match = durationStr.match(/(\d+)\s*(hour|hours|hr|h|min|mins|mints|minute|minutes|m|mint)?/i);
+                if (!match) return 0;
+
+                const value = parseInt(match[1], 10);
+                const unit = match[2] || 'min';
+
+                switch (unit) {
+                    case 'hour':
+                    case 'hours':
+                    case 'hr':
+                    case 'h':
+                        return value * 60;
+                    case 'min':
+                    case 'mins':
+                    case 'mints':
+                    case 'minute':
+                    case 'minutes':
+                    case 'm':
+                    case 'mint':
+                    default:
+                        return value;
                 }
-                return duration;
             }
 
             function updatePriceAndDuration() {
@@ -539,6 +557,11 @@
                         totalDuration += parseDuration($(this).data('duration'));
                     });
 
+                    const hours = Math.floor(totalDuration / 60);
+                    const minutes = totalDuration % 60;
+
+                    const formattedDuration = `${hours > 0 ? hours + ' hours ' : ''}${minutes > 0 ? minutes + ' minutes' : ''}`;
+                    
                     let currencySymbol = '';
                     $options.filter(':checked').each(function() {
                         let price = $(this).data('price');
@@ -548,10 +571,10 @@
 
                     $priceElement.html(
                         `<span class="font-weight-bold">${currencySymbol}${totalPrice.toFixed(2)}</span>`);
-                    if (totalDuration == 0) {
-                        $durationElement.text('{{ $service->duration }}');
+                    if (formattedDuration) {
+                        $durationElement.text(`${formattedDuration}`);
                     } else {
-                        $durationElement.text(`${totalDuration} MINS`);
+                        $durationElement.text('{{ $service->duration }}');
                     }
                 } else {
                     $priceElement.html(`<span class="font-weight-bold">@currency($service->price, false, true)</span>`);
