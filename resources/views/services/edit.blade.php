@@ -362,6 +362,7 @@
                             <tr>
                                 <th>Option Name</th>
                                 <th>Option Price (AED)</th>
+                                <th>Option Duration</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -382,7 +383,14 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control"  value="{{ old('option_price.'.$option_row, $option->option_price) }}"  placeholder="Option Price">
+                                                    <input type="number" required name="option_price[{{ $option_row }}]" class="form-control"  value="{{ old('option_price.'.$option_row, $option->option_price) }}"  placeholder="Option Price">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" name="option_duration[{{ $option_row }}]" class="form-control"  value="{{ old('option_duration.'.$option_row, $option->option_duration) }}"  placeholder="Option Duration">
                                                 </div>
                                             </div>
                                         </td>
@@ -525,6 +533,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <input type="number" required name="option_price[${option_row}]" class="form-control" placeholder="Option Price">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="text" name="option_duration[${option_row}]" class="form-control" placeholder="Option Duration">
                         </div>
                     </div>
                 </td>

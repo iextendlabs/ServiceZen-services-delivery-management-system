@@ -14,6 +14,7 @@ use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\OrderService;
+use App\Models\ServiceOption;
 use App\Models\Setting;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
@@ -328,14 +329,15 @@ class OrderController extends Controller
         $services = Service::whereIn('id', $selectedServiceIds)->get();
         $sub_total = 0;
         $discount = 0;
+        $selectedOption = $this->formattingBookingData($selectedOptionIds);
 
         if (count($services) == 0) {
             return redirect()->back()->with('error', "Service not found");
         } else {
-            $sub_total = $services->sum(function ($service) use ($selectedOptionIds) {
-                $optionId = $selectedOptionIds[$service->id] ?? null;
-                if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price;
+            $sub_total = $services->sum(function ($service) use ($selectedOption) {
+                $options = $selectedOption[$service->id] ?? null;
+                if (is_array($options) && count($options['options']) > 0) {
+                    return $options['total_price'];
                 }
                 return $service->discount ?? $service->price;
             });
@@ -344,13 +346,13 @@ class OrderController extends Controller
         if ($request->coupon_code) {
             $coupon = Coupon::where("code", $request->coupon_code)->first();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $selectedOptionIds);
+                $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $selectedOption);
 
                 if ($isValid !== true) {
                     return redirect()->back()
                         ->with('error', $isValid);
                 } else {
-                    $discount = $coupon->getDiscountForProducts($services, $sub_total, $selectedOptionIds);
+                    $discount = $coupon->getDiscountForProducts($services, $sub_total, $selectedOption);
                 }
             } else {
                 return redirect()->back()
@@ -440,17 +442,19 @@ class OrderController extends Controller
 
                             $input['service_id'] = $service->id;
                             $input['service_name'] = $service->name;
-                            $input['duration'] = $service->duration;
                             $input['status'] = 'Open';
-                            $optionId = $selectedOptionIds[$service->id] ?? null;
-                            if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                                $serviceOption = $service->serviceOption->find($optionId);
-                                $input['price'] = $serviceOption->option_price;
-                                $input['option_id'] = $optionId;
-                                $input['option_name'] = $serviceOption->option_name;
+
+                            $options = $selectedOption[$service->id] ?? null;
+                            if ($options !== null && count($options['options']) > 0) {
+                                $input['price'] = $options['total_price'];
+                                $input['option_id'] = $options['options']->pluck('id')->implode(',');
+                                $input['option_name'] = $options['options']->pluck('option_name')->implode(',');
+                                $input['duration'] = $options['total_duration'] ?? $service->duration;
                             } else {
                                 $input['price'] = $service->discount ?? $service->price;
+                                $input['duration'] = $service->duration;
                             }
+                            
                             OrderService::create($input);
                         }
 
@@ -973,25 +977,27 @@ class OrderController extends Controller
 
         $services = Service::whereIn('id', $request->selected_service_ids)->get();
         $sub_total = 0;
+        
+        $groupedBookingOption = $request->selected_option_ids ? $this->formattingBookingData($request->selected_option_ids) : [];
 
         if (count($services) == 0) {
             return response()->json(['error' => 'Service not found'], 404);
         } else {
-            $sub_total = $services->sum(function ($service) use ($request) {
-                $optionId = $request->selected_option_ids[$service->id] ?? null;
-                if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price;
+            $sub_total = $services->sum(function ($service) use ($groupedBookingOption,$request) {
+                $options = $groupedBookingOption[$service->id] ?? null;
+                if ($options !== null && count($options['options']) > 0) {
+                    return $options['total_price'];
                 }
                 return $service->discount ?? $service->price;
             });
         }
 
         if ($coupon) {
-            $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $request->selected_option_ids);
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $groupedBookingOption);
             if ($isValid !== true) {
                 return response()->json(['error' => $isValid]);
             } else {
-                $discount = $coupon->getDiscountForProducts($services, $sub_total, $request->selected_option_ids);
+                $discount = $coupon->getDiscountForProducts($services, $sub_total, $groupedBookingOption);
                 return response()->json([
                     'message' => 'Coupon applied successfully',
                     'discount' => $discount
@@ -1000,6 +1006,43 @@ class OrderController extends Controller
         } else {
             return response()->json(['error' => "Coupon is invalid!"]);
         }
+    }
+
+    private function formattingBookingData($bookingOptions)
+    {
+        $groupedBookingOption = [];
+
+        foreach ($bookingOptions as $service_id => $optionIds) {
+            if (isset($optionIds) && is_array($optionIds) && count($optionIds) > 0) {
+                $options = ServiceOption::whereIn('id', $optionIds)->get();
+                
+                $totalDuration = 0;
+
+                if ($options) {
+                    foreach ($options as $opt) {
+                        if (!empty($opt->option_duration)) {
+                            preg_match('/\d+/', $opt->option_duration, $matches);
+                            $totalDuration += isset($matches[0]) ? (int)$matches[0] : 0;
+                        }
+                    }
+                }
+                
+                $totalPrice = $options->sum('option_price');
+                $groupedBookingOption[$service_id] = [
+                    'options' => $options,
+                    'total_price' => $totalPrice,
+                    'total_duration' => $totalDuration > 0 ? $totalDuration . ' MINS' : null
+                ];
+            } else {
+                $groupedBookingOption[$service_id] = [
+                    'options' => [],
+                    'total_price' => 0,
+                    'total_duration' => null,
+                ];
+            }
+        }
+
+        return $groupedBookingOption;
     }
 
     public function staffCategoriesServices(Request $request)

@@ -140,8 +140,11 @@ class SiteController extends Controller
                 $price = $lowestPriceOption->option_price; 
             }
         }
+
+        $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
+
         if ($service->status) {
-            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price'));
+            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price','review_char_limit'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');
