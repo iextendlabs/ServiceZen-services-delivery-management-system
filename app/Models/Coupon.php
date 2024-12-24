@@ -52,12 +52,13 @@ class Coupon extends Model
                 foreach ($services as $service) {
                     if (in_array($service->id, $applicable_services)) {
                         $options = $bookingOption[$service->id] ?? null;
-
-                        if (is_array($options) && count($options['options']) > 0) {
-                            $sub_total += ($options['total_price'] + ($zone_extra_charges ?? 0));
-                        } elseif ($options && count($service->serviceOption->find($options)) > 0) {
-                            $sub_total += ($service->serviceOption->find($options)->option_price + ($zone_extra_charges ?? 0));
-                        } else {
+                        if($options){
+                            if (is_array($options) && count($options['options']) > 0) {
+                                $sub_total += ($options['total_price'] + ($zone_extra_charges ?? 0));
+                            } elseif ($service->serviceOption->find($options)) {
+                                $sub_total += ($service->serviceOption->find($options)->option_price + ($zone_extra_charges ?? 0));
+                            }
+                        }else {
                             $sub_total += (($service->discount ?? $service->price) + ($zone_extra_charges ?? 0));
                         }
                     }
@@ -139,12 +140,13 @@ class Coupon extends Model
         
         $services_total = $services->sum(function ($service) use ($options, $zone_extra_charges) {
             $options = $options[$service->id] ?? null;
-
-            if (is_array($options) && count($options['options']) > 0) {
-                $servicePrice = $options['total_price'];
-            } elseif ($options && count($service->serviceOption->find($options)) > 0) {
-                $servicePrice = $service->serviceOption->find($options)->option_price;
-            } else {
+            if($options){
+                if (is_array($options) && count($options['options']) > 0) {
+                    $servicePrice = $options['total_price'];
+                } elseif ($options && $service->serviceOption->find($options)) {
+                    $servicePrice = $service->serviceOption->find($options)->option_price;
+                }
+            }else {
                 $servicePrice = ($service->discount ?? $service->price);
             }
 
