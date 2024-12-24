@@ -185,35 +185,37 @@
                 var servicePrice = $(this).data('price');
                 var serviceDuration = $(this).data('duration');
                 var serviceOptions = $(this).data('options');
-    
+
                 $('#selected-service-name').text(serviceName);
                 $('#selected-service-price').text(servicePrice);
                 $('#selected-service-duration').text(serviceDuration);
 
                 $('#selected-service').show();
-    
+
                 if (serviceOptions && serviceOptions.length > 0) {
                     var optionsHtml = '';
                     var minPrice = Infinity;
                     var minPriceOption = null;
-    
+                    var minPriceDuration = 0;
+
                     for (const option of serviceOptions) {
-                        var optionPrice = parseFloat(option.option_price);
-                        
+                        var optionPrice = parseFloat(option.option_price) || 0;
+
                         try {
-                            var formattedOptionPrice = await formatCurrencyJS(optionPrice,true);
-                            
+                            var formattedOptionPrice = await formatCurrencyJS(optionPrice);
                             optionsHtml += `
                                 <div>
                                     <label>
-                                        <input type="radio" name="option_id" value="${option.id}" data-option-price="${formattedOptionPrice}" required> ${option.option_name} (${formattedOptionPrice})
+                                        <input type="checkbox" class="option-checkbox" name="option_id[]" value="${option.id}" data-price="${formattedOptionPrice}" data-duration="${option.option_duration}"> 
+                                        ${option.option_name} (${formattedOptionPrice}) ${option.option_duration ? option.option_duration : ''}
                                     </label>
                                 </div>
                             `;
-                            
+
                             if (optionPrice < minPrice) {
                                 minPrice = optionPrice;
                                 minPriceOption = option.id;
+                                minOptionDuration = option.option_duration;
                             }
                         } catch (error) {
                             console.error("Error formatting currency:", error);
@@ -225,24 +227,69 @@
 
                     if (minPriceOption !== null) {
                         try {
-                            var formattedMinPrice = await formatCurrencyJS(minPrice,true);
-                            $(`input[name="option_id"][value="${minPriceOption}"]`).prop('checked', true);
+                            var formattedMinPrice = await formatCurrencyJS(minPrice);
+                            $(`input[name="option_id[]"][value="${minPriceOption}"]`).prop('checked', true);
                             $('#selected-service-price').text(formattedMinPrice);
+                            $('#selected-service-duration').text(minOptionDuration ? minOptionDuration : serviceDuration);
                         } catch (error) {
                             console.error("Error formatting currency:", error);
-                            $('#selected-service-price').text(minPrice);
+                            $('#selected-service-price').text(servicePrice);
+                            $('#selected-service-duration').text(serviceDuration);
                         }
                     }
 
-                    $('input[name="option_id"]').on('change', function() {
-                        var selectedOptionPrice = $(this).data('option-price');
-                        $('#selected-service-price').text(selectedOptionPrice);
+                    function updatePriceAndDuration() {
+                        if ($('.option-checkbox').filter(':checked').length > 0) {
+                            let totalPrice = 0;
+                            let totalDuration = 0;
+
+                            $('.option-checkbox').filter(':checked').each(function() {
+                                totalPrice += parsePrice($(this).data('price'));
+                                totalDuration += parseDuration($(this).data('duration'));
+                            });
+
+                            let currencySymbol = '';
+                            $('.option-checkbox').filter(':checked').each(function() {
+                                let price = $(this).data('price');
+                                currencySymbol = price.replace(/[0-9.-]/g, '');
+                                return false;
+                            });
+                            $('#selected-service-price').text(`${currencySymbol}${totalPrice.toFixed(2)}`);
+
+                            if (totalDuration == 0) {
+                                $('#selected-service-duration').text(serviceDuration);
+                            } else {
+                                $('#selected-service-duration').text(`${totalDuration} MINT`);
+                            }
+                        } else {
+                            $('#selected-service-price').text(servicePrice);
+                            $('#selected-service-duration').text(serviceDuration);
+                        }
+                    }
+
+                    $('.option-checkbox').on('change', function() {
+                        updatePriceAndDuration();
                     });
                 } else {
                     $('#service-options').hide();
                     $('#service-options-list').html('');
                 }
             });
+
+            function parsePrice(priceStr) {
+                return parseFloat(priceStr.replace(/[^0-9.-]+/g, ''));
+            }
+
+            function parseDuration(durationStr) {
+                let duration = 0;
+                if (durationStr) {
+                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT)/i);
+                    if (minMatch) {
+                        duration = parseInt(minMatch[1], 10);
+                    }
+                }
+                return duration;
+            }
 
             function formatCurrencyJS(amount,extra_charges=false) {
                 return new Promise((resolve, reject) => {
@@ -251,7 +298,6 @@
                         url: '{{ route('format-currency') }}',
                         data: {
                             amount: amount,
-                            extra_charges: extra_charges,
                             _token: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {

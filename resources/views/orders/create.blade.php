@@ -275,6 +275,51 @@
 
     <script>
         $(document).ready(function() {
+            $(document).on('change', '.option_checkbox', function () {
+                let totalPrice = 0;
+                let totalDuration = 0;
+
+                const row = $(this).closest('tr');
+
+                const servicePriceElement = row.find('.service-price');
+                var servicePrice = servicePriceElement.data('original-price');
+                
+                const serviceDurationElement = row.find('.service-duration');
+                var serviceDuration = serviceDurationElement.data('original-duration');
+
+                row.find('.option_checkbox:checked').each(function () {
+                    totalPrice += parseFloat($(this).data('price')) || 0;
+                    totalDuration += parseDuration($(this).data('duration'));
+                });
+
+                if (totalPrice > 0) {
+                    servicePriceElement.text("AED " +totalPrice.toFixed(2));
+                } else {
+                    servicePriceElement.text("AED " +servicePrice.toFixed(2));
+                }
+
+                if (totalDuration == 0) {
+                    serviceDurationElement.text(serviceDuration);
+                } else {
+                    serviceDurationElement.text(`${totalDuration} MINT`);
+                }
+
+                $('#coupon-discount').text(0);
+                $("#coupon_code").val("");
+                handleSelectedServiceOption();
+                updateTotal();
+            });
+
+            function parseDuration(durationStr) {
+                let duration = 0;
+                if (durationStr) {
+                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT)/i);
+                    if (minMatch) {
+                        duration = parseInt(minMatch[1], 10);
+                    }
+                }
+                return duration;
+            }
 
             function updateTotal() {
                 let subTotal = 0;
@@ -294,16 +339,15 @@
                     let serviceId = $(this).val();
                     let serviceOptions = $(this).data('options');
                     let servicePrice = parseFloat($(this).data('price'));
+                    let optionTotalPrice = 0;
 
                     if (serviceOptions) {
-                        let selectedOptionPrice = parseFloat($(
-                            `input[name="service_option_${serviceId}"]:checked`).data('price'));
-                        if (!isNaN(selectedOptionPrice)) {
-                            servicePrice = selectedOptionPrice;
-                        }
+                        const checkedValues = $(`input[name="service_option_${serviceId}[]"]:checked`).map(function () {
+                            optionTotalPrice += parseFloat($(this).data('price')) || 0;
+                            return $(this).val();
+                        }).get();
                     }
-
-                    subTotal += servicePrice;
+                    subTotal += optionTotalPrice > 0 ? optionTotalPrice : servicePrice;
                 });
 
                 totalAmount = subTotal + staffCharges + transportCharges - couponDiscount;
@@ -321,9 +365,12 @@
                     let serviceId = $(this).val();
                     selectedServiceIds.push(serviceId);
 
-                    let selectedOptionId = $(`input[name="service_option_${serviceId}"]:checked`).val();
-                    if (selectedOptionId) {
-                        selectedOptionIds[serviceId] = selectedOptionId;
+                    const checkedValues = $(`input[name="service_option_${serviceId}[]"]:checked`).map(function () {
+                        return $(this).val(); // Get the value of each checked checkbox
+                    }).get();
+
+                    if (checkedValues) {
+                        selectedOptionIds[serviceId] = checkedValues;
                     } else {
                         selectedOptionIds[serviceId] =
                             null;
@@ -476,18 +523,19 @@
                     let serviceOptions = $(this).data('options');
 
                     let optionsHtml = '';
-                    let lowestPrice = servicePrice;
-
+                    let lowestPrice = 0;
                     if (serviceOptions) {
                         serviceOptions.forEach((option, index) => {
                             if (index === 0 || parseFloat(option.option_price) < lowestPrice) {
                                 lowestPrice = parseFloat(option.option_price);
                             }
+                        });
+                        serviceOptions.forEach((option, index) => {
                             optionsHtml += `
                                 <label>
-                                    <input type="radio" name="service_option_${serviceId}" value="${option.id}" class="form-check-input"
-                                        data-price="${option.option_price}" data-name="${option.option_name}" ${index === 0 ? 'checked' : ''}>
-                                    ${option.option_name} (AED ${option.option_price})
+                                    <input type="checkbox" name="service_option_${serviceId}[]" value="${option.id}" class="form-check-input option_checkbox"
+                                        data-price="${option.option_price}" data-name="${option.option_name}" data-duration="${option.option_duration}" ${lowestPrice == option.option_price ? 'checked': ''}>
+                                    ${option.option_name} (AED ${option.option_price}) ${option.option_duration ?? ''}
                                 </label><br>
                             `;
                         });
@@ -496,7 +544,8 @@
                     selectedServices.push({
                         id: serviceId,
                         name: serviceName,
-                        price: lowestPrice,
+                        price: lowestPrice > 0 ? lowestPrice : servicePrice,
+                        originalPrice: servicePrice,
                         duration: serviceDuration,
                         optionsHtml: optionsHtml
                     });
@@ -508,8 +557,8 @@
                     selectedServicesHtml += `
                         <tr>
                             <td>${service.name}</td>
-                            <td class="service-price">${service.price}</td>
-                            <td>${service.duration}</td>
+                            <td class="service-price" data-original-price="${service.originalPrice}">AED ${service.price}</td>
+                            <td class="service-duration" data-original-duration="${service.duration}">${service.duration}</td>
                             <td>${service.optionsHtml}</td>
                         </tr>
                     `;
@@ -523,17 +572,7 @@
                 } else {
                     $('#selected-services-container').hide();
                 }
-
-                // Attach event listener to new option radios to update price on change
-                $('input[type="radio"]').change(function() {
-                    let serviceRow = $(this).closest('tr');
-                    let newPrice = $(this).data('price');
-                    serviceRow.find('.service-price').text(newPrice);
-                    $('#coupon-discount').text(0);
-                    $("#coupon_code").val("");
-                    handleSelectedServiceOption();
-                    updateTotal();
-                });
+                
                 $('#coupon-discount').text(0);
                 $("#coupon_code").val("");
                 handleSelectedServiceOption();
@@ -571,22 +610,19 @@
                 let selectedServiceIds = [];
                 let selectedOptionIds = {};
 
-                $('input[name="service_id"]:checked').each(function() {
+                $('input[name="service_id"]:checked').each(function () {
                     let serviceId = $(this).val();
                     selectedServiceIds.push(serviceId);
 
-                    let selectedOptionId = $(`input[name="service_option_${serviceId}"]:checked`).val();
-                    if (selectedOptionId) {
-                        selectedOptionIds[serviceId] = selectedOptionId;
-                    } else {
-                        selectedOptionIds[serviceId] =
-                            null;
-                    }
+                    const checkedValues = $(`input[name="service_option_${serviceId}[]"]:checked`).map(function () {
+                        return $(this).val();
+                    }).get();
+
+                    selectedOptionIds[serviceId] = checkedValues;
                 });
 
                 $('input[name="selected_service_ids"]').val(JSON.stringify(selectedServiceIds));
                 $('input[name="selected_option_ids"]').val(JSON.stringify(selectedOptionIds));
-
             }
 
             $("#applyCouponBtn").click(function() {

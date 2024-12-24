@@ -62,20 +62,8 @@
                                                     <div><strong>Name:</strong> {{ $service->name }}</div>
                                                     <div><strong>Price:</strong> 
                                                         <span class="price">
-                                                            @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id] != null)
-                                                                @php
-                                                                    $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
-                                                                @endphp
-                                                                @if($option)
-                                                                    @currency($option->option_price,false,true)
-                                                                @else
-                                                                    @if (isset($service->discount))
-                                                                        @currency($service->discount,false,true)
-                                                                    @else
-                                                                        @currency($service->price,false,true)
-                                                                    @endif
-                                                                @endif
-
+                                                            @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_price'] > 0)
+                                                                @currency($groupedBookingOption[$service->id]['total_price'],false,true)
                                                             @else
                                                                 @if (isset($service->discount))
                                                                     @currency($service->discount,false,true)
@@ -86,16 +74,24 @@
 
                                                         </span>
                                                     </div>
-                                                    @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id] != null)
-                                                        @php
-                                                            $option = $service->serviceOption->find($groupedBookingOption[$service->id]);
-                                                        @endphp
-                                                        @if($option)
-                                                        <div><strong>Option:</strong> {{ $option->option_name }}</div>
-                                                        @endif
-
+                                                    <div><strong>Duration:</strong> 
+                                                        @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_duration'] != null)
+                                                                {{ $groupedBookingOption[$service->id]['total_duration'] }}
+                                                            @else
+                                                            {{ $service->duration }}
+                                                        @endif</div>
+                                                    @if(isset($groupedBookingOption[$service->id]) && count($groupedBookingOption[$service->id]['options']) > 0)
+                                                    <div>
+                                                        <strong>Option:</strong>
+                                                        <ul>
+                                                            @foreach ($groupedBookingOption[$service->id]['options'] as $option)
+                                                                <li>
+                                                                    {{ $option->option_name }}
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
                                                     @endif
-                                                    <div><strong>Duration:</strong> {{ $service->duration }}</div>
                                                 </div>
                                                 <div class="col-md-6 d-flex justify-content-end align-items-center">
                                                     <button onclick="openBookingPopup('{{ $service->id }}')"

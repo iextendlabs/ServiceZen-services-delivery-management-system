@@ -159,7 +159,14 @@
                 </tr>
                 @foreach ($order->orderServices as $orderService)
                     <tr>
-                        <td>{{ $orderService->service_name }}@if($orderService->option_name) ({{$orderService->option_name }})@endif</td>
+                        <td>
+                            <b>{{ $orderService->service_name }}</b>
+                            @if($orderService->option_name)
+                                @foreach(explode(',', $orderService->option_name) as $option)
+                                    <br>{{ trim($option) }}
+                                @endforeach
+                            @endif
+                        </td>
                         <td>{{ $orderService->status }}</td>
                         <td>{{ $orderService->duration ?? ($orderService->service->duration ?? '') }}</td>
                         <td class="text-right">

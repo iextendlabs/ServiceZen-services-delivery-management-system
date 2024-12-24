@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('order_services', function (Blueprint $table) {
-            $table->string('option_id')->nullable();
-            $table->string('option_name')->nullable();
+        Schema::table('service_options', function (Blueprint $table) {
+            $table->string('option_duration')->nullable();
         });
     }
 
@@ -26,9 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('order_services', function (Blueprint $table) {
-            $table->dropColumn('option_id');
-            $table->dropColumn('option_name');
+        Schema::table('service_options', function (Blueprint $table) {
+            $table->dropColumn('option_duration');
         });
     }
 };

@@ -159,7 +159,8 @@ class ServiceController extends Controller
                 ServiceOption::create([
                     'service_id' => $service->id, 
                     'option_name' => $name,
-                    'option_price' => $request->option_price[$key]
+                    'option_price' => $request->option_price[$key],
+                    'option_duration' => $request->option_duration[$key]
                 ]);
             }
         }
@@ -298,7 +299,8 @@ class ServiceController extends Controller
                 ServiceOption::create([
                     'service_id' => $service->id, 
                     'option_name' => $name,
-                    'option_price' => $request->option_price[$key]
+                    'option_price' => $request->option_price[$key],
+                    'option_duration' => $request->option_duration[$key]
                 ]);
             }
         }
