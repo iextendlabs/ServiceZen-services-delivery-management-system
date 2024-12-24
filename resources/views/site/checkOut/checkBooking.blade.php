@@ -259,7 +259,7 @@
                             if (totalDuration == 0) {
                                 $('#selected-service-duration').text(serviceDuration);
                             } else {
-                                $('#selected-service-duration').text(`${totalDuration} MINT`);
+                                $('#selected-service-duration').text(`${totalDuration} MINS`);
                             }
                         } else {
                             $('#selected-service-price').text(servicePrice);
@@ -283,7 +283,7 @@
             function parseDuration(durationStr) {
                 let duration = 0;
                 if (durationStr) {
-                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT)/i);
+                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT|MINS)/i);
                     if (minMatch) {
                         duration = parseInt(minMatch[1], 10);
                     }

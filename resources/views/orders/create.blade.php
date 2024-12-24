@@ -301,7 +301,7 @@
                 if (totalDuration == 0) {
                     serviceDurationElement.text(serviceDuration);
                 } else {
-                    serviceDurationElement.text(`${totalDuration} MINT`);
+                    serviceDurationElement.text(`${totalDuration} MINS`);
                 }
 
                 $('#coupon-discount').text(0);
@@ -313,7 +313,7 @@
             function parseDuration(durationStr) {
                 let duration = 0;
                 if (durationStr) {
-                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT)/i);
+                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT|MINS)/i);
                     if (minMatch) {
                         duration = parseInt(minMatch[1], 10);
                     }

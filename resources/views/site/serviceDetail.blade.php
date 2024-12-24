@@ -521,7 +521,7 @@
             function parseDuration(durationStr) {
                 let duration = 0;
                 if (durationStr) {
-                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT)/i);
+                    const minMatch = durationStr.match(/(\d+)\s*(min|mint|MINT|MINS)/i);
                     if (minMatch) {
                         duration = parseInt(minMatch[1], 10);
                     }
@@ -551,7 +551,7 @@
                     if (totalDuration == 0) {
                         $durationElement.text('{{ $service->duration }}');
                     } else {
-                        $durationElement.text(`${totalDuration} MINT`);
+                        $durationElement.text(`${totalDuration} MINS`);
                     }
                 } else {
                     $priceElement.html(`<span class="font-weight-bold">@currency($service->price, false, true)</span>`);
