@@ -362,7 +362,7 @@
                             <tr>
                                 <th>Option Name</th>
                                 <th>Option Price (AED)</th>
-                                <th>Option Price (AED)</th>
+                                <th>Option Duration</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
