@@ -641,9 +641,9 @@ class OrderController extends Controller
     public function custom_location(Request $request, $id)
     {
         $request->validate([
-            'custom_location' => ['required', 'regex:/^\d+\s*,\s*\d+$/'],
+            'custom_location' => ['required', 'regex:/^\d+(\.\d+)?\s*,\s*\d+(\.\d+)?$/'],
         ], [
-            'custom_location.regex' => 'The custom location must be in the format: 12345,67890 (without extra spaces)',
+            'custom_location.regex' => 'The custom location must be in the format: 25.4055714,55.5141217 (without extra spaces)',
         ]);
 
         $input = $request->all();
