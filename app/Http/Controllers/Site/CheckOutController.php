@@ -520,6 +520,9 @@ class CheckOutController extends Controller
 
             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
 
+            $input['latitude'] = $input['latitude'] ?? '';
+            $input['longitude'] = $input['longitude'] ?? '';
+
             $order = Order::create($input);
             $order_ids[] = $order->id;
             $input['order_id'] = $order->id;

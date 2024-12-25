@@ -425,6 +425,9 @@ class OrderController extends Controller
 
                         $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($request->date, $input['time_slot_id']) : null;
                         
+                        $input['latitude'] = $input['latitude'] ?? '';
+                        $input['longitude'] = $input['longitude'] ?? '';
+
                         $order = Order::create($input);
 
                         $input['order_id'] = $order->id;
