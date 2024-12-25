@@ -558,7 +558,10 @@ class CustomerController extends Controller
                             $input['customer_name'] = $input['name'];
                             $input['customer_email'] = $input['email'];
                             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
-            
+                            
+                            $input['latitude'] = $input['latitude'] ?? '';
+                            $input['longitude'] = $input['longitude'] ?? '';
+
                             $order = Order::create($input);
             
                             $input['order_id'] = $order->id;
