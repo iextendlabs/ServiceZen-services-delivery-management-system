@@ -767,6 +767,9 @@ class OrderController extends Controller
 
         $order->update($request->all());
 
+        if ($order->driver) {
+            $order->driver->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->driver_status, $order->id);
+        }
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
@@ -814,7 +817,7 @@ class OrderController extends Controller
                 Transaction::where('order_id', $order->id)->delete();
             }
 
-            if ($request->status == "Confirm" && $order->staff) {
+            if ($order->staff) {
                 $order->staff->user->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->status, $order->id);
             }
 
