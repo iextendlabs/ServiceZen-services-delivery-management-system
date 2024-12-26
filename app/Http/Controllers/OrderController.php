@@ -641,11 +641,11 @@ class OrderController extends Controller
                 }
             }elseif ($old_order['time_slot_id'] != $order->time_slot_id) {
                 if ($order->staff && $order->staff->user) {
-                    $order->staff->user->notifyOnMobile("Order. $order->id . Update", 'The admin has updated the time slot.', $id);
+                    $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id);
                 }
 
                 if ($order->driver) {
-                    $order->driver->notifyOnMobile("Order. $order->id . Update", 'The admin has updated the time slot.', $id);
+                    $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id);
                 }
             }
         }
@@ -720,11 +720,11 @@ class OrderController extends Controller
 
         if (!empty($changedData) && Carbon::now()->toDateString() == $order->date) {
             if ($order->staff && $order->staff->user) {
-                $order->staff->user->notifyOnMobile("Order. $order->id . Update", 'The admin has updated the customer address.', $id);
+                $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id);
             }
 
             if ($order->driver) {
-                $order->driver->notifyOnMobile("Order. $order->id . Update", 'The admin has updated the customer address.', $id);
+                $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id);
             }
         }
 
@@ -815,7 +815,7 @@ class OrderController extends Controller
             }
 
             if ($request->status == "Confirm" && $order->staff) {
-                $order->staff->user->notifyOnMobile("Order. $order->id . Update", "The admin has confirmed the order; you may proceed with it.", $order->id);
+                $order->staff->user->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->status, $order->id);
             }
 
             $order->update($input);
