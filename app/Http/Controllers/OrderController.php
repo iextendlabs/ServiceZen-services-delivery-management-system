@@ -589,8 +589,8 @@ class OrderController extends Controller
         $input = $request->all();
         $order = Order::findOrFail($id);
 
-        $old_order = $order;
-        
+        $old_order = $order->getOriginal();
+
         $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
         $staff_id = $input['service_staff_id'] = $request->service_staff_id;
         $time_slot = TimeSlot::find($input['time_slot_id']);
@@ -613,6 +613,7 @@ class OrderController extends Controller
         $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
         
         $order->update($input);
+        $order = Order::findOrFail($id);
 
         if ($order->staff->charges) {
 
@@ -621,9 +622,9 @@ class OrderController extends Controller
             $order->order_total->staff_charges = $order->staff->charges;
             $order->order_total->save();
         }
-        
+
         if (Carbon::now()->toDateString() == $request->date) {
-            if ($old_order->date != $request->date) {
+            if ($old_order['date'] != $request->date) {
                 if ($order->staff && $order->staff->user) {
                     $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id);
                 }
@@ -631,14 +632,14 @@ class OrderController extends Controller
                 if ($order->driver) {
                     $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
                 }
-            }elseif($old_order->service_staff_id != $order->service_staff_id){
+            }elseif($old_order['service_staff_id'] != $order->service_staff_id){
                 if ($order->staff && $order->staff->user) {
                     $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id);
                 }
                 if ($order->driver) {
                     $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
                 }
-            }elseif ($old_order->time_slot_id != $order->time_slot_id) {
+            }elseif ($old_order['time_slot_id'] != $order->time_slot_id) {
                 if ($order->staff && $order->staff->user) {
                     $order->staff->user->notifyOnMobile("Order. $order->id . Update", 'The admin has updated the time slot.', $id);
                 }
@@ -734,6 +735,7 @@ class OrderController extends Controller
     public function driver_edit(Request $request, $id)
     {
         $order = Order::findOrFail($id);
+        $old_order = $order->getOriginal();
 
         if($request->driver_id != $order->driver_id){
             if ($order->driver && $order->driver->driver) {
@@ -745,16 +747,16 @@ class OrderController extends Controller
                     Transaction::where('order_id', $order->id)->where('user_id',$order->driver->driver->affiliate_id)->where('type','Order Driver Affiliate Commission')->delete();
                 }
             }
+        }
+        $order->update($request->all());
+        $order = Order::findOrFail($id);
 
-            if (Carbon::now()->toDateString() == $order->date) {
-                if ($order->driver) {
-                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
-                }
+        if (Carbon::now()->toDateString() == $old_order['date'] && $old_order['driver_id'] != $order->driver_id) {
+            if ($order->driver) {
+                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
             }
         }
-
-        $order->update($request->all());
-
+        
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
