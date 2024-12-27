@@ -96,6 +96,14 @@
                                             ['misc', ['undo', 'redo']], 
                                             ['view', ['fullscreen', 'codeview', 'help']]
                                         ],
+                                        popover: {
+                                            image: [
+                                                ['custom', ['imageAttributes']],
+                                                ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+                                                ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                                                ['remove', ['removeMedia']]
+                                            ]
+                                        },
                                         callbacks: {
                                             onImageUpload: function(files) {
                                                 uploadImage(files[0]);
@@ -148,6 +156,14 @@
                                             ['misc', ['undo', 'redo']], 
                                             ['view', ['fullscreen', 'codeview', 'help']]
                                         ],
+                                        popover: {
+                                            image: [
+                                                ['custom', ['imageAttributes']],
+                                                ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+                                                ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                                                ['remove', ['removeMedia']]
+                                            ]
+                                        },
                                         callbacks: {
                                             onImageUpload: function(files) {
                                                 uploadImage(files[0]);
