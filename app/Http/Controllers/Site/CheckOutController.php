@@ -727,7 +727,16 @@ class CheckOutController extends Controller
         $hours = intdiv($totalDuration, 60);
         $minutes = $totalDuration % 60;
 
-        $formattedDuration = $hours && $minutes ? sprintf('%d hours %d minutes', $hours, $minutes) : 0;
+        if ($hours > 0 && $minutes > 0) {
+            $formattedDuration = sprintf('%d hours %d minutes', $hours, $minutes);
+        } elseif ($hours > 0) {
+            $formattedDuration = sprintf('%d hours', $hours);
+        } elseif ($minutes > 0) {
+            $formattedDuration = sprintf('%d minutes', $minutes);
+        } else {
+            $formattedDuration = '0 minutes';
+        }
+
         return $formattedDuration;
     }
 
