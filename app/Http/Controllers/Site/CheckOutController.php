@@ -734,7 +734,7 @@ class CheckOutController extends Controller
         } elseif ($minutes > 0) {
             $formattedDuration = sprintf('%d minutes', $minutes);
         } else {
-            $formattedDuration = '0 minutes';
+            $formattedDuration = 0;
         }
 
         return $formattedDuration;
