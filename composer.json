@@ -9,6 +9,7 @@
         "barryvdh/laravel-dompdf": "^2.0",
         "doctrine/dbal": "^3.6",
         "fruitcake/laravel-cors": "^3.0",
+        "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^2.5",
         "laravel/framework": "^9.19",

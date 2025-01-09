@@ -51,12 +51,13 @@ class Coupon extends Model
             if($applicable_services){
                 foreach ($services as $service) {
                     if (in_array($service->id, $applicable_services)) {
-                        $optionId = $bookingOption[$service->id] ?? null;
-                        if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                            $sub_total += $service->serviceOption->find($optionId)->option_price + $zone_extra_charges ?? 0;
-                        }else{
-                            $sub_total += ($service->discount ?? $service->price) + ($zone_extra_charges ?? 0);
-                        }
+                        $options = $bookingOption[$service->id] ?? null;
+
+                        $servicePrice = $options['total_price'] ?? 
+                            ($service->serviceOption->find($options ?? null)?->option_price ?? 
+                            ($service->discount ?? $service->price));
+
+                        $sub_total += $servicePrice + ($zone_extra_charges ?? 0);
                     }
                 }
                 if($sub_total){
@@ -133,13 +134,12 @@ class Coupon extends Model
                 }
             }
         }
-        
-        $services_total = $services->sum(function ($service) use ($options, $zone_extra_charges) {
-            $optionId = $options[$service->id] ?? null;
-            $servicePrice = $optionId !== null && $service->serviceOption->find($optionId)
-                ? $service->serviceOption->find($optionId)->option_price
-                : ($service->discount ?? $service->price);
 
+        $services_total = $services->sum(function ($service) use ($options, $zone_extra_charges) {
+            $servicePrice = $options[$service->id]['total_price'] ?? 
+                ($service->serviceOption->find($options[$service->id] ?? null)?->option_price ?? 
+                ($service->discount ?? $service->price));
+        
             return $servicePrice + ($zone_extra_charges ?? 0);
         });
 

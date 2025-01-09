@@ -191,9 +191,9 @@ class StaffAppController2 extends Controller
             'type' => $request->type,
         ]);
 
-        $title = "Message on Order #" . $order->id . " by Staff.";
+        $title = "Order. $order->id . Update";
 
-        $order->driver->notifyOnMobile($title, $request->text, $order->id);
+        $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
 
         return response()->json(['success' => 'Order Update Successfully']);
     }

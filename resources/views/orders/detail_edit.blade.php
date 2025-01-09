@@ -97,7 +97,7 @@
                             <div class="form-group">
                                 <strong>Customer Email:</strong>
                                 <input required type="email" name="customer_email" id="customer_email" value="{{ old('customer_email',$order->customer_email) }}" class="form-control" placeholder="old(Customer Email">
-                            </div>)
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">

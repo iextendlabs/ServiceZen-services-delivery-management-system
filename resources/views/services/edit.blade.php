@@ -87,12 +87,32 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Description:</strong>
-                        <textarea class="form-control" id="summernote" name="description" placeholder="Description">{{old('description',$service->description)}}</textarea>
+                        <textarea class="form-control" id="description_summernote" name="description" placeholder="Description">{{old('description',$service->description)}}</textarea>
                         <script>
                             (function($) {
-                                $('#summernote').summernote({
+                                $('#description_summernote').summernote({
                                     tabsize: 2,
                                     height: 250,
+                                    toolbar: [
+                                        ['style', ['style']],
+                                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                                        ['fontname', ['fontname']],
+                                        ['fontsize', ['fontsize']],
+                                        ['color', ['color']],
+                                        ['para', ['ul', 'ol', 'paragraph']],
+                                        ['height', ['height']],
+                                        ['insert', ['picture', 'link', 'video', 'table']],
+                                        ['misc', ['undo', 'redo']],
+                                        ['view', ['fullscreen', 'codeview', 'help']]
+                                    ],
+                                    popover: {
+                                        image: [
+                                            ['custom', ['imageAttributes']],
+                                            ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+                                            ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                                            ['remove', ['removeMedia']]
+                                        ]
+                                    },
                                     callbacks: {
                                         onImageUpload: function(files) {
                                             uploadImage(files[0]);
@@ -112,7 +132,7 @@
                                         processData: false,
                                         contentType: false,
                                         success: function(response) {
-                                            $('#summernote').summernote('insertImage', response.url);
+                                            $('#description_summernote').summernote('insertImage', response.url);
                                         },
                                         error: function(response) {
                                             console.error(response);
@@ -126,7 +146,60 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <strong>Short Description:</strong>
-                        <textarea class="form-control" style="height:150px" name="short_description" placeholder="Short Description">{{old('short_description',$service->short_description)}}</textarea>
+                        <textarea class="form-control" style="height:150px" id="short_description_summernote" name="short_description" placeholder="Short Description">{{old('short_description',$service->short_description)}}</textarea>
+                        <script>
+                            (function($) {
+                                $('#short_description_summernote').summernote({
+                                    tabsize: 2,
+                                    height: 250,
+                                    toolbar: [
+                                        ['style', ['style']],
+                                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                                        ['fontname', ['fontname']],
+                                        ['fontsize', ['fontsize']],
+                                        ['color', ['color']],
+                                        ['para', ['ul', 'ol', 'paragraph']],
+                                        ['height', ['height']],
+                                        ['insert', ['picture', 'link', 'video', 'table']],
+                                        ['misc', ['undo', 'redo']], 
+                                        ['view', ['fullscreen', 'codeview', 'help']]
+                                    ],
+                                    popover: {
+                                        image: [
+                                            ['custom', ['imageAttributes']],
+                                            ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+                                            ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                                            ['remove', ['removeMedia']]
+                                        ]
+                                    },
+                                    callbacks: {
+                                        onImageUpload: function(files) {
+                                            uploadImage(files[0]);
+                                        }
+                                    }
+                                });
+                        
+                                function uploadImage(file) {
+                                    let data = new FormData();
+                                    data.append("file", file);
+                                    data.append("_token", "{{ csrf_token() }}");
+                        
+                                    $.ajax({
+                                        url: "{{ route('summerNote.upload') }}",
+                                        method: "POST",
+                                        data: data,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            $('#short_description_summernote').summernote('insertImage', response.url);
+                                        },
+                                        error: function(response) {
+                                            console.error(response);
+                                        }
+                                    });
+                                }
+                            })(jQuery);
+                        </script>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -305,6 +378,7 @@
                             <tr>
                                 <th>Option Name</th>
                                 <th>Option Price (AED)</th>
+                                <th>Option Duration</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -325,7 +399,14 @@
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" required name="option_price[{{ $option_row }}]" class="form-control"  value="{{ old('option_price.'.$option_row, $option->option_price) }}"  placeholder="Option Price">
+                                                    <input type="number" required name="option_price[{{ $option_row }}]" class="form-control"  value="{{ old('option_price.'.$option_row, $option->option_price) }}"  placeholder="Option Price">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" name="option_duration[{{ $option_row }}]" class="form-control"  value="{{ old('option_duration.'.$option_row, $option->option_duration) }}"  placeholder="Option Duration">
                                                 </div>
                                             </div>
                                         </td>
@@ -468,6 +549,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <input type="number" required name="option_price[${option_row}]" class="form-control" placeholder="Option Price">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="text" name="option_duration[${option_row}]" class="form-control" placeholder="Option Duration">
                         </div>
                     </div>
                 </td>

@@ -35,7 +35,7 @@ use App\Http\Controllers\{
     ShortHolidayController,
     RotaController,
     ChatController,
-    CompanyController,
+    CampaignController,
     SummerNoteController,
     ComplaintController,
     CurrencyController,
@@ -152,8 +152,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/rota', [RotaController::class, 'index'])->name('rota');
     Route::resource('chats', ChatController::class);
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
-    Route::resource('companies', CompanyController::class);
-    Route::get('clear', [CompanyController::class,"clear"])->name('companies.clear');
+    Route::resource('campaigns', CampaignController::class);
+    Route::get('clear', [CampaignController::class,"clear"])->name('campaigns.clear');
 
     Route::post('/summerNote/upload', [SummerNoteController::class,"upload"])->name('summerNote.upload');
     Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');

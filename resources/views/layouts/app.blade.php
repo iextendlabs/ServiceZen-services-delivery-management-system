@@ -33,6 +33,7 @@
 
     <!-- Summernote JS -->
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/DiemenDesign/summernote-image-attributes/summernote-image-attributes.js"></script>
 
     <!-- Other CSS and JS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/css/intlTelInput.css" integrity="sha512-MqSNU3ahHjuMbcLdeu1dngxB4OaOS7vnnLjnADs9E+0OhS0qk8CZ8nxvA+xyiU+Qy12+0vl2ove9F9ssWZpeuQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -119,9 +120,9 @@
                             </div>
                         </li>
                         @endif
-                        @can('company-list')
+                        @can('campaign-list')
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('companies.index')}}">Companies</a>
+                            <a class="nav-link" aria-current="page" href="{{ route('campaigns.index')}}">Campaigns</a>
                         </li>
                         @endcan
                         @can('chat-list')

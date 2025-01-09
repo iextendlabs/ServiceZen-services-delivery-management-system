@@ -35,6 +35,7 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use App\Models\ServiceOption;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
 
@@ -558,7 +559,10 @@ class CustomerController extends Controller
                             $input['customer_name'] = $input['name'];
                             $input['customer_email'] = $input['email'];
                             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
-            
+                            
+                            $input['latitude'] = $input['latitude'] ?? '';
+                            $input['longitude'] = $input['longitude'] ?? '';
+
                             $order = Order::create($input);
             
                             $input['order_id'] = $order->id;
@@ -586,8 +590,8 @@ class CustomerController extends Controller
             
                             if (Carbon::now()->toDateString() == $input['date']) {
                                 $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                                if ($staff->staff->driver) {
-                                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                                if ($order->driver) {
+                                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                                 }
                                 try {
                                     $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
@@ -807,11 +811,16 @@ class CustomerController extends Controller
 
         $affiliate_id = Affiliate::where('code', $request->affiliate)->value('user_id');
         $coupon = Coupon::where('code', $request->coupon)->first();
+        $groupedBookingOption = [];
+
+        if($request->options){
+            $groupedBookingOption = $this->formattingBookingData($request->options);
+        }
 
         if ($request->coupon && $request->service_ids && $request->options) {
             $services = Service::whereIn('id', $request->service_ids)->get();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id ?? null,$request->options ?? []);
+                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id ?? null,$groupedBookingOption ?? $request->options ?? []);
                 if ($isValid !== true) {
                     return response()->json(['errors' => ['coupon' => [$isValid]]], 201);
                 }
@@ -826,7 +835,7 @@ class CustomerController extends Controller
             $sub_total = $services->sum(function ($service) {
                 return $service->discount ?? $service->price;
             });
-            $coupon_discount = $coupon->getDiscountForProducts($services, $sub_total, $request->options ?? []);
+            $coupon_discount = $coupon->getDiscountForProducts($services, $sub_total, $groupedBookingOption ?? $request->options ?? []);
         }
 
         return response()->json([
@@ -1300,29 +1309,113 @@ class CustomerController extends Controller
         ], 200);
     }
 
+    private function formattingBookingData($options)
+    {
+        $groupedBookingOption = [];
+
+        foreach ($options as $service_id => $option) {
+            if (isset($option) && is_array($option) && count($option) > 0) {
+                $options = ServiceOption::whereIn('id', $option)->get();
+    
+                $formattedDuration = $this->calculateTotalDuration($options);
+                
+                $totalPrice = $options->sum('option_price');
+                $groupedBookingOption[$service_id] = [
+                    'options' => $options,
+                    'total_price' => $totalPrice,
+                    'total_duration' => $formattedDuration > 0 ? $formattedDuration : null
+                ];
+            }
+        }
+
+        return $groupedBookingOption;
+    }
+
+    public function calculateTotalDuration($options){
+        $totalDuration = 0;
+
+        foreach ($options as $opt) {
+            if (!empty($opt->option_duration)) {
+                // Normalize the string to lowercase for easier handling
+                $durationStr = strtolower($opt->option_duration);
+    
+                // Match the numeric value and the unit (if any)
+                if (preg_match('/(\d+)\s*(hour|hours|hr|h|min|mins|mints|minute|minutes|m|mint)?/i', $durationStr, $matches)) {
+                    $value = (int)$matches[1];
+                    $unit = isset($matches[2]) ? $matches[2] : 'min';
+    
+                    // Convert to minutes based on the unit
+                    switch ($unit) {
+                        case 'hour':
+                        case 'hours':
+                        case 'hr':
+                        case 'h':
+                            $totalDuration += $value * 60; // Convert hours to minutes
+                            break;
+                        case 'min':
+                        case 'mins':
+                        case 'mints':
+                        case 'minute':
+                        case 'minutes':
+                        case 'm':
+                        case 'mint':
+                        default:
+                            $totalDuration += $value; // Already in minutes
+                            break;
+                    }
+                }
+            }
+        }
+    
+        $hours = intdiv($totalDuration, 60);
+        $minutes = $totalDuration % 60;
+
+        if ($hours > 0 && $minutes > 0) {
+            $formattedDuration = sprintf('%d hours %d minutes', $hours, $minutes);
+        } elseif ($hours > 0) {
+            $formattedDuration = sprintf('%d hours', $hours);
+        } elseif ($minutes > 0) {
+            $formattedDuration = sprintf('%d minutes', $minutes);
+        } else {
+            $formattedDuration = '0 minutes';
+        }
+
+        return $formattedDuration;
+    }
+    
     public function OrderTotalSummary(Request $request)
     {
         $services_total = 0;
         $staff_charges = 0;
         $transport_charges = 0;
         $coupon_discount = 0;
+        $groupedBookingOption = [];
+
+        if($request->options){
+            $groupedBookingOption = $this->formattingBookingData($request->options);
+        }
+        
         if($request->service_ids){
             $services = Service::whereIn('id', $request->service_ids)->with('serviceOption')->get();
         
-            $services_total = $services->sum(function ($service) use ($request) {
-                if (isset($request->options[$service->id])) {
-                    $option_id = $request->options[$service->id];
-                    $option = $service->serviceOption->find($option_id);
-                    return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
+            $services_total = $services->sum(function ($service) use ($request,$groupedBookingOption) {
+                $options = $groupedBookingOption[$service->id] ?? $request->options[$service->id] ?? null;
+                if($options){
+                    if (is_array($options) && count($options['options']) > 0) {
+                        return $options['total_price'];
+                    } elseif ($options && $service->serviceOption->find($options)) {
+                        return $service->serviceOption->find($options)->option_price;
+                    }
+                }else {
+                    return ($service->discount ?? $service->price);
                 }
-                return isset($service->discount) ? $service->discount : $service->price;
             });
 
             if($request->coupon_id && $services->isNotEmpty()) {
                 $coupon = Coupon::find($request->coupon_id);
     
                 $coupon_discount = $coupon
-                ? $coupon->getDiscountForProducts($services, $services_total, $request->options ?? [])
+                ? $coupon->getDiscountForProducts($services, $services_total, $groupedBookingOption ?? $request->options ?? [])
                 : 0;
             }
         }
@@ -1412,6 +1505,11 @@ class CustomerController extends Controller
             ], 201);
         }
         try{
+            $groupedBookingOption = [];
+
+            if($request->options){
+                $groupedBookingOption = $this->formattingBookingData($request->options);
+            }
             $bookingData = $request->cartData;
             $excludedServices = $this->processBookingData($input, $bookingData);
 
@@ -1427,7 +1525,7 @@ class CustomerController extends Controller
 
             }
         
-            $isValidOrderValue = $this->min_order_value($input, $bookingData, $staffZone,$minimum_booking_price);
+            $isValidOrderValue = $this->min_order_value($input, $bookingData, $staffZone,$minimum_booking_price,$groupedBookingOption);
 
             if($isValidOrderValue !== true){
                 return response()->json([
@@ -1435,7 +1533,7 @@ class CustomerController extends Controller
                 ], 201);
             }
             $checkOutController = new CheckOutController();
-            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController);
+            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption);
 
             return response()->json([
                 'sub_total' => $all_sub_total,
@@ -1502,7 +1600,7 @@ class CustomerController extends Controller
         return $excludedServices;
     }
 
-    private function min_order_value($input, $bookingData, $staffZone,$minimum_booking_price)
+    private function min_order_value($input, $bookingData, $staffZone,$minimum_booking_price,$groupedBookingOption)
     {
 
         $sub_total = 0;
@@ -1516,13 +1614,16 @@ class CustomerController extends Controller
         }
         $all_selected_staff = User::whereIn('id', $serviceStaffIds)->get();
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
-        $sub_total = $all_selected_services->sum(function ($service) use ($input) {
-            if (isset($input['options'][$service->id])) {
-                $option_id = (int) $input['options'][$service->id];
-                $option = $service->serviceOption->find($option_id);
-                return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
-            } else {
-                return isset($service->discount) ? $service->discount : $service->price;
+        $sub_total = $all_selected_services->sum(function ($service) use ($input, $groupedBookingOption) {
+            $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
+            if($options){
+                if (is_array($options) && count($options['options']) > 0) {
+                    return $options['total_price'];
+                } elseif ($options && $service->serviceOption->find($options)) {
+                    return $service->serviceOption->find($options)->option_price;
+                }
+            }else {
+                return ($service->discount ?? $service->price);
             }
         });
      
@@ -1530,9 +1631,9 @@ class CustomerController extends Controller
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,$input['user_id'] ?? null, $input['options'] ?? []);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,$input['user_id'] ?? null, $groupedBookingOption ?? $input['options'] ?? []);
                 if ($isValid === true) {
-                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total,$input['options'] ?? []);
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total,$groupedBookingOption ?? $input['options'] ?? []);
                 } else {
                     return $isValid;
                 }
@@ -1556,7 +1657,7 @@ class CustomerController extends Controller
 
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController)
+    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption)
     {
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
@@ -1594,20 +1695,24 @@ class CustomerController extends Controller
 
             $selected_services = Service::whereIn('id', $singleBookingService)->get();
 
-            $sub_total = $selected_services->sum(function ($service) use ($input) {
-                if (isset($input['options'][$service->id])) {
-                    $option_id = (int) $input['options'][$service->id];  // Cast to integer
-                    $option = $service->serviceOption->find($option_id);
-                    return $option ? $option->option_price : (isset($service->discount) ? $service->discount : $service->price);
+            $sub_total = $selected_services->sum(function ($service) use ($input,$groupedBookingOption) {
+                $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
+                if($options){
+                    if (is_array($options) && count($options['options']) > 0) {
+                        return $options['total_price'];
+                    } elseif ($options && $service->serviceOption->find($options)) {
+                        return $service->serviceOption->find($options)->option_price;
+                    }
+                }else {
+                    return ($service->discount ?? $service->price);
                 }
-                return isset($service->discount) ? $service->discount : $service->price;
             });
 
             if ($input['coupon_code'] && $singleBookingService) {
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$input['options'] ?? []);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$groupedBookingOption ?? $input['options'] ?? []);
                         if ($discount > 0) {
                             $input['coupon_id'] = $coupon->id;
                             $i++;
@@ -1616,7 +1721,7 @@ class CustomerController extends Controller
                         }
                     } elseif ($coupon->type == "Percentage") {
                         $input['coupon_id'] = $coupon->id;
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$input['options'] ?? []);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$groupedBookingOption ?? $input['options'] ?? []);
                     }
                 }
             }
@@ -1652,6 +1757,9 @@ class CustomerController extends Controller
             $input['time_end'] = $time_slot->time_end;
             $input['payment_method'] = $input['payment_method'] ?? "Cash-On-Delivery";
             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
+            
+            $input['latitude'] = $input['latitude'] ?? '';
+            $input['longitude'] = $input['longitude'] ?? '';
 
             $order = Order::create($input);
             $order_ids[] = $order->id;
@@ -1674,17 +1782,21 @@ class CustomerController extends Controller
                 $input['service_name'] = $service->name;
                 $input['duration'] = $service->duration;
                 $input['status'] = 'Open';
-                if (isset($input['options'][$service->id])) {
-                    $option_id = $input['options'][$service->id];
-                    $option = $service->serviceOption->find($option_id);
-                    if($option){
-                        $input['price'] = $option->option_price;
-                        $input['option_id'] = $option_id;
-                        $input['option_name'] = $option->option_name;
-                    }else{
-                    $input['price'] = $service->discount ?? $service->price;
+
+                $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
+                if($options){
+                    if (is_array($options) && count($options['options']) > 0) {
+                        $input['price'] = $options['total_price'];
+                        $input['option_id'] = $options['options']->pluck('id')->implode(',');
+                        $input['option_name'] = $options['options']->pluck('option_name')->implode(',');
+                        $input['duration'] = $options['total_duration'] ?? $service->duration;
+                    } elseif ($options && $service->serviceOption->find($options)) {
+                        $input['price'] = $service->serviceOption->find($options)->option_price;
+                        $input['option_id'] = $options;
+                        $input['option_name'] = $service->serviceOption->find($options)->option_name;
+                        $input['duration'] = $service->serviceOption->find($options)->option__duration ?? $service->duration;
                     }
-                }else{
+                }else {
                     $input['price'] = $service->discount ?? $service->price;
                 }
                 OrderService::create($input);
@@ -1692,8 +1804,8 @@ class CustomerController extends Controller
             if(isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery"){
                 if (Carbon::now()->toDateString() == $input['date']) {
                     $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                    if ($staff->staff->driver) {
-                        $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    if ($order->driver) {
+                        $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                     }
                     try {
                         $checkOutController->sendOrderEmail($input['order_id'], $input['email']);

@@ -14,6 +14,7 @@ use App\Models\OrderTotal;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\OrderService;
+use App\Models\ServiceOption;
 use App\Models\Setting;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
@@ -121,23 +122,17 @@ class OrderController extends Controller
         }
 
         if ($userRole == "Staff") {
-            if ($request->status) {
-                $query->where('status', '=', $request->status);
-            } else {
+            if (!$request->status) {
                 $query->whereNotIn('status', ['Rejected', 'Canceled']);
-            }
-        } else {
-            if ($request->status) {
-                $query->where('status', '=', $request->status);
             }
         }
 
-        if ($request->driver_status) {
-            $query->where('driver_status', '=', $request->driver_status);
-        } else {
-            if ($request->status) {
-                $query->where('status', '=', $request->status);
-            }
+        if ($request->status) {
+            $query->where('status', '=', $request->status);
+        }
+
+        if ($request->driver_dropped) {
+            $query->where('driver_status', '=', "Dropped")->where('status','!=','Complete');
         }
 
         if ($request->driver_status) {
@@ -203,7 +198,7 @@ class OrderController extends Controller
         }
 
         if ($request->today_order) {
-            $query->where('date', $request->today_order)->where('status','!=','Complete')->where('status','!=','Canceled');
+            $query->where('date', $request->today_order)->where('driver_status','!=','Dropped')->where('status','!=','Complete')->where('status','!=','Canceled');
         }
 
         if ($userRole == "Staff" || $userRole == "Supervisor") {
@@ -334,14 +329,15 @@ class OrderController extends Controller
         $services = Service::whereIn('id', $selectedServiceIds)->get();
         $sub_total = 0;
         $discount = 0;
+        $selectedOption = $this->formattingBookingData($selectedOptionIds);
 
         if (count($services) == 0) {
             return redirect()->back()->with('error', "Service not found");
         } else {
-            $sub_total = $services->sum(function ($service) use ($selectedOptionIds) {
-                $optionId = $selectedOptionIds[$service->id] ?? null;
-                if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price;
+            $sub_total = $services->sum(function ($service) use ($selectedOption) {
+                $options = $selectedOption[$service->id] ?? null;
+                if (is_array($options) && count($options['options']) > 0) {
+                    return $options['total_price'];
                 }
                 return $service->discount ?? $service->price;
             });
@@ -350,13 +346,13 @@ class OrderController extends Controller
         if ($request->coupon_code) {
             $coupon = Coupon::where("code", $request->coupon_code)->first();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $selectedOptionIds);
+                $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $selectedOption);
 
                 if ($isValid !== true) {
                     return redirect()->back()
                         ->with('error', $isValid);
                 } else {
-                    $discount = $coupon->getDiscountForProducts($services, $sub_total, $selectedOptionIds);
+                    $discount = $coupon->getDiscountForProducts($services, $sub_total, $selectedOption);
                 }
             } else {
                 return redirect()->back()
@@ -429,6 +425,9 @@ class OrderController extends Controller
 
                         $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($request->date, $input['time_slot_id']) : null;
                         
+                        $input['latitude'] = $input['latitude'] ?? '';
+                        $input['longitude'] = $input['longitude'] ?? '';
+
                         $order = Order::create($input);
 
                         $input['order_id'] = $order->id;
@@ -446,24 +445,26 @@ class OrderController extends Controller
 
                             $input['service_id'] = $service->id;
                             $input['service_name'] = $service->name;
-                            $input['duration'] = $service->duration;
                             $input['status'] = 'Open';
-                            $optionId = $selectedOptionIds[$service->id] ?? null;
-                            if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                                $serviceOption = $service->serviceOption->find($optionId);
-                                $input['price'] = $serviceOption->option_price;
-                                $input['option_id'] = $optionId;
-                                $input['option_name'] = $serviceOption->option_name;
+
+                            $options = $selectedOption[$service->id] ?? null;
+                            if ($options !== null && count($options['options']) > 0) {
+                                $input['price'] = $options['total_price'];
+                                $input['option_id'] = $options['options']->pluck('id')->implode(',');
+                                $input['option_name'] = $options['options']->pluck('option_name')->implode(',');
+                                $input['duration'] = $options['total_duration'] ?? $service->duration;
                             } else {
                                 $input['price'] = $service->discount ?? $service->price;
+                                $input['duration'] = $service->duration;
                             }
+                            
                             OrderService::create($input);
                         }
 
                         if (Carbon::now()->toDateString() == $request->date) {
                             $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                            if ($staff->staff && $staff->staff->driver) {
-                                $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            if ($order->driver) {
+                                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                             }
                             try {
                                 $checkOutController->sendOrderEmail($input['order_id'], $request->email);
@@ -586,8 +587,9 @@ class OrderController extends Controller
         ]);
 
         $input = $request->all();
-
         $order = Order::findOrFail($id);
+
+        $old_order = $order->getOriginal();
 
         $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
         $staff_id = $input['service_staff_id'] = $request->service_staff_id;
@@ -607,8 +609,11 @@ class OrderController extends Controller
                 Transaction::where('order_id', $order->id)->where('user_id',$order->staff->affiliate_id)->where('type','Order Staff Affiliate Commission')->delete();
             }
         }
+
+        $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
         
         $order->update($input);
+        $order = Order::findOrFail($id);
 
         if ($order->staff->charges) {
 
@@ -616,6 +621,33 @@ class OrderController extends Controller
             $order->save();
             $order->order_total->staff_charges = $order->staff->charges;
             $order->order_total->save();
+        }
+
+        if (Carbon::now()->toDateString() == $request->date) {
+            if ($old_order['date'] != $request->date) {
+                if ($order->staff && $order->staff->user) {
+                    $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id);
+                }
+
+                if ($order->driver) {
+                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
+                }
+            }elseif($old_order['service_staff_id'] != $order->service_staff_id){
+                if ($order->staff && $order->staff->user) {
+                    $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id);
+                }
+                if ($order->driver) {
+                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
+                }
+            }elseif ($old_order['time_slot_id'] != $order->time_slot_id) {
+                if ($order->staff && $order->staff->user) {
+                    $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id);
+                }
+
+                if ($order->driver) {
+                    $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id);
+                }
+            }
         }
 
         $previousUrl = $request->url;
@@ -639,15 +671,17 @@ class OrderController extends Controller
     public function custom_location(Request $request, $id)
     {
         $request->validate([
-            'custom_location' => 'required',
+            'custom_location' => ['required', 'regex:/^\d+(\.\d+)?\s*,\s*\d+(\.\d+)?$/'],
+        ], [
+            'custom_location.regex' => 'The custom location must be in the format: 25.4055714,55.5141217 (without extra spaces)',
         ]);
 
         $input = $request->all();
         $order = Order::findOrFail($id);
 
         [$latitude, $longitude] = explode(",", $request->custom_location);
-        $input['latitude'] = $latitude;
-        $input['longitude'] = $longitude;
+        $input['latitude'] = trim($latitude);
+        $input['longitude'] = trim($longitude);
         $order->update($input);
 
         $previousUrl = $request->url;
@@ -658,6 +692,8 @@ class OrderController extends Controller
     {
         $input = $request->all();
         $order = Order::findOrFail($id);
+
+        $originalData = $order->getOriginal();
 
         if ($request->transport_charges) {
             if ($order->order_total->transport_charges) {
@@ -672,6 +708,26 @@ class OrderController extends Controller
         $input['whatsapp'] = $request->whatsapp_country_code . ltrim($request->whatsapp, '0');
         $order->update($input);
 
+        $changedData = [];
+        foreach ($input as $key => $value) {
+            if (array_key_exists($key, $originalData) && $originalData[$key] != $value) {
+                $changedData[$key] = [
+                    'old' => $originalData[$key],
+                    'new' => $value,
+                ];
+            }
+        }
+
+        if (!empty($changedData) && Carbon::now()->toDateString() == $order->date) {
+            if ($order->staff && $order->staff->user) {
+                $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id);
+            }
+
+            if ($order->driver) {
+                $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id);
+            }
+        }
+
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
@@ -679,6 +735,7 @@ class OrderController extends Controller
     public function driver_edit(Request $request, $id)
     {
         $order = Order::findOrFail($id);
+        $old_order = $order->getOriginal();
 
         if($request->driver_id != $order->driver_id){
             if ($order->driver && $order->driver->driver) {
@@ -691,9 +748,15 @@ class OrderController extends Controller
                 }
             }
         }
-
         $order->update($request->all());
+        $order = Order::findOrFail($id);
 
+        if (Carbon::now()->toDateString() == $old_order['date'] && $old_order['driver_id'] != $order->driver_id) {
+            if ($order->driver) {
+                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
+            }
+        }
+        
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
@@ -704,6 +767,9 @@ class OrderController extends Controller
 
         $order->update($request->all());
 
+        if ($order->driver) {
+            $order->driver->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->driver_status, $order->id);
+        }
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
     }
@@ -749,6 +815,10 @@ class OrderController extends Controller
 
             if ($request->status == "Canceled") {
                 Transaction::where('order_id', $order->id)->delete();
+            }
+
+            if ($order->staff) {
+                $order->staff->user->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->status, $order->id);
             }
 
             $order->update($input);
@@ -976,25 +1046,27 @@ class OrderController extends Controller
 
         $services = Service::whereIn('id', $request->selected_service_ids)->get();
         $sub_total = 0;
+        
+        $groupedBookingOption = $request->selected_option_ids ? $this->formattingBookingData($request->selected_option_ids) : [];
 
         if (count($services) == 0) {
             return response()->json(['error' => 'Service not found'], 404);
         } else {
-            $sub_total = $services->sum(function ($service) use ($request) {
-                $optionId = $request->selected_option_ids[$service->id] ?? null;
-                if ($optionId !== null && $service->serviceOption->find($optionId)) {
-                    return $service->serviceOption->find($optionId)->option_price;
+            $sub_total = $services->sum(function ($service) use ($groupedBookingOption,$request) {
+                $options = $groupedBookingOption[$service->id] ?? null;
+                if ($options !== null && count($options['options']) > 0) {
+                    return $options['total_price'];
                 }
                 return $service->discount ?? $service->price;
             });
         }
 
         if ($coupon) {
-            $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $request->selected_option_ids);
+            $isValid = $coupon->isValidCoupon($request->coupon_code, $services, null, $groupedBookingOption);
             if ($isValid !== true) {
                 return response()->json(['error' => $isValid]);
             } else {
-                $discount = $coupon->getDiscountForProducts($services, $sub_total, $request->selected_option_ids);
+                $discount = $coupon->getDiscountForProducts($services, $sub_total, $groupedBookingOption);
                 return response()->json([
                     'message' => 'Coupon applied successfully',
                     'discount' => $discount
@@ -1003,6 +1075,43 @@ class OrderController extends Controller
         } else {
             return response()->json(['error' => "Coupon is invalid!"]);
         }
+    }
+
+    private function formattingBookingData($bookingOptions)
+    {
+        $groupedBookingOption = [];
+
+        foreach ($bookingOptions as $service_id => $optionIds) {
+            if (isset($optionIds) && is_array($optionIds) && count($optionIds) > 0) {
+                $options = ServiceOption::whereIn('id', $optionIds)->get();
+                
+                $totalDuration = 0;
+
+                if ($options) {
+                    foreach ($options as $opt) {
+                        if (!empty($opt->option_duration)) {
+                            preg_match('/\d+/', $opt->option_duration, $matches);
+                            $totalDuration += isset($matches[0]) ? (int)$matches[0] : 0;
+                        }
+                    }
+                }
+                
+                $totalPrice = $options->sum('option_price');
+                $groupedBookingOption[$service_id] = [
+                    'options' => $options,
+                    'total_price' => $totalPrice,
+                    'total_duration' => $totalDuration > 0 ? $totalDuration . ' MINS' : null
+                ];
+            } else {
+                $groupedBookingOption[$service_id] = [
+                    'options' => [],
+                    'total_price' => 0,
+                    'total_duration' => null,
+                ];
+            }
+        }
+
+        return $groupedBookingOption;
     }
 
     public function staffCategoriesServices(Request $request)

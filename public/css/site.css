@@ -73,10 +73,6 @@ hr {
   object-fit: cover;
 }
 
-#serviceDetailContainer .card-img-top {
-  height: 100%;
-}
-
 .staff-label .rounded-circle {
   border-radius: 50% !important;
   object-fit: cover;

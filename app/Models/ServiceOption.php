@@ -9,7 +9,7 @@ class ServiceOption extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['service_id', 'option_name','option_price'];
+    protected $fillable = ['service_id', 'option_name','option_price','option_duration'];
 
     public function service()
     {
