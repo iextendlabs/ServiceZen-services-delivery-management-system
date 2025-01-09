@@ -168,7 +168,7 @@ class User extends Authenticatable
     public function notifyOnMobile($title, $body, $order_id = null)
     {
         if ($this->device_token) {
-            Notification::create([
+            $notification = Notification::create([
                 'order_id' => $order_id,
                 'user_id' => $this->id,
                 'title' => $title,
@@ -216,6 +216,7 @@ class User extends Authenticatable
                     return "Notification sent successfully.";
                 } else {
                     Log::error('FCM Notification Error', [
+                        'notification' => $notification->id,
                         'response' => $response->json(),
                         'status' => $response->status(),
                     ]);
