@@ -15,12 +15,26 @@
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ $staff->name }}</h5>
                         <a href="{{ route('staffProfile.show',$staff->id) }}" class="btn btn-block btn-primary">View</a>
-                        @for($i = 1; $i <= 5; $i++) @if($i <=$staff->averageRating()) <span class="text-warning">&#9733;</span>
-                            @else
-                            <span class="text-muted">&#9734;</span>
-                            @endif
-                            @endfor
-                            ({{ count($staff->reviews)}} Reviews)
+                        @php
+                            $rating = $staff->averageRating();
+                            $fullStars = floor($rating);
+                            $halfStar = $rating - $fullStars >= 0.5;
+                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                        @endphp
+
+                        @for ($i = 0; $i < $fullStars; $i++)
+                            <i class="fas fa-star text-warning fa-xs"></i>
+                        @endfor
+
+                        @if ($halfStar)
+                            <i class="fas fa-star-half-alt text-warning fa-xs"></i>
+                        @endif
+
+                        @for ($i = 0; $i < $emptyStars; $i++)
+                            <i class="far fa-star text-muted fa-xs"></i>
+                        @endfor
+
+                        ({{ count($staff->reviews)}} Reviews)
                     </div>
                 </div>
             </div>
