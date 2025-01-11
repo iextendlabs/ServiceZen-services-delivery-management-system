@@ -21,6 +21,7 @@ use Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ServiceStaffController extends Controller
 {
@@ -274,12 +275,28 @@ class ServiceStaffController extends Controller
             'commission' => 'required',
             'drivers' => 'required|array',
         ];
-    
+        
         if ($request->freelancer_join == 1) {
             $rules['expiry_date'] = 'required';
         }
-    
-        $this->validate($request, $rules);
+        
+        // Custom validation for drivers array
+        Validator::make($request->all(), $rules)->after(function ($validator) use ($request) {
+            $drivers = $request->input('drivers', []);
+            
+            foreach ($drivers as $day => $entries) {
+                foreach ($entries as $index => $entry) {
+                    $driverId = $entry['driver_id'] ?? null;
+                    $timeSlotId = $entry['time_slot_id'] ?? null;
+        
+                    if (is_null($driverId) xor is_null($timeSlotId)) {
+                        $validator->errors()->add("drivers.{$day}.{$index}.driver_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
+                        $validator->errors()->add("drivers.{$day}.{$index}.time_slot_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
+                    }
+                }
+            }
+        })->validate();
+        
 
         $input = $request->all();
         $input['phone'] =$request->number_country_code . $request->phone;
@@ -381,13 +398,15 @@ class ServiceStaffController extends Controller
         StaffDriver::where('staff_id', $id)->delete();
 
         foreach ($request->drivers as $day=>$drivers) {
-            foreach($drivers as $driver){
-                StaffDriver::create([
-                    'staff_id' => $id,
-                    'driver_id' => $driver['driver_id'],
-                    'day' => $day,
-                    'time_slot_id' => $driver['time_slot_id'],
-                ]);
+            foreach ($drivers as $driver){
+                if (!is_null($driver['driver_id']) && !is_null($driver['time_slot_id'])) {
+                    StaffDriver::create([
+                        'staff_id' => $id,
+                        'driver_id' => $driver['driver_id'],
+                        'day' => $day,
+                        'time_slot_id' => $driver['time_slot_id'],
+                    ]);
+                }
             }
         }
         

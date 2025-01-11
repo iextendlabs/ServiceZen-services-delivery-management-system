@@ -49,6 +49,7 @@ class HomeController extends Controller
         if (Auth::check()) {
 
             $userRole = $currentUser->getRoleNames()->first();
+            $freelancer_program = $currentUser->freelancer_program ? true : false;
 
             switch ($userRole) {
                 case 'Customer':
@@ -74,7 +75,17 @@ class HomeController extends Controller
                     break;
 
                 case 'Staff':
-                    $orders = Order::where('service_staff_id', Auth::id())
+                    if($freelancer_program){
+                        $orders = Order::where('service_staff_id', Auth::id())
+                        ->where('date', '=', $currentDate)
+                        ->orderBy('date', 'DESC')
+                        ->where(function ($query) {
+                            $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
+                                ->whereDoesntHave('cashCollection');
+                        })
+                        ->take(10)->get();
+                    }else{
+                        $orders = Order::where('service_staff_id', Auth::id())
                         ->where('date', '<=', $currentDate)
                         ->orderBy('date', 'DESC')
                         ->where(function ($query) {
@@ -82,6 +93,8 @@ class HomeController extends Controller
                                 ->whereDoesntHave('cashCollection');
                         })
                         ->take(10)->get();
+                    }
+                    
                     break;
 
                 default:
@@ -131,7 +144,7 @@ class HomeController extends Controller
                 ->where('user_id', $currentUser->id)
                 ->sum('amount');
 
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income'));
+            return view('home', compact('freelancer_program','orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income'));
         }
     }
 
