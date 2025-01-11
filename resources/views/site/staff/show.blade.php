@@ -221,15 +221,24 @@ $reviewsCarousel_chunk = 3;
             </div>
         </div>
         <div class="col-md-12 text-center mb-2">
-            @for($i = 1; $i <= 5; $i++) @if($i <=$averageRating) <span class="text-warning">&#9733;</span>
-                @else
-                <span class="text-muted">&#9734;</span>
-                @endif
-                @endfor
-                <span>{{count($reviews)}} Reviews</span><br>
-                @if($app_flag === false)
-                <a class="btn btn-primary" href="{{ route('siteReviews.index') }}">All Reviews</a>
-                @endif
+            @php
+                $rating = $averageRating;
+                $fullStars = floor($rating);
+                $halfStar = $rating - $fullStars >= 0.5;
+                $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+            @endphp
+
+            @for ($i = 0; $i < $fullStars; $i++)
+                <i class="fas fa-star text-warning fa-xs"></i>
+            @endfor
+
+            @if ($halfStar)
+                <i class="fas fa-star-half-alt text-warning fa-xs"></i>
+            @endif
+
+            @for ($i = 0; $i < $emptyStars; $i++)
+                <i class="far fa-star text-muted fa-xs"></i>
+            @endfor
         </div>
         @if(auth()->check() && $app_flag === false)
         <div class="col-md-12 text-center">

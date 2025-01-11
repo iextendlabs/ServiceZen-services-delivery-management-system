@@ -91,12 +91,23 @@
                 <span class="text-center">{{ $staff->name }}</span><br>
                 <span class="text-center">{{ $staff->staff->sub_title }}</span><br>
                 @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges,$isAdmin)</b></span>@endif <br>
-                @for($i = 1; $i <= 5; $i++)
-                @if($i <=$staff->averageRating())
-                    <span class="text-warning">&#9733;</span>
-                @else
-                    <span class="text-muted">&#9734;</span>
+                @php
+                    $rating = $staff->averageRating();
+                    $fullStars = floor($rating);
+                    $halfStar = $rating - $fullStars >= 0.5;
+                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                @endphp
+
+                @for ($i = 0; $i < $fullStars; $i++)
+                    <i class="fas fa-star text-warning fa-xs"></i>
+                @endfor
+
+                @if ($halfStar)
+                    <i class="fas fa-star-half-alt text-warning fa-xs"></i>
                 @endif
+
+                @for ($i = 0; $i < $emptyStars; $i++)
+                    <i class="far fa-star text-muted fa-xs"></i>
                 @endfor
                 <br>
                 ({{ count($staff->reviews)}} Reviews)
