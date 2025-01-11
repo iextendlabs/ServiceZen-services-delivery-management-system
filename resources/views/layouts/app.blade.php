@@ -104,9 +104,11 @@
                             <a class="nav-link" aria-current="page" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
                         </li>
                         @endif
+                        @if(Auth::user()->freelancer_program == null)
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
+                        @endif
                         @if(auth()->user()->hasRole("Admin"))
                         
                         <li class="nav-item dropdown">

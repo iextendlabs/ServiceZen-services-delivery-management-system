@@ -211,7 +211,7 @@
                                                     @php $firstRow = false; @endphp
                                                 @endif
                                                 <td>
-                                                    <select name="drivers[{{ $day }}][{{ $index }}][driver_id]" class="form-control" required>
+                                                    <select name="drivers[{{ $day }}][{{ $index }}][driver_id]" class="form-control">
                                                         <option value="">Select Driver</option>
                                                         @foreach ($users as $driver)
                                                             @if ($driver->hasRole("Driver"))
@@ -221,7 +221,7 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <select name="drivers[{{ $day }}][{{ $index }}][time_slot_id]" class="form-control" required>
+                                                    <select name="drivers[{{ $day }}][{{ $index }}][time_slot_id]" class="form-control">
                                                         <option value="">Select Time Slot</option>
                                                         @foreach ($timeSlots as $slot)
                                                             <option value="{{ $slot['id'] }}" {{ $driverData['time_slot_id'] == $slot['id'] ? 'selected' : '' }}>
@@ -245,7 +245,7 @@
                                             <tr id="{{ $day }}-first-row" data-day="{{ $day }}" style="background-color: {{ $dayColors[$day] ?? '#ffffff' }}">
                                                 <td rowspan="1" class="day-name">{{ $day }}</td>
                                                 <td>
-                                                    <select name="drivers[{{ $day }}][0][driver_id]" class="form-control" required>
+                                                    <select name="drivers[{{ $day }}][0][driver_id]" class="form-control">
                                                         <option value="">Select Driver</option>
                                                         @foreach ($users as $driver)
                                                             @if ($driver->hasRole("Driver"))
@@ -255,7 +255,7 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <select name="drivers[{{ $day }}][0][time_slot_id]" class="form-control" required>
+                                                    <select name="drivers[{{ $day }}][0][time_slot_id]" class="form-control">
                                                         <option value="">Select Time Slot</option>
                                                         @foreach ($timeSlots as $slot)
                                                             <option value="{{ $slot['id'] }}">
@@ -560,13 +560,13 @@
         const newRow = $(`
             <tr data-day="${day}" class="driver-row" style="background-color: ${dayColors[day] || '#ffffff'};">
                 <td>
-                    <select name="drivers[${day}][${rowCounts[day] - 1}][driver_id]" class="form-control" required>
+                    <select name="drivers[${day}][${rowCounts[day] - 1}][driver_id]" class="form-control">
                         <option value="" disabled selected>Select Driver</option>
                         ${generateDriverOptions()}
                     </select>
                 </td>
                 <td>
-                    <select name="drivers[${day}][${rowCounts[day] - 1}][time_slot_id]" class="form-control" required>
+                    <select name="drivers[${day}][${rowCounts[day] - 1}][time_slot_id]" class="form-control">
                         <option value="" disabled selected>Select Time Slot</option>
                         ${generateTimeSlotOptions()}
                     </select>
