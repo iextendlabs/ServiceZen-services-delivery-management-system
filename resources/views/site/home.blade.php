@@ -1,4 +1,4 @@
-@extends('site.layout.app')
+@extends('site.layout.site')
 @section('content')
     @php
         if ($app_flag === true) {
