@@ -165,6 +165,15 @@
                             <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Inprogress">
                                 <i class="fas fa-hourglass-split"></i> Inprogress
                             </a>
+                            <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
+                                <i class="fas fa-check"></i> Complete
+                            </a>
+                            <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Accepted">
+                                <i class="fas fa-check"></i> Accepted
+                            </a>
+                            <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
+                                <i class="fas fa-check"></i> Confirm
+                            </a>
                         @endif
 
                         
@@ -174,16 +183,6 @@
                                 <i class="fas fa-plus"></i> Create Order
                             </a>
                         @endcan
-                        @if($freelancer_program == false)
-                        <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
-                            <i class="fas fa-check"></i> Complete
-                        </a>
-                        <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Accepted">
-                            <i class="fas fa-check"></i> Accepted
-                        </a>
-                        <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
-                            <i class="fas fa-check"></i> Confirm
-                        </a>
                         <a class="btn btn-warning mb-2 ms-md-2"
                             href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
                             <i class="fas fa-calendar"></i> Todays Drop Order
@@ -196,7 +195,6 @@
                             href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete">
                             <i class="fas fa-calendar"></i> Todays Complete Order
                         </a>
-                        @endif
                         <a class="btn btn-secondary mb-2 ms-md-2"
                             href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}">
                             <i class="fas fa-calendar"></i> Todays Order

@@ -80,7 +80,6 @@ class OrderController extends Controller
         $currentUser = Auth::user();
         $query = Order::orderBy($sort, $direction);
         $userRole = $currentUser->getRoleNames()->first(); // Assuming you have a variable that holds the user's role, e.g., $userRole = $currentUser->getRole();
-        $freelancer_program = $currentUser->freelancer_program ? true : false;
 
         switch ($userRole) {
             case 'Manager':
@@ -98,26 +97,15 @@ class OrderController extends Controller
                 break;
 
             case 'Staff':
-                if($freelancer_program){
-                    $query = Order::where('service_staff_id', Auth::id())
-                    ->orderBy('date', 'ASC')
-                    ->orderBy('time_start')
-                    ->where('date', '=', $currentDate)
-                    ->where(function ($query) {
-                        // Get orders with status 'complete' and no cashCollection
-                        $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
-                            ->whereDoesntHave('cashCollection');
-                    });
-                }else{
-                    $query = Order::where('service_staff_id', Auth::id())
-                    ->orderBy('date', 'ASC')
-                    ->orderBy('time_start')
-                    ->where(function ($query) {
-                        // Get orders with status 'complete' and no cashCollection
-                        $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
-                            ->whereDoesntHave('cashCollection');
-                    });
-                }
+                $query = Order::where('service_staff_id', Auth::id())
+                ->orderBy('date', 'ASC')
+                ->orderBy('time_start')
+                ->where('date', '=', $currentDate)
+                ->where(function ($query) {
+                    // Get orders with status 'complete' and no cashCollection
+                    $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
+                        ->whereDoesntHave('cashCollection');
+                });
                 
                 break;
 
@@ -286,7 +274,7 @@ class OrderController extends Controller
 
             $filters = $request->only(['time_start','time_end','date_from', 'date_to', 'zone', 'order_id', 'appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id', 'category_id']);
             $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-            return view('orders.index', compact('freelancer_program','orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 
