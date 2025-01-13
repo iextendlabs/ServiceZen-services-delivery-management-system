@@ -49,11 +49,6 @@
                         </a>
                     @endif
                     
-                    <a class="btn btn-secondary mb-2 ms-md-2"
-                        href="{{ route('orders.index') }}?today_order={{ date('Y-m-d') }}">
-                        <i class="fas fa-calendar"></i> Todays Order
-                    </a>
-                    @if($freelancer_program !== true)
                     <a class="btn btn-warning mb-2 ms-md-2"
                         href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
                         <i class="fas fa-calendar"></i> Todays Drop Order
@@ -66,7 +61,10 @@
                         href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete">
                         <i class="fas fa-calendar"></i> Todays Complete Order
                     </a>
-                    @endif
+                    <a class="btn btn-secondary mb-2 ms-md-2"
+                        href="{{ route('orders.index') }}?today_order={{ date('Y-m-d') }}">
+                        <i class="fas fa-calendar"></i> Todays Order
+                    </a>
                     @can('order-create')
                         <a class="btn btn-success mb-2 ms-md-2" href="{{ route('orders.create') }}">
                             <i class="fas fa-plus"></i> Create Order
