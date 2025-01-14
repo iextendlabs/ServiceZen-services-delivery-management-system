@@ -46,7 +46,8 @@ class ServiceStaffController extends Controller
     private $documents = [
         'address_proof' => 'Address Proof',
         'noc' => 'NOC', 
-        'id_card' => 'Id Card', 
+        'id_card_front' => 'Id Card Front Side', 
+        'id_card_back' => 'Id Card Back Side', 
         'passport' => 'Passport', 
         'driving_license' => 'Driving License', 
         'education' => 'Education', 
@@ -112,7 +113,8 @@ class ServiceStaffController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
-            'id_card' => 'required',
+            'id_card_front' => 'required',
+            'id_card_back' => 'required',
             'passport' => 'required',
         ]);
 
