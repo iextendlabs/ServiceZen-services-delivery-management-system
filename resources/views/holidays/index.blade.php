@@ -21,7 +21,11 @@
             </ul>
         </div>
         @endif
-        <div class="alert alert-success">
+        <div class="alert alert-success" style="display: none">
+            <span></span>
+            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="alert alert-info">
             <b>Note: </b><span>Click on date to add holiday and click on holiday date to delete.</span>
         </div>
         <div id='full_calendar_events'></div>
@@ -83,7 +87,12 @@
             });
         });
         function displayMessage(message) {
-            toastr.success(message, 'Message');            
+            var alertBox = $('.alert.alert-success');
+            alertBox.find('span').text(message);
+            alertBox.show();
+            setTimeout(function () {
+                alertBox.hide();
+            }, 3000);
         }
     </script>
 @endsection
