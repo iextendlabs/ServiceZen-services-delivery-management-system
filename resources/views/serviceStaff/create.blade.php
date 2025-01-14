@@ -340,7 +340,7 @@
                     @foreach($documents as $field => $label)
                         <div class="col-md-12">
                             <div class="form-group">
-                                @if(in_array($field, ['address_proof', 'id_card', 'passport', 'driving_license', 'education']))
+                                @if(in_array($field, ['address_proof', 'id_card_front','id_card_back', 'passport', 'driving_license', 'education']))
                                     <span style="color: red;">*</span>
                                 @endif
                                 <strong>{{ $label }}:</strong>
