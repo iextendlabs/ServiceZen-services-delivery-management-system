@@ -29,13 +29,14 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Staff:</strong>
-                            <select name="staff_id" class="form-control">
+                            <input type="text" id="staffSearch" class="form-control mb-2" placeholder="Search staff by name">
+                            <select name="staff_id" id="staffDropdown" class="form-control">
                                 <option value="">Select</option>
                                 @foreach ($staffs as $staff)
-                                @if($staff->id == $filter['staff_id'])
-                                <option value="{{ $staff->id }}" selected>{{ $staff->name }}</option>
-                                @else
-                                <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                @if ($staff->staff->status == 1)
+                                    <option value="{{ $staff->id }}" {{ $staff->id == $filter['staff_id'] ? 'selected' : '' }}>
+                                        {{ $staff->name }}
+                                    </option>
                                 @endif
                                 @endforeach
                             </select>
@@ -153,5 +154,25 @@
             checkTableResponsive();
         });
     });
+
+    $(document).ready(function () {
+        const $searchInput = $("#staffSearch");
+        const $dropdown = $("#staffDropdown");
+        const originalOptions = $dropdown.children().clone(); // Clone original options
+
+        $searchInput.on("input", function () {
+            const filter = $searchInput.val().toLowerCase().trim();
+
+            // Filter options based on the search term
+            const filteredOptions = originalOptions.filter(function () {
+                const text = $(this).text().toLowerCase().trim();
+                return text.startsWith(filter);
+            });
+
+            // Clear and append the filtered options
+            $dropdown.empty().append(filteredOptions);
+        });
+    });
+
 </script>
 @endsection
