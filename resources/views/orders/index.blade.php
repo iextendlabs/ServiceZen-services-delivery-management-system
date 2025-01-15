@@ -298,6 +298,10 @@
     </div>
 
     <script>
+        $('.all-item-checkbox').click(function() {
+            var allCheckboxState = $(this).prop('checked');
+            $('.item-checkbox').prop('checked', allCheckboxState);
+        });
         $('#bulkEditBtn').click(function() {
             const selectedItems = $('.item-checkbox:checked').map(function() {
                 return $(this).val();

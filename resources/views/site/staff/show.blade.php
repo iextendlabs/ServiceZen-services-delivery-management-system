@@ -5,6 +5,23 @@
         height: 300px !important;
         width: 300px;
     }
+    .owl-nav {
+        display: flex;
+        justify-content: center;
+        position: relative;
+        top: -25px;
+    }
+    .owl-nav button {
+        background: #9c9b9b !important;
+        border: 1px solid #ccc !important;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        text-align: center;
+        line-height: 33px;
+    }
+
+
 </style>
 @php
 if($app_flag === true){
@@ -170,12 +187,65 @@ $reviewsCarousel_chunk = 3;
             </div>
             @endif
         </div>
+        @if(count($service_categories) > 0 || count($services) > 0)
         <h3 class="text-center">My Services</h3>
+        @if(count($service_categories) > 0 )
         <div class="row" id="categories">
             @foreach($service_categories as $category)
             @include('site.categories.category_card', ['category' => $category])
             @endforeach
         </div>
+        @endif
+        @if(count($services) > 0 )
+        <div class="row" id="services">
+            <div class="col-12">
+                <div class="owl-carousel">
+                    @foreach($services as $service)
+                    <div class="item">
+                        <div class="service-box">
+                            <div class="card mb-4 box-shadow">
+                                <a href="/serviceDetail/{{ $service->id }}">
+                                    <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
+                                    <img class="card-img-top" src="./service-images/{{ $service->image }}"
+                                        alt="Card image cap">
+                                </a>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted service-box-price">
+                                            @if (isset($service->discount))
+                                                <s>
+                                            @endif
+                                            @currency($service->price,false,true)
+                                            @if (isset($service->discount))
+                                                </s>
+                                            @endif
+                                            @if (isset($service->discount))
+                                                <b class="discount"> @currency($service->discount,false,true)</b>
+                                            @endif
+                                        </small>
+    
+                                        <small class="text-muted service-box-time"><i class="fa fa-clock"> </i>
+                                            {{ $service->duration }}</small>
+                                    </div>
+    
+                                    @if(count($service->serviceOption)>0)
+                                        <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $service->id }}" type="button" class="btn btn-block btn-primary">Book Now</a>
+                                    @else
+                                        <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
+                                    @endif
+    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            
+        </div>
+        
+        @endif
+        @endif
         <div class="col-md-12">
             <h2 class="text-center">Customer Reviews</h2>
             <div id="reviewsCarousel" class="carousel slide" data-ride="carousel">
