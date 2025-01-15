@@ -2,8 +2,28 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-12 text-center mb-3">
-                <h2>Orders</h2>
+            <div class="col-md-12 margin-tb">
+                <div class="float-start">
+                    <h2>Orders</h2>
+                </div>
+                <div class="float-end d-flex align-items-center">
+                    @can('order-edit')
+                        <div class="input-group">
+                            <strong class="my-auto mr-2">Bulk Order Status Update:</strong>
+                            <select name="bulk-status" class="form-control">
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status }}"
+                                        @if ($status == $filter['status']) selected @endif>{{ $status }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="input-group-append">
+                                <button id="bulkEditBtn" class="btn btn-primary" type="button"><i
+                                        class="fa fa-save"></i></button>
+                            </div>
+                        </div>
+                    @endcan
+                </div>
             </div>
             <div class="col-md-12 mb-3">
                 <div class="d-flex flex-wrap justify-content-md-end">
@@ -276,4 +296,46 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $('#bulkEditBtn').click(function() {
+            const selectedItems = $('.item-checkbox:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            const status_value = $('select[name="bulk-status"]').val();
+            const status_text = $('select[name="bulk-status"] option:selected').text();
+
+            if (status_value && selectedItems.length > 0) {
+                if (confirm("Are you sure you want to Set " + status_text + " to selected items?")) {
+                    editSelectedItems(selectedItems, status_value);
+                }
+            } else {
+                alert('Please first select order and select status to update order status.');
+            }
+        });
+
+        function editSelectedItems(selectedItems, status) {
+            $.ajax({
+                url: '{{ route('orders.bulkStatusEdit') }}',
+                method: 'POST',
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                data: JSON.stringify({
+                    selectedItems,
+                    status
+                }),
+                success: function(data) {
+                    alert(data.message);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    </script>
 @endsection

@@ -1163,4 +1163,23 @@ class OrderController extends Controller
             }
         }
     }
+
+    public function bulkStatusEdit(Request $request)
+    {
+        $selectedItems = $request->input('selectedItems');
+        $status = $request->input('status');
+
+        if (!empty($selectedItems)) {
+
+            foreach ($selectedItems as $order_id) {
+                $order = Order::findOrFail($order_id);
+                $order->status = $status;
+                $order->save();
+            }
+
+            return response()->json(['message' => 'Selected order status updated successfully.']);
+        } else {
+            return response()->json(['message' => 'No order selected.']);
+        }
+    }
 }
