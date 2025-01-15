@@ -1,7 +1,9 @@
 <!-- TODO Change edit dropdown to icon -->
 <table class="table-striped table-bordered table-responsive table">
     <tr>
-        <th></th>
+        <td>
+            <input type="checkbox" class="all-item-checkbox">
+        </td>
 
         <th class="text-left"><a class="text-decoration-none"
                 href="{{ route('orders.index', array_merge(request()->query(), ['sort' => 'id', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Order#</a>

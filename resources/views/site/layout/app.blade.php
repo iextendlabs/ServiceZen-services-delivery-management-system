@@ -43,6 +43,10 @@
 
         gtag('config', 'G-TEMW2WSQE1');
     </script>
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
     {!! $head_tag !!}
 </head>
 @if (session()->has('bookingData'))
@@ -326,6 +330,38 @@
         src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places&callback=mapReady&type=address">
     </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+    <!-- Owl Carousel Initialization -->
+    <script>
+        $(document).ready(function(){
+            $(".owl-carousel").owlCarousel({
+                loop: true,
+                margin: 15,
+                nav: true,  // Hide navigation arrows
+                dots: false,  // Show dots only
+                autoplay: true,
+                autoplayTimeout: 10000,
+                items: 3,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 3
+                    },
+                    1000: {
+                        items: 3
+                    }
+                },
+                navText: [
+                    '<i class="fa fa-chevron-left"></i>', // Left navigation arrow
+                    '<i class="fa fa-chevron-right"></i>' // Right navigation arrow
+                ]
+            });
+        });
+    </script>
     <script>
         $(document).ready(function($) {
             var availableTags = [];

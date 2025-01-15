@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\User;
@@ -72,7 +73,9 @@ class StaffProfileController extends Controller
             }
         }
         $category_ids = $user->categories ? $user->categories()->pluck('category_id')->toArray() : [];
+        $service_ids = $user->categories ? $user->services()->pluck('service_id')->toArray() : [];
         $service_categories = !empty($category_ids) ? ServiceCategory::whereIn('id', $category_ids)->get() : [];
+        $services = !empty($service_ids) ? Service::whereIn('id', $service_ids)->get() : [];
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
         $userAgent = $request->header('User-Agent');
@@ -82,7 +85,7 @@ class StaffProfileController extends Controller
         } else {
             $app_flag = false;
         }
-        return view('site.staff.show', compact('user', 'service_categories', 'socialLinks', 'reviews', 'averageRating','app_flag'));
+        return view('site.staff.show', compact('user', 'service_categories','services', 'socialLinks', 'reviews', 'averageRating','app_flag'));
     }
 
 
