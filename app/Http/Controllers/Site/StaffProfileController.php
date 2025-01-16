@@ -73,7 +73,7 @@ class StaffProfileController extends Controller
             }
         }
         $category_ids = $user->categories ? $user->categories()->pluck('category_id')->toArray() : [];
-        $service_ids = $user->categories ? $user->services()->pluck('service_id')->toArray() : [];
+        $service_ids = $user->services ? $user->services()->pluck('service_id')->toArray() : [];
         $service_categories = !empty($category_ids) ? ServiceCategory::whereIn('id', $category_ids)->get() : [];
         $services = !empty($service_ids) ? Service::whereIn('id', $service_ids)->get() : [];
         $reviews = Review::where('staff_id', $id)->get();
