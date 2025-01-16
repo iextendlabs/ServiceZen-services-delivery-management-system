@@ -54,7 +54,7 @@
                             @endif
                             @if ($booking['option_total_duration'] != null)
                                 <br><span>{{ $booking['option_total_duration'] }}</span>
-                            @else
+                            @elseif($booking['service']->duration)
                                 <br><span>{{ $booking['service']->duration }}</span>
                             @endif
                             @if (count($booking['option']) != 0)

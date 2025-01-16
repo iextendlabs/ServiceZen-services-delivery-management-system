@@ -216,7 +216,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <span style="color: red;">*</span><strong>Duration:</strong>
+                        <strong>Duration:</strong>
                         <input type="text" value="{{old('duration',$service->duration)}}" name="duration" class="form-control" placeholder="Duration">
                     </div>
                 </div>

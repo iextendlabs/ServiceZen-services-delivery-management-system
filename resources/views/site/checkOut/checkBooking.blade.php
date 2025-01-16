@@ -92,7 +92,7 @@
                                                     <input required type="radio" name="service_id" class="checkBooking_service_id" 
                                                            value="{{ $service->id }}" data-options="{{ $service->serviceOption }}" data-name="{{ $service->name }}"
                                                            data-price="@if($service->discount) @currency($service->discount,false,true) @else @currency($service->price,false,true) @endif"
-                                                           data-duration="{{ $service->duration }}">
+                                                           data-duration="{{ $service->duration ?? "" }}">
                                                     {{ $service->name }}
                                             </td>
                                             <td>
@@ -107,7 +107,7 @@
                                                     <b class="discount"> @currency($service->discount,false,true)</b>
                                                 @endif
                                             </td>
-                                            <td>{{ $service->duration }}</td>
+                                            <td>{{ $service->duration ?? "" }}</td>
                                                 </label>
                                         </tr>
                                     @endforeach
@@ -122,7 +122,7 @@
                                 <h4>Selected Service</h4>
                                 <p><strong>Name:</strong> <span id="selected-service-name"></span></p>
                                 <p><strong>Price:</strong> <span id="selected-service-price"></span></p>
-                                <p><strong>Duration:</strong> <span id="selected-service-duration"></span></p>
+                                <p style="display: none;"><strong>Duration:</strong> <span id="selected-service-duration"></span></p>
                             </div>
                             <div id="service-options" class="alert alert-info" style="display: none;">
                                 <h4>Service Options</h4>
@@ -188,7 +188,13 @@
 
                 $('#selected-service-name').text(serviceName);
                 $('#selected-service-price').text(servicePrice);
-                $('#selected-service-duration').text(serviceDuration);
+
+                if(serviceDuration){
+                    $('#selected-service-duration').parent().show();
+                    $('#selected-service-duration').text(serviceDuration);
+                }else{
+                    $('#selected-service-duration').parent().hide();
+                }
 
                 $('#selected-service').show();
 
@@ -230,10 +236,20 @@
                             var formattedMinPrice = await formatCurrencyJS(minPrice);
                             $(`input[name="option_id[]"][value="${minPriceOption}"]`).prop('checked', true);
                             $('#selected-service-price').text(formattedMinPrice);
+                            if(minOptionDuration || serviceDuration){
+                                $('#selected-service-duration').parent().show();
+                            }else{
+                                $('#selected-service-duration').parent().hide();
+                            }
                             $('#selected-service-duration').text(minOptionDuration ? minOptionDuration : serviceDuration);
                         } catch (error) {
                             console.error("Error formatting currency:", error);
                             $('#selected-service-price').text(servicePrice);
+                            if(serviceDuration){
+                                $('#selected-service-duration').parent().show();
+                            }else{
+                                $('#selected-service-duration').parent().hide();
+                            }
                             $('#selected-service-duration').text(serviceDuration);
                         }
                     }
@@ -260,13 +276,22 @@
                                 return false;
                             });
                             $('#selected-service-price').text(`${currencySymbol}${totalPrice.toFixed(2)}`);
-
+                            if(formattedDuration || serviceDuration){
+                                $('#selected-service-duration').parent().show();
+                            }else{
+                                $('#selected-service-duration').parent().hide();
+                            }
                             if (formattedDuration) {
                                 $('#selected-service-duration').text(formattedDuration);
                             } else {
                                 $('#selected-service-duration').text(serviceDuration);
                             }
                         } else {
+                            if(serviceDuration){
+                                $('#selected-service-duration').parent().show();
+                            }else{
+                                $('#selected-service-duration').parent().hide();
+                            }
                             $('#selected-service-price').text(servicePrice);
                             $('#selected-service-duration').text(serviceDuration);
                         }

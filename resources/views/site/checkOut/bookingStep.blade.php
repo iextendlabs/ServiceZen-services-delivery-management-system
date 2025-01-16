@@ -74,11 +74,11 @@
 
                                                         </span>
                                                     </div>
-                                                    <div><strong>Duration:</strong> 
+                                                    <div>
                                                         @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_duration'] != null)
-                                                                {{ $groupedBookingOption[$service->id]['total_duration'] }}
-                                                            @else
-                                                            {{ $service->duration }}
+                                                            <strong>Duration:</strong> {{ $groupedBookingOption[$service->id]['total_duration'] }}
+                                                        @elseif($service->duration)
+                                                            <strong>Duration:</strong> {{ $service->duration }}
                                                         @endif</div>
                                                     @if(isset($groupedBookingOption[$service->id]) && count($groupedBookingOption[$service->id]['options']) > 0)
                                                     <div>

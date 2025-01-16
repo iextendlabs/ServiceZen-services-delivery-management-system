@@ -327,7 +327,7 @@
 
                                     <td>{{ isset($service->discount) ? 
                                     $service->discount : $service->price }}</td>
-                                    <td>{{ $service->duration }}</td>
+                                    <td>{{ $service->duration ?? "" }}</td>
                                 </tr>
                                 @endforeach
                             </table>
