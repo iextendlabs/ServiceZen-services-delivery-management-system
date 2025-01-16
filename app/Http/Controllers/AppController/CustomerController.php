@@ -1067,7 +1067,9 @@ class CustomerController extends Controller
             }
         }
         $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $service_ids = $user->services()->pluck('service_id')->toArray();
         $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
+        $services = Service::whereIn('id', $service_ids)->get();
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
         $orders = Order::where('service_staff_id',$id)->where('status','Complete')->count();
@@ -1076,6 +1078,7 @@ class CustomerController extends Controller
         return response()->json([
             'user' => $user,
             'service_categories' => $service_categories,
+            'services' => $services,
             'socialLinks' => $socialLinks,
             'reviews' => $reviews,
             'averageRating' => $averageRating,
