@@ -302,7 +302,8 @@ class CustomerController extends Controller
             'package' => $services->package ?? [],
             'faqs' => $FAQs,
             'lowestPriceOption' => $lowestPriceOption,
-            'price' => $price
+            'price' => $price,
+            'additional_images' => $services->images->pluck('image') ?? [],
         ], 200);
     }
 
