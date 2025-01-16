@@ -504,7 +504,7 @@
                             <td>
                                 ${service.discount ? `<s>${service.price}</s> <b class="discount">${service.discount}</b>` : service.price}
                             </td>
-                            <td>${service.duration}</td>
+                            <td>${service.duration ?? ""}</td>
                                 </label>
                             </tr>
                     `;
@@ -581,7 +581,7 @@
                         <tr>
                             <td>${service.name}</td>
                             <td class="service-price" data-original-price="${service.originalPrice}">AED ${service.price}</td>
-                            <td class="service-duration" data-original-duration="${service.duration}">${service.duration}</td>
+                            <td class="service-duration" data-original-duration="${service.duration}">${service.duration ?? ""}</td>
                             <td>${service.optionsHtml}</td>
                         </tr>
                     `;

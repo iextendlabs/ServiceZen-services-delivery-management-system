@@ -198,8 +198,8 @@
                             @endif
                         </p>
 
-                        <p class="text-muted">
-                            <b><i class="fa fa-clock mr-2"></i><span id="duration">{{ $service->duration }}</span></b>
+                        <p class="text-muted" @if($service->duration == null) style="display:none;" @endif>
+                            <b><i class="fa fa-clock mr-2"></i><span id="duration" data-duration="{{ $service->duration }}">{{ $service->duration ?? '' }}</span></b>
                         </p>
 
                         @if (count($service->serviceOption))
@@ -385,8 +385,9 @@
                                                                     <b class="discount"> @currency($addON->service->discount, false, true)</b>
                                                                 @endif
                                                             </small>
-                                                            <small class="text-muted"><i class="fa fa-clock"> </i>
-                                                                {{ $addON->service->duration }}</small>
+                                                            @if($addON->service->duration)
+                                                                <small class="text-muted"><i class="fa fa-clock"> </i>{{ $addON->service->duration }}</small>
+                                                            @endif
                                                         </div>
                                                         @if (count($addON->service->serviceOption) > 0)
                                                             <a style="margin-top: 1em; color:#fff"
@@ -463,10 +464,11 @@
                                                                     <b class="discount"> @currency($package->service->discount, false, true)</b>
                                                                 @endif
                                                             </small>
-
-                                                            <small class="text-muted service-box-time"><i
+                                                            @if($package->service->duration)
+                                                            <small all class="text-muted service-box-time"><i
                                                                     class="fa fa-clock">
                                                                 </i> {{ $package->service->duration }}</small>
+                                                            @endif
                                                         </div>
 
                                                     </div>
@@ -584,13 +586,22 @@
                     $priceElement.html(
                         `<span class="font-weight-bold">${currencySymbol}${totalPrice.toFixed(2)}</span>`);
                     if (formattedDuration) {
+                        $durationElement.parent().parent().show();
                         $durationElement.text(`${formattedDuration}`);
                     } else {
-                        $durationElement.text('{{ $service->duration }}');
+                        if($durationElement.data("duration") == ""){
+                            $durationElement.parent().parent().hide();
+                        }else{
+                            $durationElement.text('{{ $service->duration }}');
+                        }   
                     }
                 } else {
                     $priceElement.html(`<span class="font-weight-bold">@currency($service->price, false, true)</span>`);
-                    $durationElement.text('{{ $service->duration }}');
+                    if($durationElement.data("duration") == ""){
+                        $durationElement.parent().parent().hide();
+                    }else{
+                        $durationElement.text('{{ $service->duration }}');
+                    }   
                 }
             }
 

@@ -311,7 +311,7 @@ class HomeController extends Controller
         }
 
 
-        return redirect()->route('home')
+        return redirect()->back()
             ->with('success', 'App Data updated successfully');
     }
 }

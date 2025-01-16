@@ -223,9 +223,10 @@ $reviewsCarousel_chunk = 3;
                                                 <b class="discount"> @currency($service->discount,false,true)</b>
                                             @endif
                                         </small>
-    
+                                        @if($service->duration)
                                         <small class="text-muted service-box-time"><i class="fa fa-clock"> </i>
                                             {{ $service->duration }}</small>
+                                        @endif
                                     </div>
     
                                     @if(count($service->serviceOption)>0)

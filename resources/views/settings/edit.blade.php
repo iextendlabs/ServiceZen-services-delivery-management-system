@@ -144,7 +144,7 @@
 
                                 <td>AED<span class="price">{{ isset($service->discount) ? 
                                     $service->discount : $service->price }}</span></td>
-                                <td>{{ $service->duration }}</td>
+                                <td>{{ $service->duration ?? "" }}</td>
                             </tr>
                             @endif
                             @endforeach

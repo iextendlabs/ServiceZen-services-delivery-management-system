@@ -14,7 +14,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('short_description');
             $table->string('price');
-            $table->string('duration');
+            $table->string('duration')->nullable();
             $table->string('image');
             $table->unsignedBigInteger('category_id')->nullable();
             $table->string('discount')->nullable();
