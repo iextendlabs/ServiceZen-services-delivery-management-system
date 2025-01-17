@@ -1070,7 +1070,23 @@ class CustomerController extends Controller
         $category_ids = $user->categories()->pluck('category_id')->toArray();
         $service_ids = $user->services()->pluck('service_id')->toArray();
         $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
-        $services = Service::whereIn('id', $service_ids)->get();
+        $services = Service::where('status', 1)->whereIn('id', $service_ids)->orderBy('name', 'ASC')->get();
+        $servicesArray = $services->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'image' => $service->image,
+                'price' => $service->price,
+                'discount' => $service->discount,
+                'duration' => $service->duration,
+                'category_id' => $categoryIds,
+                'short_description' => $service->short_description,
+                'rating' => $service->averageRating(),
+                'options' => $service->serviceOption
+            ];
+        })->toArray();
+
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
         $orders = Order::where('service_staff_id',$id)->where('status','Complete')->count();
@@ -1079,7 +1095,7 @@ class CustomerController extends Controller
         return response()->json([
             'user' => $user,
             'service_categories' => $service_categories,
-            'services' => $services,
+            'services' => $servicesArray,
             'socialLinks' => $socialLinks,
             'reviews' => $reviews,
             'averageRating' => $averageRating,
