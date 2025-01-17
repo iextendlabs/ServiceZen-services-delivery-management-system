@@ -1168,12 +1168,17 @@ class OrderController extends Controller
     {
         $selectedItems = $request->input('selectedItems');
         $status = $request->input('status');
+        $key = $request->input('key');
 
         if (!empty($selectedItems)) {
 
             foreach ($selectedItems as $order_id) {
                 $order = Order::findOrFail($order_id);
-                $order->status = $status;
+                if($key == 'order'){
+                    $order->status = $status;
+                }elseif($key == 'driver'){
+                    $order->driver_status = $status;
+                }
                 $order->save();
             }
 
