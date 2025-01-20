@@ -307,6 +307,12 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Location:</strong>
+                            <input type="text" name="location" class="form-control" placeholder="Location" value="{{ old('location',$serviceStaff->staff->location ?? "") }}">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>Additional Charges:</strong>
                             <input type="number" name="charges" value="{{ old('charges',$serviceStaff->staff->charges ?? "") }}" class="form-control" placeholder="Additional Charges">
                         </div>
