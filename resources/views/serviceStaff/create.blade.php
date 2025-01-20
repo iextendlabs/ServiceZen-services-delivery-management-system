@@ -191,6 +191,12 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Location:</strong>
+                            <input type="text" name="location" class="form-control" placeholder="Location" value="{{ old('location') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>Additional Charges:</strong>
                             <input type="number" name="charges" class="form-control" value="{{ old('charges') }}" placeholder="Additional Charges">
                         </div>
