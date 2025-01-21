@@ -83,6 +83,7 @@
                 </div>
             </th>
             <th>Group</th>
+            <th>Type</th>
             <th>Staff</th>
             <th>No. of Seats</th>
             <th width="280px">Action</th>
@@ -98,6 +99,7 @@
                 @endif</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->group->name }}</td>
+            <td>{{ $time_slot->type }}</td>
             <td>
                 @foreach($time_slot->staffs as $key => $staff)
                     {{ $staff->name }}@if($key != count($time_slot->staffs) -1),@endif

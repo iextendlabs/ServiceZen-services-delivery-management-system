@@ -82,7 +82,7 @@ class TimeSlotController extends Controller
         request()->validate([
             'name' => 'required',
             'status' => 'required',
-            'type' => ['required', Rule::in(['Specific', 'General'])],
+            'type' => ['required', Rule::in(['Specific', 'General', 'Partner'])],
             'time_start' => 'required',
             'time_end' => 'required',
             'ids' => 'required',
@@ -164,7 +164,7 @@ class TimeSlotController extends Controller
         request()->validate([
             'status' => 'required',
             'name' => 'required',
-            'type' => ['required', Rule::in(['Specific', 'General'])],
+            'type' => ['required', Rule::in(['Specific', 'General', 'Partner'])],
             'time_start' => 'required',
             'time_end' => 'required',
             'ids' => 'required',
@@ -176,7 +176,7 @@ class TimeSlotController extends Controller
 
         $input = $request->all();
 
-        if ($request->type == 'General') {
+        if ($request->type == 'General' || $request->type == 'Partner') {
             $input['date'] = Null;
         }
 

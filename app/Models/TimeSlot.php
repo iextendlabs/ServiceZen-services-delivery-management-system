@@ -119,41 +119,57 @@ class TimeSlot extends Model
                 ->pluck('staff_id')->toArray();
             $staff_ids = array_unique([...$staff_ids, ...$generalHolidayStaffIds, ...$longHolidaysStaffId]);
 
-
             if (count($holiday) == 0) {
+                $query = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
+                    $query->whereIn('staff_id', $staff_group_staff_ids);
+                })->where('status', '=', 1);
+            
                 if ($date == $currentDate) {
-                    if ($isAdmin) {
-                        $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                            $query->whereIn('staff_id', $staff_group_staff_ids);
-                        })->where('date', '=', $date)->where('status', '=', 1)->orderBy('time_start')->get();
+                    if (!$isAdmin) {
+                        $query->where(function ($subQuery) use ($twoHoursLater, $currentTime, $date) {
+                            $subQuery->where(function ($q) use ($twoHoursLater) {
+                                $q->where('type', '=', 'General')
+                                  ->where('time_start', '>', $twoHoursLater->toTimeString());
+                            })->orWhere(function ($q) use ($currentTime) {
+                                $q->where('type', '=', 'Partner')
+                                  ->where('time_start', '<=', $currentTime)
+                                  ->where('time_end', '>=', $currentTime);
+                            })->orWhere(function ($q) use ($date, $twoHoursLater) {
+                                $q->where('type', '=', 'Specific')
+                                  ->where('time_start', '>', $twoHoursLater->toTimeString())
+                                  ->where('date', '=', $date);
+                            });
+                        });
                     } else {
-                        $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                            $query->whereIn('staff_id', $staff_group_staff_ids);
-                        })->where('date', '=', $date)->where('status', '=', 1)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
-                    }
-
-                    if (count($timeSlots) == 0) {
-                        if ($isAdmin) {
-                            $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                                $query->whereIn('staff_id', $staff_group_staff_ids);
-                            })->where('status', '=', 1)->orderBy('time_start')->get();
-                        } else {
-                            $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                                $query->whereIn('staff_id', $staff_group_staff_ids);
-                            })->where('status', '=', 1)->where('time_start', '>', $twoHoursLater->toTimeString())->orderBy('time_start')->get();
-                        }
+                        $query->where(function ($subQuery) use ($date) {
+                            $subQuery->whereIn('type', ['General', 'Partner'])
+                                     ->orWhere(function ($q) use ($date) {
+                                         $q->where('type', '=', 'Specific')
+                                           ->where('date', '=', $date);
+                                     });
+                        });
                     }
                 } else {
-                    $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                        $query->whereIn('staff_id', $staff_group_staff_ids);
-                    })->where('date', '=', $date)->where('status', '=', 1)->orderBy('time_start')->get();
-
-                    if (count($timeSlots) == 0) {
-                        $timeSlots = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                            $query->whereIn('staff_id', $staff_group_staff_ids);
-                        })->where('status', '=',  1)->orderBy('time_start')->get();
+                    if (!$isAdmin) {
+                        $query->where(function ($subQuery) use ($date) {
+                            $subQuery->where('type', '=', 'General')
+                                     ->orWhere(function ($q) use ($date) {
+                                         $q->where('type', '=', 'Specific')
+                                           ->where('date', '=', $date);
+                                     });
+                        });
+                    } else {
+                        $query->where(function ($subQuery) use ($date) {
+                            $subQuery->whereIn('type', ['General', 'Partner'])
+                                     ->orWhere(function ($q) use ($date) {
+                                         $q->where('type', '=', 'Specific')
+                                           ->where('date', '=', $date);
+                                     });
+                        });
                     }
                 }
+            
+                $timeSlots = $query->orderBy('time_start')->get();
             }
 
             if (count($timeSlots)) {
