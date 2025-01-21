@@ -1105,6 +1105,25 @@ class CustomerController extends Controller
         ], 200);
     }
 
+    public function getStaff()
+    {
+        $staff = User::role('Staff')
+            ->whereHas('staff', function ($query) {
+                $query->where('status', 1);
+            })
+            ->orderBy('name', 'ASC')
+            ->with('staff')
+            ->get();
+
+        $staff->map(function ($staff) {
+            $staff->rating = $staff->averageRating();
+            return $staff;
+        });
+
+        return response()->json([
+            'staff' => $staff
+        ], 200);
+    }
     public function deleteAccountMail(Request $request){
         
         $user = User::find($request->id);
