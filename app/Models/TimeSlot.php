@@ -53,10 +53,9 @@ class TimeSlot extends Model
         $available_ids = [];
         $short_holiday_staff_ids = [];
         $currentDate = Carbon::now()->format('Y-m-d');
-        $currentDateTime = Carbon::now();
         $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
-        $twoHoursLater = $currentDateTime->addHours(2);
-        $currentTime = $currentDateTime->toTimeString();
+        $twoHoursLater = Carbon::now()->addHours(2);
+        $currentTime = Carbon::now()->toTimeString();
 
         if ($serviceIds) {
             $services = Service::whereIn('id', $serviceIds)
