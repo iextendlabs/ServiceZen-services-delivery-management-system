@@ -1545,7 +1545,7 @@ class CustomerController extends Controller
 
             }
 
-            $staff_mim_order_value = $this->checkStaffOrderValue($bookingData);
+            $staff_mim_order_value = $this->checkStaffOrderValue($input,$bookingData,$groupedBookingOption);
         
             if($staff_mim_order_value !== true){
                 return response()->json([
@@ -1685,11 +1685,11 @@ class CustomerController extends Controller
 
     }
 
-    function checkStaffOrderValue($bookingData)
+    function checkStaffOrderValue($input, $bookingData, $groupedBookingOption)
     {
         $staffServices = [];
         foreach ($bookingData as $data) {
-            $staffId = $data['service_staff_id'];
+            $staffId = $data['staff_id'];
             $serviceId = $data['service_id'];
 
             if (!isset($staffServices[$staffId])) {
@@ -1701,8 +1701,6 @@ class CustomerController extends Controller
 
         $errors = [];
 
-        [$formattedBookings,$groupedBookingOption,$groupedBooking] = $this->formattingBookingData($bookingData);
-
         foreach ($staffServices as $staffId => $services) {
             $staff = User::find($staffId);
 
@@ -1710,12 +1708,17 @@ class CustomerController extends Controller
 
             $services = Service::whereIn('id', $services)->get();
 
-            $serviceTotal = $services->sum(function ($service) use ($groupedBookingOption) {
-                $options = $groupedBookingOption[$service->id] ?? null;
-                if ($options !== null && count($options['options']) > 0) {
-                    return $options['total_price'];
+            $serviceTotal = $services->sum(function ($service) use ($input, $groupedBookingOption) {
+                $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
+                if($options){
+                    if (is_array($options) && count($options['options']) > 0) {
+                        return $options['total_price'];
+                    } elseif ($options && $service->serviceOption->find($options)) {
+                        return $service->serviceOption->find($options)->option_price;
+                    }
+                }else {
+                    return ($service->discount ?? $service->price);
                 }
-                return ($service->discount ?? $service->price);
             });
 
             if ($serviceTotal < $minOrderValue) {
@@ -1724,9 +1727,16 @@ class CustomerController extends Controller
         }
 
         if (!empty($errors)) {
-            return [
-                $errors,
-            ];
+            $errorCount = count($errors);
+
+            if ($errorCount === 1) {
+                $formattedMessage = $errors[0];
+            } elseif ($errorCount > 1) {
+                $allButLast = implode(', ', array_slice($errors, 0, -1));
+
+                $formattedMessage = $allButLast . ' and ' . end($errors);
+            }
+            return $formattedMessage;
         }
 
         return true;
