@@ -30,7 +30,8 @@
                     <strong for="image">Type</strong>
                     <select name="type" class="form-control">
                         <option value="General" {{ old('type') == 'General' ? 'selected' : ''}}>General</option>
-                        <option value="Specific"  {{ old('type') == 'Specific' ? 'selected' : ''}}>Specific</option>
+                        <option value="Specific" {{ old('type') == 'Specific' ? 'selected' : ''}}>Specific</option>
+                        <option value="Partner" {{ old('type') == 'Partner' ? 'selected' : ''}}>Partner</option>
                     </select>
                 </div>
             </div>
@@ -103,7 +104,7 @@
         var type = $('select[name="type"]').val();
         if (type == 'Specific') {
             $('#date').show();
-        } else if (type == 'General') {
+        } else if (type == 'General' || type == 'Partner') {
             $('#date').hide();
         }
     });
