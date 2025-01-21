@@ -287,7 +287,11 @@ class CheckOutController extends Controller
             ];
             return response()->json(['errors' => $errors, 'excludedServices' => $excludedServices], 200);
         }
-
+        $staff_mim_order_value = $this->checkStaffOrderValue($bookingData);
+        
+        if($staff_mim_order_value !== true){
+            return response()->json(['errors' => $staff_mim_order_value], 200);
+        }
         // Calculate pricing
         $isValidOrderValue = $this->min_order_value($input, $bookingData, $staffZone,$minimum_booking_price);
 
@@ -423,6 +427,53 @@ class CheckOutController extends Controller
             return true;
         }
 
+    }
+
+    function checkStaffOrderValue($bookingData)
+    {
+        $staffServices = [];
+        foreach ($bookingData as $data) {
+            $staffId = $data['service_staff_id'];
+            $serviceId = $data['service_id'];
+
+            if (!isset($staffServices[$staffId])) {
+                $staffServices[$staffId] = [];
+            }
+
+            $staffServices[$staffId][] = $serviceId;
+        }
+
+        $errors = [];
+
+        [$formattedBookings,$groupedBookingOption,$groupedBooking] = $this->formattingBookingData($bookingData);
+
+        foreach ($staffServices as $staffId => $services) {
+            $staff = User::find($staffId);
+
+            $minOrderValue = $staff->staff->min_order_value ?? null;
+
+            $services = Service::whereIn('id', $services)->get();
+
+            $serviceTotal = $services->sum(function ($service) use ($groupedBookingOption) {
+                $options = $groupedBookingOption[$service->id] ?? null;
+                if ($options !== null && count($options['options']) > 0) {
+                    return $options['total_price'];
+                }
+                return ($service->discount ?? $service->price);
+            });
+
+            if ($serviceTotal < $minOrderValue) {
+                $errors[] = "Staff $staff->name requires a minimum order value of $minOrderValue, but the total is $serviceTotal.";
+            }
+        }
+
+        if (!empty($errors)) {
+            return [
+                $errors,
+            ];
+        }
+
+        return true;
     }
 
     private function createOrder($input, $bookingData, $staffZone, &$password)
