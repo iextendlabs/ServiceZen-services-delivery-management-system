@@ -35,6 +35,7 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use App\Models\OrderAttachment;
 use App\Models\ServiceOption;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
@@ -1763,6 +1764,21 @@ class CustomerController extends Controller
 
     private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption)
     {
+
+        $uploadedImages = [];
+
+        if ($input->hasFile('image')) {
+            $images = $input->file('image');
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('order_attachment'), $filename);
+                $uploadedImages[] = $filename;
+
+            }
+        }
+
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
 
@@ -1870,6 +1886,15 @@ class CustomerController extends Controller
             $input['order_id'] = $order->id;
             $input['discount_amount'] = $input['discount'];
 
+            if(!empty($uploadedImages)){
+                foreach ($uploadedImages as $image) {
+                    OrderAttachment::create([
+                        'image' => $image,
+                        'order_id' => $order->id,
+                    ]);
+                }
+            }
+    
             OrderTotal::create($input);
             if (isset($input['coupon_id'])) {
                 $input['coupon_id'] = $coupon->id;
