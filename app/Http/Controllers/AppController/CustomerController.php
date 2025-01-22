@@ -1530,6 +1530,19 @@ class CustomerController extends Controller
     {
         $password = NULL;
         $input = $request->all();
+        $orderAttachment = [];
+
+        if ($request->hasFile('image')) {
+            $images = $request->file('image');
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('order_attachment'), $filename);
+                $orderAttachment[] = $filename;
+
+            }
+        }
         $input['order_source'] = "Android";
         Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
 
@@ -1581,7 +1594,7 @@ class CustomerController extends Controller
                 ], 201);
             }
             $checkOutController = new CheckOutController();
-            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption);
+            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption,$orderAttachment);
 
             return response()->json([
                 'sub_total' => $all_sub_total,
@@ -1762,23 +1775,8 @@ class CustomerController extends Controller
         return true;
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption)
+    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption,$orderAttachment)
     {
-
-        $uploadedImages = [];
-
-        if ($input->hasFile('image')) {
-            $images = $input->file('image');
-
-            foreach ($images as $image) {
-                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-
-                $image->move(public_path('order_attachment'), $filename);
-                $uploadedImages[] = $filename;
-
-            }
-        }
-
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
 
@@ -1886,8 +1884,8 @@ class CustomerController extends Controller
             $input['order_id'] = $order->id;
             $input['discount_amount'] = $input['discount'];
 
-            if(!empty($uploadedImages)){
-                foreach ($uploadedImages as $image) {
+            if(!empty($orderAttachment)){
+                foreach ($orderAttachment as $image) {
                     OrderAttachment::create([
                         'image' => $image,
                         'order_id' => $order->id,
