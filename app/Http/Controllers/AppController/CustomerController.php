@@ -2009,7 +2009,7 @@ class CustomerController extends Controller
             $input['user_id'] = $request->userId;
             $input['phone'] = $request->number;
             $input['whatsapp'] = $request->whatsapp;
-            $input['subTitle'] = $request->sub_title;
+            $input['sub_title'] = $request->subTitle;
             Staff::create($input);
             return response()->json([
                 'msg' => "Your request to join the freelancer program has been submitted and sent to the administrator for review.",
