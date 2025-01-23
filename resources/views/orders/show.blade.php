@@ -279,9 +279,11 @@
                 <table class="table table-striped table-bordered album bg-light">
                     <th class="text-left font-weight-bold" colspan="4">Order Attachment</th>
                     <tr>
-                        @foreach ($order->attachment as $attachment)
-                            <td class="text-left"><a href="{{ asset('order-attachment/' .$attachment->image ) }}" target="_blank">{{ $attachment->image }}</a></td>
-                        @endforeach
+                        <td class="text-left">
+                            @foreach ($order->attachment as $attachment)
+                                <a href="{{ asset('order-attachment/' .$attachment->image ) }}" target="_blank">{{ $attachment->image }}</a><br>
+                            @endforeach
+                        </td>
                     </tr>
                 </table>
             @endif
