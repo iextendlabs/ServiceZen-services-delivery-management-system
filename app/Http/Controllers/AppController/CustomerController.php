@@ -1719,7 +1719,7 @@ class CustomerController extends Controller
 
     }
 
-    function checkStaffOrderValue($input, $bookingData, $groupedBookingOption)
+    private function checkStaffOrderValue($input, $bookingData, $groupedBookingOption)
     {
         $staffServices = [];
         foreach ($bookingData as $data) {
@@ -2016,6 +2016,18 @@ class CustomerController extends Controller
             ], 200);
         }else{
             return response()->json(['error' => "You need to create a customer account before joining the freelancer program."],201);
+        }
+    }
+
+    public function getUser($id)
+    {
+        $user = User::find($id);
+        if($user){
+            return response()->json([
+                'user' => $user,
+            ], 200);
+        }else{
+            return response()->json(['error' => "You don't have an account. Please register to continue."],201);
         }
     }
 }

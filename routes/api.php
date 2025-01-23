@@ -81,3 +81,4 @@ Route::post('addNewOrder', [CustomerController::class, 'addNewOrder']);
 Route::post('/create-payment-intent', [StripePaymentController::class, 'stripePost']);
 Route::get('getStaff', [CustomerController::class, 'getStaff']);
 Route::post('/joinFreelancerProgram', [CustomerController::class,'joinFreelancerProgram']);
+Route::get('getUser/{id}', [CustomerController::class, 'getUser'])->name('getUser');
