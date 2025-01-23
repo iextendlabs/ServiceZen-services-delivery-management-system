@@ -80,3 +80,4 @@ Route::post('/apply-affiliate', [CustomerController::class,'applyAffiliate'])->n
 Route::post('addNewOrder', [CustomerController::class, 'addNewOrder']);
 Route::post('/create-payment-intent', [StripePaymentController::class, 'stripePost']);
 Route::get('getStaff', [CustomerController::class, 'getStaff']);
+Route::post('/joinFreelancerProgram', [CustomerController::class,'joinFreelancerProgram']);

@@ -37,6 +37,7 @@ use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
 use App\Models\OrderAttachment;
 use App\Models\ServiceOption;
+use App\Models\Staff;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
 
@@ -1998,5 +1999,23 @@ class CustomerController extends Controller
         return $groupedBooking;
     }
 
-    
+    public function joinFreelancerProgram(Request $request)
+    {
+        $user = User::find($request->userId);
+        if($user){
+            $user->freelancer_program = 0;
+            $user->save();
+
+            $input['user_id'] = $request->userId;
+            $input['number'] = $request->phone;
+            $input['whatsapp'] = $request->whatsapp;
+            $input['subTitle'] = $request->sub_title;
+            Staff::create($input);
+            return response()->json([
+                'msg' => "Your request to join the freelancer program has been submitted and sent to the administrator for review.",
+            ], 200);
+        }else{
+            return response()->json(['error' => "You need to create a customer account before joining the freelancer program."],201);
+        }
+    }
 }
