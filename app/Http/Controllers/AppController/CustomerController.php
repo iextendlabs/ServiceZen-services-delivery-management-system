@@ -1532,17 +1532,6 @@ class CustomerController extends Controller
         $input = $request->all();
         $orderAttachment = [];
 
-        if ($request->hasFile('image')) {
-            $images = $request->file('image');
-
-            foreach ($images as $image) {
-                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-
-                $image->move(public_path('order_attachment'), $filename);
-                $orderAttachment[] = $filename;
-
-            }
-        }
         $input['order_source'] = "Android";
         Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
 
@@ -1594,6 +1583,17 @@ class CustomerController extends Controller
                 ], 201);
             }
             $checkOutController = new CheckOutController();
+            if ($request->hasFile('image')) {
+                $images = $request->file('image');
+    
+                foreach ($images as $image) {
+                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+    
+                    $image->move(public_path('order_attachment'), $filename);
+                    $orderAttachment[] = $filename;
+    
+                }
+            }
             list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption,$orderAttachment);
 
             return response()->json([
@@ -1688,7 +1688,7 @@ class CustomerController extends Controller
             }
         });
      
-        if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
+        if ($input['coupon_code'] != "null" && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
@@ -1826,7 +1826,7 @@ class CustomerController extends Controller
                 }
             });
 
-            if ($input['coupon_code'] && $singleBookingService) {
+            if ($input['coupon_code'] != "null" && $singleBookingService) {
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
@@ -1894,7 +1894,7 @@ class CustomerController extends Controller
             }
     
             OrderTotal::create($input);
-            if (isset($input['coupon_id'])) {
+            if ($input['coupon_id'] !== null) {
                 $input['coupon_id'] = $coupon->id;
                 CouponHistory::create($input);
             }
