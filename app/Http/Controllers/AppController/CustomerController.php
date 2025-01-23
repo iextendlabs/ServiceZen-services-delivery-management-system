@@ -2007,7 +2007,7 @@ class CustomerController extends Controller
             $user->save();
 
             $input['user_id'] = $request->userId;
-            $input['number'] = $request->phone;
+            $input['phone'] = $request->number;
             $input['whatsapp'] = $request->whatsapp;
             $input['subTitle'] = $request->sub_title;
             Staff::create($input);
