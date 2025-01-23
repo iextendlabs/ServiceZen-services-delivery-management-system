@@ -267,11 +267,23 @@
                     </table>
                 @endif
             @endcan
-            @if ($order->order_comment)
+            @if ($order->order_comment && $order->order_comment != "null")
                 <table class="table table-striped table-bordered album bg-light">
                     <th class="text-left font-weight-bold" colspan="4">Order Comment</th>
                     <tr>
                         <td class="text-left">{!! nl2br($order->order_comment) !!}</td>
+                    </tr>
+                </table>
+            @endif
+            @if (count($order->attachment))
+                <table class="table table-striped table-bordered album bg-light">
+                    <th class="text-left font-weight-bold" colspan="4">Order Attachment</th>
+                    <tr>
+                        <td class="text-left">
+                            @foreach ($order->attachment as $attachment)
+                                <a href="{{ asset('order-attachment/' .$attachment->image ) }}" target="_blank">{{ $attachment->image }}</a><br>
+                            @endforeach
+                        </td>
                     </tr>
                 </table>
             @endif

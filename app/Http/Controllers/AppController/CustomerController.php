@@ -35,7 +35,9 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use App\Models\OrderAttachment;
 use App\Models\ServiceOption;
+use App\Models\Staff;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
 
@@ -1529,6 +1531,8 @@ class CustomerController extends Controller
     {
         $password = NULL;
         $input = $request->all();
+        $orderAttachment = [];
+
         $input['order_source'] = "Android";
         Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
 
@@ -1580,7 +1584,18 @@ class CustomerController extends Controller
                 ], 201);
             }
             $checkOutController = new CheckOutController();
-            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption);
+            if ($request->hasFile('image')) {
+                $images = $request->file('image');
+    
+                foreach ($images as $image) {
+                    $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+    
+                    $image->move(public_path('order-attachment'), $filename);
+                    $orderAttachment[] = $filename;
+    
+                }
+            }
+            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption,$orderAttachment);
 
             return response()->json([
                 'sub_total' => $all_sub_total,
@@ -1674,7 +1689,7 @@ class CustomerController extends Controller
             }
         });
      
-        if ($input['coupon_code'] && $all_selected_services->isNotEmpty()) {
+        if ($input['coupon_code'] && $input['coupon_code'] != "null" && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
@@ -1704,7 +1719,7 @@ class CustomerController extends Controller
 
     }
 
-    function checkStaffOrderValue($input, $bookingData, $groupedBookingOption)
+    private function checkStaffOrderValue($input, $bookingData, $groupedBookingOption)
     {
         $staffServices = [];
         foreach ($bookingData as $data) {
@@ -1761,7 +1776,7 @@ class CustomerController extends Controller
         return true;
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption)
+    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption,$orderAttachment)
     {
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
@@ -1812,7 +1827,7 @@ class CustomerController extends Controller
                 }
             });
 
-            if ($input['coupon_code'] && $singleBookingService) {
+            if ($input['coupon_code'] && $input['coupon_code'] != "null" && $singleBookingService) {
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
@@ -1870,6 +1885,15 @@ class CustomerController extends Controller
             $input['order_id'] = $order->id;
             $input['discount_amount'] = $input['discount'];
 
+            if(!empty($orderAttachment)){
+                foreach ($orderAttachment as $image) {
+                    OrderAttachment::create([
+                        'image' => $image,
+                        'order_id' => $order->id,
+                    ]);
+                }
+            }
+    
             OrderTotal::create($input);
             if (isset($input['coupon_id'])) {
                 $input['coupon_id'] = $coupon->id;
@@ -1975,5 +1999,35 @@ class CustomerController extends Controller
         return $groupedBooking;
     }
 
-    
+    public function joinFreelancerProgram(Request $request)
+    {
+        $user = User::find($request->userId);
+        if($user){
+            $user->freelancer_program = 0;
+            $user->save();
+
+            $input['user_id'] = $request->userId;
+            $input['phone'] = $request->number;
+            $input['whatsapp'] = $request->whatsapp;
+            $input['sub_title'] = $request->subTitle;
+            Staff::create($input);
+            return response()->json([
+                'msg' => "Your request to join the freelancer program has been submitted and sent to the administrator for review.",
+            ], 200);
+        }else{
+            return response()->json(['error' => "You need to create a customer account before joining the freelancer program."],201);
+        }
+    }
+
+    public function getUser($id)
+    {
+        $user = User::find($id);
+        if($user){
+            return response()->json([
+                'user' => $user,
+            ], 200);
+        }else{
+            return response()->json(['error' => "You don't have an account. Please register to continue."],201);
+        }
+    }
 }
