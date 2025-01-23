@@ -1589,7 +1589,7 @@ class CustomerController extends Controller
                 foreach ($images as $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
     
-                    $image->move(public_path('order_attachment'), $filename);
+                    $image->move(public_path('order-attachment'), $filename);
                     $orderAttachment[] = $filename;
     
                 }

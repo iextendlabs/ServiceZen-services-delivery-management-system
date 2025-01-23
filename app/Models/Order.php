@@ -317,4 +317,9 @@ class Order extends Model
 
         return [$staff_commission, $affiliate_commission, $affiliate_id, $parent_affiliate_commission, $parent_affiliate_id, $staff_affiliate_commission, $driver_commission, $driver_affiliate_commission];
     }
+
+    public function attachment()
+    {
+        return $this->hasMany(OrderAttachment::class, 'order_id');
+    }
 }
