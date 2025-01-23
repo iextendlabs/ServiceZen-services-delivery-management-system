@@ -1688,7 +1688,7 @@ class CustomerController extends Controller
             }
         });
      
-        if ($input['coupon_code'] != "null" && $all_selected_services->isNotEmpty()) {
+        if ($input['coupon_code'] && $input['coupon_code'] != "null" && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
@@ -1826,7 +1826,7 @@ class CustomerController extends Controller
                 }
             });
 
-            if ($input['coupon_code'] != "null" && $singleBookingService) {
+            if ($input['coupon_code'] && $input['coupon_code'] != "null" && $singleBookingService) {
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
@@ -1894,7 +1894,7 @@ class CustomerController extends Controller
             }
     
             OrderTotal::create($input);
-            if ($input['coupon_id'] !== null) {
+            if (isset($input['coupon_id'])) {
                 $input['coupon_id'] = $coupon->id;
                 CouponHistory::create($input);
             }
