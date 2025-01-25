@@ -287,6 +287,8 @@
         <main class="py-4">
                 @yield('content')
         </main>
+        <div id="addToCartPopup"></div>
+
     </div>
     <footer class="text-muted">
         <div class="container">

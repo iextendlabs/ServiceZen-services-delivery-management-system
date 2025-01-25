@@ -931,7 +931,7 @@ class CustomerController extends Controller
     public function getCustomerCoupon(Request $request)
     {
         $user = User::find($request->user_id);
-        $coupons = $user->coupons;
+        $coupons = $user->coupons ?? [];
 
         return response()->json([
             'coupons' => $coupons

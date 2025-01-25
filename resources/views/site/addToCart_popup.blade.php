@@ -10,21 +10,26 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ route('addToCartServicesStaff') }}" method="POST">
+            <form action="{{ route($action) }}" method="POST">
                 <div class="modal-body">
                     @csrf
-                    <input type="hidden" name="option_id" value="{{ $option_id }}">
-                    <input type="hidden" id="addToCartModalServices" name="service_id" value="{{ $serviceIds[0] }}">
+                    <input type="hidden" name="option_id" value="{{ isset($option_id) ? $option_id : '' }}">
+                    <input type="hidden" id="addToCartModalServices" name="service_id" value="{{ isset($serviceIds[0]) ? $serviceIds[0] : '' }}">
+                    <input type="hidden" name="order_ids" value="{{ isset($order_ids) ? $order_ids : '' }}">
                     <div id="slots-container" class="col-md-12">
                         @include('site.checkOut.timeSlots')
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-block btn-primary">Book</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+    $('.close').click(function () {
+        $('#addToCartModal').modal('hide'); 
+    });
+</script>
 <script src="{{ asset('js/checkout.js') }}?v={{ config('app.version') }}"></script>
