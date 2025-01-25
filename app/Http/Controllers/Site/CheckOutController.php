@@ -80,56 +80,68 @@ class CheckOutController extends Controller
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
-    public function addToCartModal(Request $request, $serviceId)
+    public function addToCartModal(Request $request, $id)
     {
-        $serviceIds = [$serviceId];
-        $address = NULL;
-
-        try {
-            $address = json_decode($request->cookie('address'), true);
-        } catch (\Throwable $th) {
-        }
-
-        $addresses = [
-            'area' => $address['area'] ?? '',
-        ];
-
-        $date = date('Y-m-d');
-        $area = $address['area'] ?? '';
-
-        [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
-
-        if ($address && $address['area']) {
-            $zoneShow = 0;
-        } else {
+        if($request->bulk == true){
+            $order_ids = $id;
+            $date = date('Y-m-d');
+            $area = '';
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date, null, null,$isAdmin=true);
             $zoneShow = 1;
-        }
+            $action = "bulkOrderBooking";
+            return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones',  'zoneShow','isAdmin','order_ids','action'));
+        }else{
+            $serviceIds = [$id];
+            $address = NULL;
 
-        $bookingData = Session::get('bookingData', []);
+            try {
+                $address = json_decode($request->cookie('address'), true);
+            } catch (\Throwable $th) {
+            }
 
-        $selected_key = null;
-        $selected_booking = null;
-        $option_id = null;
-        if (count($bookingData) > 0) {
-            foreach ($bookingData as $index => $booking) {
-                if ($booking['service_id'] == $serviceId) {
-                    $selected_key = $index;
-                    break;
+            $addresses = [
+                'area' => $address['area'] ?? '',
+            ];
+
+            $date = date('Y-m-d');
+            $area = $address['area'] ?? '';
+
+            [$timeSlots, $staff_ids, $holiday, $staffZone, $allZones,$isAdmin] = TimeSlot::getTimeSlotsForArea($area, $date, $order = null, $serviceIds);
+
+            if ($address && $address['area']) {
+                $zoneShow = 0;
+            } else {
+                $zoneShow = 1;
+            }
+
+            $bookingData = Session::get('bookingData', []);
+
+            $selected_key = null;
+            $selected_booking = null;
+            $option_id = null;
+            if (count($bookingData) > 0) {
+                foreach ($bookingData as $index => $booking) {
+                    if ($booking['service_id'] == $id) {
+                        $selected_key = $index;
+                        break;
+                    }
+                }
+                if (isset($selected_key)) {
+                    $selected_booking = $bookingData[$selected_key];
+                    if(isset($bookingData[$selected_key]['option_id']) && is_array($bookingData[$selected_key]['option_id'])){
+                        $optionIds = $bookingData[$selected_key]['option_id'];
+                        $option_id = implode(',', $optionIds);
+                    }
                 }
             }
-            if (isset($selected_key)) {
-                $selected_booking = $bookingData[$selected_key];
-                if(isset($bookingData[$selected_key]['option_id']) && is_array($bookingData[$selected_key]['option_id'])){
-                    $optionIds = $bookingData[$selected_key]['option_id'];
-                    $option_id = implode(',', $optionIds);
-                }
+            if($request->option_id !== "null"){
+                $option_id = $request->option_id;
             }
-        }
-        if($request->option_id !== "null"){
-            $option_id = $request->option_id;
-        }
+            $action = "addToCartServicesStaff";
 
-        return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'serviceIds', 'zoneShow', 'selected_booking','option_id','isAdmin'));
+            return view('site.addToCart_popup', compact('timeSlots', 'area', 'staff_ids', 'holiday', 'staffZone', 'allZones', 'serviceIds', 'zoneShow', 'selected_booking','option_id','isAdmin','action'));
+        }
+        
     }
 
     public function addToCartServicesStaff(Request $request)

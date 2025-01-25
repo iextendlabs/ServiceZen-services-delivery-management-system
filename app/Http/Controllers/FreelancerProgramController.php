@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Models\Staff;
 use App\Models\StaffImages;
 use App\Models\StaffYoutubeVideo;
+use App\Models\TimeSlotToStaff;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -112,7 +113,7 @@ class FreelancerProgramController extends Controller
             $user->categories()->detach();
 
             $staff->delete();
-
+            TimeSlotToStaff::where('staff_id',$id)->delete();
             $user->freelancer_program = 0;
             $user->update();
             $user->removeRole("Staff");

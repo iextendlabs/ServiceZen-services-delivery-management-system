@@ -4,10 +4,19 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="row">
-                    <div class="col-md-8 d-flex align-items-center">
+                    <div class="col-md-6 d-flex align-items-center">
                         <h2>Orders</h2>
                     </div>
-                    
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <strong>Bulk Booking Update:</strong>
+                            <div>
+                                <button id="bulkBookingUpdateBtn" class="btn btn-success" type="button">
+                                    <i class="fa fa-book"></i> Update Bookings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         @can('order-edit')
                             <div class="mb-3">
@@ -339,6 +348,24 @@
             }
         } else {
             alert('Please select at least one order and choose a status to update.');
+        }
+    });
+
+    $('#bulkBookingUpdateBtn').click(function () {
+        const selectedItems = getSelectedItems();
+
+        if (selectedItems.length > 0) {
+            $.ajax({
+                url: '/addToCartModal/' + selectedItems+"?bulk=true",
+                type: 'GET',
+                success: function(response) {
+                    $('#addToCartPopup').html(response);
+                    $('#addToCartModal').modal('show');
+                }
+            });
+            
+        } else {
+            alert('Please select at least one order to update order booking.');
         }
     });
 

@@ -614,6 +614,18 @@ class OrderController extends Controller
 
         $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
         
+        if($input['driver_id'] != $order->driver_id){
+            if ($order->driver && $order->driver->driver) {
+                if ($order->driver->driver->commission) {
+                    Transaction::where('order_id', $order->id)->where('user_id',$order->driver_id)->where('type','Order Driver Commission')->delete();
+                }
+    
+                if ($order->driver->driver->affiliate) {
+                    Transaction::where('order_id', $order->id)->where('user_id',$order->driver->driver->affiliate_id)->where('type','Order Driver Affiliate Commission')->delete();
+                }
+            }
+        }
+        
         $order->update($input);
         $order = Order::findOrFail($id);
 
@@ -1185,6 +1197,95 @@ class OrderController extends Controller
             return response()->json(['message' => 'Selected order status updated successfully.']);
         } else {
             return response()->json(['message' => 'No order selected.']);
+        }
+    }
+
+    public function bulkOrderBooking(Request $request)
+    {
+        if (!$request->time_slot_id || !isset($request->time_slot_id[$request->service_staff_id])) {
+            return back()->with('error', 'please select available staff and time slot first ');  
+        }
+        $order_ids = explode(',', $request->order_ids);
+        $input = $request->all();
+        $input['time_slot_id'] = $request->time_slot_id[$request->service_staff_id];
+        $staff_id = $input['service_staff_id'] = $request->service_staff_id;
+        $time_slot = TimeSlot::find($input['time_slot_id']);
+        $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
+        $input['time_start'] = $time_slot->time_start;
+        $input['time_end'] = $time_slot->time_end;
+        $staff = User::find($staff_id);
+        $input['staff_name'] = $staff->name;
+        $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
+
+        if (!empty($order_ids)) {
+
+            foreach ($order_ids as $order_id) {
+                $order = Order::findOrFail($order_id);
+                $old_order = $order->getOriginal();
+                
+                if($order->service_staff_id != $request->service_staff_id){
+                    if ($order->staff) {
+                        Transaction::where('order_id', $order->id)->where('user_id',$order->service_staff_id)->where('type','Order Staff Commission')->delete();
+                    }
+            
+                    if ($order->staff && $order->staff->affiliate && $order->staff->affiliate->affiliate) {
+                        Transaction::where('order_id', $order->id)->where('user_id',$order->staff->affiliate_id)->where('type','Order Staff Affiliate Commission')->delete();
+                    }
+                }
+
+                if($input['driver_id'] != $order->driver_id){
+                    if ($order->driver && $order->driver->driver) {
+                        if ($order->driver->driver->commission) {
+                            Transaction::where('order_id', $order->id)->where('user_id',$order->driver_id)->where('type','Order Driver Commission')->delete();
+                        }
+            
+                        if ($order->driver->driver->affiliate) {
+                            Transaction::where('order_id', $order->id)->where('user_id',$order->driver->driver->affiliate_id)->where('type','Order Driver Affiliate Commission')->delete();
+                        }
+                    }
+                }
+
+                $order->update($input);
+                $order = Order::findOrFail($order_id);
+
+                if ($order->staff->charges) {
+
+                    $order->total_amount = $order->total_amount - $order->order_total->staff_charges + $order->staff->charges;
+                    $order->save();
+                    $order->order_total->staff_charges = $order->staff->charges;
+                    $order->order_total->save();
+                }
+
+                if (Carbon::now()->toDateString() == $request->date) {
+                    if ($old_order['date'] != $request->date) {
+                        if ($order->staff && $order->staff->user) {
+                            $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                        }
+        
+                        if ($order->driver) {
+                            $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                        }
+                    }elseif($old_order['service_staff_id'] != $order->service_staff_id){
+                        if ($order->staff && $order->staff->user) {
+                            $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                        }
+                        if ($order->driver) {
+                            $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                        }
+                    }elseif ($old_order['time_slot_id'] != $order->time_slot_id) {
+                        if ($order->staff && $order->staff->user) {
+                            $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $order_id);
+                        }
+        
+                        if ($order->driver) {
+                            $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $order_id);
+                        }
+                    }
+                }
+            }
+            return back()->with('success', 'Selected order booking updated successfully.');  
+        } else {
+            return back()->with('error', 'No order selected.');  
         }
     }
 }
