@@ -112,9 +112,21 @@ class StaffAppController2 extends Controller
 
             $token = $user->createToken('app-token')->plainTextToken;
 
+            $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
+            $notifications = Notification::where('user_id', $user->id)
+            ->orderBy('id', 'desc')
+            ->limit($notification_limit)
+            ->get();
+
+            $notifications->map(function ($notification) use ($user) {
+                $notification->type = "Old";
+                return $notification;
+            });
+
             return response()->json([
                 'user' => $user,
                 'access_token' => $token,
+                'notifications' => $notifications
             ], 200);
         }
 
@@ -276,23 +288,31 @@ class StaffAppController2 extends Controller
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
-
+        
         if (!$notifications->isEmpty()) {
-
-            $notifications->map(function ($notification) use ($user) {
-                if ($notification->id > $user->last_notification_id) {
-                    $notification->type = "New";
-                } else {
+            if($request->update){
+                $notifications->map(function ($notification) use ($user) {
                     $notification->type = "Old";
-                }
-                return $notification;
-            });
-
-            $user->last_notification_id = $notifications->first()->id;
-            $user->save();
+                    return $notification;
+                });
+                
+                $user->last_notification_id = $notifications->first()->id;
+                $user->save();
+            }else{
+                $notifications->map(function ($notification) use ($user) {
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
+                    return $notification;
+                });
+            }
         }
 
-        return response()->json($notifications);
+        return response()->json([
+            'notifications' => $notifications
+        ], 200);
     }
 
     public function addShortHoliday(Request $request)
