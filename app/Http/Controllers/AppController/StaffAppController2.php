@@ -292,7 +292,11 @@ class StaffAppController2 extends Controller
         if (!$notifications->isEmpty()) {
             if($request->update){
                 $notifications->map(function ($notification) use ($user) {
-                    $notification->type = "Old";
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
                     return $notification;
                 });
                 
