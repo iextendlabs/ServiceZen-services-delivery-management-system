@@ -436,7 +436,7 @@ class StaffAppController2 extends Controller
         $orders_data = Order::where('service_staff_id', $request->user_id)
             ->whereNot('status', "Draft")
             ->where('date', '<=', $currentDate)
-            ->select('id', 'status', 'total_amount', 'date', 'time_slot_value')
+            ->select('id', 'status', 'total_amount', 'date', 'time_slot_value','created_at')
             ->get();
 
         return response()->json([
