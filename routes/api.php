@@ -44,6 +44,7 @@ Route::post('driverLogin', [DriverAppController::class, 'login']);
 Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orderDriverStatusUpdate']);
 Route::post('updateToken', [DriverAppController::class, 'updateToken']);
 Route::post('addShortHoliday', [StaffAppController2::class, 'addShortHoliday']);
+Route::get('index', [StaffAppController2::class, 'index']);
 
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);

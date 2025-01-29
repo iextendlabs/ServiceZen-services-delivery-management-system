@@ -356,4 +356,45 @@ class StaffAppController2 extends Controller
             }
         }
     }
+
+    public function index(Request $request)
+    {
+        $user = User::find($request->user_id);
+        $staff = $user->staff;
+        $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+
+        $currentMonth = Carbon::now()->format('F'); // Get current month name
+
+        $product_sales = Transaction::where('type', 'Product Sale')
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->where('user_id', $request->user_id)
+            ->sum('amount');
+
+        $bonus = Transaction::where('type', 'Bonus')
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->where('user_id', $request->user_id)
+            ->sum('amount');
+
+        
+        return response()->json([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'status' => $user->status,
+            'staff_membership_plan' => $staff->membershipPlan->name ?? null,
+            'commission' => $staff->commission ?? null,
+            'fix_salary' => $staff->fix_salary ?? null,
+            'image' => $staff->image ?? null,
+            'charge' => $staff->charges ?? null,
+            'sub_title' => $staff->sub_title ?? null,
+            'expiry_date' => $staff->expiry_date ?? null,
+            'location' => $staff->location ?? null,
+            'nationality' => $staff->nationality ?? null,
+            'total_balance' => $total_balance,
+            'product_sales' => $product_sales,
+            'bonus' => $bonus,
+            'current_month' => $currentMonth
+        ], 200);
+    }
+
 }
