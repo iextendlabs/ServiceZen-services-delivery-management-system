@@ -398,4 +398,12 @@ class StaffAppController2 extends Controller
         ], 200);
     }
 
+    public function getTransactions(Request $request)
+    {
+        $transactions = Transaction::where('user_id', $request->user_id)->latest()->get();
+
+        return response()->json([
+            'transactions' => $transactions,
+        ], 200);
+    }
 }
