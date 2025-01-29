@@ -437,7 +437,7 @@ class StaffAppController2 extends Controller
             ->whereNot('status', "Draft")
             ->where('date', '<=', $currentDate)
             ->select('id', 'status', 'total_amount', 'date', 'time_slot_value','created_at')
-            ->get();
+            ->latest()->get();
 
         return response()->json([
             'orders' => $orders_data,
