@@ -11,12 +11,16 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Holiday;
+use App\Models\LongHoliday;
 use App\Models\Notification;
 use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\OrderHistory;
 use App\Models\ShortHoliday;
+use App\Models\StaffGeneralHoliday;
+use App\Models\StaffHoliday;
 use App\Models\UserAffiliate;
 
 class StaffAppController2 extends Controller
@@ -277,7 +281,6 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Cash Collected Successfully']);
     }
 
-
     public function notification(Request $request)
     {
         $user = User::find($request->user_id);
@@ -408,6 +411,23 @@ class StaffAppController2 extends Controller
 
         return response()->json([
             'transactions' => $transactions,
+        ], 200);
+    }
+
+    public function getHolidays(Request $request)
+    {
+        $holiday = Holiday::where('date', '>=', Carbon::now()->format('Y-m-d'))->get();
+        $long_holiday = LongHoliday::where('date_start', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+        $short_holiday = ShortHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+        $staff_general_holidays = StaffGeneralHoliday::where('staff_id',$request->user_id)->get();
+        $staff_holidays = StaffHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+
+        return response()->json([
+            'holiday' => $holiday,
+            'long_holiday' => $long_holiday,
+            'short_holiday' => $short_holiday,
+            'staff_general_holidays' => $staff_general_holidays,
+            'staff_holidays' => $staff_holidays,
         ], 200);
     }
 }

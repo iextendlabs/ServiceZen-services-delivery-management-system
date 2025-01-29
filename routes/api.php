@@ -46,6 +46,7 @@ Route::post('updateToken', [DriverAppController::class, 'updateToken']);
 Route::post('addShortHoliday', [StaffAppController2::class, 'addShortHoliday']);
 Route::get('index', [StaffAppController2::class, 'index']);
 Route::get('getTransactions', [StaffAppController2::class, 'getTransactions']);
+Route::get('getHolidays', [StaffAppController2::class, 'getHolidays']);
 
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);
