@@ -381,7 +381,7 @@ class StaffAppController2 extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'status' => $user->status,
-            'staff_membership_plan' => $staff->membershipPlan->name ?? null,
+            'staff_membership_plan' => $staff->membershipPlan ?? null,
             'commission' => $staff->commission ?? null,
             'fix_salary' => $staff->fix_salary ?? null,
             'image' => $staff->image ?? null,
