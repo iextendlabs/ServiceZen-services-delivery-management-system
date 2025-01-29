@@ -38,11 +38,9 @@ class StaffAppController2 extends Controller
         $currentDate = Carbon::today();
 
         if ($request->status == 'Complete') {
-            $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
+                $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
                 ->where(function ($query) {
-                    // Filter orders with cash collection status not approved
                     $query->where('cash_collections.status', '!=', 'approved')
-                        // Filter orders without any associated cash collection
                         ->orWhereNull('cash_collections.status');
                 })
                 ->where('orders.service_staff_id', $request->user_id)
@@ -430,4 +428,20 @@ class StaffAppController2 extends Controller
             'staff_holidays' => $staff_holidays,
         ], 200);
     }
+
+    public function getOrders(Request $request)
+    {
+        $currentDate = Carbon::today();
+
+        $orders_data = Order::where('service_staff_id', $request->user_id)
+            ->whereNot('status', "Draft")
+            ->where('date', '<=', $currentDate)
+            ->select('id', 'status', 'total_amount', 'date', 'time_slot_value')
+            ->get();
+
+        return response()->json([
+            'orders' => $orders_data,
+        ], 200);
+    }
+
 }
