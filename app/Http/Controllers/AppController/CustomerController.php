@@ -1877,8 +1877,8 @@ class CustomerController extends Controller
             $input['payment_method'] = $input['payment_method'] ?? "Cash-On-Delivery";
             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
             
-            $input['latitude'] = $input['latitude'] ?? '';
-            $input['longitude'] = $input['longitude'] ?? '';
+            $input['latitude'] = $input['latitude'] == "null" ? '' : $input['latitude'];
+            $input['longitude'] = $input['longitude'] == "null" ? '' : $input['longitude'];
 
             $order = Order::create($input);
             $order_ids[] = $order->id;
