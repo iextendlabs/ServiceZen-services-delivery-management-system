@@ -11,12 +11,16 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Holiday;
+use App\Models\LongHoliday;
 use App\Models\Notification;
 use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\OrderHistory;
 use App\Models\ShortHoliday;
+use App\Models\StaffGeneralHoliday;
+use App\Models\StaffHoliday;
 use App\Models\UserAffiliate;
 
 class StaffAppController2 extends Controller
@@ -34,11 +38,9 @@ class StaffAppController2 extends Controller
         $currentDate = Carbon::today();
 
         if ($request->status == 'Complete') {
-            $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
+                $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
                 ->where(function ($query) {
-                    // Filter orders with cash collection status not approved
                     $query->where('cash_collections.status', '!=', 'approved')
-                        // Filter orders without any associated cash collection
                         ->orWhereNull('cash_collections.status');
                 })
                 ->where('orders.service_staff_id', $request->user_id)
@@ -112,9 +114,21 @@ class StaffAppController2 extends Controller
 
             $token = $user->createToken('app-token')->plainTextToken;
 
+            $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
+            $notifications = Notification::where('user_id', $user->id)
+            ->orderBy('id', 'desc')
+            ->limit($notification_limit)
+            ->get();
+
+            $notifications->map(function ($notification) use ($user) {
+                $notification->type = "Old";
+                return $notification;
+            });
+
             return response()->json([
                 'user' => $user,
                 'access_token' => $token,
+                'notifications' => $notifications
             ], 200);
         }
 
@@ -192,10 +206,13 @@ class StaffAppController2 extends Controller
         ]);
 
         $title = "Order. $order->id . Update";
+        if($order->driver){
+            $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
+        }
 
-        $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
-
-        return response()->json(['success' => 'Order Update Successfully']);
+        return response()->json([
+            'success' => "Order Update Successfully",
+        ], 200);
     }
 
     public function timeSlots(Request $request)
@@ -265,7 +282,6 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Cash Collected Successfully']);
     }
 
-
     public function notification(Request $request)
     {
         $user = User::find($request->user_id);
@@ -276,23 +292,35 @@ class StaffAppController2 extends Controller
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
-
+        
         if (!$notifications->isEmpty()) {
-
-            $notifications->map(function ($notification) use ($user) {
-                if ($notification->id > $user->last_notification_id) {
-                    $notification->type = "New";
-                } else {
-                    $notification->type = "Old";
-                }
-                return $notification;
-            });
-
-            $user->last_notification_id = $notifications->first()->id;
-            $user->save();
+            if($request->update){
+                $notifications->map(function ($notification) use ($user) {
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
+                    return $notification;
+                });
+                
+                $user->last_notification_id = $notifications->first()->id;
+                $user->save();
+            }else{
+                $notifications->map(function ($notification) use ($user) {
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
+                    return $notification;
+                });
+            }
         }
 
-        return response()->json($notifications);
+        return response()->json([
+            'notifications' => $notifications
+        ], 200);
     }
 
     public function addShortHoliday(Request $request)
@@ -336,4 +364,87 @@ class StaffAppController2 extends Controller
             }
         }
     }
+
+    public function index(Request $request)
+    {
+        $user = User::find($request->user_id);
+        $staff = $user->staff;
+        $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+
+        $currentMonth = Carbon::now()->format('F'); // Get current month name
+
+        $product_sales = Transaction::where('type', 'Product Sale')
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->where('user_id', $request->user_id)
+            ->sum('amount');
+
+        $bonus = Transaction::where('type', 'Bonus')
+            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->where('user_id', $request->user_id)
+            ->sum('amount');
+
+        
+        return response()->json([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'number' => $staff->phone,
+            'status' => $user->status,
+            'staff_membership_plan' => $staff->membershipPlan ?? null,
+            'commission' => $staff->commission ?? null,
+            'fix_salary' => $staff->fix_salary ?? null,
+            'image' => $staff->image ?? null,
+            'charge' => $staff->charges ?? null,
+            'sub_title' => $staff->sub_title ?? null,
+            'expiry_date' => $staff->expiry_date ?? null,
+            'location' => $staff->location ?? null,
+            'nationality' => $staff->nationality ?? null,
+            'total_balance' => $total_balance,
+            'product_sales' => $product_sales,
+            'bonus' => $bonus,
+            'current_month' => $currentMonth
+        ], 200);
+    }
+
+    public function getTransactions(Request $request)
+    {
+        $transactions = Transaction::where('user_id', $request->user_id)->latest()->get();
+
+        return response()->json([
+            'transactions' => $transactions,
+        ], 200);
+    }
+
+    public function getHolidays(Request $request)
+    {
+        $holiday = Holiday::where('date', '>=', Carbon::now()->format('Y-m-d'))->get();
+        $long_holiday = LongHoliday::where('date_start', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+        $short_holiday = ShortHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+        $staff_general_holidays = StaffGeneralHoliday::where('staff_id',$request->user_id)->get();
+        $staff_holidays = StaffHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+
+        return response()->json([
+            'holiday' => $holiday,
+            'long_holiday' => $long_holiday,
+            'short_holiday' => $short_holiday,
+            'staff_general_holidays' => $staff_general_holidays,
+            'staff_holidays' => $staff_holidays,
+        ], 200);
+    }
+
+    public function getOrders(Request $request)
+    {
+        $currentDate = Carbon::today();
+
+        $orders_data = Order::where('service_staff_id', $request->user_id)
+            ->whereNot('status', "Draft")
+            ->where('date', '<=', $currentDate)
+            ->select('id', 'status', 'total_amount', 'date', 'time_slot_value','created_at')
+            ->latest()->get();
+
+        return response()->json([
+            'orders' => $orders_data,
+        ], 200);
+    }
+
 }

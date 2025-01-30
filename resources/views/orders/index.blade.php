@@ -7,18 +7,19 @@
                     <div class="col-md-6 d-flex align-items-center">
                         <h2>Orders</h2>
                     </div>
-                    <div class="col-md-2">
-                        <div class="mb-3">
-                            <strong>Bulk Booking Update:</strong>
-                            <div>
-                                <button id="bulkBookingUpdateBtn" class="btn btn-success" type="button">
-                                    <i class="fa fa-book"></i> Update Bookings
-                                </button>
+                    @can('order-edit')
+
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <strong>Bulk Booking Update:</strong>
+                                <div>
+                                    <button id="bulkBookingUpdateBtn" class="btn btn-success" type="button">
+                                        <i class="fa fa-book"></i> Update Bookings
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        @can('order-edit')
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <strong>Bulk Order Status Update:</strong>
                                 <div class="input-group">
@@ -56,8 +57,8 @@
                                     </div>
                                 </div>
                             </div>
-                        @endcan
-                    </div>
+                        </div>
+                    @endcan
                 </div>
             </div>
             <div class="col-md-12 mb-3">
