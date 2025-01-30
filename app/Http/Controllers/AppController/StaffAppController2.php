@@ -209,7 +209,9 @@ class StaffAppController2 extends Controller
 
         $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
 
-        return response()->json(['success' => 'Order Update Successfully']);
+        return response()->json([
+            'success' => "Order Update Successfully",
+        ], 200);
     }
 
     public function timeSlots(Request $request)
