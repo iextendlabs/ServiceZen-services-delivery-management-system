@@ -69,6 +69,8 @@ class StaffAppController extends Controller
             } else {
                 $order->driver_name = "N/A";
             }
+            $order->attachments = $order->attachment->pluck('image')->toArray() ?? [];
+
             return $order;
         });
 
