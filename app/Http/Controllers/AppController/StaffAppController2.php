@@ -206,8 +206,9 @@ class StaffAppController2 extends Controller
         ]);
 
         $title = "Order. $order->id . Update";
-
-        $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
+        if($order->driver){
+            $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
+        }
 
         return response()->json([
             'success' => "Order Update Successfully",
