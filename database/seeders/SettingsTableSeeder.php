@@ -183,6 +183,14 @@ class SettingsTableSeeder extends Seeder
                 'value' => '',
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',
+            ],
+            
+            [
+                'id' => 25,
+                'key' => 'Staff Withdraw Payment Method',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
             ]
         ];
 

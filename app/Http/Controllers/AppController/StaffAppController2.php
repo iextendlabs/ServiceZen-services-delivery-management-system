@@ -22,6 +22,8 @@ use App\Models\ShortHoliday;
 use App\Models\StaffGeneralHoliday;
 use App\Models\StaffHoliday;
 use App\Models\UserAffiliate;
+use App\Models\Withdraw;
+use Illuminate\Support\Facades\Hash;
 
 class StaffAppController2 extends Controller
 
@@ -389,7 +391,9 @@ class StaffAppController2 extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'number' => $staff->phone,
+            'whatsapp' => $staff->whatsapp,
             'status' => $user->status,
+            'online' => $staff->online,
             'staff_membership_plan' => $staff->membershipPlan ?? null,
             'commission' => $staff->commission ?? null,
             'fix_salary' => $staff->fix_salary ?? null,
@@ -447,4 +451,96 @@ class StaffAppController2 extends Controller
         ], 200);
     }
 
+    public function getWithdrawPaymentMethods(Request $request)
+    {
+        $setting = Setting::where('key', 'Staff Withdraw Payment Method')->first();
+        $payment_methods = explode(',', $setting->value);
+        $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+
+        return response()->json([
+            'payment_methods' => $payment_methods,
+            'total_balance' => $total_balance,
+        ], 200);
+    }
+
+    public function withdraw(Request $request)
+    {
+        $withdraws = Withdraw::where('user_id', $request->user_id)->where('status', 'Un Approved')->get();
+
+        if($withdraws->count() > 0){
+            return response()->json([
+                'msg' => "You have already a withdraw request pending.",
+            ], 201);
+        }
+
+        $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+        $user = User::find($request->user_id);
+
+        if ($request->amount > 0 && $request->amount > $total_balance) {
+            return response()->json([
+                'msg' => "Your withdraw amount is greater than your total balance. Total balance: " . $total_balance,
+            ], 201);
+        }else{
+            $input = $request->all();
+
+            $input['amount'] = $request->amount;
+            $input['status'] = "Un Approved";
+            $input['user_id'] = $user->id;
+            $input['user_name'] = $user->name;
+            Withdraw::create($input);
+
+            return response()->json([
+                'msg' => "Withdraw request created successfully.",
+            ], 200);
+        }
+    }
+
+    public function getWithdraws(Request $request)
+    {
+        $withdraws = Withdraw::where('user_id', $request->user_id)->latest()->get();
+
+        return response()->json([
+            'withdraws' => $withdraws,
+        ], 200);
+    }
+
+    public function updateProfile(Request $request)
+    {
+
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 201);
+        }
+
+        $staff = $user->staff;
+
+        if (!$staff) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 201);
+        }
+
+        $user->email = $request->input('email');
+        if ($request->input('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+        $user->save();
+
+        $staff->phone = $request->input('phone');
+        $staff->whatsapp = $request->input('whatsapp');
+        $staff->location = $request->input('location');
+        $staff->nationality = $request->input('nationality');
+        $staff->sub_title = $request->input('subtitle');
+        $staff->online = $request->input('online') ? 1 : 0;
+        $staff->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
+            'data' => $user
+        ], 200);
+    }
 }
