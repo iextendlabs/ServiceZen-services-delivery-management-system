@@ -474,7 +474,7 @@ class StaffAppController2 extends Controller
         $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
         $user = User::find($request->user_id);
 
-        if ($request->amount > $total_balance) {
+        if ($request->amount > 0 && $request->amount > $total_balance) {
             return response()->json([
                 'msg' => "Your withdraw amount is greater than your total balance. Total balance: " . $total_balance,
             ], 201);
@@ -491,5 +491,14 @@ class StaffAppController2 extends Controller
                 'msg' => "Withdraw request created successfully.",
             ], 200);
         }
+    }
+
+    public function getWithdraws(Request $request)
+    {
+        $withdraws = Withdraw::where('user_id', $request->user_id)->latest()->get();
+
+        return response()->json([
+            'withdraws' => $withdraws,
+        ], 200);
     }
 }
