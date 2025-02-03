@@ -23,6 +23,7 @@ use App\Models\StaffGeneralHoliday;
 use App\Models\StaffHoliday;
 use App\Models\UserAffiliate;
 use App\Models\Withdraw;
+use Illuminate\Support\Facades\Hash;
 
 class StaffAppController2 extends Controller
 
@@ -500,6 +501,46 @@ class StaffAppController2 extends Controller
 
         return response()->json([
             'withdraws' => $withdraws,
+        ], 200);
+    }
+
+    public function updateProfile(Request $request)
+    {
+
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 201);
+        }
+
+        $staff = $user->staff;
+
+        if (!$staff) {
+            return response()->json([
+                'message' => 'User not found',
+            ], 201);
+        }
+
+        $user->email = $request->input('email');
+        if ($request->input('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+        $user->save();
+
+        $staff->phone = $request->input('phone');
+        $staff->whatsapp = $request->input('whatsapp');
+        $staff->location = $request->input('location');
+        $staff->nationality = $request->input('nationality');
+        $staff->sub_title = $request->input('subtitle');
+        $staff->online = $request->input('online') ? 1 : 0;
+        $staff->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
+            'data' => $user
         ], 200);
     }
 }
