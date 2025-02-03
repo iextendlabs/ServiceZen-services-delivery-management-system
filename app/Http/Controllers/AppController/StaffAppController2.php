@@ -22,6 +22,7 @@ use App\Models\ShortHoliday;
 use App\Models\StaffGeneralHoliday;
 use App\Models\StaffHoliday;
 use App\Models\UserAffiliate;
+use App\Models\Withdraw;
 
 class StaffAppController2 extends Controller
 
@@ -390,6 +391,7 @@ class StaffAppController2 extends Controller
             'email' => $user->email,
             'number' => $staff->phone,
             'status' => $user->status,
+            'online' => $staff->online,
             'staff_membership_plan' => $staff->membershipPlan ?? null,
             'commission' => $staff->commission ?? null,
             'fix_salary' => $staff->fix_salary ?? null,
@@ -447,4 +449,47 @@ class StaffAppController2 extends Controller
         ], 200);
     }
 
+    public function getWithdrawPaymentMethods(Request $request)
+    {
+        $setting = Setting::where('key', 'Staff Withdraw Payment Method')->first();
+        $payment_methods = explode(',', $setting->value);
+        $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+
+        return response()->json([
+            'payment_methods' => $payment_methods,
+            'total_balance' => $total_balance,
+        ], 200);
+    }
+
+    public function withdraw(Request $request)
+    {
+        $withdraws = Withdraw::where('user_id', $request->user_id)->where('status', 'Un Approved')->get();
+
+        if($withdraws->count() > 0){
+            return response()->json([
+                'msg' => "You have already a withdraw request pending.",
+            ], 201);
+        }
+
+        $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+        $user = User::find($request->user_id);
+
+        if ($request->amount > $total_balance) {
+            return response()->json([
+                'msg' => "Your withdraw amount is greater than your total balance. Total balance: " . $total_balance,
+            ], 201);
+        }else{
+            $input = $request->all();
+
+            $input['amount'] = $request->amount;
+            $input['status'] = "Un Approved";
+            $input['user_id'] = $user->id;
+            $input['user_name'] = $user->name;
+            Withdraw::create($input);
+
+            return response()->json([
+                'msg' => "Withdraw request created successfully.",
+            ], 200);
+        }
+    }
 }
