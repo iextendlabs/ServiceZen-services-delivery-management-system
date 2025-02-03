@@ -48,7 +48,8 @@ Route::get('index', [StaffAppController2::class, 'index']);
 Route::get('getTransactions', [StaffAppController2::class, 'getTransactions']);
 Route::get('getHolidays', [StaffAppController2::class, 'getHolidays']);
 Route::get('getStaffOrders', [StaffAppController2::class, 'getOrders']);
-Route::post('getWithdrawPaymentMethods', [StaffAppController2::class, 'getWithdrawPaymentMethods']);
+Route::get('getWithdrawPaymentMethods', [StaffAppController2::class, 'getWithdrawPaymentMethods']);
+Route::post('withdraw', [StaffAppController2::class, 'withdraw']);
 
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);
