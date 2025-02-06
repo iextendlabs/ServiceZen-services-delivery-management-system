@@ -311,3 +311,14 @@ function openBookingPopup(serviceId, option_id = null) {
         }
     });
 }
+
+function openQuotePopup(serviceId) {
+    $.ajax({
+        url: '/quoteModal/' + serviceId,
+        type: 'GET',
+        success: function(response) {
+            $('#quotePopup').html(response);
+            $('#quoteModal').modal('show');
+        }
+    });
+}

@@ -190,6 +190,9 @@
                                 @can('membership-plan-list')
                                 <a class="dropdown-item" href="{{ route('membershipPlans.index') }}">Membership Plans</a>
                                 @endcan
+                                @can('quote-list')
+                                <a class="dropdown-item" href="{{ route('quotes.index') }}">Quotes</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan

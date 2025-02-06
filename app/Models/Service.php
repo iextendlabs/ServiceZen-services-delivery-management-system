@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type'];
+    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type','quote'];
 
     public function averageRating()
     {

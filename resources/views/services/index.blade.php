@@ -122,6 +122,12 @@
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                         @endif     
                         </th>
+                        <th class="text-right"><a class=" text-decoration-none"
+                            href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'quote', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Quote</a>
+                            @if (request('sort') === 'quote')
+                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                        @endif     
+                        </th>
                         <th class="text-left"><a class=" text-decoration-none"
                             href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
                             @if (request('sort') === 'type')
@@ -141,6 +147,13 @@
                                 <td class="text-right">{{ $service->duration }}</td>
                                 <td class="text-right">
                                     @if ($service->status)
+                                        Enable
+                                    @else
+                                        Disable
+                                    @endif
+                                </td>
+                                <td class="text-right">
+                                    @if ($service->quote)
                                         Enable
                                     @else
                                         Disable

@@ -237,8 +237,13 @@
                       </select>
                     </div>
                     @endif --}}
-
-                    <button id="bookNowButton" type="button" class="btn btn-primary btn-block mb-2">Book Now</button>
+                    @if ($service->quote == 1)
+                        <button style="margin-top: 1em;"
+                            onclick="openQuotePopup('{{ $service->id }}')" type="button"
+                            class="btn btn-block btn-warning"> Request a Quote</button>
+                    @else
+                        <button id="bookNowButton" type="button" class="btn btn-primary btn-block mb-2">Book Now</button>
+                    @endif
 
                     @if (count($service->addONs))
                         <button class="btn btn-secondary btn-block mb-2" id="add-ons-scroll">Add ONs</button>
@@ -389,7 +394,11 @@
                                                                 <small class="text-muted"><i class="fa fa-clock"> </i>{{ $addON->service->duration }}</small>
                                                             @endif
                                                         </div>
-                                                        @if (count($addON->service->serviceOption) > 0)
+                                                        @if ($addON->service->quote == 1)
+                                                            <button style="margin-top: 1em;"
+                                                                onclick="openQuotePopup('{{ $addON->service->id }}')" type="button"
+                                                                class="btn btn-sm btn-block btn-warning"> Quote</button>
+                                                        @elseif (count($addON->service->serviceOption) > 0)
                                                             <a style="margin-top: 1em; color:#fff"
                                                                 href="/serviceDetail/{{ $addON->service->id }}"
                                                                 type="button"

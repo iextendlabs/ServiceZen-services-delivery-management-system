@@ -211,8 +211,11 @@ $reviewsCarousel_chunk = 3;
                                             {{ $service->duration }}</small>
                                         @endif
                                     </div>
-    
-                                    @if(count($service->serviceOption)>0)
+                                    @if ($service->quote == 1)
+                                    <button style="margin-top: 1em;"
+                                        onclick="openQuotePopup('{{ $service->id }}')" type="button"
+                                        class="btn btn-block btn-warning"> Request a Quote</button>
+                                    @elseif (count($service->serviceOption)>0)
                                         <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $service->id }}" type="button" class="btn btn-block btn-primary">Book Now</a>
                                     @else
                                         <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
