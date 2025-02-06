@@ -41,6 +41,7 @@ use App\Http\Controllers\{
     CurrencyController,
     FreelancerProgramController,
     InformationController,
+    QuoteController,
     StripePaymentController,
     WithdrawController
 };
@@ -62,6 +63,7 @@ use App\Http\Controllers\Site\{
     InformationPageController,
     SiteComplaintController,
     SiteInformationController,
+    SiteQuoteController,
 };
 
 /*
@@ -192,6 +194,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('membershipPlans', MembershipPlanController::class);
     Route::get('load-customers', [CouponController::class, 'loadCustomers'])->name('customers.load');
 
+    Route::resource('quotes', QuoteController::class);
+
+
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 
@@ -277,3 +282,5 @@ Route::controller(StripePaymentController::class)->group(function(){
 Route::get('/checkout-success', function () {
     return view('site.checkOut.success');
 })->name('checkout.success');
+Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
+Route::resource('siteQuotes', SiteQuoteController::class);

@@ -269,6 +269,7 @@
                                     <a class="dropdown-item" href="{{ route('apply.affiliateProgram') }}">Join Affiliate
                                         Program</a>
                                 @endif
+                                <a class="dropdown-item" href="{{ route('siteQuotes.index') }}">My Quotes</a>
                                 <a class="dropdown-item" href="{{ route('siteComplaints.index') }}">My Complaint</a>
                                 <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
                                 <a class="dropdown-item" href="{{ route('customer.logout') }}">Logout</a>
@@ -306,6 +307,7 @@
         </nav>
         @include('site.layout.locationPopup')
         <div id="addToCartPopup"></div>
+        <div id="quotePopup"></div>
     </header>
 
     <main role="main">

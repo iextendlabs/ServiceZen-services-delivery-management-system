@@ -86,6 +86,16 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>Quote:</strong>
+                        <select name="quote" class="form-control">
+
+                            <option value="1"  {{ old('quote', $service->quote) == '1' ? 'selected' : '' }}>Enable</option>
+                            <option value="0" {{ old('quote', $service->quote) == '0' ? 'selected' : '' }}>Disable</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <strong>Description:</strong>
                         <textarea class="form-control" id="description_summernote" name="description" placeholder="Description">{{old('description',$service->description)}}</textarea>
                         <script>
