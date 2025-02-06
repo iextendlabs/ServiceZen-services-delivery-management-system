@@ -14,6 +14,7 @@
             height: 200px !important;
             width: 200px;
         }
+
         .input-group {
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border-radius: 50px;
@@ -54,8 +55,8 @@
             <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
                 <div class="input-group">
                     <input type="search" id="search_product" class="form-control border-right-0" placeholder="Search Services"
-                           aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
-                           aria-describedby="search-button">
+                        aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
+                        aria-describedby="search-button">
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-primary" id="search-button">
                             <i class="fa fa-search"></i>
@@ -82,10 +83,10 @@
                     <span>To add more service<a href="/"> Continue</a></span>
                 </div>
             @endif
-            @if(count($services) == 0)
-            <span class="alert alert-danger text-center w-75 " role="alert" style="padding:10px 200px">
-                <strong>Service not found</strong>
-            </span>
+            @if (isset($search) && count($services) == 0)
+                <span class="alert alert-danger text-center w-75 " role="alert" style="padding:10px 200px">
+                    <strong>Service not found</strong>
+                </span>
             @endif
         </div>
         @if ($slider_images->value && !isset($category))
@@ -143,78 +144,172 @@
             </div>
         </section>
         <div class="row" id="categories">
-            @if (isset($all_categories))
-                @foreach ($all_categories as $single_category)
-                    @if ($single_category->status == '1')
-                        @if (is_null($single_category->parent_id) && $single_category->childCategories->isNotEmpty())
-                            @include('site.categories.category_card', ['category' => $single_category])
-                        @else
-                            @if (is_null($single_category->parent_id) && $single_category->childCategories->isEmpty())
-                                @include('site.categories.category_card', ['category' => $single_category])
-                            @endif
-                        @endif
-                    @endif
-                @endforeach
-            @endif
-        </div>
-
-        <div class="row" id="categories">
-            @if (isset($category))
-                @if (count($category->childCategories))
-                    @foreach ($category->childCategories as $childCategory)
-                        @if ($childCategory->status == '1')
-                            @include('site.categories.category_card', ['category' => $childCategory])
-                        @endif
-                    @endforeach
-                @endif
-            @endif
+            @foreach ($all_categories as $single_category)
+                @include('site.categories.category_card', ['category' => $single_category])
+            @endforeach
         </div>
         <hr>
-        <div class="album py-5 bg-light">
-            <div class="row">
-                @foreach ($services as $service)
-                    <div class="col-md-4 service-box">
-                        <div class="card mb-4 box-shadow">
-                            <a href="/serviceDetail/{{ $service->id }}">
-                                <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-                                <img class="card-img-top" src="./service-images/{{ $service->image }}"
-                                    alt="Card image cap">
-                            </a>
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted service-box-price">
-                                        @if (isset($service->discount))
-                                            <s>
-                                        @endif
-                                        @currency($service->price,false,true)
-                                        @if (isset($service->discount))
-                                            </s>
-                                        @endif
-                                        @if (isset($service->discount))
-                                            <b class="discount"> @currency($service->discount,false,true)</b>
-                                        @endif
-                                    </small>
-                                    @if($service->duration)
-                                        <small class="text-muted service-box-time"><i class="fa fa-clock"> </i>{{ $service->duration }}</small>
-                                    @endif
-                                </div>
-
-                                @if(count($service->serviceOption)>0)
-                                    <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $service->id }}" type="button" class="btn btn-block btn-primary">Book Now</a>
-                                @else
-                                    <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="btn btn-block btn-primary"> Book Now</button>
-                                @endif
-
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-            <div class="row">
+        <div class="row">
+            @if (isset($category) && count($category->services) > 0)
                 <div class="col-md-12">
-                    {!! $services->links() !!}
+                    <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
+                        {{ $category->title }}</h2>
+                    <div class="owl-carousel">
+                        @foreach ($category->services as $service)
+                            <div class="item">
+                                <div class="card mb-4 box-shadow service-box">
+                                    <a href="/serviceDetail/{{ $service->id }}">
+                                        <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
+                                        <img class="card-img-top" src="./service-images/{{ $service->image }}"
+                                            alt="Card image cap">
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted service-box-price">
+                                                @if (isset($service->discount))
+                                                    <s>
+                                                @endif
+                                                @currency($service->price, false, true)
+                                                @if (isset($service->discount))
+                                                    </s>
+                                                @endif
+                                                @if (isset($service->discount))
+                                                    <b class="discount"> @currency($service->discount, false, true)</b>
+                                                @endif
+                                            </small>
+                                            @if ($service->duration)
+                                                <small class="text-muted service-box-time"><i class="fa fa-clock">
+                                                    </i>{{ $service->duration }}</small>
+                                            @endif
+                                        </div>
+
+                                        @if (count($service->serviceOption) > 0)
+                                            <a style="margin-top: 1em; color:#fff"
+                                                href="/serviceDetail/{{ $service->id }}" type="button"
+                                                class="btn btn-block btn-primary">Book Now</a>
+                                        @else
+                                            <button style="margin-top: 1em;"
+                                                onclick="openBookingPopup('{{ $service->id }}')" type="button"
+                                                class="btn btn-block btn-primary"> Book Now</button>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <hr>
                 </div>
-            </div>
+            @endif
+        </div>
+        <div class="row">
+            @foreach ($all_categories as $single_category)
+                @if (count($single_category->services) > 0)
+                    <div class="col-md-12">
+                        <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
+                            {{ $single_category->title }}</h2>
+                        <div class="owl-carousel">
+                            @foreach ($single_category->services as $service)
+                                <div class="item">
+                                    <div class="card mb-4 box-shadow service-box">
+                                        <a href="/serviceDetail/{{ $service->id }}">
+                                            <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b>
+                                            </p>
+                                            <img class="card-img-top" src="./service-images/{{ $service->image }}"
+                                                alt="Card image cap">
+                                        </a>
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted service-box-price">
+                                                    @if (isset($service->discount))
+                                                        <s>
+                                                    @endif
+                                                    @currency($service->price, false, true)
+                                                    @if (isset($service->discount))
+                                                        </s>
+                                                    @endif
+                                                    @if (isset($service->discount))
+                                                        <b class="discount"> @currency($service->discount, false, true)</b>
+                                                    @endif
+                                                </small>
+                                                @if ($service->duration)
+                                                    <small class="text-muted service-box-time"><i class="fa fa-clock">
+                                                        </i>{{ $service->duration }}</small>
+                                                @endif
+                                            </div>
+
+                                            @if (count($service->serviceOption) > 0)
+                                                <a style="margin-top: 1em; color:#fff"
+                                                    href="/serviceDetail/{{ $service->id }}" type="button"
+                                                    class="btn btn-block btn-primary">Book Now</a>
+                                            @else
+                                                <button style="margin-top: 1em;"
+                                                    onclick="openBookingPopup('{{ $service->id }}')" type="button"
+                                                    class="btn btn-block btn-primary"> Book Now</button>
+                                            @endif
+
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <hr>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+
+
+
+        <div class="album py-5">
+            @if (isset($services))
+                <div class="row">
+                    <div class="owl-carousel">
+                        @foreach ($services as $service)
+                            <div class="item">
+                                <div class="card mb-4 box-shadow service-box">
+                                    <a href="/serviceDetail/{{ $service->id }}">
+                                        <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
+                                        <img class="card-img-top" src="./service-images/{{ $service->image }}"
+                                            alt="Card image cap">
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted service-box-price">
+                                                @if (isset($service->discount))
+                                                    <s>
+                                                @endif
+                                                @currency($service->price, false, true)
+                                                @if (isset($service->discount))
+                                                    </s>
+                                                @endif
+                                                @if (isset($service->discount))
+                                                    <b class="discount"> @currency($service->discount, false, true)</b>
+                                                @endif
+                                            </small>
+                                            @if ($service->duration)
+                                                <small class="text-muted service-box-time"><i class="fa fa-clock">
+                                                    </i>{{ $service->duration }}</small>
+                                            @endif
+                                        </div>
+
+                                        @if (count($service->serviceOption) > 0)
+                                            <a style="margin-top: 1em; color:#fff"
+                                                href="/serviceDetail/{{ $service->id }}" type="button"
+                                                class="btn btn-block btn-primary">Book Now</a>
+                                        @else
+                                            <button style="margin-top: 1em;"
+                                                onclick="openBookingPopup('{{ $service->id }}')" type="button"
+                                                class="btn btn-block btn-primary"> Book Now</button>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-md-12">
                     <h2 class="text-center">Customer Reviews</h2>
@@ -298,33 +393,38 @@
                                                                 alt="{{ $staff->name }}">
                                                         </div>
                                                     </div>
-                                                    <div class="card-body text-center" style="height: 305px; align-content: center;">
-                                                         <h6 class="card-title" style="height: 40px; overflow: hidden;">{{ $staff->name }}</h6>
-                                                         <h6 class="card-title" style="height: 40px; overflow: hidden;">{{ $staff->staff->sub_title }}</h6>
-                                                        <p class="card-title" style="height: 25px; overflow: hidden;">Extra Charges:<b>@currency($staff->staff->charges,false)</b></p>
-                                                        @if($staff->staff->location)
-                                                            <p class="card-title" style="height: 50px; overflow: hidden;">{{ $staff->staff->location }}</p>
+                                                    <div class="card-body text-center"
+                                                        style="height: 305px; align-content: center;">
+                                                        <h6 class="card-title" style="height: 40px; overflow: hidden;">
+                                                            {{ $staff->name }}</h6>
+                                                        <h6 class="card-title" style="height: 40px; overflow: hidden;">
+                                                            {{ $staff->staff->sub_title }}</h6>
+                                                        <p class="card-title" style="height: 25px; overflow: hidden;">
+                                                            Extra Charges:<b>@currency($staff->staff->charges, false)</b></p>
+                                                        @if ($staff->staff->location)
+                                                            <p class="card-title" style="height: 50px; overflow: hidden;">
+                                                                {{ $staff->staff->location }}</p>
                                                         @endif
                                                         <a href="{{ route('staffProfile.show', $staff->id) }}"
                                                             class="btn btn-block btn-primary">View</a>
-                                                            @php
-                                                                $rating = $staff->averageRating();
-                                                                $fullStars = floor($rating);
-                                                                $halfStar = $rating - $fullStars >= 0.5;
-                                                                $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
-                                                            @endphp
+                                                        @php
+                                                            $rating = $staff->averageRating();
+                                                            $fullStars = floor($rating);
+                                                            $halfStar = $rating - $fullStars >= 0.5;
+                                                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                                                        @endphp
 
-                                                            @for ($i = 0; $i < $fullStars; $i++)
-                                                                <i class="fas fa-star text-warning fa-xs"></i>
-                                                            @endfor
+                                                        @for ($i = 0; $i < $fullStars; $i++)
+                                                            <i class="fas fa-star text-warning fa-xs"></i>
+                                                        @endfor
 
-                                                            @if ($halfStar)
-                                                                <i class="fas fa-star-half-alt text-warning fa-xs"></i>
-                                                            @endif
+                                                        @if ($halfStar)
+                                                            <i class="fas fa-star-half-alt text-warning fa-xs"></i>
+                                                        @endif
 
-                                                            @for ($i = 0; $i < $emptyStars; $i++)
-                                                                <i class="far fa-star text-muted fa-xs"></i>
-                                                            @endfor
+                                                        @for ($i = 0; $i < $emptyStars; $i++)
+                                                            <i class="far fa-star text-muted fa-xs"></i>
+                                                        @endfor
                                                         ({{ count($staff->reviews) }} Reviews)
                                                     </div>
                                                 </div>
@@ -389,6 +489,35 @@
             $('html, body').animate({
                 scrollTop: $('#review-form').offset().top
             }, 1000);
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(".owl-carousel").owlCarousel({
+                loop: false,
+                margin: 15,
+                nav: true, // Hide navigation arrows
+                dots: false, // Show dots only
+                autoplay: true,
+                autoplayTimeout: 10000,
+                items: 3,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 3
+                    },
+                    1000: {
+                        items: 3
+                    }
+                },
+                navText: [
+                    '<i class="fa fa-chevron-left"></i>', // Left navigation arrow
+                    '<i class="fa fa-chevron-right"></i>' // Right navigation arrow
+                ]
+            });
         });
     </script>
 @endsection

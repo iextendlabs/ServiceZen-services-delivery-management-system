@@ -118,6 +118,22 @@
         background-color: #ff4d80;
         /* Lighter pink on hover */
     }
+    .owl-nav {
+        display: flex;
+        justify-content: center;
+        position: relative;
+        top: -25px;
+        margin-top: 10px
+    }
+    .owl-nav button {
+        background: #9c9b9b !important;
+        border: 1px solid #ccc !important;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        text-align: center;
+        line-height: 33px;
+    }
 </style>
 
 <body>
