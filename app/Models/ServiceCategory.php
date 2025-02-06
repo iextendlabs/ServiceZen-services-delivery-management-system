@@ -14,6 +14,11 @@ class ServiceCategory extends Model
         return $this->hasMany(Service::class,'category_id','id');
     }
 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'service_to_category', 'category_id', 'service_id');
+    }
+
     public function parentCategory()
     {
         return $this->belongsTo(ServiceCategory::class, 'parent_id')->where('status', 1);

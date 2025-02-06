@@ -5,23 +5,6 @@
         height: 300px !important;
         width: 300px;
     }
-    .owl-nav {
-        display: flex;
-        justify-content: center;
-        position: relative;
-        top: -25px;
-    }
-    .owl-nav button {
-        background: #9c9b9b !important;
-        border: 1px solid #ccc !important;
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
-        text-align: center;
-        line-height: 33px;
-    }
-
-
 </style>
 @php
 if($app_flag === true){
@@ -337,6 +320,34 @@ $reviewsCarousel_chunk = 3;
         $('html, body').animate({
             scrollTop: $('#review-form').offset().top
         }, 1000);
+    });
+</script>
+<script>
+    $(document).ready(function(){
+        $(".owl-carousel").owlCarousel({
+            loop: true,
+            margin: 15,
+            nav: true,  // Hide navigation arrows
+            dots: false,  // Show dots only
+            autoplay: true,
+            autoplayTimeout: 10000,
+            items: 3,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                600: {
+                    items: 3
+                },
+                1000: {
+                    items: 3
+                }
+            },
+            navText: [
+                '<i class="fa fa-chevron-left"></i>', // Left navigation arrow
+                '<i class="fa fa-chevron-right"></i>' // Right navigation arrow
+            ]
+        });
     });
 </script>
 @endsection

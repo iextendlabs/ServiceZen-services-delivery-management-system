@@ -66,9 +66,11 @@ class SiteController extends Controller
 
         $all_categories = [];
 
-        $query = Service::query();
-
+        $services = [];
+        $search = $request->search_service;
         if ($request->search_service) {
+            $query = Service::query();
+
             if (count($query->where('name', $request->search_service)->get())) {
                 $query->orWhere('name', $request->search_service);
             } else {
@@ -79,41 +81,27 @@ class SiteController extends Controller
                     $query->orWhere('name', 'like', '%' . $word . '%');
                 }
             }
+
+            $services = $query->get();
         } elseif (isset($request->id)) {
-            $category = ServiceCategory::find($request->id);
-            if (isset($category->childCategories) && count($category->childCategories)) {
-                $child_categories =  $category->childCategories->pluck('id')->toArray();
-                $child_categories[] = $request->id;
-                $query->where(function ($query) {
-                    $query->where('type', 'master')
-                        ->orWhereNull('type');
-                })->where('status', '1')
-                    ->whereHas('categories', function ($q) use ($child_categories) {
-                        $q->whereIn('category_id', $child_categories);
-                    });
-            } else {
-                $query->where(function ($query) {
-                    $query->where('type', 'master')
-                        ->orWhereNull('type');
-                })->where('status', '1')
-                    ->whereHas('categories', function ($q) use ($request) {
-                        $q->where('category_id', $request->id);
-                    });
+            $category = ServiceCategory::with('childCategories')->find($request->id);
+
+            if ($category) {
+                $all_categories = $category->childCategories->where('status', 1);
             }
 
             $FAQs = FAQ::where('category_id', $request->id)->where('status', '1')->latest()->take(3)->get();
         } else {
-            $all_categories = ServiceCategory::get();
-            $query->where(function ($query) {
-                $query->where('type', 'master')
-                    ->orWhereNull('type');
-            })->where('status', '1');
+            $all_categories = ServiceCategory::with('childCategories')
+                ->whereNull('parent_id')
+                ->where('status', 1)
+                ->get()
+                ->filter(function ($category) {
+                    return $category->childCategories->isNotEmpty() || is_null($category->parent_id);
+                });
         }
 
-        $services = $query->paginate(config('app.paginate'));
-        $filters = $request->only(['id', 'search_service']);
-        $services->appends($filters);
-        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag'));
+        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag','search'));
     }
 
     public function show($id, Request $request)
