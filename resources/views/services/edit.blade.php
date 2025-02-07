@@ -389,6 +389,7 @@
                                 <th>Option Name</th>
                                 <th>Option Price (AED)</th>
                                 <th>Option Duration</th>
+                                <th>Image</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -399,6 +400,7 @@
                                         $option_row = $option_row;
                                     @endphp
                                     <tr>
+                                    <input type="hidden" name="option_id[{{ $option_row }}]" value="{{ $option->id ?? '' }}">
                                         <td>
                                             <div class="col-md-12">
                                                 <div class="form-group">
@@ -418,6 +420,25 @@
                                                 <div class="form-group">
                                                     <input type="text" name="option_duration[{{ $option_row }}]" class="form-control"  value="{{ old('option_duration.'.$option_row, $option->option_duration) }}"  placeholder="Option Duration">
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="file" name="option_image[{{ $option_row }}]" class="form-control option-image-input" accept="image/*" data-preview="image-preview-{{ $option_row }}">
+                                                    <img id="image-preview-{{ $option_row }}" 
+                                                        src="{{ $option->image ? asset('service-images/options/' . $option->image) : '' }}" 
+                                                        alt="Preview" 
+                                                        height="130px" 
+                                                        style="{{ $option->image ? '' : 'display: none;' }} margin-top: 5px;">
+                                                </div>
+                                                @if ($option->image)
+                                                    <div class="form-group">
+                                                        <label>
+                                                            <input type="checkbox" name="remove_option_image[{{ $option_row }}]" value="1"> Remove Image
+                                                        </label>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </td>
                                         <td>
@@ -570,6 +591,14 @@
                     </div>
                 </td>
                 <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="file" name="option_image[${option_row}]" class="form-control option-image-input" accept="image/*" data-preview="image-preview-${option_row}">
+                            <img id="image-preview-${option_row}" src="" alt="Preview" height="130px" style="display: none; margin-top: 5px;">
+                        </div>
+                    </div>
+                </td>
+                <td>
                     <button type="button" class="btn btn-danger remove-option"><i class="fa fa-minus-circle"></i></button>
                 </td>
             </tr>
@@ -577,6 +606,22 @@
         $('#optionTable tbody').append(newRow);
         option_row++
     }
+
+    $(document).on("change", ".option-image-input", function () {
+        let input = this;
+        let previewId = $(this).attr("data-preview"); // Get correct preview ID
+        let preview = $("#" + previewId);
+
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                preview.attr("src", e.target.result).show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.hide();
+        }
+    });
 
     $(document).on('click', '.remove-option', function() {
         $(this).closest('tr').remove();
