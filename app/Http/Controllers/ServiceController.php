@@ -156,11 +156,17 @@ class ServiceController extends Controller
 
         if($request->option_name && $request->option_price){
             foreach($request->option_name as $key=>$name){
+                $image = '';
+                if (isset($request->option_image[$key])) {
+                    $image = mt_rand() . '.' . $request->option_image[$key]->getClientOriginalExtension();
+                    $request->option_image[$key]->move(public_path('service-images/options'), $image);
+                }
                 ServiceOption::create([
                     'service_id' => $service->id, 
                     'option_name' => $name,
                     'option_price' => $request->option_price[$key],
-                    'option_duration' => $request->option_duration[$key]
+                    'option_duration' => $request->option_duration[$key],
+                    'image' => $image
                 ]);
             }
         }
@@ -290,17 +296,76 @@ class ServiceController extends Controller
                 ServiceAddOn::create($input);
             }
         }
-        
-        ServiceOption::where('service_id',$service_id)->delete();
 
-        if($request->option_name && $request->option_price){
-            foreach($request->option_name as $key=>$name){
-                ServiceOption::create([
-                    'service_id' => $service->id, 
-                    'option_name' => $name,
-                    'option_price' => $request->option_price[$key],
-                    'option_duration' => $request->option_duration[$key]
-                ]);
+        $existingOptionIds = $request->option_id ?? [];
+        $currentOptionIds = $service->serviceOption->pluck('id')->toArray();
+
+        $optionsToDelete = array_diff($currentOptionIds, $existingOptionIds);
+        $option_services = ServiceOption::whereIn('id', $optionsToDelete)->get();
+
+        foreach ($option_services as $option_service) {
+            if ($option_service->image) {
+                $oldImagePath = public_path('service-images/options/' . $option_service->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            $option_service->delete();
+        }
+
+        if ($request->option_name && $request->option_price) {
+    
+            foreach ($request->option_name as $key => $name) {
+                $image = null;
+                
+                if (!empty($request->option_id[$key])) {
+                    $oldOption = ServiceOption::find($request->option_id[$key]);
+        
+                    if ($request->has("remove_option_image.$key") && $request->remove_option_image[$key] == "1") {
+                        if ($oldOption && $oldOption->image) {
+                            $oldImagePath = public_path('service-images/options/' . $oldOption->image);
+                            if (file_exists($oldImagePath)) {
+                                unlink($oldImagePath);
+                            }
+                        }
+                        $image = null; // Ensure image field is set to null
+                    } else {
+                        // Preserve old image if no new one is uploaded
+                        $image = $oldOption ? $oldOption->image : null;
+                    }
+                }
+
+                if (isset($request->option_image[$key])) {
+                    if (!empty($request->option_id[$key])) {
+                        $oldOption = ServiceOption::find($request->option_id[$key]);
+                        if ($oldOption && $oldOption->image) {
+                            $oldImagePath = public_path('service-images/options/' . $oldOption->image);
+                            if (file_exists($oldImagePath)) {
+                                unlink($oldImagePath);
+                            }
+                        }
+                    }
+                    
+                    $image = mt_rand() . '.' . $request->option_image[$key]->getClientOriginalExtension();
+                    $request->option_image[$key]->move(public_path('service-images/options'), $image);
+                }
+                
+                if (!empty($request->option_id[$key])) {
+                    ServiceOption::where('id', $request->option_id[$key])->update([
+                        'option_name' => $name,
+                        'option_price' => $request->option_price[$key],
+                        'option_duration' => $request->option_duration[$key],
+                        'image' => $image,
+                    ]);
+                } else {
+                    ServiceOption::create([
+                        'service_id' => $service->id,
+                        'option_name' => $name,
+                        'option_price' => $request->option_price[$key],
+                        'option_duration' => $request->option_duration[$key],
+                        'image' => $image,
+                    ]);
+                }
             }
         }
         
@@ -393,6 +458,16 @@ class ServiceController extends Controller
                 unlink(public_path('service-images/resized') . '/' . $service->image);
             }
         }
+
+        $service_options = ServiceOption::where('service_id',$id)->get();
+        foreach($service_options as $option){
+            if ($option->image) {
+                if (file_exists(public_path('service-images/options') . '/' . $option->image)) {
+                    unlink(public_path('service-images/options') . '/' . $option->image);
+                }
+            }
+        }
+
         $service->delete();
 
         ServiceToUserNote::where('service_id', $service->id)->delete();

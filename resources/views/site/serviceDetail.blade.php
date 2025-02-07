@@ -121,7 +121,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <img src="{{ asset('service-images/' . $service->image) }}" alt="Main image" height="auto"
-                                width="100%">
+                                width="100%" id="mainImage">
                         </div>
                         <div class="col-md-12 mt-3">
                             @if ($service->images)
@@ -206,21 +206,30 @@
                             <div class="mb-3">
                                 <strong>Available Options</strong>
                                 @foreach ($service->serviceOption as $option)
-                                    <div class="form-check">
-                                        <input type="checkbox" name="option[]" class="form-check-input option-checkbox"
+                                    <div class="form-check d-flex align-items-center py-2 border-bottom">
+                                        <input type="checkbox" name="option[]" class="form-check-input option-checkbox mr-3"
                                             value="{{ $option->id }}" id="option{{ $option->id }}"
-                                            data-price="@currency($option->option_price, false, false)" data-duration="{{ $option->option_duration }}"
-                                            @if (isset($lowestPriceOption) && $option->id === $lowestPriceOption->id)
-                                        checked
-                                @endif>
-                                <label class="form-check-label" for="option{{ $option->id }}">{{ $option->option_name }}
-                                    (@currency($option->option_price, false, false))
-                                    {{ $option->option_duration ?? '' }}
-                                </label>
+                                            data-price="@currency($option->option_price, false, false)" 
+                                            data-duration="{{ $option->option_duration }}"
+                                            @if (isset($lowestPriceOption) && $option->id === $lowestPriceOption->id) checked @endif
+                                            data-image="{{ !empty($option->image) ? asset('service-images/options/' . $option->image) : '' }}">
+
+                                        @if (!empty($option->image))  
+                                            <img src="{{ asset('service-images/options/' . $option->image) }}" 
+                                                alt="{{ $option->option_name }}" 
+                                                class="option-image mr-3 border border-secondary rounded"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        @endif
+
+                                        <label class="form-check-label" for="option{{ $option->id }}" style="line-height: 1.5;">
+                                            {{ $option->option_name }}  
+                                            (@currency($option->option_price, false, false))  
+                                            {{ $option->option_duration ?? '' }}
+                                        </label>
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
-                    @endif
+                        @endif
 
                     {{-- @if (count($service->variant))
                     <div class="form-group">
@@ -637,6 +646,26 @@
         });
     </script>
     <script>
+        $(document).ready(function () {
+            let defaultImage = $("#mainImage").attr("src");
+
+            $(".option-checkbox").change(function () {
+                let selectedImage = "";
+
+                $(".option-checkbox:checked").each(function () {
+                    let optionImage = $(this).data("image");
+                    if (optionImage) {
+                        selectedImage = optionImage;
+                    }
+                });
+
+                if (selectedImage) {
+                    $("#mainImage").attr("src", selectedImage);
+                } else {
+                    $("#mainImage").attr("src", defaultImage);
+                }
+            });
+        });
         $(document).on('change', '#variant-select', function() {
             var selectedOption = $(this).find('option:selected');
             var price = selectedOption.data('price');

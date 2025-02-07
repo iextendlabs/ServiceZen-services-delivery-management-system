@@ -329,6 +329,7 @@
                                     <th>Option Name</th>
                                     <th>Option Price (AED)</th>
                                     <th>Option Duration</th>
+                                    <th>Image</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -458,6 +459,14 @@
                     </div>
                 </td>
                 <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <input type="file" name="option_image[${option_row}]" class="form-control option-image-input" accept="image/*" data-preview="image-preview-${option_row}">
+                            <img id="image-preview-${option_row}" src="" alt="Preview" height="130px" style="display: none; margin-top: 5px;">
+                        </div>
+                    </div>
+                </td>
+                <td>
                     <button type="button" class="btn btn-danger remove-option"><i class="fa fa-minus-circle"></i></button>
                 </td>
             </tr>
@@ -466,6 +475,22 @@
         option_row++
     }
 
+    $(document).on("change", ".option-image-input", function () {
+        let input = $(this)[0];
+        let previewId = $(this).data("preview");
+        let preview = $("#" + previewId);
+
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                preview.attr("src", e.target.result).show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.hide();
+        }
+    });
+    
     $(document).on('click', '.remove-option', function() {
         $(this).closest('tr').remove();
     });
