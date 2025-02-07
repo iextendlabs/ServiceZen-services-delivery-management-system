@@ -156,6 +156,7 @@
                         {{ $category->title }}</h2>
                     <div class="owl-carousel">
                         @foreach ($category->services as $service)
+                            @if($service->id == 1)
                             <div class="item">
                                 <div class="card mb-4 box-shadow service-box">
                                     <a href="/serviceDetail/{{ $service->id }}">
@@ -199,6 +200,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                         @endforeach
                     </div>
                     <hr>
@@ -213,6 +215,7 @@
                             {{ $single_category->title }}</h2>
                         <div class="owl-carousel">
                             @foreach ($single_category->services as $service)
+                                @if($service->status == 1)
                                 <div class="item">
                                     <div class="card mb-4 box-shadow service-box">
                                         <a href="/serviceDetail/{{ $service->id }}">
@@ -258,6 +261,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             @endforeach
                         </div>
                         <hr>
@@ -273,6 +277,7 @@
                 <div class="row">
                     <div class="owl-carousel">
                         @foreach ($services as $service)
+                        @if($service->status == 1)
                             <div class="item">
                                 <div class="card mb-4 box-shadow service-box">
                                     <a href="/serviceDetail/{{ $service->id }}">
@@ -317,6 +322,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>
