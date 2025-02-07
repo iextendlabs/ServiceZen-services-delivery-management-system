@@ -214,7 +214,7 @@
                         <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
                             {{ $single_category->title }}</h2>
                         <div class="owl-carousel">
-                            @foreach ($single_category->services as $service)
+                            @foreach ($single_category->services->where('status', 1)->take(10) as $service)
                                 @if($service->status == 1)
                                 <div class="item">
                                     <div class="card mb-4 box-shadow service-box">
