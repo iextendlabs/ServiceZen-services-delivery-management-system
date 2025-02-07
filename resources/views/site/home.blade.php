@@ -156,7 +156,7 @@
                         {{ $category->title }}</h2>
                     <div class="owl-carousel">
                         @foreach ($category->services as $service)
-                            @if($service->id == 1)
+                            @if($service->status == 1)
                             <div class="item">
                                 <div class="card mb-4 box-shadow service-box">
                                     <a href="/serviceDetail/{{ $service->id }}">
@@ -269,8 +269,6 @@
                 @endif
             @endforeach
         </div>
-
-
 
         <div class="album py-5">
             @if (isset($services))
