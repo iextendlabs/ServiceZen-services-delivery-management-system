@@ -25,7 +25,7 @@
                         @foreach($bids as $bid)
                             <tr>
                                 <td>{{ $bid->staff->name }}</td>
-                                <td>$ {{ number_format($bid->bid_amount, 2) }}</td>
+                                <td>AED{{ number_format($bid->bid_amount, 2) }}</td>
                                 <td>{{ $bid->comment ?? 'No comment' }}</td>
                                 <td>
                                     <a href="{{ route('site.quote.bid', ['quote_id' => $quote->id, 'staff_id' => $bid->staff->id]) }}" 

@@ -12,7 +12,7 @@
             @if ($bid)
                 <div class="card p-3 mb-4">
                     <h5>Your Current Bid</h5>
-                    <p><strong>Amount:</strong> $<span id="bid-amount">{{ $bid->bid_amount }}</span></p>
+                    <p><strong>Amount:</strong>AED<span id="bid-amount">{{ $bid->bid_amount }}</span></p>
                     <p><strong>Comment:</strong> <span id="bid-comment">{{ $bid->comment ?? 'No comment' }}</span></p>
                 </div>
 
