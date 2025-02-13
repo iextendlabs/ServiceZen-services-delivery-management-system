@@ -119,7 +119,7 @@
                 $.get(`/bid-chat/${bidId}/messages`, function(messages) {
                     messagesList.empty();
                     messages.forEach(msg => {
-                        let isSender = msg.sender_id === userId;
+                        let isSender = msg.sender_id == userId;
                         let messageClass = isSender ? "chat-sender text-end" :
                             "chat-receiver text-start";
                         messagesList.append(
