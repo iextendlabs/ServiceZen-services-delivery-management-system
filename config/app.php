@@ -66,6 +66,10 @@ return [
 
     'general_holiday' => env('GENERAL_HOLIDAY', []),
     
+    'quote_status' => env('ORDER_DRIVER_STATUSES', ['Pending','Inprogress','Negotiating','Complete', 'Canceled']),
+
+    'quote_staff_status' => env('ORDER_DRIVER_STATUSES', ['Pending','Rejected','Accepted']),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

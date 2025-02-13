@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\Service;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -61,9 +62,28 @@ class SiteQuoteController extends Controller
             'service_name' => 'required',
             'detail' => 'required',
         ]);
-    
-        Quote::create($request->all());
-    
+
+        $service = Service::findOrFail($request->service_id);
+        $categoryIds = $service->categories()->pluck('category_id')->toArray(); 
+ 
+        $staff_ids = User::whereHas('categories', function ($query) use ($categoryIds) {
+            $query->whereIn('category_id', $categoryIds);
+        })
+        ->whereHas('staff', function ($query) {
+            $query->where('get_quote', 1);
+        })
+        ->pluck('id')
+        ->toArray();
+
+        $input = $request->all();
+        $input['status'] = "Pending";
+        $quote = Quote::create($input);
+        
+        $quote->categories()->sync($categoryIds);
+        foreach($staff_ids as $id){
+            $quote->staffs()->syncWithoutDetaching([$id => ['status' => 'Pending']]);
+        }
+ 
         return redirect()->back()->with('success', 'Quote request submitted successfully!');
     }
 

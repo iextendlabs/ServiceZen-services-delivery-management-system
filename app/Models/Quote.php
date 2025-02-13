@@ -9,7 +9,7 @@ class Quote extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'service_id','service_name','service_option_id','detail'];
+    protected $fillable = ['user_id', 'service_id','service_name','service_option_id','detail','status','category_id'];
 
     public function user()
     {
@@ -26,4 +26,21 @@ class Quote extends Model
         return $this->belongsTo(ServiceOption::class);
     }
 
+    public function staffs()
+    {
+        return $this->belongsToMany(User::class, 'quote_staff', 'quote_id', 'staff_id')
+                    ->withPivot('status')
+                    ->withTimestamps();
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'quote_category','quote_id', 'category_id')
+                    ->withTimestamps();
+    }
+
+    public function bids()
+    {
+        return $this->hasMany(Bid::class);
+    }
 }

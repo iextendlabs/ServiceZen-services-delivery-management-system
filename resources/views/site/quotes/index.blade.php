@@ -25,6 +25,10 @@
                                 <td>{{ $quote->detail ? substr($quote->detail, 0, 50) . '...' : '' }}</td>
                                 <td>
                                     <a class="btn btn-warning" href="{{ route('siteQuotes.show', $quote->id) }}"><i class="fa fa-eye"></i></a>
+                                    <a href="{{ route('site.quote.bids', ['quote_id' => $quote->id]) }}"
+                                        class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> View Bids
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
