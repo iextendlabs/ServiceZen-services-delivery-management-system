@@ -62,6 +62,8 @@
         <h4 style="text-align: center">ROTA</h4>
         <h5 style="text-align: center">Appointment Schedule <br> for <br> {{ $date }}</h5>
     </div>
+    @if(!auth()->user()->hasRole("Staff"))
+
     <div id="container">
         <form method="get" action="{{ route('rota') }}">
             @csrf
@@ -70,6 +72,7 @@
             <button type="submit">Submit</button>
         </form>
     </div>
+    @endif
   <!-- Create a div to hold the chart -->
   <div id="timeline_chart" style="height: 768px;"></div>
    <style>
