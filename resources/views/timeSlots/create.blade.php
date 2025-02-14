@@ -85,6 +85,8 @@
                         <tr>
                             <th><input type="checkbox" checked onclick="$('input[name*=\'ids\']').prop('checked', this.checked);"></th>
                             <th>Name</th>
+                            <th>Designation</th>
+                            <th>Zone</th>
                             <th>Email</th>
                         </tr>
                         <tbody id="staff-container">
@@ -136,7 +138,12 @@
 
                     var checkedAttribute = isChecked ? 'checked' : '';
 
-                    var html = '<tr><td><input type="checkbox" ' + checkedAttribute + ' name="ids[' + i + ']" value="' + staff.id + '"></td><td>' + staff.name + '</td><td>' + staff.email + '</td></tr>';
+                    var html = '<tr><td><input type="checkbox" ' + checkedAttribute + ' name="ids[' + i + ']" value="' + staff.id + '"></td>'
+                            + '<td>' + staff.name + '</td>'
+                            + '<td>' + (staff.sub_title != null ? staff.sub_title : "") + '</td>'
+                            + '<td>' + (staff.staffZones.length > 0 ?  staff.staffZones.join(', ') : '') + '</td>'
+                            + '<td>' + staff.email + '</td></tr>';
+
                     staffContainer.append(html);
                     i++;
                 });
