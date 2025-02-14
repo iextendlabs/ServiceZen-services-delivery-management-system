@@ -87,6 +87,8 @@
                         <tr>
                             <th><input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);"></th>
                             <th>Name</th>
+                            <th>Designation</th>
+                            <th>Zone</th>
                             <th>Email</th>
                         </tr>
                         <tbody id="staff-container">
@@ -96,6 +98,8 @@
                                     <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}" {{ in_array($staff->id, old('ids', $selected_staff)) ? 'checked' : ''}}>
                                 </td>
                                 <td>{{ $staff->name }}</td>
+                                <td>{{ $staff->sub_title != null ? $staff->sub_title : "" }}</td>
+                                <td>{{ count($staff->staffZones) > 0 ?  $staff->staffZones->implode(', ') : '' }}</td>
                                 <td>{{ $staff->email }}</td>
                             </tr>
                             @endforeach
@@ -163,8 +167,11 @@
                     });
 
                     var checkedAttribute = isChecked ? 'checked' : '';
-
-                    var html = '<tr><td><input type="checkbox" ' + checkedAttribute + ' name="ids[' + i + ']" value="' + staff.id + '"></td><td>' + staff.name + '</td><td>' + staff.email + '</td></tr>';
+                    var html = '<tr><td><input type="checkbox" ' + checkedAttribute + ' name="ids[' + i + ']" value="' + staff.id + '"></td>'
+                            + '<td>' + staff.name + '</td>'
+                            + '<td>' + (staff.sub_title != null ? staff.sub_title : "") + '</td>'
+                            + '<td>' + (staff.staffZones.length > 0 ?  staff.staffZones.join(', ') : '') + '</td>'
+                            + '<td>' + staff.email + '</td></tr>';
                     staffContainer.append(html);
                     i++;
                 });

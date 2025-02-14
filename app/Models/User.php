@@ -271,4 +271,9 @@ class User extends Authenticatable
                     ->withPivot('status')
                     ->withTimestamps();
     }
+
+    public function staffGroups()
+    {
+        return $this->belongsToMany(StaffGroup::class, 'staff_group_to_staff', 'staff_id', 'staff_group_id');
+    }
 }

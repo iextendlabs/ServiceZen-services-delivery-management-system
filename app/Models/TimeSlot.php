@@ -149,23 +149,13 @@ class TimeSlot extends Model
                         });
                     }
                 } else {
-                    if (!$isAdmin) {
-                        $query->where(function ($subQuery) use ($date) {
-                            $subQuery->where('type', '=', 'General')
-                                     ->orWhere(function ($q) use ($date) {
-                                         $q->where('type', '=', 'Specific')
-                                           ->where('date', '=', $date);
-                                     });
-                        });
-                    } else {
-                        $query->where(function ($subQuery) use ($date) {
-                            $subQuery->whereIn('type', ['General', 'Partner'])
-                                     ->orWhere(function ($q) use ($date) {
-                                         $q->where('type', '=', 'Specific')
-                                           ->where('date', '=', $date);
-                                     });
-                        });
-                    }
+                    $query->where(function ($subQuery) use ($date) {
+                        $subQuery->whereIn('type', ['General', 'Partner'])
+                                    ->orWhere(function ($q) use ($date) {
+                                        $q->where('type', '=', 'Specific')
+                                        ->where('date', '=', $date);
+                                    });
+                    });
                 }
             
                 $timeSlots = $query->orderBy('time_start')->get();

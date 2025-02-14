@@ -8,6 +8,7 @@ use App\Models\Staff;
 use App\Models\StaffDriver;
 use App\Models\StaffGroup;
 use App\Models\StaffGroupToStaff;
+use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\TimeSlotToStaff;
 use App\Models\User;
@@ -154,6 +155,16 @@ class TimeSlotController extends Controller
         $staffGroup = StaffGroup::find($time_slot->group_id);
         $staffs = User::role('Staff')->get();
 
+        $staffs->each(function ($staff) {
+            $staff->sub_title = $staff->staff->sub_title ?? null;
+
+            $staffZones = StaffZone::whereHas('staffGroups.staffs', function ($query) use ($staff) {
+                $query->where('users.id', $staff->id);
+            })->get();
+
+            $staff->staffZones = $staffZones ? $staffZones->pluck('name') : [];
+        });
+
         $selected_staff = $time_slot->staffs->pluck('id')->toArray();
 
         return view('timeSlots.edit', compact('time_slot', 'staff_groups', 'i', 'staffs', 'selected_staff'));
@@ -220,6 +231,16 @@ class TimeSlotController extends Controller
         $staffGroup = StaffGroup::find($request->group);
         $staff = $staffGroup->staffs;
         $allStaff = User::role('Staff')->get();
+  
+        $allStaff->each(function ($staff) {
+            $staff->sub_title = $staff->staff->sub_title ?? null;
+
+            $staffZones = StaffZone::whereHas('staffGroups.staffs', function ($query) use ($staff) {
+                $query->where('users.id', $staff->id);
+            })->get();
+
+            $staff->staffZones = $staffZones ? $staffZones->pluck('name')->toArray() : [];
+        });
 
         return response()->json([
             'staff' => $staff,
