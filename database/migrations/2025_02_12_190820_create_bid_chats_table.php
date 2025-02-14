@@ -20,8 +20,6 @@ return new class extends Migration
             $table->text('message');
             $table->timestamps();
 
-            
-
             $table->foreign('sender_id')
                 ->references('id')
                 ->on('users')

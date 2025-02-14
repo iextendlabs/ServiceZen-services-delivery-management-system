@@ -232,6 +232,9 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
     Route::get('/siteQuote/{quote_id}/bids', [SiteBidController::class, 'index'])->name('site.quote.bids');
     Route::get('/siteQuote/{quote_id}/bid/{staff_id}', [SiteBidController::class, 'showBidPage'])->name('site.quote.bid');
 
+    Route::post('/siteQuote/update-status', [SiteQuoteController::class, 'updateStatus'])->name('siteQuote.updateStatus');
+    Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
+    Route::resource('siteQuotes', SiteQuoteController::class);
 });
 
 // Backups
@@ -298,5 +301,3 @@ Route::controller(StripePaymentController::class)->group(function(){
 Route::get('/checkout-success', function () {
     return view('site.checkOut.success');
 })->name('checkout.success');
-Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
-Route::resource('siteQuotes', SiteQuoteController::class);

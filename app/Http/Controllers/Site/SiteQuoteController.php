@@ -77,6 +77,17 @@ class SiteQuoteController extends Controller
 
         $input = $request->all();
         $input['status'] = "Pending";
+        if ($request->image) {
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+            
+            $request->image->move(public_path('quote-images'), $filename);
+
+            $input['image'] = $filename;
+        }
+
+        $input['phone'] = $request->phone ? $request->number_country_code . $request->phone : null;
+        $input['whatsapp'] =$request->whatsapp ? $request->whatsapp_country_code . $request->whatsapp : null;
+
         $quote = Quote::create($input);
         
         $quote->categories()->sync($categoryIds);
@@ -131,5 +142,15 @@ class SiteQuoteController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $quote = Quote::findOrFail($request->id);
+        $quote->bid_id = $request->bid_id;
+        $quote->status = "Complete";
+        $quote->save();
+    
+        return response()->json(['message' => 'Quote updated successfully.']);
     }
 }

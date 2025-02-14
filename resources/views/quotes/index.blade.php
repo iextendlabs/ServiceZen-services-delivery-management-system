@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-left">
-                    <h2>Quotes</h2>
+                    <h2>Quotes({{ $total_quote }})</h2>
                 </div>
                 <div class="float-end d-flex align-items-center">
                     @can('quote-edit')
@@ -83,133 +83,182 @@
         <hr>
         <div class="row">
             @if (auth()->user()->hasRole('Admin'))
-            <div class="col-md-12">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('quotes.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <strong>User:</strong>
-                                <select name="user_id" class="form-control">
-                                    <option></option>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}"
-                                            @if ($filter['user_id'] == $user->id) selected @endif>
-                                            {{ $user->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <strong>Services:</strong>
-                                <select name="service_id" class="form-control">
-                                    <option></option>
-                                    @foreach ($services as $service)
-                                        <option value="{{ $service->id }}"
-                                            @if ($filter['service_id'] == $service->id) selected @endif>
-                                            {{ $service->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <strong>Status:</strong>
-                                <select name="status" class="form-control">
-                                    <option></option>
-                                    @foreach ($quote_statuses as $status)
-                                        <option value="{{ $status }}"
-                                            @if ($filter['status'] == $status) selected @endif>
-                                            {{ $status }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 offset-md-8">
-                            <div class="d-flex flex-wrap justify-content-md-end">
-                                <div class="col-md-3 mb-3">
-                                    <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
+                <div class="col-md-12">
+                    <h3>Filter</h3>
+                    <hr>
+                    <form action="{{ route('quotes.index') }}" method="GET" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <strong>User:</strong>
+                                    <select name="user_id" class="form-control">
+                                        <option></option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}"
+                                                @if ($filter['user_id'] == $user->id) selected @endif>
+                                                {{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <div class="col-md-9 mb-3">
-                                    <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <strong>Services:</strong>
+                                    <select name="service_id" class="form-control">
+                                        <option></option>
+                                        @foreach ($services as $service)
+                                            <option value="{{ $service->id }}"
+                                                @if ($filter['service_id'] == $service->id) selected @endif>
+                                                {{ $service->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <strong>Status:</strong>
+                                    <select name="status" class="form-control">
+                                        <option></option>
+                                        @foreach ($quote_statuses as $status)
+                                            <option value="{{ $status }}"
+                                                @if ($filter['status'] == $status) selected @endif>
+                                                {{ $status }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
+                        <div class="row">
+                            <div class="col-md-4 offset-md-8">
+                                <div class="d-flex flex-wrap justify-content-md-end">
+                                    <div class="col-md-3 mb-3">
+                                        <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
+                                    </div>
+                                    <div class="col-md-9 mb-3">
+                                        <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             @endif
-            <h3>Quote ({{ $total_quote }})</h3>
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
-                    <tr>
-                        <td>
-                            <input type="checkbox" class="all-item-checkbox">
-                        </td>
-                        <th>User</th>
-                        <th>Service</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    @if (count($quotes))
-                        @foreach ($quotes as $quote)
-                            @php
-                                $staffQuote = $quote->staffs->where('id', auth()->user()->id)->first();
-                            @endphp
+                <div class="table-responsive">
+                    <table class="table table-borderless table-striped">
+                        <thead class="border-bottom">
                             <tr>
                                 <td>
-                                    <input type="checkbox" class="item-checkbox" value="{{ $quote->id }}">
+                                    <input type="checkbox" class="all-item-checkbox">
                                 </td>
-                                <td> {{ $quote->user->name ?? '' }}</td>
-                                <td>{{ $quote->service_name }}</td>
-                                <td>{{ auth()->user()->hasRole('Staff') ? $staffQuote->pivot->status : $quote->status }}
-                                </td>
-                                <td>
-                                    <form id="deleteForm{{ $quote->id }}"
-                                        action="{{ route('quotes.destroy', $quote->id) }}" method="POST">
-                                        <a class="btn btn-warning" href="{{ route('quotes.show', $quote->id) }}">
-                                            <i class="fa fa-eye"></i>
-                                        </a>
-                                        @csrf
-                                        @method('DELETE')
-                                        @can('quote-delete')
-                                            <button type="button" onclick="confirmDelete('{{ $quote->id }}')"
-                                                class="btn btn-danger"><i class="fas fa-trash"></i></button>
-                                        @endcan
-                                        @if (auth()->user()->hasRole('Staff'))
-                                            @if ($staffQuote && $staffQuote->pivot->status == 'Pending')
-                                                <button type="button" class="btn btn-success accept-quote"
-                                                    data-id="{{ $quote->id }}">Accept</button>
-                                                <button type="button" class="btn btn-danger reject-quote"
-                                                    data-id="{{ $quote->id }}">Reject</button>
-                                            @endif
-                                            @if ($staffQuote->pivot->status == 'Accepted')
-                                                <a href="{{ route('quote.bid', ['quote_id' => $quote->id, 'staff_id' => auth()->id()]) }}"
-                                                    class="btn btn-primary">
-                                                    Bid
-                                                </a>
-                                            @endif
-                                        @endif
-                                        @if (auth()->user()->hasRole('Admin'))
-                                            <a href="{{ route('quote.bids', ['quote_id' => $quote->id]) }}"
-                                                class="btn btn-primary">
-                                                <i class="fas fa-eye"></i> View Bids
-                                            </a>
-                                        @endif
-                                    </form>
-                                </td>
+                                <th>Service</th>
+                                <th>Send by</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="6" class="text-center">There is no quote.</td>
-                        </tr>
-                    @endif
-                </table>
+                        </thead>
+                        <tbody>
+                            @if (count($quotes))
+                                @foreach ($quotes as $quote)
+                                    @php
+                                        $staffQuote = $quote->staffs->where('id', auth()->user()->id)->first();
+                                    @endphp
+                                    <tr class="border-bottom">
+                                        <td>
+                                            <input type="checkbox" class="item-checkbox" value="{{ $quote->id }}">
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                @if ($quote->service->image)
+                                                    <img src="{{ asset('service-images/' . $quote->service->image) }}"
+                                                        alt="Service Image" class="rounded" width="auto" height="80">
+                                                @endif
+                                                <div class="ml-3">
+                                                    <h6 class="mt-0 mb-1">{{ $quote->service_name }}</h6>
+                                                    @if ($quote->sourcing_quantity)
+                                                        <span class="text-muted">{{ $quote->sourcing_quantity }}
+                                                            Quantity</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <strong>{{ $quote->user->name ?? 'Unknown' }}</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <div>
+                                                <strong>{{ auth()->user()->hasRole('Staff') ? $staffQuote->pivot->status : $quote->status }}</strong>
+                                            </div>
+                                            @if (auth()->user()->hasRole('Staff') && $quote->bid)
+                                                @if ($quote->bid->staff_id == auth()->id())
+                                                    <br>
+                                                    <p><span class="badge badge-success">You have won the bid.</span></p>
+                                                @else
+                                                    <br>
+                                                    <p><span class="badge badge-danger">Another staff member has won the
+                                                            bid.</span></p>
+                                                @endif
+                                            @endif
+                                            @if (auth()->user()->hasRole('Admin') && $quote->bid)
+                                                <div class="mt-2">
+                                                    <a href="{{ route('quote.bid', ['quote_id' => $quote->id, 'staff_id' => $quote->bid->staff_id]) }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        Selected Bid
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td>
+
+                                            <form id="deleteForm{{ $quote->id }}"
+                                                action="{{ route('quotes.destroy', $quote->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <a class="btn btn-outline-primary"
+                                                    href="{{ route('quotes.show', $quote->id) }}">
+                                                    View Detail
+                                                </a>
+
+
+                                                @if (auth()->user()->hasRole('Staff'))
+                                                    @if ($staffQuote && $staffQuote->pivot->status == 'Pending')
+                                                        <button type="button" class="btn btn-success accept-quote"
+                                                            data-id="{{ $quote->id }}">Accept</button>
+                                                        <button type="button" class="btn btn-danger reject-quote"
+                                                            data-id="{{ $quote->id }}">Reject</button>
+                                                    @endif
+                                                    @if (is_null($quote->bid_id) || ($quote->bid && $quote->bid->staff_id == auth()->id()))
+                                                        @if ($staffQuote->pivot->status == 'Accepted')
+                                                            <a href="{{ route('quote.bid', ['quote_id' => $quote->id, 'staff_id' => auth()->id()]) }}"
+                                                                class="btn btn-primary">
+                                                                Bid
+                                                            </a>
+                                                        @endif
+                                                    @endif
+                                                @endif
+                                                @if (auth()->user()->hasRole('Admin'))
+                                                    <a href="{{ route('quote.bids', ['quote_id' => $quote->id]) }}"
+                                                        class="btn btn-primary">
+                                                        <i class="fas fa-eye"></i> View Bids
+                                                    </a>
+                                                @endif
+                                                @can('quote-delete')
+                                                    <button type="button" onclick="confirmDelete('{{ $quote->id }}')"
+                                                        class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                                @endcan
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5" class="text-center">There are no Quote.</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
                 {!! $quotes->links() !!}
             </div>
         </div>

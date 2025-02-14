@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bid;
 use App\Models\Quote;
 use App\Models\Service;
 use App\Models\User;
@@ -54,15 +55,15 @@ class QuoteController extends Controller
 
         $quotes = $query->paginate(config('app.paginate'));
 
-        $filters = $request->only(['user_id', 'service_id','status']);
+        $filters = $request->only(['user_id', 'service_id', 'status']);
         $quotes->appends($filters);
-        $users = User::role('Customer')->where('status',1)->get();
+        $users = User::role('Customer')->where('status', 1)->get();
         $services = Service::get();
 
         $quote_statuses = config('app.quote_status');
-        $staffs = User::role('Staff')->where('status',1)->get();
+        $staffs = User::role('Staff')->where('status', 1)->get();
 
-        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users','services','quote_statuses','staffs'))
+        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'quote_statuses', 'staffs'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -132,7 +133,11 @@ class QuoteController extends Controller
     public function destroy($id)
     {
         $quote = Quote::find($id);
-        
+        if ($quote->image) {
+            if (file_exists(public_path('quote-images') . '/' . $quote->image)) {
+                unlink(public_path('quote-images') . '/' . $quote->image);
+            }
+        }
         $quote->delete();
 
         $previousUrl = url()->previous();
@@ -189,15 +194,23 @@ class QuoteController extends Controller
         $quote = Quote::findOrFail($quoteId);
         $quote->staffs()->detach($staffId);
 
+        if ($quote->bid && $quote->bid->staff_id == $staffId) {
+            $quote->status = "Pending";
+            $quote->bid_id = null;
+            $quote->save();
+        }
+
+        Bid::where('staff_id', $staffId)->where('quote_id', $quoteId)->delete();
+
         return redirect()->back()->with('success', 'Staff removed successfully.');
     }
 
     public function updateStatus(Request $request)
     {
         $quote = Quote::findOrFail($request->id);
-    
+
         $quote->staffs()->updateExistingPivot(Auth::id(), ['status' => $request->status]);
-    
+
         return response()->json(['message' => 'Quote staff status updated successfully.']);
     }
 }
