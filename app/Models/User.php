@@ -264,4 +264,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(AffiliateCategory::class, 'affiliate_id');
     }
+
+    public function quotes()
+    {
+        return $this->belongsToMany(Quote::class, 'quote_staff', 'staff_id', 'quote_id')
+                    ->withPivot('status')
+                    ->withTimestamps();
+    }
 }

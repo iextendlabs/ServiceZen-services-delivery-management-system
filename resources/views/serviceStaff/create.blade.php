@@ -83,6 +83,24 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Online:</strong>
+                            <select name="online" class="form-control">
+                                <option value="1"  {{ old('online') == '1' ? 'selected' : '' }}>Online</option>
+                                <option value="0"  {{ old('online') == '0' ? 'selected' : '' }}>Offline</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Get Quote:</strong>
+                            <select name="get_quote" class="form-control">
+                                <option value="1"  {{ old('get_quote') == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0"  {{ old('get_quote') == '0' ? 'selected' : '' }}>Disable</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>About:</strong>
                             <textarea name="about" id="summernote" class="form-control">{{ old('about')}}</textarea>
                             <script>
@@ -193,6 +211,12 @@
                         <div class="form-group">
                             <strong>Location:</strong>
                             <input type="text" name="location" class="form-control" placeholder="Location" value="{{ old('location') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Nationality:</strong>
+                            <input type="text" name="nationality" class="form-control" placeholder="Nationality" value="{{ old('nationality') }}">
                         </div>
                     </div>
                     <div class="col-md-12">

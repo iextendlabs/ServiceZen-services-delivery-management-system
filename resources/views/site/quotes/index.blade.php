@@ -10,32 +10,79 @@
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
-                    <tr>
-                        <th>Sr#</th>
-                        <th>Service</th>
-                        <th>Detail</th>
-                        <th>Action</th>
-                    </tr>
-                    @if (count($quotes))
-                        @foreach ($quotes as $quote)
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <thead class="border-bottom">
                             <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ $quote->service_name }}</td>
-                                <td>{{ $quote->detail ? substr($quote->detail, 0, 50) . '...' : '' }}</td>
-                                <td>
-                                    <a class="btn btn-warning" href="{{ route('siteQuotes.show', $quote->id) }}"><i class="fa fa-eye"></i></a>
-                                </td>
+                                <th>Service</th>
+                                <th>Send by</th>
+                                <th class="text-center">Status</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="6" class="text-center">There is no quote.</td>
-                        </tr>
-                    @endif
-                </table>
-                {!! $quotes->links() !!}
+                        </thead>
+                        <tbody>
+                            @if (count($quotes))
+                                @foreach ($quotes as $quote)
+                                    @php
+                                        $staffQuote = $quote->staffs->where('id', auth()->user()->id)->first();
+                                    @endphp
+                                    <tr class="border-bottom">
+                                        <td>
+                                            <div class="media">
+                                                @if ($quote->service->image)
+                                                    <img src="{{ asset('service-images/' . $quote->service->image) }}"
+                                                        alt="Service Image" class="mr-3 rounded" width="auto"
+                                                        height="80">
+                                                @endif
+                                                <div class="media-body">
+                                                    <h6 class="mt-1 mb-1">{{ $quote->service_name }}</h6>
+                                                    @if ($quote->sourcing_quantity)
+                                                        <span class="text-muted">{{ $quote->sourcing_quantity }}
+                                                            Quantity</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>{{ $quote->user->name ?? 'Unknown' }}</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <div>
+                                                <strong>{{ auth()->user()->hasRole('Staff') ? $staffQuote->pivot->status : $quote->status }}</strong>
+                                            </div>
 
+                                            @if ($quote->bid)
+                                                <div class="mt-2">
+                                                    <a href="{{ route('site.quote.bid', ['quote_id' => $quote->id, 'staff_id' => $quote->bid->staff_id]) }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        Selected Bid
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </td>
+
+
+                                        <td>
+                                            <a class="btn btn-outline-primary"
+                                                href="{{ route('siteQuotes.show', $quote->id) }}">
+                                                View Detail
+                                            </a>
+                                            <a href="{{ route('site.quote.bids', ['quote_id' => $quote->id]) }}"
+                                                class="btn btn-primary">
+                                                <i class="fas fa-eye"></i> View Bids
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="4" class="text-center">There are no Quote.</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+                {!! $quotes->links() !!}
             </div>
         </div>
     </div>
