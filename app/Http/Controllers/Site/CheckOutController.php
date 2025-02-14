@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Models\CustomerProfile;
+use App\Models\OrderAttachment;
 use App\Models\ServiceOption;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cookie;
@@ -909,9 +910,22 @@ class CheckOutController extends Controller
 
     public function confirmStep(Request $request)
     {
+        $orderAttachment = [];
         $order_ids = $request->order_ids;
         $comment = $request->order_comment;
         $customer_type = $request->customer_type;
+
+        if ($request->hasFile('image')) {
+            $images = $request->file('image');
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('order-attachment'), $filename);
+                $orderAttachment[] = $filename;
+
+            }
+        }
 
         if($request->payment_method == "Credit-Debit-Card"){
             session([
@@ -926,6 +940,14 @@ class CheckOutController extends Controller
             if(isset($order_ids)){
                 foreach($order_ids as $order_id){
                     $order = Order::find($order_id);
+                    if(!empty($orderAttachment)){
+                        foreach ($orderAttachment as $image) {
+                            OrderAttachment::create([
+                                'image' => $image,
+                                'order_id' => $order->id,
+                            ]);
+                        }
+                    }
                     $order->status = "Pending";
                     $order->order_comment = $request->order_comment;
                     $order->save();

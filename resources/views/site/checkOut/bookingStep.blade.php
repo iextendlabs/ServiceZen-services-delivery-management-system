@@ -359,7 +359,7 @@
                 </form>
             </div>
             <div id="confirm-step" style="display: none;">
-                <form action="confirmStep" method="POST">
+                <form action="confirmStep" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-md-6 mt-3 mt-3 offset-md-3 ">
@@ -404,6 +404,13 @@
                                 <textarea id="order_comment" name="order_comment" class="form-control" cols="30" rows="5"></textarea>
                             </div>
                         </div>
+                        <div class="col-md-6 offset-md-3">
+                            <div class="form-group">
+                                <strong>Attachments:</strong>
+                                <input type="file" id="image" name="image[]" class="form-control" multiple accept="image/*">
+                            </div>
+                            <div id="imagePreview" class="row"></div>
+                        </div>
                         <div class="col-md-12 text-center">
                             <button id="confirmOrder" type="submit" class="btn btn-primary">Confirm
                                 Order</button><br><br>
@@ -421,6 +428,29 @@
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function () {
+            $("#image").on("change", function () {
+                let imagePreview = $("#imagePreview");
+                imagePreview.empty(); // Clear previous previews
+        
+                let files = this.files;
+                if (files.length > 0) {
+                    $.each(files, function (index, file) {
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let img = $("<img>").attr("src", e.target.result).addClass("img-thumbnail m-2").css({
+                                width: "100px",
+                                height: "100px"
+                            });
+                            imagePreview.append(img);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            });
+        });
+    </script>
     <script>
         $(document).ready(function() {
             function fillAddressForm() {

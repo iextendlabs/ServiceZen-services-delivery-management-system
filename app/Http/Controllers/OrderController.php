@@ -8,6 +8,7 @@ use App\Models\Affiliate;
 use App\Models\Coupon;
 use App\Models\CouponHistory;
 use App\Models\Order;
+use App\Models\OrderAttachment;
 use App\Models\OrderChat;
 use App\Models\OrderHistory;
 use App\Models\OrderTotal;
@@ -901,6 +902,17 @@ class OrderController extends Controller
 
         $order = Order::find($id);
         if($order){
+            $order_attachment = OrderAttachment::where('order_id',$id)->pluck('image')->toArray();
+            // dd($order_attachment);
+            if ($order_attachment) {
+                $images = $order_attachment;
+    
+                foreach ($images as $image) {
+                    if (file_exists(public_path('order-attachment') . '/' . $image)) {
+                        unlink(public_path('order-attachment') . '/' . $image);
+                    }
+                }
+            }
             $order->delete();
         }
         $previousUrl = url()->previous();
