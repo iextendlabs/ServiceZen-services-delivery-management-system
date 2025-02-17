@@ -233,10 +233,10 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
     Route::get('/siteQuote/{quote_id}/bid/{staff_id}', [SiteBidController::class, 'showBidPage'])->name('site.quote.bid');
 
     Route::post('/siteQuote/update-status', [SiteQuoteController::class, 'updateStatus'])->name('siteQuote.updateStatus');
-    Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
     Route::resource('siteQuotes', SiteQuoteController::class);
 });
 
+Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
 // Backups
 Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
 Route::get('/backups/backup', [BackupController::class, 'backup'])->name('backups.backup');

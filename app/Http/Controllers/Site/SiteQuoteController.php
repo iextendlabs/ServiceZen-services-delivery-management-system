@@ -14,10 +14,22 @@ class SiteQuoteController extends Controller
 
     public function quoteModal(Request $request, $id)
     {
+        if (!Auth::check()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => 'redirect',
+                    'url' => route('customer.login'),
+                    'message' => 'To get a quote, please login first!'
+                ]);
+            }
+            return redirect()->route('customer.login')->with('error', 'To get a quote, please login first!');
+        }
+    
         $service = Service::find($id);
         return view('site.quotes.quote_popup', compact('service'));
-        
     }
+    
+
 
     /**
      * Display a listing of the resource.
@@ -27,7 +39,7 @@ class SiteQuoteController extends Controller
     public function index()
     {
         if (!Auth::check()) {
-            return redirect()->route('customer.login')->with('error', 'To get a quote, please register first!');
+            return redirect()->route('customer.login')->with('error', 'To get a quote, please login first!');
         }
     
         $quotes = Quote::where('user_id',auth()->user()->id)->paginate(config('app.paginate'));
