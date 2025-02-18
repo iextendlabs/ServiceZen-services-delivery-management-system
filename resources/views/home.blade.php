@@ -129,7 +129,133 @@
                 @endif
             @endcan
         </div>
+        @if(auth()->user()->hasRole('Admin'))
+        <div class="row pt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">Staff Status</div>
+                    <div class="card-body">
+                        <div class="row">
+                            @forelse ($staffs as $staff)
+                                @if ($staff->staff) {{-- Ensure staff relationship exists --}}
+                                    <div class="col-md-4 mb-3"> {{-- Each staff takes 1/3 of the row --}}
+                                        <div class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ $staff->name }}
+                                                <span class="badge {{ $staff->staff->online ? 'bg-success' : 'bg-danger' }}">
+                                                    {{ $staff->staff->online ? 'Online' : 'Offline' }}
+                                                </span>
+                                            </li>
+                                        </div>
+                                    </div>
+                                @endif
+                            @empty
+                                <li class="list-group-item text-center">No staff available.</li>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        @if(auth()->user()->hasRole('Supervisor'))
+        <div class="row pt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">Staffs</div>
+                    <div class="card-body">
+                        <div class="row">
+                            @php
+                                // Get the supervisor staff IDs
+                                $supervisorStaffIds = auth()->user()->getSupervisorStaffIds(); // Assuming you're using auth to get current user
+                            @endphp
+        
+                            @forelse ($staffs->whereIn('id', $supervisorStaffIds) as $staff)
+                                @if ($staff->staff) {{-- Ensure staff relationship exists --}}
+                                    <div class="col-md-3 mb-3"> <!-- 4 per row -->
+                                        <li class="list-group-item">
+                                            {{ $staff->name }}
+                                        </li>
+                                    </div>
+                                @endif
+                            @empty
+                                <li class="list-group-item text-center">No staff available.</li>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
 
+        @if(auth()->user()->hasRole('Manager'))
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">Supervisor and Their Staff</div>
+                    <div class="card-body">
+                        @if(count(auth()->user()->managerSupervisors) > 0)
+                            @foreach (auth()->user()->managerSupervisors as $managerSupervisor)
+                                @php
+                                    $supervisor = $managerSupervisor->supervisor;
+                                    $supervisorStaffIds = $supervisor ? $supervisor->getSupervisorStaffIds() : [];
+                                @endphp
+        
+                                @if ($supervisor)
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <strong>Supervisor:</strong> {{ $supervisor->name }}
+                                        </div>
+                                    </div>
+        
+                                    @if (count($supervisorStaffIds) > 0)
+                                        @php
+                                            $chunkedStaff = $staffs->whereIn('id', $supervisorStaffIds)->chunk(4);
+                                        @endphp
+        
+                                        @foreach ($chunkedStaff as $staffGroup)
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    @foreach ($staffGroup as $staff)
+                                                        @if ($staff->staff)
+                                                            <div class="col-md-3 mb-3">
+                                                                <div class="list-group-item">
+                                                                    {{ $staff->name }}
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                                <em>No staff available for this supervisor.</em>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <em>No supervisor available.</em>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        @else
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <em>No supervisor available for this manager.</em>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+        
         @can('order-list')
             <div class="py-2"></div>
             <div class="row">
