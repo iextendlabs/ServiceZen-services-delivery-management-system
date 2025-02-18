@@ -46,8 +46,8 @@ return [
     'version' => '1.2.0',
     // TODO add option in category to hide / show in menu 
     // TODO Add in setting 
-    'packageUrl' => '/?id=11',
-    'addOnUrl' => '/?id=10',
+    'packageUrl' => '/category/11',
+    'addOnUrl' => '/category/10',
 
     'driver_statuses' => env('DRIVER_STATUSES', ['Complete', 'Canceled', 'Rejected','Accepted', 'Pending', 'Processing','Inprogress']),
 

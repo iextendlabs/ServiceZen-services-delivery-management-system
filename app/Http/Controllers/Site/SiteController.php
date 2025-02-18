@@ -62,8 +62,6 @@ class SiteController extends Controller
 
         $FAQs = FAQ::latest()->where('status', '1')->take(3)->get();
 
-        $category = null;
-
         $all_categories = [];
 
         $services = [];
@@ -83,14 +81,6 @@ class SiteController extends Controller
             }
 
             $services = $query->get();
-        } elseif (isset($request->id)) {
-            $category = ServiceCategory::with('childCategories')->find($request->id);
-
-            if ($category) {
-                $all_categories = $category->childCategories->where('status', 1);
-            }
-
-            $FAQs = FAQ::where('category_id', $request->id)->where('status', '1')->latest()->take(3)->get();
         } else {
             $all_categories = ServiceCategory::with('childCategories')
                 ->whereNull('parent_id')
@@ -101,7 +91,26 @@ class SiteController extends Controller
                 });
         }
 
-        return view('site.home', compact('services', 'category', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag','search'));
+        return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag','search'));
+    }
+
+    public function categoryShow($id)
+    {
+        $reviews = Review::latest()->take(6)->get();
+
+        $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
+
+        $category = null;
+
+        $all_categories = [];
+
+        $category = ServiceCategory::with('childCategories')->find($id);
+
+        if ($category) {
+            $all_categories = $category->childCategories->where('status', 1);
+        }
+
+        return view('site.categories.show', compact( 'category', 'reviews', 'review_char_limit', 'all_categories'));
     }
 
     public function show($id, Request $request)
