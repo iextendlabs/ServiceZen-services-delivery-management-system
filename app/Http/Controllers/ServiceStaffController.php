@@ -11,6 +11,7 @@ use App\Models\StaffHoliday;
 use App\Models\StaffImages;
 use App\Models\StaffDriver;
 use App\Models\StaffYoutubeVideo;
+use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\Transaction;
 use App\Models\User;
@@ -58,8 +59,80 @@ class ServiceStaffController extends Controller
     {
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
-        $filter_name = $request->name;
-        $query = User::orderBy($sort, $direction);
+        
+        $filter = [
+            'name' => $request->name,
+            'sub_title' => $request->sub_title,
+            'location' => $request->location,
+            'min_order_value' => $request->min_order_value,
+            'service_id' => $request->service_id,
+            'category_id' => $request->category_id,
+            'zone_id' => $request->zone_id,
+        ];
+
+        $sub_titles = Staff::where('status', 1)
+            ->whereNotNull('sub_title')
+            ->pluck('sub_title')
+            ->toArray();
+
+        $all_sub_titles = [];
+        foreach ($sub_titles as $sub_title) {
+            $sub_title_parts = preg_split('/[\/,&]/', $sub_title);
+            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
+        }
+        $sub_titles = array_unique(array_filter($all_sub_titles));
+
+        $locations = Staff::where('status', 1)
+            ->whereNotNull('location')
+            ->pluck('location')
+            ->toArray();
+
+        $all_locations = [];
+        foreach ($locations as $location) {
+            $location_parts = preg_split('/[\/,&]/', $location);
+            $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
+        }
+        $locations = array_unique(array_filter($all_locations));
+
+        $services = Service::where('status',1)->get();
+        $categories = ServiceCategory::where('status',1)->get();
+
+        $staffZones = StaffZone::get();
+
+        $query = User::orderBy($sort, $direction)->whereHas('staff', function ($query) use ($request) {
+            $query->where('status', 1);
+
+            if ($request->sub_title) {
+                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
+            }
+
+            if ($request->location) {
+                $query->where('location', 'like', '%' . $request->location . '%');
+            }
+
+            if ($request->min_order_value) {
+                $query->where('min_order_value', $request->min_order_value);
+            }
+        });
+
+        if ($request->service_id) {
+            $query->whereHas('services', function ($q) use ($request) {
+                $q->where('service_id', $request->service_id);
+            });
+        }
+    
+        // Apply Category filter
+        if ($request->category_id) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->zone_id) {
+            $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
+                $q->where('staff_zone_id', $request->zone_id);
+            });
+        }
 
         if (Auth::user()->hasRole('Supervisor')) {
             $staffIds = Auth::user()->getSupervisorStaffIds();
@@ -75,11 +148,9 @@ class ServiceStaffController extends Controller
         }
         $total_staff = $query->count();
         $serviceStaff = $query->paginate(config('app.paginate'));
-        
-        $filters = $request->only(['name']);
 
-        $serviceStaff->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-        return view('serviceStaff.index', compact('total_staff','serviceStaff', 'filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $serviceStaff->appends($filter, ['sort' => $sort, 'direction' => $direction]);
+        return view('serviceStaff.index', compact('total_staff','serviceStaff', 'filter', 'direction','sub_titles','locations','services','categories','staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
