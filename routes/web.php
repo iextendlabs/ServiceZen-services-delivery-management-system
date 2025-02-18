@@ -284,6 +284,7 @@ Route::resource('siteReviews', SiteReviewsController::class);
 Route::get('/category', function () {
     return view('site.categories.index');
 })->name('categories.index');
+Route::get('category/{id}', [SiteController::class, 'categoryShow'])->name('category.show');
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
 

@@ -203,31 +203,31 @@
                                                             @foreach ($subcategory->childCategories as $child_category)
                                                                 @if ($child_category->status == '1')
                                                                     <a class="dropdown-item"
-                                                                        href="\?id={{ $child_category->id }}">-
+                                                                        href="{{ route('category.show',$child_category->id) }}">-
                                                                         {{ $child_category->title }}</a>
                                                                 @endif
                                                             @endforeach
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item"
-                                                                href="\?id={{ $subcategory->id }}">Show All
+                                                                href="{{ route('category.show',$subcategory->id) }}">Show All
                                                                 {{ $subcategory->title }}</a>
                                                         </div>
                                                     @else
                                                         @if ($subcategory->childCategories->isEmpty())
                                                             <a class="dropdown-item"
-                                                                href="\?id={{ $subcategory->id }}">{{ $subcategory->title }}</a>
+                                                                href="{{ route('category.show',$subcategory->id) }}">{{ $subcategory->title }}</a>
                                                         @endif
                                                     @endif
                                                 @endif
                                             @endforeach
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="\?id={{ $category->id }}">Show All
+                                            <a class="dropdown-item" href="{{ route('category.show',$category->id) }}">Show All
                                                 {{ $category->title }}</a>
                                         </div>
                                     @else
                                         @if (is_null($category->parent_id) && $category->childCategories->isEmpty())
                                             <a class="dropdown-item"
-                                                href="\?id={{ $category->id }}">{{ $category->title }}</a>
+                                                href="{{ route('category.show',$category->id) }}">{{ $category->title }}</a>
                                         @endif
                                     @endif
                                 @endif

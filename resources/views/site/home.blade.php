@@ -89,7 +89,7 @@
                 </span>
             @endif
         </div>
-        @if ($slider_images->value && !isset($category))
+        @if ($slider_images->value)
             <div class="row">
                 <div id="imageSlider" class="carousel slide mt-3" data-ride="carousel">
                     <ol class="carousel-indicators">
@@ -133,9 +133,6 @@
                     <p class="lead text-muted"> Search Service:
                         <span @class(['p-4', 'font-bold', 'text-dark' => true])>{{ request('search_service') }}</span>
                     </p>
-                @elseif(isset($category))
-                    <h1 class="jumbotron-heading">{{ $category->title }}</h1>
-                    <p class="lead text-muted">{{ $category->description }}</p>
                 @else
                     <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Services</h1>
                     <p class="lead text-muted">Get Your Desired service at Your Door, easy to schedule and
@@ -150,116 +147,16 @@
         </div>
         <hr>
         <div class="row">
-            @if (isset($category) && count($category->services) > 0)
-                <div class="col-md-12">
-                    <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
-                        {{ $category->title }}</h2>
-                    <div class="owl-carousel owl-carousel-category-service">
-                        @foreach ($category->services as $service)
-                            @if($service->status == 1)
-                            <div class="item">
-                                <div class="card mb-4 box-shadow service-box">
-                                    <a href="/serviceDetail/{{ $service->id }}">
-                                        <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-                                        <img class="card-img-top" src="./service-images/{{ $service->image }}"
-                                            alt="Card image cap">
-                                    </a>
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted service-box-price">
-                                                @if (isset($service->discount))
-                                                    <s>
-                                                @endif
-                                                @currency($service->price, false, true)
-                                                @if (isset($service->discount))
-                                                    </s>
-                                                @endif
-                                                @if (isset($service->discount))
-                                                    <b class="discount"> @currency($service->discount, false, true)</b>
-                                                @endif
-                                            </small>
-                                            @if ($service->duration)
-                                                <small class="text-muted service-box-time"><i class="fa fa-clock">
-                                                    </i>{{ $service->duration }}</small>
-                                            @endif
-                                        </div>
-                                        @if ($service->quote == 1)
-                                        <button style="margin-top: 1em;"
-                                            onclick="openQuotePopup('{{ $service->id }}')" type="button"
-                                            class="btn btn-block btn-warning"> Request a Quote</button>
-                                        @elseif (count($service->serviceOption) > 0)
-                                            <a style="margin-top: 1em; color:#fff"
-                                                href="/serviceDetail/{{ $service->id }}" type="button"
-                                                class="btn btn-block btn-primary">Book Now</a>
-                                        @else
-                                            <button style="margin-top: 1em;"
-                                                onclick="openBookingPopup('{{ $service->id }}')" type="button"
-                                                class="btn btn-block btn-primary"> Book Now</button>
-                                        @endif
-
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                        @endforeach
-                    </div>
-                    <hr>
-                </div>
-            @endif
-        </div>
-        <div class="row">
             @foreach ($all_categories as $single_category)
                 @if (count($single_category->services) > 0)
                     <div class="col-md-12">
                         <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
-                            {{ $single_category->title }}</h2>
+                            <a style="text-decoration: none;" href="{{ route('category.show',$single_category->id) }}">{{ $single_category->title }}</a></h2>
                         <div class="owl-carousel owl-carousel-category-service">
                             @foreach ($single_category->services->where('status', 1)->take(10) as $service)
                                 @if($service->status == 1)
                                 <div class="item">
-                                    <div class="card mb-4 box-shadow service-box">
-                                        <a href="/serviceDetail/{{ $service->id }}">
-                                            <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b>
-                                            </p>
-                                            <img class="card-img-top" src="./service-images/{{ $service->image }}"
-                                                alt="Card image cap">
-                                        </a>
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <small class="text-muted service-box-price">
-                                                    @if (isset($service->discount))
-                                                        <s>
-                                                    @endif
-                                                    @currency($service->price, false, true)
-                                                    @if (isset($service->discount))
-                                                        </s>
-                                                    @endif
-                                                    @if (isset($service->discount))
-                                                        <b class="discount"> @currency($service->discount, false, true)</b>
-                                                    @endif
-                                                </small>
-                                                @if ($service->duration)
-                                                    <small class="text-muted service-box-time"><i class="fa fa-clock">
-                                                        </i>{{ $service->duration }}</small>
-                                                @endif
-                                            </div>
-
-                                            @if ($service->quote == 1)
-                                            <button style="margin-top: 1em;"
-                                                onclick="openQuotePopup('{{ $service->id }}')" type="button"
-                                                class="btn btn-block btn-warning"> Request a Quote</button>
-                                            @elseif (count($service->serviceOption) > 0)
-                                                <a style="margin-top: 1em; color:#fff"
-                                                    href="/serviceDetail/{{ $service->id }}" type="button"
-                                                    class="btn btn-block btn-primary">Book Now</a>
-                                            @else
-                                                <button style="margin-top: 1em;"
-                                                    onclick="openBookingPopup('{{ $service->id }}')" type="button"
-                                                    class="btn btn-block btn-primary"> Book Now</button>
-                                            @endif
-
-                                        </div>
-                                    </div>
+                                    @include('site.services.card')
                                 </div>
                                 @endif
                             @endforeach
@@ -277,48 +174,7 @@
                         @foreach ($services as $service)
                         @if($service->status == 1)
                             <div class="item">
-                                <div class="card mb-4 box-shadow service-box">
-                                    <a href="/serviceDetail/{{ $service->id }}">
-                                        <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-                                        <img class="card-img-top" src="./service-images/{{ $service->image }}"
-                                            alt="Card image cap">
-                                    </a>
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted service-box-price">
-                                                @if (isset($service->discount))
-                                                    <s>
-                                                @endif
-                                                @currency($service->price, false, true)
-                                                @if (isset($service->discount))
-                                                    </s>
-                                                @endif
-                                                @if (isset($service->discount))
-                                                    <b class="discount"> @currency($service->discount, false, true)</b>
-                                                @endif
-                                            </small>
-                                            @if ($service->duration)
-                                                <small class="text-muted service-box-time"><i class="fa fa-clock">
-                                                    </i>{{ $service->duration }}</small>
-                                            @endif
-                                        </div>
-
-                                        @if ($service->quote == 1)
-                                            <button style="margin-top: 1em;"
-                                                onclick="openQuotePopup('{{ $service->id }}')" type="button"
-                                                class="btn btn-block btn-warning"> Request a Quote</button>
-                                        @elseif (count($service->serviceOption) > 0)
-                                            <a style="margin-top: 1em; color:#fff"
-                                                href="/serviceDetail/{{ $service->id }}" type="button"
-                                                class="btn btn-block btn-primary">Book Now</a>
-                                        @else
-                                            <button style="margin-top: 1em;"
-                                                onclick="openBookingPopup('{{ $service->id }}')" type="button"
-                                                class="btn btn-block btn-primary"> Book Now</button>
-                                        @endif
-
-                                    </div>
-                                </div>
+                                @include('site.services.card')
                             </div>
                             @endif
                         @endforeach
