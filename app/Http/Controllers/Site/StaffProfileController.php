@@ -29,7 +29,7 @@ class StaffProfileController extends Controller
 
         $all_sub_titles = [];
         foreach ($sub_titles as $sub_title) {
-            $sub_title_parts = preg_split('/[\/,&]/', $sub_title);
+            $sub_title_parts = explode('/', $sub_title);;
             $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
         }
         $sub_titles = array_unique(array_filter($all_sub_titles));
@@ -41,7 +41,7 @@ class StaffProfileController extends Controller
 
         $all_locations = [];
         foreach ($locations as $location) {
-            $location_parts = preg_split('/[\/,&]/', $location);
+            $location_parts = explode('/', $location);;
             $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
         }
         $locations = array_unique(array_filter($all_locations));

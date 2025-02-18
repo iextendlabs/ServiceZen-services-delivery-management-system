@@ -18,6 +18,7 @@
     @endif
     <form action="{{ route('serviceStaff.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
+        <span class="text-danger">Note: To add multiple values in a single input field, use \ as a separator. For example, for "Sub Title": Skin\Hair\Massage, etc.</span>
         <ul class="nav nav-tabs" id="myTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
