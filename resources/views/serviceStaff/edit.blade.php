@@ -21,6 +21,7 @@
     <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
         <input type="hidden" value="{{ $serviceStaff->staff->id ?? "" }}" name="staff_id">
         <input type="hidden" value="{{ $freelancer_join }}" name="freelancer_join" />
+        <span class="text-danger">Note: To add multiple values in a single input field, use \ as a separator. For example, for "Sub Title": Skin\Hair\Massage, etc.</span>
         @csrf
         @method('PUT')
         <input type="hidden" name="url" value="{{ url()->previous() }}">
