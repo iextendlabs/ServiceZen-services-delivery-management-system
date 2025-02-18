@@ -154,7 +154,7 @@
                 <div class="col-md-12">
                     <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
                         {{ $category->title }}</h2>
-                    <div class="owl-carousel">
+                    <div class="owl-carousel owl-carousel-category-service">
                         @foreach ($category->services as $service)
                             @if($service->status == 1)
                             <div class="item">
@@ -213,7 +213,7 @@
                     <div class="col-md-12">
                         <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
                             {{ $single_category->title }}</h2>
-                        <div class="owl-carousel">
+                        <div class="owl-carousel owl-carousel-category-service">
                             @foreach ($single_category->services->where('status', 1)->take(10) as $service)
                                 @if($service->status == 1)
                                 <div class="item">
@@ -273,7 +273,7 @@
         <div class="album py-5">
             @if (isset($services))
                 <div class="row">
-                    <div class="owl-carousel">
+                    <div class="owl-carousel owl-carousel-category-service">
                         @foreach ($services as $service)
                         @if($service->status == 1)
                             <div class="item">
@@ -384,83 +384,20 @@
                         @include('site.reviews.create')
                     </div>
                 @endif
+            </div>
+            <div class="row pt-4">
                 <div class="col-md-12">
-                    <h2 class="text-center">Our Team</h2>
-                    <div id="staffCarousel" class="carousel slide" data-ride="carousel">
-                        <ol class="carousel-indicators">
-                            @foreach ($staffs->chunk($staffs_chunk) as $key => $chunk)
-                                <li data-target="#staffCarousel" data-slide-to="{{ $key }}"
-                                    class="{{ $loop->first ? 'active' : '' }}"></li>
-                            @endforeach
-                        </ol>
-                        <div class="carousel-inner">
-                            @foreach ($staffs->chunk($staffs_chunk) as $chunk)
-                                <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                    <div class="row">
-                                        @foreach ($chunk as $staff)
-                                            <div class="col-md-3">
-                                                <div class="card mb-3">
-                                                    <div class="col-md-12 text-center">
-                                                        <div class="d-flex justify-content-center align-items-center"
-                                                            style="min-height: 230px;">
-                                                            <img src="./staff-images/{{ $staff->staff->image }}"
-                                                                class="card-img-top img-fluid rounded-circle"
-                                                                alt="{{ $staff->name }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="card-body text-center"
-                                                        style="height: 305px; align-content: center;">
-                                                        <h6 class="card-title" style="height: 40px; overflow: hidden;">
-                                                            {{ $staff->name }}</h6>
-                                                        <h6 class="card-title" style="height: 40px; overflow: hidden;">
-                                                            {{ $staff->staff->sub_title }}</h6>
-                                                        <p class="card-title" style="height: 25px; overflow: hidden;">
-                                                            Extra Charges:<b>@currency($staff->staff->charges, false)</b></p>
-                                                        @if ($staff->staff->location)
-                                                            <p class="card-title" style="height: 50px; overflow: hidden;">
-                                                                {{ $staff->staff->location }}</p>
-                                                        @endif
-                                                        <a href="{{ route('staffProfile.show', $staff->id) }}"
-                                                            class="btn btn-block btn-primary">View</a>
-                                                        @php
-                                                            $rating = $staff->averageRating();
-                                                            $fullStars = floor($rating);
-                                                            $halfStar = $rating - $fullStars >= 0.5;
-                                                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
-                                                        @endphp
-
-                                                        @for ($i = 0; $i < $fullStars; $i++)
-                                                            <i class="fas fa-star text-warning fa-xs"></i>
-                                                        @endfor
-
-                                                        @if ($halfStar)
-                                                            <i class="fas fa-star-half-alt text-warning fa-xs"></i>
-                                                        @endif
-
-                                                        @for ($i = 0; $i < $emptyStars; $i++)
-                                                            <i class="far fa-star text-muted fa-xs"></i>
-                                                        @endfor
-                                                        ({{ count($staff->reviews) }} Reviews)
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <a class="carousel-control-prev" href="#staffCarousel" role="button" data-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="carousel-control-next" href="#staffCarousel" role="button" data-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
+                    <h2 class="text-center">Our Member</h2>
+                    <div class="owl-carousel owl-carousel-staff">
+                        @foreach ($staffs as $staff)
+                            <div class="item">
+                                @include('site.staff.card')
+                            </div>
+                        @endforeach
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Team</a>
+                    <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Member</a>
                 </div>
             </div>
             @if (count($FAQs))
@@ -509,7 +446,7 @@
 
     <script>
         $(document).ready(function() {
-            $(".owl-carousel").owlCarousel({
+            $(".owl-carousel-category-service").owlCarousel({
                 loop: false,
                 margin: 15,
                 nav: true, // Hide navigation arrows
@@ -526,6 +463,31 @@
                     },
                     1000: {
                         items: 3
+                    }
+                },
+                navText: [
+                    '<i class="fa fa-chevron-left"></i>', // Left navigation arrow
+                    '<i class="fa fa-chevron-right"></i>' // Right navigation arrow
+                ]
+            });
+
+            $(".owl-carousel-staff").owlCarousel({
+                loop: false,
+                margin: 15,
+                nav: true, // Hide navigation arrows
+                dots: false, // Show dots only
+                autoplay: true,
+                autoplayTimeout: 10000,
+                items: 4,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 4
+                    },
+                    1000: {
+                        items: 4
                     }
                 },
                 navText: [
