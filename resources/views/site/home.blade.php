@@ -387,7 +387,7 @@
             </div>
             <div class="row pt-4">
                 <div class="col-md-12">
-                    <h2 class="text-center">Our Member</h2>
+                    <h2 class="text-center">Our Members</h2>
                     <div class="owl-carousel owl-carousel-staff">
                         @foreach ($staffs as $staff)
                             <div class="item">
@@ -397,7 +397,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Member</a>
+                    <a href="{{ route('staffProfile.index') }}" type="button" class="btn btn-primary">Our Members</a>
                 </div>
             </div>
             @if (count($FAQs))
