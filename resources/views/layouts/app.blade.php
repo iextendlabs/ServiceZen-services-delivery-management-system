@@ -107,7 +107,7 @@
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
-                        @if(auth()->user()->hasRole("Admin"))
+                        @can('menu-new-joinee')
                         
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -115,11 +115,15 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                @can('affiliate-program-list')
                                 <a class="dropdown-item" href="{{ route('affiliateProgram.index') }}">Affiliate</a>
+                                @endcan
+                                @can('freelancer-program-list')
                                 <a class="dropdown-item" href="{{ route('freelancerProgram.index') }}">Freelancer</a>
+                                @endcan
                             </div>
                         </li>
-                        @endif
+                        @endcan
                         @can('campaign-list')
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('campaigns.index')}}">Campaigns</a>

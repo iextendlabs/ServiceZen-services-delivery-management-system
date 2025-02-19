@@ -18,6 +18,13 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'affiliate-program-list',
+            'affiliate-program-edit',
+            'affiliate-program-delete',
+            'freelancer-program-list',
+            'freelancer-program-edit',
+            'freelancer-program-delete',
+            'menu-new-joinee',
             'quote-list',
             'quote-create',
             'quote-edit',
@@ -129,10 +136,6 @@ class PermissionTableSeeder extends Seeder
             'staff-group-create',
             'staff-group-edit',
             'staff-group-delete',
-            'partner-list',
-            'partner-create',
-            'partner-edit',
-            'partner-delete',
             'holiday-list',
             'service-list',
             'service-create',

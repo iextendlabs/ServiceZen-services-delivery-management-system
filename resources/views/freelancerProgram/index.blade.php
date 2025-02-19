@@ -42,11 +42,14 @@
                                     <form id="deleteForm{{ $user->id }}"
                                         action="{{ route('serviceStaff.destroy', $user->id) }}" method="POST">
                                         @if ($user->freelancer_program === '0')
+                                            @can('freelancer-program-edit')
                                             <a class="btn btn-success"
                                                 href="{{ route('freelancerProgram.edit', $user->id) }}?status=Accepted">
                                                 <i class="fas fa-thumbs-up"></i>
                                             </a>
+                                            @endcan
                                         @elseif ($user->freelancer_program === '1')
+                                            @can('freelancer-program-edit')
                                             <a class="btn btn-danger"
                                                 href="{{ route('freelancerProgram.edit', $user->id) }}?status=Rejected">
                                                 <i class="fas fa-thumbs-down"></i>
@@ -55,15 +58,18 @@
                                                 href="{{ route('serviceStaff.edit', $user->id) }}?freelancer_join=1">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            @endcan
                                             <a class="btn btn-warning"
                                                 href="{{ route('serviceStaff.show', $user->id) }}?freelancer_join=1">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         @endif
                                         @csrf
+                                        @can('freelancer-program')
                                         @method('DELETE')
                                         <button type="button" onclick="confirmDelete('{{ $user->id }}')"
                                             class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                        @endcan
                                     </form>
                                 </td>
                             </tr>
