@@ -302,7 +302,7 @@ class AffiliateController extends Controller
 
         foreach ($request->categories as $categoryData) {
             $affiliateCategory = AffiliateCategory::create([
-                'affiliate_id' => $affiliate->id,
+                'affiliate_id' => $id,
                 'category_id' => $categoryData['category_id'],
                 'commission_type' => $categoryData['commission_type'],
                 'commission' => $categoryData['category_commission'],
