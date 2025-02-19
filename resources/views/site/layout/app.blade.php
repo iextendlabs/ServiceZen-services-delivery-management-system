@@ -277,7 +277,16 @@
                                 <a class="dropdown-item" href="{{ route('siteComplaints.index') }}">My Complaint</a>
                                 <a class="dropdown-item" href="{{ route('order.index') }}">Orders</a>
                                 <a class="dropdown-item" href="{{ route('customer.logout') }}">Logout</a>
-                                <a class="dropdown-item" href="/deleteAccount">Delete Account</a>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="confirmDelete('/deleteAccount')">Delete Account</a>
+
+                                <script>
+                                    function confirmDelete(url) {
+                                        if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+                                            window.location.href = url;
+                                        }
+                                    }
+                                </script>
+
                             @endguest
                         </div>
                     </li>
