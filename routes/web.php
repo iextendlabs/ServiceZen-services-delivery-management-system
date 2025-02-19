@@ -209,6 +209,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/bid-chat/{bid_id}/send', [BidChatController::class, 'sendMessage'])->name('bid.chat.send');
     Route::get('/quote/{quote_id}/bids', [BidController::class, 'index'])->name('quote.bids');
 
+    Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
+
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 
