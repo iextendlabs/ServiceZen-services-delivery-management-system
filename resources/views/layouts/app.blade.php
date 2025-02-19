@@ -115,8 +115,12 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                @can('affiliate-program-list')
                                 <a class="dropdown-item" href="{{ route('affiliateProgram.index') }}">Affiliate</a>
+                                @endcan
+                                @can('freelancer-program-list')
                                 <a class="dropdown-item" href="{{ route('freelancerProgram.index') }}">Freelancer</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan

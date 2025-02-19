@@ -41,11 +41,14 @@
                                     <form id="deleteForm{{ $user->id }}"
                                         action="{{ route('affiliates.destroy', $user->id) }}" method="POST">
                                         @if ($user->affiliate_program === '0')
+                                            @can('affiliate-program-edit')
                                             <a class="btn btn-success"
                                                 href="{{ route('affiliateProgram.edit', $user->id) }}?status=Accepted">
                                                 <i class="fas fa-thumbs-up"></i>
                                             </a>
+                                            @endcan
                                         @elseif ($user->affiliate_program === '1')
+                                            @can('affiliate-program-edit')
                                             <a class="btn btn-danger"
                                                 href="{{ route('affiliateProgram.edit', $user->id) }}?status=Rejected">
                                                 <i class="fas fa-thumbs-down"></i>
@@ -53,6 +56,7 @@
                                             <a class="btn btn-primary" href="{{ route('affiliates.edit', $user->id) }}">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            @endcan
                                             <a class="btn btn-warning" href="{{ route('affiliates.show', $user->id) }}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
@@ -60,9 +64,11 @@
 
                                         @csrf
                                         @method('DELETE')
+                                        @can('affiliate-program-delete')
                                         <button type="button" class="btn btn-danger"
                                             onclick="confirmDelete('{{ $user->id }}')"><i
                                                 class="fa fa-trash"></i></button>
+                                        @endcan
                                     </form>
                                 </td>
                             </tr>
