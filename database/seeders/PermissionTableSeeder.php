@@ -18,6 +18,7 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'menu-new-joinee',
             'quote-list',
             'quote-create',
             'quote-edit',
