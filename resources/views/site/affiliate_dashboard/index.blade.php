@@ -102,6 +102,71 @@
                 </div>
             @endif
         </div>
+        <div class="row bg-light py-5 mb-4">
+            <div class="col-md-12">
+                <h4>Affiliate Commissions</h4>
+            
+                @if(isset($user->affiliate) && $user->affiliate->commission)
+                    <div class="alert alert-info">
+                        <strong>Global Commission:</strong> {{ $user->affiliate->commission }}% 
+                        applied.
+                    </div>
+                @endif
+            
+                @if($user->affiliateCategories->isNotEmpty()) 
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Services</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($user->affiliateCategories as $category)
+                                <tr>
+                                    <td>{{ $category->category->title }}</td>
+                                    <td>
+                                        @if($category->services->isNotEmpty())
+                                            <table class="table table-sm table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Service</th>
+                                                        <th>Service Commission</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($category->services as $service)
+                                                        <tr>
+                                                            <td>{{ $service->service->name }}</td>
+                                                            <td>
+                                                                {{ $service->commission ?: $user->affiliate->commission }} 
+                                                                {{ $service->commission_type == 'percentage' ? '%' : 'Fixed' }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            <div class="alert alert-info">
+                                                {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all other services.
+                                            </div>
+                                        @else
+                                            <div class="alert alert-info">
+                                                {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all services.
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @elseif(!isset($user->affiliate) || !$user->affiliate->commission)
+                    <div class="alert alert-warning">
+                        No commissions available.
+                    </div>
+                @endif
+            </div>
+        </div>
+        
         <div class="row bg-light py-3 mb-4">
             <div class="col-md-12">
                 <h4>Account Actions</h4>

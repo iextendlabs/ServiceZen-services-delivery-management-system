@@ -123,25 +123,26 @@ class AffiliateController extends Controller
         $affiliate->assignRole('Affiliate');
 
         Affiliate::create($input);
-
-        foreach ($request->categories as $categoryData) {
-            // Save Category Commission
-            $affiliateCategory = AffiliateCategory::create([
-                'affiliate_id' => $affiliate->id,
-                'category_id' => $categoryData['category_id'],
-                'commission_type' => $categoryData['commission_type'],
-                'commission' => $categoryData['category_commission'],
-            ]);
-    
-            // Save Service Commissions (if any)
-            if (!empty($categoryData['services'])) {
-                foreach ($categoryData['services'] as $serviceData) {
-                    AffiliateService::create([
-                        'affiliate_category_id' => $affiliateCategory->id,
-                        'service_id' => $serviceData['service_id'],
-                        'commission_type' => $serviceData['commission_type'],
-                        'commission' => $serviceData['service_commission'],
-                    ]);
+        if($request->categories){
+            foreach ($request->categories as $categoryData) {
+                // Save Category Commission
+                $affiliateCategory = AffiliateCategory::create([
+                    'affiliate_id' => $affiliate->id,
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
+                ]);
+        
+                // Save Service Commissions (if any)
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
                 }
             }
         }
@@ -300,22 +301,24 @@ class AffiliateController extends Controller
         
         AffiliateCategory::where('affiliate_id', $id)->delete();
 
-        foreach ($request->categories as $categoryData) {
-            $affiliateCategory = AffiliateCategory::create([
-                'affiliate_id' => $id,
-                'category_id' => $categoryData['category_id'],
-                'commission_type' => $categoryData['commission_type'],
-                'commission' => $categoryData['category_commission'],
-            ]);
-    
-            if (!empty($categoryData['services'])) {
-                foreach ($categoryData['services'] as $serviceData) {
-                    AffiliateService::create([
-                        'affiliate_category_id' => $affiliateCategory->id,
-                        'service_id' => $serviceData['service_id'],
-                        'commission_type' => $serviceData['commission_type'],
-                        'commission' => $serviceData['service_commission'],
-                    ]);
+        if($request->categories){
+            foreach ($request->categories as $categoryData) {
+                $affiliateCategory = AffiliateCategory::create([
+                    'affiliate_id' => $id,
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
+                ]);
+        
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
                 }
             }
         }
