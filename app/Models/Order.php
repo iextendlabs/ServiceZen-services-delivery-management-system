@@ -186,12 +186,17 @@ class Order extends Model
                             continue;
                         }
 
+                        if (isset($processedServices[$category_id][$orderService->service_id])) {
+                            continue;
+                        }
+
                         $affiliateCategory = $affiliateCategories[$category_id];
 
                         $service = $affiliateCategory->services->where('service_id', $orderService->service_id)->first();
 
                         if ($service || isset($affiliateCategories[$category_id])) {
                             $servicesWithCommission++;
+                            $processedServices[$category_id][$orderService->service_id] = true;
                         }
                     }
                 }
@@ -276,12 +281,17 @@ class Order extends Model
                                         continue;
                                     }
 
+                                    if (isset($processedServices[$category_id][$orderService->service_id])) {
+                                        continue;
+                                    }
+
                                     $affiliateCategory = $affiliateCategories[$category_id];
 
                                     $service = $affiliateCategory->services->where('service_id', $orderService->service_id)->first();
 
                                     if ($service || isset($affiliateCategories[$category_id])) {
                                         $servicesWithCommission++;
+                                        $processedServices[$category_id][$orderService->service_id] = true;
                                     }
                                 }
                             }
