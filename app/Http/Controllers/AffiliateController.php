@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
 use App\Models\AffiliateCategory;
+use App\Models\AffiliateService;
 use App\Models\MembershipPlan;
+use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\Transaction;
@@ -121,27 +123,27 @@ class AffiliateController extends Controller
         $affiliate->assignRole('Affiliate');
 
         Affiliate::create($input);
-
-        $categories = $request->input('categories');
-        $commissions = $request->input('category_commission');
-
-        if ($categories && $commissions) {
-            $categoryCommissionPairs = array_map(null, $categories, $commissions);
-
-            $uniqueCategoryCommissionPairs = [];
-            foreach ($categoryCommissionPairs as $pair) {
-                [$categoryId, $commission] = $pair;
-                if (!isset($uniqueCategoryCommissionPairs[$categoryId])) {
-                    $uniqueCategoryCommissionPairs[$categoryId] = $commission;
-                }
-            }
-
-            foreach ($uniqueCategoryCommissionPairs as $categoryId => $commission) {
-                AffiliateCategory::create([
+        if($request->categories){
+            foreach ($request->categories as $categoryData) {
+                // Save Category Commission
+                $affiliateCategory = AffiliateCategory::create([
                     'affiliate_id' => $affiliate->id,
-                    'category_id' => $categoryId,
-                    'commission' => $commission
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
                 ]);
+        
+                // Save Service Commissions (if any)
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
+                }
             }
         }
 
@@ -212,7 +214,8 @@ class AffiliateController extends Controller
         $affiliateUser = UserAffiliate::where('affiliate_id', $affiliate->id)->get();
 
         $categories = ServiceCategory::where("status", '1')->orderBy("title")->get();
-        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join', 'affiliates', 'membership_plans', 'categories'));
+        $services = Service::where("status", '1')->orderBy("name")->get();
+        return view('affiliates.edit', compact('affiliate', 'affiliateUser', 'affiliate_join', 'affiliates', 'membership_plans', 'categories','services'));
     }
 
     /**
@@ -295,32 +298,30 @@ class AffiliateController extends Controller
         $user->assignRole('Affiliate');
 
         $user->update($input);
-
-        $categories = $request->input('categories');
-        $commissions = $request->input('category_commission');
         
         AffiliateCategory::where('affiliate_id', $id)->delete();
 
-        if ($categories && $commissions) {
-            $categoryCommissionPairs = array_map(null, $categories, $commissions);
-
-            $uniqueCategoryCommissionPairs = [];
-            foreach ($categoryCommissionPairs as $pair) {
-                [$categoryId, $commission] = $pair;
-                if (!isset($uniqueCategoryCommissionPairs[$categoryId])) {
-                    $uniqueCategoryCommissionPairs[$categoryId] = $commission;
+        if($request->categories){
+            foreach ($request->categories as $categoryData) {
+                $affiliateCategory = AffiliateCategory::create([
+                    'affiliate_id' => $id,
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
+                ]);
+        
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
                 }
             }
-
-            foreach ($uniqueCategoryCommissionPairs as $categoryId => $commission) {
-                AffiliateCategory::create([
-                    'affiliate_id' => $id,
-                    'category_id' => $categoryId,
-                    'commission' => $commission
-                ]);
-            }
         }
-
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -389,4 +390,14 @@ class AffiliateController extends Controller
         // Send the CSV file as response
         return response()->stream($callback, 200, $headers);
     }
+
+    public function getServicesByCategory(Request $request)
+    {
+        $services = Service::whereHas('categories', function ($query) use ($request) {
+            $query->where('category_id', $request->category_id);
+        })->get();
+
+        return response()->json($services);
+    }
+
 }

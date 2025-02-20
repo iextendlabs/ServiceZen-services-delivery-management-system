@@ -65,6 +65,32 @@
                 display: none;
             }
         }
+
+        .select2-container .select2-selection--single {
+            height: calc(2.25rem + 2px); /* Match Bootstrap form-control height */
+            padding: .375rem .75rem;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 1.5;
+            padding-left: 0;
+        }
+
+        .select2-container--default .select2-selection--single:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25); /* Bootstrap focus shadow */
+        }
+
+        .select2-container .select2-search__field {
+            width: 100% !important;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+        }
     </style>
 </head>
 

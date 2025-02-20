@@ -164,50 +164,86 @@ class Order extends Model
         $staff_commission = $staff_commission - $staff_affiliate_commission;
 
         if ($affiliate && $affiliate->affiliate && $affiliate->affiliate->commission) {
-            $affiliateCategories = $affiliate->affiliateCategories->pluck('commission', 'category_id')->toArray();
+            $affiliateCategories = $affiliate->affiliateCategories->keyBy('category_id');
+            $orderServices = $this->orderServices()->with('service.categories')->get();
 
-            if (!empty($affiliateCategories)) {
-                $orderServices = $this->orderServices()->with('service.categories')->get();
-                $categoryServiceMap = [];
+            if(count($affiliateCategories) > 0){
+                $affiliate_commission = 0;
+                $processedServices = [];
 
-                $orderServices->each(function ($orderService) use (&$categoryServiceMap) {
-                    $orderService->service->categories->each(function ($category) use (&$categoryServiceMap, $orderService) {
-                        $categoryServiceMap[$category->id][] = $orderService->service_id;
-                    });
-                });
+                $additional_charges = ($staff_commission + $staff_affiliate_commission + $this->order_total->staff_charges + $this->order_total->transport_charges + $this->order_total->discount);
 
-                $commonKeys = array_intersect_key($categoryServiceMap, $affiliateCategories);
-                $commonCount = count($commonKeys);
+                $servicesWithCommission = 0;
+                foreach ($orderServices as $orderService) {
+                    if (!$orderService->service || !$orderService->service->categories || $orderService->service->categories->isEmpty()) {
+                        continue;
+                    }
 
-                if ($commonCount > 0) {
-                    $additional_charges = ($staff_commission + $staff_affiliate_commission + $this->order_total->staff_charges + $this->order_total->transport_charges + $this->order_total->discount) / $commonCount;
+                    foreach ($orderService->service->categories as $category) {
+                        $category_id = $category->id;
 
-                    $processedServices = [];
+                        if (!isset($affiliateCategories[$category_id])) {
+                            continue;
+                        }
 
-                    foreach ($affiliateCategories as $category_id => $commission) {
-                        if (array_key_exists($category_id, $categoryServiceMap)) {
-                            $serviceIds = $categoryServiceMap[$category_id];
+                        if (isset($processedServices[$category_id][$orderService->service_id])) {
+                            continue;
+                        }
 
-                            $unprocessedServiceIds = array_diff($serviceIds, $processedServices);
+                        $affiliateCategory = $affiliateCategories[$category_id];
 
-                            if (empty($unprocessedServiceIds)) {
-                                continue;
-                            }
+                        $service = $affiliateCategory->services->where('service_id', $orderService->service_id)->first();
 
-                            $service_price = $this->orderServices
-                                ->whereIn('service_id', $unprocessedServiceIds)
-                                ->sum('price');
-
-                            $affiliate_commission_apply_amount = $service_price - $additional_charges;
-
-                            $affiliate_commission += ($affiliate_commission_apply_amount * $commission) / 100;
-
-                            $processedServices = array_merge($processedServices, $unprocessedServiceIds);
+                        if ($service || isset($affiliateCategories[$category_id])) {
+                            $servicesWithCommission++;
+                            $processedServices[$category_id][$orderService->service_id] = true;
                         }
                     }
                 }
-            } else {
-                $affiliate_commission_rate = 0;
+
+                $adjusted_additional_charges = $servicesWithCommission ? $additional_charges / $servicesWithCommission : $additional_charges;
+
+                foreach ($orderServices as $orderService) {
+                    if (!$orderService->service || !$orderService->service->categories || $orderService->service->categories->isEmpty()) {
+                        continue;
+                    }
+
+                    foreach ($orderService->service->categories as $category) {
+                        $category_id = $category->id;
+
+                        if (!isset($affiliateCategories[$category_id])) {
+                            continue;
+                        }
+
+                        $affiliateCategory = $affiliateCategories[$category_id];
+
+                        $service = $affiliateCategory->services->where('service_id', $orderService->service_id)->first();
+
+                        if ($service) {
+                            $service_price = $orderService->price;
+                            $commission_rate = $service->commission;
+                            $commission_type = $service->commission_type;
+                        } else {
+                            $service_price = $orderService->price;
+                            $commission_rate = $affiliateCategory->commission;
+                            $commission_type = $affiliateCategory->commission_type;
+                        }
+
+                        if (!in_array($orderService->service_id, $processedServices)) {
+                            $commission_apply_amount = $service_price - $adjusted_additional_charges;
+
+                            if ($commission_type === 'percentage') {
+                                $calculated_commission = ($commission_apply_amount * $commission_rate) / 100;
+                            } else {
+                                $calculated_commission = $commission_rate;
+                            }
+
+                            $affiliate_commission += $calculated_commission;
+                            $processedServices[] = $orderService->service_id;
+                        }
+                    }
+                }
+            }else{
                 $affiliate_commission_rate = $affiliate->affiliate->commission ?? 0;
                 $affiliate_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $affiliate_commission_rate) / 100;
             }
@@ -223,54 +259,87 @@ class Order extends Model
                     }
                 } else {
                     if ($userAffiliate->affiliate) {
+                        $affiliateCategories = $userAffiliate->affiliateUser->affiliateCategories->keyBy('category_id');
+                        $orderServices = $this->orderServices()->with('service.categories')->get();
 
-                        $affiliateCategories = $userAffiliate->affiliateUser->affiliateCategories->pluck('commission', 'category_id')->toArray();
+                        if(count($affiliateCategories) > 0){
+                            $affiliate_commission = 0;
+                            $processedServices = [];
 
-                        if (!empty($affiliateCategories)) {
-                            $orderServices = $this->orderServices()->with('service.categories')->get();
-                            $categoryServiceMap = [];
+                            $additional_charges = ($staff_commission + $staff_affiliate_commission + $this->order_total->staff_charges + $this->order_total->transport_charges + $this->order_total->discount);
 
-                            $orderServices->each(function ($orderService) use (&$categoryServiceMap) {
-                                $orderService->service->categories->each(function ($category) use (&$categoryServiceMap, $orderService) {
-                                    $categoryServiceMap[$category->id][] = $orderService->service_id;
-                                });
-                            });
+                            $servicesWithCommission = 0;
+                            foreach ($orderServices as $orderService) {
+                                if (!$orderService->service || !$orderService->service->categories || $orderService->service->categories->isEmpty()) {
+                                    continue;
+                                }
 
-                            $commonKeys = array_intersect_key($categoryServiceMap, $affiliateCategories);
-                            $commonCount = count($commonKeys);
+                                foreach ($orderService->service->categories as $category) {
+                                    $category_id = $category->id;
 
-                            if ($commonCount > 0) {
-                                $additional_charges = ($staff_commission + $staff_affiliate_commission + $this->order_total->staff_charges + $this->order_total->transport_charges + $this->order_total->discount) / $commonCount;
+                                    if (!isset($affiliateCategories[$category_id])) {
+                                        continue;
+                                    }
 
-                                $processedServices = [];
+                                    if (isset($processedServices[$category_id][$orderService->service_id])) {
+                                        continue;
+                                    }
 
-                                foreach ($affiliateCategories as $category_id => $commission) {
-                                    if (array_key_exists($category_id, $categoryServiceMap)) {
-                                        $serviceIds = $categoryServiceMap[$category_id];
+                                    $affiliateCategory = $affiliateCategories[$category_id];
 
-                                        $unprocessedServiceIds = array_diff($serviceIds, $processedServices);
+                                    $service = $affiliateCategory->services->where('service_id', $orderService->service_id)->first();
 
-                                        if (empty($unprocessedServiceIds)) {
-                                            continue;
-                                        }
-
-                                        $service_price = $this->orderServices
-                                            ->whereIn('service_id', $unprocessedServiceIds)
-                                            ->sum('price');
-
-                                        $affiliate_commission_apply_amount = $service_price - $additional_charges;
-
-                                        $affiliate_commission += ($affiliate_commission_apply_amount * $commission) / 100;
-
-                                        $processedServices = array_merge($processedServices, $unprocessedServiceIds);
+                                    if ($service || isset($affiliateCategories[$category_id])) {
+                                        $servicesWithCommission++;
+                                        $processedServices[$category_id][$orderService->service_id] = true;
                                     }
                                 }
                             }
-                        } else {
-                            $affiliate_commission_rate = 0;
-                            if ($userAffiliate->affiliate->commission) {
-                                $affiliate_commission_rate = $userAffiliate->affiliate->commission;
+
+                            $adjusted_additional_charges = $servicesWithCommission ? $additional_charges / $servicesWithCommission : $additional_charges;
+
+                            foreach ($orderServices as $orderService) {
+                                if (!$orderService->service || !$orderService->service->categories || $orderService->service->categories->isEmpty()) {
+                                    continue;
+                                }
+
+                                foreach ($orderService->service->categories as $category) {
+                                    $category_id = $category->id;
+
+                                    if (!isset($affiliateCategories[$category_id])) {
+                                        continue;
+                                    }
+
+                                    $affiliateCategory = $affiliateCategories[$category_id];
+
+                                    $service = $affiliateCategory->services->where('service_id', $orderService->service_id)->first();
+
+                                    if ($service) {
+                                        $service_price = $orderService->price;
+                                        $commission_rate = $service->commission;
+                                        $commission_type = $service->commission_type;
+                                    } else {
+                                        $service_price = $orderService->price;
+                                        $commission_rate = $affiliateCategory->commission;
+                                        $commission_type = $affiliateCategory->commission_type;
+                                    }
+
+                                    if (!in_array($orderService->service_id, $processedServices)) {
+                                        $commission_apply_amount = $service_price - $adjusted_additional_charges;
+
+                                        if ($commission_type === 'percentage') {
+                                            $calculated_commission = ($commission_apply_amount * $commission_rate) / 100;
+                                        } else {
+                                            $calculated_commission = $commission_rate;
+                                        }
+
+                                        $affiliate_commission += $calculated_commission;
+                                        $processedServices[] = $orderService->service_id;
+                                    }
+                                }
                             }
+                        }else{
+                            $affiliate_commission_rate = $userAffiliate->affiliate->commission ?? 0;
                             $affiliate_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $affiliate_commission_rate) / 100;
                         }
                     }
