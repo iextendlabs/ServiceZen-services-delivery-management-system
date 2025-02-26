@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateCategory;
+use App\Models\AffiliateService;
 use App\Models\MembershipPlan;
 use App\Models\Service;
 use App\Models\ServiceCategory;
@@ -255,6 +257,30 @@ class ServiceStaffController extends Controller
         
         UserDocument::create($input);
         
+        if($request->categories){
+            foreach ($request->categories as $categoryData) {
+                // Save Category Commission
+                $affiliateCategory = AffiliateCategory::create([
+                    'affiliate_id' => $user_id,
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
+                ]);
+        
+                // Save Service Commissions (if any)
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
+                }
+            }
+        }
+
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -479,6 +505,30 @@ class ServiceStaffController extends Controller
                         'day' => $day,
                         'time_slot_id' => $driver['time_slot_id'],
                     ]);
+                }
+            }
+        }
+
+        AffiliateCategory::where('affiliate_id', $id)->delete();
+
+        if($request->categories){
+            foreach ($request->categories as $categoryData) {
+                $affiliateCategory = AffiliateCategory::create([
+                    'affiliate_id' => $id,
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
+                ]);
+        
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
                 }
             }
         }

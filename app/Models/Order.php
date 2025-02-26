@@ -37,6 +37,11 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function serviceStaff()
+    {
+        return $this->hasOne(User::class, 'id', 'service_staff_id');
+    }
+
     public function transaction()
     {
         return  $this->hasOne(Transaction::class);
@@ -149,19 +154,99 @@ class Order extends Model
         $affiliate = $this->affiliate;
         $driver = $this->driver;
 
-        if ($staff && $staff->commission) {
-            if ($staff->affiliate) {
-                $staff_affiliate_commission_rate = $staff->affiliate->affiliate && $staff->affiliate->affiliate->commission ? $staff->affiliate->affiliate->commission : 0;
-            }
-            $staff_commission_rate = $staff->commission;
-        }
-
         $commission_apply_amount = $this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount;
 
-        $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
-        $staff_affiliate_commission = ($staff_commission * $staff_affiliate_commission_rate) / 100;
+        if ($staff) {
+            $staffCategories = $this->serviceStaff->affiliateCategories->keyBy('category_id');
+            $orderServices = $this->orderServices()->with('service.categories')->get();
 
-        $staff_commission = $staff_commission - $staff_affiliate_commission;
+            if(count($staffCategories) > 0){
+                $processedServices = [];
+
+                $additional_charges = ($this->order_total->staff_charges + $this->order_total->transport_charges + $this->order_total->discount);
+
+                $servicesWithCommission = 0;
+                foreach ($orderServices as $orderService) {
+                    if (!$orderService->service || !$orderService->service->categories || $orderService->service->categories->isEmpty()) {
+                        continue;
+                    }
+
+                    foreach ($orderService->service->categories as $category) {
+                        $category_id = $category->id;
+
+                        if (!isset($staffCategories[$category_id])) {
+                            continue;
+                        }
+
+                        if (isset($processedServices[$category_id][$orderService->service_id])) {
+                            continue;
+                        }
+
+                        $staffCategory = $staffCategories[$category_id];
+
+                        $service = $staffCategory->services->where('service_id', $orderService->service_id)->first();
+
+                        if ($service || isset($staffCategories[$category_id])) {
+                            $servicesWithCommission++;
+                            $processedServices[$category_id][$orderService->service_id] = true;
+                        }
+                    }
+                }
+
+                $adjusted_additional_charges = $servicesWithCommission ? $additional_charges / $servicesWithCommission : $additional_charges;
+
+                foreach ($orderServices as $orderService) {
+                    if (!$orderService->service || !$orderService->service->categories || $orderService->service->categories->isEmpty()) {
+                        continue;
+                    }
+
+                    foreach ($orderService->service->categories as $category) {
+                        $category_id = $category->id;
+
+                        if (!isset($staffCategories[$category_id])) {
+                            continue;
+                        }
+
+                        $staffCategory = $staffCategories[$category_id];
+
+                        $service = $staffCategory->services->where('service_id', $orderService->service_id)->first();
+
+                        if ($service) {
+                            $service_price = $orderService->price;
+                            $commission_rate = $service->commission;
+                            $commission_type = $service->commission_type;
+                        } else {
+                            $service_price = $orderService->price;
+                            $commission_rate = $staffCategory->commission;
+                            $commission_type = $staffCategory->commission_type;
+                        }
+
+                        if (!in_array($orderService->service_id, $processedServices)) {
+                            $commission_apply_amount = $service_price - $adjusted_additional_charges;
+
+                            if ($commission_type === 'percentage') {
+                                $calculated_commission = ($commission_apply_amount * $commission_rate) / 100;
+                            } else {
+                                $calculated_commission = $commission_rate;
+                            }
+
+                            $staff_commission += $calculated_commission;
+                            $processedServices[] = $orderService->service_id;
+                        }
+                    }
+                }
+            }else{
+                $staff_commission = $staff->commission ?? 0;
+                $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
+            }
+
+            if ($staff->affiliate) {
+                $staff_affiliate_commission_rate = $staff->affiliate->affiliate && $staff->affiliate->affiliate->commission ? $staff->affiliate->affiliate->commission : 0;
+                $staff_affiliate_commission = ($staff_commission * $staff_affiliate_commission_rate) / 100;
+            }
+            $staff_commission = $staff_commission - $staff_affiliate_commission;
+        }
+
 
         if ($affiliate && $affiliate->affiliate && $affiliate->affiliate->commission) {
             $affiliateCategories = $affiliate->affiliateCategories->keyBy('category_id');
@@ -363,7 +448,9 @@ class Order extends Model
         }
 
         $affiliate_commission -= $parent_affiliate_commission;
-
+        
+        $commission_apply_amount = $this->order_total->sub_total - $this->order_total->staff_charges - $this->order_total->transport_charges - $this->order_total->discount;
+        
         if ($driver && $driver->driver) {
             if ($driver->driver->commission) {
                 $driver_commission = (($commission_apply_amount - $staff_commission - $staff_affiliate_commission) * $driver->driver->commission) / 100;

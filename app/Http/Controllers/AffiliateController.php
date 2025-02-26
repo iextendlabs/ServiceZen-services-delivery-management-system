@@ -395,7 +395,7 @@ class AffiliateController extends Controller
     {
         $services = Service::whereHas('categories', function ($query) use ($request) {
             $query->where('category_id', $request->category_id);
-        })->get();
+        })->where('status', 1)->get();
 
         return response()->json($services);
     }
