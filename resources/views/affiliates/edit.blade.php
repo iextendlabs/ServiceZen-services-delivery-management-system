@@ -147,7 +147,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <strong>Categories:</strong>
+                        <strong>Categories base commission:</strong>
                         <table id="categoryTable" class="table table-bordered table-hover">
                             <thead>
                                 <tr>

@@ -256,6 +256,72 @@
         </div>
         @endif
         
+        @if(auth()->user()->hasRole('Staff'))
+        <div class="row py-5">
+            <div class="col-md-12">
+                <h4>Staff Commissions</h4>
+        
+                @if(isset(auth()->user()->staff) && auth()->user()->staff->commission)
+                    <div class="alert alert-info">
+                        <strong>Global Commission:</strong> {{ auth()->user()->staff->commission }}% 
+                        applied.
+                    </div>
+                @endif
+        
+                @if(auth()->user()->affiliateCategories->isNotEmpty()) 
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Services</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(auth()->user()->affiliateCategories as $category)
+                                <tr>
+                                    <td>{{ $category->category->title }}</td>
+                                    <td>
+                                        @if($category->services->isNotEmpty())
+                                            <table class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Service</th>
+                                                        <th>Service Commission</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($category->services as $service)
+                                                        <tr>
+                                                            <td>{{ $service->service->name }}</td>
+                                                            <td>
+                                                                {{ $service->commission ?: auth()->user()->staff->commission }} 
+                                                                {{ $service->commission_type == 'percentage' ? '%' : 'Fixed' }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            <div class="alert alert-info">
+                                                {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all other services.
+                                            </div>
+                                        @else
+                                            <div class="alert alert-info">
+                                                {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all services.
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @elseif(!isset(auth()->user()->staff) || !auth()->user()->staff->commission)
+                    <div class="alert alert-warning">
+                        No commissions available.
+                    </div>
+                @endif
+            </div>
+        </div>        
+        @endcan
         @can('order-list')
             <div class="py-2"></div>
             <div class="row">
