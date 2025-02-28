@@ -130,6 +130,11 @@
                             <a class="nav-link" aria-current="page" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
                         </li>
                         @endif
+                        @if(auth()->user()->hasRole('Staff'))
+                        <li class="nav-item">
+                            <button class="btn btn-primary mx-2" data-toggle="modal" data-target="#paymentModal">Add Funds</button>
+                        </li>
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/rota">Rota</a>
                         </li>
@@ -323,7 +328,7 @@
                 @yield('content')
         </main>
         <div id="addToCartPopup"></div>
-
+        @include('payment-modal')
     </div>
     <footer class="text-muted">
         <div class="container">

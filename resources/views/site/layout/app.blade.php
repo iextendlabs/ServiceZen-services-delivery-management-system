@@ -36,7 +36,7 @@
     
     <!-- Select dropdown -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -365,7 +365,7 @@
 
     <!-- Select dropdown -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
     <!-- Owl Carousel Initialization -->
     <script>
         $(document).ready(function(){

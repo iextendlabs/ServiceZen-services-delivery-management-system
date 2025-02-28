@@ -8,15 +8,32 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ route('siteQuotes.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
+
+            <div class="modal-body">
+                <form id="quoteForm" action="{{ route('siteQuotes.store') }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
                     <input type="hidden" id="service_id" name="service_id" value="{{ $service->id }}">
-                    <input type="hidden" id="user_id" name="user_id" value="{{ auth()->user()->id ?? '' }}">
+                    <!-- If user is not authenticated, show name and email fields -->
+                    @if (!auth()->check())
+                        <div class="form-group">
+                            <span style="color: red;">*</span><label for="guest_name">Name</label>
+                            <input type="text" class="form-control" id="guest_name" name="guest_name"
+                                placeholder="Enter your name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <span style="color: red;">*</span><label for="guest_email">Email</label>
+                            <input type="email" class="form-control" id="guest_email" name="guest_email"
+                                placeholder="Enter your email" required>
+                        </div>
+                    @else
+                        <input type="hidden" id="user_id" name="user_id" value="{{ auth()->user()->id ?? '' }}">
+                    @endif
 
                     <!-- Service Name -->
                     <div class="form-group">
-                        <label for="service_name">Service Name</label>
+                        <span style="color: red;">*</span><label for="service_name">Service Name</label>
                         <input required type="text" class="form-control" id="service_name" name="service_name"
                             value="{{ $service->name }}" readonly>
                     </div>
@@ -25,8 +42,8 @@
                     @if (count($service->serviceOption) > 0)
                         <div class="form-group">
                             <label for="service_option_id">Select Service Option</label>
-                            <select class="form-control" id="service_option_id" name="service_option_id">
-                                <option value="">Select an Option</option>
+                            <select class="form-control selectpicker" id="service_option_id" name="service_option_id[]"
+                                multiple data-live-search="true" data-actions-box="true">
                                 @foreach ($service->serviceOption as $option)
                                     <option value="{{ $option->id }}">{{ $option->option_name }} (@currency($option->option_price, true))
                                     </option>
@@ -37,57 +54,158 @@
 
                     <!-- Detail -->
                     <div class="form-group">
-                        <label for="detail">Detail</label>
-                        <textarea required style="height: 150px" class="form-control" id="detail" name="detail" rows="3"
-                            placeholder="Enter details"></textarea>
+                        <span style="color: red;">*</span><label for="detail">Detail</label>
+                        <textarea style="height: 150px" class="form-control" id="detail" name="detail" rows="3"
+                            placeholder="Enter details" required></textarea>
                     </div>
 
                     <!-- Mobile -->
                     <div class="form-group">
-                        <label for="number">Phone Number</label>
+                        <span style="color: red;">*</span><label for="number">Phone Number</label>
                         <input id="number_country_code" type="hidden" name="number_country_code" />
-                        <input type="tel" id="number" name="phone" class="form-control">
+                        <input type="tel" id="number" name="phone" class="form-control"
+                            value="{{ auth()->user()->customerProfile->number ?? '' }}" required>
                     </div>
 
                     <!-- WhatsApp -->
                     <div class="form-group">
-                        <label for="whatsapp">WhatsApp Number</label>
+                        <span style="color: red;">*</span><label for="whatsapp">WhatsApp Number</label>
                         <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                        <input type="tel" id="whatsapp" name="whatsapp" class="form-control">
+                        <input type="tel" id="whatsapp" name="whatsapp" class="form-control"
+                            value="{{ auth()->user()->customerProfile->whatsapp ?? '' }}" required>
                     </div>
 
                     <!-- Sourcing Quantity -->
                     <div class="form-group">
-                        <label for="sourcing_quantity">Sourcing Quantity</label>
+                        <span style="color: red;">*</span><label for="sourcing_quantity">Sourcing Quantity</label>
                         <input type="number" class="form-control" id="sourcing_quantity" name="sourcing_quantity"
                             placeholder="Enter quantity" required>
                     </div>
 
-                    <!-- Image Upload -->
                     <div class="form-group">
-                        <label for="image" class="font-weight-bold">Upload Image</label>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="image" name="image"
-                                accept="image/*" onchange="previewImage(event)">
-                            <label class="custom-file-label" for="image">Choose file...</label>
-                        </div>
-                        <div class="mt-3">
-                            <img id="imagePreview" src="" class="img-fluid d-none border rounded"
-                                style="max-width: 200px; max-height: 200px;">
+                        <label for="affiliate_code">Affiliate Code</label>
+                        <input type="text" class="form-control" id="affiliate_code" name="affiliate_code"
+                            placeholder="Enter Affiliate Code">
+                    </div>
+
+                    <div class="form-group">
+                        <span style="color: red;">*</span><label for="location">Location</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="location" name="location"
+                                placeholder="Enter your location" required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary" id="getLocationBtn">
+                                    📍 Use Current Location
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Quote</button>
-                </div>
-            </form>
+                    <!-- Image Upload -->
+                    <div class="form-group">
+                        <label for="images" class="font-weight-bold">Upload Multiple Images</label>
+                        <div id="drop-area" class="border p-3 rounded text-center"
+                            style="border: 2px dashed #ccc; cursor: pointer;">
+                            <i class="fa fa-cloud-upload-alt fa-2x text-muted"></i>
+                            <p class="text-muted">Click to select images or drag & drop them here</p>
+                            <input type="file" id="images" name="images[]" accept="image/*" multiple
+                                class="d-none">
+                            <button type="button" class="btn btn-primary btn-sm" id="selectImagesBtn">Select
+                                Images</button>
+                        </div>
+                        <div id="imagePreviewContainer" class="mt-3 d-flex flex-wrap"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit Quote</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    $(document).ready(function() {
+        $('#quoteForm').on('submit', function(e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        $('#quoteModal').modal('hide');
+                        alert(response.message);
+                    } else {
+                        let errors = response.errors;
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+
+                        // Loop through the errors object
+                        $.each(errors, function(field, messages) {
+                            $.each(messages, function(index, message) {
+                                errorHtml += '<li>' + message + '</li>';
+                            });
+                        });
+
+                        errorHtml += '</ul></div>';
+
+                        // Remove any existing error messages
+                        $('#quoteModal .alert-danger').remove();
+
+                        // Prepend the new error messages to the modal body
+                        $('#quoteModal .modal-body').prepend(errorHtml);
+                        $('#quoteModal').animate({
+                            scrollTop: 0
+                        }, 500);
+                    }
+                },
+                error: function(xhr) {
+                    // Handle server errors
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+    });
+    $("#getLocationBtn").click(function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    let latitude = position.coords.latitude;
+                    let longitude = position.coords.longitude;
+
+                    // Fetch address from OpenStreetMap API
+                    $.getJSON(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                        function(data) {
+                            if (data.display_name) {
+                                $("#location").val(data.display_name);
+                            } else {
+                                $("#location").val(`${latitude}, ${longitude}`);
+                            }
+                        }
+                    ).fail(function() {
+                        $("#location").val(`${latitude}, ${longitude}`);
+                    });
+                },
+                function(error) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        alert("You denied location access. Please allow it in browser settings.");
+                    } else {
+                        alert("Error fetching location: " + error.message);
+                    }
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    });
+
     $(document).ready(function() {
         function initializeIntlTelInput(inputField, countryCodeField) {
             if (!$(inputField).length || !$(countryCodeField).length) return; // Ensure elements exist
@@ -124,18 +242,90 @@
             initializeIntlTelInput("#whatsapp", "#whatsapp_country_code");
         });
     });
+
     $('.custom-file-input').on('change', function(event) {
         let fileName = $(this).val().split("\\").pop();
         $(this).siblings('.custom-file-label').addClass("selected").html(fileName);
     });
 
-    function previewImage(event) {
-        let reader = new FileReader();
-        reader.onload = function() {
-            let preview = document.getElementById('imagePreview');
-            preview.src = reader.result;
-            preview.classList.remove('d-none');
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
+    $(document).ready(function() {
+
+        $('.selectpicker').selectpicker();
+
+        $("#selectImagesBtn, #drop-area").on("click", function(event) {
+            if (event.target !== this) return; // Prevent triggering itself
+            $("#images").get(0).click();
+        });
+
+        $("#images").off("change").on("change", function(event) {
+            previewImages(event.target.files);
+        });
+
+        // Drag & Drop Feature
+        $("#drop-area").on("dragover", function(event) {
+            event.preventDefault();
+            $(this).css("border-color", "#007bff");
+        });
+
+        $("#drop-area").on("dragleave", function() {
+            $(this).css("border-color", "#ccc");
+        });
+
+        $("#drop-area").on("drop", function(event) {
+            event.preventDefault();
+            $(this).css("border-color", "#ccc");
+            let files = event.originalEvent.dataTransfer.files;
+            previewImages(files);
+        });
+
+        function previewImages(files) {
+            let previewContainer = $("#imagePreviewContainer");
+
+            $.each(files, function(index, file) {
+                // Check if the image already exists in the preview
+                let existingImages = previewContainer.find("img").map(function() {
+                    return $(this).attr("src");
+                }).get();
+
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    if (existingImages.includes(e.target.result)) return; // Skip duplicate images
+
+                    let imgWrapper = $("<div>").addClass("position-relative m-2").css({
+                        width: "120px",
+                        height: "120px",
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        display: "inline-block",
+                        position: "relative"
+                    });
+
+                    let img = $("<img>").attr("src", e.target.result).addClass("img-thumbnail")
+                        .css({
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover"
+                        });
+
+                    let removeBtn = $("<button>")
+                        .html("&times;")
+                        .addClass("btn btn-sm btn-danger position-absolute")
+                        .css({
+                            top: "5px",
+                            right: "5px",
+                            borderRadius: "50%",
+                            padding: "2px 6px"
+                        })
+                        .click(function() {
+                            imgWrapper.remove();
+                        });
+
+                    imgWrapper.append(img).append(removeBtn);
+                    previewContainer.append(imgWrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    });
 </script>

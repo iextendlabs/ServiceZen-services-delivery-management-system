@@ -1,123 +1,146 @@
 @extends('site.layout.app')
 @section('content')
-    <div class="container" style="margin-top: 50px">
-        <div class="row justify-content-center">
-            <div class="col-8 offset-1">
-                <div class="card credit-card-box">
-                    <div class="card-header">
-                        <h3 class="card-title">Payment Details</h3>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0 text-center">Payment Details</h3>
+            </div>
+            <div class="card-body">
+                @if (Session::has('error'))
+                    <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                        <p>{{ Session::get('error') }}</p>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="card-body">
-                        @if (Session::has('error'))
-                            <div class="alert alert-danger text-center">
-                                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
-                                <p>{{ Session::get('error') }}</p>
-                            </div>
-                        @endif
-                        @if (Session::has('success'))
-                            <div class="alert alert-success text-center">
-                                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
-                                <p>{{ Session::get('success') }}</p>
-                            </div>
-                        @endif
-
-                        <form role="form" action="{{ route('stripe.post') }}" method="post" class="require-validation"
-                            data-cc-on-file="false" data-stripe-publishable-key="{{ env('STRIPE_KEY') }}" id="payment-form">
-                            @csrf
-                            <div class='form-row'>
-                                <div class='col-12 form-group required'>
-                                    <label>Card Number</label>
-                                    <input autocomplete='off' class='form-control card-number' maxlength="20" type='text' required>
-                                </div>
-                            </div>
-
-                            <div class='form-row'>
-                                <div class='col-4 form-group cvc required'>
-                                    <label>CVC</label>
-                                    <input autocomplete='off' class='form-control card-cvc' placeholder='ex. 311' maxlength="4" type='text' required>
-                                </div>
-                                <div class='col-4 form-group expiration required'>
-                                    <label>Expiration Month</label>
-                                    <input class='form-control card-expiry-month' placeholder='MM' maxlength="2" type='text' required>
-                                </div>
-                                <div class='col-4 form-group expiration required'>
-                                    <label>Expiration Year</label>
-                                    <input class='form-control card-expiry-year' placeholder='YYYY' maxlength="4" type='text' required>
-                                </div>
-                            </div>
-
-                            <div class='form-row'>
-                                <div class='col-12 error form-group d-none'>
-                                    <div class='alert alert-danger'>Please correct the errors and try again.</div>
-                                </div>
-                            </div>
-
-                            <div class="row justify-content-center">
-                                <div class="col-6">
-                                    <button class="btn btn-primary btn-block" type="submit">Pay Now</button>
-                                </div>
-                                <div class="col-6">
-                                    <a class="btn btn-danger btn-block" type="button" href="bookingStep">Cancel</a>
-                                </div>
-                            </div>
-
-                        </form>
+                @endif
+                @if (Session::has('success'))
+                    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                        <p>{{ Session::get('success') }}</p>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </div>
+                @endif
+
+                <form role="form" action="{{ route('stripe.post') }}" method="post" id="payment-form">
+                    @csrf
+                    <div class="form-group">
+                        <label for="card-element" class="font-weight-bold">Card Information</label>
+                        <div id="card-element" class="form-control p-3" style="border-radius: 8px; border: 1px solid #ddd;">
+                            <!-- Stripe Element -->
+                        </div>
+                        <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary btn-lg w-100" type="submit" id="pay-button">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            <span class="btn-text">Pay Now</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-
     </div>
+</div>
 
-    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe('{{ env('STRIPE_KEY') }}');
+    var elements = stripe.elements();
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-            var $form = $(".require-validation");
+    var style = {
+        base: {
+            color: '#32325d',
+            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
+            }
+        },
+        invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a'
+        }
+    };
 
-            $('form.require-validation').on('submit', function(e) {
-                var $form = $(".require-validation"),
-                    inputSelector = ['input[type=text]', 'input[type=file]', 'textarea'].join(', '),
-                    $inputs = $form.find('.required').find(inputSelector),
-                    $errorMessage = $form.find('div.error'),
-                    valid = true;
+    var card = elements.create('card', { style: style });
+    card.mount('#card-element');
 
-                $errorMessage.addClass('d-none');
-                $('.has-error').removeClass('has-error');
-                $inputs.each(function(i, el) {
-                    var $input = $(el);
-                    if ($input.val() === '') {
-                        $input.parent().addClass('has-error');
-                        $errorMessage.removeClass('d-none');
-                        e.preventDefault();
-                    }
-                });
+    card.on('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
 
-                if (!$form.data('cc-on-file')) {
-                    e.preventDefault();
-                    Stripe.setPublishableKey($form.data('stripe-publishable-key'));
-                    Stripe.createToken({
-                        number: $('.card-number').val(),
-                        cvc: $('.card-cvc').val(),
-                        exp_month: $('.card-expiry-month').val(),
-                        exp_year: $('.card-expiry-year').val()
-                    }, stripeResponseHandler);
-                }
-            });
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            function stripeResponseHandler(status, response) {
-                if (response.error) {
-                    $('.error')
-                        .removeClass('d-none')
-                        .find('.alert')
-                        .text(response.error.message);
-                } else {
-                    var token = response['id'];
-                    $form.find('input[type=text]').empty();
-                    $form.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
-                    $form.get(0).submit();
-                }
+        var payButton = document.getElementById('pay-button');
+        payButton.disabled = true;
+        payButton.querySelector('.spinner-border').classList.remove('d-none');
+        payButton.querySelector('.btn-text').classList.add('opacity-50');
+
+        stripe.createToken(card).then(function(result) {
+            if (result.error) {
+                payButton.disabled = false;
+                payButton.querySelector('.spinner-border').classList.add('d-none');
+                payButton.querySelector('.btn-text').classList.remove('opacity-50');
+
+                var errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+            } else {
+                stripeTokenHandler(result.token);
             }
         });
-    </script>
+    });
+
+    function stripeTokenHandler(token) {
+        var form = document.getElementById('payment-form');
+        var hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripeToken');
+        hiddenInput.setAttribute('value', token.id);
+        form.appendChild(hiddenInput);
+        form.submit();
+    }
+</script>
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-radius: 12px 12px 0 0;
+    }
+    .btn-primary {
+        background-color: #4a90e2;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #357abd;
+    }
+    .btn-primary:disabled {
+        background-color: #4a90e2;
+        opacity: 0.7;
+    }
+    #card-element {
+        transition: border-color 0.3s ease;
+    }
+    #card-element:focus {
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+    .opacity-50 {
+        opacity: 0.5;
+    }
+</style>
 @endsection

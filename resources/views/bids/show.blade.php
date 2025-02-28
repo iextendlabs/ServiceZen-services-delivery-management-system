@@ -1,5 +1,89 @@
 @extends('layouts.app')
 
+<style>
+    .bid-container {
+        max-width: 75%;
+    }
+
+    .chat-container {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .chat-box {
+        height: 400px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-message {
+        padding: 10px 15px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        word-wrap: break-word;
+        font-size: 14px;
+        max-width: 75%;
+        /* Ensures message width adapts */
+        display: inline-block;
+        clear: both;
+    }
+
+    .chat-sender {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+        float: right;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .chat-receiver {
+        background-color: #ffffff;
+        align-self: flex-start;
+        border: 1px solid #ddd;
+        float: left;
+        margin-right: auto;
+        text-align: left;
+    }
+
+    .chat-input {
+        flex: 1;
+        border-radius: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .fixed-left {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        font-size: 24px;
+        padding: 10px 15px;
+        z-index: 1050;
+    }
+
+    .fixed-right {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        font-size: 24px;
+        padding: 10px 15px;
+        z-index: 1050;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+        padding: 5px 10px;
+        z-index: 1050;
+    }
+</style>
 @section('content')
     <div class="container d-flex justify-content-center">
         <div class="bid-container w-75">
@@ -20,6 +104,39 @@
                         <input type="number" id="new_bid_amount" class="form-control mb-2" placeholder="Enter new amount">
                         <button class="btn btn-primary" id="submit-update-bid">Save</button>
                     </div>
+                    
+                    @if ($bid->images)
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                @foreach ($bid->images as $key => $image)
+                                    <img src="{{ asset('quote-images/bid-images/' . $image->image) }}" alt="Inquiry Image"
+                                        class="img-thumbnail gallery-image" data-toggle="modal" data-target="#imageModal"
+                                        data-index="{{ $key }}"
+                                        data-image="{{ asset('quote-images/bid-images/' . $image->image) }}"
+                                        style="width: 150px; height: 150px; object-fit: cover;">
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Full Screen Image Modal -->
+                    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                            <div class="modal-content position-relative">
+                                <button id="prevImage" class="btn btn-dark position-absolute fixed-left">❮</button>
+                                <button id="nextImage" class="btn btn-dark position-absolute fixed-right">❯</button>
+
+                                <div class="modal-body text-center">
+                                    <img id="modalImage" src="" class="img-fluid rounded shadow-lg">
+                                </div>
+                                <button type="button" class="close-button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Chat Section -->
@@ -37,11 +154,24 @@
             @else
                 <div class="card p-3">
                     <form action="{{ route('quote.bid.store', ['quote_id' => $quote->id, 'staff_id' => $staff_id]) }}"
-                        method="POST">
+                        method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="number" name="bid_amount" class="form-control mb-2" placeholder="Enter bid amount"
                             required>
                         <textarea name="comment" class="form-control mb-2" placeholder="Leave a comment (optional)"></textarea>
+                        <div class="form-group">
+                            <label for="images" class="font-weight-bold">Upload Multiple Images</label>
+                            <div id="drop-area" class="border p-3 rounded text-center"
+                                style="border: 2px dashed #ccc; cursor: pointer;">
+                                <i class="fa fa-cloud-upload-alt fa-2x text-muted"></i>
+                                <p class="text-muted">Click to select images or drag & drop them here</p>
+                                <input type="file" id="images" name="images[]" accept="image/*" multiple
+                                    class="d-none">
+                                <button type="button" class="btn btn-primary btn-sm" id="selectImagesBtn">Select
+                                    Images</button>
+                            </div>
+                            <div id="imagePreviewContainer" class="mt-3 d-flex flex-wrap"></div>
+                        </div>
                         <button type="submit" class="btn btn-success w-100">Submit Bid</button>
                     </form>
                 </div>
@@ -49,64 +179,45 @@
         </div>
     </div>
 
-    <style>
-        .bid-container {
-            max-width: 75%;
-        }
-
-        .chat-container {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            background: #f8f9fa;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-message {
-            padding: 10px 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            word-wrap: break-word;
-            font-size: 14px;
-            max-width: 75%;
-            /* Ensures message width adapts */
-            display: inline-block;
-            clear: both;
-        }
-
-        .chat-sender {
-            background-color: #dcf8c6;
-            align-self: flex-end;
-            float: right;
-            margin-left: auto;
-            text-align: right;
-        }
-
-        .chat-receiver {
-            background-color: #ffffff;
-            align-self: flex-start;
-            border: 1px solid #ddd;
-            float: left;
-            margin-right: auto;
-            text-align: left;
-        }
-
-        .chat-input {
-            flex: 1;
-            border-radius: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-    </style>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        $(document).ready(function() {
+
+            let images = [];
+            let currentIndex = 0;
+
+            // Store images in an array
+            $(".gallery-image").each(function() {
+                images.push($(this).data("image"));
+            });
+
+            $(".gallery-image").click(function() {
+                currentIndex = parseInt($(this).data("index"));
+                updateModalImage();
+            });
+
+            $("#prevImage").click(function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateModalImage();
+                }
+            });
+
+            $("#nextImage").click(function() {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    updateModalImage();
+                }
+            });
+
+            function updateModalImage() {
+                $("#modalImage").attr("src", images[currentIndex]);
+
+                // Disable buttons if at start or end
+                $("#prevImage").prop("disabled", currentIndex === 0);
+                $("#nextImage").prop("disabled", currentIndex === images.length - 1);
+            }
+        });
         $(document).ready(function() {
             let bidId = {{ $bid->id ?? 'null' }};
             let userId = {{ auth()->id() }};
@@ -166,6 +277,83 @@
                     }
                 });
             });
+
+
+            $("#selectImagesBtn, #drop-area").on("click", function(event) {
+                if (event.target !== this) return; // Prevent triggering itself
+                $("#images").get(0).click();
+            });
+
+            $("#images").off("change").on("change", function(event) {
+                previewImages(event.target.files);
+            });
+
+            // Drag & Drop Feature
+            $("#drop-area").on("dragover", function(event) {
+                event.preventDefault();
+                $(this).css("border-color", "#007bff");
+            });
+
+            $("#drop-area").on("dragleave", function() {
+                $(this).css("border-color", "#ccc");
+            });
+
+            $("#drop-area").on("drop", function(event) {
+                event.preventDefault();
+                $(this).css("border-color", "#ccc");
+                let files = event.originalEvent.dataTransfer.files;
+                previewImages(files);
+            });
+
+            function previewImages(files) {
+                let previewContainer = $("#imagePreviewContainer");
+
+                $.each(files, function(index, file) {
+                    // Check if the image already exists in the preview
+                    let existingImages = previewContainer.find("img").map(function() {
+                        return $(this).attr("src");
+                    }).get();
+
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (existingImages.includes(e.target.result)) return; // Skip duplicate images
+
+                        let imgWrapper = $("<div>").addClass("position-relative m-2").css({
+                            width: "120px",
+                            height: "120px",
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            overflow: "hidden",
+                            display: "inline-block",
+                            position: "relative"
+                        });
+
+                        let img = $("<img>").attr("src", e.target.result).addClass("img-thumbnail")
+                            .css({
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover"
+                            });
+
+                        let removeBtn = $("<button>")
+                            .html("&times;")
+                            .addClass("btn btn-sm btn-danger position-absolute")
+                            .css({
+                                top: "5px",
+                                right: "5px",
+                                borderRadius: "50%",
+                                padding: "2px 6px"
+                            })
+                            .click(function() {
+                                imgWrapper.remove();
+                            });
+
+                        imgWrapper.append(img).append(removeBtn);
+                        previewContainer.append(imgWrapper);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
         });
     </script>
 @endsection

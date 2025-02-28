@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Bid;
 use App\Models\Quote;
+use App\Models\QuoteStaff;
 use App\Models\Service;
+use App\Models\StaffGroup;
+use App\Models\StaffZone;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,10 +64,12 @@ class QuoteController extends Controller
         $users = User::role('Customer')->where('status', 1)->get();
         $services = Service::get();
 
+        $staffGroups = StaffGroup::all();
+        $staffZones = StaffZone::all();
         $quote_statuses = config('app.quote_status');
         $staffs = User::role('Staff')->where('status', 1)->get();
 
-        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'quote_statuses', 'staffs'))
+        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -133,9 +139,11 @@ class QuoteController extends Controller
     public function destroy($id)
     {
         $quote = Quote::find($id);
-        if ($quote->image) {
-            if (file_exists(public_path('quote-images') . '/' . $quote->image)) {
-                unlink(public_path('quote-images') . '/' . $quote->image);
+        if ($quote->images) {
+            foreach ($quote->images as $images) {
+                if (file_exists(public_path('quote-images') . '/' . $images->image)) {
+                    unlink(public_path('quote-images') . '/' . $images->image);
+                }
             }
         }
         $quote->delete();
@@ -181,8 +189,18 @@ class QuoteController extends Controller
                 continue; // Skip if the quote does not exist
             }
 
-            foreach ($selectedStaffs as $staff_id) {
-                $quote->staffs()->syncWithoutDetaching([$staff_id => ['status' => 'Pending']]);
+            foreach ($selectedStaffs as $staffData) {
+                $staff_id = $staffData['staff_id'];
+                $quote_amount = $staffData['quote_amount'];
+                $quote_commission = $staffData['quote_commission'];
+
+                $quote->staffs()->syncWithoutDetaching([
+                    $staff_id => [
+                        'status' => 'Pending',
+                        'quote_amount' => $quote_amount,
+                        'quote_commission' => $quote_commission
+                    ]
+                ]);
             }
         }
 
@@ -208,9 +226,48 @@ class QuoteController extends Controller
     public function updateStatus(Request $request)
     {
         $quote = Quote::findOrFail($request->id);
+        $user = auth()->user();
 
-        $quote->staffs()->updateExistingPivot(Auth::id(), ['status' => $request->status]);
+        $staffQuote = $quote->staffs->firstWhere('id', $user->id);
+
+        if (!$staffQuote) {
+            return response()->json(['error' => 'Staff quote not found.'], 404);
+        }
+
+        $staff_total_balance = Transaction::where('user_id', $user->id)->sum('amount');
+
+        if ($staffQuote->pivot->quote_amount < 0 && $staff_total_balance < abs($staffQuote->pivot->quote_amount)) {
+            return response()->json([
+                'error' => 'You do not have enough balance to accept this quote. Please add funds to your balance.'
+            ], 400);
+        }
+        
+        $quote->staffs()->updateExistingPivot($user->id, ['status' => $request->status]);
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'amount' => $staffQuote->pivot->quote_amount,
+            'type' => 'Quote',
+            'status' => 'Approved',
+            'description' => "Quote amount for quote ID: $quote->id"
+        ]);
 
         return response()->json(['message' => 'Quote staff status updated successfully.']);
+    }
+
+    public function updateStaffData(Request $request)
+    {
+        $staffId = $request->staff_id;
+        $quoteId = $request->quote_id;
+        $field = $request->field;
+        $value = $request->value;
+
+        if (!in_array($field, ['quote_amount', 'quote_commission'])) {
+            return response()->json(['error' => 'Invalid field'], 400);
+        }
+
+        QuoteStaff::where('quote_id', $quoteId)->where('staff_id', $staffId)->update([$field => $value]);
+
+        return response()->json(['message' => 'Updated successfully']);
     }
 }

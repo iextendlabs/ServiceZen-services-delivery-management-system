@@ -112,6 +112,27 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Show Quote Detail:</strong>
+                            <select name="show_quote_detail" class="form-control">
+                                <option value="1"  {{ old('show_quote_detail', $serviceStaff->staff->show_quote_detail ?? null) == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0"  {{ old('show_quote_detail', $serviceStaff->staff->show_quote_detail ?? null) == '0' ? 'selected' : '' }}>Disable</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Quote Amount:</strong>
+                            <input type="number" name="quote_amount" class="form-control" value="{{ old('quote_amount',$serviceStaff->staff->quote_amount ?? "") }}" placeholder="Quote Amount In %">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Quote Commission:</strong>
+                            <input type="number" name="quote_commission" class="form-control" value="{{ old('quote_commission',$serviceStaff->staff->quote_commission ?? "") }}" placeholder="Quote Commission In %">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>About:</strong>
                             <textarea name="about" id="summernote" class="form-control">{{ old('about',$serviceStaff->staff->about ?? "") }}</textarea>
                             <script>
