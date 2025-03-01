@@ -306,8 +306,8 @@
                                             </td>
                                             <td>{{ $quote->affiliate->name ?? '' }}</td>
                                         @else
-                                            <td>AED{{ $staffQuote->pivot->quote_amount }} <br>
-                                                {{ $staffQuote->pivot->quote_commission }} %</td>
+                                            <td>AED{{ $staffQuote->pivot->quote_amount ?? 0 }} <br>
+                                                {{ $staffQuote->pivot->quote_commission ?? 0 }} %</td>
                                         @endif
                                         <td>{{ $quote->created_at }}</td>
                                         <td>
