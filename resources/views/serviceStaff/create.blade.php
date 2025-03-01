@@ -112,7 +112,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Quote Amount:</strong>
-                            <input type="number" name="quote_amount" class="form-control" value="{{ old('quote_amount') }}" placeholder="Quote Amount In %">
+                            <input type="number" name="quote_amount" class="form-control" value="{{ old('quote_amount') }}" placeholder="Quote Amount">
                         </div>
                     </div>
                     <div class="col-md-12">
