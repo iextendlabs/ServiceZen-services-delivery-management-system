@@ -317,13 +317,8 @@ function openQuotePopup(serviceId) {
         url: '/quoteModal/' + serviceId,
         type: 'GET',
         success: function(response) {
-            if (response.status === 'redirect') {
-                alert(response.message); // Show the error message before redirecting
-                window.location.href = response.url; // Redirect to login page
-            } else {
-                $('#quotePopup').html(response);
-                $('#quoteModal').modal('show');
-            }
+            $('#quotePopup').html(response);
+            $('#quoteModal').modal('show');
         }
     });
 }

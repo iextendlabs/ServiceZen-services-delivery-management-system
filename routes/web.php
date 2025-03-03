@@ -208,6 +208,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/bid-chat/{bid_id}/messages', [BidChatController::class, 'fetchMessages'])->name('bid.chat.fetch');
     Route::post('/bid-chat/{bid_id}/send', [BidChatController::class, 'sendMessage'])->name('bid.chat.send');
     Route::get('/quote/{quote_id}/bids', [BidController::class, 'index'])->name('quote.bids');
+    Route::post('/quotes/update-staff-data', [QuoteController::class, 'updateStaffData'])->name('quotes.updateStaffData');
+
+    Route::post('/stripe-payment', [StripePaymentController::class, 'staffDepositPost'])->name('stripe.staffDepositPost');
 
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
 
@@ -235,8 +238,9 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
     Route::get('/siteQuote/{quote_id}/bid/{staff_id}', [SiteBidController::class, 'showBidPage'])->name('site.quote.bid');
 
     Route::post('/siteQuote/update-status', [SiteQuoteController::class, 'updateStatus'])->name('siteQuote.updateStatus');
-    Route::resource('siteQuotes', SiteQuoteController::class);
 });
+
+Route::resource('siteQuotes', SiteQuoteController::class);
 
 Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
 // Backups

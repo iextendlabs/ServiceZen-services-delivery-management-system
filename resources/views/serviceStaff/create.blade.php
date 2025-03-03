@@ -102,6 +102,27 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Show Quote Detail:</strong>
+                            <select name="show_quote_detail" class="form-control">
+                                <option value="1"  {{ old('show_quote_detail') == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0"  {{ old('show_quote_detail') == '0' ? 'selected' : '' }}>Disable</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Quote Amount:</strong>
+                            <input type="number" name="quote_amount" class="form-control" value="{{ old('quote_amount') }}" placeholder="Quote Amount">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Quote Commission:</strong>
+                            <input type="number" name="quote_commission" class="form-control" value="{{ old('quote_commission') }}" placeholder="Quote Commission In %">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>About:</strong>
                             <textarea name="about" id="summernote" class="form-control">{{ old('about')}}</textarea>
                             <script>

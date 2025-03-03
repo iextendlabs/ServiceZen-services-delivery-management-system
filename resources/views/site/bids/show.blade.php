@@ -1,5 +1,90 @@
 @extends('site.layout.app')
+<style>
+    .bid-container {
+        max-width: 75%;
+    }
 
+    .chat-container {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .chat-box {
+        height: 400px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-message {
+        padding: 10px 15px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        word-wrap: break-word;
+        font-size: 14px;
+        max-width: 75%;
+        /* Ensures message width adapts */
+        display: inline-block;
+        clear: both;
+    }
+
+    .chat-sender {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+        float: right;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .chat-receiver {
+        background-color: #ffffff;
+        align-self: flex-start;
+        border: 1px solid #ddd;
+        float: left;
+        margin-right: auto;
+        text-align: left;
+    }
+
+    .chat-input {
+        flex: 1;
+        border-radius: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .fixed-left {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        font-size: 24px;
+        padding: 10px 15px;
+        z-index: 1050;
+    }
+
+    .fixed-right {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        font-size: 24px;
+        padding: 10px 15px;
+        z-index: 1050;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+        padding: 5px 10px;
+        z-index: 1050;
+        background: transparent;
+        border: none;
+    }
+</style>
 @section('content')
     <div class="container d-flex justify-content-center">
         <div class="bid-container w-75">
@@ -9,103 +94,94 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            @if ($bid)
-                <div class="card p-3 mb-4">
-                    <h5>Your Current Bid</h5>
-                    <p><strong>Amount:</strong>AED<span id="bid-amount">{{ $bid->bid_amount }}</span></p>
-                    <p><strong>Comment:</strong> <span id="bid-comment">{{ $bid->comment ?? 'No comment' }}</span></p>
-                </div>
+            <div class="card p-3 mb-4">
+                <h5>Your Current Bid</h5>
+                <p><strong>Amount:</strong>AED<span id="bid-amount">{{ $bid->bid_amount }}</span></p>
+                <p><strong>Comment:</strong> <span id="bid-comment">{{ $bid->comment ?? 'No comment' }}</span></p>
+                @if ($bid->images)
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            @foreach ($bid->images as $key => $image)
+                                <img src="{{ asset('quote-images/bid-images/' . $image->image) }}" alt="Inquiry Image"
+                                    class="img-thumbnail gallery-image" data-toggle="modal" data-target="#imageModal"
+                                    data-index="{{ $key }}"
+                                    data-image="{{ asset('quote-images/bid-images/' . $image->image) }}"
+                                    style="width: 150px; height: 150px; object-fit: cover;">
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
-                <!-- Chat Section -->
-                <div class="card chat-container">
-                    <div class="card-header bg-success text-white text-center">Bid Chat</div>
-                    <div class="card-body chat-box" id="chat-box">
-                        <ul id="messages-list" class="list-unstyled mb-0"></ul>
-                    </div>
-                    <div class="card-footer d-flex align-items-center">
-                        <input type="text" id="chat-message" class="form-control chat-input"
-                            placeholder="Type a message...">
-                        <button class="btn btn-success ml-2" id="send-message"><i class="fas fa-paper-plane"></i></button>
+
+            </div>
+
+            <!-- Full Screen Image Modal -->
+            <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content position-relative">
+                        <button id="prevImage" class="btn btn-dark fixed-left">❮</button>
+                        <button id="nextImage" class="btn btn-dark fixed-right">❯</button>
+
+                        <div class="modal-body text-center">
+                            <img id="modalImage" src="" class="img-fluid rounded shadow-lg">
+                        </div>
+                        <button type="button" class="close close-button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
                     </div>
                 </div>
-            @else
-                <div class="card p-3">
-                    <form action="{{ route('quote.bid.store', ['quote_id' => $quote->id, 'staff_id' => $staff_id]) }}"
-                        method="POST">
-                        @csrf
-                        <input type="number" name="bid_amount" class="form-control mb-2" placeholder="Enter bid amount"
-                            required>
-                        <textarea name="comment" class="form-control mb-2" placeholder="Leave a comment (optional)"></textarea>
-                        <button type="submit" class="btn btn-success btn-block">Submit Bid</button>
-                    </form>
+            </div>
+            <!-- Chat Section -->
+            <div class="card chat-container">
+                <div class="card-header bg-success text-white text-center">Bid Chat</div>
+                <div class="card-body chat-box" id="chat-box">
+                    <ul id="messages-list" class="list-unstyled mb-0"></ul>
                 </div>
-            @endif
+                <div class="card-footer d-flex align-items-center">
+                    <input type="text" id="chat-message" class="form-control chat-input" placeholder="Type a message...">
+                    <button class="btn btn-success ml-2" id="send-message"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <style>
-        .bid-container {
-            max-width: 75%;
-        }
-
-        .chat-container {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            background: #f8f9fa;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-message {
-            padding: 10px 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            word-wrap: break-word;
-            font-size: 14px;
-            max-width: 75%;
-            display: block;
-            /* Ensures messages appear as separate bubbles */
-            clear: both;
-            /* Prevents messages from floating side-by-side */
-        }
-
-        .chat-sender {
-            background-color: #dcf8c6;
-            align-self: flex-end;
-            text-align: left;
-            float: right;
-            /* Align sender messages to the right */
-            margin-left: auto;
-            /* Prevents messages from stretching */
-        }
-
-        .chat-receiver {
-            background-color: #ffffff;
-            align-self: flex-start;
-            border: 1px solid #ddd;
-            text-align: left;
-            float: left;
-            /* Align receiver messages to the left */
-            margin-right: auto;
-            /* Prevents messages from stretching */
-        }
-
-        .chat-input {
-            flex: 1;
-            border-radius: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-    </style>
-
-
     <script>
+        $(document).ready(function() {
+            let images = [];
+            let currentIndex = 0;
+
+            $(".gallery-image").each(function() {
+                images.push($(this).data("image"));
+            });
+
+            $(".gallery-image").click(function() {
+                currentIndex = parseInt($(this).data("index"));
+                updateModalImage();
+            });
+
+            $("#prevImage").click(function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateModalImage();
+                }
+            });
+
+            $("#nextImage").click(function() {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    updateModalImage();
+                }
+            });
+
+            function updateModalImage() {
+                $("#modalImage").attr("src", images[currentIndex]);
+
+                $("#prevImage").prop("disabled", currentIndex === 0);
+                $("#nextImage").prop("disabled", currentIndex === images.length - 1);
+            }
+        });
         $(document).ready(function() {
             let bidId = {{ $bid->id ?? 'null' }};
             let userId = {{ auth()->id() }};

@@ -9,11 +9,16 @@ class Quote extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'service_id','service_name','service_option_id','detail','status','category_id','phone', 'whatsapp', 'image', 'sourcing_quantity','bid_id'];
+    protected $fillable = ['user_id', 'service_id','service_name','detail','status','category_id','phone', 'whatsapp', 'location','affiliate_id', 'sourcing_quantity','bid_id'];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function affiliate()
+    {
+        return $this->belongsTo(User::class,'affiliate_id');
     }
 
     public function service()
@@ -23,15 +28,16 @@ class Quote extends Model
 
     public function serviceOption()
     {
-        return $this->belongsTo(ServiceOption::class);
+        return $this->belongsToMany(ServiceOption::class, 'quote_options', 'quote_id', 'option_id');
     }
 
     public function staffs()
     {
         return $this->belongsToMany(User::class, 'quote_staff', 'quote_id', 'staff_id')
-                    ->withPivot('status')
+                    ->withPivot(['status', 'quote_amount', 'quote_commission'])
                     ->withTimestamps();
     }
+
 
     public function categories()
     {
@@ -47,5 +53,10 @@ class Quote extends Model
     public function bid()
     {
         return $this->belongsTo(Bid::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(QuoteImage::class);
     }
 }

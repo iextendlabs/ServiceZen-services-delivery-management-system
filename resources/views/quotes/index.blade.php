@@ -3,6 +3,28 @@
     a {
         text-decoration: none !important;
     }
+
+    .modal-dialog {
+        max-width: 80%;
+    }
+
+    .modal-content {
+        max-height: 80vh;
+        overflow: hidden;
+    }
+
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .table thead th:first-child,
+    .table tbody td:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 2;
+    }
 </style>
 @section('content')
     <div class="container">
@@ -29,41 +51,98 @@
                             Assign Staff
                         </button>
 
+                        <!-- Staff Selection Modal -->
                         <div class="modal fade" id="staffModal" tabindex="-1" aria-labelledby="staffModalLabel"
                             aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
-                                    <div class="modal-header">
+                                    <div class="modal-header bg-primary text-white">
                                         <h5 class="modal-title" id="staffModalLabel">Select Staff</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
-                                            <table class="table">
-                                                <thead>
+                                            <input type="text" id="staffSearch" class="form-control"
+                                                placeholder="Search staff...">
+                                        </div>
+                                        <div class="d-flex mb-3">
+                                            <select id="staffGroupFilter" class="form-control mr-2">
+                                                <option value="">All Groups</option>
+                                                @foreach ($staffGroups as $group)
+                                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <select id="staffZoneFilter" class="form-control">
+                                                <option value="">All Zones</option>
+                                                @foreach ($staffZones as $zone)
+                                                    <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- Default Amount and Commission Input Fields -->
+                                        <div class="mb-3 d-flex">
+                                            <input type="number" id="defaultQuoteAmount" class="form-control mr-2"
+                                                placeholder="Enter Quote Amount">
+                                            <input type="number" id="defaultQuoteCommission" class="form-control"
+                                                placeholder="Enter Quote Commission in %">
+                                        </div>
+
+                                        <!-- Staff Table -->
+                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                            <table class="table table-hover">
+                                                <thead class="thead-light">
                                                     <tr>
-                                                        <th>Select</th>
+                                                        <th class="text-center" style="width: 10%;">
+                                                            <div class="d-flex justify-content-center align-items-center mb-2"
+                                                                style="height: 100%;">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="selectAllCheckbox">
+                                                            </div>
+                                                        </th>
                                                         <th>Staff</th>
+                                                        <th style="width: 20%;">Amount</th>
+                                                        <th style="width: 20%;">Commission</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="staffTableBody">
                                                     @foreach ($staffs as $staff)
-                                                        <tr>
-                                                            <td>
-                                                                <input class="form-check-input staff-checkbox"
-                                                                    id="bulk-staff{{ $staff->id }}" type="checkbox"
-                                                                    name="bulk-staff[]" value="{{ $staff->id }}"
-                                                                    style="margin-top: -8px">
+                                                        <tr data-groups="{{ $staff->staffGroups->pluck('id')->join(' ') }}"
+                                                            data-zones="{{ $staff->staffGroups->flatMap->staffZones->pluck('id')->unique()->join(' ') }}">
+                                                            <td class="text-center align-middle">
+                                                                <div class="d-flex justify-content-center align-items-center"
+                                                                    style="height: 100%;">
+                                                                    <input class="form-check-input staff-checkbox"
+                                                                        type="checkbox" name="bulk-staff[]"
+                                                                        value="{{ $staff->id }}">
+                                                                </div>
                                                             </td>
-                                                            <td>{{ $staff->name }}</td>
+                                                            <td class="staff-name font-weight-bold align-middle">
+                                                                {{ $staff->name }} <small
+                                                                    class="text-muted">({{ $staff->staff->sub_title }})</small>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control staff-amount"
+                                                                    placeholder="Amount"
+                                                                    value="{{ $staff->staff->quote_amount ?? '' }}">
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control staff-commission"
+                                                                    placeholder="Commission in %"
+                                                                    value="{{ $staff->staff->quote_commission ?? '' }}">
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <button id="assignStaffBtn" class="btn btn-primary" type="button"><i
-                                                class=""></i>Assign Staff</button>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="assignStaffBtn" class="btn btn-success btn-lg w-100">
+                                            <i class="fas fa-user-check"></i> Assign Staff
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -154,6 +233,13 @@
                                 <th>Service</th>
                                 <th>Send by</th>
                                 <th>Status</th>
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <th>Location</th>
+                                    <th>Affiliate</th>
+                                @else
+                                    <th>Quote Amount <br> Commission</th>
+                                @endif
+                                <th>Date Added</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -171,7 +257,8 @@
                                             <div class="d-flex align-items-center">
                                                 @if ($quote->service->image)
                                                     <img src="{{ asset('service-images/' . $quote->service->image) }}"
-                                                        alt="Service Image" class="rounded" width="auto" height="80">
+                                                        alt="Service Image" class="rounded" width="auto"
+                                                        height="80">
                                                 @endif
                                                 <div class="ml-3">
                                                     <h6 class="mt-0 mb-1">{{ $quote->service_name }}</h6>
@@ -209,6 +296,20 @@
                                                 </div>
                                             @endif
                                         </td>
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <td>
+                                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                                <a target="_blank"
+                                                    href="https://maps.google.com/?q={{ urlencode($quote->location) }}">
+                                                    Customer Location
+                                                </a>
+                                            </td>
+                                            <td>{{ $quote->affiliate->name ?? '' }}</td>
+                                        @else
+                                            <td>AED{{ $staffQuote->pivot->quote_amount ?? 0 }} <br>
+                                                {{ $staffQuote->pivot->quote_commission ?? 0 }} %</td>
+                                        @endif
+                                        <td>{{ $quote->created_at }}</td>
                                         <td>
 
                                             <form id="deleteForm{{ $quote->id }}"
@@ -224,7 +325,9 @@
                                                 @if (auth()->user()->hasRole('Staff'))
                                                     @if ($staffQuote && $staffQuote->pivot->status == 'Pending')
                                                         <button type="button" class="btn btn-success accept-quote"
-                                                            data-id="{{ $quote->id }}">Accept</button>
+                                                            data-id="{{ $quote->id }}"
+                                                            data-amount="{{ $staffQuote->pivot->quote_amount }}"
+                                                            data-commission="{{ $staffQuote->pivot->quote_commission }}">Accept</button>
                                                         <button type="button" class="btn btn-danger reject-quote"
                                                             data-id="{{ $quote->id }}">Reject</button>
                                                     @endif
@@ -253,7 +356,7 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="5" class="text-center">There are no Quote.</td>
+                                    <td colspan="7" class="text-center">There are no Quote.</td>
                                 </tr>
                             @endif
                         </tbody>
@@ -265,9 +368,34 @@
     </div>
     <script>
         $(document).ready(function() {
+            function filterStaff() {
+                let searchValue = $('#staffSearch').val().toLowerCase();
+                let selectedGroup = $('#staffGroupFilter').val();
+                let selectedZone = $('#staffZoneFilter').val();
+
+                $('#staffTableBody tr').each(function() {
+                    let staffName = $(this).find('.staff-name').text().toLowerCase();
+                    let staffGroups = $(this).data('groups').toString();
+                    let staffZones = $(this).data('zones').toString();
+
+                    let nameMatch = staffName.includes(searchValue);
+                    let groupMatch = selectedGroup === "" || staffGroups.includes(selectedGroup);
+                    let zoneMatch = selectedZone === "" || staffZones.includes(selectedZone);
+
+                    $(this).toggle(nameMatch && groupMatch && zoneMatch);
+                });
+            }
+
+            $('#staffSearch, #staffGroupFilter, #staffZoneFilter').on('input change', filterStaff);
+
             $('.accept-quote').click(function() {
                 let quoteId = $(this).data('id');
-                if (confirm('Are you sure you want to accept this quote?')) {
+                let amount = $(this).data('amount');
+                let commission = $(this).data('commission');
+
+                if (confirm(
+                        `Are you sure you want to accept this quote? Upon acceptance, your balance will be adjusted by ${amount} AED. If you win the bid, ${commission}% of your bid value will be deducted from your balance.`
+                    )) {
                     updateQuoteStatus(quoteId, 'Accepted');
                 }
             });
@@ -295,7 +423,8 @@
                         location.reload();
                     },
                     error: function(error) {
-                        console.error('Error:', error);
+                        console.error("Error:", error);
+                        alert(error.responseJSON.error); // Show error message
                     }
                 });
             }
@@ -330,23 +459,55 @@
                     alert('Please select a Item to Assign Staff.');
                 }
             });
-        });
 
-        $('#assignStaffBtn').click(function() {
-            const selectedItems = $('.item-checkbox:checked').map(function() {
-                return $(this).val();
-            }).get();
+            $('#selectAllCheckbox').click(function() {
+                $('tbody tr:visible .staff-checkbox').prop('checked', $(this).prop('checked'));
+            });
 
-            const selectedStaffs = $('input[name="bulk-staff[]"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            if (selectedItems.length > 0 && selectedStaffs.length > 0) {
-                if (confirm("Are you sure you want to assign the selected Staff to Quote?")) {
-                    bulkAssignStaff(selectedItems, selectedStaffs);
+            // If any checkbox is unchecked, uncheck 'Select All'
+            $('.staff-checkbox').change(function() {
+                if ($('tbody tr:visible .staff-checkbox:checked').length === $(
+                        'tbody tr:visible .staff-checkbox').length) {
+                    $('#selectAllCheckbox').prop('checked', true);
+                } else {
+                    $('#selectAllCheckbox').prop('checked', false);
                 }
-            } else {
-                alert('Please select both Quote and Staff to assign.');
-            }
+            });
+
+            // When default amount is entered, update all staff amount fields
+            $('#defaultQuoteAmount').on('input', function() {
+                let amount = $(this).val();
+                $('.staff-amount').val(amount);
+            });
+
+            // When default commission is entered, update all staff commission fields
+            $('#defaultQuoteCommission').on('input', function() {
+                let commission = $(this).val();
+                $('.staff-commission').val(commission);
+            });
+
+            // Assign Staff Button Click Event
+            $('#assignStaffBtn').click(function() {
+                const selectedItems = $('.item-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                const selectedStaffs = $('.staff-checkbox:checked').map(function() {
+                    return {
+                        staff_id: $(this).val(),
+                        quote_amount: $(this).closest('tr').find('.staff-amount').val() || 0,
+                        quote_commission: $(this).closest('tr').find('.staff-commission').val() || 0
+                    };
+                }).get();
+
+                if (selectedItems.length > 0 && selectedStaffs.length > 0) {
+                    if (confirm("Are you sure you want to assign the selected Staff to Quote?")) {
+                        bulkAssignStaff(selectedItems, selectedStaffs);
+                    }
+                } else {
+                    alert('Please select both Quote and Staff to assign.');
+                }
+            });
         });
 
         function bulkAssignStaff(selectedItems, selectedStaffs) {
@@ -371,6 +532,7 @@
                 }
             });
         }
+
 
         $(document).ready(function() {
             $('.all-item-checkbox').click(function() {

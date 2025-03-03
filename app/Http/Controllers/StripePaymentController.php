@@ -102,6 +102,42 @@ class StripePaymentController extends Controller
         ];
     }
 
+    public function staffDepositPost(Request $request)
+    {
+        $user = auth()->user();
+        try {
+            $customerData = [
+                'email' => $user->email,
+                'name' => $user->name,
+            ];
+
+            $amount = $request->amount;
+            $currency = 'AED';
+            $description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id}";
+            $app = false;
+
+            $paymentResult = $this->processStripePayment($customerData, $amount, $currency, $request, $app, $description);
+
+            if ($paymentResult['status'] === 'succeeded') {
+                Transaction::create([
+                    'amount' => $amount,
+                    'user_id' => auth()->id(),
+                    'type' => 'Deposit',
+                    'status' => 'Approved',
+                    'description' => 'Amount Deposit',
+                ]);
+                Session::flash('success', 'Payment successful!');
+            } else {
+                Session::flash('error', 'Payment failed. Please try again.');
+            }
+
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect()->back();
+        }
+    }
+
     private function processStripePayment($customerData, $amount, $currency, $request, $app, $description)
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));

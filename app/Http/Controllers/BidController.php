@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bid;
 use App\Models\BidChat;
+use App\Models\BidImage;
 use App\Models\Quote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,12 +37,24 @@ class BidController extends Controller
             'comment' => 'nullable|string|max:255',
         ]);
 
-        Bid::create([
+        $bid = Bid::create([
             'quote_id' => $quote_id,
             'staff_id' => $staff_id,
             'bid_amount' => $request->bid_amount,
             'comment' => $request->comment,
         ]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('quote-images/bid-images'), $filename);
+    
+                BidImage::create([
+                    'bid_id' => $bid->id,
+                    'image' => $filename
+                ]);
+            }
+        }
 
         return redirect()->route('quote.bid', ['quote_id' => $quote_id, 'staff_id' => $staff_id])
             ->with('success', 'Bid submitted successfully.');

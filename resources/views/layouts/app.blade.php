@@ -124,7 +124,11 @@
                         </li>
                         @endif
                         @else
-
+                        @if(auth()->user()->hasRole('Staff'))
+                        <li class="nav-item">
+                            <button class="btn btn-primary mx-2" data-toggle="modal" data-target="#paymentModal">Add Funds</button>
+                        </li>
+                        @endif
                         @if(Auth::user()->affiliate_program == null && auth()->user()->hasRole("Staff") && !auth()->user()->hasRole("Affiliate"))
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
@@ -323,7 +327,7 @@
                 @yield('content')
         </main>
         <div id="addToCartPopup"></div>
-
+        @include('payment-modal')
     </div>
     <footer class="text-muted">
         <div class="container">

@@ -17,6 +17,7 @@
                                 <th>Service</th>
                                 <th>Send by</th>
                                 <th class="text-center">Status</th>
+                                <th>Date Added</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -60,7 +61,7 @@
                                                 </div>
                                             @endif
                                         </td>
-
+                                        <td>{{ $quote->created_at }}</td>
 
                                         <td>
                                             <a class="btn btn-outline-primary"
