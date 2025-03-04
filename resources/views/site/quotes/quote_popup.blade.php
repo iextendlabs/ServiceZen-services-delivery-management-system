@@ -1,4 +1,12 @@
 <!-- Quote Request Modal -->
+<style>
+    .form-text.text-muted {
+        color: #dc3545 !important;
+        /* Red color for emphasis */
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+</style>
 <div class="modal fade" id="quoteModal" tabindex="-1" role="dialog" aria-labelledby="quoteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -10,6 +18,9 @@
             </div>
 
             <div class="modal-body">
+                <div id="detailError" class="alert alert-danger d-none" role="alert">
+                    Your request contains contact details (phone number or email). Please remove them before submitting.
+                </div>
                 <form id="quoteForm" action="{{ route('siteQuotes.store') }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
@@ -57,6 +68,8 @@
                         <span style="color: red;">*</span><label for="detail">Detail</label>
                         <textarea style="height: 150px" class="form-control" id="detail" name="detail" rows="3"
                             placeholder="Enter details" required></textarea>
+                        <small class="form-text text-muted">Please remove any contact details, it is against our
+                            policy.</small>
                     </div>
 
                     <!-- Mobile -->
@@ -128,48 +141,62 @@
 <script>
     $(document).ready(function() {
         $('#quoteForm').on('submit', function(e) {
-            e.preventDefault();
+            let detailValue = $('#detail').val().trim();
+            const phoneRegex = /\b(\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{4,9}\b/g;
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
-            let formData = new FormData(this);
+            if (phoneRegex.test(detailValue) || emailRegex.test(detailValue)) {
+                e.preventDefault();
+                $('#detailError').removeClass('d-none');
+                $('#quoteModal').animate({
+                    scrollTop: 0
+                }, 500);
+            } else {
+                $('#detailError').addClass('d-none');
 
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        $('#quoteModal').modal('hide');
-                        alert(response.message);
-                    } else {
-                        let errors = response.errors;
-                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                e.preventDefault();
 
-                        // Loop through the errors object
-                        $.each(errors, function(field, messages) {
-                            $.each(messages, function(index, message) {
-                                errorHtml += '<li>' + message + '</li>';
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            $('#quoteModal').modal('hide');
+                            alert(response.message);
+                        } else {
+                            let errors = response.errors;
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+
+                            // Loop through the errors object
+                            $.each(errors, function(field, messages) {
+                                $.each(messages, function(index, message) {
+                                    errorHtml += '<li>' + message + '</li>';
+                                });
                             });
-                        });
 
-                        errorHtml += '</ul></div>';
+                            errorHtml += '</ul></div>';
 
-                        // Remove any existing error messages
-                        $('#quoteModal .alert-danger').remove();
+                            // Remove any existing error messages
+                            $('#quoteModal .alert-danger').remove();
 
-                        // Prepend the new error messages to the modal body
-                        $('#quoteModal .modal-body').prepend(errorHtml);
-                        $('#quoteModal').animate({
-                            scrollTop: 0
-                        }, 500);
+                            // Prepend the new error messages to the modal body
+                            $('#quoteModal .modal-body').prepend(errorHtml);
+                            $('#quoteModal').animate({
+                                scrollTop: 0
+                            }, 500);
+                        }
+                    },
+                    error: function(xhr) {
+                        // Handle server errors
+                        alert('An error occurred. Please try again.');
                     }
-                },
-                error: function(xhr) {
-                    // Handle server errors
-                    alert('An error occurred. Please try again.');
-                }
-            });
+                });
+            }
         });
     });
     $("#getLocationBtn").click(function() {

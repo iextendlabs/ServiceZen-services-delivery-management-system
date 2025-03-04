@@ -6,6 +6,7 @@ use App\Models\Bid;
 use App\Models\Quote;
 use App\Models\QuoteStaff;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\StaffGroup;
 use App\Models\StaffZone;
 use App\Models\Transaction;
@@ -62,14 +63,15 @@ class QuoteController extends Controller
         $filters = $request->only(['user_id', 'service_id', 'status']);
         $quotes->appends($filters);
         $users = User::role('Customer')->where('status', 1)->get();
-        $services = Service::get();
 
         $staffGroups = StaffGroup::all();
         $staffZones = StaffZone::all();
         $quote_statuses = config('app.quote_status');
         $staffs = User::role('Staff')->where('status', 1)->get();
+        $services = Service::where('status',1)->get();
+        $categories = ServiceCategory::where('status',1)->get();
 
-        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones'))
+        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services','categories', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

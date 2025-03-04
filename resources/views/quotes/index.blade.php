@@ -4,25 +4,15 @@
         text-decoration: none !important;
     }
 
-    .modal-dialog {
-        max-width: 80%;
-    }
-
     .modal-content {
-        max-height: 80vh;
+        max-height: 100%;
         overflow: hidden;
     }
 
-    .table-responsive {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .table thead th:first-child,
-    .table tbody td:first-child {
+    .modal-content .table thead th:first-child,
+    .modal-content .table tbody td:first-child {
         position: sticky;
-        left: 0;
-        background: white;
+        left: 16px;
         z-index: 2;
     }
 </style>
@@ -62,82 +52,116 @@
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="mb-3">
-                                            <input type="text" id="staffSearch" class="form-control"
-                                                placeholder="Search staff...">
-                                        </div>
-                                        <div class="d-flex mb-3">
-                                            <select id="staffGroupFilter" class="form-control mr-2">
-                                                <option value="">All Groups</option>
-                                                @foreach ($staffGroups as $group)
-                                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <select id="staffZoneFilter" class="form-control">
-                                                <option value="">All Zones</option>
-                                                @foreach ($staffZones as $zone)
-                                                    <option value="{{ $zone->id }}">{{ $zone->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <!-- Default Amount and Commission Input Fields -->
-                                        <div class="mb-3 d-flex">
-                                            <input type="number" id="defaultQuoteAmount" class="form-control mr-2"
-                                                placeholder="Enter Quote Amount">
-                                            <input type="number" id="defaultQuoteCommission" class="form-control"
-                                                placeholder="Enter Quote Commission in %">
-                                        </div>
-
-                                        <!-- Staff Table -->
-                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                                            <table class="table table-hover">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th class="text-center" style="width: 10%;">
-                                                            <div class="d-flex justify-content-center align-items-center mb-2"
-                                                                style="height: 100%;">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="selectAllCheckbox">
-                                                            </div>
-                                                        </th>
-                                                        <th>Staff</th>
-                                                        <th style="width: 20%;">Amount</th>
-                                                        <th style="width: 20%;">Commission</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="staffTableBody">
-                                                    @foreach ($staffs as $staff)
-                                                        <tr data-groups="{{ $staff->staffGroups->pluck('id')->join(' ') }}"
-                                                            data-zones="{{ $staff->staffGroups->flatMap->staffZones->pluck('id')->unique()->join(' ') }}">
-                                                            <td class="text-center align-middle">
-                                                                <div class="d-flex justify-content-center align-items-center"
-                                                                    style="height: 100%;">
-                                                                    <input class="form-check-input staff-checkbox"
-                                                                        type="checkbox" name="bulk-staff[]"
-                                                                        value="{{ $staff->id }}">
-                                                                </div>
-                                                            </td>
-                                                            <td class="staff-name font-weight-bold align-middle">
-                                                                {{ $staff->name }} <small
-                                                                    class="text-muted">({{ $staff->staff->sub_title }})</small>
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" class="form-control staff-amount"
-                                                                    placeholder="Amount"
-                                                                    value="{{ $staff->staff->quote_amount ?? '' }}">
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" class="form-control staff-commission"
-                                                                    placeholder="Commission in %"
-                                                                    value="{{ $staff->staff->quote_commission ?? '' }}">
-                                                            </td>
-                                                        </tr>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <input type="text" id="staffSearch" class="form-control"
+                                                    placeholder="Search staff...">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="staffGroupFilter" class="form-label">Staff Group</label>
+                                                <select id="staffGroupFilter" class="form-control">
+                                                    <option value="">All Groups</option>
+                                                    @foreach ($staffGroups as $group)
+                                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
                                                     @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="staffZoneFilter" class="form-label">Staff Zone</label>
+                                                <select id="staffZoneFilter" class="form-control">
+                                                    <option value="">All Zones</option>
+                                                    @foreach ($staffZones as $zone)
+                                                        <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
 
+                                            <div class="col-md-6 mb-3">
+                                                <label for="staffServiceFilter" class="form-label">Service</label>
+                                                <select id="staffServiceFilter" class="form-control">
+                                                    <option value="">All Services</option>
+                                                    @foreach ($services as $service)
+                                                        <option value="{{ $service->id }}">{{ $service->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="staffCategoryFilter" class="form-label">Category</label>
+                                                <select id="staffCategoryFilter" class="form-control">
+                                                    <option value="">All Categories</option>
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}">{{ $category->title }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+
+                                            <div class="col-md-6 mb-3">
+                                                <input type="number" id="defaultQuoteAmount" class="form-control mr-2"
+                                                    placeholder="Enter Quote Amount">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <input type="number" id="defaultQuoteCommission" class="form-control"
+                                                    placeholder="Enter Quote Commission in %">
+                                            </div>
+                                            <div class="col-md-12">
+                                                <!-- Staff Table -->
+                                                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                    <table class="table table-hover">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th class="text-center" style="width: 10%;">
+                                                                    <div class="d-flex justify-content-center align-items-center mb-2"
+                                                                        style="height: 100%;">
+                                                                        <input class="form-check-input" type="checkbox"
+                                                                            id="selectAllCheckbox">
+                                                                    </div>
+                                                                </th>
+                                                                <th>Staff</th>
+                                                                <th style="width: 20%;">Amount</th>
+                                                                <th style="width: 20%;">Commission</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="staffTableBody">
+                                                            @foreach ($staffs as $staff)
+                                                                <tr data-groups="{{ $staff->staffGroups->pluck('id')->join(' ') }}"
+                                                                    data-zones="{{ $staff->staffGroups->flatMap->staffZones->pluck('id')->unique()->join(' ') }}"
+                                                                    data-services="{{ $staff->services->pluck('id')->unique()->join(' ') }}"
+                                                                    data-categories="{{ $staff->categories->pluck('id')->unique()->join(' ') }}">
+                                                                    <td class="text-center align-middle">
+                                                                        <div class="d-flex justify-content-center align-items-center"
+                                                                            style="height: 100%;">
+                                                                            <input class="form-check-input staff-checkbox"
+                                                                                type="checkbox" name="bulk-staff[]"
+                                                                                value="{{ $staff->id }}">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="staff-name font-weight-bold align-middle">
+                                                                        {{ $staff->name }} <small
+                                                                            class="text-muted">({{ $staff->staff->sub_title }})</small>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number"
+                                                                            class="form-control staff-amount"
+                                                                            placeholder="Amount"
+                                                                            value="{{ $staff->staff->quote_amount ?? '' }}">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number"
+                                                                            class="form-control staff-commission"
+                                                                            placeholder="Commission in %"
+                                                                            value="{{ $staff->staff->quote_commission ?? '' }}">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button id="assignStaffBtn" class="btn btn-success btn-lg w-100">
@@ -170,7 +194,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>User:</strong>
-                                    <select name="user_id" class="form-control">
+                                    <select name="user_id" class="form-control select2">
                                         <option></option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}"
@@ -183,7 +207,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <strong>Services:</strong>
-                                    <select name="service_id" class="form-control">
+                                    <select name="service_id" class="form-control select2">
                                         <option></option>
                                         @foreach ($services as $service)
                                             <option value="{{ $service->id }}"
@@ -368,25 +392,44 @@
     </div>
     <script>
         $(document).ready(function() {
+            function initializeSelect2() {
+                $('#staffGroupFilter, #staffZoneFilter, #staffServiceFilter, #staffCategoryFilter').select2({
+                    width: '100%',
+                    placeholder: 'Select an option',
+                    allowClear: true,
+                    dropdownParent: $('#staffModal')
+                });
+            }
+
+            $('#staffModal').on('shown.bs.modal', function() {
+                initializeSelect2();
+            });
+
             function filterStaff() {
                 let searchValue = $('#staffSearch').val().toLowerCase();
                 let selectedGroup = $('#staffGroupFilter').val();
                 let selectedZone = $('#staffZoneFilter').val();
+                let selectedService = $('#staffServiceFilter').val();
+                let selectedCategory = $('#staffCategoryFilter').val();
 
                 $('#staffTableBody tr').each(function() {
                     let staffName = $(this).find('.staff-name').text().toLowerCase();
                     let staffGroups = $(this).data('groups').toString();
                     let staffZones = $(this).data('zones').toString();
+                    let staffServices = $(this).data('services').toString();
+                    let staffCategories = $(this).data('categories').toString();
 
                     let nameMatch = staffName.includes(searchValue);
                     let groupMatch = selectedGroup === "" || staffGroups.includes(selectedGroup);
                     let zoneMatch = selectedZone === "" || staffZones.includes(selectedZone);
+                    let serviceMatch = selectedService === "" || staffServices.includes(selectedService);
+                    let categoryMatch = selectedCategory === "" || staffCategories.includes(selectedCategory);
 
-                    $(this).toggle(nameMatch && groupMatch && zoneMatch);
+                    $(this).toggle(nameMatch && groupMatch && zoneMatch && serviceMatch && categoryMatch);
                 });
             }
 
-            $('#staffSearch, #staffGroupFilter, #staffZoneFilter').on('input change', filterStaff);
+            $('#staffSearch, #staffGroupFilter, #staffZoneFilter, #staffServiceFilter, #staffCategoryFilter').on('input change', filterStaff);
 
             $('.accept-quote').click(function() {
                 let quoteId = $(this).data('id');

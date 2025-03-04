@@ -21,14 +21,28 @@ class BidChatController extends Controller
     public function sendMessage(Request $request, $bid_id)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'nullable|string',
+            'file' => 'nullable|file|max:2048'
         ]);
 
-        $message = BidChat::create([
+        $messageData = [
             'bid_id' => $bid_id,
             'sender_id' => Auth::id(),
-            'message' => $request->message,
-        ]);
+            'file' => 0,
+        ];
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = mt_rand() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('quote-images/bid-chat-files'), $filename);
+    
+            $messageData['message'] = $filename;
+            $messageData['file'] = 1;
+        } else {
+            $messageData['message'] = $request->message;
+        }
+
+        $message = BidChat::create($messageData);
 
         return response()->json(['success' => true, 'message' => $message]);
     }

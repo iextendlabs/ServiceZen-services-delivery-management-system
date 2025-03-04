@@ -146,6 +146,10 @@
                         <ul id="messages-list" class="list-unstyled"></ul>
                     </div>
                     <div class="card-footer d-flex align-items-center">
+                        <label for="file-upload" class="btn btn-secondary m-2">
+                            <i class="fas fa-paperclip"></i>
+                        </label>
+                        <input type="file" id="file-upload" class="d-none">
                         <input type="text" id="chat-message" class="form-control chat-input"
                             placeholder="Type a message...">
                         <button class="btn btn-success ms-2" id="send-message"><i class="fas fa-paper-plane"></i></button>
@@ -225,6 +229,7 @@
             let messagesList = $("#messages-list");
             let messageInput = $("#chat-message");
             let sendButton = $("#send-message");
+            let fileInput = $("#file-upload");
 
             function fetchMessages() {
                 $.get(`/bid-chat/${bidId}/messages`, function(messages) {
@@ -233,10 +238,12 @@
                         let isSender = msg.sender_id == userId;
                         let messageClass = isSender ? "chat-sender text-end" :
                             "chat-receiver text-start";
+                        let messageContent = msg.file ?
+                            `<strong>${msg.sender.name}:<a href="/quote-images/bid-chat-files/${msg.message}" target="_blank">📎 View File</a>` :
+                            `<strong>${msg.sender.name}:</strong> ${msg.message}`;
+
                         messagesList.append(
-                            `<li class="chat-message ${messageClass}">
-                        <strong>${msg.sender.name}:</strong> ${msg.message}
-                    </li>`
+                            `<li class="chat-message ${messageClass}">${messageContent}</li>`
                         );
                     });
                     chatBox.scrollTop(chatBox[0].scrollHeight);
@@ -253,6 +260,29 @@
                 }, function() {
                     messageInput.val("");
                     fetchMessages();
+                });
+            });
+
+            fileInput.change(function() {
+                let fileData = fileInput.prop("files")[0];
+                if (!fileData) return;
+
+                let formData = new FormData();
+                formData.append("file", fileData);
+                formData.append("_token", "{{ csrf_token() }}");
+
+                $.ajax({
+                    url: `/bid-chat/${bidId}/send`,
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        fetchMessages();
+                    },
+                    error: function(error) {
+                        alert("File upload failed!");
+                    }
                 });
             });
 
