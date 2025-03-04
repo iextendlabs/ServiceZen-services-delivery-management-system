@@ -9,7 +9,7 @@ class BidChat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['bid_id', 'sender_id', 'message'];
+    protected $fillable = ['bid_id', 'sender_id', 'message','file'];
 
     public function sender()
     {

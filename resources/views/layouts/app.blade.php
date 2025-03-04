@@ -345,6 +345,28 @@
     <!-- Select dropdown -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Search...',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    searching: function() {
+                        return "Type to search...";
+                    }
+                }
+            }).on('select2:open', function() {
+                setTimeout(() => {
+                    let searchBox = document.querySelector('.select2-search__field');
+                    if (searchBox) {
+                        searchBox.placeholder = "Type to search...";
+                        searchBox.focus();
+                    }
+                }, 100);
+            });
+        });
+    </script>
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
         const numberInputField = document.querySelector("#number");
         const whatsappInputField = document.querySelector("#whatsapp");

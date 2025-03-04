@@ -190,28 +190,7 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: 'Search...',
-                allowClear: true,
-                width: '100%',
-                language: {
-                    searching: function() {
-                        return "Type to search...";
-                    }
-                }
-            }).on('select2:open', function() {
-                setTimeout(() => {
-                    let searchBox = document.querySelector('.select2-search__field');
-                    if (searchBox) {
-                        searchBox.placeholder = "Type to search...";
-                        searchBox.focus();
-                    }
-                }, 100);
-            });
-        });
-    </script>
+    
     <script>
         function confirmDelete(Id) {
             var result = confirm("Are you sure you want to delete this Item?");

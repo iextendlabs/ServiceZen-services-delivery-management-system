@@ -263,6 +263,19 @@ class SiteQuoteController extends Controller
                     'status' => 'Approved',
                     'description' => "Quote commission for quote ID: $quote->id"
                 ]);
+
+                if ($quote->affiliate && $quote->affiliate->affiliate && $quote->affiliate->affiliate->commission) {
+                    $affiliateCommission = $commission * $quote->affiliate->affiliate->commission / 100;
+                    if ($affiliateCommission) {
+                        Transaction::create([
+                            'user_id' => $quote->affiliate->id,
+                            'amount' => $affiliateCommission,
+                            'type' => 'Quote',
+                            'status' => 'Approved',
+                            'description' => "Affiliate commission for quote ID: $quote->id"
+                        ]);
+                    }
+                }
             }
         }
 

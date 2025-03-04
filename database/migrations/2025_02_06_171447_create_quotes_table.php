@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('service_id')->nullable();
             $table->string('service_name')->nullable();
             $table->unsignedBigInteger('service_option_id')->nullable();
-            $table->string('detail');
+            $table->text('detail');
             $table->timestamps();
 
             $table->foreign('user_id')
