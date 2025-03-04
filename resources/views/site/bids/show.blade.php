@@ -201,7 +201,7 @@
                     messages.forEach(msg => {
                         let isSender = msg.sender_id == userId;
                         let messageClass = isSender ? "chat-sender" : "chat-receiver";
-                        let messageContent = msg.file ?
+                        let messageContent = msg.file == 1 ?
                             `<strong>${msg.sender.name}:</strong><a href="/quote-images/bid-chat-files/${msg.message}" target="_blank">📎 View File</a>` :
                             `<strong>${msg.sender.name}:</strong> ${msg.message}`;
 
