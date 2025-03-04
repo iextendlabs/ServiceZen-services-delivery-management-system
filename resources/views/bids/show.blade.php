@@ -104,7 +104,7 @@
                         <input type="number" id="new_bid_amount" class="form-control mb-2" placeholder="Enter new amount">
                         <button class="btn btn-primary" id="submit-update-bid">Save</button>
                     </div>
-                    
+
                     @if ($bid->images)
                         <div class="row mt-3">
                             <div class="col-md-12">
@@ -263,9 +263,12 @@
                 });
             });
 
-            fileInput.change(function() {
+            fileInput.on("change", function() {
                 let fileData = fileInput.prop("files")[0];
-                if (!fileData) return;
+                if (!fileData) {
+                    alert("No file selected!");
+                    return;
+                }
 
                 let formData = new FormData();
                 formData.append("file", fileData);
@@ -278,10 +281,11 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
+                        fileInput.val(""); // Reset file input
                         fetchMessages();
                     },
-                    error: function(error) {
-                        alert("File upload failed!");
+                    error: function(xhr) {
+                        alert("File upload failed! Error: " + xhr.statusText);
                     }
                 });
             });

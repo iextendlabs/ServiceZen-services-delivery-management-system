@@ -226,9 +226,12 @@
                 });
             });
 
-            fileInput.change(function() {
+            fileInput.on("change", function() {
                 let fileData = fileInput.prop("files")[0];
-                if (!fileData) return;
+                if (!fileData) {
+                    alert("No file selected!");
+                    return;
+                }
 
                 let formData = new FormData();
                 formData.append("file", fileData);
@@ -241,10 +244,11 @@
                     contentType: false,
                     processData: false,
                     success: function(response) {
+                        fileInput.val(""); // Reset file input
                         fetchMessages();
                     },
-                    error: function(error) {
-                        alert("File upload failed!");
+                    error: function(xhr) {
+                        alert("File upload failed! Error: " + xhr.statusText);
                     }
                 });
             });
