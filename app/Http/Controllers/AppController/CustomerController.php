@@ -1107,23 +1107,86 @@ class CustomerController extends Controller
         ], 200);
     }
 
-    public function getStaff()
+    public function getStaff(Request $request)
     {
-        $staff = User::role('Staff')
-            ->whereHas('staff', function ($query) {
-                $query->where('status', 1);
-            })
-            ->orderBy('name', 'ASC')
-            ->with('staff')
-            ->get();
+
+        $query = User::whereHas('staff', function ($query) use ($request) {
+            $query->where('status', 1);
+
+            if ($request->sub_title) {
+                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
+            }
+
+            if ($request->location) {
+                $query->where('location', 'like', '%' . $request->location . '%');
+            }
+
+            if ($request->min_order_value) {
+                $query->where('min_order_value', $request->min_order_value);
+            }
+        });
+
+        if ($request->service_id) {
+            $query->whereHas('services', function ($q) use ($request) {
+                $q->where('service_id', $request->service_id);
+            });
+        }
+    
+        if ($request->category_id) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->zone_id) {
+            $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
+                $q->where('staff_zone_id', $request->zone_id);
+            });
+        }
+
+        $staff = $query->role('Staff')->with('staff')->orderBy('name', 'ASC')->get();
 
         $staff->map(function ($staff) {
             $staff->rating = $staff->averageRating();
             return $staff;
         });
 
+        $sub_titles = Staff::where('status', 1)
+            ->whereNotNull('sub_title')
+            ->pluck('sub_title')
+            ->toArray();
+
+        $all_sub_titles = [];
+        foreach ($sub_titles as $sub_title) {
+            $sub_title_parts = explode('/', $sub_title);;
+            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
+        }
+        $sub_titles = array_unique(array_filter($all_sub_titles));
+
+        $locations = Staff::where('status', 1)
+            ->whereNotNull('location')
+            ->pluck('location')
+            ->toArray();
+
+        $all_locations = [];
+        foreach ($locations as $location) {
+            $location_parts = explode('/', $location);;
+            $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
+        }
+        $locations = array_unique(array_filter($all_locations));
+
+        $services = Service::where('status',1)->get();
+        $categories = ServiceCategory::where('status',1)->get();
+
+        $staffZones = StaffZone::get();
+
         return response()->json([
-            'staff' => $staff
+            'staff' => $staff,
+            'sub_titles' => $sub_titles,
+            'locations' => $locations,
+            'services' => $services,
+            'categories' => $categories,
+            'staffZones' => $staffZones,
         ], 200);
     }
     public function deleteAccountMail(Request $request){
