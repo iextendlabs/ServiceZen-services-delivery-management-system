@@ -1175,10 +1175,13 @@ class CustomerController extends Controller
         }
         $locations = array_unique(array_filter($all_locations));
 
+        $staffZones = StaffZone::select('id', 'name')->get();
+
         return response()->json([
             'staff' => $staff,
             'sub_titles' => $sub_titles,
-            'locations' => $locations
+            'locations' => $locations,
+            'staffZones' => $staffZones,
         ], 200);
     }
     public function deleteAccountMail(Request $request){
