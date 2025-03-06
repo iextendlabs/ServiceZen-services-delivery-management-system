@@ -1175,12 +1175,14 @@ class CustomerController extends Controller
         }
         $locations = array_unique(array_filter($all_locations));
 
+        $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
         $staffZones = StaffZone::select('id', 'name')->get();
 
         return response()->json([
             'staff' => $staff,
             'sub_titles' => $sub_titles,
             'locations' => $locations,
+            'categories' => $categories,
             'staffZones' => $staffZones,
         ], 200);
     }
