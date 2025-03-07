@@ -92,3 +92,5 @@ Route::post('/joinFreelancerProgram', [CustomerController::class,'joinFreelancer
 Route::get('getUser/{id}', [CustomerController::class, 'getUser'])->name('getUser');
 Route::post('quoteStore', [CustomerController::class, 'quoteStore']);
 Route::get('getQuotes', [CustomerController::class, 'getQuotes']);
+Route::get('/quotes/{quoteId}/bids', [CustomerController::class, 'getBids']);
+Route::post('/quotes/{quoteId}/confirm-bid', [CustomerController::class, 'confirmBid']);

@@ -35,12 +35,14 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use App\Models\Bid;
 use App\Models\OrderAttachment;
 use App\Models\Quote;
 use App\Models\QuoteImage;
 use App\Models\QuoteOption;
 use App\Models\ServiceOption;
 use App\Models\Staff;
+use App\Models\Transaction;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
 
@@ -2191,4 +2193,69 @@ class CustomerController extends Controller
             'quotes' => $quotes,
         ], 200);
     }
+
+    public function getBids($quoteId)
+    {
+        $quote = Quote::findOrFail($quoteId);
+
+        $bids = Bid::with('staff')
+            ->where('quote_id', $quoteId)
+            ->get();
+
+        return response()->json([
+            'quote' => $quote,
+            'bids' => $bids,
+        ], 200);
+    }
+
+    public function confirmBid(Request $request, $quoteId)
+    {
+        try {
+            $quote = Quote::find($quoteId);
+
+            $bid = Bid::find($request->bid_id);
+
+            $staffQuote = $quote->staffs->firstWhere('id', $bid->staff_id);
+
+            $quote->bid_id = $request->bid_id;
+            $quote->status = "Complete";
+            $quote->save();
+
+            if ($staffQuote && $staffQuote->pivot->quote_commission) {
+                $commission = $bid->bid_amount * $staffQuote->pivot->quote_commission / 100;
+
+                if ($commission) {
+                    Transaction::create([
+                        'user_id' => $bid->staff_id,
+                        'amount' => -$commission,
+                        'type' => 'Quote',
+                        'status' => 'Approved',
+                        'description' => "Quote commission for quote ID: $quote->id"
+                    ]);
+
+                    if ($quote->affiliate && $quote->affiliate->affiliate && $quote->affiliate->affiliate->commission) {
+                        $affiliateCommission = $commission * $quote->affiliate->affiliate->commission / 100;
+                        if ($affiliateCommission) {
+                            Transaction::create([
+                                'user_id' => $quote->affiliate->id,
+                                'amount' => $affiliateCommission,
+                                'type' => 'Quote',
+                                'status' => 'Approved',
+                                'description' => "Affiliate commission for quote ID: $quote->id"
+                            ]);
+                        }
+                    }
+                }
+            }
+            return response()->json([
+                'message' => 'Bid confirmed successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to confirm bid.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
