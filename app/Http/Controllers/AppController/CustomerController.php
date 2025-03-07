@@ -2130,8 +2130,6 @@ class CustomerController extends Controller
 
         $input['status'] = "Pending";
 
-        $input['phone'] = $request->phone && null;
-        $input['whatsapp'] = $request->whatsapp && null;
         if ($request->affiliate_code) {
             $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
             $input['affiliate_id'] = $affiliate->user_id;
