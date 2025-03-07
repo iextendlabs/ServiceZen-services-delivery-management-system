@@ -2199,7 +2199,7 @@ class CustomerController extends Controller
     {
         $quote = Quote::findOrFail($quoteId);
 
-        $bids = Bid::with('staff')
+        $bids = Bid::with('staff','images')
             ->where('quote_id', $quoteId)
             ->get();
 
