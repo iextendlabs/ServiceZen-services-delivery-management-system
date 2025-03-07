@@ -2182,6 +2182,7 @@ class CustomerController extends Controller
                 'staffs',
                 'bid',
                 'serviceOption',
+                'images'
             ])
             ->orderBy('created_at', 'desc')
             ->get();
