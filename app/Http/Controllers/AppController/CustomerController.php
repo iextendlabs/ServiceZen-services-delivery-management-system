@@ -2175,7 +2175,15 @@ class CustomerController extends Controller
 
     public function getQuotes(Request $request)
     {
-        $quotes = Quote::where('user_id', $request->user_id)->orderBy('created_at')->get();
+        $quotes = Quote::where('user_id', $request->user_id)
+            ->with([
+                'service',
+                'user',
+                'staffs',
+                'bid',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'quotes' => $quotes,
