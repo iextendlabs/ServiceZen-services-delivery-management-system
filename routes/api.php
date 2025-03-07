@@ -94,3 +94,5 @@ Route::post('quoteStore', [CustomerController::class, 'quoteStore']);
 Route::get('getQuotes', [CustomerController::class, 'getQuotes']);
 Route::get('/quotes/{quoteId}/bids', [CustomerController::class, 'getBids']);
 Route::post('/quotes/{quoteId}/confirm-bid', [CustomerController::class, 'confirmBid']);
+Route::get('/bid-chat/{quoteId}/messages', [CustomerController::class, 'fetchMessages']);
+Route::post('/bid-chat/{quoteId}/send', [CustomerController::class, 'sendMessage']);
