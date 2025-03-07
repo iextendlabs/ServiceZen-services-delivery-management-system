@@ -36,6 +36,9 @@ use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
 use App\Models\OrderAttachment;
+use App\Models\Quote;
+use App\Models\QuoteImage;
+use App\Models\QuoteOption;
 use App\Models\ServiceOption;
 use App\Models\Staff;
 use App\Models\UserAffiliate;
@@ -2089,5 +2092,86 @@ class CustomerController extends Controller
         }else{
             return response()->json(['error' => "You don't have an account. Please register to continue."],201);
         }
+    }
+
+    public function quoteStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_id' => 'required',
+            'service_name' => 'required',
+            'detail' => 'required',
+            'affiliate_code' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 201);
+        }
+
+        $input = $request->except('images');
+
+        $service = Service::findOrFail($request->service_id);
+        $categoryIds = $service->categories()->pluck('category_id')->toArray();
+
+        $staffs = User::with('staff')->whereHas('categories', function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds);
+            })
+            ->whereHas('staff', function ($query) {
+                $query->where('get_quote', 1);
+            })
+            ->get();
+
+        $input['status'] = "Pending";
+
+        $input['phone'] = $request->phone && null;
+        $input['whatsapp'] = $request->whatsapp && null;
+        if ($request->affiliate_code) {
+            $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
+            $input['affiliate_id'] = $affiliate->user_id;
+        }
+        $quote = Quote::create($input);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('quote-images'), $filename);
+
+                QuoteImage::create([
+                    'quote_id' => $quote->id,
+                    'image' => $filename
+                ]);
+            }
+        }
+
+        if ($request->has('option_id')) {
+            foreach ($request->option_id as $optionId) {
+                QuoteOption::create([
+                    'quote_id' => $quote->id,
+                    'option_id' => $optionId
+                ]);
+            }
+        }
+
+        $quote->categories()->sync($categoryIds);
+        foreach ($staffs as $staff) {
+            $quote->staffs()->syncWithoutDetaching([
+                $staff->id => [
+                    'status' => 'Pending',
+                    'quote_amount' => $staff->staff->quote_amount,
+                    'quote_commission' => $staff->staff->quote_commission
+                ]
+            ]);
+        }
+        
+        return response()->json([
+            'msg' => "Quote request submitted successfully!",
+        ], 200);
     }
 }
