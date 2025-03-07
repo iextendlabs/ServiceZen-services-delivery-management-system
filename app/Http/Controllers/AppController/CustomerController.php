@@ -2175,21 +2175,10 @@ class CustomerController extends Controller
 
     public function getQuotes(Request $request)
     {
-        $perPage = $request->per_page ?? config('app.paginate');
-
-        $quotes = Quote::where('user_id', $request->user_id)
-            ->with(['service', 'user', 'staffs'])
-            ->paginate($perPage);
+        $quotes = Quote::where('user_id', $request->user_id)->orderBy('created_at')->get();
 
         return response()->json([
-            'success' => true,
-            'quotes' => $quotes->items(),
-            'pagination' => [
-                'current_page' => $quotes->currentPage(),
-                'per_page' => $quotes->perPage(),
-                'total' => $quotes->total(),
-                'last_page' => $quotes->lastPage(),
-            ],
+            'quotes' => $quotes,
         ], 200);
     }
 }
