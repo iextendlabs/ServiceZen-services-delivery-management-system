@@ -24,9 +24,6 @@
                         <tbody>
                             @if (count($quotes))
                                 @foreach ($quotes as $quote)
-                                    @php
-                                        $staffQuote = $quote->staffs->where('id', auth()->user()->id)->first();
-                                    @endphp
                                     <tr class="border-bottom">
                                         <td>
                                             <div class="media">
@@ -49,7 +46,7 @@
                                         </td>
                                         <td class="text-center">
                                             <div>
-                                                <strong>{{ auth()->user()->hasRole('Staff') ? $staffQuote->pivot->status : $quote->status }}</strong>
+                                                <strong>{{ $quote->status }}</strong>
                                             </div>
 
                                             @if ($quote->bid)
