@@ -91,3 +91,4 @@ Route::get('getStaff', [CustomerController::class, 'getStaff']);
 Route::post('/joinFreelancerProgram', [CustomerController::class,'joinFreelancerProgram']);
 Route::get('getUser/{id}', [CustomerController::class, 'getUser'])->name('getUser');
 Route::post('quoteStore', [CustomerController::class, 'quoteStore']);
+Route::get('getQuotes', [CustomerController::class, 'getQuotes']);
