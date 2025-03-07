@@ -2148,8 +2148,8 @@ class CustomerController extends Controller
             }
         }
 
-        if ($request->has('option_id')) {
-            foreach ($request->option_id as $optionId) {
+        if ($request->has('option_ids')) {
+            foreach ($request->option_ids as $optionId) {
                 QuoteOption::create([
                     'quote_id' => $quote->id,
                     'option_id' => $optionId
