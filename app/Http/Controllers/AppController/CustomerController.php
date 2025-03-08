@@ -35,9 +35,15 @@ use App\Mail\OrderAdminEmail;
 use App\Mail\OrderCustomerEmail;
 use App\Mail\CustomerCreatedEmail;
 use App\Mail\OrderIssueNotification;
+use App\Models\Bid;
+use App\Models\BidChat;
 use App\Models\OrderAttachment;
+use App\Models\Quote;
+use App\Models\QuoteImage;
+use App\Models\QuoteOption;
 use App\Models\ServiceOption;
 use App\Models\Staff;
+use App\Models\Transaction;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
 
@@ -1107,23 +1113,83 @@ class CustomerController extends Controller
         ], 200);
     }
 
-    public function getStaff()
+    public function getStaff(Request $request)
     {
-        $staff = User::role('Staff')
-            ->whereHas('staff', function ($query) {
-                $query->where('status', 1);
-            })
-            ->orderBy('name', 'ASC')
-            ->with('staff')
-            ->get();
+
+        $query = User::whereHas('staff', function ($query) use ($request) {
+            $query->where('status', 1);
+
+            if ($request->sub_title) {
+                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
+            }
+
+            if ($request->location) {
+                $query->where('location', 'like', '%' . $request->location . '%');
+            }
+
+            if ($request->min_order_value) {
+                $query->where('min_order_value', $request->min_order_value);
+            }
+        });
+
+        if ($request->service_id) {
+            $query->whereHas('services', function ($q) use ($request) {
+                $q->where('service_id', $request->service_id);
+            });
+        }
+    
+        if ($request->category_id) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->zone_id) {
+            $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
+                $q->where('staff_zone_id', $request->zone_id);
+            });
+        }
+
+        $staff = $query->role('Staff')->with('staff')->orderBy('name', 'ASC')->get();
 
         $staff->map(function ($staff) {
             $staff->rating = $staff->averageRating();
             return $staff;
         });
 
+        $sub_titles = Staff::where('status', 1)
+            ->whereNotNull('sub_title')
+            ->pluck('sub_title')
+            ->toArray();
+
+        $all_sub_titles = [];
+        foreach ($sub_titles as $sub_title) {
+            $sub_title_parts = explode('/', $sub_title);;
+            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
+        }
+        $sub_titles = array_unique(array_filter($all_sub_titles));
+
+        $locations = Staff::where('status', 1)
+            ->whereNotNull('location')
+            ->pluck('location')
+            ->toArray();
+
+        $all_locations = [];
+        foreach ($locations as $location) {
+            $location_parts = explode('/', $location);;
+            $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
+        }
+        $locations = array_unique(array_filter($all_locations));
+
+        $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
+        $staffZones = StaffZone::select('id', 'name')->get();
+
         return response()->json([
-            'staff' => $staff
+            'staff' => $staff,
+            'sub_titles' => $sub_titles,
+            'locations' => $locations,
+            'categories' => $categories,
+            'staffZones' => $staffZones,
         ], 200);
     }
     public function deleteAccountMail(Request $request){
@@ -2029,5 +2095,201 @@ class CustomerController extends Controller
         }else{
             return response()->json(['error' => "You don't have an account. Please register to continue."],201);
         }
+    }
+
+    public function quoteStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_id' => 'required',
+            'service_name' => 'required',
+            'detail' => 'required',
+            'affiliate_code' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 201);
+        }
+
+        $input = $request->except('images');
+
+        $service = Service::findOrFail($request->service_id);
+        $categoryIds = $service->categories()->pluck('category_id')->toArray();
+
+        $staffs = User::with('staff')->whereHas('categories', function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds);
+            })
+            ->whereHas('staff', function ($query) {
+                $query->where('get_quote', 1);
+            })
+            ->get();
+
+        $input['status'] = "Pending";
+
+        if ($request->affiliate_code) {
+            $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
+            $input['affiliate_id'] = $affiliate->user_id;
+        }
+        $quote = Quote::create($input);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('quote-images'), $filename);
+
+                QuoteImage::create([
+                    'quote_id' => $quote->id,
+                    'image' => $filename
+                ]);
+            }
+        }
+
+        if ($request->has('option_ids')) {
+            foreach ($request->option_ids as $optionId) {
+                QuoteOption::create([
+                    'quote_id' => $quote->id,
+                    'option_id' => $optionId
+                ]);
+            }
+        }
+
+        $quote->categories()->sync($categoryIds);
+        foreach ($staffs as $staff) {
+            $quote->staffs()->syncWithoutDetaching([
+                $staff->id => [
+                    'status' => 'Pending',
+                    'quote_amount' => $staff->staff->quote_amount,
+                    'quote_commission' => $staff->staff->quote_commission
+                ]
+            ]);
+        }
+        
+        return response()->json([
+            'msg' => "Quote request submitted successfully!",
+        ], 200);
+    }
+
+    public function getQuotes(Request $request)
+    {
+        $quotes = Quote::where('user_id', $request->user_id)
+            ->with([
+                'service',
+                'user',
+                'staffs',
+                'bid',
+                'serviceOption',
+                'images'
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'quotes' => $quotes,
+        ], 200);
+    }
+
+    public function getBids($quoteId)
+    {
+        $quote = Quote::findOrFail($quoteId);
+
+        $bids = Bid::with('staff','images')
+            ->where('quote_id', $quoteId)
+            ->get();
+
+        return response()->json([
+            'quote' => $quote,
+            'bids' => $bids,
+        ], 200);
+    }
+
+    public function confirmBid(Request $request, $quoteId)
+    {
+        try {
+            $quote = Quote::find($quoteId);
+
+            $bid = Bid::find($request->bid_id);
+
+            $staffQuote = $quote->staffs->firstWhere('id', $bid->staff_id);
+
+            $quote->bid_id = $request->bid_id;
+            $quote->status = "Complete";
+            $quote->save();
+
+            if ($staffQuote && $staffQuote->pivot->quote_commission) {
+                $commission = $bid->bid_amount * $staffQuote->pivot->quote_commission / 100;
+
+                if ($commission) {
+                    Transaction::create([
+                        'user_id' => $bid->staff_id,
+                        'amount' => -$commission,
+                        'type' => 'Quote',
+                        'status' => 'Approved',
+                        'description' => "Quote commission for quote ID: $quote->id"
+                    ]);
+
+                    if ($quote->affiliate && $quote->affiliate->affiliate && $quote->affiliate->affiliate->commission) {
+                        $affiliateCommission = $commission * $quote->affiliate->affiliate->commission / 100;
+                        if ($affiliateCommission) {
+                            Transaction::create([
+                                'user_id' => $quote->affiliate->id,
+                                'amount' => $affiliateCommission,
+                                'type' => 'Quote',
+                                'status' => 'Approved',
+                                'description' => "Affiliate commission for quote ID: $quote->id"
+                            ]);
+                        }
+                    }
+                }
+            }
+            return response()->json([
+                'message' => 'Bid confirmed successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to confirm bid.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function fetchMessages($bid_id)
+    {
+        $messages = BidChat::where('bid_id', $bid_id)
+            ->with('sender')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json($messages);
+    }
+
+    public function sendMessage(Request $request, $bid_id)
+    {
+        $messageData = [
+            'bid_id' => $bid_id,
+            'sender_id' => $request->sender_id,
+            'file' => 0,
+        ];
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = mt_rand() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('quote-images/bid-chat-files'), $filename);
+    
+            $messageData['message'] = $filename;
+            $messageData['file'] = 1;
+        } else {
+            $messageData['message'] = $request->message;
+        }
+
+        $message = BidChat::create($messageData);
+
+        return response()->json(['success' => true, 'message' => $message]);
     }
 }

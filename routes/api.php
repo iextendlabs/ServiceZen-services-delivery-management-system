@@ -90,3 +90,9 @@ Route::post('/create-payment-intent', [StripePaymentController::class, 'stripePo
 Route::get('getStaff', [CustomerController::class, 'getStaff']);
 Route::post('/joinFreelancerProgram', [CustomerController::class,'joinFreelancerProgram']);
 Route::get('getUser/{id}', [CustomerController::class, 'getUser'])->name('getUser');
+Route::post('quoteStore', [CustomerController::class, 'quoteStore']);
+Route::get('getQuotes', [CustomerController::class, 'getQuotes']);
+Route::get('/quotes/{quoteId}/bids', [CustomerController::class, 'getBids']);
+Route::post('/quotes/{quoteId}/confirm-bid', [CustomerController::class, 'confirmBid']);
+Route::get('/bid-chat/{quoteId}/messages', [CustomerController::class, 'fetchMessages']);
+Route::post('/bid-chat/{quoteId}/send', [CustomerController::class, 'sendMessage']);

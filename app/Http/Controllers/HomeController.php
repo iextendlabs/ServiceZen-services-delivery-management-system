@@ -252,6 +252,7 @@ class HomeController extends Controller
                 'price' => $service->price,
                 'discount' => $service->discount,
                 'duration' => $service->duration,
+                'quote' => $service->quote,
                 'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
                 'rating' => $service->averageRating(),
