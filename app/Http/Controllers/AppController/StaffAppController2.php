@@ -395,6 +395,14 @@ class StaffAppController2 extends Controller
             ->where('user_id', $request->user_id)
             ->sum('amount');
 
+        $supervisors = $user->supervisors && $user->supervisors->isNotEmpty() 
+            ? $user->supervisors->map(function ($supervisor) {
+                return [
+                    'name' => $supervisor->name,
+                    'email' => $supervisor->email,
+                ];
+            }) 
+            : [];
 
         return response()->json([
             'user_id' => $user->id,
@@ -417,7 +425,7 @@ class StaffAppController2 extends Controller
             'product_sales' => $product_sales,
             'bonus' => $bonus,
             'current_month' => $currentMonth,
-            'supervisor' => $user->supervisors ?? []
+            'supervisors' => $supervisors
         ], 200);
     }
 
