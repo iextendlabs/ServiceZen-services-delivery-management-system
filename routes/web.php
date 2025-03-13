@@ -210,8 +210,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/quote/{quote_id}/bids', [BidController::class, 'index'])->name('quote.bids');
     Route::post('/quotes/update-staff-data', [QuoteController::class, 'updateStaffData'])->name('quotes.updateStaffData');
 
-    Route::post('/stripe-payment', [StripePaymentController::class, 'staffDepositPost'])->name('stripe.staffDepositPost');
-
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
 
 });

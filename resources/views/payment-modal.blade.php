@@ -13,7 +13,7 @@
                 <!-- Alert Messages -->
                 <div id="alert-container"></div>
 
-                <form id="payment-form" action="{{ route('stripe.staffDepositPost') }}" method="post">
+                <form id="payment-form" action="{{ route('stripe.post') }}" method="post">
                     @csrf
                     <div class="form-group">
                         <label for="amount" class="font-weight-bold">Amount</label>

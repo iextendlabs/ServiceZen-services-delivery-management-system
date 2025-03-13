@@ -26,11 +26,16 @@ class StripePaymentController extends Controller
 
     public function stripePost(Request $request, CheckOutController $checkOutController)
     {
-        $user = auth()->user();
+        if($request->user_id){
+            $user = User::find($request->user_id);
+        }else{
+            $user = auth()->user();
+        }
         $app = (bool) $request->app;
-        $order_ids = session('order_ids') ?? $request->order_ids;
-        $customer_type = session('customer_type') ?? $request->customer_type;
-        $deposit_amount = session('deposit_amount');
+        $order_ids = session('order_ids') ?? $request->order_ids ?? null;
+        $customer_type = session('customer_type') ?? $request->customer_type ?? null;
+        $deposit_amount = session('deposit_amount') ?? null;
+        $staff_deposit_amount = $request->amount ?? null;
 
         if ($order_ids) {
             $orders = Order::whereIn('id', explode(',', $order_ids))->get();
@@ -49,6 +54,13 @@ class StripePaymentController extends Controller
                 "email" => $user->email,
                 "name" => $user->name,
             ];
+        } elseif($staff_deposit_amount){
+            $payment_description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id}";
+            $currencyData = ['currency' => 'AED', 'amount' => $staff_deposit_amount];
+            $customerData = [
+                "email" => $user->email,
+                "name" => $user->name,
+            ];
         }
 
         try {
@@ -58,21 +70,31 @@ class StripePaymentController extends Controller
                 $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), $customer_type, $app);
                 session()->forget(['order_ids', 'comment', 'customer_type', 'bookingData']);
             } else {
-                $this->createDepositTransaction($deposit_amount);
+                $this->createDepositTransaction($deposit_amount ?? $staff_deposit_amount,$user->id,$currencyData['currency']);
                 session()->forget(['deposit_amount']);
             }
 
             $message = "Payment successful!";
-            $redirectRoute = $order_ids ? 'checkout.success' : 'affiliate_dashboard.index';
 
-            return $app ?
-                response()->json([
+            if ($app) {
+                return response()->json([
                     'client_secret' => $stripeResponse['client_secret'],
                     'email' => $stripeResponse['customer_email'],
                     'name' => $stripeResponse['customer_name'],
-                ], 200)
-                :
-                redirect()->route($redirectRoute)->with('success', $message);
+                ], 200);
+            }
+            
+            if ($order_ids) {
+                return redirect()->route("checkout.success")->with('success', $message);
+            } elseif ($deposit_amount) {
+                return redirect()->route("affiliate_dashboard.index")->with('success', $message);
+            } elseif ($staff_deposit_amount) {
+                Session::flash('success', 'Payment successful!');
+                return redirect()->back();
+            }
+            
+            return back(); // Default return in case none of the conditions match
+            
         } catch (Exception $e) {
             Session::flash('error', $e->getMessage());
             if ($app) {
@@ -100,42 +122,6 @@ class StripePaymentController extends Controller
             'currency' => $currency,
             'amount' => $order_total
         ];
-    }
-
-    public function staffDepositPost(Request $request)
-    {
-        $user = auth()->user();
-        try {
-            $customerData = [
-                'email' => $user->email,
-                'name' => $user->name,
-            ];
-
-            $amount = $request->amount;
-            $currency = 'AED';
-            $description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id}";
-            $app = false;
-
-            $paymentResult = $this->processStripePayment($customerData, $amount, $currency, $request, $app, $description);
-
-            if ($paymentResult['status'] === 'succeeded') {
-                Transaction::create([
-                    'amount' => $amount,
-                    'user_id' => auth()->id(),
-                    'type' => 'Deposit',
-                    'status' => 'Approved',
-                    'description' => 'Amount Deposit',
-                ]);
-                Session::flash('success', 'Payment successful!');
-            } else {
-                Session::flash('error', 'Payment failed. Please try again.');
-            }
-
-            return redirect()->back();
-        } catch (\Exception $e) {
-            Session::flash('error', $e->getMessage());
-            return redirect()->back();
-        }
     }
 
     private function processStripePayment($customerData, $amount, $currency, $request, $app, $description)
@@ -209,12 +195,15 @@ class StripePaymentController extends Controller
         }
     }
 
-    private function createDepositTransaction($amount)
+    private function createDepositTransaction($amount,$user_id,$currency)
     {
-        $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+        if($currency == "PKR"){
+            $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
+            $amount = $amount / $pkrRateValue;
+        }
         Transaction::create([
-            'amount' => $amount / $pkrRateValue,
-            'user_id' => auth()->id(),
+            'amount' => $amount,
+            'user_id' => $user_id,
             'type' => 'Deposit',
             'status' => 'Approved',
             'description' => 'Amount Deposit',
