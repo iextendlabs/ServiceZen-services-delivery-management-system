@@ -416,7 +416,8 @@ class StaffAppController2 extends Controller
             'total_balance' => $total_balance,
             'product_sales' => $product_sales,
             'bonus' => $bonus,
-            'current_month' => $currentMonth
+            'current_month' => $currentMonth,
+            'supervisor' => $user->supervisors ?? []
         ], 200);
     }
 
