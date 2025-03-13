@@ -40,7 +40,7 @@ class StaffAppController2 extends Controller
         $currentDate = Carbon::today();
 
         if ($request->status == 'Complete') {
-                $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
+            $orders_data = Order::leftJoin('cash_collections', 'orders.id', '=', 'cash_collections.order_id')
                 ->where(function ($query) {
                     $query->where('cash_collections.status', '!=', 'approved')
                         ->orWhereNull('cash_collections.status');
@@ -73,9 +73,9 @@ class StaffAppController2 extends Controller
         });
 
         $user = User::find($request->user_id);
-        
+
         $notification = Notification::where('user_id', $request->user_id)
-            ->where('id','>',$user->last_notification_id)
+            ->where('id', '>', $user->last_notification_id)
             ->count();
 
         $response = [
@@ -118,9 +118,9 @@ class StaffAppController2 extends Controller
 
             $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
             $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('id', 'desc')
-            ->limit($notification_limit)
-            ->get();
+                ->orderBy('id', 'desc')
+                ->limit($notification_limit)
+                ->get();
 
             $notifications->map(function ($notification) use ($user) {
                 $notification->type = "Old";
@@ -143,10 +143,16 @@ class StaffAppController2 extends Controller
 
         try {
             if ($request->status == "Complete") {
-                [$staff_commission, $affiliate_commission, $affiliate_id, 
-                $parent_affiliate_commission, $parent_affiliate_id,
-                $staff_affiliate_commission, $driver_commission, 
-                $driver_affiliate_commission] = $order->commissionCalculation();
+                [
+                    $staff_commission,
+                    $affiliate_commission,
+                    $affiliate_id,
+                    $parent_affiliate_commission,
+                    $parent_affiliate_id,
+                    $staff_affiliate_commission,
+                    $driver_commission,
+                    $driver_affiliate_commission
+                ] = $order->commissionCalculation();
 
                 if ($order->staff && $order->staff->commission) {
                     $this->createTransaction($order->id, $order->service_staff_id, 'Order Staff Commission', $staff_commission);
@@ -174,8 +180,8 @@ class StaffAppController2 extends Controller
                     }
                 }
             }
-            
-            if($request->status == "Canceled"){
+
+            if ($request->status == "Canceled") {
                 Transaction::where('order_id', $order->id)->delete();
             }
         } catch (\Throwable $th) {
@@ -183,13 +189,13 @@ class StaffAppController2 extends Controller
 
         $order->status = $request->status;
         $order->save();
-        OrderHistory::create(['order_id'=>$order->id,'user'=>$order->staff->user->name, 'status'=>$request->status]);
+        OrderHistory::create(['order_id' => $order->id, 'user' => $order->staff->user->name, 'status' => $request->status]);
 
-        return response()->json(['success' => 'Order Update Successfully'],200)
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
-        ->header('Content-Type', 'application/json')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        return response()->json(['success' => 'Order Update Successfully'], 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
+            ->header('Content-Type', 'application/json')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     }
 
     public function driverOrderStatusUpdate(Request $request)
@@ -198,7 +204,7 @@ class StaffAppController2 extends Controller
 
         $order->driver_status = $request->driver_status;
         $order->save();
-        OrderHistory::create(['order_id'=>$order->id,'user'=>$order->staff->user->name, 'status'=>'Drive:'.$request->driver_status]);
+        OrderHistory::create(['order_id' => $order->id, 'user' => $order->staff->user->name, 'status' => 'Drive:' . $request->driver_status]);
 
         OrderChat::create([
             'order_id' => $request->order_id,
@@ -208,7 +214,7 @@ class StaffAppController2 extends Controller
         ]);
 
         $title = "Order. $order->id . Update";
-        if($order->driver){
+        if ($order->driver) {
             $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
         }
 
@@ -294,9 +300,9 @@ class StaffAppController2 extends Controller
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
-        
+
         if (!$notifications->isEmpty()) {
-            if($request->update){
+            if ($request->update) {
                 $notifications->map(function ($notification) use ($user) {
                     if ($notification->id > $user->last_notification_id) {
                         $notification->type = "New";
@@ -305,10 +311,10 @@ class StaffAppController2 extends Controller
                     }
                     return $notification;
                 });
-                
+
                 $user->last_notification_id = $notifications->first()->id;
                 $user->save();
-            }else{
+            } else {
                 $notifications->map(function ($notification) use ($user) {
                     if ($notification->id > $user->last_notification_id) {
                         $notification->type = "New";
@@ -331,17 +337,17 @@ class StaffAppController2 extends Controller
         $input = $request->all();
 
         $timeStart = Carbon::createFromFormat('H:i', $request->time_start);
-        
+
         $carbonTimeStart = Carbon::parse($request->time_start);
 
         $input['start_time_to_sec'] = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
 
-        $staff_auto_approve = Setting::where('key',"Staffs For Holiday Auto Approve")->value('value');
+        $staff_auto_approve = Setting::where('key', "Staffs For Holiday Auto Approve")->value('value');
 
-        if(in_array($request->staff_id,explode(',', $staff_auto_approve))){
+        if (in_array($request->staff_id, explode(',', $staff_auto_approve))) {
             $input['status'] = 1;
         }
-        
+
         ShortHoliday::create($input);
 
         return response()->json(['success' => 'Your Short Holiday Request Send to Admin.']);
@@ -371,7 +377,7 @@ class StaffAppController2 extends Controller
     {
         $user = User::find($request->user_id);
         if (!$user || !$user->staff) {
-            return response()->json(['msg' => "User not found."], 201);
+            return response()->json(['message' => "User not found."], 201);
         }
 
         $staff = $user->staff;
@@ -389,7 +395,7 @@ class StaffAppController2 extends Controller
             ->where('user_id', $request->user_id)
             ->sum('amount');
 
-        
+
         return response()->json([
             'user_id' => $user->id,
             'name' => $user->name,
@@ -426,10 +432,10 @@ class StaffAppController2 extends Controller
     public function getHolidays(Request $request)
     {
         $holiday = Holiday::where('date', '>=', Carbon::now()->format('Y-m-d'))->get();
-        $long_holiday = LongHoliday::where('date_start', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
-        $short_holiday = ShortHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
-        $staff_general_holidays = StaffGeneralHoliday::where('staff_id',$request->user_id)->get();
-        $staff_holidays = StaffHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id',$request->user_id)->get();
+        $long_holiday = LongHoliday::where('date_start', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
+        $short_holiday = ShortHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
+        $staff_general_holidays = StaffGeneralHoliday::where('staff_id', $request->user_id)->get();
+        $staff_holidays = StaffHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
 
         return response()->json([
             'holiday' => $holiday,
@@ -447,7 +453,7 @@ class StaffAppController2 extends Controller
         $orders_data = Order::where('service_staff_id', $request->user_id)
             ->whereNot('status', "Draft")
             ->where('date', '<=', $currentDate)
-            ->select('id', 'status', 'total_amount', 'date', 'time_slot_value','created_at')
+            ->select('id', 'status', 'total_amount', 'date', 'time_slot_value', 'created_at')
             ->latest()->get();
 
         return response()->json([
@@ -471,7 +477,7 @@ class StaffAppController2 extends Controller
     {
         $withdraws = Withdraw::where('user_id', $request->user_id)->where('status', 'Un Approved')->get();
 
-        if($withdraws->count() > 0){
+        if ($withdraws->count() > 0) {
             return response()->json([
                 'msg' => "You have already a withdraw request pending.",
             ], 201);
@@ -484,7 +490,7 @@ class StaffAppController2 extends Controller
             return response()->json([
                 'msg' => "Your withdraw amount is greater than your total balance. Total balance: " . $total_balance,
             ], 201);
-        }else{
+        } else {
             $input = $request->all();
 
             $input['amount'] = $request->amount;
@@ -513,20 +519,11 @@ class StaffAppController2 extends Controller
 
         $user = User::find($request->user_id);
 
-        if (!$user) {
-            return response()->json([
-                'message' => 'User not found',
-            ], 201);
+        if (!$user || !$user->staff) {
+            return response()->json(['message' => "User not found."], 201);
         }
 
         $staff = $user->staff;
-
-        if (!$staff) {
-            return response()->json([
-                'message' => 'User not found',
-            ], 201);
-        }
-
         $user->email = $request->input('email');
         if ($request->input('password')) {
             $user->password = Hash::make($request->input('password'));
@@ -545,6 +542,24 @@ class StaffAppController2 extends Controller
             'status' => 'success',
             'message' => 'Profile updated successfully',
             'data' => $user
+        ], 200);
+    }
+
+    public function onlineOffline(Request $request)
+    {
+
+        $user = User::find($request->user_id);
+
+        if (!$user || !$user->staff) {
+            return response()->json(['message' => "User not found."], 201);
+        }
+        $staff = $user->staff;
+        $staff->online = $request->input('online') ? 1 : 0;
+        $staff->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully'
         ], 200);
     }
 }
