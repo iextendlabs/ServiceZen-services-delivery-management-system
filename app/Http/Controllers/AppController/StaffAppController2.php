@@ -371,7 +371,7 @@ class StaffAppController2 extends Controller
     {
         $user = User::find($request->user_id);
         if (!$user || !$user->staff) {
-            return response()->json(['msg' => "User not found."], 404);
+            return response()->json(['msg' => "User not found."], 201);
         }
 
         $staff = $user->staff;
