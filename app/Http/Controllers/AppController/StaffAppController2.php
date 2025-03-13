@@ -370,6 +370,10 @@ class StaffAppController2 extends Controller
     public function index(Request $request)
     {
         $user = User::find($request->user_id);
+        if (!$user || !$user->staff) {
+            return response()->json(['msg' => "User not found."], 404);
+        }
+
         $staff = $user->staff;
         $total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
 
