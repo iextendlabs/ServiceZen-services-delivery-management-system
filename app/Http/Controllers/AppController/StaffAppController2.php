@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Affiliate;
+use App\Models\CustomerProfile;
 use App\Models\Holiday;
 use App\Models\LongHoliday;
 use App\Models\MembershipPlan;
@@ -20,11 +22,13 @@ use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\OrderHistory;
 use App\Models\ShortHoliday;
+use App\Models\Staff;
 use App\Models\StaffGeneralHoliday;
 use App\Models\StaffHoliday;
 use App\Models\UserAffiliate;
 use App\Models\Withdraw;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class StaffAppController2 extends Controller
 
@@ -396,13 +400,13 @@ class StaffAppController2 extends Controller
             ->where('user_id', $request->user_id)
             ->sum('amount');
 
-        $supervisors = $user->supervisors && $user->supervisors->isNotEmpty() 
+        $supervisors = $user->supervisors && $user->supervisors->isNotEmpty()
             ? $user->supervisors->map(function ($supervisor) {
                 return [
                     'name' => $supervisor->name,
                     'email' => $supervisor->email,
                 ];
-            }) 
+            })
             : [];
 
         return response()->json([
@@ -575,10 +579,64 @@ class StaffAppController2 extends Controller
 
     public function getPlans()
     {
-        $membership_plans = MembershipPlan::where('status', 1)->where('type','Freelancer')->get();
+        $membership_plans = MembershipPlan::where('status', 1)->where('type', 'Freelancer')->get();
 
         return response()->json([
             'plans' => $membership_plans,
+        ], 200);
+    }
+
+    public function signup(Request $request)
+    {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required',
+            'affiliate' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
+                    if (!$affiliate) {
+                        $fail('The selected ' . $attribute . ' is invalid or not active.');
+                    }
+                }
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 201);
+        }
+
+        $input = $request->all();
+        $input['customer_source'] = "Android";
+        $input['freelancer_program'] = 0;
+        $input['password'] = Hash::make($input['password']);
+        $input['email'] = strtolower(trim($input['email']));
+        if ($request->has('fcmToken') && $request->fcmToken) {
+            $input['device_token'] = $request->fcmToken;
+        }
+        $user = User::create($input);
+        $user->assignRole("Customer");
+        $input['user_id'] = $user->id;
+
+        $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
+
+        if ($request->number) {
+            $input['phone'] = $request->number_country_code . $request->number;
+        }
+        $input['affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;
+        Staff::create($input);
+
+        if ($request->number && $request->whatsapp) {
+            CustomerProfile::create($input);
+        }
+
+        $token = $user->createToken('app-token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'access_token' => $token
         ], 200);
     }
 }
