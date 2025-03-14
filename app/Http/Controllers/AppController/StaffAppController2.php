@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Holiday;
 use App\Models\LongHoliday;
+use App\Models\MembershipPlan;
 use App\Models\Notification;
 use App\Models\OrderChat;
 use App\Models\Setting;
@@ -569,6 +570,15 @@ class StaffAppController2 extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Profile updated successfully'
+        ], 200);
+    }
+
+    public function getPlans()
+    {
+        $membership_plans = MembershipPlan::where('status', 1)->where('type','Freelancer')->get();
+
+        return response()->json([
+            'plans' => $membership_plans,
         ], 200);
     }
 }
