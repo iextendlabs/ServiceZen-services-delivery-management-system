@@ -28,7 +28,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">AED</span>
                         </div>
-                        <input type="number" class="form-control" name="amount" id="amount" placeholder="Enter amount"
+                        <input type="number" class="form-control" name="amount" id="amount" value="{{ $amount ?? null }}" placeholder="Enter amount"
                             required>
                     </div>
                 </div>

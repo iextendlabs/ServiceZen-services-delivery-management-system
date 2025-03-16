@@ -28,7 +28,8 @@ class StripePaymentController extends Controller
     {
         $app = $request->app;
         $user_id = $request->user_id ?? auth()->user()->id;
-        return view('payment-modal',compact('app','user_id'));
+        $amount = $request->amount ?? null;
+        return view('payment-modal',compact('app','user_id','amount'));
     }
 
     public function stripePost(Request $request, CheckOutController $checkOutController)

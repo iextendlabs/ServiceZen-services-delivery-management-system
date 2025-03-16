@@ -380,9 +380,18 @@ class StaffAppController2 extends Controller
 
     public function index(Request $request)
     {
+        $currentDate = Carbon::today();
+
         $user = User::find($request->user_id);
         if (!$user || !$user->staff) {
             return response()->json(['message' => "User not found."], 201);
+        }
+        if ($user->freelancer_program !== null) {
+            if ($user->freelancer_program == 0) {
+                return response()->json(['message' => "Request in progress."], 202);
+            } elseif (Carbon::parse($user->staff->expiry_date)->toDateString() < $currentDate->toDateString()) {
+                return response()->json(['message' => "Expire."], 203);
+            }
         }
 
         $staff = $user->staff;
