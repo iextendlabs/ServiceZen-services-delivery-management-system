@@ -56,6 +56,7 @@ Route::post('onlineOffline', [StaffAppController2::class, 'onlineOffline']);
 Route::get('getPlans', [StaffAppController2::class, 'getPlans']);
 Route::post('staffSignup', [StaffAppController2::class, 'signup']);
 Route::get('getStaffQuotes', [StaffAppController2::class, 'getQuotes']);
+Route::post('/quotes/update-status', [StaffAppController2::class, 'quoteStatusUpdate']);
 
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);

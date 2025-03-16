@@ -201,6 +201,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/quotes/bulkStatusEdit', [QuoteController::class, 'bulkStatusEdit'])->name('quotes.bulkStatusEdit');
     Route::post('/quotes/bulkAssignStaff', [QuoteController::class, 'bulkAssignStaff'])->name('quotes.bulkAssignStaff');
     Route::delete('/quotes/{quote}/staff/{staff}', [QuoteController::class, 'detachStaff'])->name('quotes.detachStaff');
+    Route::post('/quotes/update-status', [QuoteController::class, 'updateStatus'])->name('quotes.updateStatus');
     Route::get('/quote/{quote_id}/bid/{staff_id}', [BidController::class, 'showBidPage'])->name('quote.bid');
     Route::post('/quote/{quote_id}/bid/{staff_id}', [BidController::class, 'store'])->name('quote.bid.store');
     Route::post('/bid/{bid_id}/update', [BidController::class, 'updateBid'])->name('bid.update');
@@ -212,7 +213,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
 });
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
-Route::post('/quotes/update-status', [QuoteController::class, 'updateStatus'])->name('quotes.updateStatus');
 
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 

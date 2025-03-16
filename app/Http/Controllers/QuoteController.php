@@ -228,7 +228,7 @@ class QuoteController extends Controller
     public function updateStatus(Request $request)
     {
         $quote = Quote::findOrFail($request->id);
-        $user = $request->user_id ? User::find($request->user_id) : auth()->user();
+        $user = auth()->user();
 
         $staffQuote = $quote->staffs->firstWhere('id', $user->id);
 

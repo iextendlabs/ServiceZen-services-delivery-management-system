@@ -677,4 +677,39 @@ class StaffAppController2 extends Controller
             'quotes' => $quotes,
         ], 200);
     }
+
+    public function quoteStatusUpdate(Request $request)
+    {
+        $quote = Quote::findOrFail($request->id);
+
+        $staffQuote = $quote->staffs->firstWhere('id', $request->user_id);
+
+        if (!$staffQuote) {
+            return response()->json(['error' => 'Staff quote not found.'], 201);
+        }
+
+        if ($request->status == "Rejected") {
+            $quote->staffs()->updateExistingPivot($request->user_id, ['status' => $request->status]);
+        } else {
+            $staff_total_balance = Transaction::where('user_id', $request->user_id)->sum('amount');
+
+            if ($staffQuote->pivot->quote_amount < 0 && $staff_total_balance < abs($staffQuote->pivot->quote_amount)) {
+                return response()->json([
+                    'error' => 'You do not have enough balance to accept this quote. Please add funds to your balance.'
+                ], 201);
+            }
+
+            $quote->staffs()->updateExistingPivot($request->user_id, ['status' => $request->status]);
+
+            Transaction::create([
+                'user_id' => $request->user_id,
+                'amount' => $staffQuote->pivot->quote_amount,
+                'type' => 'Quote',
+                'status' => 'Approved',
+                'description' => "Quote amount for quote ID: $quote->id"
+            ]);
+        }
+
+        return response()->json(['message' => 'Quote staff status updated successfully.'], 200);
+    }
 }
