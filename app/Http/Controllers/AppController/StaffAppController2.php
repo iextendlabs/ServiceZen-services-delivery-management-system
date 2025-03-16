@@ -21,6 +21,7 @@ use App\Models\OrderChat;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\OrderHistory;
+use App\Models\Quote;
 use App\Models\ShortHoliday;
 use App\Models\Staff;
 use App\Models\StaffGeneralHoliday;
@@ -646,6 +647,27 @@ class StaffAppController2 extends Controller
         return response()->json([
             'user' => $user,
             'access_token' => $token
+        ], 200);
+    }
+
+    public function getQuotes(Request $request)
+    {
+        $quotes = Quote::with([
+            'service',
+            'user',
+            'staffs',
+            'bid',
+            'serviceOption',
+            'images'
+        ])
+            ->whereHas('staffs', function ($q) use ($request) {
+                $q->where('staff_id', $request->user_id); // Filter by logged-in staff
+            })
+            ->orderBy('created_at', 'desc')
+            ->get(); // Execute the query and fetch results
+
+        return response()->json([
+            'quotes' => $quotes,
         ], 200);
     }
 }
