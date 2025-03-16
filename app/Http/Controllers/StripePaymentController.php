@@ -46,7 +46,7 @@ class StripePaymentController extends Controller
         $customer_type = session('customer_type') ?? $request->customer_type ?? null;
         $deposit_amount = session('deposit_amount') ?? null;
         $staff_deposit_amount = $request->amount ?? null;
-        $plan_id = $request->plan_id ?? null;
+        $plan = $request->plan_id ? MembershipPlan::find($request->plan_id) : [];
 
         if ($order_ids) {
             $orders = Order::whereIn('id', explode(',', $order_ids))->get();
@@ -66,7 +66,11 @@ class StripePaymentController extends Controller
                 "name" => $user->name,
             ];
         } elseif ($staff_deposit_amount) {
-            $payment_description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id}";
+            if (!empty($plan)) {
+                $payment_description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id} for membership plans: {$plan->plan_name}";
+            } else {
+                $payment_description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id}";
+            }
             $currencyData = ['currency' => 'AED', 'amount' => $staff_deposit_amount];
             $customerData = [
                 "email" => $user->email,
@@ -81,8 +85,8 @@ class StripePaymentController extends Controller
                 $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), $customer_type, $app);
                 session()->forget(['order_ids', 'comment', 'customer_type', 'bookingData']);
             } else {
-                if ($plan_id !== null) {
-                    $this->upgradeStaffPlan($plan_id, $user->id);
+                if (!empty($plan)) {
+                    $this->upgradeStaffPlan($plan, $user);
                 } else {
                     $this->createDepositTransaction($deposit_amount ?? $staff_deposit_amount, $user->id, $currencyData['currency']);
                 }
@@ -225,21 +229,14 @@ class StripePaymentController extends Controller
         ]);
     }
 
-    private function upgradeStaffPlan($plan_id, $user_id)
+    private function upgradeStaffPlan($plan, $user)
     {
-        $plan = MembershipPlan::find($plan_id);
-        $user = User::find($user_id);
-
-        if (!$plan || !$user) {
-            return; // Exit if the plan or user is not found
-        }
-
         $staff = $user->staff;
 
         if ($staff) {
             $expirationDate = Carbon::now()->addDays($plan->expire);
             $staff->membership_plan_id = $plan->id;
-            $staff->expiry_date = $expirationDate->toDateString(); // Ensures it's in YYYY-MM-DD format
+            $staff->expiry_date = $expirationDate->toDateString();
             $staff->save();
         }
     }
