@@ -723,17 +723,17 @@ class StaffAppController2 extends Controller
             ->where('staff_id', $staff_id)
             ->first();
 
-        if (count($bid) == 0) {
+        if ($bid) {
+            return response()->json([
+                'quote' => $quote,
+                'bid' => $bid,
+                'images' => $bid->images ?? []
+            ], 200);
+        } else {
             return response()->json([
                 'message' => "Bid not found",
             ], 201);
         }
-        
-        return response()->json([
-            'quote' => $quote,
-            'bid' => $bid,
-            'images' => $bid->images ?? []
-        ], 200);
     }
 
     public function storeBid(Request $request, $quote_id, $staff_id)
