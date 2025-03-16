@@ -24,6 +24,12 @@ class StripePaymentController extends Controller
         return view('site.checkOut.stripe');
     }
 
+    public function stripeStaffForm(Request $request)
+    {
+        $app = $request->app;
+        return view('payment-modal',compact('app'));
+    }
+
     public function stripePost(Request $request, CheckOutController $checkOutController)
     {
         if($request->user_id){

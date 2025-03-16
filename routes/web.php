@@ -212,6 +212,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
 
+    Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
 });
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 
