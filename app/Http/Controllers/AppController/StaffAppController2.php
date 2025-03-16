@@ -660,6 +660,9 @@ class StaffAppController2 extends Controller
             'serviceOption',
             'images'
         ])
+            ->with(['staffs' => function ($q) use ($request) {
+                $q->where('staff_id', $request->user_id); // Get only the requested staff
+            }])
             ->whereHas('staffs', function ($q) use ($request) {
                 $q->where('staff_id', $request->user_id); // Filter by logged-in staff
             })
