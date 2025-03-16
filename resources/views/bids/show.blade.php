@@ -98,12 +98,7 @@
                     <h5>Your Current Bid</h5>
                     <p><strong>Amount:</strong> AED<span id="bid-amount">{{ $bid->bid_amount }}</span></p>
                     <p><strong>Comment:</strong> <span id="bid-comment">{{ $bid->comment ?? 'No comment' }}</span></p>
-                    <button class="btn btn-warning mt-2" id="update-bid-btn">Update Bid</button>
-
-                    <div id="update-bid-form" class="mt-3" style="display: none;">
-                        <input type="number" id="new_bid_amount" class="form-control mb-2" placeholder="Enter new amount">
-                        <button class="btn btn-primary" id="submit-update-bid">Save</button>
-                    </div>
+                    
 
                     @if ($bid->images)
                         <div class="row mt-3">
@@ -139,22 +134,6 @@
                     </div>
                 </div>
 
-                <!-- Chat Section -->
-                <div class="card chat-container">
-                    <div class="card-header bg-success text-white text-center">Bid Chat</div>
-                    <div class="card-body chat-box" id="chat-box">
-                        <ul id="messages-list" class="list-unstyled"></ul>
-                    </div>
-                    <div class="card-footer d-flex align-items-center">
-                        <label for="file-upload" class="btn btn-secondary m-2">
-                            <i class="fas fa-paperclip"></i>
-                        </label>
-                        <input type="file" id="file-upload" class="d-none">
-                        <input type="text" id="chat-message" class="form-control chat-input"
-                            placeholder="Type a message...">
-                        <button class="btn btn-success ms-2" id="send-message"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
             @else
                 <div class="card p-3">
                     <form action="{{ route('quote.bid.store', ['quote_id' => $quote->id, 'staff_id' => $staff_id]) }}"
@@ -222,172 +201,6 @@
                 $("#nextImage").prop("disabled", currentIndex === images.length - 1);
             }
         });
-        $(document).ready(function() {
-            let bidId = {{ $bid->id ?? 'null' }};
-            let userId = {{ auth()->id() }};
-            let chatBox = $("#chat-box");
-            let messagesList = $("#messages-list");
-            let messageInput = $("#chat-message");
-            let sendButton = $("#send-message");
-            let fileInput = $("#file-upload");
-
-            function fetchMessages() {
-                $.get(`/bid-chat/${bidId}/messages`, function(messages) {
-                    messagesList.empty();
-                    messages.forEach(msg => {
-                        let isSender = msg.sender_id == userId;
-                        let messageClass = isSender ? "chat-sender text-end" :
-                            "chat-receiver text-start";
-                        let messageContent = msg.file == 1 ?
-                            `<strong>${msg.sender.name}:<a href="/quote-images/bid-chat-files/${msg.message}" target="_blank">📎 View File</a>` :
-                            `<strong>${msg.sender.name}:</strong> ${msg.message}`;
-
-                        messagesList.append(
-                            `<li class="chat-message ${messageClass}">${messageContent}</li>`
-                        );
-                    });
-                    chatBox.scrollTop(chatBox[0].scrollHeight);
-                });
-            }
-
-            sendButton.click(function() {
-                let message = messageInput.val().trim();
-                if (!message) return;
-
-                $.post(`/bid-chat/${bidId}/send`, {
-                    message,
-                    _token: "{{ csrf_token() }}"
-                }, function() {
-                    messageInput.val("");
-                    fetchMessages();
-                });
-            });
-
-            fileInput.on("change", function() {
-                let fileData = fileInput.prop("files")[0];
-                if (!fileData) {
-                    alert("No file selected!");
-                    return;
-                }
-
-                let formData = new FormData();
-                formData.append("file", fileData);
-                formData.append("_token", "{{ csrf_token() }}");
-
-                $.ajax({
-                    url: `/bid-chat/${bidId}/send`,
-                    type: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        fileInput.val(""); // Reset file input
-                        fetchMessages();
-                    },
-                    error: function(xhr) {
-                        alert("File upload failed! Error: " + xhr.statusText);
-                    }
-                });
-            });
-
-            setInterval(fetchMessages, 3000);
-            fetchMessages();
-
-            $("#update-bid-btn").click(() => $("#update-bid-form").toggle());
-
-            $("#submit-update-bid").click(function() {
-                let newBidAmount = $("#new_bid_amount").val().trim();
-                if (!newBidAmount) return alert("Enter a valid bid amount.");
-
-                $.post(`/bid/${bidId}/update`, {
-                    bid_amount: newBidAmount,
-                    _token: "{{ csrf_token() }}"
-                }, function(response) {
-                    if (response.success) {
-                        $("#bid-amount").text(response.new_bid_amount);
-                        $("#new_bid_amount").val("");
-                        $("#update-bid-form").hide();
-                        fetchMessages();
-                    }
-                });
-            });
-
-
-            $("#selectImagesBtn, #drop-area").on("click", function(event) {
-                if (event.target !== this) return; // Prevent triggering itself
-                $("#images").get(0).click();
-            });
-
-            $("#images").off("change").on("change", function(event) {
-                previewImages(event.target.files);
-            });
-
-            // Drag & Drop Feature
-            $("#drop-area").on("dragover", function(event) {
-                event.preventDefault();
-                $(this).css("border-color", "#007bff");
-            });
-
-            $("#drop-area").on("dragleave", function() {
-                $(this).css("border-color", "#ccc");
-            });
-
-            $("#drop-area").on("drop", function(event) {
-                event.preventDefault();
-                $(this).css("border-color", "#ccc");
-                let files = event.originalEvent.dataTransfer.files;
-                previewImages(files);
-            });
-
-            function previewImages(files) {
-                let previewContainer = $("#imagePreviewContainer");
-
-                $.each(files, function(index, file) {
-                    // Check if the image already exists in the preview
-                    let existingImages = previewContainer.find("img").map(function() {
-                        return $(this).attr("src");
-                    }).get();
-
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        if (existingImages.includes(e.target.result)) return; // Skip duplicate images
-
-                        let imgWrapper = $("<div>").addClass("position-relative m-2").css({
-                            width: "120px",
-                            height: "120px",
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            display: "inline-block",
-                            position: "relative"
-                        });
-
-                        let img = $("<img>").attr("src", e.target.result).addClass("img-thumbnail")
-                            .css({
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover"
-                            });
-
-                        let removeBtn = $("<button>")
-                            .html("&times;")
-                            .addClass("btn btn-sm btn-danger position-absolute")
-                            .css({
-                                top: "5px",
-                                right: "5px",
-                                borderRadius: "50%",
-                                padding: "2px 6px"
-                            })
-                            .click(function() {
-                                imgWrapper.remove();
-                            });
-
-                        imgWrapper.append(img).append(removeBtn);
-                        previewContainer.append(imgWrapper);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-        });
+        
     </script>
 @endsection

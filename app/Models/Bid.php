@@ -25,9 +25,4 @@ class Bid extends Model
     {
         return $this->hasMany(BidImage::class);
     }
-
-    public function messages()
-    {
-        return $this->hasMany(BidChat::class);
-    }
 }

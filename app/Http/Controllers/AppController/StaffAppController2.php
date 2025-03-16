@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Affiliate;
 use App\Models\Bid;
-use App\Models\BidImage;
 use App\Models\CustomerProfile;
 use App\Models\Holiday;
 use App\Models\LongHoliday;
@@ -715,83 +714,17 @@ class StaffAppController2 extends Controller
         return response()->json(['message' => 'Quote staff status updated successfully.'], 200);
     }
 
-    public function bidShow($quoteId)
+    public function showBidPage($quote_id, $staff_id)
     {
-        $user = Auth::user();
-        $quote = Quote::findOrFail($quoteId);
+        $quote = Quote::findOrFail($quote_id);
 
-        // Find the bid for the current user and quote
-        $bid = $quote->bids()->where('staff_id', $user->id)->first();
+        $bid = Bid::where('quote_id', $quote_id)
+            ->where('staff_id', $staff_id)
+            ->first();
 
-        if (!$bid) {
-            return response()->json(['error' => 'No bid found for this quote.'], 404);
-        }
-
-        // Load related data (images, messages, etc.)
-        $bid->load('images', 'messages.sender');
-
-        return response()->json(['bid' => $bid]);
-    }
-
-    // Update bid amount
-    public function updateBid(Request $request, $bidId)
-    {
-        $request->validate([
-            'bid_amount' => 'required|numeric|min:0',
-        ]);
-
-        $bid = Bid::findOrFail($bidId);
-        $bid->update(['bid_amount' => $request->bid_amount]);
-
-        return response()->json(['success' => true, 'new_bid_amount' => $bid->bid_amount]);
-    }
-
-    // Upload bid images
-    public function bidUploadImages(Request $request, $bidId)
-    {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $bid = Bid::findOrFail($bidId);
-
-        foreach ($request->file('images') as $image) {
-            $path = $image->store('quote-images/bid-images', 'public');
-            BidImage::create([
-                'bid_id' => $bid->id,
-                'image' => $path,
-            ]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Images uploaded successfully.']);
-    }
-
-    public function fetchBidMessages($bidId)
-    {
-        $bid = Bid::findOrFail($bidId);
-        $messages = $bid->messages()->with('sender')->latest()->get();
-
-        return response()->json(['messages' => $messages]);
-    }
-
-    // Send a chat message
-    public function sendBidMessage(Request $request, $bidId)
-    {
-        $request->validate([
-            'message' => 'required|string',
-        ]);
-
-        $bid = Bid::findOrFail($bidId);
-
-        $message = $bid->messages()->create([
-            'sender_id' => Auth::id(),
-            'message' => $request->message,
-        ]);
-
-        // Load sender details
-        $message->load('sender');
-
-        return response()->json(['success' => true, 'message' => $message]);
+        return response()->json([
+            'quote' => $quote,
+            'bid' => $bid,
+        ], 200);
     }
 }
