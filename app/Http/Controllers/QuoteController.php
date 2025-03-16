@@ -233,7 +233,7 @@ class QuoteController extends Controller
         $staffQuote = $quote->staffs->firstWhere('id', $user->id);
 
         if (!$staffQuote) {
-            return response()->json(['error' => 'Staff quote not found.'], 201);
+            return response()->json(['error' => 'Staff quote not found.'], 404);
         }
 
         if ($request->status == "Rejected") {
@@ -244,7 +244,7 @@ class QuoteController extends Controller
             if ($staffQuote->pivot->quote_amount < 0 && $staff_total_balance < abs($staffQuote->pivot->quote_amount)) {
                 return response()->json([
                     'error' => 'You do not have enough balance to accept this quote. Please add funds to your balance.'
-                ], 201);
+                ], 400);
             }
 
             $quote->staffs()->updateExistingPivot($user->id, ['status' => $request->status]);
