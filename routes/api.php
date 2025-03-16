@@ -57,6 +57,11 @@ Route::get('getPlans', [StaffAppController2::class, 'getPlans']);
 Route::post('staffSignup', [StaffAppController2::class, 'signup']);
 Route::get('getStaffQuotes', [StaffAppController2::class, 'getQuotes']);
 Route::post('/quotes/update-status', [StaffAppController2::class, 'quoteStatusUpdate']);
+Route::get('/bids/{quoteId}', [StaffAppController2::class, 'bidShow']); // Fetch bid details
+Route::post('/bids/{bidId}/update', [StaffAppController2::class, 'updateBid']); // Update bid amount
+Route::post('/bids/{bidId}/upload-images', [StaffAppController2::class, 'bidUploadImages']); // Upload bid images
+Route::get('/bid-chat/{bidId}/messages', [StaffAppController2::class, 'fetchBidMessages']); // Fetch chat messages
+Route::post('/bid-chat/{bidId}/send', [StaffAppController2::class, 'sendBidMessage']);
 
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);
