@@ -1,10 +1,9 @@
 @extends($app ? 'site.layout.app_layout' : 'layouts.app')
-
 @section('content')
     @if ($app)
         <div class="container d-flex justify-content-center align-items-center" style="min-height: 94vh !important;">
-    @else
-        <div class="container d-flex justify-content-center">
+        @else
+            <div class="container d-flex justify-content-center">
     @endif
     <div class="row border border-1 py-4 bg-white shadow rounded">
         <div class="col-md-12">
@@ -112,8 +111,4 @@
             }
         });
     </script>
-
-    @if (Session::has('script'))
-        {!! Session::get('script') !!}
-    @endif
 @endsection
