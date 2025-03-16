@@ -725,6 +725,7 @@ class StaffAppController2 extends Controller
         return response()->json([
             'quote' => $quote,
             'bid' => $bid,
+            'images' => $bid->images ?? []
         ], 200);
     }
 }
