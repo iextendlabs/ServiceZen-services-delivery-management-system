@@ -211,9 +211,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/quotes/update-staff-data', [QuoteController::class, 'updateStaffData'])->name('quotes.updateStaffData');
 
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
-
-    Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
 });
+Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
+
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');
 
 Route::get('customer-login', [CustomerAuthController::class, 'index'])->name('customer.login');
