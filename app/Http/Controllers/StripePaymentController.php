@@ -96,8 +96,13 @@ class StripePaymentController extends Controller
             } elseif ($deposit_amount) {
                 return redirect()->route("affiliate_dashboard.index")->with('success', $message);
             } elseif ($staff_deposit_amount) {
-                Session::flash('success', 'Payment successful!');
-                return redirect()->back();
+                if ($app) {
+                    $script = "<script>window.postMessage('payment_success');</script>";
+                    return redirect()->back()->with('script', $script);
+                }else{
+                    Session::flash('success', 'Payment successful!');
+                    return redirect()->back();
+                }
             }
             
             return back(); // Default return in case none of the conditions match
