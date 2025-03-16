@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Site\CheckOutController;
+use App\Models\MembershipPlan;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\StaffZone;
@@ -28,15 +29,16 @@ class StripePaymentController extends Controller
     {
         $app = $request->app;
         $user_id = $request->user_id ?? auth()->user()->id;
+        $plan_id = $request->plan_id ?? null;
         $amount = $request->amount ?? null;
-        return view('payment-modal',compact('app','user_id','amount'));
+        return view('payment-modal', compact('app', 'user_id', 'amount', 'plan_id'));
     }
 
     public function stripePost(Request $request, CheckOutController $checkOutController)
     {
-        if($request->user_id){
+        if ($request->user_id) {
             $user = User::find($request->user_id);
-        }else{
+        } else {
             $user = auth()->user();
         }
         $app = (bool) $request->app;
@@ -44,6 +46,7 @@ class StripePaymentController extends Controller
         $customer_type = session('customer_type') ?? $request->customer_type ?? null;
         $deposit_amount = session('deposit_amount') ?? null;
         $staff_deposit_amount = $request->amount ?? null;
+        $plan_id = $request->plan_id ?? null;
 
         if ($order_ids) {
             $orders = Order::whereIn('id', explode(',', $order_ids))->get();
@@ -62,7 +65,7 @@ class StripePaymentController extends Controller
                 "email" => $user->email,
                 "name" => $user->name,
             ];
-        } elseif($staff_deposit_amount){
+        } elseif ($staff_deposit_amount) {
             $payment_description = "New Deposit Payment received from staff {$user->name}. Staff ID: {$user->id}";
             $currencyData = ['currency' => 'AED', 'amount' => $staff_deposit_amount];
             $customerData = [
@@ -78,7 +81,10 @@ class StripePaymentController extends Controller
                 $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), $customer_type, $app);
                 session()->forget(['order_ids', 'comment', 'customer_type', 'bookingData']);
             } else {
-                $this->createDepositTransaction($deposit_amount ?? $staff_deposit_amount,$user->id,$currencyData['currency']);
+                $this->createDepositTransaction($deposit_amount ?? $staff_deposit_amount, $user->id, $currencyData['currency']);
+                if ($plan_id !== null) {
+                    $this->upgradeStaffPlan($plan_id, $user->id);
+                }
                 session()->forget(['deposit_amount']);
             }
 
@@ -91,7 +97,7 @@ class StripePaymentController extends Controller
                     'name' => $stripeResponse['customer_name'],
                 ], 200);
             }
-            
+
             if ($order_ids) {
                 return redirect()->route("checkout.success")->with('success', $message);
             } elseif ($deposit_amount) {
@@ -100,9 +106,9 @@ class StripePaymentController extends Controller
                 Session::flash('success', 'Payment successful!');
                 return redirect()->back();
             }
-            
+
             return back(); // Default return in case none of the conditions match
-            
+
         } catch (Exception $e) {
             Session::flash('error', $e->getMessage());
             if ($app) {
@@ -203,9 +209,9 @@ class StripePaymentController extends Controller
         }
     }
 
-    private function createDepositTransaction($amount,$user_id,$currency)
+    private function createDepositTransaction($amount, $user_id, $currency)
     {
-        if($currency == "PKR"){
+        if ($currency == "PKR") {
             $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
             $amount = $amount / $pkrRateValue;
         }
@@ -216,5 +222,24 @@ class StripePaymentController extends Controller
             'status' => 'Approved',
             'description' => 'Amount Deposit',
         ]);
+    }
+
+    private function upgradeStaffPlan($plan_id, $user_id)
+    {
+        $plan = MembershipPlan::find($plan_id);
+        $user = User::find($user_id);
+
+        if (!$plan || !$user) {
+            return; // Exit if the plan or user is not found
+        }
+
+        $staff = $user->staff;
+
+        if ($staff) {
+            $expirationDate = Carbon::now()->addDays($plan->expire);
+            $staff->membership_plan_id = $plan->id;
+            $staff->expiry_date = $expirationDate->toDateString(); // Ensures it's in YYYY-MM-DD format
+            $staff->save();
+        }
     }
 }

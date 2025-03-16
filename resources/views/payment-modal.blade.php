@@ -21,6 +21,7 @@
 
             <form id="payment-form" action="{{ route('stripe.post') }}" method="post">
                 <input type="hidden" name="user_id" value="{{ $user_id }}">
+                <input type="hidden" name="plan_id" value="{{ $plan_id ?? null }}">
                 @csrf
                 <div class="form-group">
                     <label for="amount" class="font-weight-bold">Amount</label>
