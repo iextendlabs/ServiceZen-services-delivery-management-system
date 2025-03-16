@@ -5,7 +5,7 @@
         @else
             <div class="container d-flex justify-content-center">
     @endif
-    <div class="row border border-1 p-4 bg-white shadow rounded">
+    <div class="row border border-1 py-4 bg-white shadow rounded">
         <div class="col-md-12">
             <div class="text-center">
                 <h3>Enter Payment Details</h3>
@@ -20,6 +20,7 @@
             @endif
 
             <form id="payment-form" action="{{ route('stripe.post') }}" method="post">
+                <input type="hidden" name="user_id" value="{{ $user_id }}">
                 @csrf
                 <div class="form-group">
                     <label for="amount" class="font-weight-bold">Amount</label>
