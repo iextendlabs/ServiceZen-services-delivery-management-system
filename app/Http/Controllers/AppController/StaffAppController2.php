@@ -653,22 +653,26 @@ class StaffAppController2 extends Controller
     public function getQuotes(Request $request)
     {
         $quotes = Quote::with([
-            'service',
-            'user',
-            'staffs',
+            'service:id,image',
+            'user:id,name', // Load user and their staff directly
+            'staffs' => function ($q) use ($request) {
+                $q->where('staff_id', $request->user_id); // Get only the requested staff
+            },
             'bid',
             'serviceOption',
             'images'
         ])
-            ->with(['staffs' => function ($q) use ($request) {
-                $q->where('staff_id', $request->user_id); // Get only the requested staff
-            }])
             ->whereHas('staffs', function ($q) use ($request) {
                 $q->where('staff_id', $request->user_id); // Filter by logged-in staff
             })
             ->orderBy('created_at', 'desc')
             ->get(); // Execute the query and fetch results
 
+        $user = User::find($request->user_id);
+        $quotes = $quotes->map(function ($quote) use ($user) {
+            $quote->show_quote_detail = $user->staff->show_quote_detail ?? null;
+            return $quote;
+        });
         return response()->json([
             'quotes' => $quotes,
         ], 200);
