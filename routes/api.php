@@ -58,6 +58,7 @@ Route::post('staffSignup', [StaffAppController2::class, 'signup']);
 Route::get('getStaffQuotes', [StaffAppController2::class, 'getQuotes']);
 Route::post('/quotes/update-status', [StaffAppController2::class, 'quoteStatusUpdate']);
 Route::get('/quote/{quote_id}/bid/{staff_id}', [StaffAppController2::class, 'showBidPage']);
+Route::post('/quote/{quote_id}/bid/{staff_id}', [StaffAppController2::class, 'storeBid']);
 
 // customer App
 Route::post('customerLogin', [CustomerController::class, 'login']);

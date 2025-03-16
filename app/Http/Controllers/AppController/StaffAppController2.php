@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Affiliate;
 use App\Models\Bid;
+use App\Models\BidImage;
 use App\Models\CustomerProfile;
 use App\Models\Holiday;
 use App\Models\LongHoliday;
@@ -726,6 +727,32 @@ class StaffAppController2 extends Controller
             'quote' => $quote,
             'bid' => $bid,
             'images' => $bid->images ?? []
+        ], 200);
+    }
+
+    public function storeBid(Request $request, $quote_id, $staff_id)
+    {
+        $bid = Bid::create([
+            'quote_id' => $quote_id,
+            'staff_id' => $staff_id,
+            'bid_amount' => $request->bid_amount,
+            'comment' => $request->comment,
+        ]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('quote-images/bid-images'), $filename);
+    
+                BidImage::create([
+                    'bid_id' => $bid->id,
+                    'image' => $filename
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => "Bid submitted successfully",
         ], 200);
     }
 }
