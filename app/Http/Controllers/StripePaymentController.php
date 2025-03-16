@@ -81,9 +81,10 @@ class StripePaymentController extends Controller
                 $this->updateOrderStatus($order_ids, $checkOutController, session('comment'), $customer_type, $app);
                 session()->forget(['order_ids', 'comment', 'customer_type', 'bookingData']);
             } else {
-                $this->createDepositTransaction($deposit_amount ?? $staff_deposit_amount, $user->id, $currencyData['currency']);
                 if ($plan_id !== null) {
                     $this->upgradeStaffPlan($plan_id, $user->id);
+                } else {
+                    $this->createDepositTransaction($deposit_amount ?? $staff_deposit_amount, $user->id, $currencyData['currency']);
                 }
                 session()->forget(['deposit_amount']);
             }
