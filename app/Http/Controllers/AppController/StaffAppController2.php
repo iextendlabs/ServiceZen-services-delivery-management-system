@@ -723,6 +723,12 @@ class StaffAppController2 extends Controller
             ->where('staff_id', $staff_id)
             ->first();
 
+        if (count($bid) == 0) {
+            return response()->json([
+                'message' => "Bid not found",
+            ], 201);
+        }
+        
         return response()->json([
             'quote' => $quote,
             'bid' => $bid,
@@ -743,7 +749,7 @@ class StaffAppController2 extends Controller
             foreach ($request->file('images') as $image) {
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('quote-images/bid-images'), $filename);
-    
+
                 BidImage::create([
                     'bid_id' => $bid->id,
                     'image' => $filename
