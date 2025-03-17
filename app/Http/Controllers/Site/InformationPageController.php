@@ -13,7 +13,11 @@ class InformationPageController extends Controller
 
     public function index(Request $request)
     {
-        $termsCondition = Setting::where('key','Terms & Condition')->value('value');
+        if($request->staff == '1'){
+            $termsCondition = Setting::where('key','Terms & Condition for Partner')->value('value');
+        }else{
+            $termsCondition = Setting::where('key','Terms & Condition')->value('value');
+        }
         $app = $request->app;
         return view('site.termsCondition', compact('termsCondition','app'));
         

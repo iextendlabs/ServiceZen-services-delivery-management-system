@@ -68,10 +68,10 @@ class QuoteController extends Controller
         $staffZones = StaffZone::all();
         $quote_statuses = config('app.quote_status');
         $staffs = User::role('Staff')->where('status', 1)->get();
-        $services = Service::where('status',1)->get();
-        $categories = ServiceCategory::where('status',1)->get();
+        $services = Service::where('status', 1)->get();
+        $categories = ServiceCategory::where('status', 1)->get();
 
-        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services','categories', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones'))
+        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'categories', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -236,23 +236,27 @@ class QuoteController extends Controller
             return response()->json(['error' => 'Staff quote not found.'], 404);
         }
 
-        $staff_total_balance = Transaction::where('user_id', $user->id)->sum('amount');
+        if ($request->status == "Rejected") {
+            $quote->staffs()->updateExistingPivot($user->id, ['status' => $request->status]);
+        } else {
+            $staff_total_balance = Transaction::where('user_id', $user->id)->sum('amount');
 
-        if ($staffQuote->pivot->quote_amount < 0 && $staff_total_balance < abs($staffQuote->pivot->quote_amount)) {
-            return response()->json([
-                'error' => 'You do not have enough balance to accept this quote. Please add funds to your balance.'
-            ], 400);
+            if ($staffQuote->pivot->quote_amount < 0 && $staff_total_balance < abs($staffQuote->pivot->quote_amount)) {
+                return response()->json([
+                    'error' => 'You do not have enough balance to accept this quote. Please add funds to your balance.'
+                ], 400);
+            }
+
+            $quote->staffs()->updateExistingPivot($user->id, ['status' => $request->status]);
+
+            Transaction::create([
+                'user_id' => $user->id,
+                'amount' => $staffQuote->pivot->quote_amount,
+                'type' => 'Quote',
+                'status' => 'Approved',
+                'description' => "Quote amount for quote ID: $quote->id"
+            ]);
         }
-        
-        $quote->staffs()->updateExistingPivot($user->id, ['status' => $request->status]);
-
-        Transaction::create([
-            'user_id' => $user->id,
-            'amount' => $staffQuote->pivot->quote_amount,
-            'type' => 'Quote',
-            'status' => 'Approved',
-            'description' => "Quote amount for quote ID: $quote->id"
-        ]);
 
         return response()->json(['message' => 'Quote staff status updated successfully.']);
     }
