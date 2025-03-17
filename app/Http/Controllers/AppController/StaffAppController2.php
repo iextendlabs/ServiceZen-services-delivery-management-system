@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Affiliate;
 use App\Models\Bid;
+use App\Models\BidChat;
 use App\Models\BidImage;
 use App\Models\CustomerProfile;
 use App\Models\Holiday;
@@ -759,6 +760,23 @@ class StaffAppController2 extends Controller
 
         return response()->json([
             'message' => "Bid submitted successfully",
+        ], 200);
+    }
+
+    public function updateBid(Request $request, $bid_id)
+    {
+        $bid = Bid::findOrFail($bid_id);
+        $bid->bid_amount = $request->bid_amount;
+        $bid->save();
+
+        BidChat::create([
+            'bid_id' => $bid_id,
+            'sender_id' => $request->user_id,
+            'message' => "Bid updated to $" . $request->bid_amount . ".",
+        ]);
+
+        return response()->json([
+            'message' => "Bid updated successfully.",
         ], 200);
     }
 }
