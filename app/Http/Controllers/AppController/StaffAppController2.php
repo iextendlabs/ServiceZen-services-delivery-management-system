@@ -746,6 +746,10 @@ class StaffAppController2 extends Controller
             'comment' => $request->comment,
         ]);
 
+        $quote = Quote::find($quote_id);
+
+        $staff = User::find($staff_id);
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
@@ -756,6 +760,10 @@ class StaffAppController2 extends Controller
                     'image' => $filename
                 ]);
             }
+        }
+
+        if ($quote->user) {
+            $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name);
         }
 
         return response()->json([
@@ -772,8 +780,12 @@ class StaffAppController2 extends Controller
         BidChat::create([
             'bid_id' => $bid_id,
             'sender_id' => $request->user_id,
-            'message' => "Bid updated to $" . $request->bid_amount . ".",
+            'message' => "Bid updated to AED" . $request->bid_amount . ".",
         ]);
+
+        if ($bid->quote && $bid->quote->user) {
+            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".");
+        }
 
         return response()->json([
             'message' => "Bid updated successfully.",

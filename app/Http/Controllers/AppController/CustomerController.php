@@ -71,13 +71,13 @@ class CustomerController extends Controller
 
             $token = $user->createToken('app-token')->plainTextToken;
             $user_info = CustomerProfile::where('user_id', $user->id)->first();
-            
+
             $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
             $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('id', 'desc')
-            ->limit($notification_limit)
-            ->get();
+                ->orderBy('id', 'desc')
+                ->limit($notification_limit)
+                ->get();
 
             $notifications->map(function ($notification) use ($user) {
                 $notification->type = "Old";
@@ -96,7 +96,7 @@ class CustomerController extends Controller
     }
 
     public function updateCustomerInfo(Request $request)
-    {   
+    {
         if (!empty($request->password)) {
             $user = User::find($request->user_id);
             $user->password = Hash::make($request->password);
@@ -105,7 +105,7 @@ class CustomerController extends Controller
         $customerProfile = CustomerProfile::where('user_id', $request->user_id)->first();
         if ($customerProfile) {
             $customerProfile->update($request->all());
-        }else{
+        } else {
             CustomerProfile::create($request->all());
         }
         return response()->json([
@@ -121,7 +121,7 @@ class CustomerController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'affiliate' => [
-                'nullable', 
+                'nullable',
                 function ($attribute, $value, $fail) {
                     $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
                     if (!$affiliate) {
@@ -134,20 +134,20 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 201);
         }
-        if(isset($request->number) && isset($request->whatsapp)){
-            if(strlen(trim($request->number)) < 6 ){
+        if (isset($request->number) && isset($request->whatsapp)) {
+            if (strlen(trim($request->number)) < 6) {
                 return response()->json([
                     'msg' => "Please check the phone number."
                 ], 201);
             }
-    
-            if(strlen(trim($request->whatsapp)) < 6){
+
+            if (strlen(trim($request->whatsapp)) < 6) {
                 return response()->json([
                     'msg' => "Please check the whatsapp number."
                 ], 201);
             }
         }
-        
+
 
         // If validation passes, proceed with creating the user
         $input = $request->all();
@@ -168,11 +168,11 @@ class CustomerController extends Controller
         if ($request->affiliate) {
             $affiliate = Affiliate::where('code', $request->affiliate)->first();
 
-            if($affiliate->expire){
+            if ($affiliate->expire) {
                 $now = Carbon::now();
 
                 $newDate = $now->addDays($affiliate->expire);
-    
+
                 $input['expiry_date'] = $newDate->toDateString();
             }
 
@@ -210,10 +210,10 @@ class CustomerController extends Controller
 
         $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
         $images = explode(",", $slider_images);
-        
+
         $app_categories = Setting::where('key', 'App Categories')->value('value');
         $app_categories = explode(",", $app_categories);
-        $categories = ServiceCategory::whereIn('id',$app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
+        $categories = ServiceCategory::whereIn('id', $app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $categoriesArray = $categories->map(function ($category) {
             return [
@@ -289,9 +289,9 @@ class CustomerController extends Controller
 
     public function getServiceDetails(Request $request)
     {
-        $services = Service::where('status', 1)->where('id', $request->service_id)->where('status','1')->orderBy('name', 'ASC')->first();
+        $services = Service::where('status', 1)->where('id', $request->service_id)->where('status', '1')->orderBy('name', 'ASC')->first();
         $FAQs = FAQ::where('service_id', $request->service_id)->get();
-        
+
         $lowestPriceOption = null;
         $price = null;
         foreach ($services->serviceOption as $option) {
@@ -299,7 +299,7 @@ class CustomerController extends Controller
                 $lowestPriceOption = $option;
             }
             if (is_null($price) || $lowestPriceOption->option_price < $price) {
-                $price = $lowestPriceOption->option_price; 
+                $price = $lowestPriceOption->option_price;
             }
         }
 
@@ -379,13 +379,13 @@ class CustomerController extends Controller
     public function servicesTimeSlot(Request $request)
     {
         try {
-            if(isset($request->service_id)){
+            if (isset($request->service_id)) {
                 $serviceIds = [$request->service_id];
-            }else{
+            } else {
                 $serviceIds = null;
             }
             $transportCharges = StaffZone::where('name', $request->area)->value('transport_charges');
-            [$timeSlots, $staffIds, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date,$order=null,$serviceIds);
+            [$timeSlots, $staffIds, $holiday, $staffZone, $allZones] = TimeSlot::getTimeSlotsForArea($request->area, $request->date, $order = null, $serviceIds);
             $availableStaff = [];
             $staffDisplayed = [];
             $staffSlots = [];
@@ -449,23 +449,23 @@ class CustomerController extends Controller
         $input['order_source'] = "Android";
         Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
 
-        if(strlen(trim($request->number)) < 6 ){
+        if (strlen(trim($request->number)) < 6) {
             return response()->json([
                 'msg' => "Please check the number in personal information."
             ], 201);
         }
 
-        if(strlen(trim($request->whatsapp)) < 6){
+        if (strlen(trim($request->whatsapp)) < 6) {
             return response()->json([
                 'msg' => "Please check the whatsapp in personal information."
             ], 201);
         }
-        try{
+        try {
 
             $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
             $staff = User::find($input['service_staff_id']);
             $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
-            
+
             $services = Service::whereIn('id', $request->service_ids)->get();
 
             $sub_total = $services->sum(function ($service) {
@@ -475,7 +475,7 @@ class CustomerController extends Controller
             if ($request->coupon_id && $input['service_ids']) {
                 $coupon = Coupon::find($request->coupon_id);
                 $input['coupon_id'] = $coupon->id;
-                $discount = $coupon->getDiscountForProducts($services,$sub_total);
+                $discount = $coupon->getDiscountForProducts($services, $sub_total);
             } else {
                 $discount = 0;
             }
@@ -489,9 +489,9 @@ class CustomerController extends Controller
             $input['staff_charges'] = (int)$staff_charges;
             $input['transport_charges'] = (int)$transport_charges;
             $input['total_amount'] = (int)$total_amount;
-            
+
             $request->merge(['orderTotal' => (float) $total_amount]);
-            
+
             $validator = Validator::make($request->all(), [
                 'service_ids.*' => 'exists:services,id',
                 'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
@@ -499,7 +499,7 @@ class CustomerController extends Controller
                 'service_ids.*.exists' => 'Invalid service selection(s).',
                 'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
             ]);
-            
+
             $validator = Validator::make($request->all(), [
                 'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
                 'service_ids.*' => 'exists:services,id',
@@ -507,7 +507,7 @@ class CustomerController extends Controller
                 'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
                 'service_ids.*.exists' => 'Invalid service selection(s).',
             ]);
-            
+
             if ($validator->fails()) {
                 $errors = $validator->errors();
                 return response()->json([
@@ -519,7 +519,7 @@ class CustomerController extends Controller
 
             if (count($has_order) == 0) {
 
-                if(isset($staff)){
+                if (isset($staff)) {
                     $input['status'] = "Pending";
                     $input['driver_status'] = "Pending";
                     $input['staff_name'] = $staff->name;
@@ -529,9 +529,9 @@ class CustomerController extends Controller
 
                     if (isset($user)) {
 
-                        if($user->customerProfile){
+                        if ($user->customerProfile) {
                             $user->customerProfile->update($input);
-                        }else{
+                        } else {
                             $user->customerProfile()->create($input);
                         }
                         $input['customer_id'] = $user->id;
@@ -545,9 +545,9 @@ class CustomerController extends Controller
 
                         $user = User::create($input);
 
-                        if($user->customerProfile){
+                        if ($user->customerProfile) {
                             $user->customerProfile->update($input);
-                        }else{
+                        } else {
                             $user->customerProfile()->create($input);
                         }
 
@@ -556,33 +556,33 @@ class CustomerController extends Controller
                         $user->assignRole('Customer');
                     }
 
-                    if(isset($staffZone)){
-        
+                    if (isset($staffZone)) {
+
                         $time_slot = TimeSlot::find($input['time_slot_id']);
-                        if(isset($time_slot)){
+                        if (isset($time_slot)) {
                             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
-        
+
                             $input['time_start'] = $time_slot->time_start;
                             $input['time_end'] = $time_slot->time_end;
                             $input['payment_method'] = "Cash-On-Delivery";
                             $input['customer_name'] = $input['name'];
                             $input['customer_email'] = $input['email'];
                             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
-                            
+
                             $input['latitude'] = $input['latitude'] ?? '';
                             $input['longitude'] = $input['longitude'] ?? '';
 
                             $order = Order::create($input);
-            
+
                             $input['order_id'] = $order->id;
                             $input['discount_amount'] = $input['discount'];
-            
+
                             OrderTotal::create($input);
-            
+
                             if ($request->coupon_id) {
                                 CouponHistory::create($input);
                             }
-            
+
                             foreach ($input['service_ids'] as $id) {
                                 $services = Service::find($id);
                                 $input['service_id'] = $id;
@@ -596,7 +596,7 @@ class CustomerController extends Controller
                                 }
                                 OrderService::create($input);
                             }
-            
+
                             if (Carbon::now()->toDateString() == $input['date']) {
                                 $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                                 if ($order->driver) {
@@ -614,7 +614,7 @@ class CustomerController extends Controller
                             } catch (\Throwable $th) {
                                 //TODO: log error or queue job later
                             }
-            
+
                             return response()->json([
                                 'msg' => "Order created successfully.",
                                 'date' => $order->date,
@@ -623,19 +623,17 @@ class CustomerController extends Controller
                                 'total_amount' => $order->total_amount,
                                 'order_id' => $order->id,
                             ], 200);
-                        }else{
+                        } else {
                             return response()->json([
                                 'msg' => "Please select timeslot again."
                             ], 201);
                         }
-                        
-                    }else{
+                    } else {
                         return response()->json([
                             'msg' => "Please select zone again."
                         ], 201);
                     }
-                    
-                }else{
+                } else {
                     return response()->json([
                         'msg' => "Please select staff again."
                     ], 201);
@@ -645,8 +643,7 @@ class CustomerController extends Controller
                     'msg' => "Sorry! Unfortunately This slot was booked by someone else just now."
                 ], 201);
             }
-
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $request_body = $request->all();
             $recipient_email = $request->email;
             $to = env('MAIL_FROM_ADDRESS');
@@ -680,9 +677,9 @@ class CustomerController extends Controller
         $orderTotal = OrderTotal::where('order_id', $request->id)->first();
         $transport_charges = StaffZone::where('name', $order->area)->value('transport_charges');
 
-        if($order->orderServices){
+        if ($order->orderServices) {
             $orderServicesId = $order->orderServices->pluck('service_id')->toArray();
-        }else{
+        } else {
             $orderServicesId = [];
         }
 
@@ -770,7 +767,7 @@ class CustomerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'affiliate' => [
-                'nullable', 
+                'nullable',
                 function ($attribute, $value, $fail) {
                     $affiliate = Affiliate::where('code', $value)->where('status', 1)->first();
                     if (!$affiliate) {
@@ -822,14 +819,14 @@ class CustomerController extends Controller
         $coupon = Coupon::where('code', $request->coupon)->first();
         $groupedBookingOption = [];
 
-        if($request->options){
+        if ($request->options) {
             $groupedBookingOption = $this->formattingBookingData($request->options);
         }
 
         if ($request->coupon && $request->service_ids && $request->options) {
             $services = Service::whereIn('id', $request->service_ids)->get();
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id ?? null,$groupedBookingOption ?? $request->options ?? []);
+                $isValid = $coupon->isValidCoupon($request->coupon, $services, $request->user_id ?? null, $groupedBookingOption ?? $request->options ?? []);
                 if ($isValid !== true) {
                     return response()->json(['errors' => ['coupon' => [$isValid]]], 201);
                 }
@@ -907,14 +904,14 @@ class CustomerController extends Controller
         $input['staff_id'] = $order->service_staff_id;
 
         foreach ($order->orderServices as $service_key => $orderServices) {
-            if(!empty($uploadedVideos)){
+            if (!empty($uploadedVideos)) {
                 $input['video'] = $uploadedVideos[$service_key];
             }
             $input['service_id'] = $orderServices->service_id;
 
             $review = Review::create($input);
-            if(!empty($uploadedImages)){
-                foreach ($uploadedImages as $key =>$image) {
+            if (!empty($uploadedImages)) {
+                foreach ($uploadedImages as $key => $image) {
                     if ($service_key == 0) {
                         $image = $uploadedImages[$key];
                     } else {
@@ -926,7 +923,6 @@ class CustomerController extends Controller
                     ]);
                 }
             }
-
         }
 
         return response()->json([
@@ -954,17 +950,17 @@ class CustomerController extends Controller
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
-        
+
         if (!$notifications->isEmpty()) {
-            if($request->update){
+            if ($request->update) {
                 $notifications->map(function ($notification) use ($user) {
                     $notification->type = "Old";
                     return $notification;
                 });
-                
+
                 $user->last_notification_id = $notifications->first()->id;
                 $user->save();
-            }else{
+            } else {
                 $notifications->map(function ($notification) use ($user) {
                     if ($notification->id > $user->last_notification_id) {
                         $notification->type = "New";
@@ -990,7 +986,7 @@ class CustomerController extends Controller
             $chat->time = $this->formatTimestamp($chat->created_at);
             return $chat;
         });
-        
+
         return response()->json([
             'chats' => $chats
         ], 200);
@@ -1016,7 +1012,6 @@ class CustomerController extends Controller
         return response()->json([
             'chats' => $chats
         ], 200);
-        
     }
 
     private function formatTimestamp($timestamp)
@@ -1037,12 +1032,13 @@ class CustomerController extends Controller
         }
     }
 
-    public function passwordReset(Request $request){
-        $user = User::where('email',$request->email)->first();
+    public function passwordReset(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
 
-        if($user){
-            $password = $user->name.rand(1000, 9999);
-            
+        if ($user) {
+            $password = $user->name . rand(1000, 9999);
+
             $from = env('MAIL_FROM_ADDRESS');
             Mail::to($request->email)->send(new PasswordReset($password, $from));
 
@@ -1052,14 +1048,15 @@ class CustomerController extends Controller
             return response()->json([
                 'msg' => "We have emailed your password on Your Email!"
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'msg' => "There is no user with this email!"
             ], 201);
         }
     }
 
-    public function staff($id){
+    public function staff($id)
+    {
         $user = User::find($id);
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
         $socialMediaPlatforms = [
@@ -1077,7 +1074,7 @@ class CustomerController extends Controller
         }
         $category_ids = $user->categories()->pluck('category_id')->toArray();
         $service_ids = $user->services()->pluck('service_id')->toArray();
-        $service_categories = ServiceCategory::whereIn('id',$category_ids)->get();
+        $service_categories = ServiceCategory::whereIn('id', $category_ids)->get();
         $services = Service::where('status', 1)->whereIn('id', $service_ids)->orderBy('name', 'ASC')->get();
         $servicesArray = $services->map(function ($service) {
             $categoryIds = collect($service->categories)->pluck('id')->toArray();
@@ -1097,7 +1094,7 @@ class CustomerController extends Controller
 
         $reviews = Review::where('staff_id', $id)->get();
         $averageRating = Review::where('staff_id', $id)->avg('rating');
-        $orders = Order::where('service_staff_id',$id)->where('status','Complete')->count();
+        $orders = Order::where('service_staff_id', $id)->where('status', 'Complete')->count();
         $images = $user->staffImages;
         $videos = $user->staffYoutubeVideo;
         return response()->json([
@@ -1107,9 +1104,9 @@ class CustomerController extends Controller
             'socialLinks' => $socialLinks,
             'reviews' => $reviews,
             'averageRating' => $averageRating,
-            'orders'=>$orders,
-            'images'=>$images,
-            'videos'=>$videos
+            'orders' => $orders,
+            'images' => $images,
+            'videos' => $videos
         ], 200);
     }
 
@@ -1137,7 +1134,7 @@ class CustomerController extends Controller
                 $q->where('service_id', $request->service_id);
             });
         }
-    
+
         if ($request->category_id) {
             $query->whereHas('categories', function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
@@ -1192,22 +1189,22 @@ class CustomerController extends Controller
             'staffZones' => $staffZones,
         ], 200);
     }
-    public function deleteAccountMail(Request $request){
-        
+    public function deleteAccountMail(Request $request)
+    {
+
         $user = User::find($request->id);
-        if($user){
+        if ($user) {
             $from = env('MAIL_FROM_ADDRESS');
             Mail::to($user->email)->send(new DeleteAccount($user->id, $from));
 
             return response()->json([
                 'msg' => "Account Deletion Confirmation email sent. Please check your inbox for further instructions."
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'msg' => "User Not Found!"
             ], 201);
         }
-        
     }
 
     public function getSubCategories(Request $request)
@@ -1268,7 +1265,7 @@ class CustomerController extends Controller
         }
         $recipient_email = env('MAIL_FROM_ADDRESS');
 
-        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray,$recipient_email));
+        Mail::to($customer->email)->send(new OrderCustomerEmail($dataArray, $recipient_email));
 
         return redirect()->back();
     }
@@ -1302,7 +1299,7 @@ class CustomerController extends Controller
         $order = Order::find($request->order_id);
         $order->status = "Canceled";
         $order->save();
-        
+
         return response()->json([
             'msg' => "Order Cancel Successfully."
         ], 200);
@@ -1310,21 +1307,21 @@ class CustomerController extends Controller
 
     public function signInWithFB(Request $request)
     {
-        $user = User::where('email',$request->email)->first();
-        if($user){
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
                 $user->save();
             }
             $token = $user->createToken('app-token')->plainTextToken;
             $user_info = CustomerProfile::where('user_id', $user->id)->first();
-            
+
             $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
             $notifications = Notification::where('user_id', $user->id)
-            ->orderBy('id', 'desc')
-            ->limit($notification_limit)
-            ->get();
+                ->orderBy('id', 'desc')
+                ->limit($notification_limit)
+                ->get();
 
             $notifications->map(function ($notification) use ($user) {
                 $notification->type = "Old";
@@ -1337,7 +1334,7 @@ class CustomerController extends Controller
                 'access_token' => $token,
                 'notifications' => $notifications
             ], 200);
-        }else{
+        } else {
             $input = $request->all();
             $input['customer_source'] = "FaceBook Android";
             $password = mt_rand(10000000, 99999999);
@@ -1355,9 +1352,8 @@ class CustomerController extends Controller
             $recipient_email = env('MAIL_FROM_ADDRESS');
             $user->assignRole("Customer");
             try {
-                Mail::to($input['email'])->send(new CustomerCreatedEmail($dataArray,$recipient_email));
+                Mail::to($input['email'])->send(new CustomerCreatedEmail($dataArray, $recipient_email));
             } catch (\Throwable $th) {
-                
             }
 
             $token = $user->createToken('app-token')->plainTextToken;
@@ -1375,38 +1371,38 @@ class CustomerController extends Controller
         $staff_charges = 0;
         $transport_charges = 0;
         $coupon_discount = 0;
-        if($request->service_ids){
+        if ($request->service_ids) {
             $services = Service::whereIn('id', $request->service_ids)->get();
 
             $services_total = $services->sum(function ($service) {
                 return isset($service->discount) ? $service->discount : $service->price;
             });
         }
-        
-        if($request->staff_id){
+
+        if ($request->staff_id) {
             $user = User::find($request->staff_id);
             $staff_charges = $user && $user->staff
-            ? $user->staff->charges
-            : 0;
+                ? $user->staff->charges
+                : 0;
         }
 
-        if($request->zone){
+        if ($request->zone) {
             $zone = StaffZone::where('name', $request->zone)->first();
             $transport_charges = $zone
-            ? $zone->transport_charges
-            : 0;
+                ? $zone->transport_charges
+                : 0;
         }
-    
-        if($request->coupon_id && $services){
+
+        if ($request->coupon_id && $services) {
             $coupon = Coupon::find($request->coupon_id);
 
             $coupon_discount = $coupon
-            ? $coupon->getDiscountForProducts($services, $services_total)
-            : 0;
+                ? $coupon->getDiscountForProducts($services, $services_total)
+                : 0;
         }
-    
+
         $total = $services_total + $staff_charges + $transport_charges - $coupon_discount;
-    
+
         return response()->json([
             'total' => $total,
             'coupon_discount' => $coupon_discount,
@@ -1423,9 +1419,9 @@ class CustomerController extends Controller
         foreach ($options as $service_id => $option) {
             if (isset($option) && is_array($option) && count($option) > 0) {
                 $options = ServiceOption::whereIn('id', $option)->get();
-    
+
                 $formattedDuration = $this->calculateTotalDuration($options);
-                
+
                 $totalPrice = $options->sum('option_price');
                 $groupedBookingOption[$service_id] = [
                     'options' => $options,
@@ -1438,19 +1434,20 @@ class CustomerController extends Controller
         return $groupedBookingOption;
     }
 
-    public function calculateTotalDuration($options){
+    public function calculateTotalDuration($options)
+    {
         $totalDuration = 0;
 
         foreach ($options as $opt) {
             if (!empty($opt->option_duration)) {
                 // Normalize the string to lowercase for easier handling
                 $durationStr = strtolower($opt->option_duration);
-    
+
                 // Match the numeric value and the unit (if any)
                 if (preg_match('/(\d+)\s*(hour|hours|hr|h|min|mins|mints|minute|minutes|m|mint)?/i', $durationStr, $matches)) {
                     $value = (int)$matches[1];
                     $unit = isset($matches[2]) ? $matches[2] : 'min';
-    
+
                     // Convert to minutes based on the unit
                     switch ($unit) {
                         case 'hour':
@@ -1473,7 +1470,7 @@ class CustomerController extends Controller
                 }
             }
         }
-    
+
         $hours = intdiv($totalDuration, 60);
         $minutes = $totalDuration % 60;
 
@@ -1489,7 +1486,7 @@ class CustomerController extends Controller
 
         return $formattedDuration;
     }
-    
+
     public function OrderTotalSummary(Request $request)
     {
         $services_total = 0;
@@ -1498,55 +1495,55 @@ class CustomerController extends Controller
         $coupon_discount = 0;
         $groupedBookingOption = [];
 
-        if($request->options){
+        if ($request->options) {
             $groupedBookingOption = $this->formattingBookingData($request->options);
         }
-        
-        if($request->service_ids){
+
+        if ($request->service_ids) {
             $services = Service::whereIn('id', $request->service_ids)->with('serviceOption')->get();
-        
-            $services_total = $services->sum(function ($service) use ($request,$groupedBookingOption) {
+
+            $services_total = $services->sum(function ($service) use ($request, $groupedBookingOption) {
                 $options = $groupedBookingOption[$service->id] ?? $request->options[$service->id] ?? null;
-                if($options){
+                if ($options) {
                     if (is_array($options) && count($options['options']) > 0) {
                         return $options['total_price'];
                     } elseif ($options && $service->serviceOption->find($options)) {
                         return $service->serviceOption->find($options)->option_price;
                     }
-                }else {
+                } else {
                     return ($service->discount ?? $service->price);
                 }
             });
 
-            if($request->coupon_id && $services->isNotEmpty()) {
+            if ($request->coupon_id && $services->isNotEmpty()) {
                 $coupon = Coupon::find($request->coupon_id);
-    
+
                 $coupon_discount = $coupon
-                ? $coupon->getDiscountForProducts($services, $services_total, $groupedBookingOption ?? $request->options ?? [])
-                : 0;
+                    ? $coupon->getDiscountForProducts($services, $services_total, $groupedBookingOption ?? $request->options ?? [])
+                    : 0;
             }
         }
-        
-        if($request->group_data){
+
+        if ($request->group_data) {
             foreach ($request->group_data as $index => $singleBookingService) {
                 list($date, $service_staff_id, $time_slot_id) = explode('_', $index);
-                
+
                 $staff = User::find($service_staff_id);
                 $staff_charges += $staff && $staff->staff
-                ? $staff->staff->charges
-                : 0;
+                    ? $staff->staff->charges
+                    : 0;
 
-                if($request->zone){
+                if ($request->zone) {
                     $zone = StaffZone::where('name', $request->zone)->first();
                     $transport_charges += $zone
-                    ? $zone->transport_charges
-                    : 0;
+                        ? $zone->transport_charges
+                        : 0;
                 }
             }
         }
-    
+
         $total = $services_total + $staff_charges + $transport_charges - $coupon_discount;
-    
+
         return response()->json([
             'total' => $total,
             'coupon_discount' => $coupon_discount,
@@ -1558,15 +1555,15 @@ class CustomerController extends Controller
 
     public function applyAffiliate(Request $request)
     {
-        $affiliate = Affiliate::where("code",$request->affiliate_code)->where('status',1)->first();
-        if($affiliate){
+        $affiliate = Affiliate::where("code", $request->affiliate_code)->where('status', 1)->first();
+        if ($affiliate) {
             $userAffiliate = UserAffiliate::where("user_id", $request->userId)->first();
             $input['expiry_date'] = null;
-            if($affiliate->expire){
+            if ($affiliate->expire) {
                 $now = Carbon::now();
 
                 $newDate = $now->addDays($affiliate->expire);
-    
+
                 $input['expiry_date'] = $newDate->toDateString();
             }
             $input['affiliate_id'] = $affiliate->user_id;
@@ -1579,18 +1576,16 @@ class CustomerController extends Controller
                 $input['user_id'] = $request->userId;
                 UserAffiliate::create($input);
             }
-    
+
             $affiliate_code = $affiliate->code;
-    
+
 
             return response()->json([
                 'affiliate_code' => $affiliate_code,
             ], 200);
-
-        }else{
-            return response()->json(['error' => "Affiliate is invalid!"],201);
+        } else {
+            return response()->json(['error' => "Affiliate is invalid!"], 201);
         }
-
     }
 
     public function addNewOrder(Request $request)
@@ -1602,21 +1597,21 @@ class CustomerController extends Controller
         $input['order_source'] = "Android";
         Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
 
-        if(strlen(trim($request->number)) < 6 ){
+        if (strlen(trim($request->number)) < 6) {
             return response()->json([
                 'msg' => "Please check the number in personal information."
             ], 201);
         }
 
-        if(strlen(trim($request->whatsapp)) < 6){
+        if (strlen(trim($request->whatsapp)) < 6) {
             return response()->json([
                 'msg' => "Please check the whatsapp in personal information."
             ], 201);
         }
-        try{
+        try {
             $groupedBookingOption = [];
 
-            if($request->options){
+            if ($request->options) {
                 $groupedBookingOption = $this->formattingBookingData($request->options);
             }
             $bookingData = $request->cartData;
@@ -1626,25 +1621,24 @@ class CustomerController extends Controller
             $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
 
             if (count($excludedServices) > 0) {
-                
+
                 return response()->json([
                     'msg' => "The Following booking not available. Please Update",
                     'excludedServices' => $excludedServices
                 ], 201);
-
             }
 
-            $staff_mim_order_value = $this->checkStaffOrderValue($input,$bookingData,$groupedBookingOption);
-        
-            if($staff_mim_order_value !== true){
+            $staff_mim_order_value = $this->checkStaffOrderValue($input, $bookingData, $groupedBookingOption);
+
+            if ($staff_mim_order_value !== true) {
                 return response()->json([
                     'msg' => $staff_mim_order_value
                 ], 201);
             }
-        
-            $isValidOrderValue = $this->min_order_value($input, $bookingData, $staffZone,$minimum_booking_price,$groupedBookingOption);
 
-            if($isValidOrderValue !== true){
+            $isValidOrderValue = $this->min_order_value($input, $bookingData, $staffZone, $minimum_booking_price, $groupedBookingOption);
+
+            if ($isValidOrderValue !== true) {
                 return response()->json([
                     'msg' => $isValidOrderValue
                 ], 201);
@@ -1652,16 +1646,15 @@ class CustomerController extends Controller
             $checkOutController = new CheckOutController();
             if ($request->hasFile('image')) {
                 $images = $request->file('image');
-    
+
                 foreach ($images as $image) {
                     $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-    
+
                     $image->move(public_path('order-attachment'), $filename);
                     $orderAttachment[] = $filename;
-    
                 }
             }
-            list($customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password,$checkOutController,$groupedBookingOption,$orderAttachment);
+            list($customer_type, $order_ids, $all_sub_total, $all_discount, $all_staff_charges, $all_transport_charges, $all_total_amount) = $this->createOrder($input, $bookingData, $staffZone, $password, $checkOutController, $groupedBookingOption, $orderAttachment);
 
             return response()->json([
                 'sub_total' => $all_sub_total,
@@ -1673,8 +1666,7 @@ class CustomerController extends Controller
                 'customer_type' => $customer_type,
                 'payment_method' => $input['payment_method'] ?? "",
             ], 200);
-            
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $request_body = $request->all();
             $recipient_email = $request->email;
             $to = env('MAIL_FROM_ADDRESS');
@@ -1728,7 +1720,7 @@ class CustomerController extends Controller
         return $excludedServices;
     }
 
-    private function min_order_value($input, $bookingData, $staffZone,$minimum_booking_price,$groupedBookingOption)
+    private function min_order_value($input, $bookingData, $staffZone, $minimum_booking_price, $groupedBookingOption)
     {
 
         $sub_total = 0;
@@ -1744,24 +1736,24 @@ class CustomerController extends Controller
         $all_selected_services = Service::whereIn('id', $serviceIds)->get();
         $sub_total = $all_selected_services->sum(function ($service) use ($input, $groupedBookingOption) {
             $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
-            if($options){
+            if ($options) {
                 if (is_array($options) && count($options['options']) > 0) {
                     return $options['total_price'];
                 } elseif ($options && $service->serviceOption->find($options)) {
                     return $service->serviceOption->find($options)->option_price;
                 }
-            }else {
+            } else {
                 return ($service->discount ?? $service->price);
             }
         });
-     
+
         if ($input['coupon_code'] && $input['coupon_code'] != "null" && $all_selected_services->isNotEmpty()) {
             $coupon = Coupon::where("code", $input['coupon_code'])->first();
 
             if ($coupon) {
-                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services,$input['user_id'] ?? null, $groupedBookingOption ?? $input['options'] ?? []);
+                $isValid = $coupon->isValidCoupon($input['coupon_code'], $all_selected_services, $input['user_id'] ?? null, $groupedBookingOption ?? $input['options'] ?? []);
                 if ($isValid === true) {
-                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total,$groupedBookingOption ?? $input['options'] ?? []);
+                    $discount = $coupon->getDiscountForProducts($all_selected_services, $sub_total, $groupedBookingOption ?? $input['options'] ?? []);
                 } else {
                     return $isValid;
                 }
@@ -1775,14 +1767,12 @@ class CustomerController extends Controller
         });
         $transport_charges = $staffZone->transport_charges ?? 0;
         $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
-        
+
         if ($total_amount < $minimum_booking_price) {
-            return "The total amount must be greater than or equal to AED".$minimum_booking_price;
-        }else{
+            return "The total amount must be greater than or equal to AED" . $minimum_booking_price;
+        } else {
             return true;
-
         }
-
     }
 
     private function checkStaffOrderValue($input, $bookingData, $groupedBookingOption)
@@ -1810,13 +1800,13 @@ class CustomerController extends Controller
 
             $serviceTotal = $services->sum(function ($service) use ($input, $groupedBookingOption) {
                 $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
-                if($options){
+                if ($options) {
                     if (is_array($options) && count($options['options']) > 0) {
                         return $options['total_price'];
                     } elseif ($options && $service->serviceOption->find($options)) {
                         return $service->serviceOption->find($options)->option_price;
                     }
-                }else {
+                } else {
                     return ($service->discount ?? $service->price);
                 }
             });
@@ -1842,7 +1832,7 @@ class CustomerController extends Controller
         return true;
     }
 
-    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController,$groupedBookingOption,$orderAttachment)
+    private function createOrder($input, $bookingData, $staffZone, &$password, $checkOutController, $groupedBookingOption, $orderAttachment)
     {
         $customer_type = '';
         list($customer_type, $customer_id) = $this->findOrCreateUser($input);
@@ -1864,9 +1854,9 @@ class CustomerController extends Controller
 
         foreach ($groupedBooking as $key => $singleBookingService) {
             $discount = 0;
-            if(isset($input['payment_method']) && $input['payment_method'] == "Credit-Debit-Card"){
+            if (isset($input['payment_method']) && $input['payment_method'] == "Credit-Debit-Card") {
                 $input['status'] = "Draft";
-            }else{
+            } else {
                 $input['status'] = "Pending";
             }
 
@@ -1880,15 +1870,15 @@ class CustomerController extends Controller
 
             $selected_services = Service::whereIn('id', $singleBookingService)->get();
 
-            $sub_total = $selected_services->sum(function ($service) use ($input,$groupedBookingOption) {
+            $sub_total = $selected_services->sum(function ($service) use ($input, $groupedBookingOption) {
                 $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
-                if($options){
+                if ($options) {
                     if (is_array($options) && count($options['options']) > 0) {
                         return $options['total_price'];
                     } elseif ($options && $service->serviceOption->find($options)) {
                         return $service->serviceOption->find($options)->option_price;
                     }
-                }else {
+                } else {
                     return ($service->discount ?? $service->price);
                 }
             });
@@ -1897,7 +1887,7 @@ class CustomerController extends Controller
                 $coupon = Coupon::where("code", $input['coupon_code'])->first();
                 if ($coupon) {
                     if ($coupon->type == "Fixed Amount" && $i == 0) {
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$groupedBookingOption ?? $input['options'] ?? []);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption ?? $input['options'] ?? []);
                         if ($discount > 0) {
                             $input['coupon_id'] = $coupon->id;
                             $i++;
@@ -1906,7 +1896,7 @@ class CustomerController extends Controller
                         }
                     } elseif ($coupon->type == "Percentage") {
                         $input['coupon_id'] = $coupon->id;
-                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total,$groupedBookingOption ?? $input['options'] ?? []);
+                        $discount = $coupon->getDiscountForProducts($selected_services, $sub_total, $groupedBookingOption ?? $input['options'] ?? []);
                     }
                 }
             }
@@ -1927,14 +1917,14 @@ class CustomerController extends Controller
             $all_transport_charges += $transport_charges;
             $all_total_amount += $total_amount;
 
-            $affiliate = Affiliate::where('code', $input['affiliate_code'])->where('status',1)->first();
+            $affiliate = Affiliate::where('code', $input['affiliate_code'])->where('status', 1)->first();
 
             if (isset($affiliate)) {
                 $input['affiliate_id'] = $affiliate->user_id;
             }
 
             $input['staff_name'] = $staff->name;
-  
+
             $time_slot = TimeSlot::find($input['time_slot_id']);
             $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
 
@@ -1942,7 +1932,7 @@ class CustomerController extends Controller
             $input['time_end'] = $time_slot->time_end;
             $input['payment_method'] = $input['payment_method'] ?? "Cash-On-Delivery";
             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
-            
+
             $input['latitude'] = $input['latitude'] == "null" ? '' : $input['latitude'];
             $input['longitude'] = $input['longitude'] == "null" ? '' : $input['longitude'];
 
@@ -1951,7 +1941,7 @@ class CustomerController extends Controller
             $input['order_id'] = $order->id;
             $input['discount_amount'] = $input['discount'];
 
-            if(!empty($orderAttachment)){
+            if (!empty($orderAttachment)) {
                 foreach ($orderAttachment as $image) {
                     OrderAttachment::create([
                         'image' => $image,
@@ -1959,7 +1949,7 @@ class CustomerController extends Controller
                     ]);
                 }
             }
-    
+
             OrderTotal::create($input);
             if (isset($input['coupon_id'])) {
                 $input['coupon_id'] = $coupon->id;
@@ -1978,7 +1968,7 @@ class CustomerController extends Controller
                 $input['status'] = 'Open';
 
                 $options = $groupedBookingOption[$service->id] ?? $input['options'][$service->id] ?? null;
-                if($options){
+                if ($options) {
                     if (is_array($options) && count($options['options']) > 0) {
                         $input['price'] = $options['total_price'];
                         $input['option_id'] = $options['options']->pluck('id')->implode(',');
@@ -1990,12 +1980,12 @@ class CustomerController extends Controller
                         $input['option_name'] = $service->serviceOption->find($options)->option_name;
                         $input['duration'] = $service->serviceOption->find($options)->option__duration ?? $service->duration;
                     }
-                }else {
+                } else {
                     $input['price'] = $service->discount ?? $service->price;
                 }
                 OrderService::create($input);
             }
-            if(isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery"){
+            if (isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery") {
                 if (Carbon::now()->toDateString() == $input['date']) {
                     $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
                     if ($order->driver) {
@@ -2015,8 +2005,8 @@ class CustomerController extends Controller
                 }
             }
         }
-       
-        return [$customer_type,$order_ids,$all_sub_total,$all_discount,$all_staff_charges,$all_transport_charges,$all_total_amount];
+
+        return [$customer_type, $order_ids, $all_sub_total, $all_discount, $all_staff_charges, $all_transport_charges, $all_total_amount];
     }
 
     private function findOrCreateUser($input)
@@ -2033,7 +2023,7 @@ class CustomerController extends Controller
             $user->assignRole('Customer');
             $customer_type = "New";
             $customer_id = $user->id;
-        }else{
+        } else {
             $customer_type = "Old";
             $customer_id = $user->id;
         }
@@ -2044,8 +2034,7 @@ class CustomerController extends Controller
             $user->customerProfile()->create($input);
         }
 
-        return [$customer_type,$customer_id];
-
+        return [$customer_type, $customer_id];
     }
 
     private function groupBookingData($bookingData)
@@ -2068,7 +2057,7 @@ class CustomerController extends Controller
     public function joinFreelancerProgram(Request $request)
     {
         $user = User::find($request->userId);
-        if($user){
+        if ($user) {
             $user->freelancer_program = 0;
             $user->save();
 
@@ -2080,20 +2069,20 @@ class CustomerController extends Controller
             return response()->json([
                 'msg' => "Your request to join the freelancer program has been submitted and sent to the administrator for review.",
             ], 200);
-        }else{
-            return response()->json(['error' => "You need to create a customer account before joining the freelancer program."],201);
+        } else {
+            return response()->json(['error' => "You need to create a customer account before joining the freelancer program."], 201);
         }
     }
 
     public function getUser($id)
     {
         $user = User::find($id);
-        if($user){
+        if ($user) {
             return response()->json([
                 'user' => $user,
             ], 200);
-        }else{
-            return response()->json(['error' => "You don't have an account. Please register to continue."],201);
+        } else {
+            return response()->json(['error' => "You don't have an account. Please register to continue."], 201);
         }
     }
 
@@ -2124,8 +2113,8 @@ class CustomerController extends Controller
         $categoryIds = $service->categories()->pluck('category_id')->toArray();
 
         $staffs = User::with('staff')->whereHas('categories', function ($query) use ($categoryIds) {
-                $query->whereIn('category_id', $categoryIds);
-            })
+            $query->whereIn('category_id', $categoryIds);
+        })
             ->whereHas('staff', function ($query) {
                 $query->where('get_quote', 1);
             })
@@ -2162,6 +2151,7 @@ class CustomerController extends Controller
 
         $quote->categories()->sync($categoryIds);
         foreach ($staffs as $staff) {
+            $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
             $quote->staffs()->syncWithoutDetaching([
                 $staff->id => [
                     'status' => 'Pending',
@@ -2170,7 +2160,7 @@ class CustomerController extends Controller
                 ]
             ]);
         }
-        
+
         return response()->json([
             'msg' => "Quote request submitted successfully!",
         ], 200);
@@ -2199,7 +2189,7 @@ class CustomerController extends Controller
     {
         $quote = Quote::findOrFail($quoteId);
 
-        $bids = Bid::with('staff','images')
+        $bids = Bid::with('staff', 'images')
             ->where('quote_id', $quoteId)
             ->get();
 
@@ -2248,6 +2238,10 @@ class CustomerController extends Controller
                     }
                 }
             }
+
+            if ($bid && $bid->staff) {
+                $bid->staff->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Congratulations! Your bid has been accepted by the customer.");
+            }
             return response()->json([
                 'message' => 'Bid confirmed successfully.',
             ]);
@@ -2281,7 +2275,7 @@ class CustomerController extends Controller
             $file = $request->file('file');
             $filename = mt_rand() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('quote-images/bid-chat-files'), $filename);
-    
+
             $messageData['message'] = $filename;
             $messageData['file'] = 1;
         } else {
@@ -2289,6 +2283,25 @@ class CustomerController extends Controller
         }
 
         $message = BidChat::create($messageData);
+
+        $user = User::find($request->sender_id);
+
+        $bid = Bid::find($bid_id);
+
+        $message = $messageData['file'] == 1 ? "There is a file uploaded" : $messageData['message'];
+        $usersToNotify = [];
+
+        if ($user->hasRole('Staff') && $bid->quote?->user) {
+            $usersToNotify[] = $bid->quote->user;
+        }
+
+        if ($user->hasRole('Customer') && $bid->staff) {
+            $usersToNotify[] = $bid->staff;
+        }
+
+        foreach ($usersToNotify as $user) {
+            $user->notifyOnMobile("Bid Chat on quote#{$bid->quote_id}", $message);
+        }
 
         return response()->json(['success' => true, 'message' => $message]);
     }
