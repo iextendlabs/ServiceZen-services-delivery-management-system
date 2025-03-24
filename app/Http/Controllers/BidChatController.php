@@ -41,6 +41,9 @@ class BidChatController extends Controller
     
             $messageData['message'] = $filename;
             $messageData['file'] = 1;
+        } elseif($request->hasFile('location')) {
+            $messageData['location'] = 1;
+            $messageData['message'] = $request->message;
         } else {
             $messageData['message'] = $request->message;
         }
