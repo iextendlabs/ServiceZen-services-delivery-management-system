@@ -672,8 +672,11 @@ class StaffAppController2 extends Controller
             ->get(); // Execute the query and fetch results
 
         $user = User::find($request->user_id);
-        $quotes = $quotes->map(function ($quote) use ($user) {
+        $quotes = $quotes->map(function ($quote) use ($user,$request) {
             $quote->show_quote_detail = $user->staff->show_quote_detail ?? null;
+            $quote->bid_status = Bid::where('quote_id', $quote->id)
+            ->where('staff_id', $request->user_id)
+            ->exists();
             return $quote;
         });
         return response()->json([
