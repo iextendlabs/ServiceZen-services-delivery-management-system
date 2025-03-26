@@ -250,14 +250,15 @@ class QuoteController extends Controller
             }
 
             $quote->staffs()->updateExistingPivot($user->id, ['status' => $request->status]);
-
-            Transaction::create([
-                'user_id' => $user->id,
-                'amount' => $staffQuote->pivot->quote_amount,
-                'type' => 'Quote',
-                'status' => 'Approved',
-                'description' => "Quote amount for quote ID: $quote->id"
-            ]);
+            if($staffQuote->pivot->quote_amount !== null && $staffQuote->pivot->quote_amount > 0) {
+                Transaction::create([
+                    'user_id' => $user->id,
+                    'amount' => $staffQuote->pivot->quote_amount,
+                    'type' => 'Quote',
+                    'status' => 'Approved',
+                    'description' => "Quote amount for quote ID: $quote->id"
+                ]);
+            }
         }
 
         return response()->json(['message' => 'Quote staff status updated successfully.']);

@@ -604,7 +604,7 @@ class StaffAppController2 extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email',
             'password' => 'required',
             'affiliate' => [
                 'nullable',
@@ -624,13 +624,24 @@ class StaffAppController2 extends Controller
         $input = $request->all();
         $input['customer_source'] = "Android";
         $input['freelancer_program'] = 0;
-        $input['password'] = Hash::make($input['password']);
-        $input['email'] = strtolower(trim($input['email']));
-        if ($request->has('fcmToken') && $request->fcmToken) {
-            $input['device_token'] = $request->fcmToken;
+
+        $email = strtolower(trim($request->email));
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            $user->freelancer_program = 0;
+            $user->device_token = $request->fcmToken ?? null;
+            $user->save();
+        } else {
+            $input['password'] = Hash::make($request->password);
+            $input['email'] = $email;
+            if ($request->has('fcmToken') && $request->fcmToken) {
+                $input['device_token'] = $request->fcmToken;
+            }
+            $user = User::create($input);
+            $user->assignRole("Customer");
         }
-        $user = User::create($input);
-        $user->assignRole("Customer");
+        
         $input['user_id'] = $user->id;
 
         $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
@@ -672,8 +683,11 @@ class StaffAppController2 extends Controller
             ->get(); // Execute the query and fetch results
 
         $user = User::find($request->user_id);
-        $quotes = $quotes->map(function ($quote) use ($user) {
+        $quotes = $quotes->map(function ($quote) use ($user,$request) {
             $quote->show_quote_detail = $user->staff->show_quote_detail ?? null;
+            $quote->bid_status = Bid::where('quote_id', $quote->id)
+            ->where('staff_id', $request->user_id)
+            ->exists();
             return $quote;
         });
         return response()->json([
@@ -703,14 +717,15 @@ class StaffAppController2 extends Controller
             }
 
             $quote->staffs()->updateExistingPivot($request->user_id, ['status' => $request->status]);
-
-            Transaction::create([
-                'user_id' => $request->user_id,
-                'amount' => $staffQuote->pivot->quote_amount,
-                'type' => 'Quote',
-                'status' => 'Approved',
-                'description' => "Quote amount for quote ID: $quote->id"
-            ]);
+            if($staffQuote->pivot->quote_amount !== null && $staffQuote->pivot->quote_amount > 0) {
+                Transaction::create([
+                    'user_id' => $request->user_id,
+                    'amount' => $staffQuote->pivot->quote_amount,
+                    'type' => 'Quote',
+                    'status' => 'Approved',
+                    'description' => "Quote amount for quote ID: $quote->id"
+                ]);
+            }
         }
 
         return response()->json(['message' => 'Quote staff status updated successfully.'], 200);

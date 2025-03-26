@@ -143,6 +143,9 @@
                         <i class="fas fa-paperclip"></i>
                     </label>
                     <input type="file" id="file-upload" class="d-none">
+                    <button class="btn btn-primary m-2" id="send-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </button>
                     <input type="text" id="chat-message" class="form-control chat-input" placeholder="Type a message...">
                     <button class="btn btn-success ml-2" id="send-message"><i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -194,6 +197,7 @@
             let messageInput = $("#chat-message");
             let sendButton = $("#send-message");
             let fileInput = $("#file-upload");
+            let locationButton = $("#send-location");
 
             function fetchMessages() {
                 $.get(`/bid-chat/${bidId}/messages`, function(messages) {
@@ -201,17 +205,45 @@
                     messages.forEach(msg => {
                         let isSender = msg.sender_id == userId;
                         let messageClass = isSender ? "chat-sender" : "chat-receiver";
-                        let messageContent = msg.file == 1 ?
-                            `<strong>${msg.sender.name}:</strong><a href="/quote-images/bid-chat-files/${msg.message}" target="_blank">📎 View File</a>` :
-                            `<strong>${msg.sender.name}:</strong> ${msg.message}`;
+                        let messageContent = "";
+
+                        if (msg.file == 1) {
+                            // If it's a file
+                            messageContent = `<strong>${msg.sender.name}:</strong> 
+                    <a href="/quote-images/bid-chat-files/${msg.message}" target="_blank">📎 View File</a>`;
+                        } else if (msg.location == 1) {
+                            // If it's a location, extract latitude & longitude
+                            let [latitude, longitude] = msg.message.split(",");
+
+                            messageContent = `<strong>${msg.sender.name}:</strong> 
+                    <button class="btn btn-sm btn-primary view-location" 
+                        data-lat="${latitude.trim()}" 
+                        data-lng="${longitude.trim()}">
+                        📍 View Location
+                    </button>`;
+                        } else {
+                            // Normal text message
+                            messageContent = `<strong>${msg.sender.name}:</strong> ${msg.message}`;
+                        }
 
                         messagesList.append(
                             `<li class="chat-message ${messageClass}">${messageContent}</li>`
                         );
                     });
+
                     chatBox.scrollTop(chatBox[0].scrollHeight);
                 });
             }
+
+            // Event listener for location button clicks
+            $(document).on("click", ".view-location", function() {
+                let lat = $(this).data("lat");
+                let lng = $(this).data("lng");
+
+                // Open Google Maps in a new tab
+                let mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                window.open(mapUrl, "_blank");
+            });
 
             sendButton.click(function() {
                 let message = messageInput.val().trim();
@@ -251,6 +283,41 @@
                         alert("File upload failed! Error: " + xhr.statusText);
                     }
                 });
+            });
+
+            locationButton.click(function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            let latitude = position.coords.latitude;
+                            let longitude = position.coords.longitude;
+
+                            // Send coordinates as a message
+                            $.post(`/bid-chat/${bidId}/send`, {
+                                location: true,
+                                message: `${latitude}, ${longitude}`,
+                                _token: "{{ csrf_token() }}"
+                            }, function() {
+                                fetchMessages();
+                            });
+                        },
+                        function(error) {
+                            if (error.code === error.PERMISSION_DENIED) {
+                                alert(
+                                    "Location access denied. Please allow location access in your browser settings."
+                                    );
+                            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                                alert("Location information is unavailable. Try again later.");
+                            } else if (error.code === error.TIMEOUT) {
+                                alert("Location request timed out. Please try again.");
+                            } else {
+                                alert("An unknown error occurred while fetching location.");
+                            }
+                        }
+                    );
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
             });
 
             setInterval(fetchMessages, 3000);
