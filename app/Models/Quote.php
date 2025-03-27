@@ -9,7 +9,7 @@ class Quote extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'service_id','service_name','detail','status','category_id','phone', 'whatsapp', 'location','affiliate_id', 'sourcing_quantity','bid_id'];
+    protected $fillable = ['user_id', 'service_id','service_name','detail','status','category_id','phone', 'whatsapp', 'location','affiliate_id', 'sourcing_quantity','bid_id','zone'];
 
     public function user()
     {

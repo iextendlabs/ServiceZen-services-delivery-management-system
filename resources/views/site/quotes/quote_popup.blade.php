@@ -102,6 +102,16 @@
                     </div>
 
                     <div class="form-group">
+                        <span style="color: red;">*</span><label for="location">Zone</label>
+                        <select class="form-control" id="zone" name="zone" required>
+                            <option value="">Select Zone</option>
+                            @foreach ($zones as $zone)
+                                <option value="{{ $zone }}" @if (isset($address) && isset($address['area']) && $address['area'] == $zone) selected @endif>{{ $zone }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <span style="color: red;">*</span><label for="location">Location</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="location" name="location"

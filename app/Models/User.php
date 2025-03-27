@@ -276,4 +276,36 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(StaffGroup::class, 'staff_group_to_staff', 'staff_id', 'staff_group_id');
     }
+
+    public static function getEligibleQuoteStaff($serviceId, $zone)
+    {
+        $service = Service::findOrFail($serviceId);
+        $categoryIds = $service->categories()->pluck('category_id')->toArray();
+
+        $categoriesStaffs = self::whereHas('categories', function ($query) use ($categoryIds) {
+            $query->whereIn('category_id', $categoryIds);
+        })->whereHas('staff', fn($q) => $q->where('get_quote', 1))->get();
+
+        $servicesStaffs = self::whereHas('services', function ($query) use ($serviceId) {
+            $query->where('service_id', $serviceId);
+        })->whereHas('staff', fn($q) => $q->where('get_quote', 1))->get();
+
+        $uniqueStaffs = $categoriesStaffs->merge($servicesStaffs)->unique('id')->values();
+
+        $staffs = [];
+        $staffZone = StaffZone::where('name', $zone)->first();
+
+        if ($staffZone) {
+            $staffGroupStaffIds = $staffZone->staffGroups()
+                ->with('staffs:id')
+                ->get()
+                ->pluck('staffs.*.id')
+                ->flatten()
+                ->toArray();
+
+            $staffs = $uniqueStaffs->whereIn('id', $staffGroupStaffIds)->values();
+        }
+
+        return $staffs;
+    }
 }

@@ -10,6 +10,7 @@ use App\Models\Quote;
 use App\Models\QuoteImage;
 use App\Models\QuoteOption;
 use App\Models\Service;
+use App\Models\StaffZone;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -125,13 +126,7 @@ class SiteQuoteController extends Controller
         $service = Service::findOrFail($request->service_id);
         $categoryIds = $service->categories()->pluck('category_id')->toArray();
 
-        $staffs = User::with('staff')->whereHas('categories', function ($query) use ($categoryIds) {
-            $query->whereIn('category_id', $categoryIds);
-        })
-            ->whereHas('staff', function ($query) {
-                $query->where('get_quote', 1);
-            })
-            ->get();
+        $staffs = User::getEligibleQuoteStaff($request->service_id, $request->zone ?? null);
 
         $input['status'] = "Pending";
 
@@ -166,17 +161,18 @@ class SiteQuoteController extends Controller
         }
 
         $quote->categories()->sync($categoryIds);
-        foreach ($staffs as $staff) {
-            $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
-            $quote->staffs()->syncWithoutDetaching([
-                $staff->id => [
-                    'status' => 'Pending',
-                    'quote_amount' => $staff->staff->quote_amount,
-                    'quote_commission' => $staff->staff->quote_commission
-                ]
-            ]);
+        if (count($staffs) > 0) {
+            foreach ($staffs as $staff) {
+                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
+                $quote->staffs()->syncWithoutDetaching([
+                    $staff->id => [
+                        'status' => 'Pending',
+                        'quote_amount' => $staff->staff->quote_amount,
+                        'quote_commission' => $staff->staff->quote_commission
+                    ]
+                ]);
+            }
         }
-
         if (isset($customer_type) && $customer_type == "New") {
             $msg = sprintf(
                 "Quote request submitted successfully! You can login with credentials Email: %s and Password: %s to check bids on your quotation.",
@@ -280,7 +276,7 @@ class SiteQuoteController extends Controller
             }
         }
 
-        if($bid && $bid->staff){
+        if ($bid && $bid->staff) {
             $bid->staff->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Congratulations! Your bid has been accepted by the customer.");
         }
 
