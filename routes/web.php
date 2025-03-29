@@ -43,6 +43,7 @@ use App\Http\Controllers\{
     CurrencyController,
     FreelancerProgramController,
     InformationController,
+    KommoController,
     QuoteController,
     StripePaymentController,
     WithdrawController
@@ -307,3 +308,8 @@ Route::controller(StripePaymentController::class)->group(function(){
 Route::get('/checkout-success', function () {
     return view('site.checkOut.success');
 })->name('checkout.success');
+
+Route::post('/kommo-store', [KommoController::class, 'store']);
+
+// Update Route (POST)
+Route::post('/kommo-update', [KommoController::class, 'update']);
