@@ -107,7 +107,7 @@ class KommoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $accountId = $request->input('account.id');
         $pipelineId = $request->input('leads.update.0.pipeline_id');
