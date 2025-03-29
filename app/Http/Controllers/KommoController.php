@@ -137,24 +137,29 @@ class KommoController extends Controller
 
     public function quoteCreate($input)
     {
-
+        $data = [];
         list($customer_type, $user_id) = $this->findOrCreateUser($input);
-        $input['user_id'] = $user_id;
+        $data['user_id'] = $user_id;
 
-        $service_id = 63;
-        $zone = "Ajman";
-
-        $service = Service::findOrFail($service_id);
+        $data['service_id'] = 63;
+        $data['zone'] = "Ajman";
+        
+        $service = Service::findOrFail($data['service_id']);
         $categoryIds = $service->categories()->pluck('category_id')->toArray();
 
-        $staffs = User::getEligibleQuoteStaff($service_id, $zone ?? null);
+        $staffs = User::getEligibleQuoteStaff($data['service_id'], $data['zone'] ?? null);
 
-        $input['status'] = "Pending";
+        $data['status'] = "Pending";
 
-        $input['phone'] = $input['phone'] ?? null;
-        $input['whatsapp'] = $input['phone'] ?? null;
+        $data['phone'] = $input['phone'] ?? null;
+        $data['whatsapp'] = $input['phone'] ?? null;
         
-        $quote = Quote::create($input);
+        $data['service_name'] = $service->name;
+        $data['detail'] = "testing";
+        $data['sourcing_quantity'] = 1;
+        $data['location'] = "testing";
+
+        $quote = Quote::create($data);
 
         $quote->categories()->sync($categoryIds);
         if (count($staffs) > 0) {
@@ -188,6 +193,7 @@ class KommoController extends Controller
     {
         $user = User::where('email', $input['email'])->first();
 
+        $data = [];
         if (!isset($user)) {
             $user = User::create([
                 'name' => $input['customer_name'],
@@ -197,17 +203,17 @@ class KommoController extends Controller
 
             $user->assignRole('Customer');
             $customer_type = "New";
-            $input['user_id'] = $user->id;
+            $data['user_id'] = $user->id;
         } else {
             $customer_type = "Old";
-            $input['user_id'] = $user->id;
+            $data['user_id'] = $user->id;
         }
 
-        $input['number'] = $input['phone'];
-        $input['whatsapp'] = $input['phone'];
+        $data['number'] = $input['phone'];
+        $data['whatsapp'] = $input['phone'];
 
         if ($customer_type == "New") {
-            CustomerProfile::create($input);
+            CustomerProfile::create($data);
         }
 
         return [$customer_type, $input['user_id']];
