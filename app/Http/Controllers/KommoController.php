@@ -216,7 +216,7 @@ class KommoController extends Controller
             CustomerProfile::create($data);
         }
 
-        return [$customer_type, $input['user_id']];
+        return [$customer_type, $data['user_id']];
     }
 
     /**
