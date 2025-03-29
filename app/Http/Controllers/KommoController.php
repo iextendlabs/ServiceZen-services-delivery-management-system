@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\CRM;
+use App\Models\CustomerProfile;
+use App\Models\Quote;
+use App\Models\Service;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class KommoController extends Controller
 {
@@ -117,6 +122,8 @@ class KommoController extends Controller
         if (!$crm) {
             return back()->with('error', 'Account ID not found in CRM');
         }
+        $this->quoteCreate($crm);
+
         $crm->pipelineId = $pipelineId;
         $crm->save();
         
@@ -126,6 +133,84 @@ class KommoController extends Controller
         ]);
 
         return back()->with('success', 'Pipeline ID updated successfully!');
+    }
+
+    public function quoteCreate($input)
+    {
+
+        list($customer_type, $user_id) = $this->findOrCreateUser($input);
+        $input['user_id'] = $user_id;
+
+        $service_id = 63;
+        $zone = "Ajman";
+
+        $service = Service::findOrFail($service_id);
+        $categoryIds = $service->categories()->pluck('category_id')->toArray();
+
+        $staffs = User::getEligibleQuoteStaff($service_id, $zone ?? null);
+
+        $input['status'] = "Pending";
+
+        $input['phone'] = $input['phone'] ?? null;
+        $input['whatsapp'] = $input['phone'] ?? null;
+        
+        $quote = Quote::create($input);
+
+        $quote->categories()->sync($categoryIds);
+        if (count($staffs) > 0) {
+            foreach ($staffs as $staff) {
+                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
+                $quote->staffs()->syncWithoutDetaching([
+                    $staff->id => [
+                        'status' => 'Pending',
+                        'quote_amount' => $staff->staff->quote_amount,
+                        'quote_commission' => $staff->staff->quote_commission
+                    ]
+                ]);
+            }
+        }
+        if (isset($customer_type) && $customer_type == "New") {
+            $msg = sprintf(
+                "Quote request submitted successfully! You can login with credentials Email: %s and Password: %s to check bids on your quotation.",
+                $input['email'],
+                $input['phone']
+            );
+        } else {
+            $msg = "Quote request submitted successfully! ";
+        }
+        return response()->json([
+            'success' => true,
+            'message' => $msg
+        ]);
+    }
+
+    private function findOrCreateUser($input)
+    {
+        $user = User::where('email', $input['email'])->first();
+
+        if (!isset($user)) {
+            $user = User::create([
+                'name' => $input['customer_name'],
+                'email' => $input['email'],
+                'password' => Hash::make($input['phone']),
+            ]);
+
+            $user->assignRole('Customer');
+            $customer_type = "New";
+            $input['user_id'] = $user->id;
+        } else {
+            $customer_type = "Old";
+            $input['user_id'] = $user->id;
+        }
+
+        $input['number'] = $input['phone'];
+        $input['whatsapp'] = $input['phone'];
+
+        if ($customer_type == "New") {
+            CustomerProfile::create($input);
+        }
+
+        return [$customer_type, $input['user_id']];
     }
 
     /**
