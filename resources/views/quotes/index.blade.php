@@ -100,8 +100,9 @@
 
 
                                             <div class="col-md-6 mb-3">
-                                                <input type="number" id="defaultQuoteAmount" class="form-control mr-2"
+                                                <input type="number" step="0.01" id="defaultQuoteAmount" class="form-control mr-2"
                                                     placeholder="Enter Quote Amount">
+                                                    <small class="form-text text-muted">Minimum value: 0.01</small>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <input type="number" id="defaultQuoteCommission" class="form-control"
@@ -121,7 +122,7 @@
                                                                     </div>
                                                                 </th>
                                                                 <th>Staff</th>
-                                                                <th style="width: 20%;">Amount</th>
+                                                                <th style="width: 20%;">Amount <small class="form-text text-muted">Minimum value: 0.01</small> </th>
                                                                 <th style="width: 20%;">Commission</th>
                                                             </tr>
                                                         </thead>
@@ -144,7 +145,7 @@
                                                                             class="text-muted">({{ $staff->staff->sub_title }})</small>
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number"
+                                                                        <input type="number" step="0.01" 
                                                                             class="form-control staff-amount"
                                                                             placeholder="Amount"
                                                                             value="{{ $staff->staff->quote_amount ?? '' }}">

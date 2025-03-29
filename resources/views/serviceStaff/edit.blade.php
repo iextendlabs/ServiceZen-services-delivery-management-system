@@ -122,7 +122,8 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Quote Amount:</strong>
-                            <input type="number" name="quote_amount" class="form-control" value="{{ old('quote_amount',$serviceStaff->staff->quote_amount ?? "") }}" placeholder="Quote Amount">
+                            <input type="number" step="0.01" name="quote_amount" class="form-control" value="{{ old('quote_amount',$serviceStaff->staff->quote_amount ?? "") }}" placeholder="Quote Amount">
+                            <small class="form-text text-muted">Minimum value: 0.01</small>
                         </div>
                     </div>
                     <div class="col-md-12">
