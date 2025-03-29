@@ -112,14 +112,20 @@ class KommoController extends Controller
         $accountId = $request->input('account.id');
         $pipelineId = $request->input('leads.update.0.pipeline_id');
 
-        CRM::where('accountId', $accountId)->update(['pipelineId' => $pipelineId]);
+        $crm = CRM::where('accountId', $accountId)->first();
+
+        if (!$crm) {
+            return back()->with('error', 'Account ID not found in CRM');
+        }
+        $crm->pipelineId = $pipelineId;
+        $crm->save();
         
         Log::info('kommo update Form Data:', [
             'accountId' => $accountId,
             'pipelineId' => $pipelineId
         ]);
-        
-        return response()->json(['message' => 'Pipeline ID updated successfully!']);
+
+        return back()->with('success', 'Pipeline ID updated successfully!');
     }
 
     /**
