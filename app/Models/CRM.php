@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CRM extends Model
 {
+    protected $table = 'crms';
+    
     use HasFactory;
 
     protected $fillable = ['customer_name','accountId','pipelineId','email','phone'];
