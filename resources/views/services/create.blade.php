@@ -86,6 +86,12 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Pipeline Id:</strong>
+                            <input type="number" value="{{ old('pipelineId') }}" name="pipelineId" class="form-control" placeholder="Pipeline Id">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>Description:</strong>
                             <textarea class="form-control" id="description_summernote" name="description" placeholder="Description">{{ old('description') }}</textarea>
                             <script>

@@ -70,7 +70,7 @@ class KommoController extends Controller
             'email' => $input['email'],
             'phone' => $input['phone']
         ]);
-        
+
         // Log the contact information
         Log::info('kommo Form Data:', [
             'contact' => $contact,
@@ -122,79 +122,79 @@ class KommoController extends Controller
         if (!$crm) {
             return back()->with('error', 'Account ID not found in CRM');
         }
-        $this->quoteCreate($crm);
+
+        if (!$pipelineId) {
+            return back()->with('error', 'Invalid pipeline ID.');
+        }
 
         $crm->pipelineId = $pipelineId;
         $crm->save();
-        
-        Log::info('kommo update Form Data:', [
+
+        Log::info('CRM Updated:', [
             'accountId' => $accountId,
             'pipelineId' => $pipelineId
         ]);
 
-        return back()->with('success', 'Pipeline ID updated successfully!');
+        return $this->quoteCreate($crm);
     }
 
     public function quoteCreate($input)
     {
         $data = [];
-        list($customer_type, $user_id) = $this->findOrCreateUser($input);
+        [$customer_type, $user_id] = $this->findOrCreateUser($input);
         $data['user_id'] = $user_id;
 
-        $data['service_id'] = 63;
-        $data['zone'] = "Ajman";
-        
-        $service = Service::findOrFail($data['service_id']);
+        $service = Service::where('pipelineId', optional($input)->pipelineId)->first();
+        if (!$service) {
+            return back()->with('error', 'Service not found.');
+        }
+
+        $data['service_id'] = $service->id;
         $categoryIds = $service->categories()->pluck('category_id')->toArray();
 
-        $staffs = User::getEligibleQuoteStaff($data['service_id'], $data['zone'] ?? null);
+        $staffs = User::getEligibleQuoteStaff($data['service_id'], null, true);
 
         $data['status'] = "Pending";
-
         $data['phone'] = $input['phone'] ?? null;
         $data['whatsapp'] = $input['phone'] ?? null;
-        
         $data['service_name'] = $service->name;
-        $data['detail'] = "testing";
+        $data['detail'] = "I am interested in " . $service->name . ". Send me a quote.";
         $data['sourcing_quantity'] = 1;
-        $data['location'] = "testing";
 
         $quote = Quote::create($data);
-
         $quote->categories()->sync($categoryIds);
-        if (count($staffs) > 0) {
+
+        if ($staffs->isNotEmpty()) {
             foreach ($staffs as $staff) {
                 $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
                 $quote->staffs()->syncWithoutDetaching([
                     $staff->id => [
                         'status' => 'Pending',
-                        'quote_amount' => $staff->staff->quote_amount,
-                        'quote_commission' => $staff->staff->quote_commission
+                        'quote_amount' => optional($staff->staff)->quote_amount ?? 0,
+                        'quote_commission' => optional($staff->staff)->quote_commission ?? 0,
                     ]
                 ]);
             }
         }
-        if (isset($customer_type) && $customer_type == "New") {
-            $msg = sprintf(
-                "Quote request submitted successfully! You can login with credentials Email: %s and Password: %s to check bids on your quotation.",
+
+        $msg = "Quote request submitted successfully!";
+        if ($customer_type == "New") {
+            $msg .= sprintf(
+                " You can login with credentials Email: %s and Password: %s to check bids on your quotation.",
                 $input['email'],
                 $input['phone']
             );
-        } else {
-            $msg = "Quote request submitted successfully! ";
         }
-        return response()->json([
-            'success' => true,
-            'message' => $msg
-        ]);
+
+        return back()->with('success', $msg);
     }
 
     private function findOrCreateUser($input)
     {
         $user = User::where('email', $input['email'])->first();
+        $customer_type = "Old";
 
-        $data = [];
-        if (!isset($user)) {
+        if (!$user) {
             $user = User::create([
                 'name' => $input['customer_name'],
                 'email' => $input['email'],
@@ -203,21 +203,19 @@ class KommoController extends Controller
 
             $user->assignRole('Customer');
             $customer_type = "New";
-            $data['user_id'] = $user->id;
-        } else {
-            $customer_type = "Old";
-            $data['user_id'] = $user->id;
         }
 
-        $data['number'] = $input['phone'];
-        $data['whatsapp'] = $input['phone'];
+        CustomerProfile::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'number' => $input['phone'],
+                'whatsapp' => $input['phone']
+            ]
+        );
 
-        if ($customer_type == "New") {
-            CustomerProfile::create($data);
-        }
-
-        return [$customer_type, $data['user_id']];
+        return [$customer_type, $user->id];
     }
+
 
     /**
      * Remove the specified resource from storage.
