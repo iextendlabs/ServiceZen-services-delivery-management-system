@@ -180,8 +180,9 @@
                             <td>{{ $staff->name ?? '' }}</td>
                             <td>{{ $staff->pivot->status ?? '' }}</td>
                             <td>
-                                <input type="number" class="form-control quote-amount" data-quote-id="{{ $quote->id }}"
+                                <input type="number" step="0.01" class="form-control quote-amount" data-quote-id="{{ $quote->id }}"
                                     data-staff-id="{{ $staff->id }}" value="{{ $staff->pivot->quote_amount ?? '' }}">
+                                    <small class="form-text text-muted">Minimum value: 0.01</small>
                             </td>
                             <td>
                                 <input type="number" class="form-control quote-commission"
