@@ -11,6 +11,6 @@ class CRM extends Model
     
     use HasFactory;
 
-    protected $fillable = ['customer_name','accountId','pipelineId','email','phone'];
+    protected $fillable = ['customer_name','accountId','pipelineId','email','phone','service_id'];
 
 }

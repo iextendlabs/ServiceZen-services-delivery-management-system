@@ -120,31 +120,36 @@ class KommoController extends Controller
         $crm = CRM::where('accountId', $accountId)->first();
 
         if (!$crm) {
-            return back()->with('error', 'Account ID not found in CRM');
+            return back()->with('error', 'Account ID not found in CRM.');
         }
 
         if (!$pipelineId) {
             return back()->with('error', 'Invalid pipeline ID.');
         }
 
-        $crm->pipelineId = $pipelineId;
-        $crm->save();
-
         Log::info('CRM Updated:', [
             'accountId' => $accountId,
             'pipelineId' => $pipelineId
         ]);
 
-        return $this->quoteCreate($crm);
+        $crm->pipelineId = $pipelineId;
+
+        if ($crm->service_id == null) {
+            return $this->quoteCreate($crm);
+        }
+
+        $crm->save();
+
+        return back()->with('success', 'Pipeline ID updated successfully!');
     }
 
-    public function quoteCreate($input)
+    public function quoteCreate($crm)
     {
         $data = [];
-        [$customer_type, $user_id] = $this->findOrCreateUser($input);
+        [$customer_type, $user_id] = $this->findOrCreateUser($crm);
         $data['user_id'] = $user_id;
 
-        $service = Service::where('pipelineId', optional($input)->pipelineId)->first();
+        $service = Service::where('pipelineId', $crm->pipelineId)->first();
         if (!$service) {
             return back()->with('error', 'Service not found.');
         }
@@ -155,8 +160,8 @@ class KommoController extends Controller
         $staffs = User::getEligibleQuoteStaff($data['service_id'], null, true);
 
         $data['status'] = "Pending";
-        $data['phone'] = $input['phone'] ?? null;
-        $data['whatsapp'] = $input['phone'] ?? null;
+        $data['phone'] = $crm->phone ?? null;
+        $data['whatsapp'] = $crm->phone ?? null;
         $data['service_name'] = $service->name;
         $data['detail'] = "I am interested in " . $service->name . ". Send me a quote.";
         $data['sourcing_quantity'] = 1;
@@ -177,12 +182,15 @@ class KommoController extends Controller
             }
         }
 
+        $crm->service_id = $service->id;
+        $crm->save();
+
         $msg = "Quote request submitted successfully!";
         if ($customer_type == "New") {
             $msg .= sprintf(
                 " You can login with credentials Email: %s and Password: %s to check bids on your quotation.",
-                $input['email'],
-                $input['phone']
+                $crm->email,
+                $crm->phone
             );
         }
 
