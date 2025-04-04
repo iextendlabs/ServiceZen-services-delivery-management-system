@@ -47,7 +47,10 @@ class KommoController extends Controller
 
         $input = [];
         $input['customer_name'] = $contact['name'] ?? 'N/A';
-        $input['accountId'] = $contact['account_id'];
+        $account_id = $contact['linked_leads_id'] ?? [];
+    
+        $leadId = array_key_first($account_id);
+        $input['accountId'] = $leadId;
         $input['email'] = 'N/A';
         $input['phone'] = 'N/A';
 
@@ -114,7 +117,7 @@ class KommoController extends Controller
      */
     public function update(Request $request)
     {
-        $accountId = $request->input('account.id');
+        $accountId = $request->input('leads.update.0.id');
         $pipelineId = $request->input('leads.update.0.pipeline_id');
 
         $crm = CRM::where('accountId', $accountId)->first();
