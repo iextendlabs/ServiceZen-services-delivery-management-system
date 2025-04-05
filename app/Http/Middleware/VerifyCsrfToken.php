@@ -14,6 +14,8 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'ckeditor/upload',
         '/kommo-update',
-        '/kommo-store'
+        '/kommo-store',
+        '/kommo-log',
+        '/kommo-incomingLead'
     ];
 }
