@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\{
     HomeController,
@@ -313,3 +315,17 @@ Route::post('/kommo-store', [KommoController::class, 'store']);
 
 // Update Route (POST)
 Route::post('/kommo-update', [KommoController::class, 'update']);
+
+Route::post('/kommo-incomingLead', [KommoController::class, 'incomingLead']);
+
+Route::post('/kommo-log', function (Request $request) {
+    $requestData = $request->all();
+
+    // Encode the request data as a JSON string
+    $jsonData = json_encode($requestData, JSON_PRETTY_PRINT);
+
+    // Log the JSON data
+    Log::channel('kommo_log')->info('Request Received:', ['data' => $jsonData]);
+    
+    return response()->json(['status' => 'logged']);
+});

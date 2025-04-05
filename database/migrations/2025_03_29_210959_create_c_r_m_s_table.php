@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('customer_name');
             $table->unsignedBigInteger('accountId')->nullable();
             $table->unsignedBigInteger('pipelineId')->nullable();
-            $table->string('email', 191)->unique();
+            $table->string('email', 191);
             $table->string('phone');
             $table->timestamps();
         });

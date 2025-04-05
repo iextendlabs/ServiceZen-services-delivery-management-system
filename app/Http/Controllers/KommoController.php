@@ -146,6 +146,33 @@ class KommoController extends Controller
         return back()->with('success', 'Pipeline ID updated successfully!');
     }
 
+    public function incomingLead(Request $request)
+    {
+        $data = $request->all();
+
+        $input['customer_name'] = $data['unsorted']['add'][0]['source_data']['client']['name'] ?? 'N/A';
+        $input['phone'] = $data['unsorted']['add'][0]['source_data']['client']['id'] ?? 'N/A';
+        $input['email'] = $input['phone'] ? $input['phone']."@tadhem.com" : 'N/A';
+        $input['pipelines'] = $data['unsorted']['add'][0]['pipeline_id'] ?? null;
+        $input['accountId'] = $data['unsorted']['add'][0]['lead_id'] ?? 'N/A';
+
+
+        $crm = CRM::create([
+            'customer_name' => $input['customer_name'],
+            'accountId' => $input['accountId'],
+            'pipelineId' => $input['pipelines'],
+            'email' => $input['email'],
+            'phone' => $input['phone']
+        ]);
+
+        // Log the contact information
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+        Log::channel('kommo_log')->info('Request Received:', ['data' => $jsonData]);
+
+        return $this->quoteCreate($crm);
+    }
+
     public function quoteCreate($crm)
     {
         $data = [];

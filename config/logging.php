@@ -56,6 +56,11 @@ return [
             'path' => storage_path('logs/order_request.log'),
             'level' => 'debug'
         ],
+        'kommo_log' => [
+            'driver' => 'single', // You can use 'single', 'daily', or other supported drivers
+            'path' => storage_path('logs/kommo.log'),
+            'level' => 'debug'
+        ],
         'api' => [
             'driver' => 'single',
             'path' => storage_path('logs/api.log'),
