@@ -69,6 +69,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4 mt-3">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>CRM Quotes Today</span>
+                                <a href="{{ route('crms.index') }}" class="small text-primary text-decoration-none">See All</a>
+                            </div>
+                            <div class="card-body analytic">
+                                <i class="fa fa-chart-bar"></i>
+                                <span class="float-md-end">{{ $todayCrms }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                 @endif
 
                 @if (auth()->user()->hasRole('Staff'))
