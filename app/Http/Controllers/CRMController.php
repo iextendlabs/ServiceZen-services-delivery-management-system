@@ -22,7 +22,7 @@ class CRMController extends Controller
     public function index(Request $request)
     {
         $sort = $request->input('sort', 'created_at');
-        $direction = $request->input('direction', 'asc');
+        $direction = $request->input('direction', 'desc');
         $query = CRM::orderBy($sort, $direction);
         $total_crm =  $query->count();
         $crms = $query->paginate(config('app.paginate'));
