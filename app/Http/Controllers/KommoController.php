@@ -156,7 +156,11 @@ class KommoController extends Controller
         $input['pipelines'] = $data['unsorted']['add'][0]['pipeline_id'] ?? null;
         $input['accountId'] = $data['unsorted']['add'][0]['lead_id'] ?? 'N/A';
 
-
+        $crm = CRM::where('accountId', $input['accountId'])->first();
+        if ($crm) {
+            return back()->with('error', 'Account ID already exists in CRM.');
+        }
+        
         $crm = CRM::create([
             'customer_name' => $input['customer_name'],
             'accountId' => $input['accountId'],
