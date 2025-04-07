@@ -34,11 +34,11 @@
                 @foreach ($crms as $crm)
                     <tr>
                         <td>{{ ++$i }}</td>
-                        <td class="text-left">{{ $crm->customer_name }}</td>
-                        <td class="text-left">{{ $crm->email }}</td>
-                        <td class="text-left">{{ $crm->phone }}</td>
-                        <td class="text-left">{{ $crm->accountId }}</td>
-                        <td class="text-left">{{ $crm->pipelineId }}</td>
+                        <td>{{ $crm->customer_name }}</td>
+                        <td>{{ $crm->email }}</td>
+                        <td>{{ $crm->phone }}</td>
+                        <td>{{ $crm->accountId }}</td>
+                        <td>{{ $crm->pipelineId }}</td>
                         {{-- <td></td> --}}
                     </tr>
                 @endforeach
