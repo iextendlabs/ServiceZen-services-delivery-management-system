@@ -262,7 +262,48 @@ class SiteQuoteController extends Controller
                 ]);
 
                 if ($quote->affiliate && $quote->affiliate->affiliate && $quote->affiliate->affiliate->commission) {
-                    $affiliateCommission = $commission * $quote->affiliate->affiliate->commission / 100;
+                    $affiliateCategories = $quote->affiliate->affiliateCategories->keyBy('category_id');
+                    $quoteServices = $quote->service()->with('categories')->get();
+
+                    if (count($affiliateCategories) > 0) {
+                        $affiliateCommission = 0;
+
+                        foreach ($quoteServices as $orderService) {
+                            if (!$orderService->categories || $orderService->categories->isEmpty()) {
+                                continue;
+                            }
+
+                            foreach ($orderService->categories->unique('id') as $category) {
+                                $category_id = $category->id;
+
+                                if (!isset($affiliateCategories[$category_id])) {
+                                    continue;
+                                }
+
+                                $affiliateCategory = $affiliateCategories[$category_id];
+
+                                $service = $affiliateCategory->services->where('service_id', $orderService->id)->first();
+
+                                if ($service) {
+                                    $commission_rate = $service->commission;
+                                    $commission_type = $service->commission_type;
+                                } else {
+                                    $commission_rate = $affiliateCategory->commission;
+                                    $commission_type = $affiliateCategory->commission_type;
+                                }
+
+                                if ($commission_type === 'percentage') {
+                                    $calculated_commission = ($commission * $commission_rate) / 100;
+                                } else {
+                                    $calculated_commission = $commission_rate;
+                                }
+
+                                $affiliateCommission += $calculated_commission;
+                            }
+                        }
+                    } else {
+                        $affiliateCommission = $commission * $quote->affiliate->affiliate->commission / 100;
+                    }
                     if ($affiliateCommission) {
                         Transaction::create([
                             'user_id' => $quote->affiliate->id,

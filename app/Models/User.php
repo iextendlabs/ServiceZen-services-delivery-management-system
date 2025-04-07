@@ -307,6 +307,8 @@ class User extends Authenticatable
                     ->toArray();
 
                 $staffs = $uniqueStaffs->whereIn('id', $staffGroupStaffIds)->values();
+            } else {
+                return collect();
             }
         }
 
