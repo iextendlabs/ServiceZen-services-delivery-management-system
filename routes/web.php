@@ -42,6 +42,7 @@ use App\Http\Controllers\{
     CampaignController,
     SummerNoteController,
     ComplaintController,
+    CRMController,
     CurrencyController,
     FreelancerProgramController,
     InformationController,
@@ -214,6 +215,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/quotes/update-staff-data', [QuoteController::class, 'updateStaffData'])->name('quotes.updateStaffData');
 
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
+
+    Route::resource('crms', CRMController::class);
+
 });
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
 

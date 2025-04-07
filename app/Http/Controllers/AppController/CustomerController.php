@@ -2120,6 +2120,8 @@ class CustomerController extends Controller
             $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
             $input['affiliate_id'] = $affiliate->user_id;
         }
+        $input['source'] = "App";
+
         $quote = Quote::create($input);
 
         if ($request->hasFile('images')) {

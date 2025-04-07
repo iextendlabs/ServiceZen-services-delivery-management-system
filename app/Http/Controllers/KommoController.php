@@ -199,6 +199,7 @@ class KommoController extends Controller
         $data['service_name'] = $service->name;
         $data['detail'] = "I am interested in " . $service->name . ". Send me a quote.";
         $data['sourcing_quantity'] = 1;
+        $data['source'] = "CRM";
 
         $quote = Quote::create($data);
         $quote->categories()->sync($categoryIds);

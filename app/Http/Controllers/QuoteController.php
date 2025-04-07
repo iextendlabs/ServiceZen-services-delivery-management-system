@@ -33,7 +33,8 @@ class QuoteController extends Controller
         $filter = [
             'user_id' => $request->user_id,
             'service_id' => $request->service_id,
-            'status' => $request->status
+            'status' => $request->status,
+            'source' => $request->source
         ];
 
         $query = Quote::latest();
@@ -44,6 +45,10 @@ class QuoteController extends Controller
 
         if ($request->status) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->source) {
+            $query->where('source', $request->source);
         }
 
         if ($request->service_id) {
@@ -71,7 +76,8 @@ class QuoteController extends Controller
         $services = Service::where('status', 1)->get();
         $categories = ServiceCategory::where('status', 1)->get();
 
-        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'categories', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones'))
+        $sources = ['CRM', 'App', 'Web'];
+        return view('quotes.index', compact('quotes', 'filter', 'total_quote', 'users', 'services', 'categories', 'quote_statuses', 'staffs', 'staffGroups', 'staffZones','sources'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

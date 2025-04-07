@@ -231,6 +231,19 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <strong>Source:</strong>
+                                    <select name="source" class="form-control">
+                                        <option></option>
+                                        @foreach ($sources as $source)
+                                            <option value="{{ $source }}"
+                                                @if ($filter['source'] == $source) selected @endif>
+                                                {{ $source }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4 offset-md-8">
