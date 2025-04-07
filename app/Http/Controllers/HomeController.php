@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
+use App\Models\CRM;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Staff;
@@ -132,8 +133,10 @@ class HomeController extends Controller
                 ->where('user_id', $currentUser->id)
                 ->sum('amount');
 
+            $todayCrms = CRM::whereDate('created_at', Carbon::today())->count();
+
             $staffs = User::with('staff')->role('Staff')->get();
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income','staffs'));
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income','staffs','todayCrms'));
         }
     }
 

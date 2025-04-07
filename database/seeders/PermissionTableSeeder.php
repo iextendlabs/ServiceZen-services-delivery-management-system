@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'crm-list',
+            'crm-create',
+            'crm-edit',
+            'crm-delete',
             'affiliate-program-list',
             'affiliate-program-edit',
             'affiliate-program-delete',

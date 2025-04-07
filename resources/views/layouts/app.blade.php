@@ -230,6 +230,9 @@
                                 @can('quote-list')
                                 <a class="dropdown-item" href="{{ route('quotes.index') }}">Quotes</a>
                                 @endcan
+                                @can('crm-list')
+                                <a class="dropdown-item" href="{{ route('crms.index') }}">CRM</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan
