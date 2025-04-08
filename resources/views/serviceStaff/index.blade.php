@@ -113,6 +113,13 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
+                                <strong>Email:</strong>
+                                <input type="text" name="email" value="{{ $filter['email'] ?? '' }}" class="form-control"
+                                    placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
                                 <label><strong>Sub Title / Designation:</strong></label>
                                 <select name="sub_title" class="form-control select2" id="sub_title">
                                     <option value="">Select Designation</option>

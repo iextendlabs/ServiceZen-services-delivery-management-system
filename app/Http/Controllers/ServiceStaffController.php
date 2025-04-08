@@ -12,6 +12,7 @@ use App\Models\Staff;
 use App\Models\StaffHoliday;
 use App\Models\StaffImages;
 use App\Models\StaffDriver;
+use App\Models\StaffGroup;
 use App\Models\StaffYoutubeVideo;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
@@ -64,6 +65,7 @@ class ServiceStaffController extends Controller
         
         $filter = [
             'name' => $request->name,
+            'email' => $request->email,
             'sub_title' => $request->sub_title,
             'location' => $request->location,
             'min_order_value' => $request->min_order_value,
@@ -146,7 +148,11 @@ class ServiceStaffController extends Controller
         }
 
         if ($request->name) {
-            $query->where('name', 'like', $request->name . '%');
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->email) {
+            $query->where('email', 'like', '%' . $request->email . '%');
         }
         $total_staff = $query->count();
         $serviceStaff = $query->paginate(config('app.paginate'));
@@ -167,7 +173,8 @@ class ServiceStaffController extends Controller
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $documents = $this->documents;
-        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services','documents'));
+        $staffGroups = StaffGroup::with('staffZones')->get();
+        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services','documents','staffGroups'));
     }
 
     /**
@@ -281,6 +288,14 @@ class ServiceStaffController extends Controller
             }
         }
 
+        if(isset($request->groups)){
+            foreach($request->groups as $group){
+                $staffGroup = StaffGroup::find($group);
+
+                $staffGroup->staffs()->attach($user_id);
+            }
+        }
+
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -352,7 +367,9 @@ class ServiceStaffController extends Controller
             $q->where('staff_id', $staffId);
         })->get();
         
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers','timeSlots'));
+        $staffGroups = StaffGroup::with('staffZones')->get();
+
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers','timeSlots','staffGroups'));
     }
 
     /**
@@ -529,6 +546,16 @@ class ServiceStaffController extends Controller
                             'commission' => $serviceData['service_commission'],
                         ]);
                     }
+                }
+            }
+        }
+        
+        if(isset($request->groups)){
+            foreach($request->groups as $group){
+                $staffGroup = StaffGroup::find($group);
+
+                if (!$staffGroup->staffs()->where('staff_id', $id)->exists()) {
+                    $staffGroup->staffs()->attach($id);
                 }
             }
         }
