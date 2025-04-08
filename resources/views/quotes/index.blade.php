@@ -33,7 +33,7 @@
     }
     
     /* Adjust table container height */
-    .table-responsive {
+    ..modal-content .table-responsive {
         max-height: calc(300px - 1rem); /* Adjust based on your needs */
         overflow-y: auto;
     }
