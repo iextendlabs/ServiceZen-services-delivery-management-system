@@ -549,7 +549,7 @@ class ServiceStaffController extends Controller
                 }
             }
         }
-        
+        User::find($id)->staffGroups()->detach();
         if(isset($request->groups)){
             foreach($request->groups as $group){
                 $staffGroup = StaffGroup::find($group);
