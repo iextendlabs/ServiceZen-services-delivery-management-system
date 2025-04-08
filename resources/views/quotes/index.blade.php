@@ -5,15 +5,37 @@
     }
 
     .modal-content {
-        max-height: 100%;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        max-height: 100vh; /* Adjust as needed */
     }
-
+    
+    .modal-body {
+        overflow-y: auto;
+        flex: 1;
+    }
+    
+    .modal-footer {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        z-index: 3;
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    /* Keep your existing sticky header styles */
     .modal-content .table thead th:first-child,
     .modal-content .table tbody td:first-child {
         position: sticky;
         left: 16px;
         z-index: 2;
+    }
+    
+    /* Adjust table container height */
+    .table-responsive {
+        max-height: calc(300px - 1rem); /* Adjust based on your needs */
+        overflow-y: auto;
     }
 </style>
 @section('content')
@@ -42,20 +64,17 @@
                         </button>
 
                         <!-- Staff Selection Modal -->
-                        <div class="modal fade" id="staffModal" tabindex="-1" aria-labelledby="staffModalLabel"
-                            aria-hidden="true">
+                        <div class="modal fade" id="staffModal" tabindex="-1" aria-labelledby="staffModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header bg-primary text-white">
                                         <h5 class="modal-title" id="staffModalLabel">Select Staff</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-md-12 mb-3">
-                                                <input type="text" id="staffSearch" class="form-control"
-                                                    placeholder="Search staff...">
+                                                <input type="text" id="staffSearch" class="form-control" placeholder="Search staff...">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="staffGroupFilter" class="form-label">Staff Group</label>
@@ -75,54 +94,46 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-
+                        
                                             <div class="col-md-6 mb-3">
                                                 <label for="staffServiceFilter" class="form-label">Service</label>
                                                 <select id="staffServiceFilter" class="form-control">
                                                     <option value="">All Services</option>
                                                     @foreach ($services as $service)
-                                                        <option value="{{ $service->id }}">{{ $service->name }}
-                                                        </option>
+                                                        <option value="{{ $service->id }}">{{ $service->name }}</option>
                                                     @endforeach
                                                 </select>
-
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="staffCategoryFilter" class="form-label">Category</label>
                                                 <select id="staffCategoryFilter" class="form-control">
                                                     <option value="">All Categories</option>
                                                     @foreach ($categories as $category)
-                                                        <option value="{{ $category->id }}">{{ $category->title }}
-                                                        </option>
+                                                        <option value="{{ $category->id }}">{{ $category->title }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
-
-
+                        
                                             <div class="col-md-6 mb-3">
-                                                <input type="number" step="0.01" id="defaultQuoteAmount" class="form-control mr-2"
-                                                    placeholder="Enter Quote Amount">
-                                                    <small class="form-text text-muted">Minimum value: 0.01</small>
+                                                <input type="number" step="0.01" id="defaultQuoteAmount" class="form-control mr-2" placeholder="Enter Quote Amount">
+                                                <small class="form-text text-muted">Minimum value: 0.01</small>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <input type="number" id="defaultQuoteCommission" class="form-control"
-                                                    placeholder="Enter Quote Commission in %">
+                                                <input type="number" id="defaultQuoteCommission" class="form-control" placeholder="Enter Quote Commission in %">
                                             </div>
                                             <div class="col-md-12">
                                                 <!-- Staff Table -->
-                                                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                <div class="table-responsive">
                                                     <table class="table table-hover">
                                                         <thead class="thead-light">
                                                             <tr>
                                                                 <th class="text-center" style="width: 10%;">
-                                                                    <div class="d-flex justify-content-center align-items-center mb-2"
-                                                                        style="height: 100%;">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            id="selectAllCheckbox">
+                                                                    <div class="d-flex justify-content-center align-items-center mb-2" style="height: 100%;">
+                                                                        <input class="form-check-input" type="checkbox" id="selectAllCheckbox">
                                                                     </div>
                                                                 </th>
                                                                 <th>Staff</th>
-                                                                <th style="width: 20%;">Amount <small class="form-text text-muted">Minimum value: 0.01</small> </th>
+                                                                <th style="width: 20%;">Amount <small class="form-text text-muted">Minimum value: 0.01</small></th>
                                                                 <th style="width: 20%;">Commission</th>
                                                             </tr>
                                                         </thead>
@@ -133,28 +144,18 @@
                                                                     data-services="{{ $staff->services->pluck('id')->unique()->join(' ') }}"
                                                                     data-categories="{{ $staff->categories->pluck('id')->unique()->join(' ') }}">
                                                                     <td class="text-center align-middle">
-                                                                        <div class="d-flex justify-content-center align-items-center"
-                                                                            style="height: 100%;">
-                                                                            <input class="form-check-input staff-checkbox"
-                                                                                type="checkbox" name="bulk-staff[]"
-                                                                                value="{{ $staff->id }}">
+                                                                        <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                                                                            <input class="form-check-input staff-checkbox" type="checkbox" name="bulk-staff[]" value="{{ $staff->id }}">
                                                                         </div>
                                                                     </td>
                                                                     <td class="staff-name font-weight-bold align-middle">
-                                                                        {{ $staff->name }} <small
-                                                                            class="text-muted">({{ $staff->staff->sub_title }})</small>
+                                                                        {{ $staff->name }} <small class="text-muted">({{ $staff->staff->sub_title }})</small>
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number" step="0.01" 
-                                                                            class="form-control staff-amount"
-                                                                            placeholder="Amount"
-                                                                            value="{{ $staff->staff->quote_amount ?? '' }}">
+                                                                        <input type="number" step="0.01" class="form-control staff-amount" placeholder="Amount" value="{{ $staff->staff->quote_amount ?? '' }}">
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number"
-                                                                            class="form-control staff-commission"
-                                                                            placeholder="Commission in %"
-                                                                            value="{{ $staff->staff->quote_commission ?? '' }}">
+                                                                        <input type="number" class="form-control staff-commission" placeholder="Commission in %" value="{{ $staff->staff->quote_commission ?? '' }}">
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
