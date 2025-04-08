@@ -441,6 +441,59 @@
                             <button id="addCategoryBtn" onclick="addCategoryRow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
                         </div>
                     </div>
+                    <div class="col-md-12 mt-2">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Assign Groups and Zones</h5>
+                                <div class="input-group" style="width: 300px;">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Search groups/zones...">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive scroll-div">
+                                    <table class="table" id="groupsTable">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th width="50px">
+                                                    <input type="checkbox" id="selectAll">
+                                                </th>
+                                                <th>Group Name</th>
+                                                <th>Zones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($staffGroups as $group)
+                                                <tr data-group-id="{{ $group->id }}" 
+                                                    data-group-name="{{ strtolower($group->name) }}"
+                                                    data-zones="{{ strtolower($group->staffZones->pluck('name')->implode('|')) }}">
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                            name="groups[]" 
+                                                            value="{{ $group->id }}"
+                                                            class="group-checkbox"
+                                                            {{ isset($serviceStaff) && $serviceStaff->staffGroups->contains($group->id) ? 'checked' : '' }}>
+                                                    </td>
+                                                    <td>{{ $group->name }}</td>
+                                                    <td>
+                                                        @foreach($group->staffZones as $zone)
+                                                            <span class="badge badge-info mr-1 zone-badge" 
+                                                                data-zone-id="{{ $zone->id }}"
+                                                                data-zone-name="{{ strtolower($zone->name) }}">
+                                                                {{ $zone->name }}
+                                                            </span>
+                                                        @endforeach
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Location:</strong>
@@ -1059,6 +1112,32 @@
                 error: function(xhr) {
                     alert('An error occurred while uploading the file');
                 }
+            });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#selectAll').change(function() {
+            $('.group-checkbox').prop('checked', $(this).prop('checked'));
+        });
+
+        $('#searchInput').keyup(function() {
+            const searchTerm = $(this).val().toLowerCase();
+            
+            if (searchTerm.length === 0) {
+                $('#groupsTable tbody tr').show();
+                return;
+            }
+            
+            $('#groupsTable tbody tr').each(function() {
+                const groupName = $(this).data('group-name');
+                const zones = $(this).data('zones');
+                
+                const groupMatch = groupName.includes(searchTerm);
+                const zoneMatch = zones.includes(searchTerm);
+                
+                $(this).toggle(groupMatch || zoneMatch);
             });
         });
     });
