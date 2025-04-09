@@ -282,36 +282,44 @@ class User extends Authenticatable
         $service = Service::findOrFail($serviceId);
         $categoryIds = $service->categories()->pluck('category_id')->toArray();
 
-        $categoriesStaffs = self::whereHas('categories', function ($query) use ($categoryIds) {
-            $query->whereIn('category_id', $categoryIds);
-        })->whereHas('staff', fn($q) => $q->where('get_quote', 1))->get();
+        $query = self::whereHas('staff', fn($q) => $q->where('get_quote', 1))
+            ->where(function ($query) use ($serviceId, $categoryIds) {
+                $query->whereHas('services', fn($q) => $q->where('service_id', $serviceId));
 
-        $servicesStaffs = self::whereHas('services', function ($query) use ($serviceId) {
-            $query->where('service_id', $serviceId);
-        })->whereHas('staff', fn($q) => $q->where('get_quote', 1))->get();
+                $query->orWhere(function ($q) use ($categoryIds) {
+                    $q->whereHas('categories', fn($q) => $q->whereIn('category_id', $categoryIds))
+                        ->whereDoesntHave('services');
+                });
 
-        $uniqueStaffs = $categoriesStaffs->merge($servicesStaffs)->unique('id')->values();
+                $query->orWhere(function ($q) use ($serviceId, $categoryIds) {
+                    $q->whereHas('categories', fn($q) => $q->whereIn('category_id', $categoryIds))
+                        ->whereHas('services', fn($q) => $q->where('service_id', $serviceId));
+                });
+            });
 
-        $staffs = [];
-        if ($is_kommo) {
-            $staffs = $uniqueStaffs;
-        } else {
+        if (!$is_kommo) {
             $staffZone = StaffZone::where('name', $zone)->first();
 
-            if ($staffZone) {
-                $staffGroupStaffIds = $staffZone->staffGroups()
-                    ->with('staffs:id')
-                    ->get()
-                    ->pluck('staffs.*.id')
-                    ->flatten()
-                    ->toArray();
-
-                $staffs = $uniqueStaffs->whereIn('id', $staffGroupStaffIds)->values();
-            } else {
+            if (!$staffZone) {
                 return collect();
             }
+
+            $staffGroupStaffIds = $staffZone->staffGroups()
+                ->with('staffs:id')
+                ->get()
+                ->pluck('staffs.*.id')
+                ->flatten()
+                ->unique()
+                ->values()
+                ->toArray();
+
+            if (empty($staffGroupStaffIds)) {
+                return collect();
+            }
+
+            $query->whereIn('id', $staffGroupStaffIds);
         }
 
-        return $staffs;
+        return $query->get();
     }
 }
