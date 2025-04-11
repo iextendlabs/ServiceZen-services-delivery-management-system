@@ -2065,6 +2065,9 @@ class CustomerController extends Controller
             $input['phone'] = $request->number;
             $input['whatsapp'] = $request->whatsapp;
             $input['sub_title'] = $request->subTitle;
+            if (file_exists(public_path('staff-images') . '/' . "default.png")) {
+                $input['image'] = "default.png";
+            }
             Staff::create($input);
             return response()->json([
                 'msg' => "Your request to join the freelancer program has been submitted and sent to the administrator for review.",

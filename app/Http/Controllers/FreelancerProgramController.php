@@ -93,7 +93,7 @@ class FreelancerProgramController extends Controller
             return redirect($url);
         } elseif ($request->status == "Rejected") {
             $staff = Staff::where('user_id',$id)->first();
-            if (isset($staff->image) && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+            if (isset($staff->image) && $staff->image !== "default.png" && file_exists(public_path('staff-images') . '/' . $staff->image)) {
                 unlink(public_path('staff-images') . '/' . $staff->image);
             }
     
