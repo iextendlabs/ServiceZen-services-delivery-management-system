@@ -183,9 +183,9 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <span style="color: red;">*</span><strong for="image">Upload Image</strong>
-                            <input type="file" name="image" class="class="form-control" image-input" accept="image/*">
-                            <img class="image-preview" height="130px">
+                            <strong for="image">Upload Image</strong>
+                            <input type="file" name="image" class="form-control image-input" accept="image/*">
+                            <img class="image-preview" height="130px" src="/staff-images/default.png">
                         </div>
                     </div>
                     <div class="col-md-12">

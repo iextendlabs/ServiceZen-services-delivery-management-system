@@ -190,7 +190,6 @@ class ServiceStaffController extends Controller
             'phone' => 'required',
             'whatsapp' => 'required',
             'email' => 'required|email|unique:users,email',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required|same:confirm-password',
             'commission' => 'required',
             'id_card_front' => 'required',
@@ -235,6 +234,10 @@ class ServiceStaffController extends Controller
             // save the filename to the gallery object and persist it to the database
 
             $input['image'] = $filename;
+        }else{
+            if (file_exists(public_path('staff-images') . '/' . "default.png")) {
+                $input['image'] = "default.png";
+            }
         }
 
         if ($request->youtube_video) {
@@ -246,6 +249,10 @@ class ServiceStaffController extends Controller
                     ]);
                 }
             }
+        }
+
+        if (file_exists(public_path('staff-images') . '/' . "default.png")) {
+            $input['image'] = "default.png";
         }
 
         $staff = Staff::create($input);
