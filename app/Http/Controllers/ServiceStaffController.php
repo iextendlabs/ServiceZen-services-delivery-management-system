@@ -449,7 +449,7 @@ class ServiceStaffController extends Controller
         }
 
         if (isset($request->image)) {
-            if ($staff && $staff->image && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+            if ($staff && $staff->image && $staff->image !== "default.png"  && file_exists(public_path('staff-images') . '/' . $staff->image)) {
                 unlink(public_path('staff-images') . '/' . $staff->image);
             }
 
@@ -608,7 +608,7 @@ class ServiceStaffController extends Controller
      */
     public function destroy(User $serviceStaff)
     {
-        if (isset($serviceStaff->staff->image) && file_exists(public_path('staff-images') . '/' . $serviceStaff->staff->image)) {
+        if (isset($serviceStaff->staff->image) && $serviceStaff->staff->image !== "default.png" && file_exists(public_path('staff-images') . '/' . $serviceStaff->staff->image)) {
             unlink(public_path('staff-images') . '/' . $serviceStaff->staff->image);
         }
 
