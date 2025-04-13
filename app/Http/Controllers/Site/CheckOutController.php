@@ -26,6 +26,7 @@ use App\Mail\OrderCustomerEmail;
 use App\Models\CustomerProfile;
 use App\Models\OrderAttachment;
 use App\Models\ServiceOption;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cookie;
 
@@ -1108,9 +1109,15 @@ class CheckOutController extends Controller
     }
 
     public function checkBooking(Request $request){
-        $services = Service::where('status' , 1)->get();
-        $categories = ServiceCategory::where('status',1)->get();
         $address = NULL;
+
+        $services = Cache::remember('services', 60, function () {
+            return Service::where('status' , 1)->get();
+        });
+
+        $categories = Cache::remember('categories', 60, function () {
+            return ServiceCategory::where('status',1)->get();
+        });
 
         try {
             $address = json_decode($request->cookie('address'), true);

@@ -11,6 +11,7 @@ use App\Models\Staff;
 use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class StaffProfileController extends Controller
@@ -46,11 +47,11 @@ class StaffProfileController extends Controller
         }
         $locations = array_unique(array_filter($all_locations));
 
-        $services = Service::where('status',1)->get();
-        $categories = ServiceCategory::where('status',1)->get();
+        $services = Service::where('status', 1)->get();
+        $categories = ServiceCategory::where('status', 1)->get();
 
         $staffZones = StaffZone::get();
-        
+
         $filter = [
             'sub_title' => $request->sub_title,
             'location' => $request->location,
@@ -81,7 +82,7 @@ class StaffProfileController extends Controller
                 $q->where('service_id', $request->service_id);
             });
         }
-    
+
         // Apply Category filter
         if ($request->category_id) {
             $query->whereHas('categories', function ($q) use ($request) {
@@ -98,7 +99,7 @@ class StaffProfileController extends Controller
         $staffs = $query->role('Staff')->latest()->paginate(config('app.paginate'));
         $staffs->appends(array_merge($filter));
 
-        return view('site.staff.index', compact('staffs', 'sub_titles', 'locations', 'filter','services','categories','staffZones'))
+        return view('site.staff.index', compact('staffs', 'sub_titles', 'locations', 'filter', 'services', 'categories', 'staffZones'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -141,28 +142,49 @@ class StaffProfileController extends Controller
             'tiktok' => 'https://www.tiktok.com/@',
         ];
 
-        foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
-            if (isset($user->staff)) {
+        if (isset($user->staff)) {
+            foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
                 if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
                     $user->staff->$platform = $user->staff->$platform ? $urlPrefix . $user->staff->$platform : null;
                 }
             }
         }
+
         $category_ids = $user->categories ? $user->categories()->pluck('category_id')->toArray() : [];
         $service_ids = $user->services ? $user->services()->pluck('service_id')->toArray() : [];
-        $service_categories = !empty($category_ids) ? ServiceCategory::whereIn('id', $category_ids)->get() : [];
-        $services = !empty($service_ids) ? Service::whereIn('id', $service_ids)->get() : [];
-        $reviews = Review::where('staff_id', $id)->get();
-        $averageRating = Review::where('staff_id', $id)->avg('rating');
-        $userAgent = $request->header('User-Agent');
 
-        if (Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone'])) {
-            $app_flag = true;
-        } else {
-            $app_flag = false;
-        }
-        return view('site.staff.show', compact('user', 'service_categories', 'services', 'socialLinks', 'reviews', 'averageRating', 'app_flag'));
+        // ✅ Cache service categories per user
+        $service_categories = Cache::remember("staff_{$id}_service_categories", 60, function () use ($category_ids) {
+            return !empty($category_ids) ? ServiceCategory::whereIn('id', $category_ids)->get() : collect();
+        });
+
+        // ✅ Cache services per user
+        $services = Cache::remember("staff_{$id}_services", 60, function () use ($service_ids) {
+            return !empty($service_ids) ? Service::whereIn('id', $service_ids)->get() : collect();
+        });
+
+        // ✅ Cache reviews per user
+        $reviews = Cache::remember("staff_{$id}_reviews", 60, function () use ($id) {
+            return Review::where('staff_id', $id)->get();
+        });
+
+        // ⚠️ You may still want fresh averageRating
+        $averageRating = Review::where('staff_id', $id)->avg('rating');
+
+        $userAgent = $request->header('User-Agent');
+        $app_flag = Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone']);
+
+        return view('site.staff.show', compact(
+            'user',
+            'service_categories',
+            'services',
+            'socialLinks',
+            'reviews',
+            'averageRating',
+            'app_flag'
+        ));
     }
+
 
 
     /**

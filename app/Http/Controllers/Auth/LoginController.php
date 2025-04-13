@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Session;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 
 class LoginController extends Controller
@@ -43,6 +44,7 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        Cache::flush(); // Clears all cache
         Auth::logout();
         Session::flush();
         Session::invalidate();

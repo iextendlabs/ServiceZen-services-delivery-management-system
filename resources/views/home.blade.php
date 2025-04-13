@@ -23,6 +23,7 @@
             <div class="col-md-6">
                 @if (auth()->user()->hasRole('Admin'))
                     <a class="btn btn-success float-end" href="{{ route('appData') }}"> Refresh App</a>
+                    <a class="btn btn-danger float-end mr-2" href="{{ route('cache.clear') }}"> Cache Clear</a>
                 @endif
                 @if (auth()->user()->hasRole('Affiliate'))
                     <a class="btn btn-success float-end" href="{{ route('affiliate_dashboard.index') }}">Affiliate DashBorad</a>

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class SiteController extends Controller
 {
@@ -52,9 +53,11 @@ class SiteController extends Controller
 
         $reviews = Review::latest()->take(6)->get();
 
-        $staffs = User::whereHas('staff', function ($query) {
-            $query->where('status', 1);
-        })->role('Staff')->latest()->get();
+        $staffs = Cache::remember('home_staffs', 60, function () {
+            return User::whereHas('staff', function ($query) {
+                $query->where('status', 1);
+            })->role('Staff')->latest()->get();
+        });
 
         $slider_images = Setting::where('key', 'Slider Image')->first();
 
@@ -66,29 +69,28 @@ class SiteController extends Controller
 
         $services = [];
         $search = $request->search_service;
-        if ($request->search_service) {
-            $query = Service::query();
-
-            if (count($query->where('name', $request->search_service)->get())) {
-                $query->orWhere('name', $request->search_service);
-            } else {
-                $searchTerm = $request->search_service;
-                $searchWords = explode(" ", $searchTerm);
-
-                foreach ($searchWords as $word) {
-                    $query->orWhere('name', 'like', '%' . $word . '%');
-                }
-            }
-
-            $services = $query->get();
+        if ($search) {
+            $services = Service::query()
+                ->where('name', $search)
+                ->orWhere(function ($query) use ($search) {
+                    $searchWords = explode(" ", $search);
+                    foreach ($searchWords as $word) {
+                        $query->orWhere('name', 'like', '%' . $word . '%');
+                    }
+                })
+                ->get();
+                
         } else {
-            $all_categories = ServiceCategory::with('childCategories')
-                ->whereNull('parent_id')
-                ->where('status', 1)
-                ->get()
-                ->filter(function ($category) {
-                    return $category->childCategories->isNotEmpty() || is_null($category->parent_id);
-                });
+            // ✅ Cache categories only when not searching
+            $all_categories = Cache::remember('home_all_categories', 60, function () {
+                return ServiceCategory::with('childCategories')
+                    ->whereNull('parent_id')
+                    ->where('status', 1)
+                    ->get()
+                    ->filter(function ($category) {
+                        return $category->childCategories->isNotEmpty() || is_null($category->parent_id);
+                    });
+            });
         }
 
         return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag','search'));
