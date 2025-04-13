@@ -72,6 +72,7 @@ use App\Http\Controllers\Site\{
     SiteInformationController,
     SiteQuoteController,
 };
+use Illuminate\Support\Facades\Cache;
 
 /*
 |--------------------------------------------------------------------------
@@ -217,6 +218,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-services-by-category', [AffiliateController::class, 'getServicesByCategory'])->name('getServicesByCategory');
 
     Route::resource('crms', CRMController::class);
+
+    Route::get('/clear-cache', function () {
+        Cache::flush(); // Clears all cache
+        return redirect()->back()->with('success', 'Cache cleared!');
+    })->name('cache.clear');
 
 });
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');

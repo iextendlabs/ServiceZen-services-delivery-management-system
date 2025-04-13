@@ -182,7 +182,7 @@ $reviewsCarousel_chunk = 3;
         @if(count($services) > 0 )
         <div class="row" id="services">
             <div class="col-12">
-                <div class="owl-carousel-services">
+                <div class="owl-carousel owl-carousel-services">
                     @foreach($services as $service)
                     <div class="item">
                         @include('site.services.card')
