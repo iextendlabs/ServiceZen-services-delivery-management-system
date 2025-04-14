@@ -4,7 +4,7 @@
             <p class="card-text service-box-title text-center"><b>{{ $category->title }}</b></p>
             <div class="col-md-12 text-center">
                 <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-                    <img class="card-img-top img-fluid" src="{{ url('img/service-category-images/' . $category->image) }}"
+                    <img class="card-img-top img-fluid" src="{{ url('img/service-category-images/' . $category->image) }}?w=298&h=250"
                         alt="{{ $category->title }}">
                 </div>
             </div>

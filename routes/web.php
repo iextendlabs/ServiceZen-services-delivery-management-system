@@ -343,19 +343,27 @@ Route::post('/kommo-log', function (Request $request) {
 });
 
 Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
-    // Set the correct path based on folder
+    $width = request()->query('w');  // width
+    $height = request()->query('h'); // height
+
     $path = public_path($folder . '/' . $filename);
 
     if (!file_exists($path)) {
         abort(404);
     }
 
-    // Create the image instance
     $image = Image::make($path);
 
-    // Compress the image to reduce file size (quality from 60-80 is usually a good balance)
-    $image->encode(null, 75); // 75 is the quality, you can adjust as needed
+    // Resize if width or height is provided
+    if ($width || $height) {
+        $image->resize($width, $height, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize(); // Prevent upscaling smaller images
+        });
+    }
 
-    // Return the image with cache headers
+    // Compress the image to reduce size (adjust quality as needed)
+    $image->encode(null, 75);
+
     return $image->response()->header('Cache-Control', 'public, max-age=31536000');
 })->where('filename', '.*');

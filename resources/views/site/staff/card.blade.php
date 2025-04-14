@@ -1,7 +1,7 @@
 <div class="card mb-3">
     <div class="col-md-12 text-center">
         <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-            <img src="{{ url('img/staff-images/' . $staff->staff->image) }}" class="card-img-top img-fluid rounded-circle"
+            <img src="{{ url('img/staff-images/' . $staff->staff->image) }}?w=250&h=250" class="card-img-top img-fluid rounded-circle"
                 alt="{{ $staff->name }}">
 
         </div>

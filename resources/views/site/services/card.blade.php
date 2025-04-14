@@ -2,7 +2,7 @@
     <div class="card mb-4 box-shadow">
         <a href="/serviceDetail/{{ $service->id }}">
             <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-            <img class="card-img-top" src="{{ url('img/service-images/' . $service->image) }}"
+            <img class="card-img-top" src="{{ url('img/service-images/' . $service->image) }}?w=298&h=250"
                 alt="{{ $service->name }}">
         </a>
         <div class="card-body">
