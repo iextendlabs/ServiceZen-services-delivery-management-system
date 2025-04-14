@@ -87,7 +87,7 @@ class SiteController extends Controller
             });
         }
 
-        return view('site.home', compact(
+        $view = view('site.home', compact(
             'services',
             'address',
             'FAQs',
@@ -99,6 +99,11 @@ class SiteController extends Controller
             'app_flag',
             'search'
         ));
+    
+        return response($view, 200)
+            ->header('Cache-Control', 'public, max-age=3600')
+            ->header('Pragma', 'public')
+            ->header('Expires', gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
     }
 
     public function categoryShow($id)
