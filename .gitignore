@@ -19,6 +19,7 @@ public/service-category-icons/
 public/slider-images/
 public/quote-images/
 public/AppData.json
+public/order-attachment/
 
 # Laravel 5 & Lumen specific
 public/storage

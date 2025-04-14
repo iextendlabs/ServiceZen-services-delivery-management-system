@@ -1,8 +1,9 @@
 <div class="card mb-3">
     <div class="col-md-12 text-center">
         <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-            <img src="./staff-images/{{ $staff->staff->image }}"
-                class="card-img-top img-fluid rounded-circle" alt="{{ $staff->name }}">
+            <img src="{{ url('img/staff-images/' . $staff->staff->image) }}?w=250&h=250" class="card-img-top img-fluid rounded-circle"
+                alt="{{ $staff->name }}">
+
         </div>
     </div>
     <div class="card-body text-center" style="height: 335px; align-content: center;">
@@ -19,8 +20,7 @@
             <p class="card-title">
                 {{ $staff->staff->nationality }}</p>
         @endif
-        <a href="{{ route('staffProfile.show', $staff->id) }}"
-            class="btn btn-block btn-primary">View</a>
+        <a href="{{ route('staffProfile.show', $staff->id) }}" class="btn btn-block btn-primary">View</a>
         @php
             $rating = $staff->averageRating();
             $fullStars = floor($rating);
