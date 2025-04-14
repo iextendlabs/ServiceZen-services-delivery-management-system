@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Intervention\Image\Facades\Image;
 
 use App\Http\Controllers\{
     HomeController,
@@ -72,7 +74,7 @@ use App\Http\Controllers\Site\{
     SiteInformationController,
     SiteQuoteController,
 };
-use Illuminate\Support\Facades\Cache;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -339,3 +341,21 @@ Route::post('/kommo-log', function (Request $request) {
     
     return response()->json(['status' => 'logged']);
 });
+
+Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
+    // Set the correct path based on folder
+    $path = public_path($folder . '/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    // Create the image instance
+    $image = Image::make($path);
+
+    // Compress the image to reduce file size (quality from 60-80 is usually a good balance)
+    $image->encode(null, 75); // 75 is the quality, you can adjust as needed
+
+    // Return the image with cache headers
+    return $image->response()->header('Cache-Control', 'public, max-age=31536000');
+})->where('filename', '.*');

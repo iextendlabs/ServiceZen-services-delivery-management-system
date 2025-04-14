@@ -37,15 +37,9 @@ class SiteController extends Controller
     public function index(Request $request)
     {
         $userAgent = $request->header('User-Agent');
+        $app_flag = Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone']);
 
-        if (Str::contains(strtolower($userAgent), ['mobile', 'android', 'iphone'])) {
-            $app_flag = true;
-        } else {
-            $app_flag = false;
-        }
-
-        $address = NULL;
-
+        $address = null;
         try {
             $address = json_decode($request->cookie('address'), true);
         } catch (\Throwable $th) {
@@ -54,9 +48,10 @@ class SiteController extends Controller
         $reviews = Review::latest()->take(6)->get();
 
         $staffs = Cache::remember('home_staffs', 60, function () {
-            return User::whereHas('staff', function ($query) {
-                $query->where('status', 1);
-            })->role('Staff')->latest()->get();
+            return User::whereHas('staff', fn($q) => $q->where('status', 1))
+                ->role('Staff')
+                ->latest()
+                ->get();
         });
 
         $slider_images = Setting::where('key', 'Slider Image')->first();
@@ -78,10 +73,9 @@ class SiteController extends Controller
                         $query->orWhere('name', 'like', '%' . $word . '%');
                     }
                 })
+                ->where('status', 1)
                 ->get();
-                
         } else {
-            // ✅ Cache categories only when not searching
             $all_categories = Cache::remember('home_all_categories', 60, function () {
                 return ServiceCategory::with('childCategories')
                     ->whereNull('parent_id')
@@ -93,7 +87,18 @@ class SiteController extends Controller
             });
         }
 
-        return view('site.home', compact('services', 'address', 'FAQs', 'reviews', 'staffs', 'slider_images', 'review_char_limit', 'all_categories', 'app_flag','search'));
+        return view('site.home', compact(
+            'services',
+            'address',
+            'FAQs',
+            'reviews',
+            'staffs',
+            'slider_images',
+            'review_char_limit',
+            'all_categories',
+            'app_flag',
+            'search'
+        ));
     }
 
     public function categoryShow($id)
@@ -112,7 +117,7 @@ class SiteController extends Controller
             $all_categories = $category->childCategories->where('status', 1);
         }
 
-        return view('site.categories.show', compact( 'category', 'reviews', 'review_char_limit', 'all_categories'));
+        return view('site.categories.show', compact('category', 'reviews', 'review_char_limit', 'all_categories'));
     }
 
     public function show($id, Request $request)
@@ -136,14 +141,14 @@ class SiteController extends Controller
                 $lowestPriceOption = $option;
             }
             if (is_null($price) || $lowestPriceOption->option_price < $price) {
-                $price = $lowestPriceOption->option_price; 
+                $price = $lowestPriceOption->option_price;
             }
         }
 
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
         if ($service->status) {
-            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price','review_char_limit'));
+            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');
