@@ -205,12 +205,13 @@ class HomeController extends Controller
 
     public function appJsonData()
     {
+        $services = [];
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
         $slider_images = Setting::where('key', 'Slider Image For App')->value('value');
         $featured_services = Setting::where('key', 'Featured Services')->value('value');
-
-        $featured_services = explode(",", $featured_services);
+        
+        $featured_services = $featured_services !== null ? explode(",", $featured_services) : [];
 
         $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
         $images = explode(",", $slider_images);
@@ -244,7 +245,11 @@ class HomeController extends Controller
 
         $categoriesArray = array_values($sortedCategories);
 
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        if(empty($featured_services)){
+            $services = Service::where('status', 1)->orderBy('name', 'ASC')->limit(10)->get();
+        }else{
+            $services = Service::where('status', 1)->whereIn('id',$featured_services)->orderBy('name', 'ASC')->get();
+        }
 
         $servicesArray = $services->map(function ($service) {
             $categoryIds = collect($service->categories)->pluck('id')->toArray();
@@ -263,41 +268,23 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $staffs = User::role('Staff')
-            ->whereHas('staff', function ($query) {
-                $query->where('status', 1);
-            })
-            ->orderBy('name', 'ASC')
-            ->with('staff')
-            ->get();
-
-        $staffs->map(function ($staff) {
-            $staff->rating = $staff->averageRating();
-            return $staff;
-        });
-
-
         $gender_permission = Setting::where('key','Gender Permission')->value('value');
-
-
 
         $jsonData = [
             'images' => $images,
             'categories' => $categoriesArray,
             'services' => $servicesArray,
-            'featured_services' => $featured_services,
             'staffZones' => $staffZones,
-            'staffs' => $staffs,
             'whatsapp_number' => $whatsapp_number,
             'gender_permission' => $gender_permission
         ];
 
         try {
-            $filename = "AppData.json";
+            $filename = "AppHomeData.json";
             $filePath = public_path($filename);
 
             if (File::exists($filePath)) {
-                $backupFilename = "AppData_backup.json";
+                $backupFilename = "AppHomeData_backup.json";
                 $backupFilePath = public_path($backupFilename);
 
                 File::move($filePath, $backupFilePath);
@@ -314,7 +301,6 @@ class HomeController extends Controller
             File::move($backupFilePath, $filePath);
             throw $e;
         }
-
 
         return redirect()->back()
             ->with('success', 'App Data updated successfully');

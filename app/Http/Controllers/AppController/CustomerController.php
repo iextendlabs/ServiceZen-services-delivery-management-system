@@ -193,98 +193,96 @@ class CustomerController extends Controller
         ], 200);
     }
 
-    public function index()
+    public function getCacheServiceDetail(Request $request)
     {
-        $cachedData = Cache::get('api_data');
+        $serviceId = $request->service_id;
 
-        if ($cachedData) {
-            return response()->json($cachedData, 200);
-        }
+        $data = Cache::remember("service_details_{$serviceId}", now()->addHours(1), function () use ($serviceId) {
+            $service = Service::where('status', 1)
+                ->where('id', $serviceId)
+                ->orderBy('name', 'ASC')
+                ->first();
 
-        $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
+            if (!$service) {
+                return null;
+            }
 
-        $slider_images = Setting::where('key', 'Slider Image For App')->value('value');
-        $featured_services = Setting::where('key', 'Featured Services')->value('value');
+            $FAQs = FAQ::where('service_id', $serviceId)->get();
 
-        $featured_services = explode(",", $featured_services);
+            $lowestPriceOption = null;
+            $price = null;
+            foreach ($service->serviceOption as $option) {
+                if (is_null($lowestPriceOption) || $option->option_price < $lowestPriceOption->option_price) {
+                    $lowestPriceOption = $option;
+                }
+                if (is_null($price) || $lowestPriceOption->option_price < $price) {
+                    $price = $lowestPriceOption->option_price;
+                }
+            }
 
-        $whatsapp_number = Setting::where('key', 'WhatsApp Number For Customer App')->value('value');
-        $images = explode(",", $slider_images);
+            $addONs = $service->addONs
+                ? Service::where('status', 1)
+                ->whereIn('id', $service->addONs->pluck('add_on_id')->toArray())
+                ->orderBy('name', 'ASC')
+                ->get() : collect();
 
-        $app_categories = Setting::where('key', 'App Categories')->value('value');
-        $app_categories = explode(",", $app_categories);
-        $categories = ServiceCategory::whereIn('id', $app_categories)->where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-        $categoriesArray = $categories->map(function ($category) {
+            $addONsServicesArray = $addONs->map(function ($service) {
+                $categoryIds = collect($service->categories)->pluck('id')->toArray();
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'image' => $service->image,
+                    'price' => $service->price,
+                    'discount' => $service->discount,
+                    'duration' => $service->duration,
+                    'quote' => $service->quote,
+                    'category_id' => $categoryIds,
+                    'short_description' => $service->short_description,
+                    'rating' => $service->averageRating(),
+                    'options' => $service->serviceOption
+                ];
+            })->toArray();
+
+            $package = $service->package
+                ? Service::where('status', 1)
+                ->whereIn('id', $service->package->pluck('package_id')->toArray())
+                ->orderBy('name', 'ASC')
+                ->get() : collect();
+
+            $packageServicesArray = $package->map(function ($service) {
+                $categoryIds = collect($service->categories)->pluck('id')->toArray();
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'image' => $service->image,
+                    'price' => $service->price,
+                    'discount' => $service->discount,
+                    'duration' => $service->duration,
+                    'quote' => $service->quote,
+                    'category_id' => $categoryIds,
+                    'short_description' => $service->short_description,
+                    'rating' => $service->averageRating(),
+                    'options' => $service->serviceOption
+                ];
+            })->toArray();
+
             return [
-                'id' => $category->id,
-                'title' => $category->title,
-                'image' => $category->image,
-                'icon' => $category->icon
+                'services' => $service,
+                'serviceOptions' => $service->serviceOption ?? [],
+                'addONs' => $addONsServicesArray,
+                'package' => $packageServicesArray,
+                'faqs' => $FAQs,
+                'lowestPriceOption' => $lowestPriceOption,
+                'price' => $price,
+                'additional_images' => $service->images->pluck('image') ?? [],
             ];
-        })->toArray();
-
-        $servicesArray = $services->map(function ($service) {
-            $categoryIds = collect($service->categories)->pluck('id')->toArray();
-            return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'image' => $service->image,
-                'price' => $service->price,
-                'discount' => $service->discount,
-                'duration' => $service->duration,
-                'category_id' => $categoryIds,
-                'short_description' => $service->short_description,
-                'rating' => $service->averageRating()
-            ];
-        })->toArray();
-
-        $staffs = User::role('Staff')
-            ->whereHas('staff', function ($query) {
-                $query->where('status', 1);
-            })
-            ->orderBy('name', 'ASC')
-            ->with('staff')
-            ->get();
-
-        $staffs->map(function ($staff) {
-            $staff->rating = $staff->averageRating();
-            return $staff;
         });
 
-        Cache::put('api_data', [
-            'images' => $images,
-            'categories' => $categoriesArray,
-            'services' => $servicesArray,
-            'featured_services' => $featured_services,
-            'staffZones' => $staffZones,
-            'staffs' => $staffs,
-            'whatsapp_number' => $whatsapp_number
-        ], 60 * 10);
-
-        return response()->json([
-            'images' => $images,
-            'categories' => $categoriesArray,
-            'services' => $servicesArray,
-            'featured_services' => $featured_services,
-            'staffZones' => $staffZones,
-            'staffs' => $staffs,
-            'whatsapp_number' => $whatsapp_number
-        ], 200);
-    }
-
-    public function filterServices(Request $request)
-    {
-        if ($request->category_id) {
-            $services = Service::where('status', 1)->where('category_id', $request->category_id)->orderBy('name', 'ASC')->get();
+        if (!$data) {
+            return response()->json(['message' => 'Service not found'], 404);
         }
 
-        if ($request->filter) {
-            $services = Service::where('status', 1)->where('name', 'like', '%' . $request->filter . '%')->orderBy('name', 'ASC')->get();
-        }
-        return response()->json([
-            'services' => $services,
-        ], 200);
+        return response()->json($data, 200);
     }
 
     public function getServiceDetails(Request $request)
@@ -442,224 +440,6 @@ class CustomerController extends Controller
         }
     }
 
-    public function addOrder(Request $request, CheckOutController $checkOutController)
-    {
-        $password = NULL;
-        $input = $request->all();
-        $input['order_source'] = "Android";
-        Log::channel('order_request_log')->info('Request Body:', ['body' => $request->all()]);
-
-        if (strlen(trim($request->number)) < 6) {
-            return response()->json([
-                'msg' => "Please check the number in personal information."
-            ], 201);
-        }
-
-        if (strlen(trim($request->whatsapp)) < 6) {
-            return response()->json([
-                'msg' => "Please check the whatsapp in personal information."
-            ], 201);
-        }
-        try {
-
-            $minimum_booking_price = (float) Setting::where('key', 'Minimum Booking Price')->value('value');
-            $staff = User::find($input['service_staff_id']);
-            $staffZone = StaffZone::whereRaw('LOWER(name) LIKE ?', ["%" . strtolower($input['area']) . "%"])->first();
-
-            $services = Service::whereIn('id', $request->service_ids)->get();
-
-            $sub_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
-            });
-
-            if ($request->coupon_id && $input['service_ids']) {
-                $coupon = Coupon::find($request->coupon_id);
-                $input['coupon_id'] = $coupon->id;
-                $discount = $coupon->getDiscountForProducts($services, $sub_total);
-            } else {
-                $discount = 0;
-            }
-
-            $staff_charges = $staff->staff->charges ?? 0;
-            $transport_charges = $staffZone->transport_charges ?? 0;
-            $total_amount = $sub_total + $staff_charges + $transport_charges - $discount;
-
-            $input['sub_total'] = (int)$sub_total;
-            $input['discount'] = (int)$discount;
-            $input['staff_charges'] = (int)$staff_charges;
-            $input['transport_charges'] = (int)$transport_charges;
-            $input['total_amount'] = (int)$total_amount;
-
-            $request->merge(['orderTotal' => (float) $total_amount]);
-
-            $validator = Validator::make($request->all(), [
-                'service_ids.*' => 'exists:services,id',
-                'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
-            ], [
-                'service_ids.*.exists' => 'Invalid service selection(s).',
-                'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
-            ]);
-
-            $validator = Validator::make($request->all(), [
-                'orderTotal' => 'required|numeric|min:' . $minimum_booking_price,
-                'service_ids.*' => 'exists:services,id',
-            ], [
-                'orderTotal.min' => 'The total amount must be greater than or equal to AED' . $minimum_booking_price,
-                'service_ids.*.exists' => 'Invalid service selection(s).',
-            ]);
-
-            if ($validator->fails()) {
-                $errors = $validator->errors();
-                return response()->json([
-                    'msg' => $errors->first()
-                ], 201);
-            }
-
-            $has_order = Order::where('service_staff_id', $input['service_staff_id'])->where('date', $input['date'])->where('time_slot_id', $input['time_slot_id'])->where('status', '!=', 'Canceled')->where('status', '!=', 'Rejected')->where('status', '!=', 'Draft')->get();
-
-            if (count($has_order) == 0) {
-
-                if (isset($staff)) {
-                    $input['status'] = "Pending";
-                    $input['driver_status'] = "Pending";
-                    $input['staff_name'] = $staff->name;
-                    $input['time_slot_id'] = $input['time_slot_id'];
-
-                    $user = User::where('email', $input['email'])->first();
-
-                    if (isset($user)) {
-
-                        if ($user->customerProfile) {
-                            $user->customerProfile->update($input);
-                        } else {
-                            $user->customerProfile()->create($input);
-                        }
-                        $input['customer_id'] = $user->id;
-                        $customer_type = "Old";
-                    } else {
-                        $customer_type = "New";
-
-                        $password = $input['number'];
-
-                        $input['password'] = Hash::make($password);
-
-                        $user = User::create($input);
-
-                        if ($user->customerProfile) {
-                            $user->customerProfile->update($input);
-                        } else {
-                            $user->customerProfile()->create($input);
-                        }
-
-                        $input['customer_id'] = $user->id;
-
-                        $user->assignRole('Customer');
-                    }
-
-                    if (isset($staffZone)) {
-
-                        $time_slot = TimeSlot::find($input['time_slot_id']);
-                        if (isset($time_slot)) {
-                            $input['time_slot_value'] = date('h:i A', strtotime($time_slot->time_start)) . ' -- ' . date('h:i A', strtotime($time_slot->time_end));
-
-                            $input['time_start'] = $time_slot->time_start;
-                            $input['time_end'] = $time_slot->time_end;
-                            $input['payment_method'] = "Cash-On-Delivery";
-                            $input['customer_name'] = $input['name'];
-                            $input['customer_email'] = $input['email'];
-                            $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
-
-                            $input['latitude'] = $input['latitude'] ?? '';
-                            $input['longitude'] = $input['longitude'] ?? '';
-
-                            $order = Order::create($input);
-
-                            $input['order_id'] = $order->id;
-                            $input['discount_amount'] = $input['discount'];
-
-                            OrderTotal::create($input);
-
-                            if ($request->coupon_id) {
-                                CouponHistory::create($input);
-                            }
-
-                            foreach ($input['service_ids'] as $id) {
-                                $services = Service::find($id);
-                                $input['service_id'] = $id;
-                                $input['service_name'] = $services->name;
-                                $input['duration'] = $services->duration;
-                                $input['status'] = 'Open';
-                                if ($services->discount) {
-                                    $input['price'] = $services->discount;
-                                } else {
-                                    $input['price'] = $services->price;
-                                }
-                                OrderService::create($input);
-                            }
-
-                            if (Carbon::now()->toDateString() == $input['date']) {
-                                $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                                if ($order->driver) {
-                                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
-                                }
-                                try {
-                                    $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
-                                } catch (\Throwable $th) {
-                                    //TODO: log error or queue job later
-                                }
-                            }
-                            try {
-                                $checkOutController->sendAdminEmail($input['order_id'], $input['email']);
-                                $checkOutController->sendCustomerEmail($input['customer_id'], $customer_type, $input['order_id']);
-                            } catch (\Throwable $th) {
-                                //TODO: log error or queue job later
-                            }
-
-                            return response()->json([
-                                'msg' => "Order created successfully.",
-                                'date' => $order->date,
-                                'staff' => $order->staff_name,
-                                'slot' => $order->time_slot_value,
-                                'total_amount' => $order->total_amount,
-                                'order_id' => $order->id,
-                            ], 200);
-                        } else {
-                            return response()->json([
-                                'msg' => "Please select timeslot again."
-                            ], 201);
-                        }
-                    } else {
-                        return response()->json([
-                            'msg' => "Please select zone again."
-                        ], 201);
-                    }
-                } else {
-                    return response()->json([
-                        'msg' => "Please select staff again."
-                    ], 201);
-                }
-            } else {
-                return response()->json([
-                    'msg' => "Sorry! Unfortunately This slot was booked by someone else just now."
-                ], 201);
-            }
-        } catch (\Exception $e) {
-            $request_body = $request->all();
-            $recipient_email = $request->email;
-            $to = env('MAIL_FROM_ADDRESS');
-
-            try {
-                Mail::to($to)->send(new OrderIssueNotification($request_body, $recipient_email));
-                Mail::to("support@iextendlabs.com")->send(new OrderIssueNotification($request_body, $recipient_email));
-            } catch (\Throwable $th) {
-                //TODO: log error or queue job later
-            }
-            return response()->json([
-                'mailSend' => true
-            ], 202);
-        }
-    }
-
     public function getOrders(Request $request)
     {
 
@@ -750,16 +530,6 @@ class CustomerController extends Controller
 
         return response()->json([
             'msg' => "Order Updated Successfully!"
-        ], 200);
-    }
-
-    public function getZones()
-    {
-
-        $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
-
-        return response()->json([
-            'staffZones' => $staffZones
         ], 200);
     }
 
@@ -1057,138 +827,153 @@ class CustomerController extends Controller
 
     public function staff($id)
     {
-        $user = User::find($id);
-        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
-        $socialMediaPlatforms = [
-            'instagram' => 'https://www.instagram.com/',
-            'facebook' => 'https://www.facebook.com/profile.php?id=',
-            'snapchat' => 'https://www.snapchat.com/add/',
-            'youtube' => 'https://www.youtube.com/',
-            'tiktok' => 'https://www.tiktok.com/@',
-        ];
+        $cacheKey = 'staff_profile_' . $id;
 
-        foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
-            if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
-                $user->staff->$platform = $urlPrefix . $user->staff->$platform;
-            }
-        }
-        $category_ids = $user->categories()->pluck('category_id')->toArray();
-        $service_ids = $user->services()->pluck('service_id')->toArray();
-        $service_categories = ServiceCategory::whereIn('id', $category_ids)->get();
-        $services = Service::where('status', 1)->whereIn('id', $service_ids)->orderBy('name', 'ASC')->get();
-        $servicesArray = $services->map(function ($service) {
-            $categoryIds = collect($service->categories)->pluck('id')->toArray();
-            return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'image' => $service->image,
-                'price' => $service->price,
-                'discount' => $service->discount,
-                'duration' => $service->duration,
-                'category_id' => $categoryIds,
-                'short_description' => $service->short_description,
-                'rating' => $service->averageRating(),
-                'options' => $service->serviceOption
+        $data = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($id) {
+            $user = User::find($id);
+            $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+            $socialMediaPlatforms = [
+                'instagram' => 'https://www.instagram.com/',
+                'facebook' => 'https://www.facebook.com/profile.php?id=',
+                'snapchat' => 'https://www.snapchat.com/add/',
+                'youtube' => 'https://www.youtube.com/',
+                'tiktok' => 'https://www.tiktok.com/@',
             ];
-        })->toArray();
 
-        $reviews = Review::where('staff_id', $id)->get();
-        $averageRating = Review::where('staff_id', $id)->avg('rating');
-        $orders = Order::where('service_staff_id', $id)->where('status', 'Complete')->count();
-        $images = $user->staffImages;
-        $videos = $user->staffYoutubeVideo;
-        return response()->json([
-            'user' => $user,
-            'service_categories' => $service_categories,
-            'services' => $servicesArray,
-            'socialLinks' => $socialLinks,
-            'reviews' => $reviews,
-            'averageRating' => $averageRating,
-            'orders' => $orders,
-            'images' => $images,
-            'videos' => $videos
-        ], 200);
+            foreach ($socialMediaPlatforms as $platform => $urlPrefix) {
+                if (!filter_var($user->staff->$platform, FILTER_VALIDATE_URL)) {
+                    $user->staff->$platform = $user->staff->$platform ? $urlPrefix . $user->staff->$platform : null;
+                }
+            }
+
+            $category_ids = $user->categories()->pluck('category_id')->toArray();
+            $service_ids = $user->services()->pluck('service_id')->toArray();
+            $service_categories = ServiceCategory::whereIn('id', $category_ids)->get();
+            $services = Service::where('status', 1)->whereIn('id', $service_ids)->orderBy('name', 'ASC')->get();
+
+            $servicesArray = $services->map(function ($service) {
+                $categoryIds = collect($service->categories)->pluck('id')->toArray();
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'image' => $service->image,
+                    'price' => $service->price,
+                    'discount' => $service->discount,
+                    'duration' => $service->duration,
+                    'category_id' => $categoryIds,
+                    'short_description' => $service->short_description,
+                    'rating' => $service->averageRating(),
+                    'options' => $service->serviceOption
+                ];
+            })->toArray();
+
+            $reviews = Review::where('staff_id', $id)->get();
+            $averageRating = Review::where('staff_id', $id)->avg('rating');
+            $orders = Order::where('service_staff_id', $id)->where('status', 'Complete')->count();
+            $images = $user->staffImages;
+            $videos = $user->staffYoutubeVideo;
+
+            return [
+                'user' => $user,
+                'service_categories' => $service_categories,
+                'services' => $servicesArray,
+                'socialLinks' => $socialLinks,
+                'reviews' => $reviews,
+                'averageRating' => $averageRating,
+                'orders' => $orders,
+                'images' => $images,
+                'videos' => $videos
+            ];
+        });
+
+        return response()->json($data, 200);
     }
 
     public function getStaff(Request $request)
     {
+        $cacheKey = 'staff_data_' . md5(json_encode($request->all()));
 
-        $query = User::whereHas('staff', function ($query) use ($request) {
-            $query->where('status', 1);
+        $data = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($request) {
+            $query = User::whereHas('staff', function ($query) use ($request) {
+                $query->where('status', 1);
 
-            if ($request->sub_title) {
-                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
+                if ($request->sub_title) {
+                    $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
+                }
+
+                if ($request->location) {
+                    $query->where('location', 'like', '%' . $request->location . '%');
+                }
+
+                if ($request->min_order_value) {
+                    $query->where('min_order_value', $request->min_order_value);
+                }
+            });
+
+            if ($request->service_id) {
+                $query->whereHas('services', function ($q) use ($request) {
+                    $q->where('service_id', $request->service_id);
+                });
             }
 
-            if ($request->location) {
-                $query->where('location', 'like', '%' . $request->location . '%');
+            if ($request->category_id) {
+                $query->whereHas('categories', function ($q) use ($request) {
+                    $q->where('category_id', $request->category_id);
+                });
             }
 
-            if ($request->min_order_value) {
-                $query->where('min_order_value', $request->min_order_value);
+            if ($request->zone_id) {
+                $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
+                    $q->where('staff_zone_id', $request->zone_id);
+                });
             }
+
+            $staff = $query->role('Staff')->with('staff')->orderBy('name', 'ASC')->get();
+
+            $staff->map(function ($staff) {
+                $staff->rating = $staff->averageRating();
+                return $staff;
+            });
+
+            $sub_titles = Staff::where('status', 1)
+                ->whereNotNull('sub_title')
+                ->pluck('sub_title')
+                ->toArray();
+
+            $all_sub_titles = [];
+            foreach ($sub_titles as $sub_title) {
+                $sub_title_parts = explode('/', $sub_title);
+                $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
+            }
+            $sub_titles = array_unique(array_filter($all_sub_titles));
+
+            $locations = Staff::where('status', 1)
+                ->whereNotNull('location')
+                ->pluck('location')
+                ->toArray();
+
+            $all_locations = [];
+            foreach ($locations as $location) {
+                $location_parts = explode('/', $location);
+                $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
+            }
+            $locations = array_unique(array_filter($all_locations));
+
+            $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
+            $staffZones = StaffZone::select('id', 'name')->get();
+
+            return [
+                'staff' => $staff,
+                'sub_titles' => $sub_titles,
+                'locations' => $locations,
+                'categories' => $categories,
+                'staffZones' => $staffZones,
+            ];
         });
 
-        if ($request->service_id) {
-            $query->whereHas('services', function ($q) use ($request) {
-                $q->where('service_id', $request->service_id);
-            });
-        }
-
-        if ($request->category_id) {
-            $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('category_id', $request->category_id);
-            });
-        }
-
-        if ($request->zone_id) {
-            $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
-                $q->where('staff_zone_id', $request->zone_id);
-            });
-        }
-
-        $staff = $query->role('Staff')->with('staff')->orderBy('name', 'ASC')->get();
-
-        $staff->map(function ($staff) {
-            $staff->rating = $staff->averageRating();
-            return $staff;
-        });
-
-        $sub_titles = Staff::where('status', 1)
-            ->whereNotNull('sub_title')
-            ->pluck('sub_title')
-            ->toArray();
-
-        $all_sub_titles = [];
-        foreach ($sub_titles as $sub_title) {
-            $sub_title_parts = explode('/', $sub_title);;
-            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
-        }
-        $sub_titles = array_unique(array_filter($all_sub_titles));
-
-        $locations = Staff::where('status', 1)
-            ->whereNotNull('location')
-            ->pluck('location')
-            ->toArray();
-
-        $all_locations = [];
-        foreach ($locations as $location) {
-            $location_parts = explode('/', $location);;
-            $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
-        }
-        $locations = array_unique(array_filter($all_locations));
-
-        $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
-        $staffZones = StaffZone::select('id', 'name')->get();
-
-        return response()->json([
-            'staff' => $staff,
-            'sub_titles' => $sub_titles,
-            'locations' => $locations,
-            'categories' => $categories,
-            'staffZones' => $staffZones,
-        ], 200);
+        return response()->json($data, 200);
     }
+
     public function deleteAccountMail(Request $request)
     {
 
@@ -1209,9 +994,13 @@ class CustomerController extends Controller
 
     public function getSubCategories(Request $request)
     {
-        $categories = ServiceCategory::find($request->id);
+        $cacheKey = 'sub_categories_' . $request->id;
 
-        $sub_categories = $categories->childCategories;
+        $sub_categories = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($request) {
+            $category = ServiceCategory::find($request->id);
+            return $category ? $category->childCategories : [];
+        });
+
         return response()->json([
             'sub_categories' => $sub_categories
         ], 200);
@@ -1302,113 +1091,6 @@ class CustomerController extends Controller
 
         return response()->json([
             'msg' => "Order Cancel Successfully."
-        ], 200);
-    }
-
-    public function signInWithFB(Request $request)
-    {
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            if ($request->has('fcmToken') && $request->fcmToken) {
-                $user->device_token = $request->fcmToken;
-                $user->save();
-            }
-            $token = $user->createToken('app-token')->plainTextToken;
-            $user_info = CustomerProfile::where('user_id', $user->id)->first();
-
-            $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
-
-            $notifications = Notification::where('user_id', $user->id)
-                ->orderBy('id', 'desc')
-                ->limit($notification_limit)
-                ->get();
-
-            $notifications->map(function ($notification) use ($user) {
-                $notification->type = "Old";
-                return $notification;
-            });
-
-            return response()->json([
-                'user' => $user,
-                'user_info' => $user_info,
-                'access_token' => $token,
-                'notifications' => $notifications
-            ], 200);
-        } else {
-            $input = $request->all();
-            $input['customer_source'] = "FaceBook Android";
-            $password = mt_rand(10000000, 99999999);
-            $input['password'] = Hash::make($password);
-            $input['email'] = strtolower(trim($input['email']));
-            if ($request->has('fcmToken') && $request->fcmToken) {
-                $input['device_token'] = $request->fcmToken;
-            }
-            $user = User::create($input);
-            $dataArray = [
-                'name' => $input['name'],
-                'email' => $input['email'],
-                'password' => $password
-            ];
-            $recipient_email = env('MAIL_FROM_ADDRESS');
-            $user->assignRole("Customer");
-            try {
-                Mail::to($input['email'])->send(new CustomerCreatedEmail($dataArray, $recipient_email));
-            } catch (\Throwable $th) {
-            }
-
-            $token = $user->createToken('app-token')->plainTextToken;
-
-            return response()->json([
-                'user' => $user,
-                'access_token' => $token,
-            ], 203);
-        }
-    }
-
-    public function orderTotal(Request $request)
-    {
-        $services_total = 0;
-        $staff_charges = 0;
-        $transport_charges = 0;
-        $coupon_discount = 0;
-        if ($request->service_ids) {
-            $services = Service::whereIn('id', $request->service_ids)->get();
-
-            $services_total = $services->sum(function ($service) {
-                return isset($service->discount) ? $service->discount : $service->price;
-            });
-        }
-
-        if ($request->staff_id) {
-            $user = User::find($request->staff_id);
-            $staff_charges = $user && $user->staff
-                ? $user->staff->charges
-                : 0;
-        }
-
-        if ($request->zone) {
-            $zone = StaffZone::where('name', $request->zone)->first();
-            $transport_charges = $zone
-                ? $zone->transport_charges
-                : 0;
-        }
-
-        if ($request->coupon_id && $services) {
-            $coupon = Coupon::find($request->coupon_id);
-
-            $coupon_discount = $coupon
-                ? $coupon->getDiscountForProducts($services, $services_total)
-                : 0;
-        }
-
-        $total = $services_total + $staff_charges + $transport_charges - $coupon_discount;
-
-        return response()->json([
-            'total' => $total,
-            'coupon_discount' => $coupon_discount,
-            'transport_charges' => $transport_charges,
-            'staff_charges' => $staff_charges,
-            'services_total' => $services_total,
         ], 200);
     }
 
