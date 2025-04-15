@@ -208,6 +208,10 @@ class CustomerController extends Controller
                 return null;
             }
 
+            if ($service) {
+                $service->options = $service->serviceOption;
+                unset($service->serviceOption);
+            }
             $FAQs = FAQ::where('service_id', $serviceId)->get();
 
             $lowestPriceOption = null;
