@@ -201,6 +201,7 @@ class CustomerController extends Controller
             $service = Service::where('status', 1)
                 ->where('id', $serviceId)
                 ->orderBy('name', 'ASC')
+                ->with('serviceOption')
                 ->first();
 
             if (!$service) {
@@ -268,7 +269,6 @@ class CustomerController extends Controller
 
             return [
                 'services' => $service,
-                'serviceOptions' => $service->serviceOption ?? [],
                 'addONs' => $addONsServicesArray,
                 'package' => $packageServicesArray,
                 'faqs' => $FAQs,
