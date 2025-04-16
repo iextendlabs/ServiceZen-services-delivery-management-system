@@ -650,6 +650,9 @@ class StaffAppController2 extends Controller
             $input['phone'] = $request->number_country_code . $request->number;
         }
         $input['affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;
+        if (file_exists(public_path('staff-images') . '/' . "default.png")) {
+            $input['image'] = "default.png";
+        }
         Staff::create($input);
 
         if ($request->number && $request->whatsapp) {

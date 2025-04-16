@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Intervention\Image\Facades\Image;
 
 use App\Http\Controllers\{
     HomeController,
@@ -72,6 +74,7 @@ use App\Http\Controllers\Site\{
     SiteInformationController,
     SiteQuoteController,
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -218,6 +221,11 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('crms', CRMController::class);
 
+    Route::get('/clear-cache', function () {
+        Cache::flush(); // Clears all cache
+        return redirect()->back()->with('success', 'Cache cleared!');
+    })->name('cache.clear');
+
 });
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
 
@@ -333,3 +341,29 @@ Route::post('/kommo-log', function (Request $request) {
     
     return response()->json(['status' => 'logged']);
 });
+
+Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
+    $width = request()->query('w');  // width
+    $height = request()->query('h'); // height
+
+    $path = public_path($folder . '/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    $image = Image::make($path);
+
+    // Resize if width or height is provided
+    if ($width || $height) {
+        $image->resize($width, $height, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize(); // Prevent upscaling smaller images
+        });
+    }
+
+    // Compress the image to reduce size (adjust quality as needed)
+    $image->encode(null, 75);
+
+    return $image->response()->header('Cache-Control', 'public, max-age=31536000');
+})->where('filename', '.*');

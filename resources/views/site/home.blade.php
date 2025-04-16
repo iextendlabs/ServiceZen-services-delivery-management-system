@@ -110,7 +110,7 @@
                           href="/serviceDetail/{{ $id }}"
                       @elseif($type === 'customLink' && !empty($id))
                           href="{{ $id }}" @endif>
-                                    <img src="/slider-images/{{ $filename }}" alt="Slide {{ $loop->iteration }}"
+                                    <img src="{{ url('img/slider-images/' . $filename) }}" src="{{ asset('slider-images/' . $filename) }}" alt="Slide {{ $loop->iteration }}"
                                         class="d-block w-100">
                                 </a>
                             </div>
