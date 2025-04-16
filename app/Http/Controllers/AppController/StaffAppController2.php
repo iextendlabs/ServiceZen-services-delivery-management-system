@@ -720,7 +720,7 @@ class StaffAppController2 extends Controller
             }
 
             $quote->staffs()->updateExistingPivot($request->user_id, ['status' => $request->status]);
-            if($staffQuote->pivot->quote_amount !== null && $staffQuote->pivot->quote_amount > 0) {
+            if($staffQuote->pivot->quote_amount !== null) {
                 Transaction::create([
                     'user_id' => $request->user_id,
                     'amount' => $staffQuote->pivot->quote_amount,
