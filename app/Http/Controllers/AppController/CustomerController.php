@@ -1778,7 +1778,7 @@ class CustomerController extends Controller
     public function getServices()
     {
         $servicesArray = Cache::rememberForever('active_services', function () {
-            $services = Service::where('status', 1)->orderBy('name', 'ASC')->limit(10)->get();
+            $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
 
             return $services->map(function ($service) {
                 $categoryIds = collect($service->categories)->pluck('id')->toArray();
