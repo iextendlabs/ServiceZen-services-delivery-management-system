@@ -197,7 +197,7 @@ class CustomerController extends Controller
     {
         $serviceId = $request->service_id;
 
-        $data = Cache::remember("service_details_{$serviceId}", now()->addHours(1), function () use ($serviceId) {
+        $data = Cache::rememberForever("service_details_{$serviceId}", function () use ($serviceId) {
             $service = Service::where('status', 1)
                 ->where('id', $serviceId)
                 ->orderBy('name', 'ASC')
@@ -833,7 +833,7 @@ class CustomerController extends Controller
     {
         $cacheKey = 'staff_profile_' . $id;
 
-        $data = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($id) {
+        $data = Cache::rememberForever($cacheKey, function () use ($id) {
             $user = User::find($id);
             $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
             $socialMediaPlatforms = [
@@ -897,7 +897,7 @@ class CustomerController extends Controller
     {
         $cacheKey = 'staff_data_' . md5(json_encode($request->all()));
 
-        $data = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($request) {
+        $data = Cache::rememberForever($cacheKey, function () use ($request) {
             $query = User::whereHas('staff', function ($query) use ($request) {
                 $query->where('status', 1);
 
@@ -1000,7 +1000,7 @@ class CustomerController extends Controller
     {
         $cacheKey = 'sub_categories_' . $request->id;
 
-        $sub_categories = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($request) {
+        $sub_categories = Cache::rememberForever($cacheKey, function () use ($request) {
             $category = ServiceCategory::find($request->id);
             return $category ? $category->childCategories : [];
         });
@@ -1773,6 +1773,34 @@ class CustomerController extends Controller
         } else {
             return response()->json(['error' => "You don't have an account. Please register to continue."], 201);
         }
+    }
+
+    public function getServices()
+    {
+        $servicesArray = Cache::rememberForever('active_services', function () {
+            $services = Service::where('status', 1)->orderBy('name', 'ASC')->limit(10)->get();
+
+            return $services->map(function ($service) {
+                $categoryIds = collect($service->categories)->pluck('id')->toArray();
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'image' => $service->image,
+                    'price' => $service->price,
+                    'discount' => $service->discount,
+                    'duration' => $service->duration,
+                    'quote' => $service->quote,
+                    'category_id' => $categoryIds,
+                    'short_description' => $service->short_description,
+                    'rating' => $service->averageRating(),
+                    'options' => $service->serviceOption
+                ];
+            })->toArray();
+        });
+
+        return response()->json([
+            'services' => $servicesArray,
+        ], 200);
     }
 
     public function quoteStore(Request $request)
