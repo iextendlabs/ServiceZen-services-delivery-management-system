@@ -969,12 +969,14 @@ class CustomerController extends Controller
 
         $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
         $staffZones = StaffZone::select('id', 'name')->get();
+        $services = Service::where('status', 1)->select('id', 'name')->get();
 
         return response()->json([
             'staff' => $staff,
             'sub_titles' => $sub_titles,
             'locations' => $locations,
             'categories' => $categories,
+            'services' => $services,
             'staffZones' => $staffZones,
             'pagination' => [
                 'current_page' => $staff->currentPage(),
@@ -1782,31 +1784,60 @@ class CustomerController extends Controller
         }
     }
 
-    public function getServices()
+    public function getServices(Request $request)
     {
-        $servicesArray = Cache::rememberForever('active_services', function () {
-            $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $perPage = 10; // Number of items per page
+        $searchTerm = $request->input('search');
+        $categoryId = $request->input('category');
 
-            return $services->map(function ($service) {
-                $categoryIds = collect($service->categories)->pluck('id')->toArray();
-                return [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'image' => $service->image,
-                    'price' => $service->price,
-                    'discount' => $service->discount,
-                    'duration' => $service->duration,
-                    'quote' => $service->quote,
-                    'category_id' => $categoryIds,
-                    'short_description' => $service->short_description,
-                    'rating' => $service->averageRating(),
-                    'options' => $service->serviceOption
-                ];
-            })->toArray();
+        $query = Service::where('status', 1)
+            ->orderBy('name', 'ASC')
+            ->with('categories');
+
+        if ($searchTerm) {
+            $query->where('name', 'like', '%' . $searchTerm . '%');
+        }
+
+        if ($categoryId) {
+            $query->whereHas('categories', function ($q) use ($categoryId) {
+                $q->where('service_categories.id', $categoryId); // Use correct table alias if needed
+            });
+        }
+
+        $services = $query->paginate($perPage);
+
+        $formattedServices = $services->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'image' => $service->image,
+                'price' => $service->price,
+                'discount' => $service->discount,
+                'duration' => $service->duration,
+                'quote' => $service->quote,
+                'category_id' => $categoryIds,
+                'short_description' => $service->short_description,
+                'rating' => $service->averageRating(),
+                'options' => $service->serviceOption
+            ];
         });
 
         return response()->json([
-            'services' => $servicesArray,
+            'services' => [
+                'current_page' => $services->currentPage(),
+                'data' => $formattedServices,
+                'first_page_url' => $services->url(1),
+                'from' => $services->firstItem(),
+                'last_page' => $services->lastPage(),
+                'last_page_url' => $services->url($services->lastPage()),
+                'next_page_url' => $services->nextPageUrl(),
+                'path' => $services->path(),
+                'per_page' => $services->perPage(),
+                'prev_page_url' => $services->previousPageUrl(),
+                'to' => $services->lastItem(),
+                'total' => $services->total(),
+            ],
         ], 200);
     }
 
