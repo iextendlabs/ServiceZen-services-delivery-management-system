@@ -51,6 +51,7 @@ class SiteController extends Controller
             return User::whereHas('staff', fn($q) => $q->where('status', 1))
                 ->role('Staff')
                 ->latest()
+                ->limit(10)
                 ->get();
         });
 
