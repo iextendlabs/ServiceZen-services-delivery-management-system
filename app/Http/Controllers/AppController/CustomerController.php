@@ -953,7 +953,7 @@ class CustomerController extends Controller
         ], 200);
     }
 
-    public function staffFilterData(Request $request)
+    public function staffFilterOption(Request $request)
     {
         $data = Cache::rememberForever("staff_filter_data", function () {
 
