@@ -21,27 +21,6 @@
         border-color: #007bff;
     }
 
-    .modal-dialog-centered {
-        max-width: 700px !important;
-        max-height: 700px !important;
-        margin: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        max-width: 700px !important;
-        max-height: 700px !important;
-    }
-
-    .modal-body {
-        padding: 0;
-    }
-
     .carousel-control-prev,
     .carousel-control-next {
         width: 5%;
