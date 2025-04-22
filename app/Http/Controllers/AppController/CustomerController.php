@@ -942,42 +942,8 @@ class CustomerController extends Controller
             return $user;
         });
 
-        // Get filter options (these don't need pagination)
-        $sub_titles = Staff::where('status', 1)
-            ->whereNotNull('sub_title')
-            ->pluck('sub_title')
-            ->toArray();
-
-        $all_sub_titles = [];
-        foreach ($sub_titles as $sub_title) {
-            $sub_title_parts = explode('/', $sub_title);
-            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
-        }
-        $sub_titles = array_unique(array_filter($all_sub_titles));
-
-        $locations = Staff::where('status', 1)
-            ->whereNotNull('location')
-            ->pluck('location')
-            ->toArray();
-
-        $all_locations = [];
-        foreach ($locations as $location) {
-            $location_parts = explode('/', $location);
-            $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
-        }
-        $locations = array_unique(array_filter($all_locations));
-
-        $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
-        $staffZones = StaffZone::select('id', 'name')->get();
-        $services = Service::where('status', 1)->select('id', 'name')->get();
-
         return response()->json([
             'staff' => $staff,
-            'sub_titles' => $sub_titles,
-            'locations' => $locations,
-            'categories' => $categories,
-            'services' => $services,
-            'staffZones' => $staffZones,
             'pagination' => [
                 'current_page' => $staff->currentPage(),
                 'last_page' => $staff->lastPage(),
@@ -985,6 +951,49 @@ class CustomerController extends Controller
                 'total' => $staff->total(),
             ]
         ], 200);
+    }
+
+    public function staffFilterData(Request $request)
+    {
+        $data = Cache::rememberForever("staff_filter_data", function () {
+
+            $sub_titles = Staff::where('status', 1)
+                ->whereNotNull('sub_title')
+                ->pluck('sub_title')
+                ->toArray();
+
+            $all_sub_titles = [];
+            foreach ($sub_titles as $sub_title) {
+                $sub_title_parts = explode('/', $sub_title);
+                $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
+            }
+            $sub_titles = array_unique(array_filter($all_sub_titles));
+
+            $locations = Staff::where('status', 1)
+                ->whereNotNull('location')
+                ->pluck('location')
+                ->toArray();
+
+            $all_locations = [];
+            foreach ($locations as $location) {
+                $location_parts = explode('/', $location);
+                $all_locations = array_merge($all_locations, array_map('trim', $location_parts));
+            }
+            $locations = array_unique(array_filter($all_locations));
+
+            $categories = ServiceCategory::where('status', 1)->select('id', 'title')->get();
+            $staffZones = StaffZone::select('id', 'name')->get();
+            $services = Service::where('status', 1)->select('id', 'name')->get();
+            return [
+                'sub_titles' => $sub_titles,
+                'locations' => $locations,
+                'categories' => $categories,
+                'services' => $services,
+                'staffZones' => $staffZones,
+            ];
+        });
+
+        return response()->json($data, 200);
     }
 
     public function deleteAccountMail(Request $request)
