@@ -1795,7 +1795,7 @@ class CustomerController extends Controller
 
     public function getServices(Request $request)
     {
-        $perPage = 10; // Number of items per page
+        $perPage = 20; // Number of items per page
         $searchTerm = $request->input('search');
         $categoryId = $request->input('category');
 
