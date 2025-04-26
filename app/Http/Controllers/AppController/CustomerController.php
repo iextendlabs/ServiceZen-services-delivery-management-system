@@ -2070,30 +2070,4 @@ class CustomerController extends Controller
 
         return response()->json(['success' => true, 'message' => $message]);
     }
-
-    public function getAllServices()
-    {
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-
-        $servicesArray = $services->map(function ($service) {
-            $categoryIds = collect($service->categories)->pluck('id')->toArray();
-            return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'image' => $service->image,
-                'price' => $service->price,
-                'discount' => $service->discount,
-                'duration' => $service->duration,
-                'quote' => $service->quote,
-                'category_id' => $categoryIds,
-                'short_description' => $service->short_description,
-                'rating' => $service->averageRating(),
-                'options' => $service->serviceOption
-            ];
-        })->toArray();
-
-        return response()->json([
-            'services' => $servicesArray,
-        ], 200);
-    }
 }

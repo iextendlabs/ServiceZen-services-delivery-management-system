@@ -294,6 +294,29 @@ class HomeController extends Controller
             'gender_permission' => $gender_permission
         ];
 
+        $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+
+        $allServicesArray = $allServices->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'image' => $service->image,
+                'price' => $service->price,
+                'discount' => $service->discount,
+                'duration' => $service->duration,
+                'quote' => $service->quote,
+                'category_id' => $categoryIds,
+                'short_description' => $service->short_description,
+                'rating' => $service->averageRating(),
+                'options' => $service->serviceOption
+            ];
+        })->toArray();
+
+        $servicesJsonData = [
+            'services' => $allServicesArray,
+        ];
+
         try {
             $filename = "AppHomeData.json";
             $filePath = public_path($filename);
@@ -311,6 +334,29 @@ class HomeController extends Controller
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        try {
+            $filename = "AppServicesData.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppServicesData_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $servicesJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($servicesJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);
