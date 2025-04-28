@@ -172,7 +172,7 @@
             </td>
         </tr>
     </table>
-    @if($order->order_comment)
+    @if($order->order_comment && $order->order_comment != 'null')
     <table>
         <th colspan="4">Order Comment</th>
         <tr>

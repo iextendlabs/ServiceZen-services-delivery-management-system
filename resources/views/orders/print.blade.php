@@ -78,7 +78,7 @@
                             <td>{{ $order->whatsapp }}</td>
                             <td>@currency($order->total_amount,true)</td>
                             <td>{{ $order->payment_method }}</td>
-                            <td>@if(isset($order->order_comment)){{ substr($order->order_comment, 0, 50) }}... @endif</td>
+                            <td>@if(isset($order->order_comment) && $order->order_comment != 'null'){{ substr($order->order_comment, 0, 50) }}... @endif</td>
                             <td>{{ $order->created_at }}</td>
                         @endif
                         <td>{{ $order->status }}</td>
