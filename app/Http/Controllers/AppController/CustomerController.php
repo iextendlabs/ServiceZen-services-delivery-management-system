@@ -84,11 +84,16 @@ class CustomerController extends Controller
                 return $notification;
             });
 
+            $quotesTotal = Quote::where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->count();
+
             return response()->json([
                 'user' => $user,
                 'user_info' => $user_info,
                 'access_token' => $token,
-                'notifications' => $notifications
+                'notifications' => $notifications,
+                'quotesTotal'   => $quotesTotal,
             ], 200);
         }
 
@@ -746,8 +751,13 @@ class CustomerController extends Controller
             }
         }
 
+        $quotesTotal = Quote::where('user_id', $request->user_id)
+            ->orderBy('created_at', 'desc')
+            ->count();
+
         return response()->json([
-            'notifications' => $notifications
+            'notifications' => $notifications,
+            'quotesTotal'   => $quotesTotal,
         ], 200);
     }
 
