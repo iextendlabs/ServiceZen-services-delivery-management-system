@@ -212,6 +212,7 @@ class CustomerController extends Controller
             if (!$service) {
                 return null;
             }
+            $service->rating = $service->averageRating();
 
             if ($service) {
                 $service->options = $service->serviceOption;
