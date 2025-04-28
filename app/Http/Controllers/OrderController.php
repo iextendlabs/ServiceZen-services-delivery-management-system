@@ -258,7 +258,7 @@ class OrderController extends Controller
 
                     $csvRow = $currentUser->hasRole('Supervisor')
                         ? array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->landmark, $row->district, $row->area, $row->city, $row->buildingName, $row->status, implode(",", $services))
-                        : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->number, $row->whatsapp, $row->total_amount, $row->payment_method, $row->order_comment, $row->status, $row->created_at, implode(",", $services));
+                        : array(++$key, $row->id, $row->staff_name, $row->date, $row->time_slot_value, $row->customer_name, $row->number, $row->whatsapp, $row->total_amount, $row->payment_method, $row->order_comment == "null" ? '' : $row->order_comment, $row->status, $row->created_at, implode(",", $services));
 
                     // Write the CSV data row
                     fputcsv($output, $csvRow);

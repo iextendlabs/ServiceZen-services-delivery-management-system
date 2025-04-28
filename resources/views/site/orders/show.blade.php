@@ -183,7 +183,7 @@
                     </td>
                 </tr>
             </table>
-            @if($order->order_comment)
+            @if($order->order_comment && $order->order_comment != 'null')
             <table class="table table-striped table-bordered album bg-light">
                 <th class="text-left" colspan="4">Order Comment</th>
                 <tr>
