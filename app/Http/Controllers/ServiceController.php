@@ -110,6 +110,10 @@ class ServiceController extends Controller
             'price' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'categoriesId' => 'required',
+            'meta_title' => 'required|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'slug' => 'required|string|max:255|unique:services,slug',
         ]);
 
         $input = $request->all();
@@ -244,6 +248,10 @@ class ServiceController extends Controller
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'categoriesId' => 'required',
+            'meta_title' => 'required|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'slug' => 'required|string|max:255|unique:services,slug,' . $id,
         ]);
 
         $input = $request->all();

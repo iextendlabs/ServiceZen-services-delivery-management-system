@@ -72,6 +72,10 @@ class ServiceCategoryController extends Controller
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta_title' => 'required|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'slug' => 'required|string|max:255|unique:service_categories,slug',
         ]);
 
         $service_category = ServiceCategory::create($request->all());
@@ -129,6 +133,10 @@ class ServiceCategoryController extends Controller
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'meta_title' => 'required|string|max:60',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'slug' => 'required|string|max:255|unique:service_categories,slug,' . $id,
         ]);
 
         $service_category = ServiceCategory::find($id);

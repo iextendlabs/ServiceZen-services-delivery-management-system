@@ -266,7 +266,7 @@ Route::get('/backups/clear', [BackupController::class, 'clear'])->name('backups.
 
 Route::get('/', [SiteController::class, 'index'])->name('storeHome');
 Route::get('/service-list', [SiteController::class, 'service_list']);
-Route::get('serviceDetail/{id}', [SiteController::class, 'show']);
+Route::get('service/{slug}', [SiteController::class, 'show']);
 Route::get('updateZone', [SiteController::class, 'updateZone']);
 
 
@@ -304,7 +304,7 @@ Route::resource('siteReviews', SiteReviewsController::class);
 Route::get('/category', function () {
     return view('site.categories.index');
 })->name('categories.index');
-Route::get('category/{id}', [SiteController::class, 'categoryShow'])->name('category.show');
+Route::get('category/{slug}', [SiteController::class, 'categoryShow'])->name('category.show');
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
 
@@ -367,3 +367,7 @@ Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
 
     return $image->response()->header('Cache-Control', 'public, max-age=31536000');
 })->where('filename', '.*');
+
+Route::get('sitemap.xml', function() {
+    return response()->file(public_path('sitemap.xml'));
+});

@@ -15,7 +15,7 @@
         </div>
         <div class="float-right">
             <button type="submit" form="services-form" class="btn btn-primary float-end">Update</button>
-            <a class="btn btn-warning mr-2" href="/serviceDetail/{{ $service->id }}">Store View</a>
+            <a class="btn btn-warning mr-2" href="/service/{{ $service->slug }}">Store View</a>
 
         </div>
     </div>
@@ -41,6 +41,9 @@
             <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" id="seo-tab" data-toggle="tab" href="#seo" role="tab" aria-controls="seo" aria-selected="false">SEO</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" id="package-services-tab" data-toggle="tab" href="#package-services" role="tab" aria-controls="package-services" aria-selected="false">Package Services</a>
         </li>
         <li class="nav-item">
@@ -56,7 +59,7 @@
             <a class="nav-link" id="additionalImages-tab" data-toggle="tab" href="#additionalImages" role="tab" aria-controls="additionalImages" aria-selected="false">Additional Images</a>
         </li>
     </ul>
-    <div class="tab-content" id="myTabsContent">
+    <div class="tab-content mt-2" id="myTabsContent">
         <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
             <div class="row">
                 <div class="col-md-12">
@@ -274,6 +277,48 @@
                         </select>
                     </div>
                 </div> -->
+            </div>
+        </div>
+        <div class="tab-pane fade show" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="slug"><span style="color: red;">*</span><strong>SEO URL (Slug)</strong></label>
+                        <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug', $service->slug ?? '') }}">
+                        <small class="text-muted">
+                            • Should be lowercase with hyphens instead of spaces (e.g., "my-service")<br>
+                            • Avoid special characters and punctuation<br>
+                            • Should be unique across all services
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="meta_title"><span style="color: red;">*</span><strong>Meta Title</strong></label>
+                        <input type="text" name="meta_title" id="meta_title" class="form-control" value="{{ old('meta_title', $service->meta_title ?? '') }}" maxlength="60">
+                        <small class="text-muted">
+                            • Recommended: 50-60 characters
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="meta_description"><strong>Meta Description</strong></label>
+                        <textarea name="meta_description" id="meta_description" class="form-control" rows="4" maxlength="160">{{ old('meta_description', $service->meta_description ?? '') }}</textarea>
+                        <small class="text-muted">
+                            • Recommended: 150-160 characters
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="meta_keywords"><strong>Meta Keywords</strong> (comma separated)</label>
+                        <input type="text" name="meta_keywords" id="meta_keywords" class="form-control" value="{{ old('meta_keywords', $service->meta_keywords ?? '') }}" placeholder="keyword1, keyword2, keyword3">
+                    </div>
+                </div>
             </div>
         </div>
         <div class="tab-pane fade" id="package-services" role="tabpanel" aria-labelledby="package-services-tab">

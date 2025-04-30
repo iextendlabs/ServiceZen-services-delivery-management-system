@@ -355,7 +355,7 @@
                                         @foreach ($addONsChunk as $addON)
                                             <div class="col-md-2 col-12 service-box">
                                                 <div class="card mb-2 box-shadow">
-                                                    <a href="/serviceDetail/{{ $addON->service->id }}">
+                                                    <a href="/service/{{ $addON->service->slug }}">
                                                         <div class="position-relative">
                                                             <img src="./service-images/{{ $addON->service->image }}"
                                                                 class="d-block carousel-image"
@@ -388,7 +388,7 @@
                                                                 class="btn btn-sm btn-block btn-warning"> Quote</button>
                                                         @elseif (count($addON->service->serviceOption) > 0)
                                                             <a style="margin-top: 1em; color:#fff"
-                                                                href="/serviceDetail/{{ $addON->service->id }}"
+                                                                href="/service/{{ $addON->service->slug }}"
                                                                 type="button"
                                                                 class="btn btn-sm btn-block btn-primary float-right mt-2"><i
                                                                     class="fa fa-plus"></i></a>
@@ -439,7 +439,7 @@
                                         @foreach ($packageChunk as $package)
                                             <div class="col-md-4 service-box">
                                                 <div class="card mb-4 box-shadow">
-                                                    <a href="/serviceDetail/{{ $package->service->id }}">
+                                                    <a href="/service/{{ $package->service->slug }}">
                                                         <p class="card-text service-box-title text-center">
                                                             <b>{{ $package->service->name }}</b>
                                                         </p>

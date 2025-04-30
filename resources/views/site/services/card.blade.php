@@ -1,6 +1,6 @@
 <div class="service-box">
     <div class="card mb-4 box-shadow">
-        <a href="/serviceDetail/{{ $service->id }}">
+        <a href="/service/{{ $service->slug }}">
             <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
             <img class="card-img-top" src="{{ url('img/service-images/' . $service->image) }}?w=298&h=250"
                 alt="{{ $service->name }}">
@@ -28,7 +28,7 @@
                 <button style="margin-top: 1em;" onclick="openQuotePopup('{{ $service->id }}')" type="button"
                     class="btn btn-block btn-warning"> Request a Quote</button>
             @elseif (count($service->serviceOption) > 0)
-                <a style="margin-top: 1em; color:#fff" href="/serviceDetail/{{ $service->id }}" type="button"
+                <a style="margin-top: 1em; color:#fff" href="/service/{{ $service->slug }}" type="button"
                     class="btn btn-block btn-primary">Book Now</a>
             @else
                 <button onclick="openBookingPopup('{{ $service->id }}')" type="button"

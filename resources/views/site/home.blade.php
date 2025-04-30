@@ -105,9 +105,9 @@
                             @endphp
                             <div class="carousel-item @if ($loop->first) active @endif">
                                 <a
-                                    @if ($type === 'category' && !empty($id)) href="?id={{ $id }}"
+                                    @if ($type === 'category' && !empty($id)) href="{{ route('category.show', $id) }}"
                       @elseif($type === 'service' && !empty($id))
-                          href="/serviceDetail/{{ $id }}"
+                          href="/service/{{ $id }}"
                       @elseif($type === 'customLink' && !empty($id))
                           href="{{ $id }}" @endif>
                                     <img src="{{ url('img/slider-images/' . $filename) }}" src="{{ asset('slider-images/' . $filename) }}" alt="Slide {{ $loop->iteration }}"
@@ -151,7 +151,7 @@
                 @if (count($single_category->services) > 0)
                     <div class="col-md-12">
                         <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
-                            <a style="text-decoration: none;" href="{{ route('category.show',$single_category->id) }}">{{ $single_category->title }}</a></h2>
+                            <a style="text-decoration: none;" href="{{ route('category.show',$single_category->slug) }}">{{ $single_category->title }}</a></h2>
                         <div class="owl-carousel owl-carousel-category-service">
                             @foreach ($single_category->services->where('status', 1)->take(10) as $service)
                                 @if($service->status == 1)
