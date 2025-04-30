@@ -301,6 +301,7 @@
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
                                 <a class="dropdown-item" target="_blank" href="/">Your Store</a>
+                                <a class="dropdown-item" target="_blank" href="/sitemap.xml">Sitemap</a>
                                 @if(auth()->user()->hasRole("Admin"))
                                 <a class="dropdown-item" href="{{ route('backups.index') }}">Database Backups</a>
                                 @endif

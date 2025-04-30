@@ -39,7 +39,23 @@ class GenerateSitemap extends Command
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY));
         });
 
-        $sitemap->writeToFile(public_path('sitemap.xml'));
+        // Get the XML content
+        $xml = $sitemap->render();
+
+        // Add XML declaration if not present
+        if (strpos($xml, '<?xml') === false) {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $xml;
+        }
+
+        // Add XSL stylesheet reference after the XML declaration
+        $xml = preg_replace(
+            '/<\?xml.*\?>\n?/',
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
+                "<?xml-stylesheet type=\"text/xsl\" href=\"/sitemap.xsl\"?>\n",
+            $xml
+        );
+
+        file_put_contents(public_path('sitemap.xml'), $xml);
 
         $this->info('Sitemap generated successfully!');
     }
