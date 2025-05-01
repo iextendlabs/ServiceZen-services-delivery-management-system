@@ -9,6 +9,7 @@ use App\Models\ServiceCategory;
 use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\StaffZone;
+use App\Models\SubTitle;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -23,17 +24,8 @@ class StaffProfileController extends Controller
      */
     public function index(Request $request)
     {
-        $sub_titles = Staff::where('status', 1)
-            ->whereNotNull('sub_title')
-            ->pluck('sub_title')
-            ->toArray();
-
-        $all_sub_titles = [];
-        foreach ($sub_titles as $sub_title) {
-            $sub_title_parts = explode('/', $sub_title);;
-            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
-        }
-        $sub_titles = array_unique(array_filter($all_sub_titles));
+        
+        $sub_titles = SubTitle::all();
 
         $locations = Staff::where('status', 1)
             ->whereNotNull('location')
@@ -62,20 +54,21 @@ class StaffProfileController extends Controller
         ];
 
         $query = User::whereHas('staff', function ($query) use ($request) {
-            $query->where('status', 1);
+                $query->where('status', 1);
 
-            if ($request->sub_title) {
-                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
-            }
+                if ($request->location) {
+                    $query->where('location', 'like', '%' . $request->location . '%');
+                }
 
-            if ($request->location) {
-                $query->where('location', 'like', '%' . $request->location . '%');
-            }
-
-            if ($request->min_order_value) {
-                $query->where('min_order_value', $request->min_order_value);
-            }
-        });
+                if ($request->min_order_value) {
+                    $query->where('min_order_value', $request->min_order_value);
+                }
+            })
+            ->when($request->sub_title, function ($query) use ($request) {
+                $query->whereHas('subTitles', function ($q) use ($request) {
+                    $q->where('sub_titles.id', $request->sub_title);
+                });
+            });
 
         if ($request->service_id) {
             $query->whereHas('services', function ($q) use ($request) {

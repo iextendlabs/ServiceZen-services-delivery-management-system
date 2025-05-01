@@ -149,7 +149,7 @@
                                                                         </div>
                                                                     </td>
                                                                     <td class="staff-name font-weight-bold align-middle">
-                                                                        {{ $staff->name }} <small class="text-muted">({{ $staff->staff->sub_title }})</small>
+                                                                        {{ $staff->name }} <small class="text-muted">@if(count($staff->subTitles) > 0) ({{ $staff->subTitles->pluck('name')->implode('/') }}) @endif</small>
                                                                     </td>
                                                                     <td>
                                                                         <input type="number" step="0.01" class="form-control staff-amount" placeholder="Amount" value="{{ $staff->staff->quote_amount ?? '' }}">

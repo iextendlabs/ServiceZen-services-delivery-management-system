@@ -62,7 +62,12 @@
                                         Disabled
                                     @endif
                                 </td>
-                                <td>{{ $staff->staff->sub_title }}</td>
+                                <td>
+                                    @foreach ($staff->subTitles as $subTitle)
+                                        <span class="badge badge-info">{{ $subTitle->name }}</span>
+                                    @endforeach
+                                </td>
+                                
                                 {{-- <td>
                                     @if($staff->staff->driver)
                                         <a href="{{ route('drivers.index', ['id' => $staff->staff->driver->id]) }}">{{ $staff->staff->driver ? $staff->staff->driver->name : '' }}</a>
@@ -124,8 +129,8 @@
                                 <select name="sub_title" class="form-control select2" id="sub_title">
                                     <option value="">Select Designation</option>
                                     @foreach ($sub_titles as $sub_title)
-                                        <option value="{{ $sub_title }}" {{ $sub_title == $filter['sub_title'] ? 'selected' : '' }}>
-                                            {{ $sub_title }}
+                                        <option value="{{ $sub_title->id }}" {{ $sub_title->id == $filter['sub_title'] ? 'selected' : '' }}>
+                                            {{ $sub_title->name }}
                                         </option>
                                     @endforeach
                                 </select>

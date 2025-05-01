@@ -1,5 +1,34 @@
 @extends('site.layout.app')
 @section('content')
+<style>
+    .select2-container .select2-selection--single {
+        height: calc(2.25rem + 2px);
+        /* Match Bootstrap form-control height */
+        padding: .375rem .75rem;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 1.5;
+        padding-left: 0;
+    }
+
+    .select2-container--default .select2-selection--single:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        /* Bootstrap focus shadow */
+    }
+
+    .select2-container .select2-search__field {
+        width: 100% !important;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+    }
+</style>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -113,14 +142,19 @@
                                 </div>
                             </div>
                             <div class="row mb-3 sub_title">
+                                
                                 <label for="sub_title"
-                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Sub Title / Designation</label>
+                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Sub Title / Designation:</label>
 
                                 <div class="col-md-6">
-                                    <input id="sub_title" type="text"
-                                        class="form-control @error('sub_title') is-invalid @enderror"
-                                        name="sub_title" value="{{ old('sub_title') }}"
-                                        autocomplete="sub_title">
+                                    <select id="sub_title" class="form-control selectpicker" name="sub_titles[]"
+                                    multiple data-live-search="true" data-actions-box="true">
+                                        @foreach ($sub_titles as $sub_title)
+                                            <option value="{{ $sub_title->id }}">
+                                                {{ $sub_title->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                     @error('sub_title')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -223,6 +257,28 @@
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Search...',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    searching: function() {
+                        return "Type to search...";
+                    }
+                }
+            }).on('select2:open', function() {
+                setTimeout(() => {
+                    let searchBox = document.querySelector('.select2-search__field');
+                    if (searchBox) {
+                        searchBox.placeholder = "Type to search...";
+                        searchBox.focus();
+                    }
+                }, 100);
+            });
+        });
+    </script>
     <script>
         $(document).ready(function() {
             handleTypeChange($("#type").val());

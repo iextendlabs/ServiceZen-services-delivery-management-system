@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasOne(Staff::class);
     }
 
+    public function subTitles()
+    {
+        return $this->belongsToMany(SubTitle::class, 'staff_sub_title', 'staff_id', 'sub_title_id');
+    }
+    
     public function driver()
     {
         return $this->hasOne(Driver::class);

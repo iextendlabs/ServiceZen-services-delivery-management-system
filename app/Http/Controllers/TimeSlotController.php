@@ -156,7 +156,7 @@ class TimeSlotController extends Controller
         $staffs = User::role('Staff')->get();
 
         $staffs->each(function ($staff) {
-            $staff->sub_title = $staff->staff->sub_title ?? null;
+            $staff->sub_title = $staff->subTitles ? $staff->subTitles->pluck('name')->implode('/') : null;
 
             $staffZones = StaffZone::whereHas('staffGroups.staffs', function ($query) use ($staff) {
                 $query->where('users.id', $staff->id);
@@ -233,7 +233,7 @@ class TimeSlotController extends Controller
         $allStaff = User::role('Staff')->get();
   
         $allStaff->each(function ($staff) {
-            $staff->sub_title = $staff->staff->sub_title ?? null;
+            $staff->sub_title = $staff->subTitles ? $staff->subTitles->pluck('name')->implode('/') : null;
 
             $staffZones = StaffZone::whereHas('staffGroups.staffs', function ($query) use ($staff) {
                 $query->where('users.id', $staff->id);

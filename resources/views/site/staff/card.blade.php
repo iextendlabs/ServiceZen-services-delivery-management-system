@@ -9,7 +9,7 @@
     <div class="card-body text-center" style="height: 335px; align-content: center;">
         <h6 class="card-title" style="height: 40px; overflow: hidden;">{{ $staff->name }}</h6>
         <h6 class="card-title" style="height: 40px; overflow: hidden;">
-            {{ $staff->staff->sub_title }}</h6>
+            {{ $staff->subTitles->pluck('name')->implode('/') }}</h6>
         <p class="card-title" style="height: 25px; overflow: hidden;">Extra
             Charges:<b>@currency($staff->staff->charges, false)</b></p>
         @if ($staff->staff->location)

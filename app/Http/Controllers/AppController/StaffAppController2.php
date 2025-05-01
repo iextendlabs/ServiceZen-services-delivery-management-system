@@ -435,7 +435,7 @@ class StaffAppController2 extends Controller
             'fix_salary' => $staff->fix_salary ?? null,
             'image' => $staff->image ?? null,
             'charge' => $staff->charges ?? null,
-            'sub_title' => $staff->sub_title ?? null,
+            'sub_title' => $staff->subTitles ? $staff->subTitles->pluck('name')->implode('/') : null,
             'expiry_date' => $staff->expiry_date ?? null,
             'location' => $staff->location ?? null,
             'nationality' => $staff->nationality ?? null,

@@ -56,7 +56,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Sub Title / Designation</strong>
-                            <input type="text" name="sub_title" class="form-control" value="{{ old('sub_title', $serviceStaff->staff->sub_title ?? "") }}" placeholder="Sub Title">
+                            <select class="form-control selectpicker" id="sub_titles" name="sub_titles[]"
+                                multiple data-live-search="true" data-actions-box="true">
+                                @foreach ($subTitles as $subTitle)
+                                    <option value="{{ $subTitle->id }}" {{ in_array($subTitle->id, old('sub_titles', $serviceStaff->subTitles->pluck('id')->toArray() ?? [])) ? 'selected' : '' }}>{{ $subTitle->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-12">

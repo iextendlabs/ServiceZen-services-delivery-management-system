@@ -51,6 +51,7 @@ use App\Http\Controllers\{
     KommoController,
     QuoteController,
     StripePaymentController,
+    SubTitleController,
     WithdrawController
 };
 
@@ -139,6 +140,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('coupons', CouponController::class);
     Route::resource('FAQs', FAQController::class);
+    Route::resource('subTitles', SubTitleController::class);
     Route::resource('information', InformationController::class);
     Route::resource('settings', SettingController::class);
     Route::resource('reviews', ReviewController::class);
