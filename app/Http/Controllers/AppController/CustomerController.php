@@ -888,6 +888,7 @@ class CustomerController extends Controller
             $orders = Order::where('service_staff_id', $id)->where('status', 'Complete')->count();
             $images = $user->staffImages;
             $videos = $user->staffYoutubeVideo;
+            $sub_title = $user->subTitles ? $user->subTitles->pluck('name')->implode('/') : null;
 
             return [
                 'user' => $user,
@@ -898,7 +899,8 @@ class CustomerController extends Controller
                 'averageRating' => $averageRating,
                 'orders' => $orders,
                 'images' => $images,
-                'videos' => $videos
+                'videos' => $videos,
+                'sub_title' => $sub_title
             ];
         });
 
