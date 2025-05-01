@@ -951,6 +951,7 @@ class CustomerController extends Controller
             ->paginate($perPage, ['*'], 'page', $page);
 
         $staff->getCollection()->transform(function ($user) {
+            $user->sub_title = $user->subTitles ? $user->subTitles->pluck('name')->implode('/') : null;
             $user->rating = $user->averageRating();
             return $user;
         });
