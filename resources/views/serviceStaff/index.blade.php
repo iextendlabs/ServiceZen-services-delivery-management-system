@@ -64,7 +64,7 @@
                                 </td>
                                 <td>
                                     @foreach ($staff->subTitles as $subTitle)
-                                        <span class="badge badge-info">{{ $subTitle->name }}</span>
+                                        <span class="badge badge-info m-2">{{ $subTitle->name }}</span>
                                     @endforeach
                                 </td>
                                 
