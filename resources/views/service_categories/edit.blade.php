@@ -28,6 +28,44 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <label for="slug"><span style="color: red;">*</span><strong>SEO URL (Slug)</strong></label>
+                    <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug', $service_category->slug ?? '') }}">
+                    <small class="text-muted">
+                        • Should be lowercase with hyphens instead of spaces (e.g., "my-service")<br>
+                        • Avoid special characters and punctuation<br>
+                        • Should be unique across all services
+                    </small>
+                </div>
+            </div>
+            
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="meta_title"><span style="color: red;">*</span><strong>Meta Title</strong></label>
+                    <input type="text" name="meta_title" id="meta_title" class="form-control" value="{{ old('meta_title', $service_category->meta_title ?? '') }}" maxlength="60">
+                    <small class="text-muted">
+                        • Recommended: 50-60 characters
+                    </small>
+                </div>
+            </div>
+            
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="meta_description"><strong>Meta Description</strong></label>
+                    <textarea name="meta_description" id="meta_description" class="form-control" rows="4" maxlength="160">{{ old('meta_description', $service_category->meta_description ?? '') }}</textarea>
+                    <small class="text-muted">
+                        • Recommended: 150-160 characters
+                    </small>
+                </div>
+            </div>
+            
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="meta_keywords"><strong>Meta Keywords</strong> (comma separated)</label>
+                    <input type="text" name="meta_keywords" id="meta_keywords" class="form-control" value="{{ old('meta_keywords', $service_category->meta_keywords ?? '') }}" placeholder="keyword1, keyword2, keyword3">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong for="image">Upload Image</strong>
                     <input type="file" name="image" id="image" class="form-control-file">
                     <br>

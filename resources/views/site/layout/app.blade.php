@@ -7,7 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ env('APP_NAME') }}</title>
+    <title>{{ $metaTitle ?? config('app.name') }}</title>
+    <meta name="description" content="{{ $metaDescription ?? 'Default description' }}">
+    <meta name="keywords" content="{{ $metaKeywords ?? 'default,keywords' }}">
 
     <!-- Bootstrap core CSS -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
@@ -203,31 +205,31 @@
                                                             @foreach ($subcategory->childCategories as $child_category)
                                                                 @if ($child_category->status == '1')
                                                                     <a class="dropdown-item"
-                                                                        href="{{ route('category.show',$child_category->id) }}">-
+                                                                        href="{{ route('category.show',$child_category->slug) }}">-
                                                                         {{ $child_category->title }}</a>
                                                                 @endif
                                                             @endforeach
                                                             <div class="dropdown-divider"></div>
                                                             <a class="dropdown-item"
-                                                                href="{{ route('category.show',$subcategory->id) }}">Show All
+                                                                href="{{ route('category.show',$subcategory->slug) }}">Show All
                                                                 {{ $subcategory->title }}</a>
                                                         </div>
                                                     @else
                                                         @if ($subcategory->childCategories->isEmpty())
                                                             <a class="dropdown-item"
-                                                                href="{{ route('category.show',$subcategory->id) }}">{{ $subcategory->title }}</a>
+                                                                href="{{ route('category.show',$subcategory->slug) }}">{{ $subcategory->title }}</a>
                                                         @endif
                                                     @endif
                                                 @endif
                                             @endforeach
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="{{ route('category.show',$category->id) }}">Show All
+                                            <a class="dropdown-item" href="{{ route('category.show',$category->slug) }}">Show All
                                                 {{ $category->title }}</a>
                                         </div>
                                     @else
                                         @if (is_null($category->parent_id) && $category->childCategories->isEmpty())
                                             <a class="dropdown-item"
-                                                href="{{ route('category.show',$category->id) }}">{{ $category->title }}</a>
+                                                href="{{ route('category.show',$category->slug) }}">{{ $category->title }}</a>
                                         @endif
                                     @endif
                                 @endif

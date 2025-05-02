@@ -163,7 +163,7 @@
                                 <td class="text-right">
                                     <form id="deleteForm{{ $service->id }}"
                                         action="{{ route('services.destroy', $service->id) }}" method="POST">
-                                        <a class="btn btn-warning" href="/serviceDetail/{{ $service->id }}">Store View</a>
+                                        <a class="btn btn-warning" href="/service/{{ $service->slug }}">Store View</a>
                                         @can('FAQs-create')
                                             <a class="btn btn-primary"
                                                 href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>

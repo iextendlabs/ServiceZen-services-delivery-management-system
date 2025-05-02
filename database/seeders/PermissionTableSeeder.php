@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'staff-designation-list',
+            'staff-designation-create',
+            'staff-designation-edit',
+            'staff-designation-delete',
             'crm-list',
             'crm-create',
             'crm-edit',

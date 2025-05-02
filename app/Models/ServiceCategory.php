@@ -2,16 +2,37 @@
 
 namespace App\Models;
 
+use App\Traits\SeoHelpers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Artisan;
 
 class ServiceCategory extends Model
 {
-    protected $fillable = ['title', 'description','parent_id','status','type'];
+    protected $fillable = ['title', 'description', 'parent_id', 'status', 'type', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
+    use SeoHelpers;
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::saving(function ($model) {
+            $model->generateMetaTags();
+        });
+
+        static::saved(function ($model) {
+            if ($model->wasChanged(['slug', 'status'])) {
+                Artisan::call('sitemap:generate');
+            }
+        });
+    
+        static::deleted(function () {
+            Artisan::call('sitemap:generate');
+        });
+    }
     
     public function service()
     {
-        return $this->hasMany(Service::class,'category_id','id');
+        return $this->hasMany(Service::class, 'category_id', 'id');
     }
 
     public function services()
@@ -36,7 +57,7 @@ class ServiceCategory extends Model
 
     public function FAQs()
     {
-        return $this->hasMany(FAQ::class,'category_id')->where('status', '=', 'your_desired_status');
+        return $this->hasMany(FAQ::class, 'category_id')->where('status', '=', 'your_desired_status');
     }
 
     public function users()

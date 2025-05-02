@@ -15,6 +15,7 @@ use App\Models\StaffDriver;
 use App\Models\StaffGroup;
 use App\Models\StaffYoutubeVideo;
 use App\Models\StaffZone;
+use App\Models\SubTitle;
 use App\Models\TimeSlot;
 use App\Models\Transaction;
 use App\Models\User;
@@ -49,12 +50,12 @@ class ServiceStaffController extends Controller
 
     private $documents = [
         'address_proof' => 'Address Proof',
-        'noc' => 'NOC', 
-        'id_card_front' => 'Id Card Front Side', 
-        'id_card_back' => 'Id Card Back Side', 
-        'passport' => 'Passport', 
-        'driving_license' => 'Driving License', 
-        'education' => 'Education', 
+        'noc' => 'NOC',
+        'id_card_front' => 'Id Card Front Side',
+        'id_card_back' => 'Id Card Back Side',
+        'passport' => 'Passport',
+        'driving_license' => 'Driving License',
+        'education' => 'Education',
         'other' => 'Other'
     ];
 
@@ -62,7 +63,7 @@ class ServiceStaffController extends Controller
     {
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
-        
+
         $filter = [
             'name' => $request->name,
             'email' => $request->email,
@@ -74,17 +75,7 @@ class ServiceStaffController extends Controller
             'zone_id' => $request->zone_id,
         ];
 
-        $sub_titles = Staff::where('status', 1)
-            ->whereNotNull('sub_title')
-            ->pluck('sub_title')
-            ->toArray();
-
-        $all_sub_titles = [];
-        foreach ($sub_titles as $sub_title) {
-            $sub_title_parts = explode('/', $sub_title);
-            $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
-        }
-        $sub_titles = array_unique(array_filter($all_sub_titles));
+        $sub_titles = SubTitle::all();
 
         $locations = Staff::where('status', 1)
             ->whereNotNull('location')
@@ -98,33 +89,36 @@ class ServiceStaffController extends Controller
         }
         $locations = array_unique(array_filter($all_locations));
 
-        $services = Service::where('status',1)->get();
-        $categories = ServiceCategory::where('status',1)->get();
+        $services = Service::where('status', 1)->get();
+        $categories = ServiceCategory::where('status', 1)->get();
 
         $staffZones = StaffZone::get();
 
-        $query = User::orderBy($sort, $direction)->whereHas('staff', function ($query) use ($request) {
-            $query->where('status', 1);
+        $query = User::orderBy($sort, $direction)
+            ->whereHas('staff', function ($query) use ($request) {
+                $query->where('status', 1);
 
-            if ($request->sub_title) {
-                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
-            }
+                if ($request->location) {
+                    $query->where('location', 'like', '%' . $request->location . '%');
+                }
 
-            if ($request->location) {
-                $query->where('location', 'like', '%' . $request->location . '%');
-            }
+                if ($request->min_order_value) {
+                    $query->where('min_order_value', $request->min_order_value);
+                }
+            })
+            ->when($request->sub_title, function ($query) use ($request) {
+                $query->whereHas('subTitles', function ($q) use ($request) {
+                    $q->where('sub_titles.id', $request->sub_title);
+                });
+            });
 
-            if ($request->min_order_value) {
-                $query->where('min_order_value', $request->min_order_value);
-            }
-        });
 
         if ($request->service_id) {
             $query->whereHas('services', function ($q) use ($request) {
                 $q->where('service_id', $request->service_id);
             });
         }
-    
+
         // Apply Category filter
         if ($request->category_id) {
             $query->whereHas('categories', function ($q) use ($request) {
@@ -158,7 +152,7 @@ class ServiceStaffController extends Controller
         $serviceStaff = $query->paginate(config('app.paginate'));
 
         $serviceStaff->appends($filter, ['sort' => $sort, 'direction' => $direction]);
-        return view('serviceStaff.index', compact('total_staff','serviceStaff', 'filter', 'direction','sub_titles','locations','services','categories','staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.index', compact('total_staff', 'serviceStaff', 'filter', 'direction', 'sub_titles', 'locations', 'services', 'categories', 'staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -174,7 +168,8 @@ class ServiceStaffController extends Controller
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $documents = $this->documents;
         $staffGroups = StaffGroup::with('staffZones')->get();
-        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services','documents','staffGroups'));
+        $subTitles = SubTitle::all();
+        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services', 'documents', 'staffGroups', 'subTitles'));
     }
 
     /**
@@ -198,8 +193,8 @@ class ServiceStaffController extends Controller
         ]);
 
         $input = $request->all();
-        $input['phone'] =$request->number_country_code . $request->phone;
-        $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
+        $input['phone'] = $request->number_country_code . $request->phone;
+        $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
         $input['password'] = Hash::make($input['password']);
 
         $ServiceStaff = User::create($input);
@@ -234,7 +229,7 @@ class ServiceStaffController extends Controller
             // save the filename to the gallery object and persist it to the database
 
             $input['image'] = $filename;
-        }else{
+        } else {
             if (file_exists(public_path('staff-images') . '/' . "default.png")) {
                 $input['image'] = "default.png";
             }
@@ -255,6 +250,8 @@ class ServiceStaffController extends Controller
             $input['image'] = "default.png";
         }
 
+        $ServiceStaff->subTitles()->sync($request->sub_titles);
+
         $staff = Staff::create($input);
         $ServiceStaff->services()->attach($request->service_ids);
         $ServiceStaff->categories()->attach($request->category_ids);
@@ -268,10 +265,10 @@ class ServiceStaffController extends Controller
                 $input[$fileField] = $filename;
             }
         }
-        
+
         UserDocument::create($input);
-        
-        if($request->categories){
+
+        if ($request->categories) {
             foreach ($request->categories as $categoryData) {
                 // Save Category Commission
                 $affiliateCategory = AffiliateCategory::create([
@@ -280,7 +277,7 @@ class ServiceStaffController extends Controller
                     'commission_type' => $categoryData['commission_type'],
                     'commission' => $categoryData['category_commission'],
                 ]);
-        
+
                 // Save Service Commissions (if any)
                 if (!empty($categoryData['services'])) {
                     foreach ($categoryData['services'] as $serviceData) {
@@ -295,8 +292,8 @@ class ServiceStaffController extends Controller
             }
         }
 
-        if(isset($request->groups)){
-            foreach($request->groups as $group){
+        if (isset($request->groups)) {
+            foreach ($request->groups as $group) {
                 $staffGroup = StaffGroup::find($group);
 
                 $staffGroup->staffs()->attach($user_id);
@@ -330,18 +327,18 @@ class ServiceStaffController extends Controller
             ->where('created_at', '>=', $currentMonth)
             ->where('user_id', $serviceStaff->id)
             ->sum('amount');
-        
+
         $freelancer_join = $request->freelancer_join;
 
         $documents = $this->documents;
 
         $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
-        ->get()
-        ->groupBy('day');
-        
+            ->get()
+            ->groupBy('day');
+
         $timeSlots = TimeSlot::get();
 
-        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus','freelancer_join','documents','assignedDrivers','timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.show', compact('serviceStaff', 'transactions', 'total_balance', 'product_sales', 'bonus', 'freelancer_join', 'documents', 'assignedDrivers', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -350,7 +347,7 @@ class ServiceStaffController extends Controller
      * @param  \App\User  $User
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $serviceStaff,Request $request)
+    public function edit(User $serviceStaff, Request $request)
     {
         $users = User::all();
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
@@ -362,21 +359,22 @@ class ServiceStaffController extends Controller
         $freelancer_join = $request->freelancer_join;
         $affiliates = User::role('Affiliate')->orderBy('name')->get();
         $membership_plans = MembershipPlan::where('status', 1)
-        ->where('type',"Freelancer")
-        ->get();
+            ->where('type', "Freelancer")
+            ->get();
         $documents = $this->documents;
 
         $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)
-        ->get()
-        ->groupBy('day');
+            ->get()
+            ->groupBy('day');
         $staffId = $serviceStaff->id;
         $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($staffId) {
             $q->where('staff_id', $staffId);
         })->get();
-        
-        $staffGroups = StaffGroup::with('staffZones')->get();
 
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services','freelancer_join','affiliates','membership_plans','documents','assignedDrivers','timeSlots','staffGroups'));
+        $staffGroups = StaffGroup::with('staffZones')->get();
+        $subTitles = SubTitle::all();
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffGroups', 'subTitles'))
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -398,20 +396,20 @@ class ServiceStaffController extends Controller
             'commission' => 'required',
             'drivers' => 'required|array',
         ];
-        
+
         if ($request->freelancer_join == 1) {
             $rules['expiry_date'] = 'required';
         }
-        
+
         // Custom validation for drivers array
         Validator::make($request->all(), $rules)->after(function ($validator) use ($request) {
             $drivers = $request->input('drivers', []);
-            
+
             foreach ($drivers as $day => $entries) {
                 foreach ($entries as $index => $entry) {
                     $driverId = $entry['driver_id'] ?? null;
                     $timeSlotId = $entry['time_slot_id'] ?? null;
-        
+
                     if (is_null($driverId) xor is_null($timeSlotId)) {
                         $validator->errors()->add("drivers.{$day}.{$index}.driver_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
                         $validator->errors()->add("drivers.{$day}.{$index}.time_slot_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
@@ -419,11 +417,11 @@ class ServiceStaffController extends Controller
                 }
             }
         })->validate();
-        
+
 
         $input = $request->all();
-        $input['phone'] =$request->number_country_code . $request->phone;
-        $input['whatsapp'] =$request->whatsapp_country_code . $request->whatsapp;
+        $input['phone'] = $request->number_country_code . $request->phone;
+        $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
         if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
         } else {
@@ -471,9 +469,11 @@ class ServiceStaffController extends Controller
                 }
             }
         }
-        if($staff){
+
+        $serviceStaff->subTitles()->sync($request->sub_titles);
+        if ($staff) {
             $staff->update($input);
-        }else{
+        } else {
             $input['user_id'] = $id;
             Staff::create($input);
         }
@@ -490,16 +490,16 @@ class ServiceStaffController extends Controller
 
 
         $documentFields = $this->documents;
-    
+
         $userDocuments = UserDocument::where('user_id', $id)->first();
-    
+
         foreach ($documentFields as $fileField => $dbField) {
             if ($request->hasFile($fileField)) {
                 $filename = mt_rand(1000, 9999) . '.' . $request->$fileField->getClientOriginalExtension();
                 $request->$fileField->move(public_path('staff-document'), $filename);
-    
+
                 $input[$fileField] = $filename;
-    
+
                 if ($userDocuments && $userDocuments->$fileField) {
                     $oldFile = public_path('staff-document/' . $userDocuments->$fileField);
                     if (file_exists($oldFile)) {
@@ -510,7 +510,7 @@ class ServiceStaffController extends Controller
                 $input[$fileField] = $userDocuments->$fileField ?? null;
             }
         }
-    
+
         if ($userDocuments) {
             $userDocuments->update($input);
         } else {
@@ -520,8 +520,8 @@ class ServiceStaffController extends Controller
 
         StaffDriver::where('staff_id', $id)->delete();
 
-        foreach ($request->drivers as $day=>$drivers) {
-            foreach ($drivers as $driver){
+        foreach ($request->drivers as $day => $drivers) {
+            foreach ($drivers as $driver) {
                 if (!is_null($driver['driver_id']) && !is_null($driver['time_slot_id'])) {
                     StaffDriver::create([
                         'staff_id' => $id,
@@ -535,7 +535,7 @@ class ServiceStaffController extends Controller
 
         AffiliateCategory::where('affiliate_id', $id)->delete();
 
-        if($request->categories){
+        if ($request->categories) {
             foreach ($request->categories as $categoryData) {
                 $affiliateCategory = AffiliateCategory::create([
                     'affiliate_id' => $id,
@@ -543,7 +543,7 @@ class ServiceStaffController extends Controller
                     'commission_type' => $categoryData['commission_type'],
                     'commission' => $categoryData['category_commission'],
                 ]);
-        
+
                 if (!empty($categoryData['services'])) {
                     foreach ($categoryData['services'] as $serviceData) {
                         AffiliateService::create([
@@ -557,8 +557,8 @@ class ServiceStaffController extends Controller
             }
         }
         User::find($id)->staffGroups()->detach();
-        if(isset($request->groups)){
-            foreach($request->groups as $group){
+        if (isset($request->groups)) {
+            foreach ($request->groups as $group) {
                 $staffGroup = StaffGroup::find($group);
 
                 if (!$staffGroup->staffs()->where('staff_id', $id)->exists()) {
@@ -566,7 +566,7 @@ class ServiceStaffController extends Controller
                 }
             }
         }
-        
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Service Staff updated successfully');
@@ -575,7 +575,7 @@ class ServiceStaffController extends Controller
     public function uploadDocument(Request $request, $id)
     {
         $documentFields = $this->documents;
-        
+
         $userDocuments = UserDocument::where('user_id', $id)->first() ?? new UserDocument();
 
         foreach ($documentFields as $fileField => $dbField) {
@@ -632,12 +632,12 @@ class ServiceStaffController extends Controller
                 }
             }
         }
-
+        $serviceStaff->subTitles()->detach();
         $serviceStaff->delete();
 
         $previousUrl = url()->previous();
 
-        StaffDriver::where('staff_id',$serviceStaff->id)->delete();
+        StaffDriver::where('staff_id', $serviceStaff->id)->delete();
 
         return redirect($previousUrl)
             ->with('success', 'Service Staff deleted successfully');

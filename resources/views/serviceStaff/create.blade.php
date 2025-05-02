@@ -18,7 +18,6 @@
     @endif
     <form action="{{ route('serviceStaff.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <span class="text-danger">Note: To add multiple values in a single input field, use \ as a separator. For example, for "Sub Title": Skin\Hair\Massage, etc.</span>
         <ul class="nav nav-tabs" id="myTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
@@ -50,7 +49,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Sub Title / Designation</strong>
-                            <input type="text" name="sub_title" class="form-control" value="{{ old('sub_title') }}" placeholder="Sub Title">
+                            <select class="form-control selectpicker" id="sub_titles" name="sub_titles[]"
+                                multiple data-live-search="true" data-actions-box="true">
+                                @foreach ($subTitles as $subTitle)
+                                    <option value="{{ $subTitle->id }}" {{ in_array($subTitle->id, old('sub_titles', [])) ? 'selected' : '' }}>{{ $subTitle->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-12">

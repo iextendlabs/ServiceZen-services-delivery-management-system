@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\StaffZone;
 use App\Models\ServiceCategory;
 use App\Models\Service;
+use App\Models\SubTitle;
 
 class HomeController extends Controller
 {
@@ -278,6 +279,7 @@ class HomeController extends Controller
             ->get();
 
         $staffs->map(function ($staff) {
+            $staff->sub_title = $staff->subTitles ? $staff->subTitles->pluck('name')->implode('/') : null;
             $staff->rating = $staff->averageRating();
             return $staff;
         });
@@ -315,6 +317,19 @@ class HomeController extends Controller
 
         $servicesJsonData = [
             'services' => $allServicesArray,
+        ];
+
+        $allSubTitles = SubTitle::all();
+
+        $allSubTitlesArray = $allSubTitles->map(function ($subTitle) {
+            return [
+                'id' => $subTitle->id,
+                'name' => $subTitle->name,
+            ];
+        })->toArray();
+
+        $subTitlesJsonData = [
+            'subTitles' => $allSubTitlesArray,
         ];
 
         try {
@@ -357,6 +372,29 @@ class HomeController extends Controller
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($servicesJsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        try {
+            $filename = "AppSubTitles.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppSubTitles_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $subTitlesJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($subTitlesJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);

@@ -45,9 +45,9 @@
                                 <select name="sub_title" class="form-control select2" id="sub_title">
                                     <option value="">Select Designation</option>
                                     @foreach ($sub_titles as $sub_title)
-                                        <option value="{{ $sub_title }}"
-                                            {{ $sub_title == $filter['sub_title'] ? 'selected' : '' }}>
-                                            {{ $sub_title }}
+                                        <option value="{{ $sub_title->id }}"
+                                            {{ $sub_title->id == $filter['sub_title'] ? 'selected' : '' }}>
+                                            {{ $sub_title->name }}
                                         </option>
                                     @endforeach
                                 </select>

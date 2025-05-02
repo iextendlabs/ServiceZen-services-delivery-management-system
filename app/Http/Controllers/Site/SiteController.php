@@ -107,7 +107,7 @@ class SiteController extends Controller
             ->header('Expires', gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
     }
 
-    public function categoryShow($id)
+    public function categoryShow($slug)
     {
         $reviews = Review::latest()->take(6)->get();
 
@@ -117,16 +117,20 @@ class SiteController extends Controller
 
         $all_categories = [];
 
-        $category = ServiceCategory::with('childCategories')->find($id);
+        $category = ServiceCategory::with('childCategories')->where('slug', $slug)->orWhere('id', $slug)->firstOrFail();
+
+        $metaTitle = $category->meta_title ?? $category->title;
+        $metaDescription = $category->meta_description;
+        $metaKeywords = $category->meta_keywords;
 
         if ($category) {
             $all_categories = $category->childCategories->where('status', 1);
         }
 
-        return view('site.categories.show', compact('category', 'reviews', 'review_char_limit', 'all_categories'));
+        return view('site.categories.show', compact('category','metaTitle','metaDescription','metaKeywords', 'reviews', 'review_char_limit', 'all_categories'));
     }
 
-    public function show($id, Request $request)
+    public function show($slug, Request $request)
     {
         $userAgent = $request->header('User-Agent');
 
@@ -135,10 +139,15 @@ class SiteController extends Controller
         } else {
             $app_flag = false;
         }
-        $service = Service::findOrFail($id);
-        $FAQs = FAQ::where('service_id', $id)->where('status', '1')->get();
-        $reviews = Review::where('service_id', $id)->get();
-        $averageRating = Review::where('service_id', $id)->avg('rating');
+        $service = Service::where('slug', $slug)->orWhere('id', $slug)->firstOrFail();
+
+        $metaTitle = $service->meta_title ?? $service->name;
+        $metaDescription = $service->meta_description;
+        $metaKeywords = $service->meta_keywords;
+
+        $FAQs = FAQ::where('service_id', $service->id)->where('status', '1')->get();
+        $reviews = Review::where('service_id', $service->id)->get();
+        $averageRating = Review::where('service_id', $service->id)->avg('rating');
 
         $lowestPriceOption = null;
         $price = null;
@@ -154,7 +163,7 @@ class SiteController extends Controller
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
         if ($service->status) {
-            return view('site.serviceDetail', compact('service', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit'));
+            return view('site.serviceDetail', compact('service','metaTitle','metaDescription','metaKeywords', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');

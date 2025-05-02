@@ -43,6 +43,7 @@ use App\Models\QuoteImage;
 use App\Models\QuoteOption;
 use App\Models\ServiceOption;
 use App\Models\Staff;
+use App\Models\SubTitle;
 use App\Models\Transaction;
 use App\Models\UserAffiliate;
 use Illuminate\Support\Facades\Log;
@@ -887,6 +888,7 @@ class CustomerController extends Controller
             $orders = Order::where('service_staff_id', $id)->where('status', 'Complete')->count();
             $images = $user->staffImages;
             $videos = $user->staffYoutubeVideo;
+            $sub_title = $user->subTitles ? $user->subTitles->pluck('name')->implode('/') : null;
 
             return [
                 'user' => $user,
@@ -897,7 +899,8 @@ class CustomerController extends Controller
                 'averageRating' => $averageRating,
                 'orders' => $orders,
                 'images' => $images,
-                'videos' => $videos
+                'videos' => $videos,
+                'sub_title' => $sub_title
             ];
         });
 
@@ -912,10 +915,6 @@ class CustomerController extends Controller
         $query = User::whereHas('staff', function ($query) use ($request) {
             $query->where('status', 1);
 
-            if ($request->sub_title) {
-                $query->where('sub_title', 'like', '%' . $request->sub_title . '%');
-            }
-
             if ($request->location) {
                 $query->where('location', 'like', '%' . $request->location . '%');
             }
@@ -923,6 +922,11 @@ class CustomerController extends Controller
             if ($request->min_order_value) {
                 $query->where('min_order_value', $request->min_order_value);
             }
+        })
+        ->when($request->sub_title, function ($query) use ($request) {
+            $query->whereHas('subTitles', function ($q) use ($request) {
+                $q->where('sub_titles.id', $request->sub_title);
+            });
         });
 
         if ($request->service_id) {
@@ -949,6 +953,7 @@ class CustomerController extends Controller
             ->paginate($perPage, ['*'], 'page', $page);
 
         $staff->getCollection()->transform(function ($user) {
+            $user->sub_title = $user->subTitles ? $user->subTitles->pluck('name')->implode('/') : null;
             $user->rating = $user->averageRating();
             return $user;
         });
@@ -968,18 +973,6 @@ class CustomerController extends Controller
     {
         $data = Cache::rememberForever("staff_filter_data", function () {
 
-            $sub_titles = Staff::where('status', 1)
-                ->whereNotNull('sub_title')
-                ->pluck('sub_title')
-                ->toArray();
-
-            $all_sub_titles = [];
-            foreach ($sub_titles as $sub_title) {
-                $sub_title_parts = explode('/', $sub_title);
-                $all_sub_titles = array_merge($all_sub_titles, array_map('trim', $sub_title_parts));
-            }
-            $sub_titles = array_unique(array_filter($all_sub_titles));
-
             $locations = Staff::where('status', 1)
                 ->whereNotNull('location')
                 ->pluck('location')
@@ -996,7 +989,6 @@ class CustomerController extends Controller
             $staffZones = StaffZone::select('id', 'name')->get();
             $services = Service::where('status', 1)->select('id', 'name')->get();
             return [
-                'sub_titles' => $sub_titles,
                 'locations' => $locations,
                 'categories' => $categories,
                 'services' => $services,
@@ -1776,10 +1768,11 @@ class CustomerController extends Controller
             $user->freelancer_program = 0;
             $user->save();
 
+            $user->subTitles()->sync($request->sub_titles);
             $input['user_id'] = $request->userId;
             $input['phone'] = $request->number;
             $input['whatsapp'] = $request->whatsapp;
-            $input['sub_title'] = $request->subTitle;
+            
             if (file_exists(public_path('staff-images') . '/' . "default.png")) {
                 $input['image'] = "default.png";
             }

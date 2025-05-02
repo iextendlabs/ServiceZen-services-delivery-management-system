@@ -19,6 +19,7 @@ use App\Mail\DeleteAccount;
 use App\Models\MembershipPlan;
 use App\Models\Setting;
 use App\Models\Staff;
+use App\Models\SubTitle;
 use Illuminate\Support\Facades\Mail;
 use App\Models\UserAffiliate;
 use Carbon\Carbon;
@@ -40,7 +41,8 @@ class CustomerAuthController extends Controller
         $gender_permission = Setting::where('key','Gender Permission')->value('value');
 
         $membership_plans = MembershipPlan::where('status', 1)->get();
-        return view('site.auth.signUp', compact('affiliate_code','type','gender_permission','membership_plans'));
+        $sub_titles = SubTitle::all();
+        return view('site.auth.signUp', compact('affiliate_code','type','gender_permission','membership_plans','sub_titles'));
     }
 
     public function postRegistration(Request $request)
@@ -99,6 +101,8 @@ class CustomerAuthController extends Controller
             if (file_exists(public_path('staff-images') . '/' . "default.png")) {
                 $input['image'] = "default.png";
             }
+            $customer->subTitles()->sync($request->sub_titles);
+            
             Staff::create($input);
         }elseif($request->type == "Affiliate"){
             $input['parent_affiliate_id'] = $affiliate && $affiliate->user_id ? $affiliate->user_id : null;

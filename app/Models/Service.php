@@ -2,12 +2,36 @@
 
 namespace App\Models;
 
+use App\Traits\SeoHelpers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Artisan;
 
 class Service extends Model
 {
-    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type','quote','pipelineId'];
+    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type','quote','pipelineId','meta_title', 'meta_description', 'meta_keywords', 'slug'];
+
+    protected $nameField = 'name'; // Tell the trait to use 'name' field
+    use SeoHelpers;
+    
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::saving(function ($model) {
+            $model->generateMetaTags();
+        });
+
+        static::saved(function ($model) {
+            if ($model->wasChanged(['slug', 'status'])) {
+                Artisan::call('sitemap:generate');
+            }
+        });
+    
+        static::deleted(function () {
+            Artisan::call('sitemap:generate');
+        });
+    }
 
     public function averageRating()
     {
