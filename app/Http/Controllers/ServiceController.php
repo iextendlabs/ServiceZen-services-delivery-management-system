@@ -113,7 +113,23 @@ class ServiceController extends Controller
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string|max:255',
-            'slug' => 'required|string|max:255|unique:services,slug',
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:services,slug',
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                function ($attribute, $value, $fail) {
+                    if (preg_match('/--/', $value)) {
+                        $fail('The slug cannot contain consecutive hyphens.');
+                    }
+                    if (str_starts_with($value, '-') || str_ends_with($value, '-')) {
+                        $fail('The slug cannot start or end with a hyphen.');
+                    }
+                },
+            ],
+        ], [
+            'slug.regex' => 'The slug must contain only lowercase letters, numbers, and hyphens.',
         ]);
 
         $input = $request->all();
@@ -251,7 +267,26 @@ class ServiceController extends Controller
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string|max:255',
-            'slug' => 'required|string|max:255|unique:services,slug,' . $id,
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:services,slug,' . $id, // Works for both create/update
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                function ($attribute, $value, $fail) {
+                    if (preg_match('/--/', $value)) {
+                        $fail('The slug cannot contain consecutive hyphens.');
+                    }
+                    if (str_starts_with($value, '-') || str_ends_with($value, '-')) {
+                        $fail('The slug cannot start or end with a hyphen.');
+                    }
+                    if (preg_match('/[^a-z0-9-]/', $value)) {
+                        $fail('The slug can only contain lowercase letters, numbers, and hyphens.');
+                    }
+                },
+            ],
+        ], [
+            'slug.regex' => 'The slug must contain only lowercase letters, numbers, and hyphens.',
         ]);
 
         $input = $request->all();
