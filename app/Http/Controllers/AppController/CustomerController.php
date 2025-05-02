@@ -973,8 +973,6 @@ class CustomerController extends Controller
     {
         $data = Cache::rememberForever("staff_filter_data", function () {
 
-            $sub_titles = SubTitle::all();
-
             $locations = Staff::where('status', 1)
                 ->whereNotNull('location')
                 ->pluck('location')
@@ -991,7 +989,6 @@ class CustomerController extends Controller
             $staffZones = StaffZone::select('id', 'name')->get();
             $services = Service::where('status', 1)->select('id', 'name')->get();
             return [
-                'sub_titles' => $sub_titles,
                 'locations' => $locations,
                 'categories' => $categories,
                 'services' => $services,
@@ -1771,10 +1768,11 @@ class CustomerController extends Controller
             $user->freelancer_program = 0;
             $user->save();
 
+            $user->subTitles()->sync($request->sub_titles);
             $input['user_id'] = $request->userId;
             $input['phone'] = $request->number;
             $input['whatsapp'] = $request->whatsapp;
-            $input['sub_title'] = $request->subTitle;
+            
             if (file_exists(public_path('staff-images') . '/' . "default.png")) {
                 $input['image'] = "default.png";
             }
