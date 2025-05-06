@@ -49,6 +49,7 @@ use App\Http\Controllers\{
     FreelancerProgramController,
     InformationController,
     KommoController,
+    LogController,
     QuoteController,
     StripePaymentController,
     SubTitleController,
@@ -172,10 +173,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/summerNote/upload', [SummerNoteController::class,"upload"])->name('summerNote.upload');
     Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
 
-    Route::get('/log', [OrderController::class, 'showLog'])->name('log.show');
-    Route::post('/log/empty', [OrderController::class, 'emptyLog'])->name('log.empty');
-
-
     Route::post('/affiliate_edit/{id}', [OrderController::class, 'affiliate_edit'])->name('orders.affiliate_edit');
     Route::post('/booking_edit/{id}', [OrderController::class, 'booking_edit'])->name('orders.booking_edit');
     Route::post('/custom_location/{id}', [OrderController::class, 'custom_location'])->name('orders.custom_location');
@@ -227,6 +224,9 @@ Route::group(['middleware' => ['auth']], function () {
         Cache::flush(); // Clears all cache
         return redirect()->back()->with('success', 'Cache cleared!');
     })->name('cache.clear');
+
+    Route::get('/logs/view/{file}', [LogController::class, 'view'])->name('logs.view');
+    Route::post('/logs/clear/{file}', [LogController::class, 'clear'])->name('logs.clear');
 
 });
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');

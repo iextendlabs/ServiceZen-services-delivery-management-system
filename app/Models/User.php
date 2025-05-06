@@ -230,10 +230,6 @@ class User extends Authenticatable
                     return "Failed to send notification. FCM Response: " . $response->body();
                 }
             } catch (\Exception $e) {
-                Log::error('FCM Notification Exception', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
                 return "Error sending notification: " . $e->getMessage();
             }
         }

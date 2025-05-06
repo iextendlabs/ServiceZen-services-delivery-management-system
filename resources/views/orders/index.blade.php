@@ -100,7 +100,7 @@
                         <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
                             <i class="fas fa-check"></i> Confirm
                         </a>
-                        <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('log.show') }}">
+                        <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('logs.view', ['file' => 'order_request']) }}">
                             Order request log
                         </a>
                     @endif

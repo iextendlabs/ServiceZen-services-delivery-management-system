@@ -161,6 +161,19 @@
                             </div>
                         </li>
                         @endcan
+                        @can('menu-maintenance')
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                Maintenance
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('logs.view', ['file' => 'laravel']) }}">Laravel Log</a>
+                                <a class="dropdown-item" href="{{ route('logs.view', ['file' => 'app_error']) }}">Error Log</a>
+                                <a class="dropdown-item" href="{{ route('logs.view', ['file' => 'order_request']) }}">Order Request Log</a>
+                            </div>
+                        </li>
+                        @endcan
                         @can('campaign-list')
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{{ route('campaigns.index')}}">Campaigns</a>

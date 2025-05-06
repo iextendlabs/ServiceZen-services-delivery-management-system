@@ -1011,31 +1011,6 @@ class OrderController extends Controller
         return redirect()->back();
     }
 
-    public function showLog()
-    {
-        $logPath = storage_path('logs/order_request.log');
-
-        if (File::exists($logPath)) {
-            $logContent = File::get($logPath);
-        } else {
-            $logContent = 'Log file does not exist.';
-        }
-
-        return view('orders.log.show', compact('logContent'));
-    }
-
-    public function emptyLog()
-    {
-        $logPath = storage_path('logs/order_request.log');
-
-        if (File::exists($logPath)) {
-            File::put($logPath, '');
-            return redirect()->route('log.show')->with('success', 'Log file emptied successfully.');
-        } else {
-            return redirect()->route('log.show')->with('error', 'Log file not found.');
-        }
-    }
-
     public function removeCoupon($id)
     {
         $order = Order::find($id);
