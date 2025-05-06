@@ -43,65 +43,103 @@
 
             @can('dashboard-report')
                 @if (auth()->user()->hasRole('Admin'))
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">TOTAL SALES</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-credit-card"></i>
-                                <span class="float-md-end">@currency($sale,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">TOTAL AFFILIATE COMMISSION</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($affiliate_commission,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">TOTAL STAFF COMMISSION</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_commission,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>CRM Quotes Today</span>
-                                <a href="{{ route('crms.index') }}" class="small text-primary text-decoration-none">See All</a>
-                            </div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-chart-bar"></i>
-                                <span class="float-md-end">{{ $todayCrms }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 mt-3">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Today's App Report</span>
-                            </div>
-                            <div class="card-body p-4" style="min-height: 80px;"> <!-- Adjust height as needed -->
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <i class="fa fa-users"></i>
-                                        <span>Users: {{ $todayAppUser }}</span>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6 mt-5">
+                                <div class="card">
+                                    <div class="card-header">TOTAL SALES</div>
+                                    <div class="card-body analytic">
+                                        <i class="fa fa-credit-card"></i>
+                                        <span class="float-md-end">@currency($sale,true)</span>
                                     </div>
-                                    <div>
-                                        <i class="fa fa-shopping-cart"></i>
-                                        <span>Orders: {{ $todayAppOrder }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-5">
+                                <div class="card">
+                                    <div class="card-header">TOTAL AFFILIATE COMMISSION</div>
+                                    <div class="card-body analytic">
+                                        <i class="fa fa-dollar-sign"></i>
+                                        <span class="float-md-end">@currency($affiliate_commission,true)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-5">
+                                <div class="card">
+                                    <div class="card-header">TOTAL STAFF COMMISSION</div>
+                                    <div class="card-body analytic">
+                                        <i class="fa fa-dollar-sign"></i>
+                                        <span class="float-md-end">@currency($staff_commission,true)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-5">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <span>CRM Quotes Today</span>
+                                        <a href="{{ route('crms.index') }}" class="small text-primary text-decoration-none">See All</a>
+                                    </div>
+                                    <div class="card-body analytic">
+                                        <i class="fa fa-chart-bar"></i>
+                                        <span class="float-md-end">{{ $todayCrms }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <div class="card h-100"> <!-- Added h-100 for consistent height -->
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Today's Application Report</span>
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-4"> <!-- Added gutter spacing -->
+                                    <!-- Users Stats -->
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-center p-2 bg-light rounded">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                                                <i class="fa fa-users text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">Total Users</h6>
+                                                <p class="mb-0 fs-5">{{ $todayAppUser }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <!-- Logged-in Users -->
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-center p-2 bg-light rounded">
+                                            <div class="bg-success bg-opacity-10 p-2 rounded me-3">
+                                                <i class="fas fa-user-check text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">Active Users</h6>
+                                                <p class="mb-0 fs-5">{{ $todayLoginAppUser }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <!-- Orders -->
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-center p-2 bg-light rounded">
+                                            <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
+                                                <i class="fa fa-shopping-cart text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">Today's Orders</h6>
+                                                <p class="mb-0 fs-5">{{ $todayAppOrder }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                    
                     
                 @endif
 
@@ -164,7 +202,7 @@
             @endcan
         </div>
         @if(auth()->user()->hasRole('Admin'))
-        <div class="row pt-3">
+        <div class="row pt-5">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header bg-primary text-white">Staff Status</div>
