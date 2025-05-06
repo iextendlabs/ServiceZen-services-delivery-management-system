@@ -923,11 +923,11 @@ class CustomerController extends Controller
                 $query->where('min_order_value', $request->min_order_value);
             }
         })
-        ->when($request->sub_title, function ($query) use ($request) {
-            $query->whereHas('subTitles', function ($q) use ($request) {
-                $q->where('sub_titles.id', $request->sub_title);
+            ->when($request->sub_title, function ($query) use ($request) {
+                $query->whereHas('subTitles', function ($q) use ($request) {
+                    $q->where('sub_titles.id', $request->sub_title);
+                });
             });
-        });
 
         if ($request->service_id) {
             $query->whereHas('services', function ($q) use ($request) {
@@ -1571,7 +1571,7 @@ class CustomerController extends Controller
             $input['date'] = $date;
             $input['service_staff_id'] = $service_staff_id;
             $input['time_slot_id'] = $time_slot_id;
-            $input['order_source'] = "Site";
+            $input['order_source'] = "Android";
 
             $staff = User::find($service_staff_id);
 
@@ -1772,7 +1772,7 @@ class CustomerController extends Controller
             $input['user_id'] = $request->userId;
             $input['phone'] = $request->number;
             $input['whatsapp'] = $request->whatsapp;
-            
+
             if (file_exists(public_path('staff-images') . '/' . "default.png")) {
                 $input['image'] = "default.png";
             }
@@ -2073,5 +2073,17 @@ class CustomerController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => $message]);
+    }
+
+    public function errorLog(Request $request)
+    {
+        $errorData = [
+            'error' => $request->input('error', 'Unknown error'),
+            'timestamp' => now()->toISOString()
+        ];
+
+        Log::channel('app_error_log')->info('React Native Error', $errorData);
+
+        return response()->json(['status' => 'error_logged']);
     }
 }
