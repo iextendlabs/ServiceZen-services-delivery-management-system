@@ -143,7 +143,12 @@ class StaffProfileController extends Controller
             }
         }
 
-        $category_ids = $user->categories ? $user->categories()->pluck('category_id')->toArray() : [];
+        $category_ids = [];
+
+        if ($user) {
+            $category_ids = $user->categories ? $user->categories()->pluck('category_id')->toArray() : [];
+        }
+        
         $service_ids = $user->services ? $user->services()->pluck('service_id')->toArray() : [];
 
         // ✅ Cache service categories per user
