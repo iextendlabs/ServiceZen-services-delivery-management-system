@@ -41,7 +41,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
 
         $currentDate = Carbon::today()->toDateString();
@@ -143,8 +143,24 @@ class HomeController extends Controller
             $todayAppOrder = Order::whereDate('created_at', Carbon::today())->where('order_source','Android')->count();
 
 
-            $staffs = User::with('staff')->role('Staff')->get();
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms','todayAppUser','todayAppOrder','todayLoginAppUser'));
+            $query = User::with('staff')->role('Staff');
+        
+            if ($request->search) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+        
+            if ($request->status) {
+                $status = $request->status === 'online';
+                $query->whereHas('staff', function($q) use ($status) {
+                    $q->where('online', $status);
+                });
+            }
+        
+            $onlineCount = User::role('Staff')->whereHas('staff', fn($q) => $q->where('online', 1))->count();
+            $offlineCount = User::role('Staff')->whereHas('staff', fn($q) => $q->where('online', 0))->count();
+        
+            $staffs = $query->paginate(20);
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms','todayAppUser','todayAppOrder','todayLoginAppUser','onlineCount','offlineCount'));
         }
     }
 
