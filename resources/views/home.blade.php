@@ -82,6 +82,26 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-4 mt-3">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Today's App Report</span>
+                            </div>
+                            <div class="card-body p-4" style="min-height: 80px;"> <!-- Adjust height as needed -->
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <i class="fa fa-users"></i>
+                                        <span>Users: {{ $todayAppUser }}</span>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-shopping-cart"></i>
+                                        <span>Orders: {{ $todayAppOrder }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                 @endif
 
