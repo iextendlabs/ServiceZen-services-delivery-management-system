@@ -64,13 +64,12 @@ class CustomerController extends Controller
         ];
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
-
+            $user->last_login_time = Carbon::now();
+            $user->login_source = "Android";
             if ($request->has('fcmToken') && $request->fcmToken) {
-                $user->last_login_time = Carbon::now();
-                $user->login_source = "Android";
                 $user->device_token = $request->fcmToken;
-                $user->save();
             }
+            $user->save();
 
             $token = $user->createToken('app-token')->plainTextToken;
             $user_info = CustomerProfile::where('user_id', $user->id)->first();
@@ -165,6 +164,9 @@ class CustomerController extends Controller
         if ($request->has('fcmToken') && $request->fcmToken) {
             $input['device_token'] = $request->fcmToken;
         }
+        $input['last_login_time'] = Carbon::now();
+        $input['login_source'] = "Android";
+        
         $user = User::create($input);
         $user->assignRole("Customer");
         $input['user_id'] = $user->id;
