@@ -66,6 +66,8 @@ class CustomerController extends Controller
             $user = User::where('email', $request->username)->first();
 
             if ($request->has('fcmToken') && $request->fcmToken) {
+                $user->last_login_time = Carbon::now();
+                $user->login_source = "Android";
                 $user->device_token = $request->fcmToken;
                 $user->save();
             }

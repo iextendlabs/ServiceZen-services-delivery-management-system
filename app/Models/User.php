@@ -31,7 +31,9 @@ class User extends Authenticatable
         'customer_source',
         'status',
         'affiliate_program',
-        'freelancer_program'
+        'freelancer_program',
+        'last_login_time', 
+        'login_source'
     ];
 
     /**
