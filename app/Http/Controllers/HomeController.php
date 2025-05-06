@@ -136,8 +136,13 @@ class HomeController extends Controller
 
             $todayCrms = CRM::whereDate('created_at', Carbon::today())->count();
 
+            $todayAppUser = User::whereDate('created_at', Carbon::today())->where('customer_source','Android')->count();
+
+            $todayAppOrder = Order::whereDate('created_at', Carbon::today())->where('order_source','Android')->count();
+
+
             $staffs = User::with('staff')->role('Staff')->get();
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms'));
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms','todayAppUser','todayAppOrder'));
         }
     }
 
