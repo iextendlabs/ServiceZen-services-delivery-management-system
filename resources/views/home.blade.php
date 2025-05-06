@@ -13,6 +13,33 @@
         font-size: 2.5rem;
         display: inline;
     }
+    .staff-status .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .staff-status .filter-btn.active {
+        font-weight: bold;
+        border-width: 2px;
+    }
+    .staff-status #staffSearch:focus {
+        box-shadow: none;
+        border-color: #86b7fe;
+    }
+    .staff-status .input-group:focus-within {
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.25);
+    }
+    .staff-status #clearAllFilters {
+        transition: all 0.2s ease;
+    }
+    .staff-status #clearAllFilters:hover {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .staff-status .input-group button {
+        border-left: none;
+    }
+    .staff-status .input-group button:last-child {
+        border-left: 1px solid #ced4da;
+    }
 </style>
 @section('content')
     <div class="container">
@@ -202,29 +229,82 @@
             @endcan
         </div>
         @if(auth()->user()->hasRole('Admin'))
-        <div class="row pt-5">
+        <div class="row pt-5 staff-status">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">Staff Status</div>
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span>Staff Status ({{ $staffs->total() }})</span>
+                        <div class="input-group" style="width: 350px;">
+                            <input type="text" id="staffSearch" class="form-control" placeholder="Search staff by name..." value="{{ request('search') }}">
+                            <button class="btn btn-light" type="button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            @if(request('search') || request('status'))
+                            <button class="btn btn-outline-light" type="button" id="clearButton" title="Clear all filters">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            @endif
+                        </div>
+                    </div>
                     <div class="card-body">
+                        <!-- Status Summary -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="alert alert-info p-2">
+                                    <strong>Total Staff:</strong> {{ $staffs->total() }} | 
+                                    <span class="text-success"><strong>Online:</strong> {{ $onlineCount }}</span> | 
+                                    <span class="text-danger"><strong>Offline:</strong> {{ $offlineCount }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                <div class="btn-group me-3" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary filter-btn {{ !request('status') ? 'active' : '' }}" data-filter="all">All</button>
+                                    <button type="button" class="btn btn-sm btn-outline-success filter-btn {{ request('status') === 'online' ? 'active' : '' }}" data-filter="online">Online</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger filter-btn {{ request('status') === 'offline' ? 'active' : '' }}" data-filter="offline">Offline</button>
+                                </div>
+                                @if(request('search') || request('status'))
+                                <button class="btn btn-sm btn-outline-warning" id="clearAllFilters">
+                                    <i class="fas fa-filter-circle-xmark me-1"></i> Clear Filters
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <!-- Staff List -->
                         <div class="row">
                             @forelse ($staffs as $staff)
-                                @if ($staff->staff) {{-- Ensure staff relationship exists --}}
-                                    <div class="col-md-4 mb-3"> {{-- Each staff takes 1/3 of the row --}}
-                                        <div class="list-group">
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                {{ $staff->name }}
-                                                <span class="badge {{ $staff->staff->online ? 'bg-success' : 'bg-danger' }}">
+                                @if ($staff->staff)
+                                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                                                <div class="staff-info">
+                                                    <h6 class="mb-0 text-truncate" style="max-width: 180px;" title="{{ $staff->name }}">
+                                                        {{ $staff->name }}
+                                                    </h6>
+                                                    <small class="text-muted">{{ $staff->email ?? '' }}</small>
+                                                </div>
+                                                <span class="badge {{ $staff->staff->online ? 'bg-success' : 'bg-danger' }} rounded-pill">
                                                     {{ $staff->staff->online ? 'Online' : 'Offline' }}
                                                 </span>
-                                            </li>
+                                            </div>
                                         </div>
                                     </div>
                                 @endif
                             @empty
-                                <li class="list-group-item text-center">No staff available.</li>
+                                <div class="col-12">
+                                    <div class="alert alert-warning text-center">No staff found matching your criteria.</div>
+                                </div>
                             @endforelse
                         </div>
+                        
+                        <!-- Pagination -->
+                        @if($staffs->hasPages())
+                            <div class="row mt-3">
+                                <div class="col-md-12 d-flex justify-content-center">
+                                    {{ $staffs->appends(request()->query())->links() }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -479,4 +559,46 @@
             </div>
         @endcan
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#searchButton').on('click', function(e) {
+                if (e.type === 'click') {
+                    updateSearch();
+                }
+            });
+            
+            $('.filter-btn').on('click', function() {
+                const filter = $(this).data('filter');
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                updateSearch(filter === 'all' ? '' : filter);
+            });
+            
+            // Clear search input
+            $('#clearButton').on('click', function() {
+                $('#staffSearch').val('');
+                updateSearch();
+            });
+            
+            // Clear all filters
+            $('#clearAllFilters').on('click', function() {
+                window.location.href = window.location.pathname;
+            });
+            
+            function updateSearch(status = '{{ request('status') }}') {
+                const search = $('#staffSearch').val();
+                const params = new URLSearchParams(window.location.search);
+                
+                if (search) params.set('search', search);
+                else params.delete('search');
+                
+                if (status) params.set('status', status);
+                else params.delete('status');
+                
+                params.delete('page'); // Reset to first page when filtering
+                
+                window.location.href = window.location.pathname + '?' + params.toString();
+            }
+        });
+    </script>
 @endsection
