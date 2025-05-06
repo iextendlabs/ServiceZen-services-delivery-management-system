@@ -2075,7 +2075,7 @@ class CustomerController extends Controller
         return response()->json(['success' => true, 'message' => $message]);
     }
 
-    public function store(Request $request)
+    public function errorLog(Request $request)
     {
         $errorData = [
             'error' => $request->input('error', 'Unknown error'),
