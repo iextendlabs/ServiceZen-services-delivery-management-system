@@ -103,7 +103,7 @@
                                                 <i class="fa fa-users text-white"></i>
                                             </div>
                                             <div>
-                                                <h6 class="mb-0 fw-bold">Total Users</h6>
+                                                <h6 class="mb-0 fw-bold">Total Register Users</h6>
                                                 <p class="mb-0 fs-5">{{ $todayAppUser }}</p>
                                             </div>
                                         </div>
