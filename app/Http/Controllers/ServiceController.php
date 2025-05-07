@@ -112,7 +112,6 @@ class ServiceController extends Controller
             'categoriesId' => 'required',
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
-            'meta_keywords' => 'nullable|string|max:255',
             'slug' => [
                 'required',
                 'string',
@@ -266,7 +265,6 @@ class ServiceController extends Controller
             'categoriesId' => 'required',
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
-            'meta_keywords' => 'nullable|string|max:255',
             'slug' => [
                 'required',
                 'string',
