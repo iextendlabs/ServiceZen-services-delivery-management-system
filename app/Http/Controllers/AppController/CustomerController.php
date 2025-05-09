@@ -883,6 +883,7 @@ class CustomerController extends Controller
                     'category_id' => $categoryIds,
                     'short_description' => $service->short_description,
                     'rating' => $service->averageRating(),
+                    'quote' => $service->quote,
                     'options' => $service->serviceOption
                 ];
             })->toArray();
