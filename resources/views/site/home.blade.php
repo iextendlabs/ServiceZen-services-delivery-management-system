@@ -146,12 +146,6 @@
             @endforeach
         </div>
         <hr>
-        <x-ads.ad-unit 
-            slot="1234567890" 
-            format="rectangle"
-            style="display:block; width: 300px; height: 250px; margin: 0 auto;"
-        />
-        <hr>
         <div class="row">
             @foreach ($all_categories as $single_category)
                 @if (count($single_category->services->where('status', 1)->take(10)) > 0)
