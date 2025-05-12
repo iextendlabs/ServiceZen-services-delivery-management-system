@@ -275,11 +275,6 @@
                        
                         <span>{{ count($reviews) }} Reviews</span>
                     </div>
-                    <x-ads.ad-unit 
-                        slot="1234567890"
-                        format="rectangle"
-                        style="display:block; width: 300px; height: 250px; margin: 0 auto;"
-                    />
                 </div>
             </div>
         </div>
