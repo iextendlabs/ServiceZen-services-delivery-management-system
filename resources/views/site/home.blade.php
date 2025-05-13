@@ -1,4 +1,9 @@
 @extends('site.layout.app')
+@section('adsense_head')
+    @if (!empty($ads['home']['head']))
+        {!! $ads['home']['head'] !!}
+    @endif
+@endsection
 @section('content')
     @php
         if ($app_flag === true) {
@@ -51,6 +56,9 @@
         }
     </style>
     <div class="container">
+        @if (!empty($ads['home']['top']))
+                {!! $ads['home']['top'] !!}
+            @endif
         <div class="col-md-6 col-sm-12 offset-md-3 mt-5">
             <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
                 <div class="input-group">
@@ -145,6 +153,9 @@
                 @include('site.categories.category_card', ['category' => $single_category])
             @endforeach
         </div>
+        @if (!empty($ads['home']['center']))
+            {!! $ads['home']['center'] !!}
+        @endif
         <hr>
         <div class="row">
             @foreach ($all_categories as $single_category)
@@ -288,6 +299,9 @@
                         <a href="{{ route('siteFAQs.index') }}" class="btn btn-primary">More..</a>
                     </div>
                 </div>
+            @endif
+            @if (!empty($ads['home']['bottom']))
+                {!! $ads['home']['bottom'] !!}
             @endif
         </div>
     </div>

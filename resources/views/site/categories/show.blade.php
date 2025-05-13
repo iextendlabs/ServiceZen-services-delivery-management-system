@@ -1,4 +1,9 @@
 @extends('site.layout.app')
+@section('adsense_head')
+    @if (!empty($ads['category']['head']))
+        {!! $ads['category']['head'] !!}
+    @endif
+@endsection
 @section('content')
     <div class="container">
         <div class="text-center mt-3">
@@ -20,6 +25,9 @@
                 </div>
             @endif
         </div>
+        @if (!empty($ads['category']['top']))
+            {!! $ads['category']['top'] !!}
+        @endif
         <section class="jumbotron text-center">
             <div class="container">
                 @if (isset($category))
@@ -110,6 +118,9 @@
                     </div>
                 @endif
             </div>
+            @if (!empty($ads['category']['bottom']))
+                {!! $ads['category']['bottom'] !!}
+            @endif
         </div>
     </div>
     <script>

@@ -54,6 +54,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
 
     {!! $head_tag !!}
+
+    {{-- AdSense Code from Section --}}
+    @yield('adsense_head')
 </head>
 @if (session()->has('bookingData'))
     @php
