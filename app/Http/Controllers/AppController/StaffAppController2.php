@@ -780,6 +780,8 @@ class StaffAppController2 extends Controller
             }
         }
 
+        $quote->staffs()->updateExistingPivot($staff_id, ['status' => "Inprogress"]);
+
         if ($quote->user) {
             $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name);
         }
