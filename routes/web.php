@@ -228,6 +228,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/logs/view/{file}', [LogController::class, 'view'])->name('logs.view');
     Route::post('/logs/clear/{file}', [LogController::class, 'clear'])->name('logs.clear');
 
+    Route::put('/adsense/update/{id}', [SettingController::class, 'adsUpdate'])->name('settings.adsUpdate');
 });
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
 

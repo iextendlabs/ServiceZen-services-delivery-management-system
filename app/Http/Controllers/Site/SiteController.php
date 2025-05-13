@@ -88,6 +88,9 @@ class SiteController extends Controller
             });
         }
 
+        $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
+        $ads = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+
         $view = view('site.home', compact(
             'services',
             'address',
@@ -98,7 +101,8 @@ class SiteController extends Controller
             'review_char_limit',
             'all_categories',
             'app_flag',
-            'search'
+            'search',
+            'ads'
         ));
     
         return response($view, 200)
@@ -127,7 +131,10 @@ class SiteController extends Controller
             $all_categories = $category->childCategories->where('status', 1);
         }
 
-        return view('site.categories.show', compact('category','metaTitle','metaDescription','metaKeywords', 'reviews', 'review_char_limit', 'all_categories'));
+        $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
+        $ads = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+
+        return view('site.categories.show', compact('category','metaTitle','metaDescription','metaKeywords', 'reviews', 'review_char_limit', 'all_categories','ads'));
     }
 
     public function show($slug, Request $request)
@@ -163,7 +170,9 @@ class SiteController extends Controller
         $review_char_limit = Setting::where('key', 'Character Limit Of Review On Home Page')->value('value');
 
         if ($service->status) {
-            return view('site.serviceDetail', compact('service','metaTitle','metaDescription','metaKeywords', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit'));
+            $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
+            $ads = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+            return view('site.serviceDetail', compact('service','metaTitle','metaDescription','metaKeywords', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit','ads'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');

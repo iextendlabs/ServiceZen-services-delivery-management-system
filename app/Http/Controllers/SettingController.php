@@ -72,9 +72,15 @@ class SettingController extends Controller
      */
     public function edit($id)
     {
+        $setting = Setting::find($id);
+
+        if($setting->key == 'Google AdSense') {
+            $ads = $setting ? json_decode($setting->value, true) : [];
+
+            return view('settings.adSenseEdit', compact('ads','setting'));
+        }
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-        $setting = Setting::find($id);
         $staffs = User::role('Staff')->get();
         return view('settings.edit', compact('setting', 'services', 'categories', 'staffs'));
     }
@@ -227,6 +233,26 @@ class SettingController extends Controller
         return redirect()->route('settings.index')
             ->with('success', 'Setting Update successfully.');
     }
+
+    public function adsUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'codes' => 'required|array',
+        ]);
+
+        $setting = Setting::findOrFail($id);
+
+        if ($setting->key !== 'Google AdSense') {
+            return back()->withErrors(['Invalid setting key.']);
+        }
+
+        // Save the codes as JSON
+        $setting->value = json_encode($request->codes, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $setting->save();
+
+        return redirect()->back()->with('success', 'AdSense settings updated successfully.');
+    }
+
 
 
     /**

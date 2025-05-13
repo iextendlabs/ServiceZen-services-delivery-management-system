@@ -1,4 +1,9 @@
 @extends('site.layout.app')
+@section('adsense_head')
+    @if (!empty($ads['service']['head']))
+        {!! $ads['service']['head'] !!}
+    @endif
+@endsection
 <style>
     .box-shadow {
         background: none !important;
@@ -93,6 +98,9 @@
                 </div>
             @endif
         </div>
+        @if (!empty($ads['service']['top']))
+            {!! $ads['service']['top'] !!}
+        @endif
         <div id="serviceDetailContainer" class="album py-5">
             <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
             <div class="row">
@@ -275,6 +283,9 @@
                        
                         <span>{{ count($reviews) }} Reviews</span>
                     </div>
+                    @if (!empty($ads['service']['right']))
+                        {!! $ads['service']['right'] !!}
+                    @endif
                 </div>
             </div>
         </div>
@@ -517,6 +528,9 @@
                 </div>
             @endif
         </div>
+        @if (!empty($ads['service']['bottom']))
+            {!! $ads['service']['bottom'] !!}
+        @endif
     </div>
     </div>
     <script>
