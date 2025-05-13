@@ -41,7 +41,6 @@ class BidController extends Controller
         $quote = Quote::find($quote_id);
 
         $staff = User::find($staff_id);
-
         $bid = Bid::create([
             'quote_id' => $quote_id,
             'staff_id' => $staff_id,
@@ -60,6 +59,8 @@ class BidController extends Controller
                 ]);
             }
         }
+
+        $quote->staffs()->updateExistingPivot($staff_id, ['status' => "Inprogress"]);
 
         if ($quote->user) {
             $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name);
