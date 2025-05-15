@@ -309,6 +309,19 @@ class HomeController extends Controller
 
         $gender_permission = Setting::where('key', 'Gender Permission')->value('value');
 
+        $setting = Setting::where('key', 'In App Browsing')->first();
+
+        $entries = json_decode($setting->value, true);
+
+        $in_app_browsing = [];
+
+        foreach ($entries as $entry) {
+            $in_app_browsing[] = [
+                'image' => asset('app-browsing-icon/' . $entry['image']),
+                'destination_url' => $entry['destinationUrl'],
+            ];
+        }
+
         $jsonData = [
             'images' => $images,
             'categories' => $categoriesArray,
@@ -316,7 +329,8 @@ class HomeController extends Controller
             'staffZones' => $staffZones,
             'staffs' => $staffs,
             'whatsapp_number' => $whatsapp_number,
-            'gender_permission' => $gender_permission
+            'gender_permission' => $gender_permission,
+            'in_app_browsing' => $in_app_browsing
         ];
 
         $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
