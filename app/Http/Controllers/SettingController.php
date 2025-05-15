@@ -7,6 +7,8 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class SettingController extends Controller
 {
@@ -74,10 +76,19 @@ class SettingController extends Controller
     {
         $setting = Setting::find($id);
 
-        if($setting->key == 'Google AdSense') {
+        if ($setting->key == 'Google AdSense') {
             $ads = $setting ? json_decode($setting->value, true) : [];
 
-            return view('settings.adSenseEdit', compact('ads','setting'));
+            return view('settings.adSenseEdit', compact('ads', 'setting'));
+        }
+
+        if ($setting->key == 'In App Browsing') {
+            $links = [];
+
+            if ($setting && $setting->value) {
+                $links = json_decode($setting->value, true);
+            }
+            return view('settings.InAppBrowsing', compact('links', 'setting'));
         }
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
@@ -253,7 +264,73 @@ class SettingController extends Controller
         return redirect()->back()->with('success', 'AdSense settings updated successfully.');
     }
 
+    public function appBrowsingUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'entries' => 'required|array|min:1',
+        ]);
 
+        $validatedEntries = [];
+
+        foreach ($request->entries as $index => $entry) {
+            $hasImage = isset($entry['image']) && $entry['image'] !== null;
+            $hasExistingImage = !empty($entry['existing_image']);
+            $hasURL = !empty($entry['destination_url']);
+
+            // Skip validation if both fields are empty
+            if (!$hasImage && !$hasExistingImage && !$hasURL) {
+                continue;
+            }
+
+            // Conditionally require image if URL is filled
+            $rules = [
+                'destination_url' => ['nullable', 'url'],
+                'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048', 'dimensions:width=300,height=300'],
+                'existing_image' => ['nullable', 'string'],
+            ];
+
+            if ($hasURL && !$hasImage && !$hasExistingImage) {
+                $rules['image'][] = 'required_without:existing_image';
+                $rules['existing_image'][] = 'required_without:image';
+            }
+
+            if (($hasImage || $hasExistingImage) && !$hasURL) {
+                $rules['destination_url'][] = 'required';
+            }
+
+            $validator = Validator::make($entry, $rules, [
+                'destination_url.required' => "Destination URL is required for entry #" . ($index + 1),
+                'destination_url.url' => "Destination URL must be valid for entry #" . ($index + 1),
+                'image.required_without' => "Image or existing image is required for entry #" . ($index + 1),
+                'image.image' => "The image must be valid for entry #" . ($index + 1),
+                'existing_image.required_without' => "Please select an existing image or upload a new one for entry #" . ($index + 1),
+            ]);
+
+            $validator->validate();
+
+            // Process image
+            $imageName = $entry['existing_image'] ?? null;
+
+            if (isset($entry['image'])) {
+                $imageFile = $entry['image'];
+                $imageName = time() . '_' . rand(1000, 9999) . '.' . $imageFile->getClientOriginalExtension();
+                $imageFile->move(public_path('app-browsing-icon'), $imageName);
+            }
+
+            // Add to list
+            $validatedEntries[] = [
+                'image' => $imageName,
+                'destinationUrl' => $entry['destination_url'],
+            ];
+        }
+
+        // Save data
+        $setting = Setting::findOrFail($id);
+        $setting->value = json_encode($validatedEntries);
+        $setting->save();
+
+        return redirect()->route('settings.edit', $id)->with('success', 'Settings updated successfully');
+    }
 
     /**
      * Remove the specified resource from storage.

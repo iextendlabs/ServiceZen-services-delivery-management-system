@@ -23,6 +23,7 @@ public/AppHomeData.json
 public/AppServicesData.json
 public/sitemap.xml
 public/order-attachment/
+public/app-browsing-icon/
 
 # Laravel 5 & Lumen specific
 public/storage

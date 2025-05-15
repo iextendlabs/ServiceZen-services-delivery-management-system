@@ -205,6 +205,13 @@ class SettingsTableSeeder extends Seeder
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',
             ],
+            [
+                'id' => 27,
+                'key' => 'In App Browsing',
+                'value' => '',
+                'created_at' => '2023-08-31 17:36:24',
+                'updated_at' => '2023-08-31 16:45:43',
+            ],
         ];
 
         foreach ($settings as $setting) {
