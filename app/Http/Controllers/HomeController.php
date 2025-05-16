@@ -311,15 +311,27 @@ class HomeController extends Controller
 
         $setting = Setting::where('key', 'In App Browsing')->first();
 
-        $entries = json_decode($setting->value, true);
-
         $in_app_browsing = [];
 
-        foreach ($entries as $entry) {
-            $in_app_browsing[] = [
-                'image' => asset('app-browsing-icon/' . $entry['image']),
-                'destination_url' => $entry['destinationUrl'],
-            ];
+        if ($setting && $setting->value) {
+            $sections = json_decode($setting->value, true);
+            
+            if (is_array($sections)) {
+                foreach ($sections as $section) {
+                    if (isset($section['status']) && $section['status'] == 1 && !empty($section['entries'])) {
+                        $sectionName = $section['name'] ?? 'Unnamed Section';
+                        
+                        foreach ($section['entries'] as $entry) {
+                            if (!empty($entry['image']) && !empty($entry['destinationUrl'])) {
+                                $in_app_browsing[$sectionName][] = [
+                                    'image' => asset('app-browsing-icon/' . $entry['image']),
+                                    'destination_url' => $entry['destinationUrl'],
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         $jsonData = [
