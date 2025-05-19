@@ -264,7 +264,7 @@ class SettingController extends Controller
         return redirect()->back()->with('success', 'AdSense settings updated successfully.');
     }
 
-    public function appBrowsingUpdate(Request $request, $id)
+    public function appBrowsingUpdate(Request $request, $id,HomeController $homeController)
     {
         try {
             $request->validate([
@@ -379,6 +379,8 @@ class SettingController extends Controller
             return !empty($section['name']);
         })));
         $setting->save();
+        
+        $homeController->appJsonData();
 
         return redirect()->route('settings.edit', $id)->with('success', 'Settings updated successfully');
     }
