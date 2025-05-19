@@ -309,6 +309,31 @@ class HomeController extends Controller
 
         $gender_permission = Setting::where('key', 'Gender Permission')->value('value');
 
+        $setting = Setting::where('key', 'In App Browsing')->first();
+
+        $in_app_browsing = [];
+
+        if ($setting && $setting->value) {
+            $sections = json_decode($setting->value, true);
+            
+            if (is_array($sections)) {
+                foreach ($sections as $section) {
+                    if (isset($section['status']) && $section['status'] == 1 && !empty($section['entries'])) {
+                        $sectionName = $section['name'] ?? 'Unnamed Section';
+                        
+                        foreach ($section['entries'] as $entry) {
+                            if (!empty($entry['image']) && !empty($entry['destinationUrl'])) {
+                                $in_app_browsing[$sectionName][] = [
+                                    'image' => asset('app-browsing-icon/' . $entry['image']),
+                                    'destination_url' => $entry['destinationUrl'],
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         $jsonData = [
             'images' => $images,
             'categories' => $categoriesArray,
@@ -316,7 +341,8 @@ class HomeController extends Controller
             'staffZones' => $staffZones,
             'staffs' => $staffs,
             'whatsapp_number' => $whatsapp_number,
-            'gender_permission' => $gender_permission
+            'gender_permission' => $gender_permission,
+            'in_app_browsing' => $in_app_browsing
         ];
 
         $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
