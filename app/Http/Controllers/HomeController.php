@@ -381,6 +381,19 @@ class HomeController extends Controller
             'subTitles' => $allSubTitlesArray,
         ];
 
+        $allCategories = ServiceCategory::all();
+
+        $allCategoriesArray = $allCategories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'title' => $category->title,
+            ];
+        })->toArray();
+
+        $categoriesJsonData = [
+            'categories' => $allCategoriesArray,
+        ];
+
         try {
             $filename = "AppHomeData.json";
             $filePath = public_path($filename);
@@ -449,6 +462,30 @@ class HomeController extends Controller
             File::move($backupFilePath, $filePath);
             throw $e;
         }
+
+        try {
+            $filename = "AppCategories.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppCategories_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $categoriesJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($categoriesJsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
 
         return redirect()->back()
             ->with('success', 'App Data updated successfully');
