@@ -39,47 +39,73 @@
                         'sections',
                         isset($sections) && count($sections) > 0
                             ? $sections
-                            : [['name' => '', 'status' => 1,'zone' => '', 'entries' => [['image' => '', 'destinationUrl' => '']]]],
+                            : [
+                                [
+                                    'name' => '',
+                                    'status' => 1,
+                                    'zone' => '',
+                                    'entries' => [['image' => '', 'destinationUrl' => '']],
+                                ],
+                            ],
                     );
                 @endphp
 
                 @foreach ($sections as $sectionIndex => $section)
                     <div class="card mb-4 section-item">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div class="form-group mb-0 flex-grow-1 mr-3">
-                                <input type="text" class="form-control section-name @error("sections.$sectionIndex.name") is-invalid @enderror"
-                                    name="sections[{{ $sectionIndex }}][name]"
-                                    value="{{ old("sections.$sectionIndex.name", $section['name']) }}"
-                                    placeholder="Section name (e.g., Business, Social)" required>
-                                @error("sections.$sectionIndex.name")
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group mt-2">
+                                        <input type="text"
+                                            class="form-control section-name @error("sections.$sectionIndex.name") is-invalid @enderror"
+                                            name="sections[{{ $sectionIndex }}][name]"
+                                            value="{{ old("sections.$sectionIndex.name", $section['name']) }}"
+                                            placeholder="Section name (e.g., Business, Social)" required>
+                                        @error("sections.$sectionIndex.name")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mt-2">
+                                        <select
+                                            class="form-control section-zone select2 @error("sections.$sectionIndex.zone") is-invalid @enderror"
+                                            name="sections[{{ $sectionIndex }}][zone]" required>
+                                            @foreach ($zones as $zone)
+                                                <option value="{{ $zone }}"
+                                                    {{ old("sections.$sectionIndex.zone", $section['zone']) == $zone ? 'selected' : '' }}>
+                                                    {{ $zone }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error("sections.$sectionIndex.zone")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group mt-2">
+                                        <select
+                                            class="form-control section-status @error("sections.$sectionIndex.status") is-invalid @enderror"
+                                            name="sections[{{ $sectionIndex }}][status]" required>
+                                            <option value="1"
+                                                {{ old("sections.$sectionIndex.status", $section['status']) == 1 ? 'selected' : '' }}>
+                                                Active</option>
+                                            <option value="0"
+                                                {{ old("sections.$sectionIndex.status", $section['status']) == 0 ? 'selected' : '' }}>
+                                                Inactive</option>
+                                        </select>
+                                        @error("sections.$sectionIndex.status")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-danger remove-section mt-2"
+                                        {{ count($sections) == 1 ? 'disabled' : '' }}>
+                                        <i class="fas fa-trash"></i> Remove Section
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group mb-0 mr-3" style="width: 150px;">
-                                <select class="form-control section-zone select2 @error("sections.$sectionIndex.zone") is-invalid @enderror" 
-                                    name="sections[{{ $sectionIndex }}][zone]" required>
-                                    @foreach($zones as $zone)
-                                        <option value="{{ $zone }}" {{ old("sections.$sectionIndex.zone", $section['zone']) == $zone ? 'selected' : '' }}>{{ $zone }}</option>
-                                    @endforeach
-                                </select>
-                                @error("sections.$sectionIndex.zone")
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="form-group mb-0" style="width: 150px;">
-                                <select class="form-control section-status @error("sections.$sectionIndex.status") is-invalid @enderror" 
-                                    name="sections[{{ $sectionIndex }}][status]" required>
-                                    <option value="1" {{ old("sections.$sectionIndex.status", $section['status']) == 1 ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ old("sections.$sectionIndex.status", $section['status']) == 0 ? 'selected' : '' }}>Inactive</option>
-                                </select>
-                                @error("sections.$sectionIndex.status")
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <button type="button" class="btn btn-sm btn-danger ml-3 remove-section"
-                                {{ count($sections) == 1 ? 'disabled' : '' }}>
-                                <i class="fas fa-trash"></i> Remove Section
-                            </button>
                         </div>
                         <div class="card-body">
                             <table class="table table-bordered entries-table">
@@ -96,7 +122,10 @@
                                             $imagePath = null;
                                             if (isset($entry['existing_image'])) {
                                                 $imagePath = $entry['existing_image'];
-                                            } elseif (isset($entry['image']) && file_exists(public_path('app-browsing-icon/' . $entry['image']))) {
+                                            } elseif (
+                                                isset($entry['image']) &&
+                                                file_exists(public_path('app-browsing-icon/' . $entry['image']))
+                                            ) {
                                                 $imagePath = $entry['image'];
                                             }
                                         @endphp
@@ -109,7 +138,8 @@
                                                                 name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][existing_image]"
                                                                 value="{{ $imagePath }}">
                                                         @endif
-                                                        <input type="file" class="form-control image-upload @error("sections.$sectionIndex.entries.$entryIndex.image") is-invalid @enderror"
+                                                        <input type="file"
+                                                            class="form-control image-upload @error("sections.$sectionIndex.entries.$entryIndex.image") is-invalid @enderror"
                                                             name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][image]"
                                                             accept="image/*" style="width: 220px;">
                                                         <small class="form-text text-muted">300x300px</small>
@@ -117,11 +147,11 @@
                                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <div class="image-preview" style="{{ $imagePath ? '' : 'display:none;' }}">
+                                                    <div class="image-preview"
+                                                        style="{{ $imagePath ? '' : 'display:none;' }}">
                                                         @if ($imagePath)
                                                             <img src="{{ asset('app-browsing-icon/' . $imagePath) }}"
-                                                                alt="Image preview"
-                                                                style="max-height: 80px; width: auto;"
+                                                                alt="Image preview" style="max-height: 80px; width: auto;"
                                                                 class="img-thumbnail">
                                                         @else
                                                             <img src="#" alt="Image preview"
@@ -132,7 +162,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type="url" class="form-control @error("sections.$sectionIndex.entries.$entryIndex.destination_url") is-invalid @enderror"
+                                                <input type="url"
+                                                    class="form-control @error("sections.$sectionIndex.entries.$entryIndex.destination_url") is-invalid @enderror"
                                                     name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][destination_url]"
                                                     placeholder="https://example.com"
                                                     value="{{ old("sections.$sectionIndex.entries.$entryIndex.destination_url", $entry['destinationUrl'] ?? '') }}">
@@ -184,27 +215,37 @@
             $('#add-section').on('click', function() {
                 const html = `
                 <div class="card mb-4 section-item">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="form-group mb-0 flex-grow-1 mr-3">
-                            <input type="text" class="form-control section-name" name="sections[${sectionIndex}][name]" 
-                                   placeholder="Section name (e.g., Business, Social)" required>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mt-2">
+                                    <input type="text" class="form-control section-name" name="sections[${sectionIndex}][name]" 
+                                        placeholder="Section name (e.g., Business, Social)" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mt-2">
+                                    <select class="form-control section-zone select2" name="sections[${sectionIndex}][zone]" required>
+                                        @foreach ($zones as $zone)
+                                            <option value="{{ $zone }}">{{ $zone }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mt-2">
+                                    <select class="form-control section-status" name="sections[${sectionIndex}][status]" required>
+                                        <option value="1" selected>Active</option>
+                                        <option value="0">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-sm btn-danger ml-3 remove-section">
+                                    <i class="fas fa-trash"></i> Remove Section
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group mb-0 mr-3" style="width: 150px;">
-                            <select class="form-control section-zone select2" name="sections[${sectionIndex}][zone]" required>
-                                @foreach($zones as $zone)
-                                    <option value="{{ $zone }}">{{ $zone }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group mb-0" style="width: 150px;">
-                            <select class="form-control section-status" name="sections[${sectionIndex}][status]" required>
-                                <option value="1" selected>Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-danger ml-3 remove-section">
-                            <i class="fas fa-trash"></i> Remove Section
-                        </button>
                     </div>
                     <div class="card-body">
                         <table class="table table-bordered entries-table">
@@ -371,14 +412,15 @@
                 const input = this;
                 const previewWrapper = $(this).closest('td').find('.image-preview');
                 const previewImg = previewWrapper.find('img');
-                const existingImageInput = $(this).siblings('input[type="hidden"][name$="[existing_image]"]');
+                const existingImageInput = $(this).siblings(
+                    'input[type="hidden"][name$="[existing_image]"]');
 
                 if (input.files && input.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         previewImg.attr('src', e.target.result);
                         previewWrapper.show();
-                        
+
                         // If there was an existing image, keep the hidden field
                         if (existingImageInput.length) {
                             existingImageInput.val('');
