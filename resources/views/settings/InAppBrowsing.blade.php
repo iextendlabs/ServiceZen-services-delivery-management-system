@@ -56,7 +56,7 @@
                                 @enderror
                             </div>
                             <div class="form-group mb-0 mr-3" style="width: 150px;">
-                                <select class="form-control section-zone @error("sections.$sectionIndex.zone") is-invalid @enderror" 
+                                <select class="form-control section-zone select2 @error("sections.$sectionIndex.zone") is-invalid @enderror" 
                                     name="sections[{{ $sectionIndex }}][zone]" required>
                                     @foreach($zones as $zone)
                                         <option value="{{ $zone }}" {{ old("sections.$sectionIndex.zone", $section['zone']) == $zone ? 'selected' : '' }}>{{ $zone }}</option>
@@ -190,7 +190,7 @@
                                    placeholder="Section name (e.g., Business, Social)" required>
                         </div>
                         <div class="form-group mb-0 mr-3" style="width: 150px;">
-                            <select class="form-control section-zone" name="sections[${sectionIndex}][zone]" required>
+                            <select class="form-control section-zone select2" name="sections[${sectionIndex}][zone]" required>
                                 @foreach($zones as $zone)
                                     <option value="{{ $zone }}">{{ $zone }}</option>
                                 @endforeach
@@ -258,6 +258,14 @@
                 </div>`;
 
                 $('#sections-container').append(html);
+
+                // Initialize Select2 for the newly added element
+                $('#sections-container .section-item:last .section-zone.select2').select2({
+                    width: '100%',
+                    placeholder: "Select Zone",
+                    allowClear: true
+                });
+
                 entryIndices[sectionIndex] = 1;
                 sectionIndex++;
 
