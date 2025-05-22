@@ -136,31 +136,31 @@ class HomeController extends Controller
 
             $todayCrms = CRM::whereDate('created_at', Carbon::today())->count();
 
-            $todayAppUser = User::whereDate('created_at', Carbon::today())->where('customer_source','Android')->count();
-            
-            $todayLoginAppUser = User::whereDate('last_login_time', Carbon::today())->where('login_source','Android')->count();
+            $todayAppUser = User::whereDate('created_at', Carbon::today())->where('customer_source', 'Android')->count();
 
-            $todayAppOrder = Order::whereDate('created_at', Carbon::today())->where('order_source','Android')->count();
+            $todayLoginAppUser = User::whereDate('last_login_time', Carbon::today())->where('login_source', 'Android')->count();
+
+            $todayAppOrder = Order::whereDate('created_at', Carbon::today())->where('order_source', 'Android')->count();
 
 
             $query = User::with('staff')->role('Staff');
-        
+
             if ($request->search) {
                 $query->where('name', 'like', '%' . $request->search . '%');
             }
-        
+
             if ($request->status) {
                 $status = $request->status === 'online';
-                $query->whereHas('staff', function($q) use ($status) {
+                $query->whereHas('staff', function ($q) use ($status) {
                     $q->where('online', $status);
                 });
             }
-        
+
             $onlineCount = User::role('Staff')->whereHas('staff', fn($q) => $q->where('online', 1))->count();
             $offlineCount = User::role('Staff')->whereHas('staff', fn($q) => $q->where('online', 0))->count();
-        
+
             $staffs = $query->paginate(20);
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms','todayAppUser','todayAppOrder','todayLoginAppUser','onlineCount','offlineCount'));
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount'));
         }
     }
 
@@ -315,19 +315,32 @@ class HomeController extends Controller
 
         if ($setting && $setting->value) {
             $sections = json_decode($setting->value, true);
-            
+
             if (is_array($sections)) {
                 foreach ($sections as $section) {
                     if (isset($section['status']) && $section['status'] == 1 && !empty($section['entries'])) {
                         $sectionName = $section['name'] ?? 'Unnamed Section';
-                        
+                        $sectionZone = $section['zone'] ?? null;
+
+                        // Initialize section entries array
+                        $sectionEntries = [];
+
                         foreach ($section['entries'] as $entry) {
                             if (!empty($entry['image']) && !empty($entry['destinationUrl'])) {
-                                $in_app_browsing[$sectionName][] = [
+                                $sectionEntries[] = [
                                     'image' => asset('app-browsing-icon/' . $entry['image']),
                                     'destination_url' => $entry['destinationUrl'],
                                 ];
                             }
+                        }
+
+                        // Only add section if it has valid entries
+                        if (!empty($sectionEntries)) {
+                            $in_app_browsing[] = [
+                                'section_name' => $sectionName,
+                                'section_zone' => $sectionZone,
+                                'entries' => $sectionEntries
+                            ];
                         }
                     }
                 }
@@ -379,6 +392,19 @@ class HomeController extends Controller
 
         $subTitlesJsonData = [
             'subTitles' => $allSubTitlesArray,
+        ];
+
+        $allCategories = ServiceCategory::all();
+
+        $allCategoriesArray = $allCategories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'title' => $category->title,
+            ];
+        })->toArray();
+
+        $categoriesJsonData = [
+            'categories' => $allCategoriesArray,
         ];
 
         try {
@@ -449,6 +475,30 @@ class HomeController extends Controller
             File::move($backupFilePath, $filePath);
             throw $e;
         }
+
+        try {
+            $filename = "AppCategories.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppCategories_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $categoriesJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($categoriesJsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
 
         return redirect()->back()
             ->with('success', 'App Data updated successfully');

@@ -39,7 +39,7 @@
                         'sections',
                         isset($sections) && count($sections) > 0
                             ? $sections
-                            : [['name' => '', 'status' => 1, 'entries' => [['image' => '', 'destinationUrl' => '']]]],
+                            : [['name' => '', 'status' => 1,'zone' => '', 'entries' => [['image' => '', 'destinationUrl' => '']]]],
                     );
                 @endphp
 
@@ -52,6 +52,17 @@
                                     value="{{ old("sections.$sectionIndex.name", $section['name']) }}"
                                     placeholder="Section name (e.g., Business, Social)" required>
                                 @error("sections.$sectionIndex.name")
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group mb-0 mr-3" style="width: 150px;">
+                                <select class="form-control section-zone @error("sections.$sectionIndex.zone") is-invalid @enderror" 
+                                    name="sections[{{ $sectionIndex }}][zone]" required>
+                                    @foreach($zones as $zone)
+                                        <option value="{{ $zone }}" {{ old("sections.$sectionIndex.zone", $section['zone']) == $zone ? 'selected' : '' }}>{{ $zone }}</option>
+                                    @endforeach
+                                </select>
+                                @error("sections.$sectionIndex.zone")
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -178,6 +189,13 @@
                             <input type="text" class="form-control section-name" name="sections[${sectionIndex}][name]" 
                                    placeholder="Section name (e.g., Business, Social)" required>
                         </div>
+                        <div class="form-group mb-0 mr-3" style="width: 150px;">
+                            <select class="form-control section-zone" name="sections[${sectionIndex}][zone]" required>
+                                @foreach($zones as $zone)
+                                    <option value="{{ $zone }}">{{ $zone }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group mb-0" style="width: 150px;">
                             <select class="form-control section-status" name="sections[${sectionIndex}][status]" required>
                                 <option value="1" selected>Active</option>
@@ -300,6 +318,7 @@
                     // Reindex sections
                     $('.section-item').each(function(index) {
                         $(this).find('.section-name').attr('name', `sections[${index}][name]`);
+                        $(this).find('.section-zone').attr('name', `sections[${index}][zone]`);
                         $(this).find('.section-status').attr('name', `sections[${index}][status]`);
 
                         // Reindex entries

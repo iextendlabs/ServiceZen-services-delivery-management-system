@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\Setting;
+use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -88,7 +89,8 @@ class SettingController extends Controller
             if ($setting && $setting->value) {
                 $sections = json_decode($setting->value, true);
             }
-            return view('settings.InAppBrowsing', compact('sections', 'setting'));
+            $zones = StaffZone::pluck('name')->toArray();
+            return view('settings.InAppBrowsing', compact('sections', 'setting','zones'));
         }
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
@@ -271,6 +273,7 @@ class SettingController extends Controller
                 'sections' => 'required|array|min:1',
                 'sections.*.name' => 'required|string|max:255',
                 'sections.*.status' => 'required|boolean',
+                'sections.*.zone' => 'required',
             ]);
 
             $validatedSections = [];
@@ -351,6 +354,7 @@ class SettingController extends Controller
                     $validatedSections[] = [
                         'name' => $section['name'],
                         'status' => $section['status'],
+                        'zone' => $section['zone'],
                         'entries' => $validatedEntries
                     ];
                 }
