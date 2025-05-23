@@ -367,12 +367,16 @@
             // Remove section
             $(document).on('click', '.remove-section', function() {
                 if ($('.section-item').length > 1) {
+                    const sectionIndex = $(this).closest('.section-item').index();
+                    entryIndices.splice(sectionIndex, 1); // Remove the entry index for this section
+
                     $(this).closest('.section-item').remove();
 
                     // Reindex sections
                     $('.section-item').each(function(index) {
                         $(this).find('.section-name').attr('name', `sections[${index}][name]`);
-                        $(this).find('.section-zone').attr('name', `sections[${index}][zone]`);
+                        $(this).find('.section-zone').attr('name',
+                        `sections[${index}][zone][]`); // Note the [] for array
                         $(this).find('.section-status').attr('name', `sections[${index}][status]`);
 
                         // Reindex entries
