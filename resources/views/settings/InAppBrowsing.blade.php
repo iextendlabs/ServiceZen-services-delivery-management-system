@@ -1,5 +1,10 @@
 @extends('layouts.app')
-
+<style>
+    #section_zone {
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+    }
+</style>
 @section('content')
     <div class="container mt-4">
         <div class="row mb-3">
@@ -43,7 +48,7 @@
                                 [
                                     'name' => '',
                                     'status' => 1,
-                                    'zone' => '',
+                                    'zone' => [],
                                     'entries' => [['image' => '', 'destinationUrl' => '']],
                                 ],
                             ],
@@ -67,13 +72,14 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group mt-2">
+                                    <div class="form-group mt-2" id="section_zone">
                                         <select
-                                            class="form-control section-zone select2 @error("sections.$sectionIndex.zone") is-invalid @enderror"
-                                            name="sections[{{ $sectionIndex }}][zone]" required>
+                                            class="form-control section-zone selectpicker @error("sections.$sectionIndex.zone") is-invalid @enderror"
+                                            name="sections[{{ $sectionIndex }}][zone][]" required multiple
+                                            data-live-search="true" data-actions-box="true">
                                             @foreach ($zones as $zone)
                                                 <option value="{{ $zone }}"
-                                                    {{ old("sections.$sectionIndex.zone", $section['zone']) == $zone ? 'selected' : '' }}>
+                                                    {{ in_array($zone, old("sections.$sectionIndex.zone", $section['zone'] ?? [])) ? 'selected' : '' }}>
                                                     {{ $zone }}</option>
                                             @endforeach
                                         </select>
@@ -211,6 +217,7 @@
             let sectionIndex = {{ count($sections) }};
             let entryIndices = {!! json_encode(array_fill(0, count($sections), count($sections[0]['entries'] ?? 1))) !!};
 
+            $('.section-zone').selectpicker();
             // Add new section
             $('#add-section').on('click', function() {
                 const html = `
@@ -224,8 +231,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group mt-2">
-                                    <select class="form-control section-zone select2" name="sections[${sectionIndex}][zone]" required>
+                                <div class="form-group mt-2" id="section_zone">
+                                    <select class="form-control section-zone selectpicker" name="sections[${sectionIndex}][zone][]" required multiple data-live-search="true" data-actions-box="true">
                                         @foreach ($zones as $zone)
                                             <option value="{{ $zone }}">{{ $zone }}</option>
                                         @endforeach
@@ -300,11 +307,9 @@
 
                 $('#sections-container').append(html);
 
-                // Initialize Select2 for the newly added element
-                $('#sections-container .section-item:last .section-zone.select2').select2({
+                $('#sections-container .section-item:last .section-zone.selectpicker').selectpicker({
                     width: '100%',
-                    placeholder: "Select Zone",
-                    allowClear: true
+                    size: 'auto'
                 });
 
                 entryIndices[sectionIndex] = 1;
