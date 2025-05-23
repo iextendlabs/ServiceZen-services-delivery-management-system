@@ -318,30 +318,37 @@ class HomeController extends Controller
 
             if (is_array($sections)) {
                 foreach ($sections as $section) {
-                    if (isset($section['status']) && $section['status'] == 1 && !empty($section['entries'])) {
-                        $sectionName = $section['name'] ?? 'Unnamed Section';
-                        $sectionZone = $section['zone'] ?? null;
+                    if (!isset($section['status']) || $section['status'] != 1 || empty($section['entries'])) {
+                        continue;
+                    }
 
-                        // Initialize section entries array
-                        $sectionEntries = [];
+                    $sectionName = $section['name'] ?? 'Unnamed Section';
+                    $sectionZones = is_array($section['zone'] ?? null) ? $section['zone'] : [];
 
-                        foreach ($section['entries'] as $entry) {
-                            if (!empty($entry['image']) && !empty($entry['destinationUrl'])) {
-                                $sectionEntries[] = [
-                                    'image' => asset('app-browsing-icon/' . $entry['image']),
-                                    'destination_url' => $entry['destinationUrl'],
-                                ];
-                            }
+                    $sectionEntries = [];
+
+                    foreach ($section['entries'] as $entry) {
+                        if (empty($entry['image']) || empty($entry['destinationUrl'])) {
+                            continue;
                         }
 
-                        // Only add section if it has valid entries
-                        if (!empty($sectionEntries)) {
-                            $in_app_browsing[] = [
-                                'section_name' => $sectionName,
-                                'section_zone' => $sectionZone,
-                                'entries' => $sectionEntries
-                            ];
+                        $imagePath = public_path('app-browsing-icon/' . $entry['image']);
+                        if (!file_exists($imagePath)) {
+                            continue;
                         }
+
+                        $sectionEntries[] = [
+                            'image' => asset('app-browsing-icon/' . $entry['image']),
+                            'destination_url' => $entry['destinationUrl'],
+                        ];
+                    }
+
+                    if (!empty($sectionEntries)) {
+                        $in_app_browsing[] = [
+                            'section_name' => $sectionName,
+                            'section_zones' => $sectionZones,
+                            'entries' => $sectionEntries
+                        ];
                     }
                 }
             }

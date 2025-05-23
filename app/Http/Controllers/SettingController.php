@@ -90,7 +90,7 @@ class SettingController extends Controller
                 $sections = json_decode($setting->value, true);
             }
             $zones = StaffZone::pluck('name')->toArray();
-            return view('settings.InAppBrowsing', compact('sections', 'setting','zones'));
+            return view('settings.InAppBrowsing', compact('sections', 'setting', 'zones'));
         }
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
@@ -266,14 +266,15 @@ class SettingController extends Controller
         return redirect()->back()->with('success', 'AdSense settings updated successfully.');
     }
 
-    public function appBrowsingUpdate(Request $request, $id,HomeController $homeController)
+    public function appBrowsingUpdate(Request $request, $id, HomeController $homeController)
     {
         try {
             $request->validate([
                 'sections' => 'required|array|min:1',
                 'sections.*.name' => 'required|string|max:255',
                 'sections.*.status' => 'required|boolean',
-                'sections.*.zone' => 'required',
+                'sections.*.zone' => 'required|array|min:1',
+                'sections.*.zone.*' => 'string', // Validate each zone value is a string
             ]);
 
             $validatedSections = [];
@@ -354,7 +355,7 @@ class SettingController extends Controller
                     $validatedSections[] = [
                         'name' => $section['name'],
                         'status' => $section['status'],
-                        'zone' => $section['zone'],
+                        'zone' => is_array($section['zone']) ? $section['zone'] : [$section['zone']], // Ensure zone is always an array
                         'entries' => $validatedEntries
                     ];
                 }
@@ -383,7 +384,7 @@ class SettingController extends Controller
             return !empty($section['name']);
         })));
         $setting->save();
-        
+
         $homeController->appJsonData();
 
         return redirect()->route('settings.edit', $id)->with('success', 'Settings updated successfully');
