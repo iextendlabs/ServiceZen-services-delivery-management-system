@@ -45,6 +45,7 @@ Route::get('driverOrderStatusUpdate/{order}', [DriverAppController::class, 'orde
 Route::post('updateToken', [DriverAppController::class, 'updateToken']);
 Route::post('addShortHoliday', [StaffAppController2::class, 'addShortHoliday']);
 Route::get('index', [StaffAppController2::class, 'index']);
+Route::get('getStaffProfile', [StaffAppController2::class, 'getStaffProfile']);
 Route::get('getTransactions', [StaffAppController2::class, 'getTransactions']);
 Route::get('getHolidays', [StaffAppController2::class, 'getHolidays']);
 Route::get('getStaffOrders', [StaffAppController2::class, 'getOrders']);
