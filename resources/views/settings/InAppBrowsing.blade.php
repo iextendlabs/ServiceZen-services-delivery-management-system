@@ -338,8 +338,20 @@
             $(document).on('click', '.add-entry', function() {
                 const sectionItem = $(this).closest('.section-item');
                 const sectionIndex = $('.section-item').index(sectionItem);
-                const entryIndex = entryIndices[sectionIndex] || 1;
                 const entriesContainer = sectionItem.find('.entries-container');
+
+                let maxIndex = -1;
+                entriesContainer.find('.entry').each(function() {
+                    const nameAttr = $(this).find('[name*="[entries]"]').first().attr('name');
+                    const matches = nameAttr.match(/\[entries\]\[(\d+)\]/);
+                    if (matches && matches[1]) {
+                        const currentIndex = parseInt(matches[1]);
+                        if (currentIndex > maxIndex) {
+                            maxIndex = currentIndex;
+                        }
+                    }
+                });
+                const entryIndex = maxIndex + 1;
 
                 const html = `
                 <tr class="entry">
@@ -392,8 +404,6 @@
                     width: '100%',
                     size: 'auto'
                 });
-
-                entryIndices[sectionIndex] = entryIndex + 1;
             });
 
             // Remove section
