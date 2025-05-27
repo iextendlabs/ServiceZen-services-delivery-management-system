@@ -89,7 +89,13 @@ class SiteController extends Controller
         }
 
         $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
-        $ads = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+        $googleAds = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+
+        $ads = [];
+
+        if (isset($googleAds['home']['status']) && $googleAds['home']['status'] == true) {
+            $ads = $googleAds['home'];
+        }
 
         $view = view('site.home', compact(
             'services',
@@ -132,7 +138,13 @@ class SiteController extends Controller
         }
 
         $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
-        $ads = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+        $googleAds = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+
+        $ads = [];
+
+        if (isset($googleAds['category']['status']) && $googleAds['category']['status'] == true) {
+            $ads = $googleAds['category'];
+        }
 
         return view('site.categories.show', compact('category','metaTitle','metaDescription','metaKeywords', 'reviews', 'review_char_limit', 'all_categories','ads'));
     }
@@ -171,7 +183,13 @@ class SiteController extends Controller
 
         if ($service->status) {
             $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
-            $ads = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+            $googleAds = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
+
+            $ads = [];
+
+            if (isset($googleAds['service']['status']) && $googleAds['service']['status'] == true) {
+                $ads = $googleAds['service'];
+            }
             return view('site.serviceDetail', compact('service','metaTitle','metaDescription','metaKeywords', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit','ads'));
         } else {
             if (empty($service->category_id)) {

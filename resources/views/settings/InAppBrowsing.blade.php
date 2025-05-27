@@ -48,8 +48,13 @@
                                 [
                                     'name' => '',
                                     'status' => 1,
-                                    'zone' => [],
-                                    'entries' => [['image' => '', 'destinationUrl' => '']],
+                                    'entries' => [
+                                        [
+                                            'image' => '', 
+                                            'destinationUrl' => '',
+                                            'zone' => []
+                                        ]
+                                    ],
                                 ],
                             ],
                     );
@@ -59,7 +64,7 @@
                     <div class="card mb-4 section-item">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group mt-2">
                                         <input type="text"
                                             class="form-control section-name @error("sections.$sectionIndex.name") is-invalid @enderror"
@@ -72,23 +77,6 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group mt-2" id="section_zone">
-                                        <select
-                                            class="form-control section-zone selectpicker @error("sections.$sectionIndex.zone") is-invalid @enderror"
-                                            name="sections[{{ $sectionIndex }}][zone][]" required multiple
-                                            data-live-search="true" data-actions-box="true">
-                                            @foreach ($zones as $zone)
-                                                <option value="{{ $zone }}"
-                                                    {{ in_array($zone, old("sections.$sectionIndex.zone", $section['zone'] ?? [])) ? 'selected' : '' }}>
-                                                    {{ $zone }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error("sections.$sectionIndex.zone")
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
                                     <div class="form-group mt-2">
                                         <select
                                             class="form-control section-status @error("sections.$sectionIndex.status") is-invalid @enderror"
@@ -117,8 +105,9 @@
                             <table class="table table-bordered entries-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40%">Image</th>
-                                        <th style="width: 50%">Destination URL</th>
+                                        <th style="width: 30%">Image</th>
+                                        <th style="width: 40%">Destination URL</th>
+                                        <th style="width: 20%">Zones</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -177,6 +166,24 @@
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
                                             </td>
+                                            <td>
+                                                <div class="form-group" id="section_zone">
+                                                    <select
+                                                        class="form-control entry-zone selectpicker @error("sections.$sectionIndex.entries.$entryIndex.zone") is-invalid @enderror"
+                                                        name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][zone][]" 
+                                                        multiple
+                                                        data-live-search="true" data-actions-box="true">
+                                                        @foreach ($zones as $zone)
+                                                            <option value="{{ $zone }}"
+                                                                {{ in_array($zone, old("sections.$sectionIndex.entries.$entryIndex.zone", $entry['zone'] ?? [])) ? 'selected' : '' }}>
+                                                                {{ $zone }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error("sections.$sectionIndex.entries.$entryIndex.zone")
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-danger remove-entry">
                                                     <i class="fas fa-trash"></i>
@@ -217,29 +224,21 @@
             let sectionIndex = {{ count($sections) }};
             let entryIndices = {!! json_encode(array_fill(0, count($sections), count($sections[0]['entries'] ?? 1))) !!};
 
-            $('.section-zone').selectpicker();
+            $('.entry-zone').selectpicker();
+            
             // Add new section
             $('#add-section').on('click', function() {
                 const html = `
                 <div class="card mb-4 section-item">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group mt-2">
                                     <input type="text" class="form-control section-name" name="sections[${sectionIndex}][name]" 
                                         placeholder="Section name (e.g., Business, Social)" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group mt-2" id="section_zone">
-                                    <select class="form-control section-zone selectpicker" name="sections[${sectionIndex}][zone][]" required multiple data-live-search="true" data-actions-box="true">
-                                        @foreach ($zones as $zone)
-                                            <option value="{{ $zone }}">{{ $zone }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
                                 <div class="form-group mt-2">
                                     <select class="form-control section-status" name="sections[${sectionIndex}][status]" required>
                                         <option value="1" selected>Active</option>
@@ -258,8 +257,9 @@
                         <table class="table table-bordered entries-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 40%">Image</th>
-                                    <th style="width: 50%">Destination URL</th>
+                                    <th style="width: 30%">Image</th>
+                                    <th style="width: 40%">Destination URL</th>
+                                    <th style="width: 20%">Zones</th>
                                     <th style="width: 10%">Action</th>
                                 </tr>
                             </thead>
@@ -288,6 +288,18 @@
                                                name="sections[${sectionIndex}][entries][0][destination_url]" 
                                                placeholder="https://example.com">
                                     </td>
+                                    <td>
+                                        <div class="form-group" id="section_zone">
+                                            <select class="form-control entry-zone selectpicker" 
+                                                    name="sections[${sectionIndex}][entries][0][zone][]" 
+                                                    multiple
+                                                    data-live-search="true" data-actions-box="true">
+                                                @foreach ($zones as $zone)
+                                                    <option value="{{ $zone }}">{{ $zone }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-sm btn-danger remove-entry">
                                             <i class="fas fa-trash"></i>
@@ -307,7 +319,8 @@
 
                 $('#sections-container').append(html);
 
-                $('#sections-container .section-item:last .section-zone.selectpicker').selectpicker({
+                // Initialize selectpicker for the new entry's zone
+                $('#sections-container .section-item:last .entry-zone.selectpicker').selectpicker({
                     width: '100%',
                     size: 'auto'
                 });
@@ -353,6 +366,18 @@
                                name="sections[${sectionIndex}][entries][${entryIndex}][destination_url]" 
                                placeholder="https://example.com">
                     </td>
+                    <td>
+                        <div class="form-group" id="section_zone">
+                            <select class="form-control entry-zone selectpicker" 
+                                    name="sections[${sectionIndex}][entries][${entryIndex}][zone][]" 
+                                    multiple
+                                    data-live-search="true" data-actions-box="true">
+                                @foreach ($zones as $zone)
+                                    <option value="{{ $zone }}">{{ $zone }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-sm btn-danger remove-entry">
                             <i class="fas fa-trash"></i>
@@ -361,6 +386,13 @@
                 </tr>`;
 
                 entriesContainer.append(html);
+                
+                // Initialize selectpicker for the new entry's zone
+                entriesContainer.find('.entry:last .entry-zone.selectpicker').selectpicker({
+                    width: '100%',
+                    size: 'auto'
+                });
+                
                 entryIndices[sectionIndex] = entryIndex + 1;
             });
 
@@ -375,8 +407,6 @@
                     // Reindex sections
                     $('.section-item').each(function(index) {
                         $(this).find('.section-name').attr('name', `sections[${index}][name]`);
-                        $(this).find('.section-zone').attr('name',
-                        `sections[${index}][zone][]`); // Note the [] for array
                         $(this).find('.section-status').attr('name', `sections[${index}][status]`);
 
                         // Reindex entries
@@ -388,6 +418,9 @@
                             );
                             $(this).find('input[name$="[existing_image]"]').attr('name',
                                 `sections[${index}][entries][${entryIndex}][existing_image]`
+                            );
+                            $(this).find('.entry-zone').attr('name',
+                                `sections[${index}][entries][${entryIndex}][zone][]`
                             );
                         });
                     });
@@ -408,8 +441,6 @@
                 const sectionName = sectionItem.find('.section-name').val();
 
                 if (entriesContainer.find('.entry').length > 1) {
-                    $(this).closest('tr').remove();
-                } else if (sectionName === '') {
                     $(this).closest('tr').remove();
                 } else {
                     alert('At least one entry is required when section has a name.');

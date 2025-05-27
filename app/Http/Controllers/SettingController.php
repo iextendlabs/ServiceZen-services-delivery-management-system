@@ -259,8 +259,13 @@ class SettingController extends Controller
             return back()->withErrors(['Invalid setting key.']);
         }
 
-        // Save the codes as JSON
-        $setting->value = json_encode($request->codes, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $codes = $request->input('codes');
+
+        foreach (['home', 'category', 'service'] as $page) {
+            $codes[$page]['status'] = isset($codes[$page]['status']) ? true : false;
+        }
+
+        $setting->value = json_encode($codes, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $setting->save();
 
         return redirect()->back()->with('success', 'AdSense settings updated successfully.');
@@ -273,14 +278,11 @@ class SettingController extends Controller
                 'sections' => 'required|array|min:1',
                 'sections.*.name' => 'required|string|max:255',
                 'sections.*.status' => 'required|boolean',
-                'sections.*.zone' => 'required|array|min:1',
-                'sections.*.zone.*' => 'string', // Validate each zone value is a string
             ]);
 
             $validatedSections = [];
 
             foreach ($request->sections as $sectionIndex => $section) {
-                // Validate that if name is entered, there must be at least one valid entry
                 if (!empty($section['name']) && empty($section['entries'])) {
                     throw ValidationException::withMessages([
                         "sections.$sectionIndex.entries" => "At least one entry is required for section '{$section['name']}'"
@@ -289,16 +291,13 @@ class SettingController extends Controller
 
                 $validatedEntries = [];
 
-                // Only validate entries if they exist
                 if (!empty($section['entries'])) {
                     foreach ($section['entries'] as $entryIndex => $entry) {
                         $hasImage = isset($entry['image']) && $entry['image'] !== null;
                         $hasExistingImage = !empty($entry['existing_image']);
                         $hasURL = !empty($entry['destination_url']);
 
-                        // Skip validation if both fields are empty
                         if (!$hasImage && !$hasExistingImage && !$hasURL) {
-                            // If section has name, we need at least one valid entry
                             if (!empty($section['name'])) {
                                 throw ValidationException::withMessages([
                                     "sections.$sectionIndex.entries.$entryIndex.destination_url" => "Either image or URL is required for entry in section '{$section['name']}'"
@@ -307,7 +306,6 @@ class SettingController extends Controller
                             continue;
                         }
 
-                        // Conditionally require image if URL is filled
                         $rules = [
                             'destination_url' => ['nullable', 'url'],
                             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048', 'dimensions:width=300,height=300'],
@@ -333,7 +331,6 @@ class SettingController extends Controller
 
                         $validator->validate();
 
-                        // Process image
                         $imageName = $entry['existing_image'] ?? null;
 
                         if (isset($entry['image'])) {
@@ -342,26 +339,25 @@ class SettingController extends Controller
                             $imageFile->move(public_path('app-browsing-icon'), $imageName);
                         }
 
-                        // Add to list
                         $validatedEntries[] = [
                             'image' => $imageName,
-                            'destinationUrl' => $entry['destination_url'],
+                            'destinationUrl' => $entry['destination_url'] ?? null,
+                            'zone' => isset($entry['zone'])
+                                ? (is_array($entry['zone']) ? $entry['zone'] : [$entry['zone']])
+                                : [],
                         ];
                     }
                 }
 
-                // Add section to list only if it has entries or if name is empty (for new sections)
                 if (!empty($validatedEntries) || empty($section['name'])) {
                     $validatedSections[] = [
                         'name' => $section['name'],
                         'status' => $section['status'],
-                        'zone' => is_array($section['zone']) ? $section['zone'] : [$section['zone']], // Ensure zone is always an array
                         'entries' => $validatedEntries
                     ];
                 }
             }
 
-            // Final check that we have at least one section with entries
             $hasValidSections = collect($validatedSections)->filter(function ($section) {
                 return !empty($section['name']) && !empty($section['entries']);
             })->count() > 0;
@@ -374,7 +370,7 @@ class SettingController extends Controller
         } catch (ValidationException $e) {
             return redirect()
                 ->back()
-                ->withInput($request->all()) // This preserves all input data
+                ->withInput($request->all())
                 ->withErrors($e->validator);
         }
 

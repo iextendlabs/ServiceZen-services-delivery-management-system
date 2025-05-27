@@ -1,7 +1,7 @@
 @extends('site.layout.app')
 @section('adsense_head')
-    @if (!empty($ads['service']['head']))
-        {!! $ads['service']['head'] !!}
+    @if (!empty($ads['head']))
+        {!! $ads['head'] !!}
     @endif
 @endsection
 <style>
@@ -98,8 +98,8 @@
                 </div>
             @endif
         </div>
-        @if (!empty($ads['service']['top']))
-            {!! $ads['service']['top'] !!}
+        @if (!empty($ads['top']))
+            {!! $ads['top'] !!}
         @endif
         <div id="serviceDetailContainer" class="album py-5">
             <h1 class="card-text text-center service-title"><b>{{ $service->name }}</b></h1>
@@ -283,8 +283,8 @@
                        
                         <span>{{ count($reviews) }} Reviews</span>
                     </div>
-                    @if (!empty($ads['service']['right']))
-                        {!! $ads['service']['right'] !!}
+                    @if (!empty($ads['right']))
+                        {!! $ads['right'] !!}
                     @endif
                 </div>
             </div>
@@ -528,8 +528,8 @@
                 </div>
             @endif
         </div>
-        @if (!empty($ads['service']['bottom']))
-            {!! $ads['service']['bottom'] !!}
+        @if (!empty($ads['bottom']))
+            {!! $ads['bottom'] !!}
         @endif
     </div>
     </div>

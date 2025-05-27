@@ -69,7 +69,19 @@
                                     } else {
                                         $positions = ['head', 'top', 'right', 'bottom'];
                                     }
+
+                                    // Get status if available, default to true
+                                    $pageStatus = $ads[$page]['status'] ?? true;    
                                 @endphp
+
+                                <div class="form-check form-switch mb-4">
+                                    <input class="form-check-input" type="checkbox"
+                                        name="codes[{{ $page }}][status]" id="status_{{ $page }}"
+                                        value="1" {{ $pageStatus ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="status_{{ $page }}">
+                                        Enable {{ ucfirst($page) }} Page Ads
+                                    </label>
+                                </div>
 
                                 @foreach ($positions as $position)
                                     <div class="mb-3">

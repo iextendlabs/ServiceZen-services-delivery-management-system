@@ -1,7 +1,7 @@
 @extends('site.layout.app')
 @section('adsense_head')
-    @if (!empty($ads['category']['head']))
-        {!! $ads['category']['head'] !!}
+    @if (!empty($ads['head']))
+        {!! $ads['head'] !!}
     @endif
 @endsection
 @section('content')
@@ -25,8 +25,8 @@
                 </div>
             @endif
         </div>
-        @if (!empty($ads['category']['top']))
-            {!! $ads['category']['top'] !!}
+        @if (!empty($ads['top']))
+            {!! $ads['top'] !!}
         @endif
         <section class="jumbotron text-center">
             <div class="container">
@@ -118,8 +118,8 @@
                     </div>
                 @endif
             </div>
-            @if (!empty($ads['category']['bottom']))
-                {!! $ads['category']['bottom'] !!}
+            @if (!empty($ads['bottom']))
+                {!! $ads['bottom'] !!}
             @endif
         </div>
     </div>

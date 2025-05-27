@@ -323,8 +323,6 @@ class HomeController extends Controller
                     }
 
                     $sectionName = $section['name'] ?? 'Unnamed Section';
-                    $sectionZones = is_array($section['zone'] ?? null) ? $section['zone'] : [];
-
                     $sectionEntries = [];
 
                     foreach ($section['entries'] as $entry) {
@@ -337,16 +335,18 @@ class HomeController extends Controller
                             continue;
                         }
 
+                        $entryZones = is_array($entry['zone'] ?? null) ? $entry['zone'] : [];
+
                         $sectionEntries[] = [
                             'image' => asset('app-browsing-icon/' . $entry['image']),
                             'destination_url' => $entry['destinationUrl'],
+                            'zones' => $entryZones
                         ];
                     }
 
                     if (!empty($sectionEntries)) {
                         $in_app_browsing[] = [
                             'section_name' => $sectionName,
-                            'section_zones' => $sectionZones,
                             'entries' => $sectionEntries
                         ];
                     }
