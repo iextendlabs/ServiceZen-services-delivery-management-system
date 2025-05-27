@@ -447,6 +447,57 @@ class StaffAppController2 extends Controller
         ], 200);
     }
 
+    public function getStaffProfile(Request $request)
+    {
+        $user = User::find($request->user_id);
+        if (!$user || !$user->staff) {
+            return response()->json(['message' => "User not found."], 201);
+        }
+
+        $staff = $user->staff;
+
+        $staffImages = $user->staffImages->pluck('image')->map(function ($image) {
+            return asset('staff-images/' . $image);
+        })->toArray();
+        $staffYoutubeVideo = $user->staffYoutubeVideo->pluck('youtube_video')->toArray();
+        $staffGroups = $user->staffGroups->pluck('id')->toArray();
+        $service_ids = $user->services()->pluck('service_id')->toArray();
+        $category_ids = $user->categories()->pluck('category_id')->toArray();
+        $document = $user->document;
+        $userDocument = [];
+
+        $exclude = ['id', 'user_id', 'created_at', 'updated_at'];
+
+        foreach ($document->getAttributes() as $key => $value) {
+            if (!in_array($key, $exclude) && $value) {
+                $userDocument[$key] = asset('staff-document/' . $value);
+            }
+        }
+
+        $subTitles = $user->subTitles->pluck('id')->toArray();
+
+        return response()->json([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $staff->phone,
+            'whatsapp' => $staff->whatsapp,
+            'get_quote' => $staff->get_quote,
+            'status' => $user->status,
+            'image' => $staff->image ? asset('staff-images/' . $staff->image) : null,
+            'location' => $staff->location ?? null,
+            'nationality' => $staff->nationality ?? null,
+            'about' => $staff->about ?? null,
+            'staffImages' => $staffImages,
+            'staffYoutubeVideo' => $staffYoutubeVideo,
+            'staffGroups' => $staffGroups,
+            'service_ids' => $service_ids,
+            'category_ids' => $category_ids,
+            'document' => $userDocument,
+            'subTitles' => $subTitles,
+        ], 200);
+    }
+
     public function getTransactions(Request $request)
     {
         $transactions = Transaction::where('user_id', $request->user_id)->latest()->get();
@@ -641,7 +692,7 @@ class StaffAppController2 extends Controller
             $user = User::create($input);
             $user->assignRole("Customer");
         }
-        
+
         $input['user_id'] = $user->id;
 
         $affiliate = Affiliate::where('code', $request->affiliate_code)->first();
@@ -686,11 +737,11 @@ class StaffAppController2 extends Controller
             ->get(); // Execute the query and fetch results
 
         $user = User::find($request->user_id);
-        $quotes = $quotes->map(function ($quote) use ($user,$request) {
+        $quotes = $quotes->map(function ($quote) use ($user, $request) {
             $quote->show_quote_detail = $user->staff->show_quote_detail ?? null;
             $quote->bid_status = Bid::where('quote_id', $quote->id)
-            ->where('staff_id', $request->user_id)
-            ->exists();
+                ->where('staff_id', $request->user_id)
+                ->exists();
             return $quote;
         });
         return response()->json([
@@ -720,7 +771,7 @@ class StaffAppController2 extends Controller
             }
 
             $quote->staffs()->updateExistingPivot($request->user_id, ['status' => $request->status]);
-            if($staffQuote->pivot->quote_amount !== null) {
+            if ($staffQuote->pivot->quote_amount !== null) {
                 Transaction::create([
                     'user_id' => $request->user_id,
                     'amount' => $staffQuote->pivot->quote_amount,

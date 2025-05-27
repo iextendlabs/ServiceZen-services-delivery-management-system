@@ -1,7 +1,7 @@
 @extends('site.layout.app')
 @section('adsense_head')
-    @if (!empty($ads['home']['head']))
-        {!! $ads['home']['head'] !!}
+    @if (!empty($ads['head']))
+        {!! $ads['head'] !!}
     @endif
 @endsection
 @section('content')
@@ -56,8 +56,8 @@
         }
     </style>
     <div class="container">
-        @if (!empty($ads['home']['top']))
-                {!! $ads['home']['top'] !!}
+        @if (!empty($ads['top']))
+                {!! $ads['top'] !!}
             @endif
         <div class="col-md-6 col-sm-12 offset-md-3 mt-5">
             <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
@@ -153,8 +153,8 @@
                 @include('site.categories.category_card', ['category' => $single_category])
             @endforeach
         </div>
-        @if (!empty($ads['home']['center']))
-            {!! $ads['home']['center'] !!}
+        @if (!empty($ads['center']))
+            {!! $ads['center'] !!}
         @endif
         <hr>
         <div class="row">
@@ -300,8 +300,8 @@
                     </div>
                 </div>
             @endif
-            @if (!empty($ads['home']['bottom']))
-                {!! $ads['home']['bottom'] !!}
+            @if (!empty($ads['bottom']))
+                {!! $ads['bottom'] !!}
             @endif
         </div>
     </div>
