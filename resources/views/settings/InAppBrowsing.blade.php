@@ -3,6 +3,7 @@
     #section_zone {
         border: 1px solid #ced4da;
         border-radius: .25rem;
+        width: 335px !important;
     }
 </style>
 @section('content')
@@ -50,10 +51,10 @@
                                     'status' => 1,
                                     'entries' => [
                                         [
-                                            'image' => '', 
+                                            'image' => '',
                                             'destinationUrl' => '',
-                                            'zone' => []
-                                        ]
+                                            'zone' => [],
+                                        ],
                                     ],
                                 ],
                             ],
@@ -106,8 +107,8 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 30%">Image</th>
-                                        <th style="width: 40%">Destination URL</th>
-                                        <th style="width: 20%">Zones</th>
+                                        <th style="width: 30%">Destination URL</th>
+                                        <th style="width: 30%">Zones</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -170,9 +171,8 @@
                                                 <div class="form-group" id="section_zone">
                                                     <select
                                                         class="form-control entry-zone selectpicker @error("sections.$sectionIndex.entries.$entryIndex.zone") is-invalid @enderror"
-                                                        name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][zone][]" 
-                                                        multiple
-                                                        data-live-search="true" data-actions-box="true">
+                                                        name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][zone][]"
+                                                        multiple data-live-search="true" data-actions-box="true">
                                                         @foreach ($zones as $zone)
                                                             <option value="{{ $zone }}"
                                                                 {{ in_array($zone, old("sections.$sectionIndex.entries.$entryIndex.zone", $entry['zone'] ?? [])) ? 'selected' : '' }}>
@@ -225,7 +225,7 @@
             let entryIndices = {!! json_encode(array_fill(0, count($sections), count($sections[0]['entries'] ?? 1))) !!};
 
             $('.entry-zone').selectpicker();
-            
+
             // Add new section
             $('#add-section').on('click', function() {
                 const html = `
@@ -386,13 +386,13 @@
                 </tr>`;
 
                 entriesContainer.append(html);
-                
+
                 // Initialize selectpicker for the new entry's zone
                 entriesContainer.find('.entry:last .entry-zone.selectpicker').selectpicker({
                     width: '100%',
                     size: 'auto'
                 });
-                
+
                 entryIndices[sectionIndex] = entryIndex + 1;
             });
 
@@ -482,6 +482,26 @@
                 if (img.attr('src') && img.attr('src') !== '#') {
                     $(this).show();
                 }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            function checkTableResponsive() {
+                var viewportWidth = $(window).width();
+                var $table = $('table');
+
+                if (viewportWidth < 768) {
+                    $table.addClass('table-responsive');
+                } else {
+                    $table.removeClass('table-responsive');
+                }
+            }
+
+            checkTableResponsive();
+
+            $(window).resize(function() {
+                checkTableResponsive();
             });
         });
     </script>
