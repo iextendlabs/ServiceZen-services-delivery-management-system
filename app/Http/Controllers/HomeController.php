@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\File;
 use App\Models\StaffZone;
 use App\Models\ServiceCategory;
 use App\Models\Service;
+use App\Models\StaffGroup;
 use App\Models\SubTitle;
 
 class HomeController extends Controller
@@ -419,6 +420,20 @@ class HomeController extends Controller
             'categories' => $allCategoriesArray,
         ];
 
+        $staffGroups = StaffGroup::with('staffZones')->get();
+
+        $groupData = $staffGroups->map(function ($group) {
+            return [
+                'id' => $group->id,
+                'group_name' => $group->name,
+                'zone' => $group->staffZones->pluck('name')->toArray(),
+            ];
+        })->toArray();
+
+        $groupDataJsonData = [
+            'groupData' => $groupData,
+        ];
+
         try {
             $filename = "AppHomeData.json";
             $filePath = public_path($filename);
@@ -505,6 +520,29 @@ class HomeController extends Controller
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($categoriesJsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        try {
+            $filename = "AppGroupData.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppGroupData_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $groupDataJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($groupDataJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);
