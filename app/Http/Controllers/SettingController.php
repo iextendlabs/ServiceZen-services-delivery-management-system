@@ -353,6 +353,7 @@ class SettingController extends Controller
                     $validatedSections[] = [
                         'name' => $section['name'],
                         'status' => $section['status'],
+                        'sort' => $section['sort'] ?? 0,
                         'entries' => $validatedEntries
                     ];
                 }

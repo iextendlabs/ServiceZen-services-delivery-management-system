@@ -317,6 +317,11 @@ class HomeController extends Controller
             $sections = json_decode($setting->value, true);
 
             if (is_array($sections)) {
+                // Sort sections by 'sort' key (ascending)
+                usort($sections, function ($a, $b) {
+                    return ($a['sort'] ?? 0) <=> ($b['sort'] ?? 0);
+                });
+
                 foreach ($sections as $section) {
                     if (!isset($section['status']) || $section['status'] != 1 || empty($section['entries'])) {
                         continue;

@@ -49,6 +49,7 @@
                                 [
                                     'name' => '',
                                     'status' => 1,
+                                    'sort' => 0,
                                     'entries' => [
                                         [
                                             'image' => '',
@@ -65,7 +66,7 @@
                     <div class="card mb-4 section-item">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group mt-2">
                                         <input type="text"
                                             class="form-control section-name @error("sections.$sectionIndex.name") is-invalid @enderror"
@@ -90,6 +91,18 @@
                                                 Inactive</option>
                                         </select>
                                         @error("sections.$sectionIndex.status")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group mt-2">
+                                        <input type="text"
+                                            class="form-control section-sort @error("sections.$sectionIndex.sort") is-invalid @enderror"
+                                            name="sections[{{ $sectionIndex }}][sort]"
+                                            value="{{ old("sections.$sectionIndex.sort", $section['sort'] ?? 0) }}"
+                                            placeholder="Section Sort Order">
+                                        @error("sections.$sectionIndex.sort")
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -232,7 +245,7 @@
                 <div class="card mb-4 section-item">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group mt-2">
                                     <input type="text" class="form-control section-name" name="sections[${sectionIndex}][name]" 
                                         placeholder="Section name (e.g., Business, Social)" required>
@@ -244,6 +257,12 @@
                                         <option value="1" selected>Active</option>
                                         <option value="0">Inactive</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mt-2">
+                                    <input type="text" class="form-control section-sort" name="sections[${sectionIndex}][sort]" 
+                                        placeholder="Section Sort Order" value="0">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -418,6 +437,7 @@
                     $('.section-item').each(function(index) {
                         $(this).find('.section-name').attr('name', `sections[${index}][name]`);
                         $(this).find('.section-status').attr('name', `sections[${index}][status]`);
+                        $(this).find('.section-sort').attr('name', `sections[${index}][sort]`);
 
                         // Reindex entries
                         $(this).find('.entry').each(function(entryIndex) {
