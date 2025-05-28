@@ -422,6 +422,8 @@ class StaffAppController2 extends Controller
             })
             : [];
 
+        $whatsapp_number = Setting::where('key', 'WhatsApp Number For Staff App')->value('value');
+
         return response()->json([
             'user_id' => $user->id,
             'name' => $user->name,
@@ -443,7 +445,8 @@ class StaffAppController2 extends Controller
             'product_sales' => $product_sales,
             'bonus' => $bonus,
             'current_month' => $currentMonth,
-            'supervisors' => $supervisors
+            'supervisors' => $supervisors,
+            'whatsapp_number' => $whatsapp_number,
         ], 200);
     }
 
