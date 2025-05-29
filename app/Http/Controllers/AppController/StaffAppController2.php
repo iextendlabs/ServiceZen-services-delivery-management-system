@@ -659,7 +659,7 @@ class StaffAppController2 extends Controller
         $staff = $user->staff;
         $staffData = $request->user ?? [];
 
-        $staff->get_quote = $staffData['get_quote'] == true ? 1 : 0;
+        $staff->get_quote = $staffData['get_quote'] == "true" ? 1 : 0;
         $staff->phone = $staffData['phone'] ?? $staff->phone;
         $staff->about = $staffData['about'] ?? $staff->about;
         $staff->location = $staffData['location'] ?? $staff->location;
@@ -684,7 +684,7 @@ class StaffAppController2 extends Controller
             foreach ($request->file('documents') as $docType => $file) {
                 if ($file) {
                     $filename = mt_rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('staff-documents'), $filename);
+                    $file->move(public_path('staff-document'), $filename);
                     $input[$docType] = $filename;
                 }
             }
