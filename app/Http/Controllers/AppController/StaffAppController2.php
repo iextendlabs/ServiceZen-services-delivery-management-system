@@ -679,7 +679,7 @@ class StaffAppController2 extends Controller
         $staff->save();
 
         $userDocuments = UserDocument::where('user_id', $user->id)->first();
-
+        $input = [];
         if ($request->has('documents')) {
             foreach ($request->file('documents') as $docType => $file) {
                 if ($file) {
@@ -689,13 +689,15 @@ class StaffAppController2 extends Controller
                 }
             }
         }
-
-        if ($userDocuments) {
-            $userDocuments->update($input);
-        } else {
-            $input['user_id'] = $user->id;
-            UserDocument::create($input);
+        if ($input) {
+            if ($userDocuments) {
+                $userDocuments->update($input);
+            } else {
+                $input['user_id'] = $user->id;
+                UserDocument::create($input);
+            }
         }
+
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
