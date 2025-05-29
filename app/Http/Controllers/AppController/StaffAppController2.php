@@ -713,21 +713,21 @@ class StaffAppController2 extends Controller
             $subtitles = is_string($request->subtitles)
                 ? json_decode($request->subtitles, true)
                 : $request->subtitles;
-            $staff->subTitles()->sync($subtitles);
+            $user->subTitles()->sync($subtitles);
         }
 
         if ($request->has('staff_categories')) {
             $categories = is_string($request->staff_categories)
                 ? json_decode($request->staff_categories, true)
                 : $request->staff_categories;
-            $staff->categories()->sync($categories);
+            $user->categories()->sync($categories);
         }
 
         if ($request->has('staff_services')) {
             $services = is_string($request->staff_services)
                 ? json_decode($request->staff_services, true)
                 : $request->staff_services;
-            $staff->services()->sync($services);
+            $user->services()->sync($services);
         }
 
         User::find($user->id)->staffGroups()->detach();
