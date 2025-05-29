@@ -53,6 +53,7 @@ Route::get('getWithdrawPaymentMethods', [StaffAppController2::class, 'getWithdra
 Route::post('withdraw', [StaffAppController2::class, 'withdraw']);
 Route::get('getWithdraws', [StaffAppController2::class, 'getWithdraws']);
 Route::post('updateProfile', [StaffAppController2::class, 'updateProfile']);
+Route::post('updateUser', [StaffAppController2::class, 'updateUser']);
 Route::post('onlineOffline', [StaffAppController2::class, 'onlineOffline']);
 Route::get('getPlans', [StaffAppController2::class, 'getPlans']);
 Route::post('staffSignup', [StaffAppController2::class, 'signup']);

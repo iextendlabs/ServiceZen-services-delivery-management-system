@@ -28,8 +28,11 @@ use App\Models\Quote;
 use App\Models\ShortHoliday;
 use App\Models\Staff;
 use App\Models\StaffGeneralHoliday;
+use App\Models\StaffGroup;
 use App\Models\StaffHoliday;
+use App\Models\StaffImages;
 use App\Models\UserAffiliate;
+use App\Models\UserDocument;
 use App\Models\Withdraw;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -470,10 +473,11 @@ class StaffAppController2 extends Controller
         $userDocument = [];
 
         $exclude = ['id', 'user_id', 'created_at', 'updated_at'];
-
-        foreach ($document->getAttributes() as $key => $value) {
-            if (!in_array($key, $exclude) && $value) {
-                $userDocument[$key] = asset('staff-document/' . $value);
+        if ($document) {
+            foreach ($document->getAttributes() as $key => $value) {
+                if (!in_array($key, $exclude) && $value) {
+                    $userDocument[$key] = asset('staff-document/' . $value);
+                }
             }
         }
 
@@ -623,6 +627,126 @@ class StaffAppController2 extends Controller
             'status' => 'success',
             'message' => 'Profile updated successfully',
             'data' => $user
+        ], 200);
+    }
+
+    public function updateUser(Request $request)
+    {
+        $user = User::with('staff')->findOrFail($request->user_id);
+
+        if (!$user->staff) {
+            return response()->json(['message' => "Staff profile not found."], 201);
+        }
+
+        if ($request->has('user')) {
+            $userData = $request->user;
+
+            if (isset($userData['password'])) {
+                $user->password = Hash::make($userData['password']);
+            }
+
+            if (isset($userData['email'])) {
+                $user->email = $userData['email'];
+            }
+
+            if (isset($userData['name'])) {
+                $user->name = $userData['name'];
+            }
+
+            $user->save();
+        }
+
+        $staff = $user->staff;
+        $staffData = $request->user ?? [];
+
+        $staff->get_quote = $staffData['get_quote'] == "true" ? 1 : 0;
+        $staff->phone = $staffData['phone'] ?? $staff->phone;
+        $staff->about = $staffData['about'] ?? $staff->about;
+        $staff->location = $staffData['location'] ?? $staff->location;
+        $staff->nationality = $staffData['nationality'] ?? $staff->nationality;
+        $staff->whatsapp = $staffData['whatsapp'] ?? $staff->whatsapp;
+
+        if ($request->hasFile('image')) {
+            if ($staff->image && file_exists(public_path('staff-images/' . $staff->image))) {
+                unlink(public_path('staff-images/' . $staff->image));
+            }
+
+            $filename = 'profile_' . md5(time()) . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move(public_path('staff-images'), $filename);
+            $staff->image = $filename;
+        }
+
+        $staff->save();
+
+        $userDocuments = UserDocument::where('user_id', $user->id)->first();
+
+        if ($request->has('documents')) {
+            foreach ($request->file('documents') as $docType => $file) {
+                if ($file) {
+                    $filename = mt_rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('staff-document'), $filename);
+                    $input[$docType] = $filename;
+                }
+            }
+        }
+
+        if ($userDocuments) {
+            $userDocuments->update($input);
+        } else {
+            $input['user_id'] = $user->id;
+            UserDocument::create($input);
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = 'gallery_' . md5(time() . rand()) . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('staff-images'), $filename);
+
+                StaffImages::updateOrCreate(
+                    ['staff_id' => $user->id, 'image' => $filename],
+                    ['image' => $filename]
+                );
+            }
+        }
+
+        if ($request->has('subtitles')) {
+            $subtitles = is_string($request->subtitles)
+                ? json_decode($request->subtitles, true)
+                : $request->subtitles;
+            $user->subTitles()->sync($subtitles);
+        }
+
+        if ($request->has('staff_categories')) {
+            $categories = is_string($request->staff_categories)
+                ? json_decode($request->staff_categories, true)
+                : $request->staff_categories;
+            $user->categories()->sync($categories);
+        }
+
+        if ($request->has('staff_services')) {
+            $services = is_string($request->staff_services)
+                ? json_decode($request->staff_services, true)
+                : $request->staff_services;
+            $user->services()->sync($services);
+        }
+
+        User::find($user->id)->staffGroups()->detach();
+        if ($request->has('staff_groups')) {
+            $groups = is_string($request->staff_groups)
+                ? json_decode($request->staff_groups, true)
+                : $request->staff_groups;
+            foreach ($groups as $group) {
+                $staffGroup = StaffGroup::find($group);
+
+                if (!$staffGroup->staffs()->where('staff_id', $user->id)->exists()) {
+                    $staffGroup->staffs()->attach($user->id);
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
         ], 200);
     }
 
