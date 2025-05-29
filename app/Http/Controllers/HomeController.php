@@ -407,7 +407,7 @@ class HomeController extends Controller
             'subTitles' => $allSubTitlesArray,
         ];
 
-        $allCategories = ServiceCategory::all();
+        $allCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
 
         $allCategoriesArray = $allCategories->map(function ($category) {
             return [
