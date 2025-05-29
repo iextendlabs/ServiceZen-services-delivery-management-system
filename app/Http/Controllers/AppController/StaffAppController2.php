@@ -470,10 +470,11 @@ class StaffAppController2 extends Controller
         $userDocument = [];
 
         $exclude = ['id', 'user_id', 'created_at', 'updated_at'];
-
-        foreach ($document->getAttributes() as $key => $value) {
-            if (!in_array($key, $exclude) && $value) {
-                $userDocument[$key] = asset('staff-document/' . $value);
+        if ($document) {
+            foreach ($document->getAttributes() as $key => $value) {
+                if (!in_array($key, $exclude) && $value) {
+                    $userDocument[$key] = asset('staff-document/' . $value);
+                }
             }
         }
 
