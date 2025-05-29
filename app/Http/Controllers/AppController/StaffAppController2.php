@@ -659,7 +659,7 @@ class StaffAppController2 extends Controller
         $staff = $user->staff;
         $staffData = $request->user ?? [];
 
-        $staff->get_quote = $staffData['get_quote'] ? true : 0;
+        $staff->get_quote = $staffData['get_quote'] == true ? 1 : 0;
         $staff->phone = $staffData['phone'] ?? $staff->phone;
         $staff->about = $staffData['about'] ?? $staff->about;
         $staff->location = $staffData['location'] ?? $staff->location;
