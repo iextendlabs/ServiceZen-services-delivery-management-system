@@ -4,6 +4,7 @@
         border: 1px solid #ced4da;
         border-radius: .25rem;
         width: 335px !important;
+        margin-top: 1rem;
     }
 </style>
 @section('content')
@@ -55,6 +56,7 @@
                                             'image' => '',
                                             'destinationUrl' => '',
                                             'zone' => [],
+                                            'sort' => 0,
                                         ],
                                     ],
                                 ],
@@ -122,6 +124,7 @@
                                         <th style="width: 30%">Image</th>
                                         <th style="width: 30%">Destination URL</th>
                                         <th style="width: 30%">Zones</th>
+                                        <th style="width: 30%">Sort</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -196,6 +199,12 @@
                                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
                                                 </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control"
+                                                    name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][sort]"
+                                                    placeholder="Entries Sort Order"
+                                                    value="{{ old("sections.$sectionIndex.entries.$entryIndex.sort", $entry['sort'] ?? 0) }}">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-danger remove-entry">
@@ -279,6 +288,7 @@
                                     <th style="width: 30%">Image</th>
                                     <th style="width: 40%">Destination URL</th>
                                     <th style="width: 20%">Zones</th>
+                                    <th style="width: 20%">Sort</th>
                                     <th style="width: 10%">Action</th>
                                 </tr>
                             </thead>
@@ -318,6 +328,11 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" 
+                                               name="sections[${sectionIndex}][entries][0][sort]" 
+                                               placeholder="Entries Sort Order" value="0">
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-sm btn-danger remove-entry">
@@ -409,6 +424,11 @@
                             </select>
                         </div>
                     </td>
+                    <td>
+                        <input type="number" class="form-control" 
+                               name="sections[${sectionIndex}][entries][${entryIndex}][sort]" 
+                               placeholder="Entries Sort Order" value="0">
+                    </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-sm btn-danger remove-entry">
                             <i class="fas fa-trash"></i>
@@ -428,30 +448,35 @@
             // Remove section
             $(document).on('click', '.remove-section', function() {
                 if ($('.section-item').length > 1) {
-                    const sectionIndex = $(this).closest('.section-item').index();
-                    entryIndices.splice(sectionIndex, 1); // Remove the entry index for this section
-
                     $(this).closest('.section-item').remove();
 
-                    // Reindex sections
-                    $('.section-item').each(function(index) {
-                        $(this).find('.section-name').attr('name', `sections[${index}][name]`);
-                        $(this).find('.section-status').attr('name', `sections[${index}][status]`);
-                        $(this).find('.section-sort').attr('name', `sections[${index}][sort]`);
+                    // Reindex all sections and their entries
+                    $('.section-item').each(function(sectionIndex) {
+                        // Update section fields
+                        $(this).find('.section-name').attr('name',
+                            `sections[${sectionIndex}][name]`);
+                        $(this).find('.section-status').attr('name',
+                            `sections[${sectionIndex}][status]`);
+                        $(this).find('.section-sort').attr('name',
+                            `sections[${sectionIndex}][sort]`);
 
-                        // Reindex entries
+                        // Reindex entries within this section
                         $(this).find('.entry').each(function(entryIndex) {
                             $(this).find('.image-upload').attr('name',
-                                `sections[${index}][entries][${entryIndex}][image]`);
+                                `sections[${sectionIndex}][entries][${entryIndex}][image]`
+                                );
                             $(this).find('input[type="url"]').attr('name',
-                                `sections[${index}][entries][${entryIndex}][destination_url]`
-                            );
+                                `sections[${sectionIndex}][entries][${entryIndex}][destination_url]`
+                                );
                             $(this).find('input[name$="[existing_image]"]').attr('name',
-                                `sections[${index}][entries][${entryIndex}][existing_image]`
-                            );
+                                `sections[${sectionIndex}][entries][${entryIndex}][existing_image]`
+                                );
                             $(this).find('.entry-zone').attr('name',
-                                `sections[${index}][entries][${entryIndex}][zone][]`
-                            );
+                                `sections[${sectionIndex}][entries][${entryIndex}][zone][]`
+                                );
+                            $(this).find('input[name$="[sort]"]').attr('name',
+                                `sections[${sectionIndex}][entries][${entryIndex}][sort]`
+                                );
                         });
                     });
 

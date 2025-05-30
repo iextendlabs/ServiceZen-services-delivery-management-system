@@ -345,6 +345,7 @@ class SettingController extends Controller
                             'zone' => isset($entry['zone'])
                                 ? (is_array($entry['zone']) ? $entry['zone'] : [$entry['zone']])
                                 : [],
+                            'sort' => $entry['sort'] ?? 0,
                         ];
                     }
                 }
