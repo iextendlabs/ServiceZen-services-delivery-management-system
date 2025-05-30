@@ -4,6 +4,7 @@
         border: 1px solid #ced4da;
         border-radius: .25rem;
         width: 335px !important;
+        margin-top: 1rem;
     }
 </style>
 @section('content')
@@ -55,6 +56,7 @@
                                             'image' => '',
                                             'destinationUrl' => '',
                                             'zone' => [],
+                                            'sort' => 0,
                                         ],
                                     ],
                                 ],
@@ -122,6 +124,7 @@
                                         <th style="width: 30%">Image</th>
                                         <th style="width: 30%">Destination URL</th>
                                         <th style="width: 30%">Zones</th>
+                                        <th style="width: 30%">Sort</th>
                                         <th style="width: 10%">Action</th>
                                     </tr>
                                 </thead>
@@ -196,6 +199,13 @@
                                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
                                                 </div>
+                                            </td>
+                                            <td>
+                                                <input type="number"
+                                                    class="form-control"
+                                                    name="sections[{{ $sectionIndex }}][entries][{{ $entryIndex }}][sort]"
+                                                    placeholder="Entries Sort Order"
+                                                    value="{{ old("sections.$sectionIndex.entries.$entryIndex.sort", $entry['sort'] ?? 0) }}">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-sm btn-danger remove-entry">
@@ -279,6 +289,7 @@
                                     <th style="width: 30%">Image</th>
                                     <th style="width: 40%">Destination URL</th>
                                     <th style="width: 20%">Zones</th>
+                                    <th style="width: 20%">Sort</th>
                                     <th style="width: 10%">Action</th>
                                 </tr>
                             </thead>
@@ -318,6 +329,11 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" 
+                                               name="sections[${sectionIndex}][entries][0][sort]" 
+                                               placeholder="Entries Sort Order" value="0">
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-sm btn-danger remove-entry">
@@ -408,6 +424,11 @@
                                 @endforeach
                             </select>
                         </div>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" 
+                               name="sections[${sectionIndex}][entries][${entryIndex}][sort]" 
+                               placeholder="Entries Sort Order" value="0">
                     </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-sm btn-danger remove-entry">
