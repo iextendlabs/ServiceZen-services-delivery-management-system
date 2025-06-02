@@ -9,6 +9,10 @@ use App\Http\Controllers\AppController\{
     ChatController,
     CustomerController,
 };
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Response;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 
 use App\Http\Controllers\StripePaymentController;
 /*
@@ -89,13 +93,13 @@ Route::get('appOffer', [CustomerController::class, 'getOffer']);
 Route::get('checkUser', [CustomerController::class, 'checkUser']);
 Route::get('cancelOrder', [CustomerController::class, 'cancelOrder']);
 Route::get('OrderTotalSummary', [CustomerController::class, 'OrderTotalSummary']);
-Route::post('/apply-affiliate', [CustomerController::class,'applyAffiliate'])->name('apply.affiliate');
+Route::post('/apply-affiliate', [CustomerController::class, 'applyAffiliate'])->name('apply.affiliate');
 Route::post('addNewOrder', [CustomerController::class, 'addNewOrder']);
 Route::post('/create-payment-intent', [StripePaymentController::class, 'stripePost']);
 Route::get('getStaff', [CustomerController::class, 'getStaff']);
 Route::get('staffFilterOption', [CustomerController::class, 'staffFilterOption']);
 Route::get('getServices', [CustomerController::class, 'getServices']);
-Route::post('/joinFreelancerProgram', [CustomerController::class,'joinFreelancerProgram']);
+Route::post('/joinFreelancerProgram', [CustomerController::class, 'joinFreelancerProgram']);
 Route::get('getUser/{id}', [CustomerController::class, 'getUser'])->name('getUser');
 Route::post('quoteStore', [CustomerController::class, 'quoteStore']);
 Route::get('getQuotes', [CustomerController::class, 'getQuotes']);
@@ -104,3 +108,77 @@ Route::post('/quotes/{quoteId}/confirm-bid', [CustomerController::class, 'confir
 Route::get('/bid-chat/{quoteId}/messages', [CustomerController::class, 'fetchMessages']);
 Route::post('/bid-chat/{quoteId}/send', [CustomerController::class, 'sendMessage']);
 Route::post('/app-log-error', [CustomerController::class, 'errorLog']);
+
+Route::get('/resized-images/{width}x{height}/{path}', function ($width, $height, $path) {
+    $parts = explode('/', $path);
+    $filename = array_pop($parts);
+    $folder = implode('/', $parts);
+    
+    // Validate inputs
+    $filename = basename($filename);
+    $folder = collect(explode('/', $folder))
+        ->map(fn($part) => basename($part))
+        ->filter()
+        ->implode('/');
+    
+    $width = (int)$width;
+    $height = (int)$height;
+    
+    if (!is_numeric($width) || $width <= 0 || 
+        !is_numeric($height) || $height <= 0) {
+        abort(400, 'Invalid parameters');
+    }
+
+    // Check for WebP support
+    $acceptHeader = request()->header('Accept');
+    $useWebP = str_contains($acceptHeader ?? '', 'image/webp');
+    $extension = $useWebP ? 'webp' : 'jpg';
+    $cacheKey = "resized_{$width}x{$height}_{$folder}_{$filename}_{$extension}";
+    
+    // Check cache first
+    if (Cache::has($cacheKey)) {
+        $cachedPath = Cache::get($cacheKey);
+        return Response::file($cachedPath)
+            ->header('Content-Type', "image/{$extension}");
+    }
+
+    $originalPath = public_path("{$folder}/{$filename}");
+    
+    if (!file_exists($originalPath)) {
+        abort(404);
+    }
+
+    $image = Image::make($originalPath);
+    $originalRatio = $image->width() / $image->height();
+    $targetRatio = $width / $height;
+
+    // Resize strategy
+    if ($originalRatio > $targetRatio) {
+        $image->resize(null, $height, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+    } else {
+        $image->resize($width, null, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+    }
+
+    // Encode image
+    $encodedImage = $useWebP 
+        ? $image->encode('webp', 80) 
+        : $image->encode('jpg', 85);
+
+    // Store in cache
+    $cacheDir = storage_path('app/cache');
+    if (!file_exists($cacheDir)) {
+        mkdir($cacheDir, 0755, true);
+    }
+    $tempPath = "{$cacheDir}/{$cacheKey}.{$extension}";
+    $encodedImage->save($tempPath);
+    Cache::put($cacheKey, $tempPath, now()->addDays(30));
+
+    return $encodedImage->response()
+        ->header('Content-Type', "image/{$extension}")
+        ->header('Cache-Control', 'public, max-age=31536000')
+        ->header('Vary', 'Accept');
+})->where('path', '.*');

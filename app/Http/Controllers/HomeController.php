@@ -347,7 +347,7 @@ class HomeController extends Controller
                         $entryZones = is_array($entry['zone'] ?? null) ? $entry['zone'] : [];
 
                         $sectionEntries[] = [
-                            'image' => asset('app-browsing-icon/' . $entry['image']),
+                            'image' => $entry['image'],
                             'destination_url' => $entry['destinationUrl'],
                             'zones' => $entryZones
                         ];
