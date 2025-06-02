@@ -138,8 +138,12 @@ Route::get('/resized-images/{width}x{height}/{path}', function ($width, $height,
     // Check cache first
     if (Cache::has($cacheKey)) {
         $cachedPath = Cache::get($cacheKey);
-        return Response::file($cachedPath)
-            ->header('Content-Type', "image/{$extension}");
+        $headers = [
+            'Content-Type' => "image/{$extension}",
+            'Cache-Control' => 'public, max-age=31536000',
+            'Vary' => 'Accept'
+        ];
+        return response()->file($cachedPath, $headers);
     }
 
     $originalPath = public_path("{$folder}/{$filename}");
@@ -164,9 +168,8 @@ Route::get('/resized-images/{width}x{height}/{path}', function ($width, $height,
     }
 
     // Encode image
-    $encodedImage = $useWebP 
-        ? $image->encode('webp', 80) 
-        : $image->encode('jpg', 85);
+    $quality = $useWebP ? 80 : 85;
+    $encodedImage = $image->encode($extension, $quality);
 
     // Store in cache
     $cacheDir = storage_path('app/cache');
@@ -177,7 +180,7 @@ Route::get('/resized-images/{width}x{height}/{path}', function ($width, $height,
     $encodedImage->save($tempPath);
     Cache::put($cacheKey, $tempPath, now()->addDays(30));
 
-    return $encodedImage->response()
+    return response($encodedImage, 200)
         ->header('Content-Type', "image/{$extension}")
         ->header('Cache-Control', 'public, max-age=31536000')
         ->header('Vary', 'Accept');
