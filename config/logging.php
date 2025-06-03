@@ -66,6 +66,11 @@ return [
             'path' => storage_path('logs/app_error.log'),
             'level' => 'debug'
         ],
+        'app_errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/app_console_errors.log'),
+            'level' => 'error',
+        ],
         'api' => [
             'driver' => 'single',
             'path' => storage_path('logs/api.log'),

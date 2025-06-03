@@ -8,6 +8,7 @@ use App\Http\Controllers\AppController\{
     DriverAppController,
     ChatController,
     CustomerController,
+    ErrorLogController,
 };
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
@@ -185,3 +186,5 @@ Route::get('/resized-images/{width}x{height}/{path}', function ($width, $height,
         ->header('Cache-Control', 'public, max-age=31536000')
         ->header('Vary', 'Accept');
 })->where('path', '.*');
+
+Route::post('/log-error', [ErrorLogController::class, 'store']);
