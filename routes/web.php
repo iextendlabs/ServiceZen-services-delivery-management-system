@@ -151,7 +151,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/removeStaffImages', [ServiceStaffController::class, 'removeImages']);
     Route::post('/serviceStaff/{id}/upload-document', [ServiceStaffController::class, 'uploadDocument'])->name('serviceStaff.upload.document');
 
-    Route::get('/transactionUnapprove', [TransactionController::class,'Unapprove'])->name('transactions.Unapprove');
+    Route::get('/transactionUnapprove', [TransactionController::class, 'Unapprove'])->name('transactions.Unapprove');
 
     Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
     Route::post('chatUpdate/{id}', [OrderController::class, 'chatUpdate'])->name('orders.chatUpdate');
@@ -168,10 +168,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('chats', ChatController::class);
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
     Route::resource('campaigns', CampaignController::class);
-    Route::get('clear', [CampaignController::class,"clear"])->name('campaigns.clear');
+    Route::get('clear', [CampaignController::class, "clear"])->name('campaigns.clear');
 
-    Route::post('/summerNote/upload', [SummerNoteController::class,"upload"])->name('summerNote.upload');
-    Route::get('appData', [HomeController::class,"appJsonData"])->name('appData');
+    Route::post('/summerNote/upload', [SummerNoteController::class, "upload"])->name('summerNote.upload');
+    Route::get('appData', [HomeController::class, "appJsonData"])->name('appData');
 
     Route::post('/affiliate_edit/{id}', [OrderController::class, 'affiliate_edit'])->name('orders.affiliate_edit');
     Route::post('/booking_edit/{id}', [OrderController::class, 'booking_edit'])->name('orders.booking_edit');
@@ -193,11 +193,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/customers/update-affiliate', [CustomerController::class, 'bulkUpdateAffiliate'])->name('customers.updateAffiliate');
 
     Route::resource('withdraws', WithdrawController::class);
-    Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus'); 
-    Route::post('/apply-order-coupon', [OrderController::class,'applyOrderCoupon'])->name('apply.order_coupon');
-    Route::get('/staff-categories-services', [OrderController::class,'staffCategoriesServices'])->name('fetch.staff_categories_services');
-    Route::post('/bulkOrderBooking', [OrderController::class,'bulkOrderBooking'])->name('bulkOrderBooking');
-    
+    Route::get('withdraws-update/{withdraw}', [WithdrawController::class, 'updateWithdrawStatus'])->name('updateWithdrawStatus');
+    Route::post('/apply-order-coupon', [OrderController::class, 'applyOrderCoupon'])->name('apply.order_coupon');
+    Route::get('/staff-categories-services', [OrderController::class, 'staffCategoriesServices'])->name('fetch.staff_categories_services');
+    Route::post('/bulkOrderBooking', [OrderController::class, 'bulkOrderBooking'])->name('bulkOrderBooking');
+
     Route::resource('currencies', CurrencyController::class);
 
     Route::resource('membershipPlans', MembershipPlanController::class);
@@ -260,7 +260,7 @@ Route::group(['middleware' => 'checkSessionExpiry'], function () {
 
 Route::resource('siteQuotes', SiteQuoteController::class);
 
-Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class,'quoteModal'])->name('quoteModal');
+Route::get('/quoteModal/{serviceId}', [SiteQuoteController::class, 'quoteModal'])->name('quoteModal');
 // Backups
 Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
 Route::get('/backups/backup', [BackupController::class, 'backup'])->name('backups.backup');
@@ -312,14 +312,14 @@ Route::get('category/{slug}', [SiteController::class, 'categoryShow'])->name('ca
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');
 
-Route::post('/apply-coupon', [CheckOutController::class,'applyCoupon'])->name('apply.coupon');
-Route::post('/apply-affiliate', [CustomerAuthController::class,'applyAffiliate'])->name('apply.affiliate');
-Route::get('/join-affiliate-program', [CustomerAuthController::class,'JoinAffiliateProgram'])->name('apply.affiliateProgram');
-Route::get('/addToCartModal/{serviceId}', [CheckOutController::class,'addToCartModal'])->name('addToCartModal');
-Route::post('/addToCartServicesStaff', [CheckOutController::class,'addToCartServicesStaff'])->name('addToCartServicesStaff');
-Route::get('/checkBooking', [CheckOutController::class,'checkBooking'])->name('checkBooking');
+Route::post('/apply-coupon', [CheckOutController::class, 'applyCoupon'])->name('apply.coupon');
+Route::post('/apply-affiliate', [CustomerAuthController::class, 'applyAffiliate'])->name('apply.affiliate');
+Route::get('/join-affiliate-program', [CustomerAuthController::class, 'JoinAffiliateProgram'])->name('apply.affiliateProgram');
+Route::get('/addToCartModal/{serviceId}', [CheckOutController::class, 'addToCartModal'])->name('addToCartModal');
+Route::post('/addToCartServicesStaff', [CheckOutController::class, 'addToCartServicesStaff'])->name('addToCartServicesStaff');
+Route::get('/checkBooking', [CheckOutController::class, 'checkBooking'])->name('checkBooking');
 Route::post('/format-currency', [CheckOutController::class, 'formatCurrencyJS'])->name('format-currency');
-Route::controller(StripePaymentController::class)->group(function(){
+Route::controller(StripePaymentController::class)->group(function () {
     Route::get('stripe', 'stripe')->name('stripe.form');
     Route::post('stripe', 'stripePost')->name('stripe.post');
 });
@@ -342,36 +342,61 @@ Route::post('/kommo-log', function (Request $request) {
 
     // Log the JSON data
     Log::channel('kommo_log')->info('Request Received:', ['data' => $jsonData]);
-    
+
     return response()->json(['status' => 'logged']);
 });
 
 Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
     $width = request()->query('w');  // width
     $height = request()->query('h'); // height
+    $quality = min(100, max(10, (int)request()->query('q', 75))); // quality (10-100)
+    $format = in_array(strtolower(request()->query('f')), ['webp', 'jpg', 'png'])
+        ? strtolower(request()->query('f'))
+        : null; // format
 
-    $path = public_path($folder . '/' . $filename);
+    $path = public_path("{$folder}/{$filename}");
 
+    // Check if file exists
     if (!file_exists($path)) {
         abort(404);
     }
 
+    // Check if the original image is too large (over 100KB)
+    $originalSize = filesize($path);
+    $shouldCompress = $originalSize > 100 * 1024; // 100KB threshold
+
     $image = Image::make($path);
 
-    // Resize if width or height is provided
-    if ($width || $height) {
-        $image->resize($width, $height, function ($constraint) {
-            $constraint->aspectRatio();
-            $constraint->upsize(); // Prevent upscaling smaller images
-        });
+    // Apply transformations only if needed
+    if ($width || $height || $shouldCompress || $format) {
+        // Resize if dimensions provided
+        if ($width || $height) {
+            $image->resize($width, $height, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+        }
+
+        // Convert to modern format if not specified
+        $targetFormat = $format ?: (str_contains($filename, '.')
+            ? pathinfo($filename, PATHINFO_EXTENSION)
+            : 'webp');
+
+        // Ensure webp for non-transparent images
+        if (!str_contains($filename, '.png') && !$format) {
+            $targetFormat = 'webp';
+        }
+
+        // Compress the image
+        $image->encode($targetFormat, $quality);
     }
 
-    // Compress the image to reduce size (adjust quality as needed)
-    $image->encode(null, 75);
-
-    return $image->response()->header('Cache-Control', 'public, max-age=31536000');
+    // Set proper caching headers (1 year)
+    return $image->response()
+        ->header('Cache-Control', 'public, max-age=31536000')
+        ->header('Content-Type', $image->mime());
 })->where('filename', '.*');
 
-Route::get('sitemap.xml', function() {
+Route::get('sitemap.xml', function () {
     return response()->file(public_path('sitemap.xml'));
 });

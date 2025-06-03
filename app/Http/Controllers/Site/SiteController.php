@@ -158,7 +158,14 @@ class SiteController extends Controller
         } else {
             $app_flag = false;
         }
-        $service = Service::where('slug', $slug)->orWhere('id', $slug)->firstOrFail();
+        $service = Service::where('slug', $slug);
+
+        if (is_numeric($slug) && (string)(int)$slug === (string)$slug) {
+            $service->orWhere('id', $slug);
+        }
+
+        $service = $service->firstOrFail();
+
 
         $metaTitle = $service->meta_title ?? $service->name;
         $metaDescription = $service->meta_description;
