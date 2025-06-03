@@ -1,9 +1,19 @@
 <div class="card mb-3">
     <div class="col-md-12 text-center">
         <div class="d-flex justify-content-center align-items-center" style="min-height: 230px;">
-            <img src="{{ url('img/staff-images/' . $staff->staff->image) }}?w=250&h=250" class="card-img-top img-fluid rounded-circle"
-                alt="{{ $staff->name }}">
+            @php
+                $imagePath = 'staff-images/' . $staff->staff->image;
+                $altText = $staff->staff->image_alt ?? $staff->name;
+                $width = 250;
+                $height = 250;
+            @endphp
 
+            <img class="card-img-top img-fluid rounded-circle"
+                src="{{ url('img/' . $imagePath) }}?w={{ $width }}&h={{ $height }}&q=80&f=webp"
+                srcset="{{ url('img/' . $imagePath) }}?w={{ $width }}&h={{ $height }}&q=80&f=webp 1x,
+                                 {{ url('img/' . $imagePath) }}?w={{ $width * 2 }}&h={{ $height * 2 }}&q=80&f=webp 2x"
+                alt="{{ $altText }}" width="{{ $width }}" height="{{ $height }}" loading="lazy"
+                decoding="async">
         </div>
     </div>
     <div class="card-body text-center" style="height: 335px; align-content: center;">

@@ -2,8 +2,19 @@
     <div class="card mb-4 box-shadow">
         <a href="/service/{{ $service->slug }}">
             <p class="card-text service-box-title text-center"><b>{{ $service->name }}</b></p>
-            <img class="card-img-top" src="{{ url('img/service-images/' . $service->image) }}?w=298&h=250"
-                alt="{{ $service->name }}">
+            @php
+                $imagePath = 'service-images/' . $service->image;
+                $altText = $service->image_alt ?? $service->name;
+                $width = 298;
+                $height = 250;
+            @endphp
+
+            <img class="card-img-top img-fluid"
+                src="{{ url('img/' . $imagePath) }}?w={{ $width }}&h={{ $height }}&q=80&f=webp"
+                srcset="{{ url('img/' . $imagePath) }}?w={{ $width }}&h={{ $height }}&q=80&f=webp 1x,
+                                 {{ url('img/' . $imagePath) }}?w={{ $width * 2 }}&h={{ $height * 2 }}&q=80&f=webp 2x"
+                alt="{{ $altText }}" width="{{ $width }}" height="{{ $height }}" loading="lazy"
+                decoding="async">
         </a>
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">

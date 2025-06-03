@@ -57,8 +57,8 @@
     </style>
     <div class="container">
         @if (!empty($ads['top']))
-                {!! $ads['top'] !!}
-            @endif
+            {!! $ads['top'] !!}
+        @endif
         <div class="col-md-6 col-sm-12 offset-md-3 mt-5">
             <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
                 <div class="input-group">
@@ -118,8 +118,22 @@
                           href="/service/{{ $id }}"
                       @elseif($type === 'customLink' && !empty($id))
                           href="{{ $id }}" @endif>
-                                    <img src="{{ url('img/slider-images/' . $filename) }}" src="{{ asset('slider-images/' . $filename) }}" alt="Slide {{ $loop->iteration }}"
-                                        class="d-block w-100">
+                                    @php
+                                        $imagePath = 'slider-images/' . $filename;
+                                        $altText = $filename_alt ?? 'Lipslay Slider Image';
+                                        $width = 1140;
+                                        $height = 500;
+                                    @endphp
+
+                                    <img class="d-block w-100"
+                                        src="{{ url('img/' . $imagePath) }}?w={{ $width }}&h={{ $height }}&q=80&f=webp"
+                                        srcset="{{ url('img/' . $imagePath) }}?w={{ $width }}&h={{ $height }}&q=80&f=webp 1x,
+                                 {{ url('img/' . $imagePath) }}?w={{ $width * 2 }}&h={{ $height * 2 }}&q=80&f=webp 2x"
+                                        alt="{{ $altText }}" loading="lazy" decoding="async">
+
+                                    {{-- <img src="{{ url('img/slider-images/' . $filename) }}"
+                                        src="{{ asset('slider-images/' . $filename) }}" alt="Slide {{ $loop->iteration }}"
+                                        class="d-block w-100"> --}}
                                 </a>
                             </div>
                         @endforeach
@@ -142,7 +156,8 @@
                         <span @class(['p-4', 'font-bold', 'text-dark' => true])>{{ request('search_service') }}</span>
                     </p>
                 @else
-                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town Services</h1>
+                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town
+                        Services</h1>
                     <p class="lead text-muted">Get Your Desired service at Your Door, easy to schedule and
                         just few clicks away.</p>
                 @endif
@@ -162,13 +177,15 @@
                 @if (count($single_category->services->where('status', 1)->take(10)) > 0)
                     <div class="col-md-12">
                         <h2 class="font-weight-bold m-3 text-center" style="font-family: 'Titillium Web', sans-serif;">
-                            <a style="text-decoration: none;" href="{{ route('category.show',$single_category->slug) }}">{{ $single_category->title }}</a></h2>
+                            <a style="text-decoration: none;"
+                                href="{{ route('category.show', $single_category->slug) }}">{{ $single_category->title }}</a>
+                        </h2>
                         <div class="owl-carousel owl-carousel-category-service">
                             @foreach ($single_category->services->where('status', 1)->take(10) as $service)
-                                @if($service->status == 1)
-                                <div class="item">
-                                    @include('site.services.card')
-                                </div>
+                                @if ($service->status == 1)
+                                    <div class="item">
+                                        @include('site.services.card')
+                                    </div>
                                 @endif
                             @endforeach
                         </div>
@@ -183,10 +200,10 @@
                 <div class="row">
                     <div class="owl-carousel owl-carousel-category-service">
                         @foreach ($services as $service)
-                        @if($service->status == 1)
-                            <div class="item">
-                                @include('site.services.card')
-                            </div>
+                            @if ($service->status == 1)
+                                <div class="item">
+                                    @include('site.services.card')
+                                </div>
                             @endif
                         @endforeach
                     </div>

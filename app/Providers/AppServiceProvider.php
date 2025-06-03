@@ -34,5 +34,13 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('currency', function ($expression) {
             return "<?php echo formatCurrency($expression); ?>";
         });
+
+        Blade::directive('optimizedImage', function ($expression) {
+            return "<?php echo App\Helpers\ImageHelper::getOptimizedImageUrl($expression); ?>";
+        });
+        
+        Blade::directive('srcSet', function ($expression) {
+            return "<?php echo App\Helpers\ImageHelper::getSrcSet($expression); ?>";
+        });
     }
 }
