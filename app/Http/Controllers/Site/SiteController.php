@@ -110,7 +110,7 @@ class SiteController extends Controller
             'search',
             'ads'
         ));
-    
+
         return response($view, 200)
             ->header('Cache-Control', 'public, max-age=3600')
             ->header('Pragma', 'public')
@@ -146,7 +146,7 @@ class SiteController extends Controller
             $ads = $googleAds['category'];
         }
 
-        return view('site.categories.show', compact('category','metaTitle','metaDescription','metaKeywords', 'reviews', 'review_char_limit', 'all_categories','ads'));
+        return view('site.categories.show', compact('category', 'metaTitle', 'metaDescription', 'metaKeywords', 'reviews', 'review_char_limit', 'all_categories', 'ads'));
     }
 
     public function show($slug, Request $request)
@@ -197,7 +197,7 @@ class SiteController extends Controller
             if (isset($googleAds['service']['status']) && $googleAds['service']['status'] == true) {
                 $ads = $googleAds['service'];
             }
-            return view('site.serviceDetail', compact('service','metaTitle','metaDescription','metaKeywords', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit','ads'));
+            return view('site.serviceDetail', compact('service', 'metaTitle', 'metaDescription', 'metaKeywords', 'FAQs', 'reviews', 'averageRating', 'app_flag', 'lowestPriceOption', 'price', 'review_char_limit', 'ads'));
         } else {
             if (empty($service->category_id)) {
                 return redirect('/')->with('error', 'This Service is disabled by admin.');
@@ -269,9 +269,12 @@ class SiteController extends Controller
             }
         }
 
-        cookie()->queue('address', json_encode($address), 5256000);
+        $cookie = cookie('address', json_encode($address), 5256000);
 
-        return redirect('/');
+        return response()->json([
+            'success' => true,
+            'message' => 'Zone updated successfully'
+        ])->withCookie($cookie);
     }
 
 
