@@ -37,9 +37,10 @@
                 </tr>
                 @foreach ($formattedBookings as $key => $booking)
                     <tr>
-                        <td><img src="service-images/{{ $booking['service']->image }}" height="60px" width="60px"
-                                style="border: 1px solid #ddd; border-radius: 4px;"></td>
-                        <td>{{ $booking['service']->name }}</td>
+                        <td><a href="/service/{{ $booking['service']->slug }}">
+                                <img src="service-images/{{ $booking['service']->image }}" height="60px" width="60px"
+                                    style="border: 1px solid #ddd; border-radius: 4px;"></a></td>
+                        <td><a href="/service/{{ $booking['service']->slug }}"> {{ $booking['service']->name }}</a></td>
                         <td>
                             @if ($booking['option_total_price'] > 0)
                                 <span>@currency($booking['option_total_price'], false, true)</span>
