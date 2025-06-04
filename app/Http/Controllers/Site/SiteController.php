@@ -62,31 +62,15 @@ class SiteController extends Controller
         $FAQs = FAQ::latest()->where('status', '1')->take(3)->get();
 
         $all_categories = [];
-
-        $services = [];
-        $search = $request->search_service;
-        if ($search) {
-            $services = Service::query()
-                ->where('name', $search)
-                ->orWhere(function ($query) use ($search) {
-                    $searchWords = explode(" ", $search);
-                    foreach ($searchWords as $word) {
-                        $query->orWhere('name', 'like', '%' . $word . '%');
-                    }
-                })
+        $all_categories = Cache::remember('home_all_categories', 60, function () {
+            return ServiceCategory::with('childCategories')
+                ->whereNull('parent_id')
                 ->where('status', 1)
-                ->get();
-        } else {
-            $all_categories = Cache::remember('home_all_categories', 60, function () {
-                return ServiceCategory::with('childCategories')
-                    ->whereNull('parent_id')
-                    ->where('status', 1)
-                    ->get()
-                    ->filter(function ($category) {
-                        return $category->childCategories->isNotEmpty() || is_null($category->parent_id);
-                    });
-            });
-        }
+                ->get()
+                ->filter(function ($category) {
+                    return $category->childCategories->isNotEmpty() || is_null($category->parent_id);
+                });
+        });
 
         $adSenseSetting = Setting::where('key', 'Google AdSense')->first();
         $googleAds = $adSenseSetting ? json_decode($adSenseSetting->value, true) : [];
@@ -98,7 +82,6 @@ class SiteController extends Controller
         }
 
         $view = view('site.home', compact(
-            'services',
             'address',
             'FAQs',
             'reviews',
@@ -107,7 +90,6 @@ class SiteController extends Controller
             'review_char_limit',
             'all_categories',
             'app_flag',
-            'search',
             'ads'
         ));
 
@@ -117,6 +99,30 @@ class SiteController extends Controller
             ->header('Expires', gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
     }
 
+    public function search(Request $request)
+    {
+        $search = $request->search_service;
+        $services = Service::query()
+            ->where('name', $search)
+            ->orWhere(function ($query) use ($search) {
+                $searchWords = explode(" ", $search);
+                foreach ($searchWords as $word) {
+                    $query->orWhere('name', 'like', '%' . $word . '%');
+                }
+            })
+            ->where('status', 1)
+            ->get();
+
+        $view = view('site.services.search', compact(
+            'services',
+            'search',
+        ));
+
+        return response($view, 200)
+            ->header('Cache-Control', 'public, max-age=3600')
+            ->header('Pragma', 'public')
+            ->header('Expires', gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
+    }
     public function categoryShow($slug)
     {
         $reviews = Review::latest()->take(6)->get();
