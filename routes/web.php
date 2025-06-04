@@ -272,6 +272,7 @@ Route::get('/', [SiteController::class, 'index'])->name('storeHome');
 Route::get('/service-list', [SiteController::class, 'service_list']);
 Route::get('service/{slug}', [SiteController::class, 'show']);
 Route::post('/updateZone', [SiteController::class, 'updateZone'])->name('updateZone');
+Route::get('search', [SiteController::class, 'search'])->name('search');
 
 Route::get('deleteAccount', [CustomerAuthController::class, 'account']);
 Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountMail'])->name('deleteAccountMail');

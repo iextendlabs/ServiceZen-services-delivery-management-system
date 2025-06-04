@@ -8,10 +8,8 @@
     @php
         if ($app_flag === true) {
             $reviews_chunk = 1;
-            $staffs_chunk = 1;
         } else {
             $reviews_chunk = 3;
-            $staffs_chunk = 4;
         }
     @endphp
     <style>
@@ -60,7 +58,7 @@
             {!! $ads['top'] !!}
         @endif
         <div class="col-md-6 col-sm-12 offset-md-3 mt-5">
-            <form action="{{ route('storeHome') }}" method="GET" enctype="multipart/form-data">
+            <form action="{{ route('search') }}" method="GET" enctype="multipart/form-data">
                 <div class="input-group">
                     <input type="search" id="search_product" class="form-control border-right-0" placeholder="Search Services"
                         aria-label="Search Product" name="search_service" value="{{ request('search_service') }}"
@@ -90,11 +88,6 @@
                     <span><a href="bookingStep">Go and Book Now!</a></span><br>
                     <span>To add more service<a href="/"> Continue</a></span>
                 </div>
-            @endif
-            @if (isset($search) && count($services) == 0)
-                <span class="alert alert-danger text-center w-75 " role="alert" style="padding:10px 200px">
-                    <strong>Service not found</strong>
-                </span>
             @endif
         </div>
         @if ($slider_images->value)
@@ -151,16 +144,10 @@
         @endif
         <section class="jumbotron text-center">
             <div class="container">
-                @if (request('search_service'))
-                    <p class="lead text-muted"> Search Service:
-                        <span @class(['p-4', 'font-bold', 'text-dark' => true])>{{ request('search_service') }}</span>
-                    </p>
-                @else
-                    <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town
-                        Services</h1>
-                    <p class="lead text-muted">Get Your Desired service at Your Door, easy to schedule and
-                        just few clicks away.</p>
-                @endif
+                <h1 class="jumbotron-heading" style="font-family: 'Titillium Web', sans-serif;">Best In the Town
+                    Services</h1>
+                <p class="lead text-muted">Get Your Desired service at Your Door, easy to schedule and
+                    just few clicks away.</p>
             </div>
         </section>
         <div class="row" id="categories">
@@ -196,19 +183,6 @@
         </div>
 
         <div class="album py-5">
-            @if (isset($services))
-                <div class="row">
-                    <div class="owl-carousel owl-carousel-category-service">
-                        @foreach ($services as $service)
-                            @if ($service->status == 1)
-                                <div class="item">
-                                    @include('site.services.card')
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-            @endif
             <div class="row">
                 <div class="col-md-12">
                     <h2 class="text-center">Customer Reviews</h2>
