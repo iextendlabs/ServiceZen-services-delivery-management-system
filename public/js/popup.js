@@ -149,6 +149,36 @@ function mapReady() {
     });
 }
 
+$(document).ready(function() {
+    $('#zoneSelect').on('change', function() {
+        const selectedZone = $(this).val();
+        
+        if (selectedZone) {
+            $.ajax({
+                url: '/updateZone',
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    zone: selectedZone
+                },
+                success: function(data) {
+                    if (data.success) {
+                        window.location.reload();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                },
+                complete: function() {
+                }
+            });
+        }
+    });
+});
+
 
 $(document).ready(function () {
         $(".modal-footer .btn-primary").click(function () {

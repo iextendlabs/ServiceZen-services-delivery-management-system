@@ -12,12 +12,11 @@
 
       <!-- Popup Body -->
       <div class="modal-body">
-        <select class="form-control" id="zoneSelect" onchange="window.location.href='/updateZone?zone='+this.value">
-          <option value="">-- Select Zone -- </option>
-          <!-- Loop through the $zones array to generate options -->
-          @foreach ($zones as $zone)
-          <option value="{{ $zone }}">{{ $zone }}</option>
-          @endforeach
+        <select class="form-control" id="zoneSelect">
+            <option value="">-- Select Zone -- </option>
+            @foreach ($zones as $zone)
+            <option value="{{ $zone }}">{{ $zone }}</option>
+            @endforeach
         </select>
         <p>OR Add Address </p>
 
