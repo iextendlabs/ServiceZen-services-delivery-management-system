@@ -81,7 +81,7 @@ class SiteController extends Controller
             $ads = $googleAds['home'];
         }
 
-        $view = view('site.home', compact(
+        return view('site.home', compact(
             'address',
             'FAQs',
             'reviews',
@@ -92,11 +92,6 @@ class SiteController extends Controller
             'app_flag',
             'ads'
         ));
-
-        return response($view, 200)
-            ->header('Cache-Control', 'public, max-age=3600')
-            ->header('Pragma', 'public')
-            ->header('Expires', gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
     }
 
     public function search(Request $request)
@@ -112,7 +107,9 @@ class SiteController extends Controller
             })
             ->where('status', 1)
             ->get();
-
+        if (count($services) <= 0) {
+            return redirect('/')->with('error', 'No services found for your search query.');
+        }
         $view = view('site.services.search', compact(
             'services',
             'search',
