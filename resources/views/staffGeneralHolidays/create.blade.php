@@ -50,7 +50,7 @@
                 </table>
             </div>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-12 scroll-div">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Staffs:</strong>
                 <input type="text" name="staff-search" id="staff-search" class="form-control" placeholder="Search Staff By Name And Email">
