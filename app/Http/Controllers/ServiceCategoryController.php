@@ -30,6 +30,10 @@ class ServiceCategoryController extends Controller
         $sort = $request->input('sort', 'title');
         $direction = $request->input('direction', 'desc');
 
+        $filter = [
+            'title' => $request->title,
+        ];
+
         $query = ServiceCategory::query()
             ->with('parentCategory')
             ->when($request->title, function ($query) use ($request) {
@@ -45,8 +49,8 @@ class ServiceCategoryController extends Controller
         $total_service_category = $query->count();
         $service_categories = $query->paginate(config('app.paginate'));
 
-        $service_categories->appends($request->title, ['sort' => $sort, 'direction' => $direction]);
-        return view('service_categories.index', compact('total_service_category', 'service_categories', 'direction'))
+        $service_categories->appends($filter, ['sort' => $sort, 'direction' => $direction]);
+        return view('service_categories.index', compact('total_service_category', 'service_categories', 'direction','filter'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

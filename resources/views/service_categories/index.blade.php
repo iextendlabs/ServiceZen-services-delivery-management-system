@@ -30,7 +30,7 @@
                 @csrf
                 <div class="input-group flex-nowrap">
                     <input type="search" id="search_service_category" class="form-control" placeholder="Type to Search..."
-                        aria-label="Search Product" name="title" value="{{ request('title') }}"
+                        aria-label="Search Product" name="title" value="{{ $filter['title'] ?? '' }}"
                         aria-describedby="addon-wrapping">
                 </div>
                 <div id="autocomplete-container" class="autocomplete-container"></div>
