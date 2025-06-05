@@ -55,8 +55,7 @@ class ServiceCategoryController extends Controller
      */
     public function create()
     {
-        $categories = ServiceCategory::all();
-        return view('service_categories.create', compact('categories'));
+        return view('service_categories.create');
     }
 
     /**
@@ -82,22 +81,22 @@ class ServiceCategoryController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
             $request->image->move(public_path('service-category-images'), $filename);
-
             $service_category->image = $filename;
             $service_category->save();
         }
 
         if ($request->icon) {
             $filename = time() . '.' . $request->icon->getClientOriginalExtension();
-
             $request->icon->move(public_path('service-category-icons'), $filename);
-
             $service_category->icon = $filename;
             $service_category->save();
         }
 
+        if ($request->has('subcategoriesIds') && is_array($request->subcategoriesIds)) {
+            ServiceCategory::whereIn('id', $request->subcategoriesIds)
+                ->update(['parent_id' => $service_category->id]);
+        }
 
         return redirect()->route('serviceCategories.index')
             ->with('success', 'Service Category created successfully.');
@@ -124,7 +123,9 @@ class ServiceCategoryController extends Controller
     public function edit($id)
     {
         $service_category = ServiceCategory::find($id);
-        return view('service_categories.edit', compact('service_category'));
+        $childCategoryIds = $service_category->childCategories()->pluck('id')->toArray();
+
+        return view('service_categories.edit', compact('service_category','childCategoryIds'));
     }
     public function update(Request $request, $id)
     {
@@ -151,9 +152,7 @@ class ServiceCategoryController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-
             $request->image->move(public_path('service-category-images'), $filename);
-
             $service_category->image = $filename;
             $service_category->save();
         }
@@ -166,11 +165,16 @@ class ServiceCategoryController extends Controller
 
         if ($request->icon) {
             $filename = time() . '.' . $request->icon->getClientOriginalExtension();
-
             $request->icon->move(public_path('service-category-icons'), $filename);
-
             $service_category->icon = $filename;
             $service_category->save();
+        }
+        ServiceCategory::where('parent_id', $service_category->id)
+            ->update(['parent_id' => null]);
+
+        if ($request->has('subcategoriesIds') && is_array($request->subcategoriesIds)) {
+            ServiceCategory::whereIn('id', $request->subcategoriesIds)
+                ->update(['parent_id' => $service_category->id]);
         }
 
         return redirect()->route('serviceCategories.index')
