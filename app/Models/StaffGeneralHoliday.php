@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class StaffGeneralHoliday extends Model
 {
     use HasFactory;
-    protected $fillable = ['staff_id', 'day'];
+    protected $fillable = ['staff_id', 'day', 'status'];
 
     public function staff()
     {

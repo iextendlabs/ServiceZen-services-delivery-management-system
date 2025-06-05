@@ -85,30 +85,50 @@ class StaffGeneralHolidayController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate([
-            'days' => 'required',
-            'ids' => 'required'
+        $request->validate([
+            'days' => 'required|array',
+            'ids' => 'required|array'
         ]);
 
-        $input = $request->all();
+        $added = false;
 
-        foreach($request->days as $day){
-            $input['day'] = $day;
+        foreach ($request->days as $day) {
+            foreach ($request->ids as $staff_id) {
+                // Check if the record already exists
+                $exists = StaffGeneralHoliday::where('staff_id', $staff_id)
+                    ->where('day', $day)
+                    ->exists();
 
-            foreach($request->ids as $staff_id){
-
-                $input['staff_id'] = $staff_id;
-               
-                StaffGeneralHoliday::updateOrCreate([
-                    'staff_id' => $staff_id,
-                    'day' => $day,
-                ]);
+                if (!$exists) {
+                    StaffGeneralHoliday::create([
+                        'staff_id' => $staff_id,
+                        'day' => $day,
+                        'status' => $request->status,
+                    ]);
+                    $added = true;
+                }
             }
         }
-        return redirect()->route('staffGeneralHolidays.index')
-                        ->with('success','Staff General Holiday created successfully.');
+
+        if ($added) {
+            return redirect()->route('staffGeneralHolidays.index')
+                ->with('success', 'Staff General Holiday created successfully.');
+        } else {
+            return redirect()->route('staffGeneralHolidays.index')
+                ->with('success', 'No new Staff General Holiday was added. Duplicate entries were skipped.');
+        }
     }
-    
+
+    public function toggleStatus($id, $status)
+    {
+        $holiday = StaffGeneralHoliday::findOrFail($id);
+        $holiday->status = $status;
+        $holiday->save();
+
+        return redirect()->route('staffGeneralHolidays.index')
+            ->with('success', 'Staff General Holiday status updated successfully.');
+    }
+
     public function show()
     {
         // 

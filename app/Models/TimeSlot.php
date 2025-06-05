@@ -111,7 +111,7 @@ class TimeSlot extends Model
             } else {
                 $holiday = Holiday::where('date', $date)->pluck('date')->toArray();
             }
-            $generalHolidayStaffIds = StaffGeneralHoliday::where('day', $dayName)->pluck('staff_id')->toArray();
+            $generalHolidayStaffIds = StaffGeneralHoliday::where('status',1)->where('day', $dayName)->pluck('staff_id')->toArray();
 
             $longHolidaysStaffId = LongHoliday::where('date_start', '<=', $date)
                 ->where('date_end', '>=', $date)

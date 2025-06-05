@@ -115,6 +115,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('shortHolidays', ShortHolidayController::class);
     Route::resource('longHolidays', LongHolidayController::class);
     Route::resource('staffGeneralHolidays', StaffGeneralHolidayController::class);
+    Route::post('staffGeneralHolidays/{id}/toggle-status/{status}', [StaffGeneralHolidayController::class, 'toggleStatus'])->name('staffGeneralHolidays.toggleStatus');
+    
     Route::post('/shortHolidayBulkDelete', [ShortHolidayController::class, 'bulkDelete'])->name('shortHolidays.bulkDelete');
     Route::post('/longHolidayBulkDelete', [longHolidayController::class, 'bulkDelete'])->name('longHolidays.bulkDelete');
     Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('services.bulkDelete');
