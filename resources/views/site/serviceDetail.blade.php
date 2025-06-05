@@ -56,6 +56,14 @@
             $packageCarousel_chunk = 3;
             $reviews_chunk = 3;
         }
+
+        $validPackage = $service->package->filter(function($package) {
+            return isset($package->service) && $package->service->status == 1;
+        });
+        
+        $validAddONs = $service->addONs->filter(function($addON) {
+            return isset($addON->service) && $addON->service->status == 1;
+        });
     @endphp
 
     @if (isset($lowestPriceOption))
@@ -347,20 +355,21 @@
                     </div>
                 @endif
             </div>
-            @if (count($service->addONs))
+            
+            @if ($validAddONs->count())
                 <div class="col-md-12">
                     <hr>
                     <h2 class="text-center mt-4 my-4">Add ONs</h2>
                     <div id="myCarousel" class="carousel slide col-md-12" data-ride="carousel">
                         <ol class="carousel-indicators">
-                            @foreach ($service->addONs->chunk($addONsCarousel_chunk) as $key => $addONsChunk)
+                            @foreach ($validAddONs->chunk($addONsCarousel_chunk) as $key => $addONsChunk)
                                 <li data-target="#myCarousel" data-slide-to="{{ $key }}"
                                     class="{{ $loop->first ? 'active' : '' }}"></li>
                             @endforeach
                         </ol>
 
                         <div class="carousel-inner">
-                            @foreach ($service->addONs->chunk($addONsCarousel_chunk) as $key => $addONsChunk)
+                            @foreach ($validAddONs->chunk($addONsCarousel_chunk) as $key => $addONsChunk)
                                 <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                                     <div class="row">
                                         @foreach ($addONsChunk as $addON)
@@ -377,7 +386,7 @@
                                                     </a>
                                                     <div class="card-body">
                                                         <div class="d-flex justify-content-between align-items-center">
-                                                            <small class="text-mutede">
+                                                            <small class="text-muted">
                                                                 @if (isset($addON->service->discount))
                                                                     <s>
                                                                 @endif
@@ -431,20 +440,21 @@
                 </div>
             @endif
 
-            @if (count($service->package))
+            
+            @if ($validPackage->count())
                 <div class="col-md-12">
                     <hr>
                     <h2 class="text-center mt-4 my-4">Package Services</h2>
                     <div id="packageCarousel" class="carousel slide col-md-12" data-ride="carousel">
                         <ol class="carousel-indicators">
-                            @foreach ($service->package->chunk($packageCarousel_chunk) as $key => $packageChunk)
+                            @foreach ($validPackage->chunk($packageCarousel_chunk) as $key => $packageChunk)
                                 <li data-target="#packageCarousel" data-slide-to="{{ $key }}"
                                     class="{{ $loop->first ? 'active' : '' }}"></li>
                             @endforeach
                         </ol>
 
                         <div class="carousel-inner">
-                            @foreach ($service->package->chunk($packageCarousel_chunk) as $key => $packageChunk)
+                            @foreach ($validPackage->chunk($packageCarousel_chunk) as $key => $packageChunk)
                                 <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                                     <div class="row">
                                         @foreach ($packageChunk as $package)
@@ -488,7 +498,7 @@
                             @endforeach
                         </div>
 
-                        <a class="carousel-control-prev" href="#  " role="button" data-slide="prev">
+                        <a class="carousel-control-prev" href="#packageCarousel" role="button" data-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="sr-only">Previous</span>
                         </a>

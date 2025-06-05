@@ -153,12 +153,12 @@ class StaffProfileController extends Controller
 
         // ✅ Cache service categories per user
         $service_categories = Cache::remember("staff_{$id}_service_categories", 60, function () use ($category_ids) {
-            return !empty($category_ids) ? ServiceCategory::whereIn('id', $category_ids)->get() : collect();
+            return !empty($category_ids) ? ServiceCategory::where('status',1)->whereIn('id', $category_ids)->get() : collect();
         });
 
         // ✅ Cache services per user
         $services = Cache::remember("staff_{$id}_services", 60, function () use ($service_ids) {
-            return !empty($service_ids) ? Service::whereIn('id', $service_ids)->get() : collect();
+            return !empty($service_ids) ? Service::where('status',1)->whereIn('id', $service_ids)->get() : collect();
         });
 
         // ✅ Cache reviews per user
