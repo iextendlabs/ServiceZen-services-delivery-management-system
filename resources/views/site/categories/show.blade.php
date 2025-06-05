@@ -66,11 +66,9 @@
                             <a style="text-decoration: none;" href="{{ route('category.show',$single_category->slug) }}">{{ $single_category->title }}</a></h2>
                         <div class="owl-carousel owl-carousel-category-service">
                             @foreach ($single_category->services->where('status', 1)->take(10) as $service)
-                                @if ($service->status == 1)
-                                    <div class="item">
-                                        @include('site.services.card')
-                                    </div>
-                                @endif
+                                <div class="item">
+                                    @include('site.services.card')
+                                </div>
                             @endforeach
                         </div>
                         <hr>

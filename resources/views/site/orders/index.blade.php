@@ -84,7 +84,7 @@
                         <a class="btn btn-danger" href="{{ route('cancelOrder', $order->id) }}"><i class="fas fa-trash"> Cancel order</i> </a>
                     @else
                     <a class="btn btn-info" href="{{ route('order.show', $order->id) }}"><i class="fas fa-eye"></i> </a>
-                    <a class="btn btn-primary" href="{{ route('order.reOrder',$order->id) }}">ReOrder </a>
+                    {{-- <a class="btn btn-primary" href="{{ route('order.reOrder',$order->id) }}">ReOrder </a> --}}
                     @endif
                     <a class="btn btn-warning" href="{{ route('siteComplaints.create', ['order_id' => $order->id]) }}">Add Complaint</a>
                 </td>

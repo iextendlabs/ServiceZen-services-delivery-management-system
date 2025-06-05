@@ -21,13 +21,12 @@ class SiteFAQsController extends Controller
 
         $FAQCategoryIds = $FAQs->pluck('category_id')->unique();
 
-        $categoriesFAQ = ServiceCategory::WhereIn('id',$FAQCategoryIds)->get();
-        // dd($categories);
+        $categoriesFAQ = ServiceCategory::where('status',1)->WhereIn('id',$FAQCategoryIds)->get();
 
         $FAQServiceIds = $FAQs->pluck('service_id')->unique();
 
-        $servicesFAQ = Service::WhereIn('id',$FAQServiceIds)->get();
-        // dd($categories);
+        $servicesFAQ = Service::where('status',1)->WhereIn('id',$FAQServiceIds)->get();
+        
         $generalFAQ = FAQ::where('category_id',null)->where('status','1')->where('service_id',null)->get();
 
         return view('site.FAQs.index', compact('categoriesFAQ','servicesFAQ','generalFAQ'));
