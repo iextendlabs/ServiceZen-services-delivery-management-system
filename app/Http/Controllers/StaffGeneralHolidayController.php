@@ -102,13 +102,24 @@ class StaffGeneralHolidayController extends Controller
                 StaffGeneralHoliday::updateOrCreate([
                     'staff_id' => $staff_id,
                     'day' => $day,
+                    'status' => $request->status,
                 ]);
             }
         }
         return redirect()->route('staffGeneralHolidays.index')
                         ->with('success','Staff General Holiday created successfully.');
     }
-    
+
+    public function toggleStatus($id, $status)
+    {
+        $holiday = StaffGeneralHoliday::findOrFail($id);
+        $holiday->status = $status;
+        $holiday->save();
+
+        return redirect()->route('staffGeneralHolidays.index')
+            ->with('success', 'Staff General Holiday status updated successfully.');
+    }
+
     public function show()
     {
         // 

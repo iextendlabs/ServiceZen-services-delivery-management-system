@@ -33,6 +33,7 @@
                         @endif
                         </th>
                         <th>Staff Name</th>
+                        <th>Status</th>
                         <th width="280px">Action</th>
                     </tr>
                     @if (count($staffGeneralHolidays))
@@ -42,9 +43,14 @@
                                 <td>{{ $staffGeneralHoliday->day }}</td>
                                 <td>{{ $staffGeneralHoliday->staff->name }}</td>
                                 <td>
+                                    <span class="badge {{ $staffGeneralHoliday->status == 1 ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $staffGeneralHoliday->status == 1 ? 'Enable' : 'Disable' }}
+                                    </span>
+                                </td>
+                                <td>
                                     <form id="deleteForm{{ $staffGeneralHoliday->id }}"
                                         action="{{ route('staffGeneralHolidays.destroy', $staffGeneralHoliday->id) }}"
-                                        method="POST">
+                                        method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         @can('staff-holiday-delete')
@@ -52,6 +58,14 @@
                                                 class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
+                                    @can('staff-holiday-create')
+                                        <form action="{{ route('staffGeneralHolidays.toggleStatus', ['id' => $staffGeneralHoliday->id, 'status' => $staffGeneralHoliday->status == 1 ? 0 : 1]) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn {{ $staffGeneralHoliday->status == 1 ? 'btn-danger' : 'btn-success' }}" title="{{ $staffGeneralHoliday->status == 1 ? 'Disable' : 'Enable' }}">
+                                                <i class="fa {{ $staffGeneralHoliday->status == 1 ? 'fa-thumbs-down' : 'fa-thumbs-up' }}"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @endforeach

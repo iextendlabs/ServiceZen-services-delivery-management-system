@@ -519,7 +519,7 @@ class StaffAppController2 extends Controller
         $holiday = Holiday::where('date', '>=', Carbon::now()->format('Y-m-d'))->get();
         $long_holiday = LongHoliday::where('date_start', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
         $short_holiday = ShortHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
-        $staff_general_holidays = StaffGeneralHoliday::where('staff_id', $request->user_id)->get();
+        $staff_general_holidays = StaffGeneralHoliday::where('status',1)->where('staff_id', $request->user_id)->get();
         $staff_holidays = StaffHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
 
         return response()->json([

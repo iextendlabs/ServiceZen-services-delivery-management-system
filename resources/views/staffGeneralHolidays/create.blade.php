@@ -21,6 +21,15 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Status:</strong>
+                <select name="status" class="form-control">
+                    <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                    <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <span style="color: red;">*</span><strong>Days:</strong>
                 <input type="text" name="day-search" id="day-search" class="form-control" placeholder="Search day">
                 <table class="table table-striped table-bordered days_table">
