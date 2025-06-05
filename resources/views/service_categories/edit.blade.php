@@ -21,6 +21,11 @@
         @method('PUT')
         <div class="row">
             <div class="col-md-12">
+                <div class="float-right">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+            <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Title:</strong>
                     <input type="text" name="title" value="{{ old('title',$service_category->title) }}" class="form-control" placeholder="Title">
@@ -111,17 +116,53 @@
                     <select name="parent_id" class="form-control">
                         <option></option>
                         @foreach($categories as $category)
+                        @if($category->id != $service_category->id)
                         @if($category->id == $service_category->parent_id)
                         <option value="{{$category->id}}" selected>{{$category->title}}</option>
                         @else
                         <option value="{{$category->id}}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>{{$category->title}}</option>
                         @endif
+                        @endif
                         @endforeach
                     </select>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group scroll-div">
+                    <strong>Sub Category:</strong>
+                    <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
+                    <table class="table table-striped table-bordered categories-table">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                        </tr>
+                        @if(count($categories) > 0)
+
+                        @php
+                            // Use old input if available, otherwise use existing childCategoryIds
+                            $selectedSubcategories = old('subcategoriesIds', $childCategoryIds ?? []);
+                        @endphp
+                        @foreach ($categories as $category)
+                        @if($category->id != $service_category->id)
+
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="subcategoriesIds[]" value="{{ $category->id }}" {{ in_array($category->id, $selectedSubcategories) ? 'checked' : '' }}>
+                            </td>
+                            <td>{{ $category->title }}</td>
+                        </tr>
+                        @endif
+                        @endforeach
+                        @else
+                        <tr>
+                            <td colspan="2" class="text-center">No categories found</td>
+                        </tr>
+                        @endif
+                    </table>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Update</button>
             </div>
         </div>
     </form>
@@ -136,6 +177,27 @@
     document.getElementById('icon').addEventListener('change', function(e) {
         var preview = document.getElementById('icon-preview');
         preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $("#categories-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".categories-table tr").hide();
+
+            $(".categories-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
     });
 </script>
 @endsection

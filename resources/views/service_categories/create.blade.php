@@ -20,6 +20,11 @@
         @csrf
         <div class="row">
             <div class="col-md-12">
+                <div class="float-right">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+            <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Title:</strong>
                     <input type="text" name="title" value="{{old('title')}}" class="form-control" placeholder="Title">
@@ -115,6 +120,31 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group scroll-div">
+                    <strong>Sub Category:</strong>
+                    <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
+                    <table class="table table-striped table-bordered categories-table">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                        </tr>
+                        @if(count($categories) > 0)
+                        @foreach ($categories as $category)
+                            <td>
+                                <input type="checkbox" name="subcategoriesIds[]" value="{{ $category->id }}" {{ in_array($category->id, old('subcategoriesIds', [])) ? 'checked' : '' }}>
+                            </td>
+                            <td>{{ $category->title }}</td>
+                        </tr>
+                        @endforeach
+                        @else
+                        <tr>
+                            <td colspan="2" class="text-center">No categories found</td>
+                        </tr>
+                        @endif
+                    </table>
+                </div>
+            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
@@ -131,6 +161,27 @@
     document.getElementById('icon').addEventListener('change', function(e) {
         var preview = document.getElementById('icon-preview');
         preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $("#categories-search").keyup(function() {
+            var value = $(this).val().toLowerCase();
+
+            $(".categories-table tr").hide();
+
+            $(".categories-table tr").each(function() {
+
+                $row = $(this);
+
+                var name = $row.find("td:first").next().text().toLowerCase();
+
+
+                if (name.indexOf(value) != -1) {
+                    $(this).show();
+                }
+            });
+        });
     });
 </script>
 @endsection
