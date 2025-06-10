@@ -40,7 +40,7 @@
                                 <td>
 
                                     <form id="deleteForm{{ $user->id }}"
-                                        action="{{ route('serviceStaff.destroy', $user->id) }}" method="POST">
+                                        action="{{ route('freelancerProgram.destroy', $user->id) }}" method="POST">
                                         @if ($user->freelancer_program === '0')
                                             @can('freelancer-program-edit')
                                             <a class="btn btn-success"
@@ -65,7 +65,7 @@
                                             </a>
                                         @endif
                                         @csrf
-                                        @can('freelancer-program')
+                                        @can('freelancer-program-delete')
                                         @method('DELETE')
                                         <button type="button" onclick="confirmDelete('{{ $user->id }}')"
                                             class="btn btn-danger"><i class="fa fa-trash"></i></button>

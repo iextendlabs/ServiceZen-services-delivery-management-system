@@ -1,5 +1,5 @@
 <?php
-    
+
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class FreelancerProgramController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -31,7 +31,7 @@ class FreelancerProgramController extends Controller
      */
     public function index(Request $request)
     {
-        
+
         $filter_status = $request->status;
         $filter_name = $request->name;
         $filter_email = $request->email;
@@ -53,9 +53,9 @@ class FreelancerProgramController extends Controller
 
         $filters = $request->only(['status']);
         $users->appends($filters);
-        return view('freelancerProgram.index',compact('users','filter_status','filter_name','filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('freelancerProgram.index', compact('users', 'filter_status', 'filter_name', 'filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -65,7 +65,7 @@ class FreelancerProgramController extends Controller
     {
         // 
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -75,30 +75,30 @@ class FreelancerProgramController extends Controller
     public function store(Request $request)
     {
         // 
-        
+
     }
-    
+
     public function show(User $user)
     {
         //    
     }
-    
-    
+
+
     public function edit($id, Request $request)
     {
         $user = User::find($id);
         if ($request->status == "Accepted") {
             $url = route('serviceStaff.edit', $id) . '?freelancer_join=1';
-    
+
             return redirect($url);
         } elseif ($request->status == "Rejected") {
-            $staff = Staff::where('user_id',$id)->first();
+            $staff = Staff::where('user_id', $id)->first();
             if (isset($staff->image) && $staff->image !== "default.png" && file_exists(public_path('staff-images') . '/' . $staff->image)) {
                 unlink(public_path('staff-images') . '/' . $staff->image);
             }
-    
+
             if (isset($user->staffImages)) {
-    
+
                 foreach ($user->staffImages as $image) {
                     if ($image->image && file_exists(public_path('staff-images') . '/' . $image->image)) {
                         unlink(public_path('staff-images') . '/' . $image->image);
@@ -106,30 +106,57 @@ class FreelancerProgramController extends Controller
                 }
             }
 
-            StaffImages::where('staff_id',$id)->delete();
-            StaffYoutubeVideo::where('staff_id',$id)->delete();
-            
+            StaffImages::where('staff_id', $id)->delete();
+            StaffYoutubeVideo::where('staff_id', $id)->delete();
+
             $user->services()->detach();
             $user->categories()->detach();
 
             $staff->delete();
-            TimeSlotToStaff::where('staff_id',$id)->delete();
+            TimeSlotToStaff::where('staff_id', $id)->delete();
             $user->freelancer_program = 0;
             $user->update();
             $user->removeRole("Staff");
             return redirect()->back()->with('success', 'New Freelancer Joinee Rejected.');
         }
     }
-    
-    
+
+
     public function update(Request $request, $id)
     {
         //    
     }
-    
-    
+
+
     public function destroy($id)
     {
-        // 
+        $user = User::find($id);
+
+        $staff = Staff::where('user_id', $id)->first();
+        if (isset($staff->image) && $staff->image !== "default.png" && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+            unlink(public_path('staff-images') . '/' . $staff->image);
+        }
+
+        if (isset($user->staffImages)) {
+
+            foreach ($user->staffImages as $image) {
+                if ($image->image && file_exists(public_path('staff-images') . '/' . $image->image)) {
+                    unlink(public_path('staff-images') . '/' . $image->image);
+                }
+            }
+        }
+
+        StaffImages::where('staff_id', $id)->delete();
+        StaffYoutubeVideo::where('staff_id', $id)->delete();
+
+        $user->services()->detach();
+        $user->categories()->detach();
+
+        $staff && $staff->delete();
+        TimeSlotToStaff::where('staff_id', $id)->delete();
+        $user->freelancer_program = null;
+        $user->update();
+        $user->removeRole("Staff");
+        return redirect()->back()->with('success', 'Freelancer Joinee Deleted Successfully.');
     }
 }

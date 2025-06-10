@@ -39,7 +39,7 @@
                                 </td>
                                 <td>
                                     <form id="deleteForm{{ $user->id }}"
-                                        action="{{ route('affiliates.destroy', $user->id) }}" method="POST">
+                                        action="{{ route('affiliateProgram.destroy', $user->id) }}" method="POST">
                                         @if ($user->affiliate_program === '0')
                                             @can('affiliate-program-edit')
                                             <a class="btn btn-success"
