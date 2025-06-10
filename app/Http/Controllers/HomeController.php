@@ -416,6 +416,7 @@ class HomeController extends Controller
             return [
                 'id' => $category->id,
                 'title' => $category->title,
+                'parent_id' => $category->parent_id,
             ];
         })->toArray();
 
