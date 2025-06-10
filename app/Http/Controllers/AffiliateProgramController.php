@@ -1,5 +1,5 @@
 <?php
-    
+
 namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AffiliateProgramController extends Controller
-{ 
+{
     /**
      * Display a listing of the resource.
      *
@@ -27,7 +27,7 @@ class AffiliateProgramController extends Controller
      */
     public function index(Request $request)
     {
-        
+
         $filter_status = $request->status;
         $filter_name = $request->name;
         $filter_email = $request->email;
@@ -49,9 +49,9 @@ class AffiliateProgramController extends Controller
 
         $filters = $request->only(['status']);
         $users->appends($filters);
-        return view('affiliateProgram.index',compact('users','filter_status','filter_name','filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('affiliateProgram.index', compact('users', 'filter_status', 'filter_name', 'filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -61,7 +61,7 @@ class AffiliateProgramController extends Controller
     {
         // 
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -71,40 +71,48 @@ class AffiliateProgramController extends Controller
     public function store(Request $request)
     {
         // 
-        
+
     }
-    
+
     public function show(User $user)
     {
         //    
     }
-    
-    
+
+
     public function edit($id, Request $request)
     {
         $user = User::find($id);
         if ($request->status == "Accepted") {
             $url = route('affiliates.edit', $id) . '?affiliate_join=1';
-    
+
             return redirect($url);
         } elseif ($request->status == "Rejected") {
-            Affiliate::where('user_id',$id)->delete();
+            Affiliate::where('user_id', $id)->delete();
             $user->affiliate_program = 0;
             $user->update();
             $user->removeRole("Affiliate");
             return redirect()->back()->with('success', 'New Affiliate Joinee Rejected.');
         }
     }
-    
-    
+
+
     public function update(Request $request, $id)
     {
         //    
     }
-    
-    
+
+
     public function destroy($id)
     {
-        // 
+        $user = User::find($id);
+        if ($user) {
+            Affiliate::where('user_id', $id)->delete();
+            $user->affiliate_program = null;
+            $user->update();
+            $user->removeRole("Affiliate");
+        }
+
+        return redirect()->back()->with('success', 'Affiliate Joinee Deleted Successfully.');
     }
 }
