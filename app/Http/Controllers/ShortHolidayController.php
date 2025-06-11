@@ -176,7 +176,7 @@ class ShortHolidayController extends Controller
         }
         
         $body = "Your Short Holiday ".$status." by Admin.\nDate: ".$shortHoliday->date."\nTime Start: ".$shortHoliday->time_start.".\nHours: ".$shortHoliday->hours;
-        $shortHoliday->staff->notifyOnMobile("Short Holiday",$body);
+        $shortHoliday->staff->notifyOnMobile("Short Holiday",$body, null, 'Staff App');
 
         return redirect()->route('shortHolidays.index')->with('success', 'Short Holiday updated successfully');
     }

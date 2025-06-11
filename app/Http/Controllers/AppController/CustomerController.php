@@ -68,6 +68,7 @@ class CustomerController extends Controller
             $user->login_source = "Android";
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
+                $user->device_type = "Customer App";
             }
             $user->save();
 
@@ -77,6 +78,7 @@ class CustomerController extends Controller
             $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
             $notifications = Notification::where('user_id', $user->id)
+                ->where('type', 'Customer App')
                 ->orderBy('id', 'desc')
                 ->limit($notification_limit)
                 ->get();
@@ -163,6 +165,7 @@ class CustomerController extends Controller
         $input['email'] = strtolower(trim($input['email']));
         if ($request->has('fcmToken') && $request->fcmToken) {
             $input['device_token'] = $request->fcmToken;
+            $input['device_type'] = "Customer App";
         }
         $input['last_login_time'] = Carbon::now();
         $input['login_source'] = "Android";
@@ -732,6 +735,7 @@ class CustomerController extends Controller
         $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
         $notifications = Notification::where('user_id', $request->user_id)
+            ->where('type', 'Customer App')
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
@@ -1699,9 +1703,9 @@ class CustomerController extends Controller
             }
             if (isset($input['payment_method']) && $input['payment_method'] == "Cash-On-Delivery") {
                 if (Carbon::now()->toDateString() == $input['date']) {
-                    $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                    $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id'], "Staff App");
                     if ($order->driver) {
-                        $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                        $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id'], "Driver App");
                     }
                     try {
                         $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
@@ -1921,7 +1925,7 @@ class CustomerController extends Controller
         $quote->categories()->sync($categoryIds);
         if (count($staffs) > 0) {
             foreach ($staffs as $staff) {
-                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
+                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id, null, "Staff App");
                 $quote->staffs()->syncWithoutDetaching([
                     $staff->id => [
                         'status' => 'Pending',
@@ -2011,7 +2015,7 @@ class CustomerController extends Controller
             }
 
             if ($bid && $bid->staff) {
-                $bid->staff->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Congratulations! Your bid has been accepted by the customer.");
+                $bid->staff->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Congratulations! Your bid has been accepted by the customer.", null, "Staff App");
             }
             return response()->json([
                 'message' => 'Bid confirmed successfully.',
@@ -2066,15 +2070,26 @@ class CustomerController extends Controller
         $usersToNotify = [];
 
         if ($user->hasRole('Staff') && $bid->quote?->user) {
-            $usersToNotify[] = $bid->quote->user;
+            $usersToNotify[] = [
+                'user' => $bid->quote->user,
+                'device_type' => 'Customer App'
+            ];
         }
 
         if ($user->hasRole('Customer') && $bid->staff) {
-            $usersToNotify[] = $bid->staff;
+            $usersToNotify[] = [
+                'user' => $bid->staff,
+                'device_type' => 'Staff App'
+            ];
         }
 
-        foreach ($usersToNotify as $user) {
-            $user->notifyOnMobile("Bid Chat on quote#{$bid->quote_id}", $message);
+        foreach ($usersToNotify as $notifyData) {
+            $notifyData['user']->notifyOnMobile(
+                "Bid Chat on quote#{$bid->quote_id}",
+                $message,
+                null,
+                $notifyData['device_type']
+            );
         }
 
         return response()->json(['success' => true, 'message' => $message]);

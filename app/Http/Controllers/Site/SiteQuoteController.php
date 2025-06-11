@@ -165,7 +165,7 @@ class SiteQuoteController extends Controller
         $quote->categories()->sync($categoryIds);
         if (count($staffs) > 0) {
             foreach ($staffs as $staff) {
-                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
+                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id,null, 'Staff App');
                 $quote->staffs()->syncWithoutDetaching([
                     $staff->id => [
                         'status' => 'Pending',
@@ -320,7 +320,7 @@ class SiteQuoteController extends Controller
         }
 
         if ($bid && $bid->staff) {
-            $bid->staff->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Congratulations! Your bid has been accepted by the customer.");
+            $bid->staff->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Congratulations! Your bid has been accepted by the customer.", null, 'Staff App');
         }
 
 

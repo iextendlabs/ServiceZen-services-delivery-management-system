@@ -206,7 +206,7 @@ class KommoController extends Controller
 
         if ($staffs->isNotEmpty()) {
             foreach ($staffs as $staff) {
-                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
+                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id, null, 'Staff App');
                 $quote->staffs()->syncWithoutDetaching([
                     $staff->id => [
                         'status' => 'Pending',

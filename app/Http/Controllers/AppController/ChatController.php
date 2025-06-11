@@ -68,11 +68,11 @@ private function formatTimestamp($timestamp)
         if ($order->service_staff_id === $request->user_id) {
 
             $title = "Message on Order #" . $order->id . " by Staff.";
-            $order->driver->notifyOnMobile($title, $request->text, $order->id);
+            $order->driver->notifyOnMobile($title, $request->text, $order->id, 'Driver App');
         } elseif ($order->driver_id === $request->user_id) {
 
             $title = "Message on Order #" . $order->id . " by Customer.";
-            $order->staff->user->notifyOnMobile($title, $request->text, $order->id);
+            $order->staff->user->notifyOnMobile($title, $request->text, $order->id, 'Staff App');
         }
 
         $order_chat = OrderChat::where('order_id', $request->order_id)

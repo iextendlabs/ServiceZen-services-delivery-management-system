@@ -465,9 +465,9 @@ class OrderController extends Controller
                         }
 
                         if (Carbon::now()->toDateString() == $request->date) {
-                            $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                            $staff->notifyOnMobile('Order', 'New Order Generated.', $input['order_id'], 'Staff App');
                             if ($order->driver) {
-                                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id']);
+                                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $input['order_id'], 'Driver App');
                             }
                             try {
                                 $checkOutController->sendOrderEmail($input['order_id'], $request->email);
@@ -641,26 +641,26 @@ class OrderController extends Controller
         if (Carbon::now()->toDateString() == $request->date) {
             if ($old_order['date'] != $request->date) {
                 if ($order->staff && $order->staff->user) {
-                    $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id);
+                    $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id, 'Staff App');
                 }
 
                 if ($order->driver) {
-                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
+                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id, 'Driver App');
                 }
             }elseif($old_order['service_staff_id'] != $order->service_staff_id){
                 if ($order->staff && $order->staff->user) {
-                    $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id);
+                    $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $id, 'Staff App');
                 }
                 if ($order->driver) {
-                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
+                    $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id, 'Driver App');
                 }
             }elseif ($old_order['time_slot_id'] != $order->time_slot_id) {
                 if ($order->staff && $order->staff->user) {
-                    $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id);
+                    $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id, 'Staff App');
                 }
 
                 if ($order->driver) {
-                    $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id);
+                    $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $id, 'Driver App');
                 }
             }
         }
@@ -735,11 +735,11 @@ class OrderController extends Controller
 
         if (!empty($changedData) && Carbon::now()->toDateString() == $order->date) {
             if ($order->staff && $order->staff->user) {
-                $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id);
+                $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id, 'Staff App');
             }
 
             if ($order->driver) {
-                $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id);
+                $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the customer address.', $id, 'Driver App');
             }
         }
 
@@ -768,7 +768,7 @@ class OrderController extends Controller
 
         if (Carbon::now()->toDateString() == $old_order['date'] && $old_order['driver_id'] != $order->driver_id) {
             if ($order->driver) {
-                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id);
+                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $id, 'Driver App');
             }
         }
         
@@ -783,7 +783,7 @@ class OrderController extends Controller
         $order->update($request->all());
 
         if ($order->driver) {
-            $order->driver->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->driver_status, $order->id);
+            $order->driver->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->driver_status, $order->id, 'Driver App');
         }
         $previousUrl = $request->url;
         return redirect($previousUrl)->with('success', 'Order updated successfully.');
@@ -833,7 +833,7 @@ class OrderController extends Controller
             }
 
             if ($order->staff) {
-                $order->staff->user->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->status, $order->id);
+                $order->staff->user->notifyOnMobile("Order #$order->id Update", "The admin has Change order status to ".$request->status, $order->id, 'Staff App');
             }
 
             $order->update($input);
@@ -1001,11 +1001,11 @@ class OrderController extends Controller
         $title = "Message on Order #" . $order_id . " by Admin.";
 
         if ($request->staff == "on") {
-            $order->staff->user->notifyOnMobile($title, $request->text, $order_id);
+            $order->staff->user->notifyOnMobile($title, $request->text, $order_id, 'Staff App');
         }
 
         if ($request->driver == "on") {
-            $order->driver->notifyOnMobile($title, $request->text, $order_id);
+            $order->driver->notifyOnMobile($title, $request->text, $order_id, 'Driver App');
         }
 
         return redirect()->back();
@@ -1246,26 +1246,26 @@ class OrderController extends Controller
                 if (Carbon::now()->toDateString() == $request->date) {
                     if ($old_order['date'] != $request->date) {
                         if ($order->staff && $order->staff->user) {
-                            $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                            $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $order_id, 'Staff App');
                         }
         
                         if ($order->driver) {
-                            $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                            $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order_id, 'Driver App');
                         }
                     }elseif($old_order['service_staff_id'] != $order->service_staff_id){
                         if ($order->staff && $order->staff->user) {
-                            $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                            $order->staff->user->notifyOnMobile('Order', 'New Order Generated.', $order_id, 'Staff App');
                         }
                         if ($order->driver) {
-                            $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order_id);
+                            $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order_id, 'Driver App');
                         }
                     }elseif ($old_order['time_slot_id'] != $order->time_slot_id) {
                         if ($order->staff && $order->staff->user) {
-                            $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $order_id);
+                            $order->staff->user->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $order_id, 'Staff App');
                         }
         
                         if ($order->driver) {
-                            $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $order_id);
+                            $order->driver->notifyOnMobile("Order #$order->id Update", 'The admin has updated the time slot.', $order_id, 'Driver App');
                         }
                     }
                 }

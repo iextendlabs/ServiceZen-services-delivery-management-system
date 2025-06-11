@@ -26,14 +26,14 @@ class SendTodayOrdersAppNotification extends Command
         foreach ($staffs as $staff) {
             $order = Order::where("service_staff_id", $staff->id)->where('date', $currentDate)->count();
             $body = $order . " Orders of todays.";
-            $staff->notifyOnMobile('Staff Order', $body);
+            $staff->notifyOnMobile('Staff Order', $body, null, 'Staff App');
         }
 
         $drivers = User::role('Driver')->whereNotNull('device_token')->get();
         foreach ($drivers as $driver) {
             $order = Order::where("driver_status", "Pending")->where('driver_id',$driver->id)->where('date', $currentDate)->count();
             $body = $order . " Orders of todays.";
-            $driver->notifyOnMobile('Driver Order', $body);
+            $driver->notifyOnMobile('Driver Order', $body, null, 'Driver App');
         }
 
         $this->info('Today\'s orders Notification sent successfully!');

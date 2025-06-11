@@ -63,7 +63,7 @@ class BidController extends Controller
         $quote->staffs()->updateExistingPivot($staff_id, ['status' => "Inprogress"]);
 
         if ($quote->user) {
-            $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name);
+            $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name, null, 'Customer App');
         }
 
         return redirect()->route('quote.bid', ['quote_id' => $quote_id, 'staff_id' => $staff_id])
@@ -88,7 +88,7 @@ class BidController extends Controller
         ]);
 
         if ($bid->quote && $bid->quote->user) {
-            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".");
+            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".", null, 'Customer App');
         }
 
         return response()->json([

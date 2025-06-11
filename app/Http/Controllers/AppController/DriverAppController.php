@@ -82,6 +82,7 @@ class DriverAppController extends Controller
 
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
+                $user->device_type = "Driver App";
                 $user->save();
             }
 
@@ -104,7 +105,7 @@ class DriverAppController extends Controller
         $title = "Message on Order #" . $order->id . " by Driver.";
         $body = "Change order driver status to ".$request->status;
         OrderHistory::create(['order_id'=>$order->id,'user'=>$order->driver->name, 'status'=>'Drive:'.$request->status]);
-        $order->staff->user->notifyOnMobile($title, $body, $order->id);
+        $order->staff->user->notifyOnMobile($title, $body, $order->id, 'Staff App');
         return response()->json(['success' => 'Order Update Successfully']);
     }
 }

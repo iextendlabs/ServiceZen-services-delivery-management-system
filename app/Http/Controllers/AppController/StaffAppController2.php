@@ -87,6 +87,7 @@ class StaffAppController2 extends Controller
         $user = User::find($request->user_id);
 
         $notification = Notification::where('user_id', $request->user_id)
+            ->where('type', 'Staff App')
             ->where('id', '>', $user->last_notification_id)
             ->count();
 
@@ -123,6 +124,7 @@ class StaffAppController2 extends Controller
 
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
+                $user->device_type = "Staff App";
                 $user->save();
             }
 
@@ -130,6 +132,7 @@ class StaffAppController2 extends Controller
 
             $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
             $notifications = Notification::where('user_id', $user->id)
+                ->where('type', 'Staff App')
                 ->orderBy('id', 'desc')
                 ->limit($notification_limit)
                 ->get();
@@ -227,7 +230,7 @@ class StaffAppController2 extends Controller
 
         $title = "Order. $order->id . Update";
         if ($order->driver) {
-            $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id);
+            $order->driver->notifyOnMobile($title, 'The order status has been updated to "Pick Me."' . "\n" . $request->text, $order->id, 'Driver App');
         }
 
         return response()->json([
@@ -309,6 +312,7 @@ class StaffAppController2 extends Controller
         $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
         $notifications = Notification::where('user_id', $request->user_id)
+            ->where('type', 'Staff App')
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();
@@ -811,12 +815,14 @@ class StaffAppController2 extends Controller
         if ($user) {
             $user->freelancer_program = 0;
             $user->device_token = $request->fcmToken ?? null;
+            $user->device_type = "Staff App";
             $user->save();
         } else {
             $input['password'] = Hash::make($request->password);
             $input['email'] = $email;
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $input['device_token'] = $request->fcmToken;
+                $input['device_type'] = "Staff App";
             }
             $user = User::create($input);
             $user->assignRole("Customer");
@@ -963,7 +969,7 @@ class StaffAppController2 extends Controller
         $quote->staffs()->updateExistingPivot($staff_id, ['status' => "Inprogress"]);
 
         if ($quote->user) {
-            $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name);
+            $quote->user->notifyOnMobile("Bid", 'A bid has been created for your quote by staff member ' . $staff->name, null, 'Customer App');
         }
 
         return response()->json([
@@ -984,7 +990,7 @@ class StaffAppController2 extends Controller
         ]);
 
         if ($bid->quote && $bid->quote->user) {
-            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".");
+            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".",null, 'Customer App');
         }
 
         return response()->json([
