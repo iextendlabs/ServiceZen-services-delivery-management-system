@@ -184,7 +184,7 @@ class User extends Authenticatable
                 'type' => $type
             ]);
 
-            if($this->device_type && $this->device_type == $type){
+            if($this->device_type ? $this->device_type == $type : true) {
                 try {
                     $serviceAccountFile = storage_path('app/firebase/firebase-service-account.json');
 
