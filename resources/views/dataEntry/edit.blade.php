@@ -62,7 +62,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group scroll-div">
-                        <span style="color: red;">*</span><strong>Category:</strong>
+                        <strong>Category:</strong>
                         <input type="text" name="search-category" id="search-category" class="form-control"
                             placeholder="Search category By Name, Price And Duration">
                         <table class="table table-striped table-bordered category-table">
