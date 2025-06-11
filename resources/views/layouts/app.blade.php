@@ -310,7 +310,7 @@
                                 @can('driver-list')
                                 <a class="dropdown-item" href="{{ route('drivers.index') }}">Drivers</a>
                                 @endcan
-                                <a class="dropdown-item" href="{{ route('users.index') }}?role=Data Entry">Data Entry User</a>
+                                <a class="dropdown-item" href="{{ route('dataEntry.index') }}">Data Entry User</a>
                                 <a class="dropdown-item" href="{{ route('users.index') }}?role=Support team">Support team</a>
                             </div>
                         </li>

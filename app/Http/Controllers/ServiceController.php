@@ -59,6 +59,14 @@ class ServiceController extends Controller
         if ($request->price) {
             $query->where('price', $request->price);
         }
+        $userCategories = [];
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereHas('categories', function ($q) use ($userCategories) {
+                $q->whereIn('category_id', $userCategories);
+            });
+        }
 
         // Filter by category_id
         if ($request->category_id) {
@@ -74,7 +82,12 @@ class ServiceController extends Controller
 
         $master_services = Service::has('variant', '=', 0)->get();
 
-        $service_categories = ServiceCategory::all();
+        $query = ServiceCategory::query();
+        if ($user->hasRole('Data Entry')) {
+            $query->whereIn('id',$userCategories);
+        }
+        $service_categories = $query->get();
+
         $filters = $request->only(['name', 'price', 'category_id']);
         $services->appends(array_merge($filters, ['sort' => $sort, 'direction' => $direction]));
         
@@ -93,7 +106,14 @@ class ServiceController extends Controller
         $package_services = [];
         $all_services = Service::all();
         $users = User::all();
-        $service_categories = ServiceCategory::all();
+        $query = ServiceCategory::query();
+
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
+        $service_categories = $query->get();
         return view('services.create', compact('service_categories', 'all_services', 'i', 'package_services', 'users'));
     }
 
@@ -251,7 +271,14 @@ class ServiceController extends Controller
         $variant_services = ServiceVariant::where('service_id', $service->id)->pluck('variant_id')->toArray();
         $users = User::all();
         $all_services = Service::all();
-        $service_categories = ServiceCategory::all();
+        $query = ServiceCategory::query();
+
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
+        $service_categories = $query->get();
         $category_ids = $service->categories()->pluck('category_id')->toArray();
         return view('services.edit', compact('service', 'service_categories', 'all_services', 'i', 'package_services', 'users', 'userNote', 'add_on_services', 'variant_services','category_ids'));
     }

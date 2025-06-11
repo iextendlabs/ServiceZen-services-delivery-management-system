@@ -46,6 +46,7 @@ use App\Http\Controllers\{
     ComplaintController,
     CRMController,
     CurrencyController,
+    DataEntryUserController,
     FreelancerProgramController,
     InformationController,
     KommoController,
@@ -101,6 +102,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('serviceStaff', ServiceStaffController::class);
     Route::resource('customers', CustomerController::class);
     Route::resource('drivers', DriverController::class);
+    Route::resource('dataEntry', DataEntryUserController::class);
     Route::resource('serviceCategories', ServiceCategoryController::class);
     Route::resource('affiliates', AffiliateController::class);
     Route::resource('orders', OrderController::class);
