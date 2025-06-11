@@ -33,7 +33,8 @@ class User extends Authenticatable
         'affiliate_program',
         'freelancer_program',
         'last_login_time', 
-        'login_source'
+        'login_source',
+        'device_type',
     ];
 
     /**
@@ -172,65 +173,68 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'customer_id');
     }
     //  TODO Use Quey to send notification
-    public function notifyOnMobile($title, $body, $order_id = null)
+    public function notifyOnMobile($title, $body, $order_id = null, $type = null)
     {
         if ($this->device_token) {
             $notification = Notification::create([
                 'order_id' => $order_id,
                 'user_id' => $this->id,
                 'title' => $title,
-                'body' => $body
+                'body' => $body,
+                'type' => $type
             ]);
 
-            try {
-                $serviceAccountFile = storage_path('app/firebase/firebase-service-account.json');
+            if($this->device_type ? $this->device_type == $type : true) {
+                try {
+                    $serviceAccountFile = storage_path('app/firebase/firebase-service-account.json');
 
-                $client = new Client();
-                $client->setAuthConfig($serviceAccountFile);
-                $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+                    $client = new Client();
+                    $client->setAuthConfig($serviceAccountFile);
+                    $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
 
-                $accessToken = $client->fetchAccessTokenWithAssertion()['access_token'];
-                // FCM HTTP v1 API endpoint
-                $url = "https://fcm.googleapis.com/v1/projects/sallon-9a41d/messages:send";
+                    $accessToken = $client->fetchAccessTokenWithAssertion()['access_token'];
+                    // FCM HTTP v1 API endpoint
+                    $url = "https://fcm.googleapis.com/v1/projects/sallon-9a41d/messages:send";
 
-                $data = [
-                    "message" => [
-                        "token" => $this->device_token,
-                        "notification" => [
-                            "title" => $title,
-                            "body" => $body,
-                        ],
-                        "apns" => [
-                            "payload" => [
-                                "aps" => [
-                                    "content-available" => 1,
-                                    "priority" => "high"
+                    $data = [
+                        "message" => [
+                            "token" => $this->device_token,
+                            "notification" => [
+                                "title" => $title,
+                                "body" => $body,
+                            ],
+                            "apns" => [
+                                "payload" => [
+                                    "aps" => [
+                                        "content-available" => 1,
+                                        "priority" => "high"
+                                    ]
                                 ]
+                            ],
+                            "android" => [
+                                "priority" => "high"
                             ]
-                        ],
-                        "android" => [
-                            "priority" => "high"
                         ]
-                    ]
-                ];
+                    ];
 
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $accessToken,
-                    'Content-Type' => 'application/json',
-                ])->post($url, $data);
+                    $response = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Content-Type' => 'application/json',
+                    ])->post($url, $data);
 
-                if ($response->successful()) {
-                    return "Notification sent successfully.";
-                } else {
-                    Log::error('FCM Notification Error', [
-                        'notification' => $notification->id,
-                        'response' => $response->json(),
-                        'status' => $response->status(),
-                    ]);
-                    return "Failed to send notification. FCM Response: " . $response->body();
+                    if ($response->successful()) {
+                        return "Notification sent successfully.";
+                    } else {
+                        Log::error('FCM Notification Error', [
+                            'notification' => $notification->id,
+                            'response' => $response->json(),
+                            'status' => $response->status(),
+                        ]);
+                        return "Failed to send notification. FCM Response: " . $response->body();
+                    }
+                } catch (\Exception $e) {
+                    return "Error sending notification: " . $e->getMessage();
                 }
-            } catch (\Exception $e) {
-                return "Error sending notification: " . $e->getMessage();
             }
         }
 

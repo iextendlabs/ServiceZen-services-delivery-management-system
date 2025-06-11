@@ -200,7 +200,7 @@ class QuoteController extends Controller
             foreach ($selectedStaffs as $staffData) {
                 $staff_id = $staffData['staff_id'];
                 $staff = User::find($staff_id);
-                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id);
+                $staff->notifyOnMobile('Quote', 'A new quote has been generated with ID: ' . $quote->id, null, 'Staff App');
                 $quote_amount = $staffData['quote_amount'];
                 $quote_commission = $staffData['quote_commission'];
 

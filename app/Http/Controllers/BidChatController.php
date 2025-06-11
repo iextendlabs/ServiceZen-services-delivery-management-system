@@ -38,10 +38,10 @@ class BidChatController extends Controller
             $file = $request->file('file');
             $filename = mt_rand() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('quote-images/bid-chat-files'), $filename);
-    
+
             $messageData['message'] = $filename;
             $messageData['file'] = 1;
-        } elseif($request->location) {
+        } elseif ($request->location) {
             $messageData['location'] = 1;
             $messageData['message'] = $request->message;
         } else {
@@ -54,24 +54,41 @@ class BidChatController extends Controller
         $usersToNotify = [];
 
         if (auth()->user()->hasRole('Staff') && $bid->quote?->user) {
-            $usersToNotify[] = $bid->quote->user;
+            $usersToNotify[] = [
+                'user' => $bid->quote->user,
+                'device_type' => 'Customer App'
+            ];
         }
 
         if (auth()->user()->hasRole('Customer') && $bid->staff) {
-            $usersToNotify[] = $bid->staff;
+            $usersToNotify[] = [
+                'user' => $bid->staff,
+                'device_type' => 'Staff App'
+            ];
         }
 
         if (auth()->user()->hasRole('Admin')) {
             if ($bid->staff) {
-                $usersToNotify[] = $bid->staff;
+                $usersToNotify[] = [
+                    'user' => $bid->staff,
+                    'device_type' => 'Staff App'
+                ];
             }
             if ($bid->quote?->user) {
-                $usersToNotify[] = $bid->quote->user;
+                $usersToNotify[] = [
+                    'user' => $bid->quote->user,
+                    'device_type' => 'Customer App'
+                ];
             }
         }
 
-        foreach ($usersToNotify as $user) {
-            $user->notifyOnMobile("Bid Chat on quote#{$bid->quote_id}", $message);
+        foreach ($usersToNotify as $notifyData) {
+            $notifyData['user']->notifyOnMobile(
+                "Bid Chat on quote#{$bid->quote_id}",
+                $message,
+                null,
+                $notifyData['device_type']
+            );
         }
 
         return response()->json(['success' => true, 'message' => $message]);

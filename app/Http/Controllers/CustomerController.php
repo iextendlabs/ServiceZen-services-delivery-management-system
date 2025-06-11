@@ -437,7 +437,7 @@ class CustomerController extends Controller
                         : "AED " . $coupon->discount;
 
                     $body = "There is a new Voucher for You.\nUse the code " . $coupon->code . " to get a discount of " . $discount;
-                    $customer->notifyOnMobile('New Voucher', $body);
+                    $customer->notifyOnMobile('New Voucher', $body, null, 'Customer App');
                 }
             }
         }
@@ -473,7 +473,7 @@ class CustomerController extends Controller
                                 : "AED " . $coupon->discount;
 
                             $body = "There is a new Voucher for You.\nUse " . $coupon->code . " Code To Get Discount of " . $discount;
-                            $customer->notifyOnMobile('New Voucher', $body);
+                            $customer->notifyOnMobile('New Voucher', $body, null, 'Customer App');
                         }
                     }
                 }

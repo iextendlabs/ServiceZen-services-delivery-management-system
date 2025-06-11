@@ -78,10 +78,12 @@ class StaffAppController extends Controller
         
         if($user->last_notification_id){
             $notification = Notification::where('user_id', $request->user_id)
+                ->where('type', 'Staff App')
                 ->where('id', '>', $user->last_notification_id)
                 ->count();
         }else{
             $notification = Notification::where('user_id', $request->user_id)
+                ->where('type', 'Staff App')
                 ->count();
         }
         
@@ -228,7 +230,7 @@ class StaffAppController extends Controller
 
         $title = "Message on Order #" . $order->id . " by Staff.";
 
-        $order->driver->notifyOnMobile($title, $request->text, $order->id);
+        $order->driver->notifyOnMobile($title, $request->text, $order->id, 'Driver App');
 
         return response()->json(['success' => 'Order Update Successfully']);
     }
@@ -308,6 +310,7 @@ class StaffAppController extends Controller
         $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
 
         $notifications = Notification::where('user_id', $request->user_id)
+            ->where('type', 'Staff App')
             ->orderBy('id', 'desc')
             ->limit($notification_limit)
             ->get();

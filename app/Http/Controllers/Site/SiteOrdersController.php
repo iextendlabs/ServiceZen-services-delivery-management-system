@@ -144,9 +144,9 @@ class SiteOrdersController extends Controller
         if (isset($input['date']) && Carbon::now()->toDateString() == $input['date'] || !isset($input['date']) && Carbon::now()->toDateString() == $order->date) {
             if (isset($staff_id) && $staff_id == $order->service_staff_id || $request->has('custom_location')) {
                 $msg = "Order #" . $id . " is Update by Customer";
-                $staff->notifyOnMobile('Order Update', $msg,$id);
+                $staff->notifyOnMobile('Order Update', $msg,$id, 'Staff App');
                 if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order Update', $msg,$id);
+                    $staff->staff->driver->notifyOnMobile('Order Update', $msg,$id, 'Driver App');
                 }
                 try {
                     $checkOutController->sendOrderEmail($input['order_id'], $input['email']);
@@ -154,9 +154,9 @@ class SiteOrdersController extends Controller
                     //TODO: log error or queue job later
                 }
             } else {
-                $staff->notifyOnMobile('Order', 'New Order Generated.',$id);
+                $staff->notifyOnMobile('Order', 'New Order Generated.',$id, 'Staff App');
                 if ($staff->staff->driver) {
-                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$id);
+                    $staff->staff->driver->notifyOnMobile('Order', 'New Order Generated.',$id, 'Driver App');
                 }
                 try {
                     $checkOutController->sendOrderEmail($input['order_id'], $input['email']);

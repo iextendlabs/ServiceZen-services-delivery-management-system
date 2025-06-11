@@ -958,9 +958,9 @@ class CheckOutController extends Controller
                     $staff = User::find($order->service_staff_id);
                     if ($staff) {
                         if (Carbon::now()->toDateString() == $order->date) {
-                            $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                            $staff->notifyOnMobile('Order', 'New Order Generated.', $order->id, "Staff App");
                             if ($order->driver) {
-                                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id);
+                                $order->driver->notifyOnMobile('Order', 'New Order Generated.', $order->id, "Driver App");
                             }
                             try {
                                 $this->sendOrderEmail($order->id, $customer->email);
