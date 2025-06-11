@@ -72,12 +72,14 @@
                     <tr>
                         <td>{{ ++$i }}</td>
                             <td>
+                                @if(!auth()->user()->hasRole('Data Entry'))
                                 @if($service_category->parentCategoryForList) 
                                 <a
                                     href="{{ route('services.index', ['category_id' => $service_category->parentCategoryForList->id]) }}">
                                     {{$service_category->parentCategoryForList->title}}
                                 </a>
                                 ->
+                                @endif
                                 @endif
                                 <a href="{{ route('services.index', ['category_id' => $service_category->id]) }}">{{ $service_category->title }} </a>
                             </td>

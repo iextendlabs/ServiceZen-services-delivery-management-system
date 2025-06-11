@@ -115,7 +115,7 @@
                     <strong>Parent Category:</strong>
                     <select name="parent_id" class="form-control">
                         <option></option>
-                        @foreach($categories as $category)
+                        @foreach($service_categories as $category)
                         @if($category->id != $service_category->id)
                         @if($category->id == $service_category->parent_id)
                         <option value="{{$category->id}}" selected>{{$category->title}}</option>
@@ -136,13 +136,13 @@
                             <th></th>
                             <th>Name</th>
                         </tr>
-                        @if(count($categories) > 0)
+                        @if(count($service_categories) > 0)
 
                         @php
                             // Use old input if available, otherwise use existing childCategoryIds
                             $selectedSubcategories = old('subcategoriesIds', $childCategoryIds ?? []);
                         @endphp
-                        @foreach ($categories as $category)
+                        @foreach ($service_categories as $category)
                         @if($category->id != $service_category->id)
 
                         <tr>

@@ -37,20 +37,25 @@ class ServiceCategoryController extends Controller
         $query = ServiceCategory::query()
             ->with('parentCategory')
             ->when($request->title, function ($query) use ($request) {
-                $query->where('title', 'like', "%".$request->title."%")
+                $query->where('title', 'like', "%" . $request->title . "%")
                     ->orWhereIn('parent_id', function ($subQuery) use ($request) {
                         $subQuery->select('id')
                             ->from('service_categories')
-                            ->where('title', 'like', "%". $request->title."%");
+                            ->where('title', 'like', "%" . $request->title . "%");
                     })->orderBy('parent_id');
             })
             ->orderBy($sort, $direction);
 
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
         $total_service_category = $query->count();
         $service_categories = $query->paginate(config('app.paginate'));
 
         $service_categories->appends($filter, ['sort' => $sort, 'direction' => $direction]);
-        return view('service_categories.index', compact('total_service_category', 'service_categories', 'direction','filter'))
+        return view('service_categories.index', compact('total_service_category', 'service_categories', 'direction', 'filter'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -61,7 +66,15 @@ class ServiceCategoryController extends Controller
      */
     public function create()
     {
-        return view('service_categories.create');
+        $query = ServiceCategory::query();
+
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
+        $service_categories = $query->get();
+        return view('service_categories.create', compact('service_categories'));
     }
 
     /**
@@ -130,8 +143,16 @@ class ServiceCategoryController extends Controller
     {
         $service_category = ServiceCategory::find($id);
         $childCategoryIds = $service_category->childCategories()->pluck('id')->toArray();
+        $query = ServiceCategory::query();
 
-        return view('service_categories.edit', compact('service_category','childCategoryIds'));
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
+        $service_categories = $query->get();
+
+        return view('service_categories.edit', compact('service_category', 'childCategoryIds', 'service_categories'));
     }
     public function update(Request $request, $id)
     {
@@ -216,7 +237,14 @@ class ServiceCategoryController extends Controller
 
     public function listServiceCategory()
     {
-        $service_categories = ServiceCategory::all();
+        $query = ServiceCategory::query();
+
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
+        $service_categories = $query->get();
         $data = [];
 
         foreach ($service_categories as $item) {

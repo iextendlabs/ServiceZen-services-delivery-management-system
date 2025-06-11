@@ -251,6 +251,11 @@ class User extends Authenticatable
         return $this->belongsToMany(ServiceCategory::class, 'staff_to_categories', 'staff_id', 'category_id');
     }
 
+    public function dataEntryUserCategories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'dataEntry_to_categories', 'user_id', 'category_id');
+    }
+
     public function coupons()
     {
         return $this->belongsToMany(Coupon::class, 'customer_coupons', 'customer_id', 'coupon_id')
