@@ -24,6 +24,7 @@ use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\StaffGroup;
 use App\Models\SubTitle;
+use App\Models\TimeSlot;
 
 class HomeController extends Controller
 {
@@ -438,6 +439,24 @@ class HomeController extends Controller
             'groupData' => $groupData,
         ];
 
+        $timeSlots = TimeSlot::where('status', 1)->get();
+
+        $timeSlotsData = $timeSlots->map(function ($timeSlot) {
+            return [
+                'id' => $timeSlot->id,
+                'name' => $timeSlot->name,
+                'time_start' => $timeSlot->time_start,
+                'time_end' => $timeSlot->time_end,
+                'date' => $timeSlot->date,
+                'type' => $timeSlot->type,
+                'group_id' => $timeSlot->group_id,
+            ];
+        })->toArray();
+
+        $timeSlotsJsonData = [
+            'timeSlots' => $timeSlotsData,
+        ];
+
         try {
             $filename = "AppHomeData.json";
             $filePath = public_path($filename);
@@ -547,6 +566,29 @@ class HomeController extends Controller
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($groupDataJsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        try {
+            $filename = "AppTimeSlotsData.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppTimeSlotsData_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $timeSlotsJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($timeSlotsJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);
