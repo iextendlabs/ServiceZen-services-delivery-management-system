@@ -212,6 +212,12 @@ class TimeSlot extends Model
                             $excluded_staff[] = $staff->staff->user_id;
                             $timeSlot->space_availability--;
                         }
+                        
+                        $user = User::find($staff->staff->user_id);
+                        if (!$user || !$user->hasRole("Staff")) {
+                            $excluded_staff[] = $staff->staff->user_id;
+                            $timeSlot->space_availability--;
+                        }
                     }
 
                     $excluded_staffs = array_unique(array_merge($excluded_staff, $short_holiday_staff_ids));
