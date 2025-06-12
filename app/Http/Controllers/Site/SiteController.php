@@ -97,19 +97,28 @@ class SiteController extends Controller
     public function search(Request $request)
     {
         $search = $request->search_service;
-        $services = Service::query()
+        $exactMatches = Service::query()
             ->where('name', $search)
-            ->orWhere(function ($query) use ($search) {
-                $searchWords = explode(" ", $search);
+            ->where('status', 1)
+            ->get();
+
+        $searchWords = explode(" ", $search);
+        $wordMatches = Service::query()
+            ->where('status', 1)
+            ->where(function ($query) use ($searchWords, $search) {
                 foreach ($searchWords as $word) {
                     $query->orWhere('name', 'like', '%' . $word . '%');
                 }
+                $query->where('name', '!=', $search);
             })
-            ->where('status', 1)
             ->get();
-        if (count($services) <= 0) {
+
+        $services = $exactMatches->merge($wordMatches);
+
+        if ($services->isEmpty()) {
             return redirect('/')->with('error', 'No services found for your search query.');
         }
+        
         $view = view('site.services.search', compact(
             'services',
             'search',
