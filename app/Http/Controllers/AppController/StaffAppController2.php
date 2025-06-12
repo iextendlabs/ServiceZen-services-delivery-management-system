@@ -27,6 +27,7 @@ use App\Models\OrderHistory;
 use App\Models\Quote;
 use App\Models\ShortHoliday;
 use App\Models\Staff;
+use App\Models\StaffDriver;
 use App\Models\StaffGeneralHoliday;
 use App\Models\StaffGroup;
 use App\Models\StaffHoliday;
@@ -491,6 +492,8 @@ class StaffAppController2 extends Controller
             $q->where('staff_id', $request->user_id);
         })->pluck('id')->toArray();
 
+        $assignedDrivers = StaffDriver::where('staff_id', $request->user_id)
+            ->get();
         return response()->json([
             'user_id' => $user->id,
             'name' => $user->name,
@@ -510,7 +513,8 @@ class StaffAppController2 extends Controller
             'category_ids' => $category_ids,
             'document' => $userDocument,
             'subTitles' => $subTitles,
-            'timeSlots' => $timeSlots
+            'timeSlots' => $timeSlots,
+            'drivers'=> $assignedDrivers
         ], 200);
     }
 
