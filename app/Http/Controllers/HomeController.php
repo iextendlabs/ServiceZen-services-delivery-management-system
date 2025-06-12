@@ -460,6 +460,19 @@ class HomeController extends Controller
             'timeSlots' => $timeSlotsData,
         ];
 
+        $drivers = User::role('Driver')->orderBy('name')->get();
+
+        $driversData = $drivers->map(function ($driver) {
+            return [
+                'id' => $driver->id,
+                'name' => $driver->name,
+            ];
+        })->toArray();
+
+        $driversJsonData = [
+            'drivers' => $driversData,
+        ];
+
         try {
             $filename = "AppHomeData.json";
             $filePath = public_path($filename);
@@ -592,6 +605,29 @@ class HomeController extends Controller
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($timeSlotsJsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        try {
+            $filename = "AppDriverData.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "AppDriverData_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $driversJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($driversJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);
