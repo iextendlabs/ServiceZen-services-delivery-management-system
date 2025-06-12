@@ -486,6 +486,10 @@ class StaffAppController2 extends Controller
         }
 
         $subTitles = $user->subTitles->pluck('id')->toArray();
+        
+        $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($request) {
+            $q->where('staff_id', $request->user_id);
+        })->pluck('id')->toArray();
 
         return response()->json([
             'user_id' => $user->id,
@@ -506,6 +510,7 @@ class StaffAppController2 extends Controller
             'category_ids' => $category_ids,
             'document' => $userDocument,
             'subTitles' => $subTitles,
+            'timeSlots' => $timeSlots
         ], 200);
     }
 

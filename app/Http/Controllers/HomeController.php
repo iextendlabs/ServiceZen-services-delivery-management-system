@@ -439,7 +439,10 @@ class HomeController extends Controller
             'groupData' => $groupData,
         ];
 
-        $timeSlots = TimeSlot::where('status', 1)->get();
+        $timeSlots = TimeSlot::where('status', 1)
+            ->orderBy('group_id')
+            ->orderBy('time_start')
+            ->get();
 
         $timeSlotsData = $timeSlots->map(function ($timeSlot) {
             return [
