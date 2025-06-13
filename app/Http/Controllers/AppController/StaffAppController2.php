@@ -123,7 +123,9 @@ class StaffAppController2 extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
-
+            if(!$user->hasRole("Staff")){
+                return response()->json(['error' => 'These credentials do not match our records.'], 401);
+            }
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
                 $user->device_type = "Staff App";
