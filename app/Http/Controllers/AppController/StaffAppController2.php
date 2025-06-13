@@ -123,7 +123,7 @@ class StaffAppController2 extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
-            if(!$user->hasRole("Staff")){
+            if(!$user->hasRole("Staff") && $user->freelancer_program == null){
                 return response()->json(['error' => 'These credentials do not match our records.'], 401);
             }
             if ($request->has('fcmToken') && $request->fcmToken) {
