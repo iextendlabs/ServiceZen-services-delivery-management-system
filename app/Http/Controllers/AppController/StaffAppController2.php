@@ -32,6 +32,7 @@ use App\Models\StaffGeneralHoliday;
 use App\Models\StaffGroup;
 use App\Models\StaffHoliday;
 use App\Models\StaffImages;
+use App\Models\TimeSlotToStaff;
 use App\Models\UserAffiliate;
 use App\Models\UserDocument;
 use App\Models\Withdraw;
@@ -122,7 +123,9 @@ class StaffAppController2 extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
-
+            if(!$user->hasRole("Staff") && $user->freelancer_program == null){
+                return response()->json(['error' => 'These credentials do not match our records.'], 401);
+            }
             if ($request->has('fcmToken') && $request->fcmToken) {
                 $user->device_token = $request->fcmToken;
                 $user->device_type = "Staff App";
@@ -487,7 +490,7 @@ class StaffAppController2 extends Controller
         }
 
         $subTitles = $user->subTitles->pluck('id')->toArray();
-        
+
         $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($request) {
             $q->where('staff_id', $request->user_id);
         })->pluck('id')->toArray();
@@ -514,7 +517,7 @@ class StaffAppController2 extends Controller
             'document' => $userDocument,
             'subTitles' => $subTitles,
             'timeSlots' => $timeSlots,
-            'drivers'=> $assignedDrivers
+            'drivers' => $assignedDrivers
         ], 200);
     }
 
@@ -532,7 +535,7 @@ class StaffAppController2 extends Controller
         $holiday = Holiday::where('date', '>=', Carbon::now()->format('Y-m-d'))->get();
         $long_holiday = LongHoliday::where('date_start', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
         $short_holiday = ShortHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
-        $staff_general_holidays = StaffGeneralHoliday::where('status',1)->where('staff_id', $request->user_id)->get();
+        $staff_general_holidays = StaffGeneralHoliday::where('status', 1)->where('staff_id', $request->user_id)->get();
         $staff_holidays = StaffHoliday::where('date', '>=', Carbon::now()->format('Y-m-d'))->where('staff_id', $request->user_id)->get();
 
         return response()->json([
@@ -755,6 +758,50 @@ class StaffAppController2 extends Controller
 
                 if (!$staffGroup->staffs()->where('staff_id', $user->id)->exists()) {
                     $staffGroup->staffs()->attach($user->id);
+                }
+            }
+        }
+
+        TimeSlotToStaff::where('staff_id', $user->id)->delete();
+
+        if ($request->has('timeSlots')) {
+            $timeSlotIds = is_string($request->timeSlots)
+                ? json_decode($request->timeSlots, true)
+                : $request->timeSlots;
+
+            if (is_array($timeSlotIds)) {
+                foreach ($timeSlotIds as $timeSlotId) {
+                    $timeSlot = TimeSlot::find($timeSlotId);
+                    if ($timeSlot) {
+                        TimeSlotToStaff::create([
+                            'staff_id' => $user->id,
+                            'time_slot_id' => $timeSlot->id,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        StaffDriver::where('staff_id', $user->id)->delete();
+
+        if ($request->has('driver_assignments')) {
+
+            $assignments = is_string($request->driver_assignments)
+                ? json_decode($request->driver_assignments, true)
+                : $request->driver_assignments;
+
+            if (is_array($assignments)) {
+                foreach ($assignments as $day => $dayAssignments) {
+                    foreach ($dayAssignments as $assignment) {
+                        if (!empty($assignment['driver_id']) && !empty($assignment['time_slot_id'])) {
+                            StaffDriver::create([
+                                'staff_id' => $user->id,
+                                'driver_id' => $assignment['driver_id'],
+                                'day' => $day,
+                                'time_slot_id' => $assignment['time_slot_id'],
+                            ]);
+                        }
+                    }
                 }
             }
         }
@@ -999,7 +1046,7 @@ class StaffAppController2 extends Controller
         ]);
 
         if ($bid->quote && $bid->quote->user) {
-            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".",null, 'Customer App');
+            $bid->quote->user->notifyOnMobile("Bid Chat on quote#" . $bid->quote_id, "Bid updated to AED" . $request->bid_amount . ".", null, 'Customer App');
         }
 
         return response()->json([
