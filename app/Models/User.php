@@ -32,7 +32,7 @@ class User extends Authenticatable
         'status',
         'affiliate_program',
         'freelancer_program',
-        'last_login_time', 
+        'last_login_time',
         'login_source',
         'device_type',
     ];
@@ -70,7 +70,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(SubTitle::class, 'staff_sub_title', 'staff_id', 'sub_title_id');
     }
-    
+
     public function driver()
     {
         return $this->hasOne(Driver::class);
@@ -184,7 +184,7 @@ class User extends Authenticatable
                 'type' => $type
             ]);
 
-            if($this->device_type ? $this->device_type == $type : true) {
+            if ($this->device_type ? $this->device_type == $type : true) {
                 try {
                     $serviceAccountFile = storage_path('app/firebase/firebase-service-account.json');
 
@@ -333,5 +333,15 @@ class User extends Authenticatable
         }
 
         return $query->get();
+    }
+
+    public function zones()
+    {
+        return $this->belongsToMany(StaffZone::class, 'staff_to_zone','user_id','zone_id');
+    }
+
+    public function timeSlots()
+    {
+        return $this->belongsToMany(TimeSlot::class, 'staff_to_time_slot','user_id','time_slot_id');
     }
 }

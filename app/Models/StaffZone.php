@@ -25,4 +25,9 @@ class StaffZone extends Model
     {
         return $this->hasOne(Currency::class,'id','currency_id');
     }
+
+    public function partner()
+    {
+        return $this->belongsToMany(User::class, 'staff_to_zone','zone_id');
+    }
 }

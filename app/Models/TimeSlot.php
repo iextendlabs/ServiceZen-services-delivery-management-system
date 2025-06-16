@@ -43,6 +43,11 @@ class TimeSlot extends Model
         return (int) $this->space_availability > 0;
     }
 
+    public function partner()
+    {
+        return $this->belongsToMany(User::class, 'staff_to_time_slot');
+    }
+
     public static function getTimeSlotsForArea($area, $date, $currentOrder = null, $serviceIds = null,$isAdmin=false)
     {
         //TODO check area if empty 
