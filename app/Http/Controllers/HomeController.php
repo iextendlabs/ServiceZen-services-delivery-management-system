@@ -398,6 +398,19 @@ class HomeController extends Controller
             'services' => $allServicesArray,
         ];
 
+        $filteredServicesArray = $allServices->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'category_id' => $categoryIds,
+            ];
+        })->toArray();
+
+        $filteredServicesJsonData = [
+            'services' => $filteredServicesArray,
+        ];
+
         $allSubTitles = SubTitle::all();
 
         $allSubTitlesArray = $allSubTitles->map(function ($subTitle) {
@@ -490,6 +503,29 @@ class HomeController extends Controller
                 File::delete($backupFilePath);
             } else {
                 File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+            }
+        } catch (\Exception $e) {
+            File::move($backupFilePath, $filePath);
+            throw $e;
+        }
+
+        try {
+            $filename = "StaffAppServicesData.json";
+            $filePath = public_path($filename);
+
+            if (File::exists($filePath)) {
+                $backupFilename = "StaffAppServicesData_backup.json";
+                $backupFilePath = public_path($backupFilename);
+
+                File::move($filePath, $backupFilePath);
+
+                $currentData = json_decode(File::get($backupFilePath), true);
+                $updatedData = array_merge($currentData, $filteredServicesJsonData);
+                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                File::delete($backupFilePath);
+            } else {
+                File::put($filePath, json_encode($filteredServicesJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);
