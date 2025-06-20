@@ -47,31 +47,6 @@
             </div>
         </div>
         @endif
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Staff Group:</strong>
-                {{ $time_slot->group->name }}
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <strong>Available Staff of Group</strong><br><br>
-                <table class="table table-striped table-bordered">
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                    </tr>
-                    @foreach($staffs as $staff)
-                    <tr>
-                        <td>{{ $staff->id }}</td>
-                        <td>{{ $staff->name }}</td>
-                        <td>{{ $staff->staff->phone}}</td>
-                    </tr>
-                    @endforeach
-                </table>
-            </div>
-        </div>
     </div>
 </div>
 @endsection

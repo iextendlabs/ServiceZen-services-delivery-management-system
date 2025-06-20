@@ -85,6 +85,7 @@
                 @endif
             </div>
         </div>
+        
         @foreach($documents as $field => $label)
             <div class="col-md-12">
                 <div class="form-group">
@@ -109,6 +110,59 @@
         @endif
     </div>
     <hr>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Assigned Time Slots</h4>
+            @if($serviceStaff->staffTimeSlots->count() > 0)
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($serviceStaff->staffTimeSlots as $timeSlot)
+                    <tr>
+                        <td>{{ $timeSlot->name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($timeSlot->time_start)->format('h:i A') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($timeSlot->time_end)->format('h:i A') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            @else
+            <div class="alert alert-info">No time slots assigned</div>
+            @endif
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Assigned Zones</h4>
+            @if($serviceStaff->staffZones->count() > 0)
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($serviceStaff->staffZones as $zone)
+                    <tr>
+                        <td>{{ $zone->name }}</td>
+                        <td>{{ $zone->description ?? 'N/A' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            @else
+            <div class="alert alert-info">No zones assigned</div>
+            @endif
+        </div>
+    </div>
     <div class="row">
         <h4>Weekly Driver Assignments</h4>
         <table class="table table-bordered">

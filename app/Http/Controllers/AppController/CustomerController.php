@@ -951,8 +951,8 @@ class CustomerController extends Controller
         }
 
         if ($request->zone_id) {
-            $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
-                $q->where('staff_zone_id', $request->zone_id);
+            $query->whereHas('staffZones', function ($q) use ($request) {
+                $q->where('staff_zones.id', $request->zone_id);
             });
         }
 

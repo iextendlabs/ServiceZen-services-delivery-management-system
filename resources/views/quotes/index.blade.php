@@ -77,15 +77,6 @@
                                                 <input type="text" id="staffSearch" class="form-control" placeholder="Search staff...">
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label for="staffGroupFilter" class="form-label">Staff Group</label>
-                                                <select id="staffGroupFilter" class="form-control">
-                                                    <option value="">All Groups</option>
-                                                    @foreach ($staffGroups as $group)
-                                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
                                                 <label for="staffZoneFilter" class="form-label">Staff Zone</label>
                                                 <select id="staffZoneFilter" class="form-control">
                                                     <option value="">All Zones</option>
@@ -113,6 +104,8 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+                                        </div>
+                                        <div class="row">
                         
                                             <div class="col-md-6 mb-3">
                                                 <input type="number" step="0.01" id="defaultQuoteAmount" class="form-control mr-2" placeholder="Enter Quote Amount">
@@ -139,8 +132,7 @@
                                                         </thead>
                                                         <tbody id="staffTableBody">
                                                             @foreach ($staffs as $staff)
-                                                                <tr data-groups="{{ $staff->staffGroups->pluck('id')->join(' ') }}"
-                                                                    data-zones="{{ $staff->staffGroups->flatMap->staffZones->pluck('id')->unique()->join(' ') }}"
+                                                                <tr data-zones="{{ $staff->staffZones->pluck('id')->unique()->join(' ') }}"
                                                                     data-services="{{ $staff->services->pluck('id')->unique()->join(' ') }}"
                                                                     data-categories="{{ $staff->categories->pluck('id')->unique()->join(' ') }}">
                                                                     <td class="text-center align-middle">
@@ -408,7 +400,7 @@
     <script>
         $(document).ready(function() {
             function initializeSelect2() {
-                $('#staffGroupFilter, #staffZoneFilter, #staffServiceFilter, #staffCategoryFilter').select2({
+                $('#staffZoneFilter, #staffServiceFilter, #staffCategoryFilter').select2({
                     width: '100%',
                     placeholder: 'Select an option',
                     allowClear: true,
@@ -422,20 +414,17 @@
 
             function filterStaff() {
                 let searchValue = $('#staffSearch').val().toLowerCase();
-                let selectedGroup = $('#staffGroupFilter').val();
                 let selectedZone = $('#staffZoneFilter').val();
                 let selectedService = $('#staffServiceFilter').val();
                 let selectedCategory = $('#staffCategoryFilter').val();
 
                 $('#staffTableBody tr').each(function() {
                     let staffName = $(this).find('.staff-name').text().toLowerCase();
-                    let staffGroups = $(this).data('groups').toString();
                     let staffZones = $(this).data('zones').toString();
                     let staffServices = $(this).data('services').toString();
                     let staffCategories = $(this).data('categories').toString();
 
                     let nameMatch = staffName.includes(searchValue);
-                    let groupMatch = selectedGroup === "" || staffGroups.includes(selectedGroup);
                     let zoneMatch = selectedZone === "" || staffZones.includes(selectedZone);
                     let serviceMatch = selectedService === "" || staffServices.includes(selectedService);
                     let categoryMatch = selectedCategory === "" || staffCategories.includes(selectedCategory);
@@ -444,7 +433,7 @@
                 });
             }
 
-            $('#staffSearch, #staffGroupFilter, #staffZoneFilter, #staffServiceFilter, #staffCategoryFilter').on('input change', filterStaff);
+            $('#staffSearch, #staffZoneFilter, #staffServiceFilter, #staffCategoryFilter').on('input change', filterStaff);
 
             $('.accept-quote').click(function() {
                 let quoteId = $(this).data('id');

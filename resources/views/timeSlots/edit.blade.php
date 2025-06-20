@@ -70,43 +70,6 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <span style="color: red;">*</span><strong for="image">Staff Group</strong>
-                <select name="group_id" class="form-control">
-                    <option></option>
-                    @foreach($staff_groups as $staff_group )
-                    <option value="{{$staff_group->id}}" {{ old('group_id', $time_slot->group_id ) == $staff_group->id ? 'selected' : ''}}>{{$staff_group->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-12" id="group_staff" style="display: none;">
-                <div class="form-group scroll-div">
-                    <span style="color: red;">*</span><strong>Staff of Group:</strong>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search Staff By Name And Email">
-                    <table class="table table-striped table-bordered">
-                        <tr>
-                            <th><input type="checkbox" onclick="$('input[name*=\'ids\']').prop('checked', this.checked);"></th>
-                            <th>Name</th>
-                            <th>Designation</th>
-                            <th>Zone</th>
-                            <th>Email</th>
-                        </tr>
-                        <tbody id="staff-container">
-                            @foreach ($staffs as $staff)
-                            <tr>
-                                <td>
-                                    <input type="checkbox" name="ids[{{ ++$i }}]" value="{{ $staff->id }}" {{ in_array($staff->id, old('ids', $selected_staff)) ? 'checked' : ''}}>
-                                </td>
-                                <td>{{ $staff->name }}</td>
-                                <td>{{ $staff->sub_title != null ? $staff->sub_title : "" }}</td>
-                                <td>{{ count($staff->staffZones) > 0 ?  $staff->staffZones->implode(', ') : '' }}</td>
-                                <td>{{ $staff->email }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
@@ -130,80 +93,6 @@
         } else if (type == 'General' || type == 'Partner') {
             $('#date').hide();
         }
-    });
-
-    $(document).ready(function() {
-        var group_id = '{{$time_slot->group_id}}';
-        if (group_id == ' ') {
-            $('#group_staff').hide();
-        } else {
-            $('#group_staff').show();
-        }
-    });
-
-
-    $('select[name="group_id"]').on('change', function() {
-        $('#group_staff').css('display', 'block')
-        var group = $('select[name="group_id"]').val();
-
-        $.ajax({
-            url: '/staff-by-group',
-            method: 'GET',
-            cache: false,
-            data: {
-                group: group
-            },
-            success: function(response) {
-                var staffs = response.staff;
-                var allStaff = response.allStaff;
-
-                var staffContainer = $('#staff-container');
-                staffContainer.empty();
-                var i = 1;
-
-                allStaff.forEach(function(staff) {
-                    var isChecked = staffs.some(function(selectedStaff) {
-                        return selectedStaff.id === staff.id;
-                    });
-
-                    var checkedAttribute = isChecked ? 'checked' : '';
-                    var html = '<tr><td><input type="checkbox" ' + checkedAttribute + ' name="ids[' + i + ']" value="' + staff.id + '"></td>'
-                            + '<td>' + staff.name + '</td>'
-                            + '<td>' + (staff.sub_title != null ? staff.sub_title : "") + '</td>'
-                            + '<td>' + (staff.staffZones.length > 0 ?  staff.staffZones.join(', ') : '') + '</td>'
-                            + '<td>' + staff.email + '</td></tr>';
-                    staffContainer.append(html);
-                    i++;
-                });
-            },
-            error: function() {
-                alert('Error retrieving staffs.');
-            }
-        });
-
-    });
-
-    $(document).ready(function() {
-        $("#search").keyup(function() {
-            var value = $(this).val().toLowerCase();
-
-            $("table tr").hide();
-
-            $("table tr").each(function() {
-
-                $row = $(this);
-
-                var name = $row.find("td:first").next().text().toLowerCase();
-
-                var email = $row.find("td:last").text().toLowerCase();
-
-                if (name.indexOf(value) != -1) {
-                    $(this).show();
-                } else if (email.indexOf(value) != -1) {
-                    $(this).show();
-                }
-            });
-        });
     });
 </script>
 @endsection

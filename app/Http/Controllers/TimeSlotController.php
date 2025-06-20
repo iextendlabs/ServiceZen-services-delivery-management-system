@@ -6,8 +6,6 @@ use App\Models\Holiday;
 use App\Models\Order;
 use App\Models\Staff;
 use App\Models\StaffDriver;
-use App\Models\StaffGroup;
-use App\Models\StaffGroupToStaff;
 use App\Models\StaffZone;
 use App\Models\TimeSlot;
 use App\Models\TimeSlotToStaff;
@@ -40,24 +38,12 @@ class TimeSlotController extends Controller
     {
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
-        $filter = [
-            'staff_id' => $request->staff_id
-        ];
 
         $query = TimeSlot::orderBy($sort, $direction);
 
-        if ($request->has('staff_id')) {
-            $staffId = $request->input('staff_id');
-            $query->whereHas('staffs', function ($q) use ($staffId) {
-                $q->where('staff_id', $staffId);
-            });
-        }
         $total_time_slot = $query->count();
         $time_slots = $query->paginate(config('app.paginate'));
-        $staffs = User::role('Staff')->get();
-        $filters = $request->only(['staff_id']);
-        $time_slots->appends($filters);
-        return view('timeSlots.index', compact('time_slots', 'staffs', 'filter', 'total_time_slot', 'direction'))
+        return view('timeSlots.index', compact('time_slots', 'total_time_slot', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -68,8 +54,7 @@ class TimeSlotController extends Controller
      */
     public function create()
     {
-        $staff_groups = StaffGroup::all();
-        return view('timeSlots.create', compact('staff_groups'));
+        return view('timeSlots.create');
     }
 
     /**
@@ -80,15 +65,49 @@ class TimeSlotController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate([
+        $request->validate([
             'name' => 'required',
             'status' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General', 'Partner'])],
-            'time_start' => 'required',
+            'time_start' => [
+                'required',
+                function ($attribute, $value, $fail) use ($request) {
+                    // For dated slots (Specific) - check same date + time combination
+                    if ($request->type === 'Specific') {
+                        $exists = TimeSlot::where('date', $request->date)
+                            ->where('time_start', $value)
+                            ->where('time_end', $request->time_end)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('This time slot already exists for the selected date.');
+                        }
+                    }
+                    // For non-dated slots (General/Partner) - check time combination without date
+                    else {
+                        $exists = TimeSlot::whereNull('date')
+                            ->where('time_start', $value)
+                            ->where('time_end', $request->time_end)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('This general time slot already exists (without date).');
+                        }
+                    }
+                }
+            ],
             'time_end' => 'required',
-            'ids' => 'required',
-            'seat' => 'required',
-            'date' => Rule::requiredIf($request->type === 'Specific')
+            'seat' => 'required|integer|min:1',
+            'date' => [
+                Rule::requiredIf($request->type === 'Specific'),
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->type !== 'Specific' && !empty($value)) {
+                        $fail('General time slots cannot have a date.');
+                    }
+                }
+            ]
         ]);
 
         $input = $request->all();
@@ -107,16 +126,9 @@ class TimeSlotController extends Controller
 
         if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
             $input['end_time_to_sec'] = $input['end_time_to_sec'] + 86400;
-            $time_slot = TimeSlot::create($input);
+            TimeSlot::create($input);
         } else {
-            $time_slot = TimeSlot::create($input);
-        }
-
-        $input['time_slot_id'] = $time_slot->id;
-
-        foreach ($request->ids as $id) {
-            $input['staff_id'] = $id;
-            TimeSlotToStaff::create($input);
+            TimeSlot::create($input);
         }
 
         return redirect()->route('timeSlots.index')
@@ -132,12 +144,7 @@ class TimeSlotController extends Controller
     public function show($id)
     {
         $time_slot = TimeSlot::find($id);
-
-        $staffGroup = StaffGroup::find($time_slot->group_id);
-        $staffs = $staffGroup->staffs;
-
-        $time_slot = TimeSlot::find($id);
-        return view('timeSlots.show', compact('time_slot', 'staffs'));
+        return view('timeSlots.show', compact('time_slot'));
     }
 
     /**
@@ -148,42 +155,67 @@ class TimeSlotController extends Controller
      */
     public function edit($id)
     {
-        $i = 0;
-        $staff_groups = StaffGroup::all();
         $time_slot = TimeSlot::find($id);
 
-        $staffGroup = StaffGroup::find($time_slot->group_id);
-        $staffs = User::role('Staff')->get();
-
-        $staffs->each(function ($staff) {
-            $staff->sub_title = $staff->subTitles ? $staff->subTitles->pluck('name')->implode('/') : null;
-
-            $staffZones = StaffZone::whereHas('staffGroups.staffs', function ($query) use ($staff) {
-                $query->where('users.id', $staff->id);
-            })->get();
-
-            $staff->staffZones = $staffZones ? $staffZones->pluck('name') : [];
-        });
-
-        $selected_staff = $time_slot->staffs->pluck('id')->toArray();
-
-        return view('timeSlots.edit', compact('time_slot', 'staff_groups', 'i', 'staffs', 'selected_staff'));
+        return view('timeSlots.edit', compact('time_slot'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, TimeSlot $timeSlot)
     {
-        request()->validate([
-            'status' => 'required',
+        $request->validate([
             'name' => 'required',
+            'status' => 'required',
             'type' => ['required', Rule::in(['Specific', 'General', 'Partner'])],
-            'time_start' => 'required',
-            'time_end' => 'required',
-            'ids' => 'required',
-            'seat' => 'required',
-            'date' => Rule::requiredIf($request->type === 'Specific')
-        ]);
+            'time_start' => [
+                'required',
+                function ($attribute, $value, $fail) use ($request, $timeSlot) {
+                    if ($request->type === 'Specific') {
+                        $exists = TimeSlot::where('date', $request->date)
+                            ->where('time_start', $value)
+                            ->where('time_end', $request->time_end)
+                            ->where('id', '!=', $timeSlot->id)
+                            ->exists();
 
-        $time_slot = TimeSlot::find($id);
+                        if ($exists) {
+                            $fail('This time slot already exists for the selected date.');
+                        }
+                    } else {
+                        $exists = TimeSlot::whereNull('date')
+                            ->where('time_start', $value)
+                            ->where('time_end', $request->time_end)
+                            ->where('id', '!=', $timeSlot->id)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('This general time slot already exists (without date).');
+                        }
+                    }
+                }
+            ],
+            'time_end' => 'required',
+            'seat' => 'required|integer|min:1',
+            'date' => [
+                Rule::requiredIf($request->type === 'Specific'),
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) use ($request, $timeSlot) {
+                    if ($request->type !== 'Specific' && !empty($value)) {
+                        $fail('General time slots cannot have a date.');
+                    }
+
+                    if ($request->type === 'Specific' && $timeSlot->type !== 'Specific') {
+                        $exists = TimeSlot::where('date', $value)
+                            ->where('time_start', $request->time_start)
+                            ->where('time_end', $request->time_end)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('This time slot already exists for the selected date.');
+                        }
+                    }
+                }
+            ]
+        ]);
 
         $input = $request->all();
 
@@ -205,50 +237,15 @@ class TimeSlotController extends Controller
 
         if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
             $input['end_time_to_sec'] = $input['end_time_to_sec'] + 86400;
-            $time_slot->update($input);
+            $timeSlot->update($input);
         } else {
-            $time_slot->update($input);
-        }
-
-
-        $input['time_slot_id'] = $id;
-
-        TimeSlotToStaff::where('time_slot_id', $id)->delete();
-
-        foreach ($request->ids as $staff_id) {
-            $input['staff_id'] = $staff_id;
-            TimeSlotToStaff::create($input);
+            $timeSlot->update($input);
         }
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Time slot update successfully.');
     }
-
-    // Search staff by staff group
-    public function staff_group(Request $request)
-    {
-        $staffGroup = StaffGroup::find($request->group);
-        $staff = $staffGroup->staffs;
-        $allStaff = User::role('Staff')->get();
-  
-        $allStaff->each(function ($staff) {
-            $staff->sub_title = $staff->subTitles ? $staff->subTitles->pluck('name')->implode('/') : null;
-
-            $staffZones = StaffZone::whereHas('staffGroups.staffs', function ($query) use ($staff) {
-                $query->where('users.id', $staff->id);
-            })->get();
-
-            $staff->staffZones = $staffZones ? $staffZones->pluck('name')->toArray() : [];
-        });
-
-        return response()->json([
-            'staff' => $staff,
-            'allStaff' => $allStaff
-        ]);
-    }
-
-
 
     /**
      * Remove the specified resource from storage.
@@ -262,48 +259,11 @@ class TimeSlotController extends Controller
 
         $time_slot->delete();
 
-        StaffDriver::where('time_slot_id',$id)->delete();
+        StaffDriver::where('time_slot_id', $id)->delete();
 
         $previousUrl = url()->previous();
 
         return redirect($previousUrl)
             ->with('success', 'Time slot deleted successfully');
-    }
-
-    function dayName($dateString)
-    {
-        return \Carbon\Carbon::parse($dateString)->format('l');
-    }
-
-    public function slots(Request $request)
-    {
-        $order = Order::find($request->order_id);
-        $holiday = Holiday::where('date', $request->date)->get();
-        if (count($holiday) == 0) {
-            $staffZoneNames = [$order->area, $order->city];
-
-            $slots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                $query->where(function ($query) use ($staffZoneNames) {
-                    foreach ($staffZoneNames as $staffZoneName) {
-                        $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
-                    }
-                });
-            })->where('date', 'like', $request->date)
-                ->get();
-            if (count($slots)) {
-                $timeSlots = $slots;
-            } else {
-                $timeSlots = TimeSlot::whereHas('staffGroup.staffZone', function ($query) use ($staffZoneNames) {
-                    $query->where(function ($query) use ($staffZoneNames) {
-                        foreach ($staffZoneNames as $staffZoneName) {
-                            $query->orWhere('name', 'LIKE', "{$staffZoneName}%");
-                        }
-                    });
-                })->get();
-            }
-        } else {
-            $timeSlots = "There is no Slots";
-        }
-        return response()->json($timeSlots);
     }
 }

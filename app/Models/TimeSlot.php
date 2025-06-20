@@ -11,27 +11,16 @@ class TimeSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'group_id', 'status', 'start_time_to_sec', 'end_time_to_sec', 'seat'];
+    protected $fillable = ['name', 'time_start', 'time_end', 'type', 'date', 'status', 'start_time_to_sec', 'end_time_to_sec', 'seat'];
 
     public $space_availability = 0;
 
     public $booked_staff;
 
-    public function group()
-    {
-        return $this->hasOne(StaffGroup::class, 'id', 'group_id');
-    }
-
     public function appointment()
     {
         return $this->hasMany(OrderService::class, 'time_slot_id', 'id');
     }
-
-    public function staffGroup()
-    {
-        return $this->belongsTo(StaffGroup::class, 'group_id');
-    }
-
 
     public function staffs()
     {
@@ -41,11 +30,6 @@ class TimeSlot extends Model
     public function isAvailable()
     {
         return (int) $this->space_availability > 0;
-    }
-
-    public function partner()
-    {
-        return $this->belongsToMany(User::class, 'staff_to_time_slot');
     }
 
     public static function getTimeSlotsForArea($area, $date, $currentOrder = null, $serviceIds = null,$isAdmin=false)
@@ -97,14 +81,8 @@ class TimeSlot extends Model
 
         if ($staffZone) {
             // staff groups
-            $staff_group_staff_ids = [];
+            $staff_zone_staff_ids = $staffZone->staffs()->pluck('users.id')->toArray() ?? [];
 
-            $staffGroups = $staffZone->staffGroups()->get();
-
-
-            foreach ($staffGroups as $staffGroup) {
-                $staff_group_staff_ids = array_merge($staff_group_staff_ids, $staffGroup->staffs->pluck('id')->toArray());
-            }
             // extract staffs
 
             $staff_ids = StaffHoliday::where('date', $date)->pluck('staff_id')->toArray();
@@ -124,8 +102,8 @@ class TimeSlot extends Model
             $staff_ids = array_unique([...$staff_ids, ...$generalHolidayStaffIds, ...$longHolidaysStaffId]);
 
             if (count($holiday) == 0) {
-                $query = self::whereHas('staffs', function ($query) use ($staff_group_staff_ids) {
-                    $query->whereIn('staff_id', $staff_group_staff_ids);
+                $query = self::whereHas('staffs', function ($query) use ($staff_zone_staff_ids) {
+                    $query->whereIn('staff_id', $staff_zone_staff_ids);
                 })->where('status', '=', 1);
             
                 if ($date == $currentDate) {
@@ -209,6 +187,11 @@ class TimeSlot extends Model
                     foreach ($timeSlot->staffs as $staff) {
 
                         if ($staff->staff->status == 0) {
+                            $excluded_staff[] = $staff->staff->user_id;
+                            $timeSlot->space_availability--;
+                        }
+
+                        if (!in_array($staff->staff->user_id, $staff_zone_staff_ids)) {
                             $excluded_staff[] = $staff->staff->user_id;
                             $timeSlot->space_availability--;
                         }

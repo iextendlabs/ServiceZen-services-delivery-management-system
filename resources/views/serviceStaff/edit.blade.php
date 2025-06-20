@@ -29,6 +29,12 @@
             <li class="nav-item">
                 <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="slot-tab" data-toggle="tab" href="#slot" role="tab" aria-controls="slot" aria-selected="false">Time Slot</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="zone-tab" data-toggle="tab" href="#zone" role="tab" aria-controls="zone" aria-selected="false">Zone</a>
+            </li>
             @if($socialLinks)
             <li class="nav-item">
                 <a class="nav-link" id="social-links-tab" data-toggle="tab" href="#social-links" role="tab" aria-controls="social-links" aria-selected="false">Social Links</a>
@@ -219,7 +225,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Assign Drivers for Each Day:</strong>
-                            @if (count($timeSlots) <= 0)
+                            @if (count($serviceStaff->staffTimeSlots) <= 0)
                                 <div class="alert alert-danger">
                                     This staff member doesn't have any assigned time slots. Please assign time slots first before assigning a driver.
                                 </div>
@@ -270,7 +276,7 @@
                                                 <td>
                                                     <select name="drivers[{{ $day }}][{{ $index }}][time_slot_id]" class="form-control">
                                                         <option value="">Select Time Slot</option>
-                                                        @foreach ($timeSlots as $slot)
+                                                        @foreach ($serviceStaff->staffTimeSlots as $slot)
                                                             <option value="{{ $slot['id'] }}" {{ $driverData['time_slot_id'] == $slot['id'] ? 'selected' : '' }}>
                                                                 {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
                                                                 {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
@@ -304,7 +310,7 @@
                                                 <td>
                                                     <select name="drivers[{{ $day }}][0][time_slot_id]" class="form-control">
                                                         <option value="">Select Time Slot</option>
-                                                        @foreach ($timeSlots as $slot)
+                                                        @foreach ($serviceStaff->staffTimeSlots as $slot)
                                                             <option value="{{ $slot['id'] }}">
                                                                 {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
                                                                 {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
@@ -447,59 +453,6 @@
                             <button id="addCategoryBtn" onclick="addCategoryRow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
                         </div>
                     </div>
-                    <div class="col-md-12 mt-2">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Assign Groups and Zones</h5>
-                                <div class="input-group" style="width: 300px;">
-                                    <input type="text" id="searchInput" class="form-control" placeholder="Search groups/zones...">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive scroll-div">
-                                    <table class="table" id="groupsTable">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th width="50px">
-                                                    <input type="checkbox" id="selectAll">
-                                                </th>
-                                                <th>Group Name</th>
-                                                <th>Zones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($staffGroups as $group)
-                                                <tr data-group-id="{{ $group->id }}" 
-                                                    data-group-name="{{ strtolower($group->name) }}"
-                                                    data-zones="{{ strtolower($group->staffZones->pluck('name')->implode('|')) }}">
-                                                    <td>
-                                                        <input type="checkbox" 
-                                                            name="groups[]" 
-                                                            value="{{ $group->id }}"
-                                                            class="group-checkbox"
-                                                            {{ isset($serviceStaff) && $serviceStaff->staffGroups->contains($group->id) ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>{{ $group->name }}</td>
-                                                    <td>
-                                                        @foreach($group->staffZones as $zone)
-                                                            <span class="badge badge-info mr-1 zone-badge" 
-                                                                data-zone-id="{{ $zone->id }}"
-                                                                data-zone-name="{{ strtolower($zone->name) }}">
-                                                                {{ $zone->name }}
-                                                            </span>
-                                                        @endforeach
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Location:</strong>
@@ -568,6 +521,97 @@
                         </div>
                     </div>
                     @endif
+                </div>
+            </div>
+            <div class="tab-pane fade" id="slot" role="tabpanel" aria-labelledby="slot-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Time Slots</h5>
+                                <div class="form-group">
+                                    <input type="text" id="timeSlotSearch" class="form-control" placeholder="Search time slots...">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" id="startTimeFilter" placeholder="Start time (e.g. 9:00 AM)">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" id="endTimeFilter" placeholder="End time (e.g. 5:00 PM)">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-sm btn-secondary w-100" id="clearTimeFilters">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px">
+                                                <input type="checkbox" id="selectAllTimeSlots">
+                                            </th>
+                                            <th>Name</th>
+                                            <th>Start Time</th>
+                                            <th>End Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timeSlotTable">
+                                        @foreach($timeSlots as $timeSlot)
+                                        <tr class="time-slot-row">
+                                            <td>
+                                                <input type="checkbox" name="time_slots[]" class="time-slot-checkbox" 
+                                                    value="{{ $timeSlot->id }}" {{ in_array($timeSlot->id, old('time_slots', $serviceStaff->staffTimeSlots->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                                            </td>
+                                            <td class="slot-name">{{ $timeSlot->name }}</td>
+                                            <td class="start-time">{{ \Carbon\Carbon::parse($timeSlot->time_start)->format('h:i A') }}</td>
+                                            <td class="end-time">{{ \Carbon\Carbon::parse($timeSlot->time_end)->format('h:i A') }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="zone" role="tabpanel" aria-labelledby="zone-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Zones</h5>
+                                <div class="form-group">
+                                    <input type="text" id="zoneSearch" class="form-control" placeholder="Search zones...">
+                                </div>
+                            </div>
+                            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px">
+                                                <input type="checkbox" id="selectAllZones">
+                                            </th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="zoneTable">
+                                        @foreach($staffZones as $zone)
+                                        <tr class="zone-row">
+                                            <td>
+                                                <input type="checkbox" name="zones[]" class="zone-checkbox" 
+                                                    value="{{ $zone->id }}" {{ in_array($zone->id, old('zones', $serviceStaff->staffZones->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                                            </td>
+                                            <td class="zone-name">{{ $zone->name }}</td>
+                                            <td>{{ $zone->description ?? 'N/A' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             @if($socialLinks)
@@ -946,7 +990,7 @@
     // Generate time slot options
     function generateTimeSlotOptions() {
         let options = '';
-        @foreach ($timeSlots as $slot)
+        @foreach ($serviceStaff->staffTimeSlots as $slot)
             options += `<option value="{{ $slot['id'] }}">
                             {{ \Carbon\Carbon::parse($slot['time_start'])->format('h:i A') }} - 
                             {{ \Carbon\Carbon::parse($slot['time_end'])->format('h:i A') }}
@@ -1124,27 +1168,57 @@
 </script>
 <script>
     $(document).ready(function() {
-        $('#selectAll').change(function() {
-            $('.group-checkbox').prop('checked', $(this).prop('checked'));
+        // Time Slot Search and Filter
+        $('#timeSlotSearch, #startTimeFilter, #endTimeFilter').on('keyup', function() {
+            filterTimeSlots();
         });
 
-        $('#searchInput').keyup(function() {
-            const searchTerm = $(this).val().toLowerCase();
-            
-            if (searchTerm.length === 0) {
-                $('#groupsTable tbody tr').show();
-                return;
-            }
-            
-            $('#groupsTable tbody tr').each(function() {
-                const groupName = $(this).data('group-name');
-                const zones = $(this).data('zones');
-                
-                const groupMatch = groupName.includes(searchTerm);
-                const zoneMatch = zones.includes(searchTerm);
-                
-                $(this).toggle(groupMatch || zoneMatch);
+        $('#clearTimeFilters').click(function(e) {
+            e.preventDefault();
+            $('#timeSlotSearch').val('');
+            $('#startTimeFilter').val('');
+            $('#endTimeFilter').val('');
+            filterTimeSlots();
+        });
+
+        function filterTimeSlots() {
+            const nameSearch = $('#timeSlotSearch').val().toLowerCase();
+            const startTime = $('#startTimeFilter').val().toLowerCase();
+            const endTime = $('#endTimeFilter').val().toLowerCase();
+
+            $('.time-slot-row').each(function() {
+                const $row = $(this);
+                const name = $row.find('.slot-name').text().toLowerCase();
+                const start = $row.find('.start-time').text().toLowerCase();
+                const end = $row.find('.end-time').text().toLowerCase();
+
+                const nameMatch = name.includes(nameSearch);
+                const startMatch = startTime ? start.includes(startTime) : true;
+                const endMatch = endTime ? end.includes(endTime) : true;
+
+                $row.toggle(nameMatch && startMatch && endMatch);
             });
+            
+            $('#selectAllTimeSlots').prop('checked', false);
+        }
+
+        // Zone Search
+        $('#zoneSearch').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            $('.zone-row').each(function() {
+                const name = $(this).find('.zone-name').text().toLowerCase();
+                $(this).toggle(name.includes(searchText));
+            });
+            $('#selectAllZones').prop('checked', false);
+        });
+
+        // Select All Checkboxes
+        $('#selectAllTimeSlots').change(function() {
+            $('.time-slot-row:visible .time-slot-checkbox').prop('checked', this.checked);
+        });
+
+        $('#selectAllZones').change(function() {
+            $('.zone-row:visible .zone-checkbox').prop('checked', this.checked);
         });
     });
 </script>

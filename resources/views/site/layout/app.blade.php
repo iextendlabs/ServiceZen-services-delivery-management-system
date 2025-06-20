@@ -357,9 +357,9 @@
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
-    <script src="./js/vendor/popper.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/vendor/holder.min.js"></script>
+    <script src="{{ asset('js/vendor/popper.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/vendor/holder.min.js') }}"></script>
     <script src="{{ asset('js/popup.js') }}?v={{ config('app.version') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script

@@ -11,22 +11,12 @@ class StaffZone extends Model
 
     use HasFactory;
 
-    public function staff()
-    {
-        return $this->hasMany(User::class,'id','staff_ids');
-    }
-
-    public function staffGroups()
-    {
-        return $this->belongsToMany(StaffGroup::class, 'staff_group_staff_zone', 'staff_zone_id', 'staff_group_id');
-    }
-
     public function currency()
     {
         return $this->hasOne(Currency::class,'id','currency_id');
     }
 
-    public function partner()
+    public function staffs()
     {
         return $this->belongsToMany(User::class, 'staff_to_zone','zone_id');
     }

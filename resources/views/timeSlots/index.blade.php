@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h2>Time Slots</h2>
+            <h2>Time Slots ({{ $total_time_slot }})</h2>
         </div>
         <div class="col-md-6">
             @can('time-slot-create')
@@ -18,49 +18,6 @@
     </div>
     @endif
     <hr>
-    <div class="row">
-        @if(!auth()->user()->hasRole("Staff"))
-        <!-- Second Column (Filter Form) -->
-        <div class="col-md-12">
-            <h3>Filter</h3>
-            <hr>
-            <form action="{{ route('timeSlots.index') }}" method="GET" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Staff:</strong>
-                            <input type="text" id="staffSearch" class="form-control mb-2" placeholder="Search staff by name">
-                            <select name="staff_id" id="staffDropdown" class="form-control">
-                                <option value="">Select</option>
-                                @foreach ($staffs as $staff)
-                                @if ($staff->staff->status == 1)
-                                    <option value="{{ $staff->id }}" {{ $staff->id == $filter['staff_id'] ? 'selected' : '' }}>
-                                        {{ $staff->name }}
-                                    </option>
-                                @endif
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 offset-md-8">
-                        <div class="d-flex flex-wrap justify-content-md-end">
-                            <div class="col-md-3 mb-3">
-                                <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
-                            </div>
-                            <div class="col-md-9 mb-3">
-                                <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        @endif
-
-    </div>
-    <h3>Time Slots  ({{ $total_time_slot }})</h3>
     <table class="table table-striped table-bordered">
         <tr>
             <th>Sr#</th>
@@ -82,9 +39,7 @@
 
                 </div>
             </th>
-            <th>Group</th>
             <th>Type</th>
-            <th>Staff</th>
             <th>No. of Seats</th>
             <th width="280px">Action</th>
         </tr>
@@ -98,13 +53,7 @@
                 <span class="text-danger">{{ $time_slot->name }}</span>
                 @endif</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
-            <td>{{ $time_slot->group->name }}</td>
             <td>{{ $time_slot->type }}</td>
-            <td>
-                @foreach($time_slot->staffs as $key => $staff)
-                    {{ $staff->name }}@if($key != count($time_slot->staffs) -1),@endif
-                @endforeach
-            </td>
             <td>{{ $time_slot->seat }}</td>
             <td>
                 <form id="deleteForm{{ $time_slot->id }}" action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
@@ -123,7 +72,7 @@
         @endforeach
         @else
         <tr>
-            <td colspan="6" class="text-center">There is no time slots.</td>
+            <td colspan="7" class="text-center">There is no time slots.</td>
         </tr>
         @endif
     </table>
@@ -156,25 +105,5 @@
             checkTableResponsive();
         });
     });
-
-    $(document).ready(function () {
-        const $searchInput = $("#staffSearch");
-        const $dropdown = $("#staffDropdown");
-        const originalOptions = $dropdown.children().clone(); // Clone original options
-
-        $searchInput.on("input", function () {
-            const filter = $searchInput.val().toLowerCase().trim();
-
-            // Filter options based on the search term
-            const filteredOptions = originalOptions.filter(function () {
-                const text = $(this).text().toLowerCase().trim();
-                return text.startsWith(filter);
-            });
-
-            // Clear and append the filtered options
-            $dropdown.empty().append(filteredOptions);
-        });
-    });
-
 </script>
 @endsection

@@ -19,7 +19,6 @@ use App\Http\Controllers\{
     ManagerController,
     ServiceCategoryController,
     OrderController,
-    StaffGroupController,
     StaffHolidayController,
     StaffZoneController,
     SupervisorController,
@@ -108,7 +107,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('orders', OrderController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('staffZones', StaffZoneController::class);
-    Route::resource('staffGroups', StaffGroupController::class);
     Route::resource('managers', ManagerController::class);
     Route::resource('supervisors', SupervisorController::class);
     Route::resource('timeSlots', TimeSlotController::class);
@@ -132,8 +130,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('holidays', [HolidayController::class, 'index']);
     Route::post('/holidays/crud-ajax', [HolidayController::class, 'store']);
-    Route::get('time-slots', [TimeSlotController::class, 'slots']);
-    Route::get('staff-by-group', [TimeSlotController::class, 'staff_group']);
 
     Route::resource('cashCollection', CashCollectionController::class);
     Route::get('staffCashCollection', [CashCollectionController::class, 'staffCashCollection'])->name('staffCashCollection');
@@ -155,6 +151,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/removeStaffImages', [ServiceStaffController::class, 'removeImages']);
     Route::post('/serviceStaff/{id}/upload-document', [ServiceStaffController::class, 'uploadDocument'])->name('serviceStaff.upload.document');
 
+    Route::post('/assign-time-slots', [ServiceStaffController::class, 'assignTimeSlots'])
+        ->name('serviceStaff.assignTimeSlots');
+
+    Route::post('/assign-zones', [ServiceStaffController::class, 'assignZones'])
+        ->name('serviceStaff.assignZones');
     Route::get('/transactionUnapprove', [TransactionController::class, 'Unapprove'])->name('transactions.Unapprove');
 
     Route::get('orderChat/{id}', [OrderController::class, 'orderChat'])->name('orders.chat');
@@ -290,7 +291,6 @@ Route::get('bookingStep', [CheckOutController::class, 'bookingStep']);
 Route::post('confirmStep', [CheckOutController::class, 'confirmStep'])->name('confirmStep');
 //TODO :set no cache headers for all ajax calls
 Route::middleware('no-cache')->get('slots', [CheckOutController::class, 'slots']);
-Route::get('staff-group', [CheckOutController::class, 'staff_group']);
 Route::post('saveLocation', [SiteController::class, 'saveLocation']);
 Route::resource('siteFAQs', SiteFAQsController::class);
 Route::get('applyCoupon', [CustomerAuthController::class, 'applyCoupon']);
