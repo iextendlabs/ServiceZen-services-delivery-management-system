@@ -12,7 +12,6 @@ use App\Models\Staff;
 use App\Models\StaffHoliday;
 use App\Models\StaffImages;
 use App\Models\StaffDriver;
-use App\Models\StaffGroup;
 use App\Models\StaffYoutubeVideo;
 use App\Models\StaffZone;
 use App\Models\SubTitle;
@@ -93,6 +92,7 @@ class ServiceStaffController extends Controller
         $categories = ServiceCategory::where('status', 1)->get();
 
         $staffZones = StaffZone::get();
+        $timeSlots = TimeSlot::where('status', 1)->get();
 
         $query = User::orderBy($sort, $direction)
             ->whereHas('staff', function ($query) use ($request) {
@@ -127,8 +127,8 @@ class ServiceStaffController extends Controller
         }
 
         if ($request->zone_id) {
-            $query->whereHas('staffGroups.staffZones', function ($q) use ($request) {
-                $q->where('staff_zone_id', $request->zone_id);
+            $query->whereHas('staffZones', function ($q) use ($request) {
+                $q->where('staff_zones.id', $request->zone_id);
             });
         }
 
@@ -152,7 +152,7 @@ class ServiceStaffController extends Controller
         $serviceStaff = $query->paginate(config('app.paginate'));
 
         $serviceStaff->appends($filter, ['sort' => $sort, 'direction' => $direction]);
-        return view('serviceStaff.index', compact('total_staff', 'serviceStaff', 'filter', 'direction', 'sub_titles', 'locations', 'services', 'categories', 'staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.index', compact('total_staff', 'serviceStaff', 'filter', 'direction', 'sub_titles', 'locations', 'services', 'categories', 'staffZones', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -167,9 +167,11 @@ class ServiceStaffController extends Controller
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $documents = $this->documents;
-        $staffGroups = StaffGroup::with('staffZones')->get();
         $subTitles = SubTitle::all();
-        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services', 'documents', 'staffGroups', 'subTitles'));
+
+        $staffZones = StaffZone::get();
+        $timeSlots = TimeSlot::where('status', 1)->get();
+        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services', 'documents', 'subTitles', 'staffZones', 'timeSlots'));
     }
 
     /**
@@ -190,6 +192,10 @@ class ServiceStaffController extends Controller
             'id_card_front' => 'required',
             'id_card_back' => 'required',
             'passport' => 'required',
+            'time_slots' => 'sometimes|array',
+            'time_slots.*' => 'exists:time_slots,id',
+            'zones' => 'sometimes|array',
+            'zones.*' => 'exists:staff_zones,id',
         ]);
 
         $input = $request->all();
@@ -292,12 +298,13 @@ class ServiceStaffController extends Controller
             }
         }
 
-        if (isset($request->groups)) {
-            foreach ($request->groups as $group) {
-                $staffGroup = StaffGroup::find($group);
+        if ($request->has('time_slots')) {
+            $ServiceStaff->staffTimeSlots()->sync($request->time_slots);
+        }
 
-                $staffGroup->staffs()->attach($user_id);
-            }
+        // Assign Zones
+        if ($request->has('zones')) {
+            $ServiceStaff->staffZones()->sync($request->zones);
         }
 
         return redirect()->route('serviceStaff.index')
@@ -367,13 +374,12 @@ class ServiceStaffController extends Controller
             ->get()
             ->groupBy('day');
         $staffId = $serviceStaff->id;
-        $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($staffId) {
-            $q->where('staff_id', $staffId);
-        })->get();
 
-        $staffGroups = StaffGroup::with('staffZones')->get();
         $subTitles = SubTitle::all();
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffGroups', 'subTitles'))
+
+        $timeSlots = TimeSlot::all();
+        $staffZones = StaffZone::all();
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffZones', 'subTitles'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -556,16 +562,10 @@ class ServiceStaffController extends Controller
                 }
             }
         }
-        User::find($id)->staffGroups()->detach();
-        if (isset($request->groups)) {
-            foreach ($request->groups as $group) {
-                $staffGroup = StaffGroup::find($group);
 
-                if (!$staffGroup->staffs()->where('staff_id', $id)->exists()) {
-                    $staffGroup->staffs()->attach($id);
-                }
-            }
-        }
+        $serviceStaff->staffTimeSlots()->sync($request->time_slots);
+
+        $serviceStaff->staffZones()->sync($request->zones);
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -658,5 +658,71 @@ class ServiceStaffController extends Controller
         StaffImages::where('image', $request->image)->delete();
 
         return redirect()->back()->with('success', 'Image Remove successfully.');
+    }
+
+    public function assignZones(Request $request)
+    {
+        $request->validate([
+            'staff_ids' => 'required',
+            'zones' => 'required|array',
+            'zones.*' => 'exists:staff_zones,id',
+        ]);
+
+        $staffIds = explode(',', $request->staff_ids);
+        $zoneIds = $request->zones;
+        $replace = $request->has('replace_existing');
+
+        foreach ($staffIds as $staffId) {
+            $user = User::findOrFail($staffId);
+
+            if ($replace) {
+                // Replace existing zones - sync without detaching
+                $user->staffZones()->sync($zoneIds);
+            } else {
+                // Add new zones without duplicates - sync without detaching
+                $existingZones = $user->staffZones()->pluck('zone_id')->toArray();
+                $newZones = array_diff($zoneIds, $existingZones);
+
+                if (!empty($newZones)) {
+                    $user->staffZones()->attach($newZones);
+                }
+            }
+        }
+
+        return redirect()->back()
+            ->with('success', 'Zones assigned successfully');
+    }
+
+    public function assignTimeSlots(Request $request)
+    {
+        $request->validate([
+            'staff_ids' => 'required',
+            'time_slots' => 'required|array',
+            'time_slots.*' => 'exists:time_slots,id',
+        ]);
+
+        $staffIds = explode(',', $request->staff_ids);
+        $timeSlotIds = $request->time_slots;
+        $replace = $request->has('replace_existing');
+
+        foreach ($staffIds as $staffId) {
+            $user = User::findOrFail($staffId);
+
+            if ($replace) {
+                // Replace existing time slots
+                $user->staffTimeSlots()->sync($timeSlotIds);
+            } else {
+                // Add new time slots without duplicates
+                $existingTimeSlots = $user->staffTimeSlots()->pluck('time_slot_id')->toArray();
+                $newTimeSlots = array_diff($timeSlotIds, $existingTimeSlots);
+
+                if (!empty($newTimeSlots)) {
+                    $user->staffTimeSlots()->attach($newTimeSlots);
+                }
+            }
+        }
+
+        return redirect()->back()
+            ->with('success', 'Time slots assigned successfully');
     }
 }

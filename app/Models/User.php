@@ -32,7 +32,7 @@ class User extends Authenticatable
         'status',
         'affiliate_program',
         'freelancer_program',
-        'last_login_time', 
+        'last_login_time',
         'login_source',
         'device_type',
     ];
@@ -70,7 +70,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(SubTitle::class, 'staff_sub_title', 'staff_id', 'sub_title_id');
     }
-    
+
     public function driver()
     {
         return $this->hasOne(Driver::class);
@@ -184,7 +184,7 @@ class User extends Authenticatable
                 'type' => $type
             ]);
 
-            if($this->device_type ? $this->device_type == $type : true) {
+            if ($this->device_type ? $this->device_type == $type : true) {
                 try {
                     $serviceAccountFile = storage_path('app/firebase/firebase-service-account.json');
 
@@ -284,11 +284,6 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function staffGroups()
-    {
-        return $this->belongsToMany(StaffGroup::class, 'staff_group_to_staff', 'staff_id', 'staff_group_id');
-    }
-
     public static function getEligibleQuoteStaff($serviceId, $zone, $is_kommo = false)
     {
         $service = Service::findOrFail($serviceId);
@@ -316,22 +311,25 @@ class User extends Authenticatable
                 return collect();
             }
 
-            $staffGroupStaffIds = $staffZone->staffGroups()
-                ->with('staffs:id')
-                ->get()
-                ->pluck('staffs.*.id')
-                ->flatten()
-                ->unique()
-                ->values()
-                ->toArray();
+            $staffZoneStaffIds = $staffZone->staffs()->pluck('users.id')->toArray();
 
-            if (empty($staffGroupStaffIds)) {
+            if (empty($staffZoneStaffIds)) {
                 return collect();
             }
 
-            $query->whereIn('id', $staffGroupStaffIds);
+            $query->whereIn('id', $staffZoneStaffIds);
         }
 
         return $query->get();
+    }
+
+    public function staffZones()
+    {
+        return $this->belongsToMany(StaffZone::class, 'staff_to_zone', 'user_id', 'zone_id');
+    }
+
+    public function staffTimeSlots()
+    {
+        return $this->belongsToMany(TimeSlot::class, 'time_slot_to_staff', 'staff_id', 'time_slot_id');
     }
 }

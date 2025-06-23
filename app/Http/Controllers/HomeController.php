@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\File;
 use App\Models\StaffZone;
 use App\Models\ServiceCategory;
 use App\Models\Service;
-use App\Models\StaffGroup;
 use App\Models\SubTitle;
 use App\Models\TimeSlot;
 
@@ -438,22 +437,20 @@ class HomeController extends Controller
             'categories' => $allCategoriesArray,
         ];
 
-        $staffGroups = StaffGroup::with('staffZones')->get();
+        $staffZones = StaffZone::get();
 
-        $groupData = $staffGroups->map(function ($group) {
+        $zoneData = $staffZones->map(function ($zone) {
             return [
-                'id' => $group->id,
-                'group_name' => $group->name,
-                'zone' => $group->staffZones->pluck('name')->toArray(),
+                'id' => $zone->id,
+                'name' => $zone->name,
             ];
         })->toArray();
 
-        $groupDataJsonData = [
-            'groupData' => $groupData,
+        $zoneDataJsonData = [
+            'zoneData' => $zoneData,
         ];
 
         $timeSlots = TimeSlot::where('status', 1)
-            ->orderBy('group_id')
             ->orderBy('time_start')
             ->get();
 
@@ -465,7 +462,6 @@ class HomeController extends Controller
                 'time_end' => $timeSlot->time_end,
                 'date' => $timeSlot->date,
                 'type' => $timeSlot->type,
-                'group_id' => $timeSlot->group_id,
             ];
         })->toArray();
 
@@ -602,22 +598,22 @@ class HomeController extends Controller
         }
 
         try {
-            $filename = "AppGroupData.json";
+            $filename = "AppZoneData.json";
             $filePath = public_path($filename);
 
             if (File::exists($filePath)) {
-                $backupFilename = "AppGroupData_backup.json";
+                $backupFilename = "AppZoneData_backup.json";
                 $backupFilePath = public_path($backupFilename);
 
                 File::move($filePath, $backupFilePath);
 
                 $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $groupDataJsonData);
+                $updatedData = array_merge($currentData, $zoneDataJsonData);
                 File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
 
                 File::delete($backupFilePath);
             } else {
-                File::put($filePath, json_encode($groupDataJsonData, JSON_PRETTY_PRINT));
+                File::put($filePath, json_encode($zoneDataJsonData, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
             File::move($backupFilePath, $filePath);

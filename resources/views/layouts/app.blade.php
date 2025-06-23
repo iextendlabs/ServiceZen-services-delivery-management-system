@@ -228,9 +228,6 @@
                                 @can('staff-zone-list')
                                 <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
                                 @endcan
-                                @can('staff-group-list')
-                                <a class="dropdown-item" href="{{ route('staffGroups.index') }}">Staff Groups</a>
-                                @endcan
                                 @can('FAQs-list')
                                 <a class="dropdown-item" href="{{ route('FAQs.index') }}">FAQs</a>
                                 @endcan

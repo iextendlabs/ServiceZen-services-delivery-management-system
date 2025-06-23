@@ -29,7 +29,6 @@ use App\Models\ShortHoliday;
 use App\Models\Staff;
 use App\Models\StaffDriver;
 use App\Models\StaffGeneralHoliday;
-use App\Models\StaffGroup;
 use App\Models\StaffHoliday;
 use App\Models\StaffImages;
 use App\Models\TimeSlotToStaff;
@@ -123,7 +122,7 @@ class StaffAppController2 extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = User::where('email', $request->username)->first();
-            if(!$user->hasRole("Staff") && $user->freelancer_program == null){
+            if (!$user->hasRole("Staff") && $user->freelancer_program == null) {
                 return response()->json(['error' => 'These credentials do not match our records.'], 401);
             }
             if ($request->has('fcmToken') && $request->fcmToken) {
@@ -474,7 +473,7 @@ class StaffAppController2 extends Controller
             return asset('staff-images/' . $image);
         })->toArray();
         $staffYoutubeVideo = $user->staffYoutubeVideo->pluck('youtube_video')->toArray();
-        $staffGroups = $user->staffGroups->pluck('id')->toArray();
+        $staffZones = $user->staffZones->pluck('id')->toArray();
         $service_ids = $user->services()->pluck('service_id')->toArray();
         $category_ids = $user->categories()->pluck('category_id')->toArray();
         $document = $user->document;
@@ -490,10 +489,7 @@ class StaffAppController2 extends Controller
         }
 
         $subTitles = $user->subTitles->pluck('id')->toArray();
-
-        $timeSlots = TimeSlot::whereHas('staffs', function ($q) use ($request) {
-            $q->where('staff_id', $request->user_id);
-        })->pluck('id')->toArray();
+        $timeSlots = $user->staffTimeSlots->pluck('id')->toArray();
 
         $assignedDrivers = StaffDriver::where('staff_id', $request->user_id)
             ->get();
@@ -511,7 +507,7 @@ class StaffAppController2 extends Controller
             'about' => $staff->about ?? null,
             'staffImages' => $staffImages,
             'staffYoutubeVideo' => $staffYoutubeVideo,
-            'staffGroups' => $staffGroups,
+            'staffZones' => $staffZones,
             'service_ids' => $service_ids,
             'category_ids' => $category_ids,
             'document' => $userDocument,
@@ -748,38 +744,18 @@ class StaffAppController2 extends Controller
             $user->services()->sync($services);
         }
 
-        User::find($user->id)->staffGroups()->detach();
-        if ($request->has('staff_groups')) {
-            $groups = is_string($request->staff_groups)
-                ? json_decode($request->staff_groups, true)
-                : $request->staff_groups;
-            foreach ($groups as $group) {
-                $staffGroup = StaffGroup::find($group);
-
-                if (!$staffGroup->staffs()->where('staff_id', $user->id)->exists()) {
-                    $staffGroup->staffs()->attach($user->id);
-                }
-            }
-        }
-
-        TimeSlotToStaff::where('staff_id', $user->id)->delete();
-
         if ($request->has('timeSlots')) {
-            $timeSlotIds = is_string($request->timeSlots)
+            $timeSlots = is_string($request->timeSlots)
                 ? json_decode($request->timeSlots, true)
                 : $request->timeSlots;
+            $user->staffTimeSlots()->sync($timeSlots);
+        }
 
-            if (is_array($timeSlotIds)) {
-                foreach ($timeSlotIds as $timeSlotId) {
-                    $timeSlot = TimeSlot::find($timeSlotId);
-                    if ($timeSlot) {
-                        TimeSlotToStaff::create([
-                            'staff_id' => $user->id,
-                            'time_slot_id' => $timeSlot->id,
-                        ]);
-                    }
-                }
-            }
+        if ($request->has('staffZones')) {
+            $staffZones = is_string($request->staffZones)
+                ? json_decode($request->staffZones, true)
+                : $request->staffZones;
+            $user->staffZones()->sync($staffZones);
         }
 
         StaffDriver::where('staff_id', $user->id)->delete();
