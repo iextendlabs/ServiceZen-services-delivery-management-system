@@ -1222,4 +1222,26 @@
         });
     });
 </script>
+<script>
+$(document).ready(function() {
+    function sortCheckedToTop(tableId, checkboxClass) {
+        const $table = $(tableId);
+        const $rows = $table.find('tr');
+        
+        $rows.sort(function(a, b) {
+            const aChecked = $(a).find(checkboxClass).is(':checked');
+            const bChecked = $(b).find(checkboxClass).is(':checked');
+            
+            if (aChecked && !bChecked) return -1;
+            if (!aChecked && bChecked) return 1;
+            return 0;
+        });
+        
+        $table.append($rows);
+    }
+
+    sortCheckedToTop('#timeSlotTable', '.time-slot-checkbox');
+    sortCheckedToTop('#zoneTable', '.zone-checkbox');
+});
+</script>
 @endsection
