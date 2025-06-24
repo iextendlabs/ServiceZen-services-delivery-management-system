@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 margin-tb">
-            <h2>Add New Service Category</h2>
+            <h2>Update Service Category</h2>
         </div>
     </div>
     @if ($errors->any())
@@ -132,32 +132,34 @@
                     <strong>Sub Category:</strong>
                     <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
                     <table class="table table-striped table-bordered categories-table">
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                        </tr>
-                        @if(count($service_categories) > 0)
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categories-tbody">
+                            @if(count($service_categories) > 0)
+                                @php
+                                    $selectedSubcategories = old('subcategoriesIds', $childCategoryIds ?? []);
+                                @endphp
+                                @foreach ($service_categories as $category)
+                                @if($category->id != $service_category->id)
 
-                        @php
-                            // Use old input if available, otherwise use existing childCategoryIds
-                            $selectedSubcategories = old('subcategoriesIds', $childCategoryIds ?? []);
-                        @endphp
-                        @foreach ($service_categories as $category)
-                        @if($category->id != $service_category->id)
-
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="subcategoriesIds[]" value="{{ $category->id }}" {{ in_array($category->id, $selectedSubcategories) ? 'checked' : '' }}>
-                            </td>
-                            <td>{{ $category->title }}</td>
-                        </tr>
-                        @endif
-                        @endforeach
-                        @else
-                        <tr>
-                            <td colspan="2" class="text-center">No categories found</td>
-                        </tr>
-                        @endif
+                                <tr>
+                                    <td>
+                                        <input class="category-checkbox" type="checkbox" name="subcategoriesIds[]" value="{{ $category->id }}" {{ in_array($category->id, $selectedSubcategories) ? 'checked' : '' }}>
+                                    </td>
+                                    <td>{{ $category->title }}</td>
+                                </tr>
+                                @endif
+                                @endforeach
+                            @else
+                            <tr>
+                                <td colspan="2" class="text-center">No categories found</td>
+                            </tr>
+                            @endif
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -199,5 +201,26 @@
             });
         });
     });
+</script>
+<script>
+$(document).ready(function() {
+    function sortCheckedToTop(tableId, checkboxClass) {
+        const $table = $(tableId);
+        const $rows = $table.find('tr');
+        
+        $rows.sort(function(a, b) {
+            const aChecked = $(a).find(checkboxClass).is(':checked');
+            const bChecked = $(b).find(checkboxClass).is(':checked');
+            
+            if (aChecked && !bChecked) return -1;
+            if (!aChecked && bChecked) return 1;
+            return 0;
+        });
+        
+        $table.append($rows);
+    }
+
+    sortCheckedToTop('#categories-tbody', '.category-checkbox');
+});
 </script>
 @endsection
