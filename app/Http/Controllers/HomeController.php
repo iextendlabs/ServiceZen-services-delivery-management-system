@@ -411,19 +411,8 @@ class HomeController extends Controller
 
         $this->saveJsonFile('StaffAppServicesData.json', $jsonData);
 
-        $filePath = public_path('updatesDatetime.json');
-        $now = Carbon::now()->toDateTimeString();
+        $this->updateVersion('services');
 
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
-            $data = json_decode($json, true) ?? [];
-        } else {
-            $data = [];
-        }
-
-        $data["services"] = $now;
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     public function appServicesData()
@@ -471,19 +460,8 @@ class HomeController extends Controller
 
         $this->saveJsonFile('AppSubTitles.json', $jsonData);
 
-        $filePath = public_path('updatesDatetime.json');
-        $now = Carbon::now()->toDateTimeString();
+        $this->updateVersion('subtitles');
 
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
-            $data = json_decode($json, true) ?? [];
-        } else {
-            $data = [];
-        }
-
-        $data["subtitles"] = $now;
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     public function appCategories()
@@ -504,19 +482,8 @@ class HomeController extends Controller
 
         $this->saveJsonFile('AppCategories.json', $jsonData);
 
-        $filePath = public_path('updatesDatetime.json');
-        $now = Carbon::now()->toDateTimeString();
+        $this->updateVersion('categories');
 
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
-            $data = json_decode($json, true) ?? [];
-        } else {
-            $data = [];
-        }
-
-        $data["categories"] = $now;
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     public function appZoneData()
@@ -536,19 +503,8 @@ class HomeController extends Controller
 
         $this->saveJsonFile('AppZoneData.json', $jsonData);
 
-        $filePath = public_path('updatesDatetime.json');
-        $now = Carbon::now()->toDateTimeString();
+        $this->updateVersion('zones');
 
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
-            $data = json_decode($json, true) ?? [];
-        } else {
-            $data = [];
-        }
-
-        $data["zones"] = $now;
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     public function appTimeSlotsData()
@@ -574,19 +530,7 @@ class HomeController extends Controller
 
         $this->saveJsonFile('AppTimeSlotsData.json', $jsonData);
 
-        $filePath = public_path('updatesDatetime.json');
-        $now = Carbon::now()->toDateTimeString();
-
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
-            $data = json_decode($json, true) ?? [];
-        } else {
-            $data = [];
-        }
-
-        $data["timeSlots"] = $now;
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+        $this->updateVersion('timeSlots');
     }
 
     public function appDriverData()
@@ -606,19 +550,7 @@ class HomeController extends Controller
 
         $this->saveJsonFile('AppDriverData.json', $jsonData);
 
-        $filePath = public_path('updatesDatetime.json');
-        $now = Carbon::now()->toDateTimeString();
-
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
-            $data = json_decode($json, true) ?? [];
-        } else {
-            $data = [];
-        }
-
-        $data["drivers"] = $now;
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+        $this->updateVersion('drivers');
     }
 
     public function saveJsonFile($filename, $data)
@@ -646,5 +578,25 @@ class HomeController extends Controller
             }
             throw $e;
         }
+    }
+
+    private function updateVersion($var)
+    {
+        $filePath = public_path('updatesDataVersion.json');
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        if (isset($data[$var])) {
+            $data[$var] = (int)$data[$var] + 1;
+        } else {
+            $data[$var] = 1;
+        }
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
