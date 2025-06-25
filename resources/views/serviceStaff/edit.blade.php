@@ -702,26 +702,23 @@
                             <span style="color: red;">*</span><strong>Category:</strong>
                             <input type="text" name="search-category" id="search-category" class="form-control" placeholder="Search category By Name, Price And Duration">
                             <table class="table table-striped table-bordered category-table">
-                                <tr>
-                                    <th></th>
-                                    <th>Title</th>
-                                </tr>
-                                <tr>
-                                    <td>
+                                <thead>
+                                    <tr>
+                                        <th> <input type="checkbox" class="category-checkbox" name="category" value="all"> </th>
+                                        <th>Title</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="category-table-body">
+                                    @foreach ($categories as $category)
+                                    <tr>
+                                        <td>
 
-                                        <input type="checkbox" class="category-checkbox" name="category" value="all">
-                                    </td>
-                                    <td>All</td>
-                                </tr>
-                                @foreach ($categories as $category)
-                                <tr>
-                                    <td>
-
-                                        <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" {{ in_array($category->id, old('category_ids', $category_ids)) ? 'checked' : '' }}>
-                                    </td>
-                                    <td>{{ $category->title }}</td>
-                                </tr>
-                                @endforeach
+                                            <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" {{ in_array($category->id, old('category_ids', $category_ids)) ? 'checked' : '' }}>
+                                        </td>
+                                        <td>{{ $category->title }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -731,31 +728,28 @@
                             <span style="color: red;">*</span><strong>Services:</strong>
                             <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name, Price And Duration">
                             <table class="table table-striped table-bordered services-table">
-                                <tr>
-                                    <th></th>
-                                    <th>Name</th>
-                                    <th>Price</th>
-                                    <th>Duration</th>
-                                </tr>
-                                <tr>
-                                    <td>
+                                <thead>
+                                    <tr>
+                                        <th> <input type="checkbox" class="service-checkbox" name="service" value="all"> </th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="service-table-body">
+                                    @foreach ($services as $service)
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" {{ in_array($service->id, old('service_ids', $service_ids)) ? 'checked' : '' }}>
+                                        </td>
+                                        <td>{{ $service->name }}</td>
 
-                                        <input type="checkbox" class="service-checkbox" name="service" value="all">
-                                    </td>
-                                    <td>All</td>
-                                </tr>
-                                @foreach ($services as $service)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" {{ in_array($service->id, old('service_ids', $service_ids)) ? 'checked' : '' }}>
-                                    </td>
-                                    <td>{{ $service->name }}</td>
-
-                                    <td>{{ isset($service->discount) ? 
-                                    $service->discount : $service->price }}</td>
-                                    <td>{{ $service->duration ?? ""}}</td>
-                                </tr>
-                                @endforeach
+                                        <td>{{ isset($service->discount) ? 
+                                        $service->discount : $service->price }}</td>
+                                        <td>{{ $service->duration ?? ""}}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -1242,6 +1236,8 @@ $(document).ready(function() {
 
     sortCheckedToTop('#timeSlotTable', '.time-slot-checkbox');
     sortCheckedToTop('#zoneTable', '.zone-checkbox');
+    sortCheckedToTop('#category-table-body', '.category-checkbox');
+    sortCheckedToTop('#service-table-body', '.service-checkbox');
 });
 </script>
 @endsection

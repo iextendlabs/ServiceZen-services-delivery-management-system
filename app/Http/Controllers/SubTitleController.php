@@ -41,7 +41,7 @@ class SubTitleController extends Controller
         $filters = $request->only(['name']);
 
         $subTitles->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-        return view('subTitles.index', compact('total_sub_title','subTitles','filter', 'direction'))
+        return view('subTitles.index', compact('total_sub_title', 'subTitles', 'filter', 'direction'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -62,13 +62,15 @@ class SubTitleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, HomeController $homeController)
     {
         $request->validate([
             'name' => 'required|string|unique:sub_titles,name',
         ]);
 
         SubTitle::create($request->all());
+
+        $homeController->appSubTitles();
 
         return redirect()->route('subTitles.index')
             ->with('success', 'Sub Title / Designation created successfully.');
@@ -100,7 +102,7 @@ class SubTitleController extends Controller
         return view('subTitles.edit', compact('subTitle'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, HomeController $homeController)
     {
         $request->validate([
             'name' => 'required|string|unique:sub_titles,name,' . $id,
@@ -109,6 +111,8 @@ class SubTitleController extends Controller
         $subTitle = SubTitle::find($id);
 
         $subTitle->update($request->all());
+
+        $homeController->appSubTitles();
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -121,12 +125,14 @@ class SubTitleController extends Controller
      * @param  \App\SubTitle  $subTitle
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, HomeController $homeController)
     {
         $subTitle = SubTitle::find($id);
         $subTitle->delete();
 
         $previousUrl = url()->previous();
+
+        $homeController->appSubTitles();
 
         return redirect($previousUrl)
             ->with('success', 'Sub Title / Designation deleted successfully');

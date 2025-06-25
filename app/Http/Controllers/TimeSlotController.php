@@ -63,7 +63,7 @@ class TimeSlotController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, HomeController $homeController)
     {
         $request->validate([
             'name' => 'required',
@@ -131,6 +131,8 @@ class TimeSlotController extends Controller
             TimeSlot::create($input);
         }
 
+        $homeController->appTimeSlotsData();
+
         return redirect()->route('timeSlots.index')
             ->with('success', 'Time slot created successfully.');
     }
@@ -160,7 +162,7 @@ class TimeSlotController extends Controller
         return view('timeSlots.edit', compact('time_slot'));
     }
 
-    public function update(Request $request, TimeSlot $timeSlot)
+    public function update(Request $request, TimeSlot $timeSlot, HomeController $homeController)
     {
         $request->validate([
             'name' => 'required',
@@ -242,6 +244,8 @@ class TimeSlotController extends Controller
             $timeSlot->update($input);
         }
 
+        $homeController->appTimeSlotsData();
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Time slot update successfully.');
@@ -253,13 +257,15 @@ class TimeSlotController extends Controller
      * @param  \App\TimeSlot  $time_slot
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, HomeController $homeController)
     {
         $time_slot = TimeSlot::find($id);
 
         $time_slot->delete();
 
         StaffDriver::where('time_slot_id', $id)->delete();
+
+        $homeController->appTimeSlotsData();
 
         $previousUrl = url()->previous();
 
