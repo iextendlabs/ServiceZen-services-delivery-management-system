@@ -57,7 +57,7 @@ class StaffZoneController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, HomeController $homeController)
     {
         request()->validate([
             'name' => 'required',
@@ -71,6 +71,8 @@ class StaffZoneController extends Controller
         } else {
             $staffZone = StaffZone::create($request->all());
         }
+
+        $homeController->appZoneData();
 
         return redirect()->route('staffZones.index')
                         ->with('success','Staff Zone created successfully.');
@@ -99,7 +101,7 @@ class StaffZoneController extends Controller
         return view('staffZones.edit', compact('staffZone','currencies'));
     }
     
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, HomeController $homeController)
     {
         request()->validate([
             'name' => 'required',
@@ -109,6 +111,8 @@ class StaffZoneController extends Controller
         $staffZone = StaffZone::find($id);
             
         $staffZone->update($request->all());
+
+        $homeController->appZoneData();
 
         return redirect()->route('staffZones.index')
                         ->with('success','Staff Zone update successfully.');
@@ -120,11 +124,12 @@ class StaffZoneController extends Controller
      * @param  \App\StaffZone  $staffZone
      * @return \Illuminate\Http\Response
      */
-    public function destroy(StaffZone $staffZone)
+    public function destroy(StaffZone $staffZone, HomeController $homeController)
     {
         
         $staffZone->delete();
 
+        $homeController->appZoneData();
         
         return redirect()->route('staffZones.index')
                         ->with('success','Staff Zone deleted successfully');

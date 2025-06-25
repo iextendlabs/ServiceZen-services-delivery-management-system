@@ -83,7 +83,7 @@ class ServiceCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request,HomeController $homeController)
     {
         request()->validate([
             'title' => 'required',
@@ -116,6 +116,9 @@ class ServiceCategoryController extends Controller
             ServiceCategory::whereIn('id', $request->subcategoriesIds)
                 ->update(['parent_id' => $service_category->id]);
         }
+
+        $homeController->appData();
+        $homeController->appCategories();
 
         return redirect()->route('serviceCategories.index')
             ->with('success', 'Service Category created successfully.');
@@ -154,7 +157,7 @@ class ServiceCategoryController extends Controller
 
         return view('service_categories.edit', compact('service_category', 'childCategoryIds', 'service_categories'));
     }
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, HomeController $homeController)
     {
         request()->validate([
             'title' => 'required',
@@ -204,6 +207,9 @@ class ServiceCategoryController extends Controller
                 ->update(['parent_id' => $service_category->id]);
         }
 
+        $homeController->appData();
+        $homeController->appCategories();
+
         return redirect()->route('serviceCategories.index')
             ->with('success', 'Service Category Update successfully.');
     }
@@ -214,7 +220,7 @@ class ServiceCategoryController extends Controller
      * @param  \App\ServiceCategory  $service_category
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, HomeController $homeController)
     {
         $service_category = ServiceCategory::find($id);
         //delete image for service_category
@@ -231,6 +237,9 @@ class ServiceCategoryController extends Controller
         }
         $service_category->delete();
 
+        $homeController->appData();
+        $homeController->appCategories();
+        
         return redirect()->route('serviceCategories.index')
             ->with('success', 'Service Category deleted successfully');
     }

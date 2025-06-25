@@ -70,7 +70,7 @@ class DriverController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, HomeController $homeController)
     {
         $this->validate($request, [
             'name' => 'required',
@@ -92,6 +92,9 @@ class DriverController extends Controller
         $input['user_id'] = $driver->id;
         
         Driver::create($input);
+
+        $homeController->appDriverData();
+        
         return redirect()->route('drivers.index')
                         ->with('success','Driver created successfully.');
     }
@@ -130,7 +133,7 @@ class DriverController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, HomeController $homeController)
     {
         $this->validate($request, [
             'name' => 'required',
@@ -160,6 +163,9 @@ class DriverController extends Controller
         } else {
             Driver::create($input);
         }
+
+        $homeController->appDriverData();
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
                         ->with('success','Driver updated successfully');
@@ -171,13 +177,15 @@ class DriverController extends Controller
      * @param  \App\User  $driver
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $driver)
+    public function destroy(User $driver, HomeController $homeController)
     {
         $driver->delete();
     
         $previousUrl = url()->previous();
 
         StaffDriver::where('driver_id',$driver->id)->delete();
+
+        $homeController->appDriverData();
 
         return redirect($previousUrl)
                         ->with('success','Driver deleted successfully');

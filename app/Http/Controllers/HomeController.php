@@ -230,6 +230,21 @@ class HomeController extends Controller
 
     public function appJsonData()
     {
+        $this->appData();
+        $this->staffAppServicesData();
+        $this->appServicesData();
+        $this->appSubTitles();
+        $this->appCategories();
+        $this->appZoneData();
+        $this->appTimeSlotsData();
+        $this->appDriverData();
+
+        return redirect()->back()
+            ->with('success', 'App Data updated successfully');
+    }
+
+    public function appData()
+    {
         $services = [];
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
@@ -374,6 +389,45 @@ class HomeController extends Controller
             'in_app_browsing' => $in_app_browsing
         ];
 
+        $this->saveJsonFile('AppHomeData.json', $jsonData);
+    }
+
+    public function staffAppServicesData()
+    {
+        $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+
+        $filteredServicesArray = $allServices->map(function ($service) {
+            $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            return [
+                'id' => $service->id,
+                'name' => $service->name,
+                'category_id' => $categoryIds,
+            ];
+        })->toArray();
+
+        $jsonData = [
+            'services' => $filteredServicesArray,
+        ];
+
+        $this->saveJsonFile('StaffAppServicesData.json', $jsonData);
+
+        $filePath = public_path('updatesDatetime.json');
+        $now = Carbon::now()->toDateTimeString();
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        $data["services"] = $now;
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function appServicesData()
+    {
         $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
 
         $allServicesArray = $allServices->map(function ($service) {
@@ -393,23 +447,15 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $servicesJsonData = [
+        $jsonData = [
             'services' => $allServicesArray,
         ];
 
-        $filteredServicesArray = $allServices->map(function ($service) {
-            $categoryIds = collect($service->categories)->pluck('id')->toArray();
-            return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'category_id' => $categoryIds,
-            ];
-        })->toArray();
+        $this->saveJsonFile('AppServicesData.json', $jsonData);
+    }
 
-        $filteredServicesJsonData = [
-            'services' => $filteredServicesArray,
-        ];
-
+    public function appSubTitles()
+    {
         $allSubTitles = SubTitle::all();
 
         $allSubTitlesArray = $allSubTitles->map(function ($subTitle) {
@@ -419,10 +465,29 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $subTitlesJsonData = [
+        $jsonData = [
             'subTitles' => $allSubTitlesArray,
         ];
 
+        $this->saveJsonFile('AppSubTitles.json', $jsonData);
+
+        $filePath = public_path('updatesDatetime.json');
+        $now = Carbon::now()->toDateTimeString();
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        $data["subtitles"] = $now;
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function appCategories()
+    {
         $allCategories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
 
         $allCategoriesArray = $allCategories->map(function ($category) {
@@ -433,10 +498,29 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $categoriesJsonData = [
+        $jsonData = [
             'categories' => $allCategoriesArray,
         ];
 
+        $this->saveJsonFile('AppCategories.json', $jsonData);
+
+        $filePath = public_path('updatesDatetime.json');
+        $now = Carbon::now()->toDateTimeString();
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        $data["categories"] = $now;
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function appZoneData()
+    {
         $staffZones = StaffZone::get();
 
         $zoneData = $staffZones->map(function ($zone) {
@@ -446,10 +530,29 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $zoneDataJsonData = [
+        $jsonData = [
             'zoneData' => $zoneData,
         ];
 
+        $this->saveJsonFile('AppZoneData.json', $jsonData);
+
+        $filePath = public_path('updatesDatetime.json');
+        $now = Carbon::now()->toDateTimeString();
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        $data["zones"] = $now;
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function appTimeSlotsData()
+    {
         $timeSlots = TimeSlot::where('status', 1)
             ->orderBy('time_start')
             ->get();
@@ -465,10 +568,29 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $timeSlotsJsonData = [
+        $jsonData = [
             'timeSlots' => $timeSlotsData,
         ];
 
+        $this->saveJsonFile('AppTimeSlotsData.json', $jsonData);
+
+        $filePath = public_path('updatesDatetime.json');
+        $now = Carbon::now()->toDateTimeString();
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        $data["timeSlots"] = $now;
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function appDriverData()
+    {
         $drivers = User::role('Driver')->orderBy('name')->get();
 
         $driversData = $drivers->map(function ($driver) {
@@ -478,196 +600,51 @@ class HomeController extends Controller
             ];
         })->toArray();
 
-        $driversJsonData = [
+        $jsonData = [
             'drivers' => $driversData,
         ];
 
+        $this->saveJsonFile('AppDriverData.json', $jsonData);
+
+        $filePath = public_path('updatesDatetime.json');
+        $now = Carbon::now()->toDateTimeString();
+
+        if (File::exists($filePath)) {
+            $json = File::get($filePath);
+            $data = json_decode($json, true) ?? [];
+        } else {
+            $data = [];
+        }
+
+        $data["drivers"] = $now;
+
+        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function saveJsonFile($filename, $data)
+    {
         try {
-            $filename = "AppHomeData.json";
             $filePath = public_path($filename);
 
             if (File::exists($filePath)) {
-                $backupFilename = "AppHomeData_backup.json";
+                $backupFilename = pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
                 $backupFilePath = public_path($backupFilename);
 
                 File::move($filePath, $backupFilePath);
 
                 $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $jsonData);
+                $updatedData = array_merge($currentData, $data);
                 File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
 
                 File::delete($backupFilePath);
             } else {
-                File::put($filePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+                File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-        try {
-            $filename = "StaffAppServicesData.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "StaffAppServicesData_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $filteredServicesJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($filteredServicesJsonData, JSON_PRETTY_PRINT));
+            if (isset($backupFilePath) && File::exists($backupFilePath)) {
+                File::move($backupFilePath, $filePath);
             }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
             throw $e;
         }
-
-        try {
-            $filename = "AppServicesData.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "AppServicesData_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $servicesJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($servicesJsonData, JSON_PRETTY_PRINT));
-            }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-        try {
-            $filename = "AppSubTitles.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "AppSubTitles_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $subTitlesJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($subTitlesJsonData, JSON_PRETTY_PRINT));
-            }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-        try {
-            $filename = "AppCategories.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "AppCategories_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $categoriesJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($categoriesJsonData, JSON_PRETTY_PRINT));
-            }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-        try {
-            $filename = "AppZoneData.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "AppZoneData_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $zoneDataJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($zoneDataJsonData, JSON_PRETTY_PRINT));
-            }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-        try {
-            $filename = "AppTimeSlotsData.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "AppTimeSlotsData_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $timeSlotsJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($timeSlotsJsonData, JSON_PRETTY_PRINT));
-            }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-        try {
-            $filename = "AppDriverData.json";
-            $filePath = public_path($filename);
-
-            if (File::exists($filePath)) {
-                $backupFilename = "AppDriverData_backup.json";
-                $backupFilePath = public_path($backupFilename);
-
-                File::move($filePath, $backupFilePath);
-
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $driversJsonData);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                File::delete($backupFilePath);
-            } else {
-                File::put($filePath, json_encode($driversJsonData, JSON_PRETTY_PRINT));
-            }
-        } catch (\Exception $e) {
-            File::move($backupFilePath, $filePath);
-            throw $e;
-        }
-
-
-        return redirect()->back()
-            ->with('success', 'App Data updated successfully');
     }
 }

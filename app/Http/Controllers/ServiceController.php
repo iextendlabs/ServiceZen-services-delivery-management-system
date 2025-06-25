@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
 
 class ServiceController extends Controller
 {
@@ -239,7 +240,9 @@ class ServiceController extends Controller
             $service->save();
         }
 
-        $homeController->appJsonData();
+        $homeController->appData();
+        $homeController->appServicesData();
+        $homeController->staffAppServicesData();
 
         return redirect()->route('services.edit',$service->id)
             ->with('success', 'Service created successfully.');
@@ -491,7 +494,9 @@ class ServiceController extends Controller
             }
         }
 
-        $homeController->appJsonData();
+        $homeController->appData();
+        $homeController->appServicesData();
+        $homeController->staffAppServicesData();
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -540,7 +545,10 @@ class ServiceController extends Controller
 
         ServiceToUserNote::where('service_id', $service->id)->delete();
         $previousUrl = url()->previous();
-        $homeController->appJsonData();
+
+        $homeController->appData();
+        $homeController->appServicesData();
+        $homeController->staffAppServicesData();
 
         return redirect($previousUrl)
             ->with('success', 'Service deleted successfully');
@@ -571,7 +579,10 @@ class ServiceController extends Controller
 
                 $service->delete();
             }
-            $homeController->appJsonData();
+
+            $homeController->appData();
+            $homeController->appServicesData();
+            $homeController->staffAppServicesData();
 
             return response()->json(['message' => 'Selected items deleted successfully.']);
         } else {
@@ -597,7 +608,9 @@ class ServiceController extends Controller
                 $copiedService->save();
             }
 
-            $homeController->appJsonData();
+            $homeController->appData();
+            $homeController->appServicesData();
+            $homeController->staffAppServicesData();
 
             return response()->json(['message' => 'Selected items Copy successfully.']);
         } elseif ($new_variant && $service_id) {
@@ -609,7 +622,9 @@ class ServiceController extends Controller
             $copiedService->type = 'Variant';
             $copiedService->save();
 
-            $homeController->appJsonData();
+            $homeController->appData();
+            $homeController->appServicesData();
+            $homeController->staffAppServicesData();
 
             return response()->json(['service_id' => $copiedService->id]);
         } else {
@@ -630,11 +645,13 @@ class ServiceController extends Controller
                 $service->save();
             }
             
-            $homeController->appJsonData();
+            $homeController->appData();
+            $homeController->appServicesData();
+            $homeController->staffAppServicesData();
 
             return response()->json(['message' => 'Selected items Edit successfully.']);
         } else {
             return response()->json(['message' => 'No items selected.']);
         }
-    }
+    }  
 }
