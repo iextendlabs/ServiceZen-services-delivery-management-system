@@ -313,6 +313,11 @@
                                 </div>
                             </div>
                             <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <div class="mb-2">
+                                    <button type="button" id="addSlotBtn" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus"></i> Add New Time Slot
+                                    </button>
+                                </div>
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -322,6 +327,7 @@
                                             <th>Name</th>
                                             <th>Start Time</th>
                                             <th>End Time</th>
+                                            <th width="50px">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="timeSlotTable">
@@ -334,6 +340,7 @@
                                             <td class="slot-name">{{ $timeSlot->name }}</td>
                                             <td class="start-time">{{ \Carbon\Carbon::parse($timeSlot->time_start)->format('h:i A') }}</td>
                                             <td class="end-time">{{ \Carbon\Carbon::parse($timeSlot->time_end)->format('h:i A') }}</td>
+                                            <td></td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -354,6 +361,11 @@
                                 </div>
                             </div>
                             <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <div class="mb-2">
+                                    <button type="button" id="addZoneBtn" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus"></i> Add New Zone
+                                    </button>
+                                </div>
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -362,6 +374,7 @@
                                             </th>
                                             <th>Name</th>
                                             <th>Description</th>
+                                            <th width="50px">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="zoneTable">
@@ -373,6 +386,7 @@
                                             </td>
                                             <td class="zone-name">{{ $zone->name }}</td>
                                             <td>{{ $zone->description ?? 'N/A' }}</td>
+                                            <td></td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -774,52 +788,160 @@
     });
 </script>
 <script>
-$(document).ready(function() {
-    // Time Slot Search and Filter
-    $('#timeSlotSearch, #startTimeFilter, #endTimeFilter').on('keyup', function() {
-        filterTimeSlots();
-    });
-
-    function filterTimeSlots() {
-        const nameSearch = $('#timeSlotSearch').val().toLowerCase();
-        const startTime = $('#startTimeFilter').val().toLowerCase();
-        const endTime = $('#endTimeFilter').val().toLowerCase();
-
-        $('.time-slot-row').each(function() {
-            const $row = $(this);
-            const name = $row.find('.slot-name').text().toLowerCase();
-            const start = $row.find('.start-time').text().toLowerCase();
-            const end = $row.find('.end-time').text().toLowerCase();
-
-            const nameMatch = name.includes(nameSearch);
-            const startMatch = startTime ? start.includes(startTime) : true;
-            const endMatch = endTime ? end.includes(endTime) : true;
-
-            $row.toggle(nameMatch && startMatch && endMatch);
+    $(document).ready(function() {
+        // Add new time slot row
+        $('#addSlotBtn').click(function() {
+            const newSlotCount = $('.new-time-slot').length;
+            const newRow = $(`
+                <tr class="time-slot-row new-time-slot">
+                    <td>
+                        <input type="checkbox" class="time-slot-checkbox" disabled>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span style="color: red; margin-right: 4px;">*</span>
+                            <input type="text" required name="new_time_slots[${newSlotCount}][name]" class="form-control form-control-sm new-slot-name" placeholder="Slot name">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span style="color: red; margin-right: 4px;">*</span>
+                            <input type="time" required name="new_time_slots[${newSlotCount}][time_start]" class="form-control form-control-sm new-start-time">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span style="color: red; margin-right: 4px;">*</span>
+                            <input type="time" required name="new_time_slots[${newSlotCount}][time_end]" class="form-control form-control-sm new-end-time">
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-time-slot-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+            
+            $('#timeSlotTable').prepend(newRow);
+            
+            // Add event listener to remove button
+            newRow.find('.remove-time-slot-btn').click(function() {
+                newRow.remove();
+                // Re-index remaining time slots if needed
+                $('.new-time-slot').each(function(index) {
+                    $(this).find('[name^="new_time_slots"]').each(function() {
+                        const name = $(this).attr('name').replace(/\[\d+\]/, `[${index}]`);
+                        $(this).attr('name', name);
+                    });
+                });
+            });
         });
+
+        // Search functionality
+        $('#timeSlotSearch').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $('.time-slot-row').each(function() {
+                const $row = $(this);
+                const name = $row.find('.slot-name').text().toLowerCase() || 
+                            $row.find('.new-slot-name').val().toLowerCase();
+                $row.toggle(name.includes(searchTerm));
+            });
+        });
+
+        // Time filter functionality
+        function filterByTime() {
+            const startFilter = $('#startTimeFilter').val().toLowerCase();
+            const endFilter = $('#endTimeFilter').val().toLowerCase();
+            
+            $('.time-slot-row').each(function() {
+                const $row = $(this);
+                const startTime = $row.find('.start-time').text().toLowerCase() || 
+                                $row.find('.new-start-time').val().toLowerCase();
+                const endTime = $row.find('.end-time').text().toLowerCase() || 
+                                $row.find('.new-end-time').val().toLowerCase();
+                
+                const matchesStart = !startFilter || (startTime && startTime.includes(startFilter));
+                const matchesEnd = !endFilter || (endTime && endTime.includes(endFilter));
+                
+                $row.toggle(matchesStart && matchesEnd);
+            });
+        }
         
-        // Reset "Select All" checkbox when filtering
-        $('#selectAllTimeSlots').prop('checked', false);
-    }
-
-    // Zone Search
-    $('#zoneSearch').on('keyup', function() {
-        const searchText = $(this).val().toLowerCase();
-        $('.zone-row').each(function() {
-            const name = $(this).find('.zone-name').text().toLowerCase();
-            $(this).toggle(name.includes(searchText));
+        $('#startTimeFilter, #endTimeFilter').on('input', filterByTime);
+        
+        // Select all functionality
+        $('#selectAllTimeSlots').change(function() {
+            const isChecked = $(this).prop('checked');
+            $('.time-slot-checkbox:not(:disabled)').prop('checked', isChecked);
         });
-        $('#selectAllZones').prop('checked', false);
     });
+</script>
 
-    // Select All Checkboxes
-    $('#selectAllTimeSlots').change(function() {
-        $('.time-slot-row:visible .time-slot-checkbox').prop('checked', this.checked);
-    });
+<script>
+    $(document).ready(function() {
+        // Add new zone row
+        $('#addZoneBtn').click(function() {
+            const newZoneCount = $('.new-zone').length;
+            const newRow = $(`
+                <tr class="zone-row new-zone">
+                    <td>
+                        <input type="checkbox" class="zone-checkbox" disabled>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span style="color: red; margin-right: 4px;">*</span>
+                            <input type="text" name="new_zones[${newZoneCount}][name]" required class="form-control form-control-sm new-zone-name" placeholder="Zone name">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span style="color: red; margin-right: 4px;">*</span>
+                            <input type="text" name="new_zones[${newZoneCount}][description]" required class="form-control form-control-sm new-zone-desc" placeholder="Description">
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-zone-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+            
+            $('#zoneTable').prepend(newRow);
+            
+            // Add event listener to remove button
+            newRow.find('.remove-zone-btn').click(function() {
+                newRow.remove();
+                // Re-index remaining zones if needed
+                $('.new-zone').each(function(index) {
+                    $(this).find('[name^="new_zones"]').each(function() {
+                        const name = $(this).attr('name').replace(/\[\d+\]/, `[${index}]`);
+                        $(this).attr('name', name);
+                    });
+                });
+            });
+        });
 
-    $('#selectAllZones').change(function() {
-        $('.zone-row:visible .zone-checkbox').prop('checked', this.checked);
+        // Search functionality
+        $('#zoneSearch').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $('.zone-row').each(function() {
+                const $row = $(this);
+                const name = $row.find('.zone-name').text().toLowerCase() || 
+                            $row.find('.new-zone-name').val().toLowerCase();
+                const desc = $row.find('td:eq(2)').text().toLowerCase() || 
+                            $row.find('.new-zone-desc').val().toLowerCase();
+                
+                $row.toggle(name.includes(searchTerm) || desc.includes(searchTerm));
+            });
+        });
+
+        // Select all functionality
+        $('#selectAllZones').change(function() {
+            const isChecked = $(this).prop('checked');
+            $('.zone-checkbox:not(:disabled)').prop('checked', isChecked);
+        });
     });
-});
 </script>
 @endsection

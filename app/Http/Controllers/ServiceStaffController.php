@@ -170,7 +170,7 @@ class ServiceStaffController extends Controller
         $subTitles = SubTitle::all();
 
         $staffZones = StaffZone::get();
-        $timeSlots = TimeSlot::where('status', 1)->get();
+        $timeSlots = TimeSlot::get();
         return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services', 'documents', 'subTitles', 'staffZones', 'timeSlots'));
     }
 
@@ -298,13 +298,14 @@ class ServiceStaffController extends Controller
             }
         }
 
-        if ($request->has('time_slots')) {
-            $ServiceStaff->staffTimeSlots()->sync($request->time_slots);
+        $timeSlotIds = $this->handleTimeSlots($request, new HomeController());
+        if (!empty($timeSlotIds)) {
+            $ServiceStaff->staffTimeSlots()->sync($timeSlotIds);
         }
 
-        // Assign Zones
-        if ($request->has('zones')) {
-            $ServiceStaff->staffZones()->sync($request->zones);
+        $zoneIds = $this->handleZones($request, new HomeController());
+        if (!empty($zoneIds)) {
+            $ServiceStaff->staffZones()->sync($zoneIds);
         }
 
         return redirect()->route('serviceStaff.index')
@@ -562,10 +563,19 @@ class ServiceStaffController extends Controller
                 }
             }
         }
+        $serviceStaff->staffTimeSlots()->sync([]);
 
-        $serviceStaff->staffTimeSlots()->sync($request->time_slots);
+        $timeSlotIds = $this->handleTimeSlots($request, new HomeController());
+        if (!empty($timeSlotIds)) {
+            $serviceStaff->staffTimeSlots()->sync($timeSlotIds);
+        }
 
-        $serviceStaff->staffZones()->sync($request->zones);
+        $serviceStaff->staffZones()->sync([]);
+
+        $zoneIds = $this->handleZones($request, new HomeController());
+        if (!empty($zoneIds)) {
+            $serviceStaff->staffZones()->sync($zoneIds);
+        }
 
         $previousUrl = $request->url;
         return redirect($previousUrl)
@@ -724,5 +734,102 @@ class ServiceStaffController extends Controller
 
         return redirect()->back()
             ->with('success', 'Time slots assigned successfully');
+    }
+
+    protected function handleTimeSlots($request, $homeController)
+    {
+        $timeSlotIds = [];
+
+        if ($request->has('time_slots')) {
+            $timeSlotIds = $request->time_slots;
+        }
+
+        if ($request->has('new_time_slots')) {
+            foreach ($request->new_time_slots as $newTimeSlot) {
+                if (empty($newTimeSlot['name']) || empty($newTimeSlot['time_start']) || empty($newTimeSlot['time_end'])) {
+                    continue;
+                }
+                $timeId = $this->timeSlotStore($newTimeSlot);
+
+                $timeSlotIds[] = $timeId;
+            }
+        }
+
+        $homeController->appTimeSlotsData();
+
+        return $timeSlotIds;
+    }
+
+    protected function timeSlotStore($newTimeSlot)
+    {
+
+        $exists = null;
+
+        $exists = TimeSlot::whereNull('date')
+            ->where('time_start', $newTimeSlot['time_start'])
+            ->where('time_end', $newTimeSlot['time_end'])
+            ->first();
+
+        if ($exists) {
+            return $exists->id;
+        }
+
+        $timeStart = Carbon::createFromFormat('H:i', $newTimeSlot['time_start']);
+        $timeEnd = Carbon::createFromFormat('H:i', $newTimeSlot['time_end']);
+
+        $carbonTimeStart = Carbon::parse($newTimeSlot['time_start']);
+        $start_time_to_sec = $carbonTimeStart->hour * 3600 + $carbonTimeStart->minute * 60 + $carbonTimeStart->second;
+
+        $carbonTimeEnd = Carbon::parse($newTimeSlot['time_end']);
+        $end_time_to_sec = $carbonTimeEnd->hour * 3600 + $carbonTimeEnd->minute * 60 + $carbonTimeEnd->second;
+
+        if ($timeStart->hour >= 12 && $timeEnd->hour < 12) {
+            $end_time_to_sec = $end_time_to_sec + 86400;
+        }
+
+        $timeSlot = TimeSlot::create([
+            'name' => $newTimeSlot['name'],
+            'time_start' => $newTimeSlot['time_start'],
+            'time_end' => $newTimeSlot['time_end'],
+            'start_time_to_sec' => $start_time_to_sec,
+            'end_time_to_sec' => $end_time_to_sec,
+            'status' => 1,
+            'type' => 'General',
+            'seat' => 1
+        ]);
+
+        return $timeSlot->id;
+    }
+
+    protected function handleZones($request, $homeController)
+    {
+        $zoneIds = [];
+
+        if ($request->has('zones')) {
+            $zoneIds = $request->zones;
+        }
+
+        if ($request->has('new_zones')) {
+            foreach ($request->new_zones as $newZone) {
+                if (empty($newZone['name'])) {
+                    continue;
+                }
+                $zone = StaffZone::where('name', $newZone['name'])->first();
+                if ($zone) {
+                    $zoneIds[] = $zone->id;
+                } else {
+                    $zone = StaffZone::create([
+                        'name' => $newZone['name'],
+                        'description' => $newZone['description'] ?? null,
+                    ]);
+
+                    $zoneIds[] = $zone->id;
+                }
+            }
+        }
+
+        $homeController->appZoneData();
+
+        return $zoneIds;
     }
 }
