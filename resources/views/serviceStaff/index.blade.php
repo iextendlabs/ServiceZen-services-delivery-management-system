@@ -140,6 +140,36 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
+                                <label><strong>Zone Assignment:</strong></label>
+                                <select name="assignedZone" class="form-control">
+                                    <option value="">All Staff</option>
+                                    <option value="0" {{ ($filter['assignedZone'] ?? '') == '0' ? 'selected' : '' }}>
+                                        With Assigned Zone
+                                    </option>
+                                    <option value="1" {{ ($filter['assignedZone'] ?? '') == '1' ? 'selected' : '' }}>
+                                        Without Assigned Zone
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label><strong>TimeSlot Assignment:</strong></label>
+                                <select name="assignedTimeSlot" class="form-control">
+                                    <option value="">All Staff</option>
+                                    <option value="0"
+                                        {{ ($filter['assignedTimeSlot'] ?? '') == '0' ? 'selected' : '' }}>
+                                        With Assigned TimeSlot
+                                    </option>
+                                    <option value="1"
+                                        {{ ($filter['assignedTimeSlot'] ?? '') == '1' ? 'selected' : '' }}>
+                                        Without Assigned TimeSlot
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
                                 <label><strong>Sub Title / Designation:</strong></label>
                                 <select name="sub_title" class="form-control select2" id="sub_title">
                                     <option value="">Select Designation</option>
@@ -216,9 +246,15 @@
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <div class="form-group d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Apply Filters
+                                </button>
+                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-sync-alt"></i> Reset
+                                </a>
+                            </div>
                         </div>
-                    </div>
                 </form>
             </div>
         </div>

@@ -286,7 +286,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <strong>Minmum Order Value:</strong>
+                            <strong>Minimum Order Value:</strong>
                             <input type="number" name="min_order_value" class="form-control" value="{{ old('min_order_value') }}" placeholder="Minmum Order Value">
                         </div>
                     </div>

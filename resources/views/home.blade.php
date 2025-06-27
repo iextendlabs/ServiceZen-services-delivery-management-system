@@ -40,6 +40,14 @@
     .staff-status .input-group button:last-child {
         border-left: 1px solid #ced4da;
     }
+    .hover-scale {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-scale:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
 </style>
 @section('content')
     <div class="container">
@@ -229,7 +237,109 @@
             @endcan
         </div>
         @if(auth()->user()->hasRole('Admin'))
-        <div class="row pt-5 staff-status">
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <span><i class="fas fa-user-plus mr-2"></i> New Joinee Report</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Freelancers Section -->
+                            <div class="col-md-6">
+                                <div class="card mb-3 mb-md-0">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0"><i class="fas fa-user-tie mr-1 text-primary"></i> Freelancers</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center">
+                                            <div class="col-3">
+                                                <a href="{{ route('freelancerProgram.index') }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #f8f9fa;">
+                                                        <div class="h4 text-primary mb-0">{{ $totalFreelancer }}</div>
+                                                        <small class="text-muted">Total</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="{{ route('freelancerProgram.index', ['status' => '2']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cfe3fc">
+                                                        <div class="h4 text-danger mb-0">{{ $newFreelancer }}</div>
+                                                        <small class="text-muted">New</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="{{ route('freelancerProgram.index', ['status' => '1']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cffccf;">
+                                                        <div class="h4 text-success mb-0">{{ $acceptedFreelancer }}</div>
+                                                        <small class="text-muted">Accepted</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="{{ route('freelancerProgram.index', ['status' => '0']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #fccfcf">
+                                                        <div class="h4 text-danger mb-0">{{ $rejectedFreelancer }}</div>
+                                                        <small class="text-muted">Rejected</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Affiliates Section -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-transparent">
+                                        <h6 class="mb-0"><i class="fas fa-handshake mr-1 text-info"></i> Affiliates</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center">
+                                            <div class="col-3">
+                                                <a href="{{ route('affiliateProgram.index') }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #f8f9fa;">
+                                                        <div class="h4 text-primary mb-0">{{ $totalAffiliate }}</div>
+                                                        <small class="text-muted">Total</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="{{ route('affiliateProgram.index', ['status' => '2']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cfe3fc;">
+                                                        <div class="h4 text-danger mb-0">{{ $newAffiliate }}</div>
+                                                        <small class="text-muted">New</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="{{ route('affiliateProgram.index', ['status' => '1']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cffccf;">
+                                                        <div class="h4 text-success mb-0">{{ $acceptedAffiliate }}</div>
+                                                        <small class="text-muted">Accepted</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="{{ route('affiliateProgram.index', ['status' => '0']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #fccfcf">
+                                                        <div class="h4 text-danger mb-0">{{ $rejectedAffiliate }}</div>
+                                                        <small class="text-muted">Rejected</small>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-3 staff-status">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -249,14 +359,20 @@
                     <div class="card-body">
                         <!-- Status Summary -->
                         <div class="row mb-4">
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <div class="alert alert-info p-2">
                                     <strong>Total Staff:</strong> {{ $staffs->total() }} | 
                                     <span class="text-success"><strong>Online:</strong> {{ $onlineCount }}</span> | 
-                                    <span class="text-danger"><strong>Offline:</strong> {{ $offlineCount }}</span>
+                                    <span class="text-danger"><strong>Offline:</strong> {{ $offlineCount }}</span> |
+                                    <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="btn btn-sm btn-danger py-1 px-2 hover-scale"  title="Filter unassigned zone staff">
+                                    <strong>Staff With No Zone:</strong> {{ $unassignedZoneCount }}
+                                </a> |
+                                <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="btn btn-sm btn-danger py-1 px-2 hover-scale" title="Filter unassigned timeslot staff">
+                                    <strong>Staff With No TimeSlot:</strong> {{ $unassignedTimeSlotCount }}
+                                </a>
                                 </div>
                             </div>
-                            <div class="col-md-6 d-flex justify-content-end align-items-center">
+                            <div class="col-md-4 d-flex justify-content-end align-items-center">
                                 <div class="btn-group me-3" role="group">
                                     <button type="button" class="btn btn-sm btn-outline-secondary filter-btn {{ !request('status') ? 'active' : '' }}" data-filter="all">All</button>
                                     <button type="button" class="btn btn-sm btn-outline-success filter-btn {{ request('status') === 'online' ? 'active' : '' }}" data-filter="online">Online</button>

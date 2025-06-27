@@ -72,6 +72,8 @@ class ServiceStaffController extends Controller
             'service_id' => $request->service_id,
             'category_id' => $request->category_id,
             'zone_id' => $request->zone_id,
+            'assignedZone' => $request->assignedZone,
+            'assignedTimeSlot' => $request->assignedTimeSlot,
         ];
 
         $sub_titles = SubTitle::all();
@@ -132,6 +134,22 @@ class ServiceStaffController extends Controller
             });
         }
 
+        if (isset($request->assignedZone)) {
+            if ($request->assignedZone == '1') {
+                $query->whereDoesntHave('staffZones'); 
+            } elseif ($request->assignedZone == '0') {
+                $query->whereHas('staffZones');
+            }
+        }
+
+        if (isset($request->assignedTimeSlot)) {
+            if ($request->assignedTimeSlot == '1') {
+                $query->whereDoesntHave('staffTimeSlots'); 
+            } elseif ($request->assignedTimeSlot == '0') {
+                $query->whereHas('staffTimeSlots');
+            }
+        }
+
         if (Auth::user()->hasRole('Supervisor')) {
             $staffIds = Auth::user()->getSupervisorStaffIds();
             $query->role('Staff')->whereIn('id', $staffIds);
@@ -148,6 +166,7 @@ class ServiceStaffController extends Controller
         if ($request->email) {
             $query->where('email', 'like', '%' . $request->email . '%');
         }
+
         $total_staff = $query->count();
         $serviceStaff = $query->paginate(config('app.paginate'));
 
@@ -361,9 +380,6 @@ class ServiceStaffController extends Controller
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
         $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
-        $supervisor_ids = $serviceStaff->supervisors()->pluck('supervisor_id')->toArray();
-        $service_ids = $serviceStaff->services()->pluck('service_id')->toArray();
-        $category_ids = $serviceStaff->categories()->pluck('category_id')->toArray();
         $freelancer_join = $request->freelancer_join;
         $affiliates = User::role('Affiliate')->orderBy('name')->get();
         $membership_plans = MembershipPlan::where('status', 1)
@@ -380,7 +396,7 @@ class ServiceStaffController extends Controller
 
         $timeSlots = TimeSlot::all();
         $staffZones = StaffZone::all();
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'supervisor_ids', 'service_ids', 'category_ids', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffZones', 'subTitles'))
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffZones', 'subTitles'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 

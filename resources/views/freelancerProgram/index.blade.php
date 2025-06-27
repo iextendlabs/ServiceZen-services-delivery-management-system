@@ -32,9 +32,21 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->freelancer_program === '1' ? 'Accepted' : 'Rejected' }}</td>
-                                <td>@if($user->staff && $user->staff->membershipPlan)
-                                    {{ $user->staff->membershipPlan->plan_name }} (AED{{ $user->staff->membershipPlan->membership_fee }})
+                                <td>
+                                    @if ($user->freelancer_program === '1')
+                                        <span class="badge bg-success">Accepted</span>
+                                    @elseif($user->freelancer_program === '0')
+                                        @if ($user->staff)
+                                            <span class="badge bg-warning text-dark">New</span>
+                                        @else
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @endif
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($user->staff && $user->staff->membershipPlan)
+                                        {{ $user->staff->membershipPlan->plan_name }}
+                                        (AED{{ $user->staff->membershipPlan->membership_fee }})
                                     @endif
                                 </td>
                                 <td>
@@ -43,22 +55,24 @@
                                         action="{{ route('freelancerProgram.destroy', $user->id) }}" method="POST">
                                         @if ($user->freelancer_program === '0')
                                             @can('freelancer-program-edit')
-                                            <a class="btn btn-success"
-                                                href="{{ route('freelancerProgram.edit', $user->id) }}?status=Accepted">
-                                                <i class="fas fa-thumbs-up"></i>
-                                            </a>
+                                                <a class="btn btn-success"
+                                                    href="{{ route('freelancerProgram.edit', $user->id) }}?status=Accepted">
+                                                    <i class="fas fa-thumbs-up"></i>
+                                                </a>
                                             @endcan
                                         @elseif ($user->freelancer_program === '1')
                                             @can('freelancer-program-edit')
-                                            <a class="btn btn-danger"
-                                                href="{{ route('freelancerProgram.edit', $user->id) }}?status=Rejected">
-                                                <i class="fas fa-thumbs-down"></i>
-                                            </a>
-                                            <a class="btn btn-primary"
-                                                href="{{ route('serviceStaff.edit', $user->id) }}?freelancer_join=1">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+                                                <a class="btn btn-danger"
+                                                    href="{{ route('freelancerProgram.edit', $user->id) }}?status=Rejected">
+                                                    <i class="fas fa-thumbs-down"></i>
+                                                </a>
+                                                <a class="btn btn-primary"
+                                                    href="{{ route('serviceStaff.edit', $user->id) }}?freelancer_join=1">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                             @endcan
+                                        @endif
+                                        @if ($user->staff)
                                             <a class="btn btn-warning"
                                                 href="{{ route('serviceStaff.show', $user->id) }}?freelancer_join=1">
                                                 <i class="fas fa-eye"></i>
@@ -66,9 +80,9 @@
                                         @endif
                                         @csrf
                                         @can('freelancer-program-delete')
-                                        @method('DELETE')
-                                        <button type="button" onclick="confirmDelete('{{ $user->id }}')"
-                                            class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                            @method('DELETE')
+                                            <button type="button" onclick="confirmDelete('{{ $user->id }}')"
+                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -93,6 +107,7 @@
                                 <strong>Status:</strong>
                                 <select name="status" class="form-control">
                                     <option value="">-- Select Status --</option>
+                                    <option value="2" @if ($filter_status === '2') selected @endif>New
                                     <option value="1" @if ($filter_status === '1') selected @endif>Accepted
                                     </option>
                                     <option value="0" @if ($filter_status === '0') selected @endif>Rejected

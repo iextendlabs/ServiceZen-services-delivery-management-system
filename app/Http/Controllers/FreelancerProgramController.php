@@ -37,8 +37,21 @@ class FreelancerProgramController extends Controller
         $filter_email = $request->email;
 
         $query = User::whereNotNull('freelancer_program');
-        if (isset($request->status)) {
-            $query->where('freelancer_program', $request->status);
+        
+        if ($request->has('status')) {
+            switch ($request->status) {
+                case '1': // Accepted
+                    $query->where('freelancer_program', 1);
+                    break;
+                    
+                case '0': // Rejected without staff
+                    $query->where('freelancer_program', 0)->whereDoesntHave('staff');
+                    break;
+                    
+                case '2': // Rejected with staff
+                    $query->where('freelancer_program', 0)->has('staff');
+                    break;
+            }
         }
 
         if (isset($request->name)) {
@@ -111,13 +124,15 @@ class FreelancerProgramController extends Controller
 
             $user->services()->detach();
             $user->categories()->detach();
+            $user->staffTimeSlots()->detach();
+            $user->staffZones()->detach();
 
             $staff->delete();
             TimeSlotToStaff::where('staff_id', $id)->delete();
             $user->freelancer_program = 0;
             $user->update();
             $user->removeRole("Staff");
-            return redirect()->back()->with('success', 'New Freelancer Joinee Rejected.');
+            return redirect()->route('freelancerProgram.index')->with('success', 'New Freelancer Joinee Rejected.');
         }
     }
 
@@ -151,12 +166,14 @@ class FreelancerProgramController extends Controller
 
         $user->services()->detach();
         $user->categories()->detach();
+        $user->staffTimeSlots()->detach();
+        $user->staffZones()->detach();
 
         $staff && $staff->delete();
         TimeSlotToStaff::where('staff_id', $id)->delete();
         $user->freelancer_program = null;
         $user->update();
         $user->removeRole("Staff");
-        return redirect()->back()->with('success', 'Freelancer Joinee Deleted Successfully.');
+        return redirect()->route('freelancerProgram.index')->with('success', 'Freelancer Joinee Deleted Successfully.');
     }
 }

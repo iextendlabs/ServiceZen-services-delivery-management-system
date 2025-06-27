@@ -33,8 +33,20 @@ class AffiliateProgramController extends Controller
         $filter_email = $request->email;
 
         $query = User::whereNotNull('affiliate_program');
-        if (isset($request->status)) {
-            $query->where('affiliate_program', $request->status);
+        if ($request->has('status')) {
+            switch ($request->status) {
+                case '1': // Accepted
+                    $query->where('affiliate_program', 1);
+                    break;
+                    
+                case '0': // Rejected without affiliate
+                    $query->where('affiliate_program', 0)->whereDoesntHave('affiliate');
+                    break;
+                    
+                case '2': // Rejected with affiliate
+                    $query->where('affiliate_program', 0)->has('affiliate');
+                    break;
+            }
         }
 
         if (isset($request->name)) {
