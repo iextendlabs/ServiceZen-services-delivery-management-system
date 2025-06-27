@@ -169,8 +169,8 @@ class HomeController extends Controller
 
             $totalAffiliate = User::whereNotNull('affiliate_program')->count();
             $acceptedAffiliate = User::where('affiliate_program','1')->count();
-            $rejectedAffiliate = User::where('affiliate_program','0')->whereDoesntHave("staff")->count();
-            $newAffiliate = User::where('affiliate_program','0')->has('staff')->count();
+            $rejectedAffiliate = User::where('affiliate_program','0')->whereDoesntHave("affiliate")->count();
+            $newAffiliate = User::where('affiliate_program','0')->has('affiliate')->count();
 
             $staffs = $query->paginate(20);
             return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount','unassignedZoneCount', 'unassignedTimeSlotCount','totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate','newFreelancer', 'newAffiliate'));

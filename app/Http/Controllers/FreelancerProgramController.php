@@ -37,8 +37,21 @@ class FreelancerProgramController extends Controller
         $filter_email = $request->email;
 
         $query = User::whereNotNull('freelancer_program');
-        if (isset($request->status)) {
-            $query->where('freelancer_program', $request->status);
+        
+        if ($request->has('status')) {
+            switch ($request->status) {
+                case '1': // Accepted
+                    $query->where('freelancer_program', 1);
+                    break;
+                    
+                case '0': // Rejected without staff
+                    $query->where('freelancer_program', 0)->whereDoesntHave('staff');
+                    break;
+                    
+                case '2': // Rejected with staff
+                    $query->where('freelancer_program', 0)->has('staff');
+                    break;
+            }
         }
 
         if (isset($request->name)) {

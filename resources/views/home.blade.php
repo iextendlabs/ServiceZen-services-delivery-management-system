@@ -40,6 +40,14 @@
     .staff-status .input-group button:last-child {
         border-left: 1px solid #ced4da;
     }
+    .hover-scale {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-scale:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
 </style>
 @section('content')
     <div class="container">
@@ -246,28 +254,36 @@
                                     <div class="card-body">
                                         <div class="row text-center">
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #f8f9fa;">
-                                                    <div class="h4 text-primary mb-0">{{ $totalFreelancer }}</div>
-                                                    <small class="text-muted">Total</small>
-                                                </div>
+                                                <a href="{{ route('freelancerProgram.index') }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #f8f9fa;">
+                                                        <div class="h4 text-primary mb-0">{{ $totalFreelancer }}</div>
+                                                        <small class="text-muted">Total</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #cfe3fc">
-                                                    <div class="h4 text-danger mb-0">{{ $newFreelancer }}</div>
-                                                    <small class="text-muted">New</small>
-                                                </div>
+                                                <a href="{{ route('freelancerProgram.index', ['status' => '2']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cfe3fc">
+                                                        <div class="h4 text-danger mb-0">{{ $newFreelancer }}</div>
+                                                        <small class="text-muted">New</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #cffccf;">
-                                                    <div class="h4 text-success mb-0">{{ $acceptedFreelancer }}</div>
-                                                    <small class="text-muted">Accepted</small>
-                                                </div>
+                                                <a href="{{ route('freelancerProgram.index', ['status' => '1']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cffccf;">
+                                                        <div class="h4 text-success mb-0">{{ $acceptedFreelancer }}</div>
+                                                        <small class="text-muted">Accepted</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #fccfcf">
-                                                    <div class="h4 text-danger mb-0">{{ $rejectedFreelancer }}</div>
-                                                    <small class="text-muted">Rejected</small>
-                                                </div>
+                                                <a href="{{ route('freelancerProgram.index', ['status' => '0']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #fccfcf">
+                                                        <div class="h4 text-danger mb-0">{{ $rejectedFreelancer }}</div>
+                                                        <small class="text-muted">Rejected</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -283,28 +299,36 @@
                                     <div class="card-body">
                                         <div class="row text-center">
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #f8f9fa;">
-                                                    <div class="h4 text-primary mb-0">{{ $totalAffiliate }}</div>
-                                                    <small class="text-muted">Total</small>
-                                                </div>
+                                                <a href="{{ route('affiliateProgram.index') }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #f8f9fa;">
+                                                        <div class="h4 text-primary mb-0">{{ $totalAffiliate }}</div>
+                                                        <small class="text-muted">Total</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #cfe3fc;">
-                                                    <div class="h4 text-danger mb-0">{{ $newAffiliate }}    </div>
-                                                    <small class="text-muted">New</small>
-                                                </div>
+                                                <a href="{{ route('affiliateProgram.index', ['status' => '2']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cfe3fc;">
+                                                        <div class="h4 text-danger mb-0">{{ $newAffiliate }}</div>
+                                                        <small class="text-muted">New</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #cffccf;">
-                                                    <div class="h4 text-success mb-0">{{ $acceptedAffiliate }}</div>
-                                                    <small class="text-muted">Accepted</small>
-                                                </div>
+                                                <a href="{{ route('affiliateProgram.index', ['status' => '1']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cffccf;">
+                                                        <div class="h4 text-success mb-0">{{ $acceptedAffiliate }}</div>
+                                                        <small class="text-muted">Accepted</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-3">
-                                                <div class="p-3 border rounded" style="background-color: #fccfcf">
-                                                    <div class="h4 text-danger mb-0">{{ $rejectedAffiliate }}    </div>
-                                                    <small class="text-muted">Rejected</small>
-                                                </div>
+                                                <a href="{{ route('affiliateProgram.index', ['status' => '0']) }}" class="text-decoration-none">
+                                                    <div class="p-3 border rounded hover-scale" style="background-color: #fccfcf">
+                                                        <div class="h4 text-danger mb-0">{{ $rejectedAffiliate }}</div>
+                                                        <small class="text-muted">Rejected</small>
+                                                    </div>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -340,10 +364,10 @@
                                     <strong>Total Staff:</strong> {{ $staffs->total() }} | 
                                     <span class="text-success"><strong>Online:</strong> {{ $onlineCount }}</span> | 
                                     <span class="text-danger"><strong>Offline:</strong> {{ $offlineCount }}</span> |
-                                    <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="btn btn-sm btn-warning py-1 px-2"  title="Filter unassigned zone staff">
+                                    <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="btn btn-sm btn-danger py-1 px-2 hover-scale"  title="Filter unassigned zone staff">
                                     <strong>Staff With No Zone:</strong> {{ $unassignedZoneCount }}
                                 </a> |
-                                <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="btn btn-sm btn-warning py-1 px-2" title="Filter unassigned timeslot staff">
+                                <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="btn btn-sm btn-danger py-1 px-2 hover-scale" title="Filter unassigned timeslot staff">
                                     <strong>Staff With No TimeSlot:</strong> {{ $unassignedTimeSlotCount }}
                                 </a>
                                 </div>

@@ -32,7 +32,17 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->freelancer_program === '1' ? 'Accepted' : 'Rejected' }}</td>
+                                <td>
+                                    @if ($user->freelancer_program === '1')
+                                        <span class="badge bg-success">Accepted</span>
+                                    @elseif($user->freelancer_program === '0')
+                                        @if ($user->staff)
+                                            <span class="badge bg-warning text-dark">New</span>
+                                        @else
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @endif
+                                    @endif
+                                </td>
                                 <td>
                                     @if ($user->staff && $user->staff->membershipPlan)
                                         {{ $user->staff->membershipPlan->plan_name }}
@@ -97,6 +107,7 @@
                                 <strong>Status:</strong>
                                 <select name="status" class="form-control">
                                     <option value="">-- Select Status --</option>
+                                    <option value="2" @if ($filter_status === '2') selected @endif>New
                                     <option value="1" @if ($filter_status === '1') selected @endif>Accepted
                                     </option>
                                     <option value="0" @if ($filter_status === '0') selected @endif>Rejected
