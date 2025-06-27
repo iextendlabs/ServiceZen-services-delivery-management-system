@@ -8,7 +8,6 @@
                         <h2>Orders</h2>
                     </div>
                     @can('order-edit')
-
                         <div class="col-md-2">
                             <div class="mb-3">
                                 <strong>Bulk Booking Update:</strong>
@@ -25,7 +24,7 @@
                                 <div class="input-group">
                                     <select name="bulk-status" class="form-control">
                                         @foreach ($statuses as $status)
-                                            <option value="{{ $status }}" 
+                                            <option value="{{ $status }}"
                                                 @if ($status == $filter['status']) selected @endif>
                                                 {{ $status }}
                                             </option>
@@ -38,13 +37,13 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <strong>Bulk Order Driver Status Update:</strong>
                                 <div class="input-group">
                                     <select name="bulk-driver-status" class="form-control">
                                         @foreach ($driver_statuses as $status)
-                                            <option value="{{ $status }}" 
+                                            <option value="{{ $status }}"
                                                 @if ($status == $filter['status']) selected @endif>
                                                 {{ $status }}
                                             </option>
@@ -100,11 +99,12 @@
                         <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
                             <i class="fas fa-check"></i> Confirm
                         </a>
-                        <a class="btn btn-secondary mb-2 ms-md-2" href="{{ route('logs.view', ['file' => 'order_request']) }}">
+                        <a class="btn btn-secondary mb-2 ms-md-2"
+                            href="{{ route('logs.view', ['file' => 'order_request']) }}">
                             Order request log
                         </a>
                     @endif
-                    
+
                     <a class="btn btn-warning mb-2 ms-md-2"
                         href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
                         <i class="fas fa-calendar"></i> Todays Drop Order
@@ -127,7 +127,7 @@
                         </a>
                     @endcan
 
-                    
+
                 </div>
             </div>
         </div>
@@ -191,7 +191,6 @@
                                 </div>
                             @endif
 
-                            <!-- Add more form-groups here to create additional rows with 3 filters in each row -->
                             @if (auth()->user()->hasRole('Admin'))
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -319,6 +318,47 @@
                         </div>
                     </form>
                 </div>
+                @if ($hasFilters = request()->except('page'))
+                    <div class="selected-filters mb-4">
+                        <h5 class="mb-3">Active Filters:</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (request()->except('page') as $key => $value)
+                                @if (!empty($value) && $key != '_token')
+                                    @php
+                                        // Clean up the key names
+                                        $cleanKey = ucwords(str_replace(['_id', '_'], ['', ' '], $key));
+
+                                        // Get display value
+                                        $displayValue = $value;
+                                        if ($key == 'category_id') {
+                                            $displayValue = $categories->firstWhere('id', $value)->title ?? $value;
+                                        } elseif (in_array($key, ['staff_id', 'affiliate_id', 'driver_id'])) {
+                                            $displayValue = $users->firstWhere('id', $value)->name ?? $value;
+                                        } elseif (in_array($key, ['date_from', 'date_to', 'appointment_date'])) {
+                                            $displayValue = \Carbon\Carbon::parse($value)->format('M d, Y');
+                                        } elseif (in_array($key, ['time_start', 'time_end'])) {
+                                            $displayValue = \Carbon\Carbon::parse($value)->format('h:i A');
+                                        }
+                                    @endphp
+
+                                    <div class="filter-tag text-black rounded-pill px-3 py-1 d-flex align-items-center"
+                                        style="background-color: #c5dcff;">
+                                        <span class="me-1">{{ $cleanKey }}:</span>
+                                        <strong class="me-2">{{ $displayValue }}</strong>
+                                        <a href="{{ route('orders.index', array_merge(request()->except('page', $key), ['page' => 1])) }}"
+                                            class="text-black" aria-label="Remove filter">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17"
+                                                fill="currentColor" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             @endif
         </div>
         <div class="fluid_container">
@@ -338,83 +378,83 @@
             var allCheckboxState = $(this).prop('checked');
             $('.item-checkbox').prop('checked', allCheckboxState);
         });
-        $('#bulkStatusBtn').click(function () {
-        const selectedItems = getSelectedItems();
-        const statusValue = $('select[name="bulk-status"]').val();
-        const statusText = $('select[name="bulk-status"] option:selected').text();
+        $('#bulkStatusBtn').click(function() {
+            const selectedItems = getSelectedItems();
+            const statusValue = $('select[name="bulk-status"]').val();
+            const statusText = $('select[name="bulk-status"] option:selected').text();
 
-        if (statusValue && selectedItems.length > 0) {
-            if (confirm(`Are you sure you want to set ${statusText} to the selected items?`)) {
-                editSelectedItems(selectedItems, statusValue, 'order');
-            }
-        } else {
-            alert('Please select at least one order and choose a status to update.');
-        }
-    });
-
-    $('#bulkBookingUpdateBtn').click(function () {
-        const selectedItems = getSelectedItems();
-
-        if (selectedItems.length > 0) {
-            $.ajax({
-                url: '/addToCartModal/' + selectedItems+"?bulk=true",
-                type: 'GET',
-                success: function(response) {
-                    $('#addToCartPopup').html(response);
-                    $('#addToCartModal').modal('show');
+            if (statusValue && selectedItems.length > 0) {
+                if (confirm(`Are you sure you want to set ${statusText} to the selected items?`)) {
+                    editSelectedItems(selectedItems, statusValue, 'order');
                 }
-            });
-            
-        } else {
-            alert('Please select at least one order to update order booking.');
-        }
-    });
-
-    $('#bulkDriverStatusBtn').click(function () {
-        const selectedItems = getSelectedItems();
-        const statusValue = $('select[name="bulk-driver-status"]').val();
-        const statusText = $('select[name="bulk-driver-status"] option:selected').text();
-
-        if (statusValue && selectedItems.length > 0) {
-            if (confirm(`Are you sure you want to set ${statusText} to the selected items?`)) {
-                editSelectedItems(selectedItems, statusValue, 'driver');
+            } else {
+                alert('Please select at least one order and choose a status to update.');
             }
-        } else {
-            alert('Please select at least one order and choose a driver status to update.');
+        });
+
+        $('#bulkBookingUpdateBtn').click(function() {
+            const selectedItems = getSelectedItems();
+
+            if (selectedItems.length > 0) {
+                $.ajax({
+                    url: '/addToCartModal/' + selectedItems + "?bulk=true",
+                    type: 'GET',
+                    success: function(response) {
+                        $('#addToCartPopup').html(response);
+                        $('#addToCartModal').modal('show');
+                    }
+                });
+
+            } else {
+                alert('Please select at least one order to update order booking.');
+            }
+        });
+
+        $('#bulkDriverStatusBtn').click(function() {
+            const selectedItems = getSelectedItems();
+            const statusValue = $('select[name="bulk-driver-status"]').val();
+            const statusText = $('select[name="bulk-driver-status"] option:selected').text();
+
+            if (statusValue && selectedItems.length > 0) {
+                if (confirm(`Are you sure you want to set ${statusText} to the selected items?`)) {
+                    editSelectedItems(selectedItems, statusValue, 'driver');
+                }
+            } else {
+                alert('Please select at least one order and choose a driver status to update.');
+            }
+        });
+
+        function getSelectedItems() {
+            return $('.item-checkbox:checked')
+                .map(function() {
+                    return $(this).val();
+                })
+                .get();
         }
-    });
 
-    function getSelectedItems() {
-        return $('.item-checkbox:checked')
-            .map(function () {
-                return $(this).val();
-            })
-            .get();
-    }
-
-    function editSelectedItems(selectedItems, status, key) {
-        $.ajax({
-            url: '{{ route('orders.bulkStatusEdit') }}',
-            method: 'POST',
-            dataType: 'json',
-            headers: {    
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            data: JSON.stringify({
+        function editSelectedItems(selectedItems, status, key) {
+            $.ajax({
+                url: '{{ route('orders.bulkStatusEdit') }}',
+                method: 'POST',
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                data: JSON.stringify({
                     selectedItems,
                     status,
                     key
                 }),
-            success: function (data) {
-                alert(data.message);
-                window.location.reload();
-            },
-            error: function (error) {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request. Please try again.');
-            }
-        });
-    }
+                success: function(data) {
+                    alert(data.message);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing your request. Please try again.');
+                }
+            });
+        }
     </script>
 @endsection

@@ -111,13 +111,15 @@ class FreelancerProgramController extends Controller
 
             $user->services()->detach();
             $user->categories()->detach();
+            $user->staffTimeSlots()->detach();
+            $user->staffZones()->detach();
 
             $staff->delete();
             TimeSlotToStaff::where('staff_id', $id)->delete();
             $user->freelancer_program = 0;
             $user->update();
             $user->removeRole("Staff");
-            return redirect()->back()->with('success', 'New Freelancer Joinee Rejected.');
+            return redirect()->route('freelancerProgram.index')->with('success', 'New Freelancer Joinee Rejected.');
         }
     }
 
@@ -151,12 +153,14 @@ class FreelancerProgramController extends Controller
 
         $user->services()->detach();
         $user->categories()->detach();
+        $user->staffTimeSlots()->detach();
+        $user->staffZones()->detach();
 
         $staff && $staff->delete();
         TimeSlotToStaff::where('staff_id', $id)->delete();
         $user->freelancer_program = null;
         $user->update();
         $user->removeRole("Staff");
-        return redirect()->back()->with('success', 'Freelancer Joinee Deleted Successfully.');
+        return redirect()->route('freelancerProgram.index')->with('success', 'Freelancer Joinee Deleted Successfully.');
     }
 }

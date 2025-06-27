@@ -21,7 +21,6 @@
     <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
         <input type="hidden" value="{{ $serviceStaff->staff->id ?? "" }}" name="staff_id">
         <input type="hidden" value="{{ $freelancer_join }}" name="freelancer_join" />
-        <span class="text-danger">Note: To add multiple values in a single input field, use \ as a separator. For example, for "Sub Title": Skin\Hair\Massage, etc.</span>
         @csrf
         @method('PUT')
         <input type="hidden" name="url" value="{{ url()->previous() }}">
@@ -342,7 +341,7 @@
                                 @if($user->hasRole("Supervisor"))
                                 <tr>
                                     <td>
-                                        <input type="checkbox" {{ in_array($user->id, old('ids', $supervisor_ids)) ? 'checked' : '' }} name="ids[]" value="{{ $user->id }}">
+                                        <input type="checkbox" {{ in_array($user->id, old('ids', $serviceStaff->supervisors()->pluck('supervisor_id')->toArray() ?? [])) ? 'checked' : '' }} name="ids[]" value="{{ $user->id }}">
                                     </td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
@@ -479,7 +478,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <strong>Minmum Order Value:</strong>
+                            <strong>Minimum Order Value:</strong>
                             <input type="number" name="min_order_value" class="form-control" value="{{ old('min_order_value',$serviceStaff->staff->min_order_value ?? "") }}" placeholder="Minmum Order Value">
                         </div>
                     </div>
@@ -727,7 +726,7 @@
                                     <tr>
                                         <td>
 
-                                            <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" {{ in_array($category->id, old('category_ids', $category_ids)) ? 'checked' : '' }}>
+                                            <input type="checkbox" class="category-checkbox" name="category_ids[]" value="{{ $category->id }}" {{ in_array($category->id, old('category_ids', $serviceStaff->categories()->pluck('category_id')->toArray() ?? [])) ? 'checked' : '' }}>
                                         </td>
                                         <td>{{ $category->title }}</td>
                                     </tr>
@@ -754,7 +753,7 @@
                                     @foreach ($services as $service)
                                     <tr>
                                         <td>
-                                            <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" {{ in_array($service->id, old('service_ids', $service_ids)) ? 'checked' : '' }}>
+                                            <input type="checkbox" class="service-checkbox" name="service_ids[]" value="{{ $service->id }}" data-category="{{ $service->category_id }}" {{ in_array($service->id, old('service_ids', $serviceStaff->services()->pluck('service_id')->toArray() ?? [])) ? 'checked' : '' }}>
                                         </td>
                                         <td>{{ $service->name }}</td>
 
