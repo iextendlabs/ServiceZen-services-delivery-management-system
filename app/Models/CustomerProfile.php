@@ -9,6 +9,6 @@ class CustomerProfile extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['gender','user_id','buildingName','district','area','landmark','flatVilla','street','city','number','whatsapp'];
+    protected $fillable = ['user_id','buildingName','district','area','landmark','flatVilla','street','city'];
 
 }

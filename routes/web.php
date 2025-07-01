@@ -404,3 +404,5 @@ Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
 Route::get('sitemap.xml', function () {
     return response()->file(public_path('sitemap.xml'));
 });
+
+// TODO : Remove number, whatsapp, gender from customer profile table and set from user table

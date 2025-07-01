@@ -82,8 +82,8 @@
                                 @endif
                             @endforeach
                         </td>
-                        <td>{{optional($customer->customerProfiles->first())->number }}</td>
-                        <td>{{ optional($customer->customerProfiles->first())->whatsapp }}</td>
+                        <td>{{ $customer->number }}</td>
+                        <td>{{ $customer->whatsapp }}</td>
                         <td>{{ $customer->created_at }}</td>
                         <td>
                             {{ $customer->userAffiliate->affiliateUser->name ?? "" }} <br>

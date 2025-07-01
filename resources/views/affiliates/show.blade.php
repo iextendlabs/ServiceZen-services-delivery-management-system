@@ -129,8 +129,8 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $user->customer->name ?? '' }}</td>
                                 <td>{{ $user->customer->email ?? '' }}</td>
-                                <td>{{ optional($user->customer->customerProfiles->first())->number }}</td>
-                                <td>{{ optional($user->customer->customerProfiles->first())->whatsapp ?? '' }}</td>
+                                <td>{{ $user->customer->number ?? '' }}</td>
+                                <td>{{ $user->customer->whatsapp ?? '' }}</td>
                                 <td>{{ $user->customer->customerProfiles->pluck('area')->filter()->implode(', ') ?? '' }}</td>
                             </tr>
                         @endforeach

@@ -37,19 +37,19 @@
                 @endif
             </div>
         </div>
-        @if(isset($customer->customerProfiles))
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Number:</strong>
-                {{optional($customer->customerProfiles->first())->number }}
+                {{$customer->number }}
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <strong>Whatsapp:</strong>
-                {{optional($customer->customerProfiles->first())->whatsapp }}
+                {{$customer->whatsapp }}
             </div>
         </div>
+        @if(isset($customer->customerProfiles))
     </div>
     <div class="row">
         <hr><h2> Address</h2>

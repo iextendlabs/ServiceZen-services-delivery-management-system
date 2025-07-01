@@ -59,9 +59,7 @@ class CustomerController extends Controller
         }
 
         if ($request->number) {
-            $query->whereHas('customerProfile', function ($subQuery) use ($request) {
-                $subQuery->whereRaw('LOWER(number) LIKE ?', ['%' . strtolower($request->number) . '%']);
-            });
+            $query->whereRaw('LOWER(number) LIKE ?', ['%' . strtolower($request->number) . '%']);
         }
 
         if ($request->zone) {
@@ -218,8 +216,8 @@ class CustomerController extends Controller
                         $row->status && $row->status == 1 ? "Enabled" : "Disabled",
                         rtrim($addressString),
                         rtrim($districtString),
-                        optional($row->customerProfiles->first())->number,
-                        optional($row->customerProfiles->first())->whatsapp,
+                        $row->number,
+                        $row->whatsapp,
                         $row->created_at,
                         $row->userAffiliate->affiliateUser->name ?? "",
                         isset($row->userAffiliate->affiliate) ? "'" . $row->userAffiliate->affiliate->code : "",
