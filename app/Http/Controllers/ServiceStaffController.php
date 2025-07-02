@@ -98,7 +98,6 @@ class ServiceStaffController extends Controller
 
         $query = User::orderBy($sort, $direction)
             ->whereHas('staff', function ($query) use ($request) {
-                $query->where('status', 1);
 
                 if ($request->location) {
                     $query->where('location', 'like', '%' . $request->location . '%');
