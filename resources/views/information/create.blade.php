@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('content')
     <div class="container">
         <div class="row">
@@ -28,6 +29,18 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <span style="color: red;">*</span><strong>Slug:</strong>
+                        <input type="text" name="slug" value="{{ old('slug') }}" class="form-control"
+                            placeholder="Slug">
+                        <small class="text-muted">
+                            • Should be lowercase with hyphens instead of spaces (e.g., "my-information")<br>
+                            • Avoid special characters and punctuation<br>
+                            • Should be unique across all informations
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <span style="color: red;">*</span><strong>Description:</strong>
                         <textarea class="form-control" id="summernote" name="description" placeholder="Description">{{ old('description') }}</textarea>
                         <script>
@@ -44,7 +57,7 @@
                                         ['para', ['ul', 'ol', 'paragraph']],
                                         ['height', ['height']],
                                         ['insert', ['picture', 'link', 'video', 'table']],
-                                        ['misc', ['undo', 'redo']], 
+                                        ['misc', ['undo', 'redo']],
                                         ['view', ['fullscreen', 'codeview', 'help']]
                                     ],
                                     popover: {
@@ -89,9 +102,20 @@
                     <div class="form-group">
                         <strong>Position:</strong>
                         <select name="position" class="form-control">
-                            <option value="Top Menu"  {{ old('position') == "Top Menu" ? 'selected' : '' }}>Top Menu</option>
-                            <option value="Bottom Footer" {{ old('position') == "Bottom Footer" ? 'selected' : '' }}>Bottom Footer</option>
+                            <option value="Top Menu" {{ old('position') == 'Top Menu' ? 'selected' : '' }}>Top Menu</option>
+                            <option value="Bottom Footer" {{ old('position') == 'Bottom Footer' ? 'selected' : '' }}>Bottom
+                                Footer</option>
                         </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Status:</strong>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="status" name="status" value="1"
+                                {{ old('status', true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="status">Enabled</label>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-12 text-center">

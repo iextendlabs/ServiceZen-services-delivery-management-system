@@ -13,7 +13,7 @@
                 </div>
                 <div class="float-right">
                     @can('information-create')
-                        <a class="btn btn-success  float-end" href="{{ route('information.create') }}"> <i
+                        <a class="btn btn-success float-end" href="{{ route('information.create') }}"> <i
                                 class="fa fa-plus"></i></a>
                     @endcan
                 </div>
@@ -51,6 +51,16 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <strong>Status:</strong>
+                                <select name="status" class="form-control">
+                                    <option></option>
+                                    <option value="1" @if ($filter['status'] === '1') selected @endif>Enabled</option>
+                                    <option value="0" @if ($filter['status'] === '0') selected @endif>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 offset-md-8">
@@ -77,6 +87,7 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
+                        <th>Slug</th>
                         <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('information.index', array_merge(request()->query(), ['sort' => 'description', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Description</a>
                             @if (request('sort') === 'description')
@@ -89,7 +100,7 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        {{-- <th class="text-left">Position</th> --}}
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                     @if (count($information))
@@ -97,10 +108,10 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td class="text-left">{{ $info->name }}</td>
+                                <td class="text-left">{{ $info->slug }}</td>
                                 <td class="text-left">{{ Str::limit(strip_tags(html_entity_decode($info->description)), 50, '...') }}</td>
-
-
                                 <td class="text-left">{{ $info->position }}</td>
+                                <td class="text-left">{{ $info->status ? 'Enabled' : 'Disabled' }}</td>
                                 <td>
                                     <form id="deleteForm{{ $info->id }}"
                                         action="{{ route('information.destroy', $info->id) }}" method="POST">
@@ -122,7 +133,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="4" class="text-center">There is no information.</td>
+                            <td colspan="7" class="text-center">There is no information.</td>
                         </tr>
                     @endif
                 </table>

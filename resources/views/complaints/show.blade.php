@@ -84,7 +84,7 @@
                         <div class="col-md-7">
                             <div class="form-group">
                                 <strong>Text:</strong>
-                                <textarea name="text" class="form-control" cols="30" rows="5">{{ old(text) }}</textarea>
+                                <textarea name="text" class="form-control" cols="30" rows="5">{{ old("text") }}</textarea>
                             </div>
                         </div>
 
