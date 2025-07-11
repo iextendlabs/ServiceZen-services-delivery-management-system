@@ -33,12 +33,43 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Type</th>
-                        <th>Feature</th>
-                        <th>Bottom</th>
+                        <th><a class=" text-decoration-none"
+                                href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'title', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Title</a>
+                            @if (request('sort') === 'title')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th><a class=" text-decoration-none"
+                                href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'sort', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Sort
+                                Order</a>
+                            @if (request('sort') === 'sort')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th><a class=" text-decoration-none"
+                                href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
+                            @if (request('sort') === 'status')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th><a class=" text-decoration-none"
+                                href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
+                            @if (request('sort') === 'type')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th><a class=" text-decoration-none"
+                                href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'feature', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Feature</a>
+                            @if (request('sort') === 'feature')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th><a class=" text-decoration-none"
+                                href="{{ route('serviceCategories.index', array_merge(request()->query(), ['sort' => 'feature_on_bottom', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Bottom</a>
+                            @if (request('sort') === 'feature_on_bottom')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
                         <th width="280px">Action</th>
                     </tr>
                     @forelse ($service_categories as $service_category)
@@ -54,7 +85,7 @@
                                 <a
                                     href="{{ route('services.index', ['category_id' => $service_category->id]) }}">{{ $service_category->title }}</a>
                             </td>
-                            <td>{{ $service_category->description }}</td>
+                            <td>{{ $service_category->sort }}</td>
                             <td>{{ $service_category->status ? 'Enable' : 'Disable' }}</td>
                             <td>{{ $service_category->type }}</td>
                             <td>{{ $service_category->feature ? 'Yes' : 'No' }}</td>

@@ -56,34 +56,6 @@
                             </div>
                         </div>
 
-                        <!-- Feature Category -->
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Feature Category:</strong>
-                                <div class="form-check form-switch">
-                                    <input type="hidden" name="feature" value="0">
-                                    <input class="form-check-input" type="checkbox" name="feature" id="feature"
-                                        value="1"
-                                        {{ old('feature', $service_category->feature) == '1' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="feature">Enable featured category</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Feature on Bottom -->
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Feature on Bottom:</strong>
-                                <div class="form-check form-switch">
-                                    <input type="hidden" name="feature_on_bottom" value="0">
-                                    <input class="form-check-input" type="checkbox" name="feature_on_bottom"
-                                        id="feature_on_bottom" value="1"
-                                        {{ old('feature_on_bottom', $service_category->feature_on_bottom) == '1' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="feature_on_bottom">Show at bottom section</label>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Image -->
                         <div class="col-md-12">
                             <div class="form-group">
@@ -118,6 +90,43 @@
                                         {{ old('status', $service_category->status) == '0' ? 'selected' : '' }}>Disable
                                     </option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Feature Category -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Feature Category:</strong>
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="feature" value="0">
+                                    <input class="form-check-input" type="checkbox" name="feature" id="feature"
+                                        value="1"
+                                        {{ old('feature', $service_category->feature) == '1' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="feature">Enable featured category</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feature on Bottom -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Feature on Bottom:</strong>
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="feature_on_bottom" value="0">
+                                    <input class="form-check-input" type="checkbox" name="feature_on_bottom"
+                                        id="feature_on_bottom" value="1"
+                                        {{ old('feature_on_bottom', $service_category->feature_on_bottom) == '1' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="feature_on_bottom">Show at bottom section</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Sort Order:</strong>
+                                <input type="number" name="sort" class="form-control"
+                                    value="{{ old('sort', $service_category->sort ?? 0) }}">
+                                <small class="text-muted">Lower numbers appear first</small>
                             </div>
                         </div>
 

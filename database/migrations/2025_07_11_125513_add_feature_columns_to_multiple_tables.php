@@ -27,6 +27,7 @@ return new class extends Migration
         Schema::table('service_categories', function (Blueprint $table) {
             $table->boolean('feature')->default(0);
             $table->boolean('feature_on_bottom')->default(0);
+            $table->integer('sort')->default(0);
         });
 
         // Add feature column to reviews table
@@ -59,7 +60,7 @@ return new class extends Migration
 
         // Remove columns from service_categories table
         Schema::table('service_categories', function (Blueprint $table) {
-            $table->dropColumn(['feature', 'feature_on_bottom']);
+            $table->dropColumn(['feature', 'feature_on_bottom','sort']);
         });
 
         // Remove columns from reviews table

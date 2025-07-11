@@ -103,6 +103,9 @@
                     <div class="form-group">
                         <strong>Position:</strong>
                         <select name="position" class="form-control">
+                            <option value="Both"
+                                {{ old('position', $information->position) == 'Both' ? 'selected' : '' }}>Both
+                            </option>
                             <option value="Top Menu"
                                 {{ old('position', $information->position) == 'Top Menu' ? 'selected' : '' }}>Top Menu
                             </option>
