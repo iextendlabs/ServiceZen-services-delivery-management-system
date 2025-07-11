@@ -74,6 +74,7 @@ class ServiceStaffController extends Controller
             'zone_id' => $request->zone_id,
             'assignedZone' => $request->assignedZone,
             'assignedTimeSlot' => $request->assignedTimeSlot,
+            'feature' => $request->feature,
         ];
 
         $sub_titles = SubTitle::all();
@@ -105,6 +106,10 @@ class ServiceStaffController extends Controller
 
                 if ($request->min_order_value) {
                     $query->where('min_order_value', $request->min_order_value);
+                }
+
+                if (!is_null($request->feature)) {
+                    $query->where('feature', $request->feature);
                 }
             })
             ->when($request->sub_title, function ($query) use ($request) {

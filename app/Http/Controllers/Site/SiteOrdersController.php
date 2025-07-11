@@ -260,7 +260,7 @@ class SiteOrdersController extends Controller
 
         return redirect('/bookingStep')->with('cart-success', 'Service Add to Cart Successfully.');
     }
-
+    // TODO: Email to admin for order cancellation
     public function cancelOrder($ids)
     {
         $order_ids = explode(',', $ids);

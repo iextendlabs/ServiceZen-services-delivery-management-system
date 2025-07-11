@@ -78,6 +78,20 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <strong>Feature:</strong>
+                                <select name="feature" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 offset-md-8">
@@ -98,8 +112,8 @@
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th></th>
-                        <th class="text-left"><a
-                                class=" text-decoration-none" href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                        <th class="text-left"><a class=" text-decoration-none"
+                                href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -111,28 +125,34 @@
                             @endif
                         </th>
                         <th class="text-right"><a class=" text-decoration-none"
-                            href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'duration', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Duration</a>
+                                href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'duration', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Duration</a>
                             @if (request('sort') === 'duration')
-                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                        @endif    
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
                         </th>
                         <th class="text-right"><a class=" text-decoration-none"
-                            href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
+                                href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
                             @if (request('sort') === 'status')
-                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                        @endif     
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
                         </th>
                         <th class="text-right"><a class=" text-decoration-none"
-                            href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'quote', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Quote</a>
+                                href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'quote', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Quote</a>
                             @if (request('sort') === 'quote')
-                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                        @endif     
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
                         </th>
                         <th class="text-left"><a class=" text-decoration-none"
-                            href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
+                                href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'type', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Type</a>
                             @if (request('sort') === 'type')
-                            <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                        @endif    
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
+                        <th class="text-left"><a class=" text-decoration-none"
+                                href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'feature', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Feature</a>
+                            @if (request('sort') === 'feature')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
                         </th>
                         <th class="text-right">Action</th>
                     </tr>
@@ -143,7 +163,7 @@
                                     <input type="checkbox" class="item-checkbox" value="{{ $service->id }}">
                                 </td>
                                 <td class="text-left">{{ $service->name }}</td>
-                                <td class="text-right">@currency($service->price,true)</td>
+                                <td class="text-right">@currency($service->price, true)</td>
                                 <td class="text-right">{{ $service->duration }}</td>
                                 <td class="text-right">
                                     @if ($service->status)
@@ -160,6 +180,7 @@
                                     @endif
                                 </td>
                                 <td class="text-left">{{ $service->type }}</td>
+                                <td>{{ $service->feature ? 'Yes' : 'No' }}</td>
                                 <td class="text-right">
                                     <form id="deleteForm{{ $service->id }}"
                                         action="{{ route('services.destroy', $service->id) }}" method="POST">
@@ -178,7 +199,8 @@
                                         @method('DELETE')
                                         @can('service-delete')
                                             <button type="button" class="btn btn-danger"
-                                                onclick="confirmDelete('{{ $service->id }}')"><i class="fa fa-trash"></i></button>
+                                                onclick="confirmDelete('{{ $service->id }}')"><i
+                                                    class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -186,7 +208,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="7" class="text-center">There is no service.</td>
+                            <td colspan="9" class="text-center">There is no service.</td>
                         </tr>
                     @endif
                 </table>

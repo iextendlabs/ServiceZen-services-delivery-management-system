@@ -59,6 +59,7 @@
                         </th>
 
                         <th>Sub Title / Designation</th>
+                        <th>Feature</th>
                         {{-- <th>Driver</th> --}}
                         <th width="280px">Action</th>
                     </tr>
@@ -82,6 +83,7 @@
                                         <span class="badge badge-info m-2">{{ $subTitle->name }}</span>
                                     @endforeach
                                 </td>
+                                <td>{{ $staff->staff->feature ? 'Yes' : 'No' }}</td>
 
                                 {{-- <td>
                                     @if ($staff->staff->driver)
@@ -136,6 +138,20 @@
                                 <strong>Email:</strong>
                                 <input type="text" name="email" value="{{ $filter['email'] ?? '' }}"
                                     class="form-control" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Feature:</strong>
+                                <select name="feature" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
+                                    </option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-12">

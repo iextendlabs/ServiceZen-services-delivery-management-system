@@ -80,6 +80,15 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Feature Service:</strong>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1" {{ old('feature') == '1' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="feature">Enable featured service</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>Quote:</strong>
                             <select name="quote" class="form-control">
                                 <option value="1" {{ old('quote') == '1' ? 'selected' : '' }}>Enable</option>

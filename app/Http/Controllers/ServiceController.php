@@ -44,7 +44,8 @@ class ServiceController extends Controller
         $filter = [
             'name' => $request->name,
             'price' => $request->price,
-            'category_id' => $request->category_id
+            'category_id' => $request->category_id,
+            'feature' => $request->feature,
         ];
         
         $sort = $request->input('sort', 'name'); // Default sort column
@@ -60,6 +61,11 @@ class ServiceController extends Controller
         if ($request->price) {
             $query->where('price', $request->price);
         }
+        
+        if (!is_null($request->feature)) {
+            $query->where('feature', $request->feature);
+        }
+
         $userCategories = [];
         $user = auth()->user();
         if ($user->hasRole('Data Entry')) {

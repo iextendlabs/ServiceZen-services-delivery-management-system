@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class ServiceCategory extends Model
 {
-    protected $fillable = ['title', 'description', 'parent_id', 'status', 'type', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
+    protected $fillable = ['title', 'description', 'parent_id', 'status', 'type', 'meta_title', 'meta_description', 'meta_keywords', 'slug','feature', 'feature_on_bottom'];
     use SeoHelpers;
     protected static function boot()
     {

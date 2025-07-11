@@ -28,13 +28,18 @@ class FAQController extends Controller
         $filter = [
             'question' => $request->question,
             'service_id' => $request->service_id,
-            'category_id' => $request->category_id
+            'category_id' => $request->category_id,
+            'feature' => $request->feature,
         ];
 
         $query = FAQ::orderBy($sort, $direction);
 
         if ($request->question) {
             $query->where('question', 'like', '%' . $request->question . '%');
+        }
+
+        if (!is_null($request->feature)) {
+            $query->where('feature', $request->feature);
         }
 
         if ($request->service_id) {

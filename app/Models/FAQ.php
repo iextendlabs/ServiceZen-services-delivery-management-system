@@ -11,7 +11,7 @@ class FAQ extends Model
     
     protected $table = 'faqs'; 
 
-    protected $fillable = ['question', 'answer','category_id','service_id','status'];
+    protected $fillable = ['question', 'answer','category_id','service_id','status','feature'];
 
     public function category()
     {

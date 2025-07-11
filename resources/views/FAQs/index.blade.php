@@ -40,6 +40,20 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
+                                <strong>Feature:</strong>
+                                <select name="feature" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
                                 <strong>Services:</strong>
                                 <select name="service_id" class="form-control">
                                     <option></option>
@@ -106,7 +120,12 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-
+                        <th><a class=" ml-2 text-decoration-none"
+                                href="{{ route('FAQs.index', array_merge(request()->query(), ['sort' => 'feature', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Feature</a>
+                            @if (request('sort') === 'feature')
+                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                            @endif
+                        </th>
                         <th>Action</th>
                     </tr>
                     @if (count($FAQs))
@@ -122,9 +141,10 @@
                                         Disable
                                     @endif
                                 </td>
+                                <td>{{ $FAQ->feature ? 'Yes' : 'No' }}</td>
                                 <td>
-                                    <form id="deleteForm{{ $FAQ->id }}" action="{{ route('FAQs.destroy', $FAQ->id) }}"
-                                        method="POST">
+                                    <form id="deleteForm{{ $FAQ->id }}"
+                                        action="{{ route('FAQs.destroy', $FAQ->id) }}" method="POST">
                                         <a class="btn btn-warning" href="{{ route('FAQs.show', $FAQ->id) }}"><i
                                                 class="fa fa-eye"></i></a>
                                         @can('FAQs-edit')
@@ -143,7 +163,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="4" class="text-center">There is no FAQs.</td>
+                            <td colspan="6" class="text-center">There is no FAQs.</td>
                         </tr>
                     @endif
                 </table>

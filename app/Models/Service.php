@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class Service extends Model
 {
-    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type','quote','pipelineId','meta_title', 'meta_description', 'meta_keywords', 'slug'];
+    protected $fillable = ['name', 'image', 'description', 'price', 'duration', 'category_id', 'short_description', 'discount', 'status', 'type','quote','pipelineId','meta_title', 'meta_description', 'meta_keywords', 'slug','feature'];
 
     protected $nameField = 'name'; // Tell the trait to use 'name' field
     use SeoHelpers;

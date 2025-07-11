@@ -11,7 +11,7 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp', 'min_order_value', 'expiry_date', 'affiliate_id', 'membership_plan_id','location','nationality','online','get_quote','quote_amount','quote_commission','show_quote_detail'];
+    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp', 'min_order_value', 'expiry_date', 'affiliate_id', 'membership_plan_id','location','nationality','online','get_quote','quote_amount','quote_commission','show_quote_detail','feature'];
 
     public function appointments()
     {

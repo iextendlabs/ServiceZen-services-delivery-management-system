@@ -32,6 +32,8 @@ class ServiceCategoryController extends Controller
 
         $filter = [
             'title' => $request->title,
+            'feature' => $request->feature,
+            'feature_on_bottom' => $request->feature_on_bottom,
         ];
 
         $query = ServiceCategory::query()
@@ -44,6 +46,12 @@ class ServiceCategoryController extends Controller
                             ->where('title', 'like', "%" . $request->title . "%");
                     })->orderBy('parent_id');
             })
+            ->when(!is_null($request->feature), function ($query) use ($request) {
+                $query->where('feature', $request->feature);
+            })
+            ->when(!is_null($request->feature_on_bottom), function ($query) use ($request) {
+                $query->where('feature_on_bottom', $request->feature_on_bottom);
+            })
             ->orderBy($sort, $direction);
 
         $user = auth()->user();
@@ -51,13 +59,20 @@ class ServiceCategoryController extends Controller
             $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
             $query->whereIn('id', $userCategories);
         }
+
         $total_service_category = $query->count();
         $service_categories = $query->paginate(config('app.paginate'));
 
-        $service_categories->appends($filter, ['sort' => $sort, 'direction' => $direction]);
-        return view('service_categories.index', compact('total_service_category', 'service_categories', 'direction', 'filter'))
-            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $service_categories->appends(array_merge($filter, ['sort' => $sort, 'direction' => $direction]));
+
+        return view('service_categories.index', compact(
+            'total_service_category',
+            'service_categories',
+            'direction',
+            'filter'
+        ))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -83,7 +98,7 @@ class ServiceCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,HomeController $homeController)
+    public function store(Request $request, HomeController $homeController)
     {
         request()->validate([
             'title' => 'required',
@@ -209,8 +224,9 @@ class ServiceCategoryController extends Controller
 
         $homeController->appData();
         $homeController->appCategories();
+        $previousUrl = $request->url;
 
-        return redirect()->route('serviceCategories.index')
+        return redirect($previousUrl)
             ->with('success', 'Service Category Update successfully.');
     }
 
@@ -239,8 +255,9 @@ class ServiceCategoryController extends Controller
 
         $homeController->appData();
         $homeController->appCategories();
-        
-        return redirect()->route('serviceCategories.index')
+        $previousUrl = url()->previous();
+
+        return redirect($previousUrl)
             ->with('success', 'Service Category deleted successfully');
     }
 

@@ -59,6 +59,19 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
+                <strong>Feature Review:</strong>
+                <div class="form-check form-switch">
+                    <!-- Hidden field ensures a value is sent when checkbox is unchecked -->
+                    <input type="hidden" name="feature" value="0">
+
+                    <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1"
+                        {{ old('feature') == '1' ? 'checked' : '' }}>
+                    <label class="form-check-label" for="feature">Enable featured review</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
                 <strong>Images:</strong>
                 <table id="imageTable" class="table">
                     <thead>

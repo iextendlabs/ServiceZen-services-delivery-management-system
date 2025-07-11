@@ -30,11 +30,17 @@
                     @endif
                 </th>
                 <th><a class=" ml-2 text-decoration-none"
-                    href="{{ route('reviews.index', array_merge(request()->query(), ['sort' => 'rating', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Rating</a>
-                @if (request('sort') === 'rating')
-                    <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                @endif
-            </th>
+                        href="{{ route('reviews.index', array_merge(request()->query(), ['sort' => 'rating', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Rating</a>
+                    @if (request('sort') === 'rating')
+                        <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+                </th>
+                <th><a class=" ml-2 text-decoration-none"
+                        href="{{ route('reviews.index', array_merge(request()->query(), ['sort' => 'feature', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Feature</a>
+                    @if (request('sort') === 'feature')
+                        <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                    @endif
+                </th>
                 <th>Action</th>
             </tr>
             @if (count($reviews))
@@ -51,6 +57,7 @@
                                 @endif
                             @endfor
                         </td>
+                        <td>{{ $review->feature ? 'Yes' : 'No' }}</td>
                         <td>
                             <form id="deleteForm{{ $review->id }}" action="{{ route('reviews.destroy', $review->id) }}"
                                 method="POST">

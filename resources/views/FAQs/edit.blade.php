@@ -35,6 +35,19 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Feature FAQs:</strong>
+                    <div class="form-check form-switch">
+                        <!-- Hidden field ensures a value is sent when checkbox is unchecked -->
+                        <input type="hidden" name="feature" value="0">
+
+                        <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1"
+                            {{ old('feature',$FAQ->feature) == '1' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="feature">Enable featured FAQs</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Category:</strong>
                     <select name="category_id" class="form-control">
                         <option></option>
