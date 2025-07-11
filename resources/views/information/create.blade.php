@@ -114,6 +114,7 @@
                     <div class="form-group">
                         <strong>Status:</strong>
                         <div class="form-check form-switch">
+                        <input type="hidden" name="status" value="0">
                             <input type="checkbox" class="form-check-input" id="status" name="status" value="1"
                                 {{ old('status', true) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status">Enabled</label>
