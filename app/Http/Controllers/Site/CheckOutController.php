@@ -585,8 +585,8 @@ class CheckOutController extends Controller
 
             $input['driver_id']  = $staff->staff ? $staff->staff->getDriverForTimeSlot($input['date'], $input['time_slot_id']) : null;
 
-            $input['latitude'] = $input['latitude'] ?? '';
-            $input['longitude'] = $input['longitude'] ?? '';
+            $input['latitude'] = $input['latitude'] ?? null;
+            $input['longitude'] = $input['longitude'] ?? null;
 
             $order = Order::create($input);
             $order_ids[] = $order->id;
@@ -631,7 +631,10 @@ class CheckOutController extends Controller
     private function findOrCreateUser($input)
     {
         $user = User::where('email', $input['email'])->first();
-
+        
+        $input['number'] = $input['number_country_code'] . ltrim($input['number'], '0');
+        $input['whatsapp'] = $input['whatsapp_country_code'] . ltrim($input['whatsapp'], '0');
+        
         if (!isset($user)) {
             $user = User::create([
                 'name' => $input['name'],
@@ -647,21 +650,11 @@ class CheckOutController extends Controller
             $customer_id = $user->id;
         }
 
-        $input['number'] = $input['number_country_code'] . ltrim($input['number'], '0');
-        $input['whatsapp'] = $input['whatsapp_country_code'] . ltrim($input['whatsapp'], '0');
-
         if (isset($input['update_profile']) && $input['update_profile'] == "on") {
             
             if(!isset($input['selectedAddress'])){
                 $input['user_id'] = $user->id;
                 CustomerProfile::create($input);
-            }
-            if (Auth::check()) {
-                CustomerProfile::where('user_id',auth()->user()->id)->update([
-                    'number' => $input['number'],
-                    'whatsapp' => $input['whatsapp'],
-                    'gender' => $input['gender']
-                ]);
             }
         }
 
