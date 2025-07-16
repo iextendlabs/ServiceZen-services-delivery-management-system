@@ -214,9 +214,9 @@
                                 <input type="text" name="slug" id="slug" class="form-control"
                                     value="{{ old('slug', $service_category->slug ?? '') }}">
                                 <small class="text-muted">
-                                    • Lowercase with hyphens<br>
-                                    • Avoid special characters<br>
-                                    • Must be unique
+                                    • Should be lowercase with hyphens instead of spaces (e.g., "my-service") <br>
+                                    • Avoid special characters and punctuation <br>
+                                    • Should be unique across all services
                                 </small>
                             </div>
                         </div>

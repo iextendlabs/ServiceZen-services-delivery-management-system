@@ -108,7 +108,13 @@ class ServiceCategoryController extends Controller
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string|max:255',
-            'slug' => 'required|string|max:255|unique:service_categories,slug',
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:service_categories,slug',
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'
+            ],
         ]);
 
         $service_category = ServiceCategory::create($request->all());
@@ -182,7 +188,13 @@ class ServiceCategoryController extends Controller
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
             'meta_keywords' => 'nullable|string|max:255',
-            'slug' => 'required|string|max:255|unique:service_categories,slug,' . $id,
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:service_categories,slug,' . $id,
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'
+            ],
         ]);
 
         $service_category = ServiceCategory::find($id);
