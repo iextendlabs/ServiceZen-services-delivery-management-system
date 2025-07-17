@@ -564,32 +564,26 @@ class HomeController extends Controller
 
     public function saveJsonFile($filename, $data)
     {
-        $disk = Storage::disk('public');
-        $filePath = $filename;
-        $backupFilename = pathinfo($filename, PATHINFO_FILENAME) . '_backup_' . time() . '.json';
-
         try {
-            if ($disk->exists($filePath)) {
-                $disk->copy($filePath, $backupFilename);
+            $filePath = "public/{$filename}";
 
-                $currentContent = $disk->get($filePath);
-                $currentData = json_decode($currentContent, true);
+            if (Storage::exists($filePath)) {
+                $backupFilename = "public/" . pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
 
-                if (is_array($currentData) && is_array($data)) {
-                    $updatedData = array_merge($currentData, $data);
-                } else {
-                    $updatedData = $data;
-                }
+                Storage::copy($filePath, $backupFilename);
 
-                $disk->put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+                $currentData = json_decode(Storage::get($filePath), true);
+                $updatedData = array_merge($currentData, $data);
 
-                $disk->delete($backupFilename);
+                Storage::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                Storage::delete($backupFilename);
             } else {
-                $disk->put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+                Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
-            if ($disk->exists($backupFilename)) {
-                $disk->move($backupFilename, $filePath);
+            if (isset($backupFilename) && Storage::exists($backupFilename)) {
+                Storage::move($backupFilename, $filePath);
             }
             throw $e;
         }
@@ -597,10 +591,10 @@ class HomeController extends Controller
 
     private function updateVersion($var)
     {
-        $filename = 'updatesDataVersion.json';
+        $filePath = "public/updatesDataVersion.json";
 
-        if (Storage::disk('public')->exists($filename)) {
-            $json = Storage::disk('public')->get($filename);
+        if (Storage::exists($filePath)) {
+            $json = Storage::get($filePath);
             $data = json_decode($json, true) ?? [];
         } else {
             $data = [];
@@ -611,7 +605,6 @@ class HomeController extends Controller
         } else {
             $data[$var] = 1;
         }
-
-        Storage::disk('public')->put($filename, json_encode($data, JSON_PRETTY_PRINT));
+        Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
