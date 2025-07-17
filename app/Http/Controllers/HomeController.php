@@ -24,6 +24,7 @@ use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\SubTitle;
 use App\Models\TimeSlot;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -163,17 +164,17 @@ class HomeController extends Controller
             $unassignedTimeSlotCount = User::role('Staff')->whereDoesntHave('staffTimeSlots')->count();
 
             $totalFreelancer = User::whereNotNull('freelancer_program')->count();
-            $acceptedFreelancer = User::where('freelancer_program','1')->count();
-            $rejectedFreelancer = User::where('freelancer_program','0')->whereDoesntHave("staff")->count();
-            $newFreelancer = User::where('freelancer_program','0')->has('staff')->count();
+            $acceptedFreelancer = User::where('freelancer_program', '1')->count();
+            $rejectedFreelancer = User::where('freelancer_program', '0')->whereDoesntHave("staff")->count();
+            $newFreelancer = User::where('freelancer_program', '0')->has('staff')->count();
 
             $totalAffiliate = User::whereNotNull('affiliate_program')->count();
-            $acceptedAffiliate = User::where('affiliate_program','1')->count();
-            $rejectedAffiliate = User::where('affiliate_program','0')->whereDoesntHave("affiliate")->count();
-            $newAffiliate = User::where('affiliate_program','0')->has('affiliate')->count();
+            $acceptedAffiliate = User::where('affiliate_program', '1')->count();
+            $rejectedAffiliate = User::where('affiliate_program', '0')->whereDoesntHave("affiliate")->count();
+            $newAffiliate = User::where('affiliate_program', '0')->has('affiliate')->count();
 
             $staffs = $query->paginate(20);
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount','unassignedZoneCount', 'unassignedTimeSlotCount','totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate','newFreelancer', 'newAffiliate'));
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount', 'unassignedZoneCount', 'unassignedTimeSlotCount', 'totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate', 'newFreelancer', 'newAffiliate'));
         }
     }
 
@@ -424,7 +425,6 @@ class HomeController extends Controller
         $this->saveJsonFile('StaffAppServicesData.json', $jsonData);
 
         $this->updateVersion('services');
-
     }
 
     public function appServicesData()
@@ -473,7 +473,6 @@ class HomeController extends Controller
         $this->saveJsonFile('AppSubTitles.json', $jsonData);
 
         $this->updateVersion('subtitles');
-
     }
 
     public function appCategories()
@@ -495,7 +494,6 @@ class HomeController extends Controller
         $this->saveJsonFile('AppCategories.json', $jsonData);
 
         $this->updateVersion('categories');
-
     }
 
     public function appZoneData()
@@ -516,7 +514,6 @@ class HomeController extends Controller
         $this->saveJsonFile('AppZoneData.json', $jsonData);
 
         $this->updateVersion('zones');
-
     }
 
     public function appTimeSlotsData()
@@ -567,26 +564,32 @@ class HomeController extends Controller
 
     public function saveJsonFile($filename, $data)
     {
+        $disk = Storage::disk('public');
+        $filePath = $filename;
+        $backupFilename = pathinfo($filename, PATHINFO_FILENAME) . '_backup_' . time() . '.json';
+
         try {
-            $filePath = public_path($filename);
+            if ($disk->exists($filePath)) {
+                $disk->copy($filePath, $backupFilename);
 
-            if (File::exists($filePath)) {
-                $backupFilename = pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
-                $backupFilePath = public_path($backupFilename);
+                $currentContent = $disk->get($filePath);
+                $currentData = json_decode($currentContent, true);
 
-                File::move($filePath, $backupFilePath);
+                if (is_array($currentData) && is_array($data)) {
+                    $updatedData = array_merge($currentData, $data);
+                } else {
+                    $updatedData = $data;
+                }
 
-                $currentData = json_decode(File::get($backupFilePath), true);
-                $updatedData = array_merge($currentData, $data);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+                $disk->put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
 
-                File::delete($backupFilePath);
+                $disk->delete($backupFilename);
             } else {
-                File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+                $disk->put($filePath, json_encode($data, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
-            if (isset($backupFilePath) && File::exists($backupFilePath)) {
-                File::move($backupFilePath, $filePath);
+            if ($disk->exists($backupFilename)) {
+                $disk->move($backupFilename, $filePath);
             }
             throw $e;
         }
@@ -594,10 +597,10 @@ class HomeController extends Controller
 
     private function updateVersion($var)
     {
-        $filePath = public_path('updatesDataVersion.json');
+        $filename = 'updatesDataVersion.json';
 
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
+        if (Storage::disk('public')->exists($filename)) {
+            $json = Storage::disk('public')->get($filename);
             $data = json_decode($json, true) ?? [];
         } else {
             $data = [];
@@ -609,6 +612,6 @@ class HomeController extends Controller
             $data[$var] = 1;
         }
 
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+        Storage::disk('public')->put($filename, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
