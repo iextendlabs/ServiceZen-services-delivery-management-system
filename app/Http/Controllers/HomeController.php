@@ -24,6 +24,7 @@ use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\SubTitle;
 use App\Models\TimeSlot;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -568,25 +569,25 @@ class HomeController extends Controller
     public function saveJsonFile($filename, $data)
     {
         try {
-            $filePath = public_path($filename);
+            $filePath = "public/{$filename}";
 
-            if (File::exists($filePath)) {
-                $backupFilename = pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
-                $backupFilePath = public_path($backupFilename);
+            if (Storage::exists($filePath)) {
+                $backupFilename = "public/" . pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
 
-                File::move($filePath, $backupFilePath);
+                Storage::copy($filePath, $backupFilename);
 
-                $currentData = json_decode(File::get($backupFilePath), true);
+                $currentData = json_decode(Storage::get($filePath), true);
                 $updatedData = array_merge($currentData, $data);
-                File::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
 
-                File::delete($backupFilePath);
+                Storage::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+
+                Storage::delete($backupFilename);
             } else {
-                File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+                Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
             }
         } catch (\Exception $e) {
-            if (isset($backupFilePath) && File::exists($backupFilePath)) {
-                File::move($backupFilePath, $filePath);
+            if (isset($backupFilename) && Storage::exists($backupFilename)) {
+                Storage::move($backupFilename, $filePath);
             }
             throw $e;
         }
@@ -594,10 +595,10 @@ class HomeController extends Controller
 
     private function updateVersion($var)
     {
-        $filePath = public_path('updatesDataVersion.json');
+        $filePath = "public/updatesDataVersion.json";
 
-        if (File::exists($filePath)) {
-            $json = File::get($filePath);
+        if (Storage::exists($filePath)) {
+            $json = Storage::get($filePath);
             $data = json_decode($json, true) ?? [];
         } else {
             $data = [];
@@ -608,7 +609,6 @@ class HomeController extends Controller
         } else {
             $data[$var] = 1;
         }
-
-        File::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+        Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
