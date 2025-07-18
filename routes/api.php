@@ -43,6 +43,7 @@ Route::post('rescheduleOrder', [StaffAppController2::class, 'rescheduleOrder']);
 Route::get('timeSlots', [StaffAppController2::class, 'timeSlots']);
 Route::get('orderChat', [ChatController::class, 'orderChat']);
 Route::post('addOrderChat', [ChatController::class, 'addOrderChat']);
+Route::get('driverNotification', [DriverAppController::class, 'notification']);
 Route::get('notification', [StaffAppController2::class, 'notification']);
 Route::get('driverOrders', [DriverAppController::class, 'orders']);
 Route::post('driverLogin', [DriverAppController::class, 'login']);

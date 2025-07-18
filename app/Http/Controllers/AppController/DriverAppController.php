@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\OrderHistory;
@@ -107,5 +108,47 @@ class DriverAppController extends Controller
         OrderHistory::create(['order_id'=>$order->id,'user'=>$order->driver->name, 'status'=>'Drive:'.$request->status]);
         $order->staff->user->notifyOnMobile($title, $body, $order->id, 'Staff App');
         return response()->json(['success' => 'Order Update Successfully']);
+    }
+
+    public function notification(Request $request)
+    {
+        $user = User::find($request->user_id);
+
+        $notification_limit = Setting::where('key', 'Notification Limit for App')->value('value');
+
+        $notifications = Notification::where('user_id', $request->user_id)
+            ->where('type', 'Driver App')
+            ->orderBy('id', 'desc')
+            ->limit($notification_limit)
+            ->get();
+
+        if (!$notifications->isEmpty()) {
+            if ($request->update) {
+                $notifications->map(function ($notification) use ($user) {
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
+                    return $notification;
+                });
+
+                $user->last_notification_id = $notifications->first()->id;
+                $user->save();
+            } else {
+                $notifications->map(function ($notification) use ($user) {
+                    if ($notification->id > $user->last_notification_id) {
+                        $notification->type = "New";
+                    } else {
+                        $notification->type = "Old";
+                    }
+                    return $notification;
+                });
+            }
+        }
+
+        return response()->json([
+            'notifications' => $notifications
+        ], 200);
     }
 }
