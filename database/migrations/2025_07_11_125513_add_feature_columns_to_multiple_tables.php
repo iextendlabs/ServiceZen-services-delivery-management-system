@@ -27,7 +27,7 @@ return new class extends Migration
         Schema::table('service_categories', function (Blueprint $table) {
             $table->boolean('feature')->default(0);
             $table->boolean('feature_on_bottom')->default(0);
-            $table->integer('sort')->default(0);
+            $table->integer('sort')->nullable()->default(0);
         });
 
         // Add feature column to reviews table

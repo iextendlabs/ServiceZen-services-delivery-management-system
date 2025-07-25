@@ -344,8 +344,8 @@
                             class="text-dark">{{ $page->name }}</a> |
                     @endforeach
                 @endif
-                <a href="https://lipslay.com/privacyPolicy" class="text-dark">Privacy Policy</a> |
-                <a href="https://lipslay.com/termsCondition" class="text-dark">Terms and Conditions</a>
+                <a href="/privacyPolicy" class="text-dark">Privacy Policy</a> |
+                <a href="/termsCondition" class="text-dark">Terms and Conditions</a>
             </div>
 
             <p class="float-right">
