@@ -15,29 +15,29 @@ return new class extends Migration
     {
         // Add feature column to staff table
         Schema::table('staff', function (Blueprint $table) {
-            $table->boolean('feature')->default(0);
+            $table->boolean('feature')->nullable()->default(0);
         });
 
         // Add feature column to services table
         Schema::table('services', function (Blueprint $table) {
-            $table->boolean('feature')->default(0);
+            $table->boolean('feature')->nullable()->default(0);
         });
 
         // Add feature and feature_on_bottom columns to service_categories table
         Schema::table('service_categories', function (Blueprint $table) {
-            $table->boolean('feature')->default(0);
-            $table->boolean('feature_on_bottom')->default(0);
+            $table->boolean('feature')->nullable()->default(0);
+            $table->boolean('feature_on_bottom')->nullable()->default(0);
             $table->integer('sort')->nullable()->default(0);
         });
 
         // Add feature column to reviews table
         Schema::table('reviews', function (Blueprint $table) {
-            $table->boolean('feature')->default(0);
+            $table->boolean('feature')->nullable()->default(0);
         });
 
         // Add feature column to faqs table
         Schema::table('faqs', function (Blueprint $table) {
-            $table->boolean('feature')->default(0);
+            $table->boolean('feature')->nullable()->default(0);
         });
     }
 
