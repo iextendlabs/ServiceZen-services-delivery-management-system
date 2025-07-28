@@ -64,7 +64,7 @@ class FreelancerProgramController extends Controller
 
         $users = $query->paginate(config('app.paginate'));
 
-        $filters = $request->only(['status']);
+        $filters = $request->only(['status','name','email']);
         $users->appends($filters);
         return view('freelancerProgram.index', compact('users', 'filter_status', 'filter_name', 'filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
