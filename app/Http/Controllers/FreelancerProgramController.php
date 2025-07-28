@@ -59,7 +59,7 @@ class FreelancerProgramController extends Controller
         }
 
         if (isset($request->email)) {
-            $query->where('email', $request->email);
+            $query->where('email', 'like', '%' . $request->email . '%');
         }
 
         $users = $query->paginate(config('app.paginate'));
