@@ -111,7 +111,7 @@
                                 <input type="hidden" name="feature" value="0">
 
                                 <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1"
-                                    {{ old('feature', $serviceStaff->staff->feature) == '1' ? 'checked' : '' }}>
+                                    {{ old('feature', $serviceStaff->staff->feature ?? null) == '1' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="feature">Enable featured staff</label>
                             </div>
                         </div>
