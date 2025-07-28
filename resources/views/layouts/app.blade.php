@@ -396,43 +396,60 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-        const numberInputField = document.querySelector("#number");
-        const whatsappInputField = document.querySelector("#whatsapp");
-        const numberCountryInputField = document.querySelector("#number_country_code");
-        const whatsappCountryInputField = document.querySelector("#whatsapp_country_code");
+            const numberInputField = document.querySelector("#number");
+            const whatsappInputField = document.querySelector("#whatsapp");
+            const numberCountryInputField = document.querySelector("#number_country_code");
+            const whatsappCountryInputField = document.querySelector("#whatsapp_country_code");
 
-        const numberInput = window.intlTelInput(numberInputField, {
-        showSelectedDialCode: true,
-        initialCountry: "ae",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/utils.js?1707906286003",
+            // Function to convert dial code (+971) to country code (ae)
+            function dialCodeToCountryCode(dialCode) {
+                const countryData = window.intlTelInputGlobals.getCountryData();
+                for (const country of countryData) {
+                    if (country.dialCode === dialCode.replace('+', '')) {
+                        return country.iso2;
+                    }
+                }
+                return "ae"; // default if not found
+            }
+
+            // Get initial country based on hidden field value or default to 'ae'
+            const initialNumberCountry = numberCountryInputField.value ? 
+                dialCodeToCountryCode(numberCountryInputField.value) : 'ae';
+            const initialWhatsappCountry = whatsappCountryInputField.value ? 
+                dialCodeToCountryCode(whatsappCountryInputField.value) : 'ae';
+
+            // Initialize intl-tel-input
+            const numberInput = window.intlTelInput(numberInputField, {
+                showSelectedDialCode: true,
+                initialCountry: initialNumberCountry,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/utils.js",
+            });
+
+            const whatsappInput = window.intlTelInput(whatsappInputField, {
+                showSelectedDialCode: true,
+                initialCountry: initialWhatsappCountry,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/utils.js",
+            });
+
+            // Set initial values if empty (shouldn't be needed if hidden fields have defaults)
+            if (!numberCountryInputField.value) {
+                numberCountryInputField.value = `+${numberInput.getSelectedCountryData().dialCode}`;
+            }
+            if (!whatsappCountryInputField.value) {
+                whatsappCountryInputField.value = `+${whatsappInput.getSelectedCountryData().dialCode}`;
+            }
+
+            // Handle country change events
+            numberInputField.addEventListener("countrychange", function () {
+                const selectedCountryData = numberInput.getSelectedCountryData();
+                numberCountryInputField.value = `+${selectedCountryData.dialCode}`;
+            });
+
+            whatsappInputField.addEventListener("countrychange", function () {
+                const selectedCountryData = whatsappInput.getSelectedCountryData();
+                whatsappCountryInputField.value = `+${selectedCountryData.dialCode}`;
+            });
         });
-
-        const whatsappInput = window.intlTelInput(whatsappInputField, {
-        showSelectedDialCode: true,
-        initialCountry: "ae",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/19.2.19/js/utils.js?1707906286003",
-        });
-
-        const initialNumberCountryCode = numberInput.getSelectedCountryData().dialCode;
-        numberCountryInputField.value = `+${initialNumberCountryCode}`;
-
-        const initialWhatsappCountryCode = whatsappInput.getSelectedCountryData().dialCode;
-        whatsappCountryInputField.value = `+${initialWhatsappCountryCode}`;
-
-        numberInputField.addEventListener("countrychange", function () {
-        numberInputField.value = "";
-        const selectedCountryData = numberInput.getSelectedCountryData();
-        const countryCode = selectedCountryData.dialCode;
-        numberCountryInputField.value = `+${countryCode}`;
-        });
-
-        whatsappInputField.addEventListener("countrychange", function () {
-        whatsappInputField.value = "";
-        const selectedCountryData = whatsappInput.getSelectedCountryData();
-        const countryCode = selectedCountryData.dialCode;
-        whatsappCountryInputField.value = `+${countryCode}`;
-        });
-    });
     </script>
     <script>
         $(document).ready(function() {

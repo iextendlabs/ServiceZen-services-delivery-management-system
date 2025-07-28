@@ -79,14 +79,14 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Phone Number:</strong>
-                            <input id="number_country_code" type="hidden" name="number_country_code" />
+                            <input id="number_country_code" type="hidden" value="{{ old('number_country_code') }}" name="number_country_code" />
                             <input type="tel" id="number" name="phone" value="{{ old('phone',$serviceStaff->staff->phone ?? "") }}" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <span style="color: red;">*</span><strong>Whatsapp Number:</strong>
-                            <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                            <input id="whatsapp_country_code" type="hidden" value="{{ old('whatsapp_country_code') }}" name="whatsapp_country_code" />
                             <input type="tel" id="whatsapp" name="whatsapp" value="{{ old('whatsapp',$serviceStaff->staff->whatsapp ?? "") }}" class="form-control">
                         </div>
                     </div>
