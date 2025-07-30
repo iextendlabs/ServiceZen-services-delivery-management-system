@@ -25,6 +25,8 @@ use App\Models\Service;
 use App\Models\SubTitle;
 use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -453,6 +455,15 @@ class HomeController extends Controller
         ];
 
         $this->saveJsonFile('AppServicesData.json', $jsonData);
+
+        $this->updateVersion('services');
+
+        try {
+            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
+            Log::info('Cache clear API called successfully.');
+        } catch (\Exception $e) {
+            Log::error('Cache clear API failed: ' . $e->getMessage());
+        }
     }
 
     public function appSubTitles()
@@ -494,6 +505,13 @@ class HomeController extends Controller
         $this->saveJsonFile('AppCategories.json', $jsonData);
 
         $this->updateVersion('categories');
+
+        try {
+            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
+            Log::info('Cache clear API called successfully.');
+        } catch (\Exception $e) {
+            Log::error('Cache clear API failed: ' . $e->getMessage());
+        }
     }
 
     public function appZoneData()
@@ -514,6 +532,13 @@ class HomeController extends Controller
         $this->saveJsonFile('AppZoneData.json', $jsonData);
 
         $this->updateVersion('zones');
+
+        try {
+            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
+            Log::info('Cache clear API called successfully.');
+        } catch (\Exception $e) {
+            Log::error('Cache clear API failed: ' . $e->getMessage());
+        }
     }
 
     public function appTimeSlotsData()
