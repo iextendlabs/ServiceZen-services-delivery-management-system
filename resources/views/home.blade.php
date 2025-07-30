@@ -58,7 +58,7 @@
             <div class="col-md-6">
                 @if (auth()->user()->hasRole('Admin'))
                     <a class="btn btn-success float-end" href="{{ route('appData') }}"> Refresh App</a>
-                    <a class="btn btn-danger float-end mr-2" href="{{ route('cache.clear') }}"> Cache Clear</a>
+                    <a id="cacheClearBtn" class="btn btn-danger float-end mr-2" href="javascript:void(0)"> Cache Clear</a>
                 @endif
                 @if (auth()->user()->hasRole('Affiliate'))
                     <a class="btn btn-success float-end" href="{{ route('affiliate_dashboard.index') }}">Affiliate DashBorad</a>
@@ -701,6 +701,20 @@
             // Clear all filters
             $('#clearAllFilters').on('click', function() {
                 window.location.href = window.location.pathname;
+            });
+            
+            // Cache Clear AJAX
+            $('#cacheClearBtn').on('click', function() {
+                $.ajax({
+                    url: 'https://api.lipslay.com/api/clearcache',
+                    type: 'POST',
+                    success: function(response) {
+                        alert('Cache cleared successfully!');
+                    },
+                    error: function(xhr) {
+                        alert('Failed to clear cache.');
+                    }
+                });
             });
             
             function updateSearch(status = '{{ request('status') }}') {
