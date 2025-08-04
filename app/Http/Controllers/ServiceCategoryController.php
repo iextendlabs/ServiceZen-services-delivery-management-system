@@ -112,9 +112,19 @@ class ServiceCategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'unique:service_categories,slug',
-                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'
+                'unique:services,slug',
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                function ($attribute, $value, $fail) {
+                    if (preg_match('/--/', $value)) {
+                        $fail('The slug cannot contain consecutive hyphens.');
+                    }
+                    if (str_starts_with($value, '-') || str_ends_with($value, '-')) {
+                        $fail('The slug cannot start or end with a hyphen.');
+                    }
+                },
             ],
+        ], [
+            'slug.regex' => 'The slug must contain only lowercase letters, numbers, and hyphens.',
         ]);
 
         $service_category = ServiceCategory::create($request->all());
@@ -192,9 +202,22 @@ class ServiceCategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'unique:service_categories,slug,' . $id,
-                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'
+                'unique:services,slug,' . $id, // Works for both create/update
+                'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                function ($attribute, $value, $fail) {
+                    if (preg_match('/--/', $value)) {
+                        $fail('The slug cannot contain consecutive hyphens.');
+                    }
+                    if (str_starts_with($value, '-') || str_ends_with($value, '-')) {
+                        $fail('The slug cannot start or end with a hyphen.');
+                    }
+                    if (preg_match('/[^a-z0-9-]/', $value)) {
+                        $fail('The slug can only contain lowercase letters, numbers, and hyphens.');
+                    }
+                },
             ],
+        ], [
+            'slug.regex' => 'The slug must contain only lowercase letters, numbers, and hyphens.',
         ]);
 
         $service_category = ServiceCategory::find($id);
