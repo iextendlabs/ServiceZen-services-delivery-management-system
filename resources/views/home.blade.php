@@ -372,18 +372,6 @@
                                 </a>
                                 </div>
                             </div>
-                            <div class="col-md-4 d-flex justify-content-end align-items-center">
-                                <div class="btn-group me-3" role="group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary filter-btn {{ !request('status') ? 'active' : '' }}" data-filter="all">All</button>
-                                    <button type="button" class="btn btn-sm btn-outline-success filter-btn {{ request('status') === 'online' ? 'active' : '' }}" data-filter="online">Online</button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger filter-btn {{ request('status') === 'offline' ? 'active' : '' }}" data-filter="offline">Offline</button>
-                                </div>
-                                @if(request('search') || request('status'))
-                                <button class="btn btn-sm btn-outline-warning" id="clearAllFilters">
-                                    <i class="fas fa-filter-circle-xmark me-1"></i> Clear Filters
-                                </button>
-                                @endif
-                            </div>
                         </div>
 
                     </div>
