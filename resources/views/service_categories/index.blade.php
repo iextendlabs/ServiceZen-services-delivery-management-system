@@ -36,6 +36,11 @@
             margin-top: 10px;
         }
 
+        .grandchild-category {
+            margin-left: 60px;
+            margin-top: 10px;
+        }
+
         .category-header {
             font-weight: bold;
             display: flex;
@@ -84,7 +89,9 @@
                         @can('FAQs-create')
                             <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $category->id]) }}">Add FAQs</a></li>
                         @endcan
-                        <li><a class="dropdown-item" href="{{ route('serviceCategories.show', $category->id) }}">View</a></li>
+                        @if($category->status)
+                            <li><a class="dropdown-item" href="https://lipslay.com/category/{{ $category->slug }}" target="_blank">View</a></li>
+                        @endif
                         @can('service-category-edit')
                             <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $category->id) }}">Edit</a></li>
                         @endcan
@@ -111,14 +118,19 @@
                     @foreach ($category->childCategories as $child)
                         <div class="child-category category-node">
                             <div class="category-header">
-                                <div>
-                                    {{ $child->title }}
-                                    @if ($child->feature)
-                                        <span class="badge bg-success">Featured</span>
+                                <div class="category-title-wrapper">
+                                    @if ($child->childCategories && $child->childCategories->count())
+                                        <span class="toggle-icon" data-bs-toggle="collapse" data-bs-target="#grand-children-{{ $child->id }}" aria-expanded="false">+</span>
                                     @endif
-                                    @if ($child->feature_on_bottom)
-                                        <span class="badge bg-info">Bottom</span>
-                                    @endif
+                                    <div>
+                                        {{ $child->title }}
+                                        @if ($child->feature)
+                                            <span class="badge bg-success">Featured</span>
+                                        @endif
+                                        @if ($child->feature_on_bottom)
+                                            <span class="badge bg-info">Bottom</span>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="dropdown">
                                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -128,7 +140,9 @@
                                         @can('FAQs-create')
                                             <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $child->id]) }}">Add FAQs</a></li>
                                         @endcan
-                                        <li><a class="dropdown-item" href="{{ route('serviceCategories.show', $child->id) }}">View</a></li>
+                                        @if($child->status)
+                                            <li><a class="dropdown-item" href="https://lipslay.com/category/{{ $child->slug }}" target="_blank">View</a></li>
+                                        @endif
                                         @can('service-category-edit')
                                             <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $child->id) }}">Edit</a></li>
                                         @endcan
@@ -149,6 +163,56 @@
                                 Type: {{ $child->type }} |
                                 Sort Order: {{ $child->sort }}
                             </div>
+
+                            @if ($child->childCategories && $child->childCategories->count())
+                                <div id="grand-children-{{ $child->id }}" class="collapse mt-2">
+                                    @foreach ($child->childCategories as $grandchild)
+                                        <div class="grandchild-category category-node">
+                                            <div class="category-header">
+                                                <div>
+                                                    {{ $grandchild->title }}
+                                                    @if ($grandchild->feature)
+                                                        <span class="badge bg-success">Featured</span>
+                                                    @endif
+                                                    @if ($grandchild->feature_on_bottom)
+                                                        <span class="badge bg-info">Bottom</span>
+                                                    @endif
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Actions
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        @can('FAQs-create')
+                                                            <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $grandchild->id]) }}">Add FAQs</a></li>
+                                                        @endcan
+                                                        @if($grandchild->status)
+                                                            <li><a class="dropdown-item" href="https://lipslay.com/category/{{ $grandchild->slug }}" target="_blank">View</a></li>
+                                                        @endif
+                                                        @can('service-category-edit')
+                                                            <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $grandchild->id) }}">Edit</a></li>
+                                                        @endcan
+                                                        @can('service-category-delete')
+                                                            <li>
+                                                                <form action="{{ route('serviceCategories.destroy', $grandchild->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                                                </form>
+                                                            </li>
+                                                        @endcan
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="text-muted small mt-1">
+                                                Status: {{ $grandchild->status ? 'Enabled' : 'Disabled' }} |
+                                                Type: {{ $grandchild->type }} |
+                                                Sort Order: {{ $grandchild->sort }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -157,7 +221,6 @@
     @endforeach
 </div>
 
-{{-- Add Bootstrap JS if not already included --}}
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -172,7 +235,6 @@
                 }
             });
 
-            // Toggle icon when collapsed via Bootstrap (e.g. user manually clicks + then again)
             const collapseEl = document.querySelector(icon.getAttribute('data-bs-target'));
             collapseEl.addEventListener('shown.bs.collapse', () => {
                 icon.textContent = '-';
