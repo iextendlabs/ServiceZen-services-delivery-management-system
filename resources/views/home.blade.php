@@ -567,7 +567,7 @@
             <div class="py-2"></div>
             <div class="row">
                 <div class="col-md-12 text-center mb-3">
-                    <h2>Orders | Today Total {{ $orderCountToday }}</h2>
+                    <h2>Orders | Today's Bookings  {{ $orderCountToday }}</h2>
                 </div>
                 <div class="col-md-12 mb-3">
                     <div class="d-flex flex-wrap justify-content-md-end">
