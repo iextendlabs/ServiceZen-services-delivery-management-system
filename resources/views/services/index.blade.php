@@ -212,7 +212,7 @@
                         </tr>
                     @endif
                 </table>
-                {!! $services->links() !!}
+                {{-- Pagination removed: $services is now a collection, not a paginator --}}
             </div>
         </div>
     </div>
