@@ -37,7 +37,7 @@ class ServiceCategoryController extends Controller
     ];
 
     $query = ServiceCategory::query()
-        ->with(['parentCategory', 'childCategory']) // Include children
+        ->with(['parentCategory', 'childCategories']) // Include children
         ->when($request->title, function ($query) use ($request) {
             $query->where('title', 'like', "%" . $request->title . "%")
                 ->orWhereIn('parent_id', function ($subQuery) use ($request) {
