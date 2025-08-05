@@ -50,7 +50,7 @@ class OrderController extends Controller
     {
 
         $sort = $request->input('sort', 'id');
-        $direction = $request->input('direction', 'asc');
+        $direction = $request->input('direction', 'desc');
 
         $currentDate = Carbon::today()->toDateString();
 
