@@ -43,27 +43,38 @@
             align-items: center;
         }
 
-        .dropdown-toggle::after {
-            margin-left: 0.5em;
+        .toggle-icon {
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 20px;
         }
 
         .text-muted small {
             font-size: 0.85rem;
         }
+
+        .category-title-wrapper {
+            display: flex;
+            align-items: center;
+        }
     </style>
 
-    {{-- Category Tree View --}}
     @foreach ($service_categories->where('parent_id', null) as $category)
         <div class="category-node">
             <div class="category-header">
-                <div>
-                    {{ $category->title }}
-                    @if ($category->feature)
-                        <span class="badge bg-success">Featured</span>
+                <div class="category-title-wrapper">
+                    @if ($category->childCategories && $category->childCategories->count())
+                        <span class="toggle-icon" data-bs-toggle="collapse" data-bs-target="#children-{{ $category->id }}" aria-expanded="false">+</span>
                     @endif
-                    @if ($category->feature_on_bottom)
-                        <span class="badge bg-info">Bottom</span>
-                    @endif
+                    <div>
+                        {{ $category->title }}
+                        @if ($category->feature)
+                            <span class="badge bg-success">Featured</span>
+                        @endif
+                        @if ($category->feature_on_bottom)
+                            <span class="badge bg-info">Bottom</span>
+                        @endif
+                    </div>
                 </div>
                 <div class="dropdown">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -95,60 +106,82 @@
                 Sort Order: {{ $category->sort }}
             </div>
 
-            {{-- Render children --}}
             @if ($category->childCategories && $category->childCategories->count())
-                @foreach ($category->childCategories as $child)
-                    <div class="child-category category-node">
-                        <div class="category-header">
-                            <div>
-                                {{ $child->title }}
-                                @if ($child->feature)
-                                    <span class="badge bg-success">Featured</span>
-                                @endif
-                                @if ($child->feature_on_bottom)
-                                    <span class="badge bg-info">Bottom</span>
-                                @endif
+                <div id="children-{{ $category->id }}" class="collapse mt-2">
+                    @foreach ($category->childCategories as $child)
+                        <div class="child-category category-node">
+                            <div class="category-header">
+                                <div>
+                                    {{ $child->title }}
+                                    @if ($child->feature)
+                                        <span class="badge bg-success">Featured</span>
+                                    @endif
+                                    @if ($child->feature_on_bottom)
+                                        <span class="badge bg-info">Bottom</span>
+                                    @endif
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        @can('FAQs-create')
+                                            <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $child->id]) }}">Add FAQs</a></li>
+                                        @endcan
+                                        <li><a class="dropdown-item" href="{{ route('serviceCategories.show', $child->id) }}">View</a></li>
+                                        @can('service-category-edit')
+                                            <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $child->id) }}">Edit</a></li>
+                                        @endcan
+                                        @can('service-category-delete')
+                                            <li>
+                                                <form action="{{ route('serviceCategories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                                </form>
+                                            </li>
+                                        @endcan
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Actions
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    @can('FAQs-create')
-                                        <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $child->id]) }}">Add FAQs</a></li>
-                                    @endcan
-                                    <li><a class="dropdown-item" href="{{ route('serviceCategories.show', $child->id) }}">View</a></li>
-                                    @can('service-category-edit')
-                                        <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $child->id) }}">Edit</a></li>
-                                    @endcan
-                                    @can('service-category-delete')
-                                        <li>
-                                            <form action="{{ route('serviceCategories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger">Delete</button>
-                                            </form>
-                                        </li>
-                                    @endcan
-                                </ul>
+                            <div class="text-muted small mt-1">
+                                Status: {{ $child->status ? 'Enabled' : 'Disabled' }} |
+                                Type: {{ $child->type }} |
+                                Sort Order: {{ $child->sort }}
                             </div>
                         </div>
-                        <div class="text-muted small mt-1">
-                            Status: {{ $child->status ? 'Enabled' : 'Disabled' }} |
-                            Type: {{ $child->type }} |
-                            Sort Order: {{ $child->sort }}
-                        </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             @endif
         </div>
     @endforeach
 </div>
 
-{{-- Bootstrap 5 required --}}
+{{-- Add Bootstrap JS if not already included --}}
 @push('scripts')
 <script>
-    // If you're not using Laravel Mix, include Bootstrap's JS manually in layout
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.toggle-icon').forEach(function (icon) {
+            icon.addEventListener('click', function () {
+                const targetId = icon.getAttribute('data-bs-target');
+                const targetEl = document.querySelector(targetId);
+                if (targetEl.classList.contains('show')) {
+                    icon.textContent = '+';
+                } else {
+                    icon.textContent = '-';
+                }
+            });
+
+            // Toggle icon when collapsed via Bootstrap (e.g. user manually clicks + then again)
+            const collapseEl = document.querySelector(icon.getAttribute('data-bs-target'));
+            collapseEl.addEventListener('shown.bs.collapse', () => {
+                icon.textContent = '-';
+            });
+            collapseEl.addEventListener('hidden.bs.collapse', () => {
+                icon.textContent = '+';
+            });
+        });
+    });
 </script>
 @endpush
 @endsection
