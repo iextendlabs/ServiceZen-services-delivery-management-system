@@ -72,9 +72,9 @@
                         </th>
                         <th width="280px">Action</th>
                     </tr>
-                    @forelse ($service_categories as $service_category)
+                    @forelse ($service_categories as $key => $service_category)
                         <tr>
-                            <td>{{ ++$i }}</td>
+                            <td>{{ ++$key }}</td>
                             <td>
                                 @if (!auth()->user()->hasRole('Data Entry') && $service_category->parentCategoryForList)
                                     <a
@@ -122,7 +122,6 @@
                         </tr>
                     @endforelse
                 </table>
-                {!! $service_categories->links() !!}
             </div>
 
             <!-- Filters Sidebar -->
