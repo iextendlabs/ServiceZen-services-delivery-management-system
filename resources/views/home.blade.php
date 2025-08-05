@@ -385,44 +385,7 @@
                                 @endif
                             </div>
                         </div>
-                        
-                        <!-- Staff List -->
-                        <div class="row">
-                            @forelse ($staffs as $staff)
-                                @if ($staff->staff)
-                                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-3">
-                                        <div class="card h-100">
-                                            <a href="{{ route('serviceStaff.index', 'name='.$staff->name) }}" class="text-decoration-none text-dark">
-                                                <div class="card-body p-3 d-flex justify-content-between align-items-center">
-                                                    <div class="staff-info">
-                                                        <h6 class="mb-0 text-truncate" style="max-width: 180px;" title="{{ $staff->name }}">
-                                                            {{ $staff->name }}
-                                                        </h6>
-                                                        <small class="text-muted">{{ $staff->email ?? '' }}</small>
-                                                    </div>
-                                                    <span class="badge {{ $staff->staff->online ? 'bg-success' : 'bg-danger' }} rounded-pill">
-                                                        {{ $staff->staff->online ? 'Online' : 'Offline' }}
-                                                    </span>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                @endif
-                            @empty
-                                <div class="col-12">
-                                    <div class="alert alert-warning text-center">No staff found matching your criteria.</div>
-                                </div>
-                            @endforelse
-                        </div>
-                        
-                        <!-- Pagination -->
-                        @if($staffs->hasPages())
-                            <div class="row mt-3">
-                                <div class="col-md-12 d-flex justify-content-center">
-                                    {{ $staffs->appends(request()->query())->links() }}
-                                </div>
-                            </div>
-                        @endif
+
                     </div>
                 </div>
             </div>
