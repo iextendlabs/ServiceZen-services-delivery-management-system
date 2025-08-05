@@ -56,45 +56,57 @@ class HomeController extends Controller
 
             $userRole = $currentUser->getRoleNames()->first();
 
-            switch ($userRole) {
-                case 'Customer':
-                case 'Affiliate':
-                    return redirect('/')
-                        ->with('success', 'You have successfully logged in');
-                    break;
+$currentDate = Carbon::today()->toDateString(); // 'Y-m-d'
 
-                case 'Manager':
-                    $staffIds = $currentUser->getManagerStaffIds();
-                    $orders = Order::whereIn('service_staff_id', $staffIds)->orderBy('date', 'DESC')->take(10)->get();
-                    break;
+switch ($userRole) {
+    case 'Customer':
+    case 'Affiliate':
+        return redirect('/')
+            ->with('success', 'You have successfully logged in');
+        break;
 
-                case 'Supervisor':
-                    $staffIds = $currentUser->getSupervisorStaffIds();
-                    $orders = Order::whereIn('service_staff_id', $staffIds)
-                        ->orderBy('date', 'DESC')
-                        ->where('date', '<=', $currentDate)
-                        ->where(function ($query) {
-                            $query->whereDoesntHave('cashCollection');
-                        })
-                        ->take(10)->get();
-                    break;
+    case 'Manager':
+        $staffIds = $currentUser->getManagerStaffIds();
+        $orders = Order::whereIn('service_staff_id', $staffIds)
+            ->whereDate('date', $currentDate)
+            ->orderBy('date', 'DESC')
+            ->take(10)
+            ->get();
+        break;
 
-                case 'Staff':
-                    $orders = Order::where('service_staff_id', Auth::id())
-                        ->where('date', '=', $currentDate)
-                        ->orderBy('date', 'DESC')
-                        ->where(function ($query) {
-                            $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
-                                ->whereDoesntHave('cashCollection');
-                        })
-                        ->take(10)->get();
+    case 'Supervisor':
+        $staffIds = $currentUser->getSupervisorStaffIds();
+        $orders = Order::whereIn('service_staff_id', $staffIds)
+            ->whereDate('date', $currentDate)
+            ->where(function ($query) {
+                $query->whereDoesntHave('cashCollection');
+            })
+            ->orderBy('date', 'DESC')
+            ->take(10)
+            ->get();
+        break;
 
-                    break;
+    case 'Staff':
+        $orders = Order::where('service_staff_id', Auth::id())
+            ->whereDate('date', $currentDate)
+            ->where(function ($query) {
+                $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
+                    ->whereDoesntHave('cashCollection');
+            })
+            ->orderBy('date', 'DESC')
+            ->take(10)
+            ->get();
+        break;
 
-                default:
-                    $orders = Order::orderBy('date', 'DESC')->take(10)->get();
-                    break;
-            }
+    default:
+        $orders = Order::whereDate('date', $currentDate)
+            ->orderBy('date', 'DESC')
+            ->take(10)
+            ->get();
+        break;
+}
+
+$orderCountToday = Order::whereDate('date', $currentDate)->count();
 
             $affiliate_commission = DB::table('transactions')
                 ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')
@@ -106,13 +118,11 @@ class HomeController extends Controller
 
 
 
-            $order = Order::where('status', 'Complete')->get();
+            $sale = Order::where('status', 'Complete')
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->sum('total_amount');
 
-            $sale = 0;
-
-            foreach ($order as $single_order) {
-                $sale = $sale + $single_order->total_amount;
-            }
 
             $i = 0;
 
@@ -177,7 +187,7 @@ class HomeController extends Controller
             $newAffiliate = User::where('affiliate_program', '0')->has('affiliate')->count();
 
             $staffs = $query->paginate(20);
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount', 'unassignedZoneCount', 'unassignedTimeSlotCount', 'totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate', 'newFreelancer', 'newAffiliate', 'totalStaff'));
+            return view('home', compact('orders', 'orderCountToday', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount', 'unassignedZoneCount', 'unassignedTimeSlotCount', 'totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate', 'newFreelancer', 'newAffiliate', 'totalStaff'));
         }
     }
 

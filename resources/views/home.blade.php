@@ -339,64 +339,35 @@
                 </div>
             </div>
         </div>
-      <div class="row pt-3 staff-status">
-    
-    <div class="col-md-12">
-        <div class="row g-3">
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body">
-                        <h6 class="card-title text-muted mb-2">Total Staff</h6>
-                        <h3 class="card-text fw-bold text-primary">{{ $totalStaff }}</h3>
+        <div class="row pt-3 staff-status">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span>Staff Status ({{ $staffs->total() }})</span>
+                       
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title text-muted mb-2">Online</h6>
-                            <h3 class="card-text fw-bold text-success">{{ $onlineCount }}</h3>
-                        </div>
-                        <div>
-                            <h6 class="card-title text-muted mb-2">Offline</h6>
-                            <h3 class="card-text fw-bold text-danger">{{ $offlineCount }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-12">
-                <div class="card d-block text-start h-100 shadow-sm border-0">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-danger mb-0">Staff with No Zone</h6>
-                                <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="text-muted text-decoration-none">View</a>
+                        <!-- Status Summary -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="alert alert-info p-2">
+                                    <strong>Total Staff:</strong> {{ $staffs->total() }} | 
+                                    <span class="text-success"><strong>Online:</strong> {{ $onlineCount }}</span> | 
+                                    <span class="text-danger"><strong>Offline:</strong> {{ $offlineCount }}</span> |
+                                    <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="btn btn-sm btn-danger py-1 px-2 hover-scale"  title="Filter unassigned zone staff">
+                                    <strong>Staff With No Zone:</strong> {{ $unassignedZoneCount }}
+                                </a> |
+                                <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="btn btn-sm btn-danger py-1 px-2 hover-scale" title="Filter unassigned timeslot staff">
+                                    <strong>Staff With No TimeSlot:</strong> {{ $unassignedTimeSlotCount }}
+                                </a>
+                                </div>
                             </div>
-                            <span class="badge bg-danger rounded-pill fs-6">{{ $unassignedZoneCount }}</span>
                         </div>
+
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-4 col-md-12 mt-3">
-                <div class="card d-block text-start h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-danger mb-0">Staff with No TimeSlot</h6>
-                                <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="text-muted text-decoration-none">View</a>
-                            </div>
-                            <span class="badge bg-danger rounded-pill fs-6">{{ $unassignedTimeSlotCount }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </div>
-</div>
         @endif
         @if(auth()->user()->hasRole('Supervisor'))
         <div class="row pt-3">
@@ -566,7 +537,7 @@
             <div class="py-2"></div>
             <div class="row">
                 <div class="col-md-12 text-center mb-3">
-                    <h2>Orders</h2>
+                    <h2>Orders | Today Total {{ $orderCountToday }}</h2>
                 </div>
                 <div class="col-md-12 mb-3">
                     <div class="d-flex flex-wrap justify-content-md-end">
