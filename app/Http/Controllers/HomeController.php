@@ -164,6 +164,7 @@ class HomeController extends Controller
             $offlineCount = User::role('Staff')->whereHas('staff', fn($q) => $q->where('online', 0))->count();
             $unassignedZoneCount = User::role('Staff')->whereDoesntHave('staffZones')->count();
             $unassignedTimeSlotCount = User::role('Staff')->whereDoesntHave('staffTimeSlots')->count();
+            $totalStaff = User::role('Staff')->count();
 
             $totalFreelancer = User::whereNotNull('freelancer_program')->count();
             $acceptedFreelancer = User::where('freelancer_program', '1')->count();
@@ -176,7 +177,7 @@ class HomeController extends Controller
             $newAffiliate = User::where('affiliate_program', '0')->has('affiliate')->count();
 
             $staffs = $query->paginate(20);
-            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount', 'unassignedZoneCount', 'unassignedTimeSlotCount', 'totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate', 'newFreelancer', 'newAffiliate'));
+            return view('home', compact('orders', 'affiliate_commission', 'staff_commission', 'sale', 'i', 'staff_total_balance', 'staff_product_sales', 'staff_bonus', 'staff_order_commission', 'staff_other_income', 'staffs', 'todayCrms', 'todayAppUser', 'todayAppOrder', 'todayLoginAppUser', 'onlineCount', 'offlineCount', 'unassignedZoneCount', 'unassignedTimeSlotCount', 'totalFreelancer', 'acceptedFreelancer', 'rejectedFreelancer', 'totalAffiliate', 'acceptedAffiliate', 'rejectedAffiliate', 'newFreelancer', 'newAffiliate', 'totalStaff'));
         }
     }
 

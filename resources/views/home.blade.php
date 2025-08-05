@@ -340,14 +340,6 @@
             </div>
         </div>
       <div class="row pt-3 staff-status">
-    <div class="col-md-12">
-        <div class="card shadow-sm mb-4 border-0">
-            <div class="card-body d-flex align-items-center">
-                <h5 class="mb-0 text-dark me-auto">Staff Status</h5>
-                <span class="badge bg-primary rounded-pill fs-6">{{ $staffs->total() }} Total</span>
-            </div>
-        </div>
-    </div>
     
     <div class="col-md-12">
         <div class="row g-3">
@@ -355,7 +347,7 @@
                 <div class="card shadow-sm h-100 border-0">
                     <div class="card-body">
                         <h6 class="card-title text-muted mb-2">Total Staff</h6>
-                        <h3 class="card-text fw-bold text-primary">{{ $staffs->total() }}</h3>
+                        <h3 class="card-text fw-bold text-primary">{{ $totalStaff }}</h3>
                     </div>
                 </div>
             </div>
