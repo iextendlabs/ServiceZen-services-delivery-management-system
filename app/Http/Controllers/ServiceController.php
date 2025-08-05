@@ -81,9 +81,8 @@ class ServiceController extends Controller
                 $q->where('category_id', $request->category_id);
             });
         }
-
-        $services = $query->get();
-        $total_service = $services->count();
+        $total_service = $query->count();
+        $services = $query->paginate(config('app.paginate'));
 
         $variantIds = ServiceVariant::distinct()->pluck('variant_id')->toArray();
         $variant_service = Service::whereIn('id', $variantIds)->get();
@@ -97,7 +96,10 @@ class ServiceController extends Controller
         $service_categories = $query->get();
 
         $filters = $request->only(['name', 'price', 'category_id']);
-        return view('services.index', compact('total_service','services', 'service_categories', 'filter', 'variant_service', 'master_services', 'direction'));
+        $services->appends(array_merge($filters, ['sort' => $sort, 'direction' => $direction]));
+        
+        return view('services.index', compact('total_service','services', 'service_categories', 'filter', 'variant_service', 'master_services', 'direction'))
+            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
