@@ -43,9 +43,12 @@
             align-items: center;
         }
 
-        .category-actions a,
-        .category-actions form {
-            margin-left: 5px;
+        .dropdown-toggle::after {
+            margin-left: 0.5em;
+        }
+
+        .text-muted small {
+            font-size: 0.85rem;
         }
     </style>
 
@@ -62,21 +65,28 @@
                         <span class="badge bg-info">Bottom</span>
                     @endif
                 </div>
-                <div class="category-actions d-flex align-items-center">
-                    @can('FAQs-create')
-                        <a class="btn btn-sm btn-secondary" href="{{ route('FAQs.create', ['category_id' => $category->id]) }}">Add FAQs</a>
-                    @endcan
-                    <a class="btn btn-sm btn-warning" href="{{ route('serviceCategories.show', $category->id) }}"><i class="fa fa-eye"></i></a>
-                    @can('service-category-edit')
-                        <a class="btn btn-sm btn-primary" href="{{ route('serviceCategories.edit', $category->id) }}"><i class="fa fa-edit"></i></a>
-                    @endcan
-                    @can('service-category-delete')
-                        <form action="{{ route('serviceCategories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                        </form>
-                    @endcan
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        @can('FAQs-create')
+                            <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $category->id]) }}">Add FAQs</a></li>
+                        @endcan
+                        <li><a class="dropdown-item" href="{{ route('serviceCategories.show', $category->id) }}">View</a></li>
+                        @can('service-category-edit')
+                            <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $category->id) }}">Edit</a></li>
+                        @endcan
+                        @can('service-category-delete')
+                            <li>
+                                <form action="{{ route('serviceCategories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                </form>
+                            </li>
+                        @endcan
+                    </ul>
                 </div>
             </div>
             <div class="text-muted small mt-1">
@@ -85,7 +95,7 @@
                 Sort Order: {{ $category->sort }}
             </div>
 
-            {{-- Render children recursively (one level deep only) --}}
+            {{-- Render children --}}
             @if ($category->childCategories && $category->childCategories->count())
                 @foreach ($category->childCategories as $child)
                     <div class="child-category category-node">
@@ -99,21 +109,28 @@
                                     <span class="badge bg-info">Bottom</span>
                                 @endif
                             </div>
-                            <div class="category-actions d-flex align-items-center">
-                                @can('FAQs-create')
-                                    <a class="btn btn-sm btn-secondary" href="{{ route('FAQs.create', ['category_id' => $child->id]) }}">Add FAQs</a>
-                                @endcan
-                                <a class="btn btn-sm btn-warning" href="{{ route('serviceCategories.show', $child->id) }}"><i class="fa fa-eye"></i></a>
-                                @can('service-category-edit')
-                                    <a class="btn btn-sm btn-primary" href="{{ route('serviceCategories.edit', $child->id) }}"><i class="fa fa-edit"></i></a>
-                                @endcan
-                                @can('service-category-delete')
-                                    <form action="{{ route('serviceCategories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                                    </form>
-                                @endcan
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    @can('FAQs-create')
+                                        <li><a class="dropdown-item" href="{{ route('FAQs.create', ['category_id' => $child->id]) }}">Add FAQs</a></li>
+                                    @endcan
+                                    <li><a class="dropdown-item" href="{{ route('serviceCategories.show', $child->id) }}">View</a></li>
+                                    @can('service-category-edit')
+                                        <li><a class="dropdown-item" href="{{ route('serviceCategories.edit', $child->id) }}">Edit</a></li>
+                                    @endcan
+                                    @can('service-category-delete')
+                                        <li>
+                                            <form action="{{ route('serviceCategories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                            </form>
+                                        </li>
+                                    @endcan
+                                </ul>
                             </div>
                         </div>
                         <div class="text-muted small mt-1">
@@ -127,4 +144,11 @@
         </div>
     @endforeach
 </div>
+
+{{-- Bootstrap 5 required --}}
+@push('scripts')
+<script>
+    // If you're not using Laravel Mix, include Bootstrap's JS manually in layout
+</script>
+@endpush
 @endsection
