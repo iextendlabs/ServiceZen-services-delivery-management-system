@@ -344,17 +344,7 @@
                 <div class="card">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <span>Staff Status ({{ $staffs->total() }})</span>
-                        <div class="input-group" style="width: 350px;">
-                            <input type="text" id="staffSearch" class="form-control" placeholder="Search staff by name..." value="{{ request('search') }}">
-                            <button class="btn btn-light" type="button" id="searchButton">
-                                <i class="fas fa-search"></i>
-                            </button>
-                            @if(request('search') || request('status'))
-                            <button class="btn btn-outline-light" type="button" id="clearButton" title="Clear all filters">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            @endif
-                        </div>
+                       
                     </div>
                     <div class="card-body">
                         <!-- Status Summary -->
