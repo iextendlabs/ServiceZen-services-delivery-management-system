@@ -329,8 +329,8 @@ class ServiceController extends Controller
         $service = Service::find($id);
         $slug = $service->slug;
         $service->categories()->sync($request->categoriesId);
-        $jsonCachePath = env('JSON_CACHE_SERVICE_PATH');
-        if ($jsonCachePath && $slug) {
+        $jsonCachePath = public_path('jsonCache/services');
+        if ($slug) {
             $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
             $patterns = [
                 $base . $slug . '.json',
@@ -537,8 +537,8 @@ class ServiceController extends Controller
     {
         $service = Service::find($id);
         $slug = $service->slug;
-        $jsonCachePath = env('JSON_CACHE_SERVICE_PATH');
-        if ($jsonCachePath && $slug) {
+        $jsonCachePath = public_path('jsonCache/services');
+        if ($slug) {
             $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
             $patterns = [
                 $base . $slug . '.json',

@@ -220,10 +220,9 @@ class ServiceCategoryController extends Controller
         ]);
 
         $service_category = ServiceCategory::find($id);
-
-        $jsonCachePath = env('JSON_CACHE_CATEGORY_PATH');
+        $jsonCachePath = public_path('jsonCache/categories');
         $slug = $service_category->slug;
-        if ($jsonCachePath && $slug) {
+        if ($slug) {
             $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
             $patterns = [
                 $base . $slug . '.json',
@@ -293,9 +292,9 @@ class ServiceCategoryController extends Controller
     {
         $service_category = ServiceCategory::find($id);
 
-        $jsonCachePath = env('JSON_CACHE_CATEGORY_PATH');
+        $jsonCachePath = public_path('jsonCache/categories');
         $slug = $service_category->slug;
-        if ($jsonCachePath && $slug) {
+        if ($slug) {
             $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
             $patterns = [
                 $base . $slug . '.json',
