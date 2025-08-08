@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ServiceCategoryController extends Controller
 {
@@ -230,7 +231,11 @@ class ServiceCategoryController extends Controller
             ];
             foreach ($patterns as $pattern) {
                 foreach (glob($pattern) as $file) {
-                    @unlink($file);
+                    if (@unlink($file)) {
+                        Log::info("Deleted JSON cache file: $file");
+                    } else {
+                        Log::error("Failed to delete JSON cache file: $file");
+                    }
                 }
             }
         }
@@ -298,7 +303,11 @@ class ServiceCategoryController extends Controller
             ];
             foreach ($patterns as $pattern) {
                 foreach (glob($pattern) as $file) {
-                    @unlink($file);
+                    if (@unlink($file)) {
+                        Log::info("Deleted JSON cache file: $file");
+                    } else {
+                        Log::error("Failed to delete JSON cache file: $file");
+                    }
                 }
             }
         }

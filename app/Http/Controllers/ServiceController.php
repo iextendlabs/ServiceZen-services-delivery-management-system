@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class ServiceController extends Controller
@@ -337,7 +338,11 @@ class ServiceController extends Controller
             ];
             foreach ($patterns as $pattern) {
                 foreach (glob($pattern) as $file) {
-                    @unlink($file);
+                    if (@unlink($file)) {
+                        Log::info("Deleted JSON cache file: $file");
+                    } else {
+                        Log::error("Failed to delete JSON cache file: $file");
+                    }
                 }
             }
         }
@@ -541,7 +546,11 @@ class ServiceController extends Controller
             ];
             foreach ($patterns as $pattern) {
                 foreach (glob($pattern) as $file) {
-                    @unlink($file);
+                    if (@unlink($file)) {
+                        Log::info("Deleted JSON cache file: $file");
+                    } else {
+                        Log::error("Failed to delete JSON cache file: $file");
+                    }
                 }
             }
         }
