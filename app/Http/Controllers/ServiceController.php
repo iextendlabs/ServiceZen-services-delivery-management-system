@@ -326,7 +326,21 @@ class ServiceController extends Controller
         $input = $request->all();
 
         $service = Service::find($id);
+        $slug = $service->slug;
         $service->categories()->sync($request->categoriesId);
+        $jsonCachePath = env('JSON_CACHE_SERVICE_PATH');
+        if ($jsonCachePath && $slug) {
+            $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            $patterns = [
+                $base . $slug . '.json',
+                $base . $slug . '_*.json',
+            ];
+            foreach ($patterns as $pattern) {
+                foreach (glob($pattern) as $file) {
+                    @unlink($file);
+                }
+            }
+        }
         
         if (isset($request->variantId)) {
             $input['type'] = "Master"; 
@@ -517,6 +531,20 @@ class ServiceController extends Controller
     public function destroy($id, HomeController $homeController)
     {
         $service = Service::find($id);
+        $slug = $service->slug;
+        $jsonCachePath = env('JSON_CACHE_SERVICE_PATH');
+        if ($jsonCachePath && $slug) {
+            $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            $patterns = [
+                $base . $slug . '.json',
+                $base . $slug . '_*.json',
+            ];
+            foreach ($patterns as $pattern) {
+                foreach (glob($pattern) as $file) {
+                    @unlink($file);
+                }
+            }
+        }
 
         // Delete additional images for the service
         if ($service->images) {

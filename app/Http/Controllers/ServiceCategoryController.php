@@ -220,6 +220,21 @@ class ServiceCategoryController extends Controller
 
         $service_category = ServiceCategory::find($id);
 
+        $jsonCachePath = env('JSON_CACHE_CATEGORY_PATH');
+        $slug = $service_category->slug;
+        if ($jsonCachePath && $slug) {
+            $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            $patterns = [
+                $base . $slug . '.json',
+                $base . $slug . '_*.json',
+            ];
+            foreach ($patterns as $pattern) {
+                foreach (glob($pattern) as $file) {
+                    @unlink($file);
+                }
+            }
+        }
+
         $service_category->update($request->all());
 
         if (isset($request->image)) {
@@ -272,6 +287,21 @@ class ServiceCategoryController extends Controller
     public function destroy($id, HomeController $homeController)
     {
         $service_category = ServiceCategory::find($id);
+
+        $jsonCachePath = env('JSON_CACHE_CATEGORY_PATH');
+        $slug = $service_category->slug;
+        if ($jsonCachePath && $slug) {
+            $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            $patterns = [
+                $base . $slug . '.json',
+                $base . $slug . '_*.json',
+            ];
+            foreach ($patterns as $pattern) {
+                foreach (glob($pattern) as $file) {
+                    @unlink($file);
+                }
+            }
+        }
         //delete image for service_category
         if (isset($service_category->image)) {
             if (file_exists(public_path('service-category-images') . '/' . $service_category->image)) {
