@@ -9,6 +9,10 @@
         @endcan
     </div>
 
+    <div class="mb-3">
+        <input type="text" id="categorySearch" class="form-control" placeholder="Search categories...">
+    </div>
+
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -221,7 +225,7 @@
     @endforeach
 </div>
 
-@push('scripts')
+@section('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('.toggle-icon').forEach(function (icon) {
@@ -245,5 +249,44 @@
         });
     });
 </script>
-@endpush
+<script>
+    $(document).ready(function () {
+        $('#categorySearch').on('keyup', function () {
+            let searchText = $(this).val().toLowerCase().trim();
+
+            if (searchText === '') {
+                // Reset view
+                $('.category-node').show();
+                $('.collapse').collapse('hide'); // Close all
+                $('.toggle-icon').text('+');
+                return;
+            }
+
+            // Hide everything first
+            $('.category-node').hide();
+
+            $('.category-node').each(function () {
+                let node = $(this);
+                let text = node.find('.category-title-wrapper').first().text().toLowerCase();
+
+                if (text.includes(searchText)) {
+                    node.show();
+
+                    // Show and expand all parent nodes
+                    node.parents('.category-node').each(function () {
+                        $(this).show(); // Make sure parent is visible
+                    });
+
+                    // Expand all collapse containers for the matched node
+                    node.parents('.collapse').each(function () {
+                        $(this).collapse('show');
+                        let toggleIcon = $('[data-bs-target="#' + $(this).attr('id') + '"]');
+                        toggleIcon.text('-');
+                    });
+                }
+            });
+        });
+    });
+</script>
+@endsection
 @endsection
