@@ -211,6 +211,7 @@ class ServiceController extends Controller
                 ServiceOption::create([
                     'service_id' => $service->id, 
                     'option_name' => $name,
+                    'description' => $request->option_description[$key],
                     'option_price' => $request->option_price[$key],
                     'option_duration' => $request->option_duration[$key],
                     'image' => $image
@@ -449,6 +450,7 @@ class ServiceController extends Controller
                 if (!empty($request->option_id[$key])) {
                     ServiceOption::where('id', $request->option_id[$key])->update([
                         'option_name' => $name,
+                        'description' => $request->option_description[$key],
                         'option_price' => $request->option_price[$key],
                         'option_duration' => $request->option_duration[$key],
                         'image' => $image,
@@ -457,6 +459,7 @@ class ServiceController extends Controller
                     ServiceOption::create([
                         'service_id' => $service->id,
                         'option_name' => $name,
+                        'description' => $request->option_description[$key],
                         'option_price' => $request->option_price[$key],
                         'option_duration' => $request->option_duration[$key],
                         'image' => $image,

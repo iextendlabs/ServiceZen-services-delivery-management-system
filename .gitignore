@@ -35,6 +35,7 @@ public/app-browsing-icon/
 # Laravel 5 & Lumen specific
 public/storage
 public/hot
+public/jsonCache
 
 # Laravel 5 & Lumen specific with changed public path
 public_html/storage

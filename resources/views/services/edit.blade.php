@@ -452,6 +452,7 @@
                         <thead>
                             <tr>
                                 <th>Option Name</th>
+                                <th width="350">Short Description</th>
                                 <th>Option Price (AED)</th>
                                 <th>Option Duration</th>
                                 <th>Image</th>
@@ -470,6 +471,14 @@
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <input type="text" required name="option_name[{{ $option_row }}]" class="form-control" value="{{ old('option_name.'.$option_row, $option->option_name) }}"  placeholder="Option Name">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <textarea name="option_description[{{ $option_row }}]" class="form-control" placeholder="Description" maxlength="100" rows="4" oninput="optionDescriptionLengthCheck(this)">{{ old('option_description.'.$option_row, $option->description ?? '') }}</textarea>
+                                                    <small class="text-muted"><span class="desc-count">0</span>/100 characters</small>
                                                 </div>
                                             </div>
                                         </td>
@@ -644,6 +653,14 @@
                 <td>
                     <div class="col-md-12">
                         <div class="form-group">
+                            <textarea name="option_description[${option_row}]" class="form-control" placeholder="Description" maxlength="100" rows="4" oninput="optionDescriptionLengthCheck(this)"></textarea>
+                            <small class="text-muted"><span class="desc-count">0</span>/100 characters</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <input type="number" required name="option_price[${option_row}]" class="form-control" placeholder="Option Price">
                         </div>
                     </div>
@@ -671,6 +688,17 @@
         $('#optionTable tbody').append(newRow);
         option_row++
     }
+
+    function optionDescriptionLengthCheck(textarea) {
+        var count = textarea.value.length;
+        $(textarea).siblings('small').find('.desc-count').text(count);
+    }
+
+    $(document).ready(function() {
+        $('textarea[name^="option_description"]').each(function() {
+            optionDescriptionLengthCheck(this);
+        });
+    });
 
     $(document).on("change", ".option-image-input", function () {
         let input = this;
