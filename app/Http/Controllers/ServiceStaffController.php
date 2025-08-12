@@ -66,6 +66,7 @@ class ServiceStaffController extends Controller
         $filter = [
             'name' => $request->name,
             'email' => $request->email,
+            'status' => $request->status,
             'sub_title' => $request->sub_title,
             'location' => $request->location,
             'min_order_value' => $request->min_order_value,
@@ -75,6 +76,7 @@ class ServiceStaffController extends Controller
             'assignedZone' => $request->assignedZone,
             'assignedTimeSlot' => $request->assignedTimeSlot,
             'feature' => $request->feature,
+            'feature_on_app' => $request->feature_on_app,
         ];
 
         $sub_titles = SubTitle::all();
@@ -104,12 +106,20 @@ class ServiceStaffController extends Controller
                     $query->where('location', 'like', '%' . $request->location . '%');
                 }
 
+                if (!is_null($request->status) && $request->status !== '') {
+                    $query->where('status', $request->status);
+                }
+
                 if ($request->min_order_value) {
                     $query->where('min_order_value', $request->min_order_value);
                 }
 
                 if (!is_null($request->feature)) {
                     $query->where('feature', $request->feature);
+                }
+
+                if (!is_null($request->feature_on_app)) {
+                    $query->where('feature_on_app', $request->feature_on_app);
                 }
             })
             ->when($request->sub_title, function ($query) use ($request) {
@@ -203,7 +213,7 @@ class ServiceStaffController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, HomeController $homeController)
     {
         $this->validate($request, [
             'name' => 'required',
@@ -331,6 +341,8 @@ class ServiceStaffController extends Controller
             $ServiceStaff->staffZones()->sync($zoneIds);
         }
 
+        $homeController->appData();
+
         return redirect()->route('serviceStaff.index')
             ->with('success', 'Service Staff created successfully.');
     }
@@ -411,7 +423,7 @@ class ServiceStaffController extends Controller
      * @param  \App\ServiceStaff  $serviceStaff
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, HomeController $homeController)
     {
         $rules = [
             'name' => 'required',
@@ -597,6 +609,8 @@ class ServiceStaffController extends Controller
             $serviceStaff->staffZones()->sync($zoneIds);
         }
 
+        $homeController->appData();
+
         $previousUrl = $request->url;
         return redirect($previousUrl)
             ->with('success', 'Service Staff updated successfully');
@@ -636,7 +650,7 @@ class ServiceStaffController extends Controller
      * @param  \App\ServiceStaff  $service
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $serviceStaff)
+    public function destroy(User $serviceStaff,HomeController $homeController)
     {
         if (isset($serviceStaff->staff->image) && $serviceStaff->staff->image !== "default.png" && file_exists(public_path('staff-images') . '/' . $serviceStaff->staff->image)) {
             unlink(public_path('staff-images') . '/' . $serviceStaff->staff->image);
@@ -668,6 +682,8 @@ class ServiceStaffController extends Controller
         $previousUrl = url()->previous();
 
         StaffDriver::where('staff_id', $serviceStaff->id)->delete();
+
+        $homeController->appData();
 
         return redirect($previousUrl)
             ->with('success', 'Service Staff deleted successfully');

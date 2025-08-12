@@ -51,17 +51,12 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('serviceStaff.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
-                            @if (request('sort') === 'status')
-                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                            @endif
-                        </th>
 
                         <th>Sub Title / Designation</th>
+                        <th>Sort Order</th>
                         <th>Feature</th>
-                        {{-- <th>Driver</th> --}}
-                        <th width="280px">Action</th>
+                        <th>Feature On App</th>
+                        <th>Action</th>
                     </tr>
                     @if (count($serviceStaff))
                         @foreach ($serviceStaff as $staff)
@@ -69,27 +64,21 @@
                                 <td>
                                     <input type="checkbox" class="rowCheckbox" value="{{ $staff->id }}">
                                 </td>
-                                <td>{{ $staff->name }}</td>
-                                <td>{{ $staff->email }}</td>
                                 <td>
-                                    @if ($staff->staff->status == 1)
-                                        Enabled
-                                    @else
-                                        Disabled
-                                    @endif
+                                    <span style="color: {{ $staff->staff->status == 1 ? 'green' : 'red' }};">
+                                        {{ $staff->name }}
+                                    </span>
                                 </td>
+                                <td>{{ $staff->email }}</td>
                                 <td>
                                     @foreach ($staff->subTitles as $subTitle)
                                         <span class="badge badge-info m-2">{{ $subTitle->name }}</span>
                                     @endforeach
                                 </td>
+                                <td>{{ $staff->staff->sort }}</td>
                                 <td>{{ $staff->staff->feature ? 'Yes' : 'No' }}</td>
+                                <td>{{ $staff->staff->feature_on_app ? 'Yes' : 'No' }}</td>
 
-                                {{-- <td>
-                                    @if ($staff->staff->driver)
-                                        <a href="{{ route('drivers.index', ['id' => $staff->staff->driver->id]) }}">{{ $staff->staff->driver ? $staff->staff->driver->name : '' }}</a>
-                                    @endif
-                                </td> --}}
                                 <td>
                                     <form id="deleteForm{{ $staff->id }}"
                                         action="{{ route('serviceStaff.destroy', $staff->id) }}" method="POST">
@@ -114,7 +103,7 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="5" class="text-center">There is no Staff.</td>
+                            <td colspan="8" class="text-center">There is no Staff.</td>
                         </tr>
                     @endif
                 </table>
@@ -142,7 +131,35 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <strong>Feature:</strong>
+                                <strong>Status:</strong>
+                                <select name="status" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['status']) && $filter['status'] === '1' ? 'selected' : '' }}>Enabled
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['status']) && $filter['status'] === '0' ? 'selected' : '' }}>Disabled
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Feature On App:</strong>
+                                <select name="feature_on_app" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['feature_on_app']) && $filter['feature_on_app'] === '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['feature_on_app']) && $filter['feature_on_app'] === '0' ? 'selected' : '' }}>No
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Feature On Web:</strong>
                                 <select name="feature" class="form-control">
                                     <option value="">-- All --</option>
                                     <option value="1"

@@ -11,7 +11,41 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'commission', 'supervisor_id', 'image', 'phone', 'charges', 'status', 'instagram', 'facebook', 'youtube', 'snapchat', 'tiktok', 'about', 'images', 'fix_salary', 'sub_title', 'driver_id', 'whatsapp', 'min_order_value', 'expiry_date', 'affiliate_id', 'membership_plan_id','location','nationality','online','get_quote','quote_amount','quote_commission','show_quote_detail','feature'];
+    protected $fillable = [
+        'user_id',
+        'commission',
+        'supervisor_id',
+        'image',
+        'phone',
+        'charges',
+        'status',
+        'instagram',
+        'facebook',
+        'youtube',
+        'snapchat',
+        'tiktok',
+        'about',
+        'images',
+        'fix_salary',
+        'sub_title',
+        'driver_id',
+        'whatsapp',
+        'min_order_value',
+        'expiry_date',
+        'affiliate_id',
+        'membership_plan_id',
+        'location',
+        'nationality',
+        'online',
+        'get_quote',
+        'quote_amount',
+        'quote_commission',
+        'show_quote_detail',
+        'feature',
+        'delivered_order',
+        'feature_on_app',
+        'sort'
+    ];
 
     public function appointments()
     {
@@ -53,7 +87,7 @@ class Staff extends Model
         $day = Carbon::parse($date)->format('l');
 
         $driver = StaffDriver::where('staff_id', $this->user_id)
-            ->where('day', $day)->where('time_slot_id',$time_slot_id)->first();
+            ->where('day', $day)->where('time_slot_id', $time_slot_id)->first();
 
         return $driver ? $driver->driver_id : ($this->driver_id ?? null);
     }

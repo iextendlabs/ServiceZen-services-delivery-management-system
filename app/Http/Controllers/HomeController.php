@@ -336,10 +336,10 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
         $staffs = User::role('Staff')
             ->whereHas('staff', function ($query) {
-                $query->where('status', 1);
+                $query->where('status', 1)->where('feature_on_app', 1);
             })
-            ->orderBy('name', 'ASC')
             ->with('staff')
+            ->orderByRaw('(SELECT sort FROM staff WHERE staff.user_id = users.id) ASC')
             ->limit(10)
             ->get();
 
@@ -416,6 +416,13 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
         ];
 
         $this->saveJsonFile('AppHomeData.json', $jsonData);
+
+        try {
+            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
+            Log::info('Cache clear API called successfully.');
+        } catch (\Exception $e) {
+            Log::error('Cache clear API failed: ' . $e->getMessage());
+        }
     }
 
     public function staffAppServicesData()
