@@ -122,7 +122,7 @@
                     <input type="time" name="value" class="form-control" value="{{ $setting->value }}">
                     @elseif($setting->key === 'Terms & Condition' || $setting->key === 'Terms & Condition for Partner' || $setting->key === 'About Us' || $setting->key === 'Privacy Policy' || $setting->key === 'Contact Us')
                     <textarea name="value" id="summernote" class="form-control"> {{ $setting->value }}</textarea>
-                    @elseif($setting->key === 'Head Tag')
+                    @elseif($setting->key === 'Head Tag' || $setting->key === 'Footer Tag')
                     <textarea name="value" id="summernote" class="form-control"> {{ $setting->value }}</textarea>
                     @elseif($setting->key === 'Featured Services')
                     <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services By Name">

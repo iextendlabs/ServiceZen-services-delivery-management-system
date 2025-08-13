@@ -535,6 +535,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong>Additional Images</strong>
+                            <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 1080 x 1080px Thank you!</p>
                         </div>
                     </div>
                     <div class="col-md-12">
