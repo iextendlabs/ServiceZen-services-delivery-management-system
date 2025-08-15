@@ -332,6 +332,7 @@ class ServiceController extends Controller
         $input = $request->all();
 
         $service = Service::find($id);
+        
         $slug = $service->slug;
         $jsonCachePath = public_path('jsonCache/services');
         if ($slug) {
@@ -356,6 +357,18 @@ class ServiceController extends Controller
         }
         $service->categories()->sync($request->categoriesId);
         
+        $userIds = $service->users()->pluck('staff_id')->toArray();
+        if($userIds){
+            $users = User::whereIn('id',$userIds)->get();
+            $jsonCacheStaffPath = public_path('jsonCache/staff');
+
+            foreach($users as $user){
+                if($user->staff && $user->staff->id){
+                    JsonCacheHelper::deleteJsonCacheFiles($user->staff->id, $jsonCacheStaffPath);
+                }
+            }
+        }
+
         if (isset($request->variantId)) {
             $input['type'] = "Master"; 
         }
@@ -547,20 +560,8 @@ class ServiceController extends Controller
     public function destroy($id, HomeController $homeController)
     {
         $service = Service::find($id);
-        $slug = $service->slug;
-        $jsonCachePath = public_path('jsonCache/services');
-        if ($slug) {
-            JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
-        }
 
-        $categories = $service->categories()->get();
-        $jsonCacheCategoryPath = public_path('jsonCache/categories');
-
-        foreach ($categories as $category) {
-            if ($category->slug) {
-                JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
-            }
-        }
+        $this->deleteServiceJsonCacheFiles($service);
 
         // Delete additional images for the service
         if ($service->images) {
@@ -627,20 +628,7 @@ class ServiceController extends Controller
                     }
                 }
 
-                $slug = $service->slug;
-                $jsonCachePath = public_path('jsonCache/services');
-                if ($slug) {
-                    JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
-                }
-
-                $categories = $service->categories()->get();
-                $jsonCacheCategoryPath = public_path('jsonCache/categories');
-
-                foreach ($categories as $category) {
-                    if ($category->slug) {
-                        JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
-                    }
-                }
+                $this->deleteServiceJsonCacheFiles($service);
 
                 $service->delete();
             }
@@ -706,22 +694,7 @@ class ServiceController extends Controller
 
             foreach ($selectedItems as $serviceId) {
                 $service = Service::findOrFail($serviceId);
-                
-                $slug = $service->slug;
-                $jsonCachePath = public_path('jsonCache/services');
-                if ($slug) {
-                    JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
-                }
-
-                $categories = $service->categories()->get();
-                $jsonCacheCategoryPath = public_path('jsonCache/categories');
-
-                foreach ($categories as $category) {
-                    if ($category->slug) {
-                        JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
-                    }
-                }
-
+                $this->deleteServiceJsonCacheFiles($service);
                 $service->status = $status;
                 $service->save();
             }
@@ -734,5 +707,35 @@ class ServiceController extends Controller
         } else {
             return response()->json(['message' => 'No items selected.']);
         }
-    }  
+    } 
+    
+    private function deleteServiceJsonCacheFiles(Service $service)
+    {
+        $slug = $service->slug;
+        $jsonCachePath = public_path('jsonCache/services');
+        if ($slug) {
+            JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+        }
+
+        $categories = $service->categories()->get();
+        $jsonCacheCategoryPath = public_path('jsonCache/categories');
+
+        foreach ($categories as $category) {
+            if ($category->slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
+            }
+        }
+
+        $userIds = $service->users()->pluck('staff_id')->toArray();
+        if ($userIds) {
+            $users = User::whereIn('id', $userIds)->get();
+            $jsonCacheStaffPath = public_path('jsonCache/staff');
+
+            foreach ($users as $user) {
+                if ($user->staff && $user->staff->id) {
+                    JsonCacheHelper::deleteJsonCacheFiles($user->staff->id, $jsonCacheStaffPath);
+                }
+            }
+        }
+    }
 }

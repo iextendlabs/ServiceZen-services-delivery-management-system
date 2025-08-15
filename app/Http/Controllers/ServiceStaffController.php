@@ -483,6 +483,11 @@ class ServiceStaffController extends Controller
 
         $staff = Staff::find($input['staff_id']);
 
+        $jsonCachePath = public_path('jsonCache/staff');
+        if ($staff->id) {
+            JsonCacheHelper::deleteJsonCacheFiles($staff->id, $jsonCachePath);
+        }
+
         if ($request->gallery_images) {
             $images = $request->gallery_images;
 
@@ -716,6 +721,12 @@ class ServiceStaffController extends Controller
             if ($service->slug) {
                 JsonCacheHelper::deleteJsonCacheFiles($service->slug, $jsonCacheServicePath);
             }
+        }
+
+        $jsonCachePath = public_path('jsonCache/staff');
+
+        if ($serviceStaff->staff && $serviceStaff->staff->id) {
+            JsonCacheHelper::deleteJsonCacheFiles($serviceStaff->staff->id, $jsonCachePath);
         }
 
         $serviceStaff->delete();

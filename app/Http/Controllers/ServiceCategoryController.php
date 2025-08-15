@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonCacheHelper;
 use App\Models\ServiceCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -261,6 +262,18 @@ class ServiceCategoryController extends Controller
             }
         }
 
+        $userIds = $service_category->users()->pluck('staff_id')->toArray();
+        if ($userIds) {
+            $users = User::whereIn('id', $userIds)->get();
+            $jsonCacheStaffPath = public_path('jsonCache/staff');
+
+            foreach ($users as $user) {
+                if ($user->staff && $user->staff->id) {
+                    JsonCacheHelper::deleteJsonCacheFiles($user->staff->id, $jsonCacheStaffPath);
+                }
+            }
+        }
+
         $service_category->update($request->all());
 
         if (isset($request->image)) {
@@ -347,6 +360,18 @@ class ServiceCategoryController extends Controller
             $slug = $parentCategory->slug;
             if ($slug) {
                 JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+            }
+        }
+
+        $userIds = $service_category->users()->pluck('staff_id')->toArray();
+        if ($userIds) {
+            $users = User::whereIn('id', $userIds)->get();
+            $jsonCacheStaffPath = public_path('jsonCache/staff');
+
+            foreach ($users as $user) {
+                if ($user->staff && $user->staff->id) {
+                    JsonCacheHelper::deleteJsonCacheFiles($user->staff->id, $jsonCacheStaffPath);
+                }
             }
         }
         //delete image for service_category
