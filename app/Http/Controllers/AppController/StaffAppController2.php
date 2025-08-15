@@ -871,7 +871,14 @@ class StaffAppController2 extends Controller
         if (file_exists(public_path('staff-images') . '/' . "default.png")) {
             $input['image'] = "default.png";
         }
-        Staff::create($input);
+
+        $staff = Staff::find($input['user_id']);
+
+        if ($staff) {
+            $staff->update($input);
+        } else {
+            Staff::create($input);
+        }
 
         if ($request->number && $request->whatsapp) {
             CustomerProfile::create($input);

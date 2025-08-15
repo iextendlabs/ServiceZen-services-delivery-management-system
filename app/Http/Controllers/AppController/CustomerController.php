@@ -1785,7 +1785,14 @@ class CustomerController extends Controller
             if (file_exists(public_path('staff-images') . '/' . "default.png")) {
                 $input['image'] = "default.png";
             }
-            Staff::create($input);
+
+            $staff = Staff::find($input['user_id']);
+
+            if ($staff) {
+                $staff->update($input);
+            } else {
+                Staff::create($input);
+            }
             return response()->json([
                 'msg' => "Your request to join the freelancer program has been submitted and sent to the administrator for review.",
             ], 200);
