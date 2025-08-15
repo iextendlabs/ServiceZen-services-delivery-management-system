@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonCacheHelper;
 use App\Http\Controllers\HomeController;
 use App\Models\Service;
 use App\Models\ServiceAddOn;
@@ -11,15 +12,9 @@ use App\Models\ServiceOption;
 use App\Models\ServicePackage;
 use App\Models\ServiceToUserNote;
 use App\Models\ServiceVariant;
-use App\Models\Setting;
-use App\Models\StaffZone;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class ServiceController extends Controller
 {
@@ -167,6 +162,15 @@ class ServiceController extends Controller
         
         $service->categories()->attach($request->categoriesId);
 
+        $categories = $service->categories()->get();
+        $jsonCacheCategoryPath = public_path('jsonCache/categories');
+
+        foreach ($categories as $category) {
+            if ($category->slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
+            }
+        }
+        
         $service_id = $service->id;
 
         if (isset($request->packageId)) {
@@ -331,42 +335,23 @@ class ServiceController extends Controller
         $slug = $service->slug;
         $jsonCachePath = public_path('jsonCache/services');
         if ($slug) {
-            $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-            $patterns = [
-                $base . $slug . '.json',
-                $base . $slug . '_*.json',
-            ];
-            foreach ($patterns as $pattern) {
-                foreach (glob($pattern) as $file) {
-                    if (@unlink($file)) {
-                        Log::info("Deleted JSON cache file: $file");
-                    } else {
-                        Log::error("Failed to delete JSON cache file: $file");
-                    }
-                }
-            }
+            JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
         }
 
-        // Delete JSON cache for service categories by their slug
-        $categories = $service->categories()->get();
-        $jsonCacheCategoryPath = public_path('jsonCache/categories');
+        $oldCategoryIds = $service->categories()->pluck('category_id')->toArray();
+        $newCategoryIds = $request->categoriesId;
 
-        foreach ($categories as $category) {
+        $removedCategoryIds = array_diff($oldCategoryIds, $newCategoryIds);
+        $addedCategoryIds = array_diff($newCategoryIds, $oldCategoryIds);
+
+        $affectedCategoryIds = array_merge($removedCategoryIds, $addedCategoryIds);
+
+        $jsonCacheCategoryPath = public_path('jsonCache/categories');
+        $affectedCategories = ServiceCategory::whereIn('id', $affectedCategoryIds)->get();
+
+        foreach ($affectedCategories as $category) {
             if ($category->slug) {
-                $categoryBase = rtrim($jsonCacheCategoryPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-                $catPatterns = [
-                    $categoryBase . $category->slug . '.json',
-                    $categoryBase . $category->slug . '_*.json',
-                ];
-                foreach ($catPatterns as $catPattern) {
-                    foreach (glob($catPattern) as $file) {
-                        if (@unlink($file)) {
-                            Log::info("Deleted JSON cache file for category: $file");
-                        } else {
-                            Log::error("Failed to delete JSON cache file for category: $file");
-                        }
-                    }
-                }
+                JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
             }
         }
         $service->categories()->sync($request->categoriesId);
@@ -565,42 +550,15 @@ class ServiceController extends Controller
         $slug = $service->slug;
         $jsonCachePath = public_path('jsonCache/services');
         if ($slug) {
-            $base = rtrim($jsonCachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-            $patterns = [
-                $base . $slug . '.json',
-                $base . $slug . '_*.json',
-            ];
-            foreach ($patterns as $pattern) {
-                foreach (glob($pattern) as $file) {
-                    if (@unlink($file)) {
-                        Log::info("Deleted JSON cache file: $file");
-                    } else {
-                        Log::error("Failed to delete JSON cache file: $file");
-                    }
-                }
-            }
+            JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
         }
 
-        // Delete JSON cache for service categories by their slug
         $categories = $service->categories()->get();
         $jsonCacheCategoryPath = public_path('jsonCache/categories');
 
         foreach ($categories as $category) {
             if ($category->slug) {
-                $categoryBase = rtrim($jsonCacheCategoryPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-                $catPatterns = [
-                    $categoryBase . $category->slug . '.json',
-                    $categoryBase . $category->slug . '_*.json',
-                ];
-                foreach ($catPatterns as $catPattern) {
-                    foreach (glob($catPattern) as $file) {
-                        if (@unlink($file)) {
-                            Log::info("Deleted JSON cache file for category: $file");
-                        } else {
-                            Log::error("Failed to delete JSON cache file for category: $file");
-                        }
-                    }
-                }
+                JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
             }
         }
 
@@ -669,6 +627,21 @@ class ServiceController extends Controller
                     }
                 }
 
+                $slug = $service->slug;
+                $jsonCachePath = public_path('jsonCache/services');
+                if ($slug) {
+                    JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+                }
+
+                $categories = $service->categories()->get();
+                $jsonCacheCategoryPath = public_path('jsonCache/categories');
+
+                foreach ($categories as $category) {
+                    if ($category->slug) {
+                        JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
+                    }
+                }
+
                 $service->delete();
             }
 
@@ -733,6 +706,22 @@ class ServiceController extends Controller
 
             foreach ($selectedItems as $serviceId) {
                 $service = Service::findOrFail($serviceId);
+                
+                $slug = $service->slug;
+                $jsonCachePath = public_path('jsonCache/services');
+                if ($slug) {
+                    JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+                }
+
+                $categories = $service->categories()->get();
+                $jsonCacheCategoryPath = public_path('jsonCache/categories');
+
+                foreach ($categories as $category) {
+                    if ($category->slug) {
+                        JsonCacheHelper::deleteJsonCacheFiles($category->slug, $jsonCacheCategoryPath);
+                    }
+                }
+
                 $service->status = $status;
                 $service->save();
             }

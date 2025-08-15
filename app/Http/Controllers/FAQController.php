@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonCacheHelper;
 use App\Models\FAQ;
 use App\Models\Service;
 use App\Models\ServiceCategory;
@@ -94,6 +95,15 @@ class FAQController extends Controller
         ]);
 
         FAQ::create($request->all());
+        
+        if($request->service_id){
+            $service = Service::find($request->service_id);
+            $slug = $service->slug;
+            $jsonCachePath = public_path('jsonCache/services');
+            if ($slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+            }
+        }
 
         return redirect()->route('FAQs.index')
             ->with('success', 'FAQs created successfully.');
@@ -136,6 +146,23 @@ class FAQController extends Controller
 
         $FAQ = FAQ::find($id);
 
+        if ((int)$request->service_id !== (int)$FAQ->service_id) {
+            $jsonCachePath = public_path('jsonCache/services');
+
+            if ($FAQ->service_id) {
+                $oldParentService = Service::find($FAQ->service_id);
+                if ($oldParentService && $oldParentService->slug) {
+                    JsonCacheHelper::deleteJsonCacheFiles($oldParentService->slug, $jsonCachePath);
+                }
+            }
+            if ($request->service_id) {
+                $newParentService = Service::find($request->service_id);
+                if ($newParentService && $newParentService->slug) {
+                    JsonCacheHelper::deleteJsonCacheFiles($newParentService->slug, $jsonCachePath);
+                }
+            }
+        }
+
         $FAQ->update($request->all());
 
         $previousUrl = $request->url;
@@ -152,6 +179,16 @@ class FAQController extends Controller
     public function destroy($id)
     {
         $FAQ = FAQ::find($id);
+
+        if ($FAQ->service_id) {
+            $service = Service::find($FAQ->service_id);
+            $slug = $service->slug;
+            $jsonCachePath = public_path('jsonCache/services');
+            if ($slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+            }
+        }
+
         $FAQ->delete();
 
         $previousUrl = url()->previous();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonCacheHelper;
 use App\Models\Review;
 use App\Models\ReviewImage;
 use App\Models\Service;
@@ -75,6 +76,15 @@ class ReviewController extends Controller
             $input['video'] = $videoName;
         }
         $review = Review::create($input);
+
+        if($request->service_id){
+            $service = Service::find($request->service_id);
+            $slug = $service->slug;
+            $jsonCachePath = public_path('jsonCache/services');
+            if ($slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+            }
+        }
 
         if ($request->images) {
             $images = $request->images;
@@ -153,6 +163,23 @@ class ReviewController extends Controller
             $input['video'] = $videoName;
         }
 
+        if ((int)$request->service_id !== (int)$review->service_id) {
+            $jsonCachePath = public_path('jsonCache/services');
+
+            if ($review->service_id) {
+                $oldParentService = Service::find($review->service_id);
+                if ($oldParentService && $oldParentService->slug) {
+                    JsonCacheHelper::deleteJsonCacheFiles($oldParentService->slug, $jsonCachePath);
+                }
+            }
+            if ($request->service_id) {
+                $newParentService = Service::find($request->service_id);
+                if ($newParentService && $newParentService->slug) {
+                    JsonCacheHelper::deleteJsonCacheFiles($newParentService->slug, $jsonCachePath);
+                }
+            }
+        }
+
         $review->update($input);
 
         if ($request->images) {
@@ -192,6 +219,15 @@ class ReviewController extends Controller
 
         if ($review && $review->video && file_exists(public_path('review-videos') . '/' . $review->video)) {
             unlink(public_path('review-videos') . '/' . $review->video);
+        }
+
+        if ($review->service_id) {
+            $service = Service::find($review->service_id);
+            $slug = $service->slug;
+            $jsonCachePath = public_path('jsonCache/services');
+            if ($slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($slug, $jsonCachePath);
+            }
         }
 
         $review->delete();

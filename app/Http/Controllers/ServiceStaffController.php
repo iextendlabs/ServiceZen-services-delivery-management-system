@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonCacheHelper;
 use App\Models\AffiliateCategory;
 use App\Models\AffiliateService;
 use App\Models\MembershipPlan;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ServiceStaffController extends Controller
 {
@@ -293,6 +295,16 @@ class ServiceStaffController extends Controller
 
         $staff = Staff::create($input);
         $ServiceStaff->services()->attach($request->service_ids);
+
+        $services = $ServiceStaff->services()->get();
+        $jsonCacheServicePath = public_path('jsonCache/services');
+
+        foreach ($services as $service) {
+            if ($service->slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($service->slug, $jsonCacheServicePath);
+            }
+        }
+
         $ServiceStaff->categories()->attach($request->category_ids);
 
         $ServiceStaff->supervisors()->attach($request->ids);
@@ -517,6 +529,24 @@ class ServiceStaffController extends Controller
             Staff::create($input);
         }
         $serviceStaff->supervisors()->sync($request->ids);
+
+        $oldServiceIds = $serviceStaff->services()->pluck('service_id')->toArray();
+        $newServiceIds = $request->service_ids;
+
+        $removedServiceIds = array_diff($oldServiceIds, $newServiceIds);
+        $addedServiceIds = array_diff($newServiceIds, $oldServiceIds);
+
+        $affectedServiceIds = array_merge($removedServiceIds, $addedServiceIds);
+
+        $jsonCacheServicePath = public_path('jsonCache/services');
+        $affectedServices = Service::whereIn('id', $affectedServiceIds)->get();
+
+        foreach ($affectedServices as $service) {
+            if ($service->slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($service->slug, $jsonCacheServicePath);
+            }
+        }
+
         $serviceStaff->services()->sync($request->service_ids);
         $serviceStaff->categories()->sync($request->category_ids);
 
@@ -677,6 +707,17 @@ class ServiceStaffController extends Controller
             }
         }
         $serviceStaff->subTitles()->detach();
+
+        // Delete JSON cache for service services by their slug
+        $services = $serviceStaff->services()->get();
+        $jsonCacheServicePath = public_path('jsonCache/services');
+
+        foreach ($services as $service) {
+            if ($service->slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($service->slug, $jsonCacheServicePath);
+            }
+        }
+
         $serviceStaff->delete();
 
         $previousUrl = url()->previous();
