@@ -206,6 +206,33 @@ class CustomerController extends Controller
         ], 200);
     }
 
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json(['error' => 'Old password is incorrect.'], 400);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['msg' => 'Password changed successfully.'], 200);
+    }
+
     public function getCacheServiceDetail(Request $request)
     {
         $serviceId = $request->service_id;

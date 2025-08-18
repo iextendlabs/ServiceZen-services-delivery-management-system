@@ -88,6 +88,7 @@ Route::get('customerNotification', [CustomerController::class, 'notification']);
 Route::get('customerChat', [CustomerController::class, 'getChat']);
 Route::post('addCustomerChat', [CustomerController::class, 'addChat']);
 Route::post('passwordReset', [CustomerController::class, 'passwordReset']);
+Route::post('changePassword', [CustomerController::class, 'changePassword']);
 Route::get('staff/{id}', [CustomerController::class, 'staff'])->name('staff');
 Route::get('deleteAccountMail', [CustomerController::class, 'deleteAccountMail']);
 Route::get('subCategories', [CustomerController::class, 'getSubCategories']);
