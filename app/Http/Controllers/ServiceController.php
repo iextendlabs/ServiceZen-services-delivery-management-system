@@ -340,7 +340,7 @@ class ServiceController extends Controller
         }
 
         $oldCategoryIds = $service->categories()->pluck('category_id')->toArray();
-        $newCategoryIds = $request->categoriesId;
+        $newCategoryIds = $request->categoriesId ?? [];
 
         $removedCategoryIds = array_diff($oldCategoryIds, $newCategoryIds);
         $addedCategoryIds = array_diff($newCategoryIds, $oldCategoryIds);

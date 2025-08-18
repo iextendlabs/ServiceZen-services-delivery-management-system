@@ -536,7 +536,7 @@ class ServiceStaffController extends Controller
         $serviceStaff->supervisors()->sync($request->ids);
 
         $oldServiceIds = $serviceStaff->services()->pluck('service_id')->toArray();
-        $newServiceIds = $request->service_ids;
+        $newServiceIds = $request->service_ids ?? [];
 
         $removedServiceIds = array_diff($oldServiceIds, $newServiceIds);
         $addedServiceIds = array_diff($newServiceIds, $oldServiceIds);
