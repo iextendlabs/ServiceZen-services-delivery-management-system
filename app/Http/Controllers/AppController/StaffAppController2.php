@@ -397,14 +397,25 @@ class StaffAppController2 extends Controller
         $currentDate = Carbon::today();
 
         $user = User::find($request->user_id);
+         $whatsapp_number = Setting::where('key', 'WhatsApp Number For Staff App')->value('value');
+
         if (!$user || !$user->staff) {
-            return response()->json(['message' => "User not found."], 201);
+            return response()->json([
+                'message' => "User not found.",
+                'whatsapp_number' => $whatsapp_number
+            ], 201);
         }
         if ($user->freelancer_program !== null) {
             if ($user->freelancer_program == 0) {
-                return response()->json(['message' => "Request in progress."], 202);
+                return response()->json([
+                    'message' => "Request in progress.",
+                    'whatsapp_number' => $whatsapp_number
+                ], 202);
             } elseif (Carbon::parse($user->staff->expiry_date)->toDateString() < $currentDate->toDateString()) {
-                return response()->json(['message' => "Expire."], 203);
+                return response()->json([
+                    'message' => "Expire.",
+                    'whatsapp_number' => $whatsapp_number
+                ], 203);
             }
         }
 
@@ -431,8 +442,6 @@ class StaffAppController2 extends Controller
                 ];
             })
             : [];
-
-        $whatsapp_number = Setting::where('key', 'WhatsApp Number For Staff App')->value('value');
 
         return response()->json([
             'user_id' => $user->id,
