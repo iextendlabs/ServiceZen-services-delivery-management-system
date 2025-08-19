@@ -236,7 +236,7 @@ class Order extends Model
                     }
                 }
             }else{
-                $staff_commission = $staff->commission ?? 0;
+                $staff_commission_rate = $staff->commission ?? 0;
                 $staff_commission = ($commission_apply_amount * $staff_commission_rate) / 100;
             }
 
