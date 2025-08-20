@@ -219,6 +219,13 @@ class SettingsTableSeeder extends Seeder
                 'created_at' => '2023-08-31 17:36:24',
                 'updated_at' => '2023-08-31 16:45:43',
             ],
+            [
+                'id' => 2,
+                'key' => 'Footer Tag',
+                'value' => '',
+                'created_at' => '2023-08-31 06:53:22',
+                'updated_at' => '2023-09-28 10:40:34',
+            ],
         ];
 
         foreach ($settings as $setting) {
