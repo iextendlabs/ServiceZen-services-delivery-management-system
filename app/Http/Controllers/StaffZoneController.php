@@ -2,6 +2,7 @@
     
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Staff;
 use App\Models\StaffZone;
@@ -33,10 +34,31 @@ class StaffZoneController extends Controller
     {
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
-        $query = StaffZone::orderBy($sort, $direction);
+        $filter = [
+            'name' => $request->name,
+            'country_id' => $request->country_id,
+        ];
+
+        $query = StaffZone::query();
+
+        if ($filter['name']) {
+            $query->where('name', 'like', '%'.$filter['name'].'%');
+        }
+
+        if ($filter['country_id']) {
+            $query->where('country_id', $filter['country_id']);
+        }
+
+        $query->orderBy($sort, $direction);
         $total_staffZone = $query->count();
         $staffZones = $query->paginate(config('app.paginate'));
-        return view('staffZones.index',compact('total_staffZone' , 'staffZones', 'direction'))
+
+        $filters = $request->only(['name','country_id']);
+        $staffZones->appends($filters, ['sort' => $sort, 'direction' => $direction]);
+
+        $country = Country::orderBy("name")->get();
+
+        return view('staffZones.index',compact('total_staffZone' , 'staffZones', 'direction', 'country','filter'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
@@ -48,7 +70,8 @@ class StaffZoneController extends Controller
     public function create()
     {
         $currencies = Currency::get();
-        return view('staffZones.create',compact('currencies'));
+        $country = Country::orderBy("name")->get();
+        return view('staffZones.create',compact('currencies','country'));
     }
     
     /**
@@ -98,7 +121,8 @@ class StaffZoneController extends Controller
     public function edit(StaffZone $staffZone)
     {
         $currencies = Currency::get();
-        return view('staffZones.edit', compact('staffZone','currencies'));
+        $country = Country::orderBy("name")->get();
+        return view('staffZones.edit', compact('staffZone','currencies','country'));
     }
     
     public function update(Request $request, $id, HomeController $homeController)
@@ -114,7 +138,8 @@ class StaffZoneController extends Controller
 
         $homeController->appZoneData();
 
-        return redirect()->route('staffZones.index')
+        $previousUrl = $request->url;
+        return redirect($previousUrl)
                         ->with('success','Staff Zone update successfully.');
     }
     

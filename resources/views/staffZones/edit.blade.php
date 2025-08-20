@@ -19,6 +19,8 @@
     <form action="{{ route('staffZones.update',$staffZone->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <input type="hidden" name="url" value="{{ url()->previous() }}">
+
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
@@ -36,6 +38,17 @@
                 <div class="form-group">
                     <strong>Transport Charges:</strong>
                     <input type="number" name="transport_charges" value="{{old('transport_charges',$staffZone->transport_charges )}}" class="form-control" placeholder="Transport Charges">
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <strong>Country:</strong>
+                    <select name="country_id" class="form-control select2" >
+                        <option></option>
+                        @foreach($country as $c)
+                            <option value="{{ $c->id }}" {{ old('country_id', $staffZone->country->id ?? null) == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-md-12">

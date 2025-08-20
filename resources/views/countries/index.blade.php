@@ -9,11 +9,11 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="float-left">
-                    <h2>Sub Title / Designation</h2>
+                    <h2>Country</h2>
                 </div>
                 <div class="float-right">
-                    @can('staff-designation-create')
-                        <a class="btn btn-success  float-end" href="{{ route('subTitles.create') }}"> <i class="fa fa-plus"></i></a>
+                    @can('country-create')
+                        <a class="btn btn-success  float-end" href="{{ route('countries.create') }}"> <i class="fa fa-plus"></i></a>
                     @endcan
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="col-md-12">
                 <h3>Filter</h3>
                 <hr>
-                <form action="{{ route('subTitles.index') }}" method="GET" enctype="multipart/form-data">
+                <form action="{{ route('countries.index') }}" method="GET" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
@@ -53,13 +53,13 @@
                     </div>
                 </form>
             </div>
-            <h3>Sub Title / Designation ({{ $total_sub_title }})</h3>
+            <h3>Country ({{ $total_countries }})</h3>
             <div class="col-md-12">
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
                         <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('subTitles.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                                href="{{ route('countries.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -67,23 +67,23 @@
 
                         <th>Action</th>
                     </tr>
-                    @if (count($subTitles))
-                        @foreach ($subTitles as $subTitle)
+                    @if (count($countries))
+                        @foreach ($countries as $country)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td>{{ $subTitle->name }}</td>
-                                
+                                <td>{{ $country->name }}</td>
+
                                 <td>
-                                    <form id="deleteForm{{ $subTitle->id }}" action="{{ route('subTitles.destroy', $subTitle->id) }}"
+                                    <form id="deleteForm{{ $country->id }}" action="{{ route('countries.destroy', $country->id) }}"
                                         method="POST">
-                                        @can('staff-designation-edit')
-                                            <a class="btn btn-primary" href="{{ route('subTitles.edit', $subTitle->id) }}"><i
+                                        @can('country-edit')
+                                            <a class="btn btn-primary" href="{{ route('countries.edit', $country->id) }}"><i
                                                     class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
-                                        @can('staff-designation-delete')
-                                            <button type="button" onclick="confirmDelete('{{ $subTitle->id }}')"
+                                        @can('country-delete')
+                                            <button type="button" onclick="confirmDelete('{{ $country->id }}')"
                                                 class="btn btn-danger"><i class="fas fa-trash"></i></button>
                                         @endcan
                                     </form>
@@ -92,11 +92,11 @@
                         @endforeach
                     @else
                         <tr>
-                            <td colspan="3" class="text-center">There is no Sub Title / Designation.</td>
+                            <td colspan="3" class="text-center">There is no Country.</td>
                         </tr>
                     @endif
                 </table>
-                {!! $subTitles->links() !!}
+                {!! $countries->links() !!}
             </div>
         </div>
     </div>

@@ -286,7 +286,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                @if ($quote->service->image)
+                                                @if ($quote->service && $quote->service->image)
                                                     <img src="{{ asset('service-images/' . $quote->service->image) }}"
                                                         alt="Service Image" class="rounded" width="auto"
                                                         height="80">

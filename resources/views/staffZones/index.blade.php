@@ -19,7 +19,7 @@
         @endif
         <hr>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-9">
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>Sr#</th>
@@ -79,6 +79,36 @@
                     @endif
                 </table>
                 {!! $staffZones->links() !!}
+            </div>
+            <div class="col-md-3">
+                <h3>Filter</h3>
+                <hr>
+                <form action="{{ route('staffZones.index') }}" method="GET" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Name:</strong>
+                                <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control"
+                                    placeholder="Name">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Country:</strong>
+                                <select name="country_id" class="form-control select2" >
+                                    <option></option>
+                                    @foreach($country as $c)
+                                        <option value="{{ $c->id }}" {{ $filter['country_id'] == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                            <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

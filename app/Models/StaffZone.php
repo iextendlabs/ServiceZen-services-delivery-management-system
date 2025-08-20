@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StaffZone extends Model
 {
-    protected $fillable = ['name', 'description','transport_charges','currency_id','extra_charges'];
+    protected $fillable = ['name', 'description','transport_charges','currency_id','extra_charges','country_id'];
 
     use HasFactory;
 
@@ -19,5 +19,10 @@ class StaffZone extends Model
     public function staffs()
     {
         return $this->belongsToMany(User::class, 'staff_to_zone','zone_id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
     }
 }

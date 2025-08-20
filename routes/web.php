@@ -43,6 +43,7 @@ use App\Http\Controllers\{
     CampaignController,
     SummerNoteController,
     ComplaintController,
+    CountryController,
     CRMController,
     CurrencyController,
     DataEntryUserController,
@@ -115,10 +116,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('shortHolidays', ShortHolidayController::class);
     Route::resource('longHolidays', LongHolidayController::class);
     Route::resource('staffGeneralHolidays', StaffGeneralHolidayController::class);
+    Route::resource('countries', CountryController::class);
     Route::post('staffGeneralHolidays/{id}/toggle-status/{status}', [StaffGeneralHolidayController::class, 'toggleStatus'])->name('staffGeneralHolidays.toggleStatus');
     
     Route::post('/shortHolidayBulkDelete', [ShortHolidayController::class, 'bulkDelete'])->name('shortHolidays.bulkDelete');
-    Route::post('/longHolidayBulkDelete', [longHolidayController::class, 'bulkDelete'])->name('longHolidays.bulkDelete');
+    Route::post('/longHolidayBulkDelete', [LongHolidayController::class, 'bulkDelete'])->name('longHolidays.bulkDelete');
     Route::post('/serviceBulkDelete', [ServiceController::class, 'bulkDelete'])->name('services.bulkDelete');
     Route::post('/services/bulkCopy', [ServiceController::class, 'bulkCopy'])->name('services.bulkCopy');
     Route::post('/services/bulkEdit', [ServiceController::class, 'bulkEdit'])->name('services.bulkEdit');

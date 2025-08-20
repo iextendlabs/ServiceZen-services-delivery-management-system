@@ -252,6 +252,9 @@
                                 @can('staff-designation-list')
                                 <a class="dropdown-item" href="{{ route('subTitles.index') }}">Sub Title / Designation</a>
                                 @endcan
+                                @can('country-list')
+                                <a class="dropdown-item" href="{{ route('countries.index') }}">Countries</a>
+                                @endcan
                             </div>
                         </li>
                         @endcan
