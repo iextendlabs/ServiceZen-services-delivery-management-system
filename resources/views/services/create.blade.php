@@ -48,6 +48,9 @@
                 <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Price Options</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" id="specifications-tab" data-toggle="tab" href="#specifications" role="tab" aria-controls="options" aria-selected="false">Service Attribute / Specifications</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" id="additionalImages-tab" data-toggle="tab" href="#additionalImages" role="tab" aria-controls="additionalImages" aria-selected="false">Additional Images</a>
             </li>
         </ul>
@@ -401,6 +404,30 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade" id="specifications" role="tabpanel" aria-labelledby="specifications-tab">
+                <h5 class="mb-3">Product Specifications</h5>
+                <div id="specifications-wrapper">
+                    <div class="form-row align-items-center specification-row p-2">
+                        <div class="col-md-5 mb-2 mb-md-0">
+                            <input type="text" name="specifications[0][title]" class="form-control" placeholder="Specification Title">
+                        </div>
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <input type="text" name="specifications[0][value]" class="form-control" placeholder="Specification Value">
+                        </div>
+                        <div class="col-md-1 text-md-right">
+                            <button type="button" class="btn btn-danger btn-sm remove-spec">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="button" id="add-spec" class="btn btn-success btn-sm mt-2">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="tab-pane fade" id="additionalImages" role="tabpanel" aria-labelledby="additionalImages-tab">
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -666,4 +693,34 @@
         preview.src = URL.createObjectURL(e.target.files[0]);
     });
 </script>
+<script>
+$(document).ready(function() {
+    let specIndex = 1;
+
+    $('#add-spec').click(function() {
+        let newRow = `
+            <div class="form-row align-items-center specification-row p-2">
+                <div class="col-md-5 mb-2 mb-md-0">
+                    <input type="text" name="specifications[${specIndex}][title]" class="form-control" placeholder="Specification Title">
+                </div>
+                <div class="col-md-6 mb-2 mb-md-0">
+                    <input type="text" name="specifications[${specIndex}][value]" class="form-control" placeholder="Specification Value">
+                </div>
+                <div class="col-md-1 text-md-right">
+                    <button type="button" class="btn btn-danger btn-sm remove-spec">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        $('#specifications-wrapper').append(newRow);
+        specIndex++;
+    });
+
+    $(document).on('click', '.remove-spec', function() {
+        $(this).closest('.specification-row').remove();
+    });
+});
+</script>
+
 @endsection

@@ -92,4 +92,9 @@ class Service extends Model
     {
         return $this->hasMany(ServiceImage::class);
     }
+
+    public function specifications()
+    {
+        return $this->hasMany(ServiceSpecification::class);
+    }
 }

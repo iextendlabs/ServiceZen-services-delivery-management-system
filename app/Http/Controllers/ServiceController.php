@@ -252,6 +252,17 @@ class ServiceController extends Controller
             $service->save();
         }
 
+        if ($request->has('specifications')) {
+            foreach ($request->specifications as $spec) {
+                if (!empty($spec['title']) && !empty($spec['value'])) {
+                    $service->specifications()->create([
+                        'title' => $spec['title'],
+                        'value' => $spec['value'],
+                    ]);
+                }
+            }
+        }
+
         $homeController->appData();
         $homeController->appServicesData();
         $homeController->staffAppServicesData();
@@ -539,6 +550,20 @@ class ServiceController extends Controller
                     $serviceImage->service_id = $service->id;
                     $serviceImage->image = $name;
                     $serviceImage->save();
+                }
+            }
+        }
+
+        $service->specifications()->delete();
+        
+        if ($request->has('specifications')) {
+
+            foreach ($request->specifications as $spec) {
+                if (!empty($spec['title']) && !empty($spec['value'])) {
+                    $service->specifications()->create([
+                        'title' => $spec['title'],
+                        'value' => $spec['value'],
+                    ]);
                 }
             }
         }

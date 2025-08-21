@@ -184,7 +184,9 @@
                                 <td class="text-right">
                                     <form id="deleteForm{{ $service->id }}"
                                         action="{{ route('services.destroy', $service->id) }}" method="POST">
-                                        <a class="btn btn-warning" href="/service/{{ $service->slug }}">Store View</a>
+                                        @if($service->status)
+                                            <a class="btn btn-warning" href="https://lipslay.com/service/{{ $service->slug }}" target="_blank">View</a>
+                                        @endif
                                         @can('FAQs-create')
                                             <a class="btn btn-primary"
                                                 href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>
