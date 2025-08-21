@@ -30,6 +30,65 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>Description:</strong>
+                        <textarea class="form-control" style="height:150px" id="description_summernote" name="description" placeholder="Description">{{old('description',$membership_plan->description)}}</textarea>
+                        <script>
+                            (function($) {
+                                $('#description_summernote').summernote({
+                                    tabsize: 2,
+                                    height: 250,
+                                    toolbar: [
+                                        ['style', ['style']],
+                                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                                        ['fontname', ['fontname']],
+                                        ['fontsize', ['fontsize']],
+                                        ['color', ['color']],
+                                        ['para', ['ul', 'ol', 'paragraph']],
+                                        ['height', ['height']],
+                                        ['insert', ['picture', 'link', 'video', 'table']],
+                                        ['misc', ['undo', 'redo']], 
+                                        ['view', ['fullscreen', 'codeview', 'help']]
+                                    ],
+                                    popover: {
+                                        image: [
+                                            ['custom', ['imageAttributes']],
+                                            ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+                                            ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                                            ['remove', ['removeMedia']]
+                                        ]
+                                    },
+                                    callbacks: {
+                                        onImageUpload: function(files) {
+                                            uploadImage(files[0]);
+                                        }
+                                    }
+                                });
+                        
+                                function uploadImage(file) {
+                                    let data = new FormData();
+                                    data.append("file", file);
+                                    data.append("_token", "{{ csrf_token() }}");
+                        
+                                    $.ajax({
+                                        url: "{{ route('summerNote.upload') }}",
+                                        method: "POST",
+                                        data: data,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            $('#short_description_summernote').summernote('insertImage', response.url);
+                                        },
+                                        error: function(response) {
+                                            console.error(response);
+                                        }
+                                    });
+                                }
+                            })(jQuery);
+                        </script>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <span style="color: red;">*</span><strong>Membership Fee:</strong>
                         <input type="number" name="membership_fee" class="form-control" value="{{ old('membership_fee',$membership_plan->membership_fee) }}"
                             placeholder="membership_fee">

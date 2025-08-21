@@ -34,6 +34,12 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
+                    <strong>Description:</strong>
+                    {!! $membership_plan->description !!}
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
                     <strong>Membership Fee:</strong>
                     {{ $membership_plan->membership_fee }}
                 </div>

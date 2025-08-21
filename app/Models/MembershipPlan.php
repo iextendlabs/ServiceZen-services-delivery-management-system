@@ -9,6 +9,6 @@ class MembershipPlan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['plan_name','membership_fee', 'expire','status','type'];
+    protected $fillable = ['plan_name','description','membership_fee', 'expire','status','type'];
 
 }
