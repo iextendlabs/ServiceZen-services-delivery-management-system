@@ -47,6 +47,7 @@ use App\Http\Controllers\{
     CRMController,
     CurrencyController,
     DataEntryUserController,
+    FreelancerGroupController,
     FreelancerProgramController,
     InformationController,
     KommoController,
@@ -117,6 +118,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('longHolidays', LongHolidayController::class);
     Route::resource('staffGeneralHolidays', StaffGeneralHolidayController::class);
     Route::resource('countries', CountryController::class);
+    Route::resource('freelancerGroups', FreelancerGroupController::class);
     Route::post('staffGeneralHolidays/{id}/toggle-status/{status}', [StaffGeneralHolidayController::class, 'toggleStatus'])->name('staffGeneralHolidays.toggleStatus');
     
     Route::post('/shortHolidayBulkDelete', [ShortHolidayController::class, 'bulkDelete'])->name('shortHolidays.bulkDelete');

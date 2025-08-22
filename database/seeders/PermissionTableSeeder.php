@@ -18,6 +18,10 @@ class PermissionTableSeeder extends Seeder
     {
         //Permissions
         $permissions = [
+            'freelancer-group-list',
+            'freelancer-group-create',
+            'freelancer-group-edit',
+            'freelancer-group-delete',
             'country-list',
             'country-create',
             'country-edit',

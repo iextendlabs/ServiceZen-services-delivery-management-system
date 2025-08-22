@@ -44,7 +44,8 @@ class Staff extends Model
         'feature',
         'delivered_order',
         'feature_on_app',
-        'sort'
+        'sort',
+        'freelancer_group_id'
     ];
 
     public function appointments()
@@ -90,5 +91,10 @@ class Staff extends Model
             ->where('day', $day)->where('time_slot_id', $time_slot_id)->first();
 
         return $driver ? $driver->driver_id : ($this->driver_id ?? null);
+    }
+
+    public function freelancerGroup()
+    {
+        return $this->hasOne(FreelancerGroup::class, 'id', 'freelancer_group_id');
     }
 }

@@ -107,10 +107,10 @@
                                 <strong>Status:</strong>
                                 <select name="status" class="form-control">
                                     <option value="">-- Select Status --</option>
-                                    <option value="2" @if ($filter_status === '2') selected @endif>New
-                                    <option value="1" @if ($filter_status === '1') selected @endif>Accepted
+                                    <option value="2" @if ($filters['status'] === '2') selected @endif>New
+                                    <option value="1" @if ($filters['status'] === '1') selected @endif>Accepted
                                     </option>
-                                    <option value="0" @if ($filter_status === '0') selected @endif>Rejected
+                                    <option value="0" @if ($filters['status'] === '0') selected @endif>Rejected
                                     </option>
                                 </select>
 
@@ -119,13 +119,13 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter_name }}" class="form-control">
+                                <input type="text" name="name" value="{{ $filters['name'] }}" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group position-relative">
                                 <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
+                                <input type="email" name="email" id="email-autocomplete" value="{{ $filters['email'] }}" class="form-control" autocomplete="off">
                                 <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
                                 <style>
                                     #email-suggestions .list-group-item {
@@ -135,6 +135,17 @@
                                         background-color: #f0f0f0;
                                     }
                                 </style>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <strong>Freelancer Group:</strong>
+                                <select name="freelancer_group_id" class="form-control select2">
+                                    <option value="">-- Select Freelancer Group --</option>
+                                    @foreach ($freelancer_groups as $group)
+                                        <option value="{{ $group->id }}" @if ($filters['freelancer_group_id'] == $group->id) selected @endif>{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-12">

@@ -225,6 +225,9 @@
                                 @can('service-category-list')
                                 <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
                                 @endcan
+                                @can('country-list')
+                                <a class="dropdown-item" href="{{ route('countries.index') }}">Countries</a>
+                                @endcan
                                 @can('staff-zone-list')
                                 <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
                                 @endcan
@@ -252,8 +255,8 @@
                                 @can('staff-designation-list')
                                 <a class="dropdown-item" href="{{ route('subTitles.index') }}">Sub Title / Designation</a>
                                 @endcan
-                                @can('country-list')
-                                <a class="dropdown-item" href="{{ route('countries.index') }}">Countries</a>
+                                @can('freelancer-group-list')
+                                <a class="dropdown-item" href="{{ route('freelancerGroups.index') }}">Freelancer Groups</a>
                                 @endcan
                             </div>
                         </li>

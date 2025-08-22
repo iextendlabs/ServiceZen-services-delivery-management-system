@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\JsonCacheHelper;
 use App\Models\AffiliateCategory;
 use App\Models\AffiliateService;
+use App\Models\FreelancerGroup;
 use App\Models\MembershipPlan;
 use App\Models\Service;
 use App\Models\ServiceCategory;
@@ -424,7 +425,8 @@ class ServiceStaffController extends Controller
 
         $timeSlots = TimeSlot::all();
         $staffZones = StaffZone::all();
-        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffZones', 'subTitles'))
+        $freelancer_groups = $freelancer_join ? FreelancerGroup::all() : [];
+        return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffZones', 'subTitles', 'freelancer_groups'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
@@ -484,7 +486,7 @@ class ServiceStaffController extends Controller
         $staff = Staff::find($input['staff_id']);
 
         $jsonCachePath = public_path('jsonCache/staff');
-        if ($staff->id) {
+        if ($staff && $staff->id) {
             JsonCacheHelper::deleteJsonCacheFiles($staff->id, $jsonCachePath);
         }
 

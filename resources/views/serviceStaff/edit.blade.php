@@ -525,6 +525,21 @@
                     @if($freelancer_join)
                     <div class="col-md-12">
                         <div class="form-group">
+                            <strong>Freelancer Group:</strong>
+                            <select name="freelancer_group_id" class="form-control select2">
+                                <option value=""></option>
+                                @foreach ($freelancer_groups as $freelancer_group)
+                                    <option value="{{ $freelancer_group->id }}" 
+                                        {{ old('freelancer_group_id', $serviceStaff->staff->freelancer_group_id ?? null) == $freelancer_group->id ? 'selected' : '' }}>
+                                        {{ $freelancer_group->name }}
+                                    </option>
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
                             <strong>Membership Plan:</strong>
                             <select name="membership_plan_id" class="form-control">
                                 <option value=""></option>

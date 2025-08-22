@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Affiliate;
 use App\Models\Chat;
+use App\Models\FreelancerGroup;
 use App\Models\Staff;
 use App\Models\StaffImages;
 use App\Models\StaffYoutubeVideo;
@@ -31,10 +32,12 @@ class FreelancerProgramController extends Controller
      */
     public function index(Request $request)
     {
-
-        $filter_status = $request->status;
-        $filter_name = $request->name;
-        $filter_email = $request->email;
+        $filters = [
+            'status' => $request->status,
+            'name' => $request->name,
+            'email' => $request->email,
+            'freelancer_group_id' => $request->freelancer_group_id,
+        ];
 
         $query = User::whereNotNull('freelancer_program');
         
@@ -58,15 +61,23 @@ class FreelancerProgramController extends Controller
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
+        if (isset($request->freelancer_group_id)) {
+            $query->whereHas('staff', function ($q) use ($request) {
+                $q->where('freelancer_group_id', $request->freelancer_group_id);
+            });
+        }
+
         if (isset($request->email)) {
             $query->where('email', 'like', '%' . $request->email . '%');
         }
 
         $users = $query->paginate(config('app.paginate'));
 
-        $filters = $request->only(['status','name','email']);
         $users->appends($filters);
-        return view('freelancerProgram.index', compact('users', 'filter_status', 'filter_name', 'filter_email'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+
+        $freelancer_groups = FreelancerGroup::all();
+
+        return view('freelancerProgram.index', compact('users', 'filters', 'freelancer_groups'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
