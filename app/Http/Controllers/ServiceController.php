@@ -129,7 +129,7 @@ class ServiceController extends Controller
     public function store(Request $request, HomeController $homeController)
     {
         request()->validate([
-            'name' => 'required',
+            'name' => 'required|unique:services,name',
             'price' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'categoriesId' => 'required',
@@ -312,7 +312,7 @@ class ServiceController extends Controller
     public function update(Request $request, $id, HomeController $homeController)
     {
         request()->validate([
-            'name' => 'required',
+            'name' => 'required|unique:services,name,' . $id,
             'price' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
             'categoriesId' => 'required',

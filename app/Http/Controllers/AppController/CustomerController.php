@@ -1059,7 +1059,7 @@ class CustomerController extends Controller
 
         $sub_categories = Cache::rememberForever($cacheKey, function () use ($request) {
             $category = ServiceCategory::find($request->id);
-            return $category ? $category->childCategories : [];
+            return $category ? $category->childCategories()->where('status', 1)->get() : [];
         });
 
         return response()->json([

@@ -29,51 +29,20 @@ class ServiceCategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-{
-    $sort = $request->input('sort', 'title');
-    $direction = $request->input('direction', 'desc');
+    {
+        $query = ServiceCategory::query()
+            ->with(['parentCategory', 'childCategories'])
+            ->orderBy("title", "asc");
 
-    $filter = [
-        'title' => $request->title,
-        'feature' => $request->feature,
-        'feature_on_bottom' => $request->feature_on_bottom,
-    ];
+        $user = auth()->user();
+        if ($user->hasRole('Data Entry')) {
+            $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
+            $query->whereIn('id', $userCategories);
+        }
 
-    $query = ServiceCategory::query()
-        ->with(['parentCategory', 'childCategories']) // Include children
-        ->when($request->title, function ($query) use ($request) {
-            $query->where('title', 'like', "%" . $request->title . "%")
-                ->orWhereIn('parent_id', function ($subQuery) use ($request) {
-                    $subQuery->select('id')
-                        ->from('service_categories')
-                        ->where('title', 'like', "%" . $request->title . "%");
-                })->orderBy('parent_id');
-        })
-        ->when(!is_null($request->feature), function ($query) use ($request) {
-            $query->where('feature', $request->feature);
-        })
-        ->when(!is_null($request->feature_on_bottom), function ($query) use ($request) {
-            $query->where('feature_on_bottom', $request->feature_on_bottom);
-        })
-        ->orderBy($sort, $direction);
-
-    $user = auth()->user();
-    if ($user->hasRole('Data Entry')) {
-        $userCategories = $user->dataEntryUserCategories ? $user->dataEntryUserCategories->pluck('id')->toArray() : [];
-        $query->whereIn('id', $userCategories);
+        $service_categories = $query->get();
+        return view('service_categories.index', compact('service_categories'));
     }
-
-    $service_categories = $query->get();
-    $total_service_category = $service_categories->count();
-
-    return view('service_categories.index', compact(
-        'total_service_category',
-        'service_categories',
-        'direction',
-        'filter'
-    ));
-}
-
 
     /**
      * Show the form for creating a new resource.
@@ -102,7 +71,7 @@ class ServiceCategoryController extends Controller
     public function store(Request $request, HomeController $homeController)
     {
         request()->validate([
-            'title' => 'required',
+            'title' => 'required|unique:service_categories,title',
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -211,7 +180,7 @@ class ServiceCategoryController extends Controller
     public function update(Request $request, $id, HomeController $homeController)
     {
         request()->validate([
-            'title' => 'required',
+            'title' => 'required|unique:service_categories,title,' . $id,
             'description' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon' => 'image|mimes:jpeg,png,jpg,gif|max:2048',

@@ -52,7 +52,7 @@ class ServiceCategory extends Model
 
     public function childCategories()
     {
-        return $this->hasMany(ServiceCategory::class, 'parent_id')->where('status', 1);
+        return $this->hasMany(ServiceCategory::class, 'parent_id');
     }
 
     public function FAQs()
