@@ -60,6 +60,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <strong for="image">Upload Image</strong>
+                                <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 318 x 192px Thank you!</p>
                                 <input type="file" name="image" id="image" class="form-control-file">
                                 <br>
                                 <img id="preview" src="/service-category-images/{{ $service_category->image }}"

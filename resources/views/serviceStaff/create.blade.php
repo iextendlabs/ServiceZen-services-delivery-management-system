@@ -229,6 +229,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <strong for="image">Upload Image</strong>
+                            <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 318 x 256px Thank you!</p>
                             <input type="file" name="image" class="form-control image-input" accept="image/*">
                             <img class="image-preview" height="130px" src="/staff-images/default.png">
                         </div>
