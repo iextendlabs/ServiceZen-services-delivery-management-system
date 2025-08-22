@@ -33,17 +33,21 @@ class ManagerController extends Controller
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::role('Manager')->orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+        if ($request->email) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
         $total_manager = $query->count();
         $managers = $query->paginate(config('app.paginate'));
-        $filters = $request->only(['name']);
+        $filters = $request->only(['name', 'email']);
         $managers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-        return view('managers.index',compact('total_manager','managers','filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('managers.index',compact('total_manager','managers','filter_name', 'filter_email', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
     
     /**

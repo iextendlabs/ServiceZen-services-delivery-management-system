@@ -35,6 +35,7 @@ class UserController extends Controller
         $direction = $request->input('direction', 'desc');
         $filter = [
             'name' => $request->name,
+            'email' => $request->email,
             'role' => $request->role
         ];
             $roles = Role::all();
@@ -43,6 +44,11 @@ class UserController extends Controller
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+
+        if ($request->email) {
+            $query->where('email', 'like', $request->email . '%');
+        }
+
         if ($request->role) {
             $query = $query->role($request->role);
         }
@@ -163,5 +169,40 @@ class UserController extends Controller
 
         return redirect($previousUrl)
                         ->with('success','User deleted successfully');
+    }
+
+    public function autocompleteEmail(Request $request)
+    {
+        try {
+            $role = $request->input('role');
+            $query = $request->input('query');
+            $affiliateProgram = $request->input('affiliate_program');
+            $freelancerProgram = $request->input('freelancer_program');
+
+            if (!$query) {
+                return response()->json(['error' => 'Query is required.'], 400);
+            }
+
+            $userQuery = User::query();
+            if ($role) {
+                $userQuery = $userQuery->role($role);
+            }
+            if ($affiliateProgram == 'true') {
+                $userQuery = $userQuery->whereNotNull('affiliate_program');
+            }
+            if ($freelancerProgram == 'true') {
+                $userQuery = $userQuery->whereNotNull('freelancer_program');
+            }
+            $emails = $userQuery->where('email', 'like', "%{$query}%")
+                ->orderBy('name')
+                ->pluck('email');
+
+            return response()->json($emails);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

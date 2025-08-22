@@ -49,3 +49,4 @@ Homestead.json
 .phpunit.result.cache
 package-lock.json
 composer.lock
+.vscode

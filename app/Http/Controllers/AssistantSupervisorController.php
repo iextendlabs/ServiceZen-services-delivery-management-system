@@ -34,15 +34,19 @@ class AssistantSupervisorController extends Controller
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::role('Assistant Supervisor')->orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+        if ($request->email) {
+            $query->where('email', 'like','%' . $request->email . '%');
+        }
         $total_assistant_supervisor = $query->count();
         $assistant_supervisors = $query->paginate(config('app.paginate'));
-        return view('assistantSupervisors.index',compact('total_assistant_supervisor','assistant_supervisors','filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('assistantSupervisors.index',compact('total_assistant_supervisor','assistant_supervisors','filter_name', 'filter_email', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
 
     }
     

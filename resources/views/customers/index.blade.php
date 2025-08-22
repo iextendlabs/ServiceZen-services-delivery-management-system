@@ -273,10 +273,18 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="form-group">
+                            <div class="form-group position-relative">
                                 <strong>Email:</strong>
-                                <input type="email" name="email" value="{{ $filter['email'] }}"
-                                    class="form-control" placeholder="abc@gmail.com">
+                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter['email'] }}" class="form-control" autocomplete="off">
+                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                <style>
+                                    #email-suggestions .list-group-item {
+                                        cursor: pointer !important;
+                                    }
+                                    #email-suggestions .list-group-item:hover {
+                                        background-color: #f0f0f0;
+                                    }
+                                </style>
                             </div>
                         </div>
                         <div class="col-12">
@@ -492,6 +500,55 @@
 
             $(window).resize(function() {
                 checkTableResponsive();
+            });
+
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+
+            var $input = $('#email-autocomplete');
+            var $suggestions = $('#email-suggestions');
+            $input.on('input', debounce(function() {
+                var query = $(this).val();
+                if (query.length < 2) {
+                    $suggestions.hide();
+                    return;
+                }
+                $.ajax({
+                    url: '{{ route('autocomplete.email') }}',
+                    data: { role: 'Customer', query: query },
+                    success: function(data) {
+                        $suggestions.empty();
+                        if (Array.isArray(data) && data.length) {
+                            data.forEach(function(email) {
+                                var $li = $('<li class="list-group-item list-group-item-action"></li>').text(email);
+                                $li.on('click', function() {
+                                    $input.val(email);
+                                    $suggestions.hide();
+                                });
+                                $suggestions.append($li);
+                            });
+                            $suggestions.show();
+                        } else {
+                            var $li = $('<li class="list-group-item text-muted"></li>').text('No data found');
+                            $suggestions.append($li);
+                            $suggestions.show();
+                        }
+                    },
+                    error: function(xhr) {
+                        $suggestions.empty();
+                        var $li = $('<li class="list-group-item text-danger"></li>').text('Error fetching data');
+                        $suggestions.append($li);
+                        $suggestions.show();
+                    }
+                });
+            }, 300));
+            $input.on('blur', function() {
+                setTimeout(function() { $suggestions.hide(); }, 200);
             });
         });
     </script>

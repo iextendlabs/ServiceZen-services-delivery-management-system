@@ -31,17 +31,21 @@ class DataEntryUserController extends Controller
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::role('Data Entry')->orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+        if ($request->email) {
+            $query->where('email', 'like','%' . $request->email . '%');
+        }
         $total_user = $query->count();
         $users = $query->paginate(config('app.paginate'));
-        $filters = $request->only(['name']);
+        $filters = $request->only(['name', 'email']);
         $users->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-        return view('dataEntry.index', compact('total_user', 'users', 'filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('dataEntry.index', compact('total_user', 'users', 'filter_name', 'filter_email', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function create()

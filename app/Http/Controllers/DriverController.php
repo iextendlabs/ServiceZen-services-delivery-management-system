@@ -35,6 +35,7 @@ class DriverController extends Controller
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::role('Driver')->orderBy($sort, $direction);
 
@@ -42,14 +43,18 @@ class DriverController extends Controller
             $query->where('name', 'like', $request->name . '%');
         }
 
+        if ($filter_email) {
+            $query->where('email', 'like', '%' . $filter_email . '%');
+        }
+
         if ($request->id) {
             $query->where('id', $request->id);
         }
         $total_driver = $query->count();
         $drivers = $query->paginate(config('app.paginate'));
-        $filters = $request->only(['name','id']);
+        $filters = $request->only(['name','id','email']);
         $drivers->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-        return view('drivers.index',compact('total_driver','drivers','filter_name', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('drivers.index',compact('total_driver','drivers','filter_name', 'filter_email', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
 
     }
     

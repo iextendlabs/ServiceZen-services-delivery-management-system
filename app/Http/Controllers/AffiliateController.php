@@ -44,20 +44,25 @@ class AffiliateController extends Controller
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'desc');
         $filter_name = $request->name;
+        $filter_email = $request->email;
 
         $query = User::role('Affiliate')->orderBy($sort, $direction);
 
         if ($request->name) {
             $query->where('name', 'like', $request->name . '%');
         }
+
+        if ($request->email) {
+            $query->where('email', 'like','%' . $request->email . '%');
+        }
         $total_affiliate = $query->count();
 
         $affiliates = $query->paginate(config('app.paginate'));
 
         $pkrRateValue = Setting::where('key', 'PKR Rate')->value('value');
-        $filters = $request->only(['name']);
+        $filters = $request->only(['name','email']);
         $affiliates->appends($filters);
-        return view('affiliates.index', compact('total_affiliate', 'affiliates', 'filter_name', 'pkrRateValue', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('affiliates.index', compact('total_affiliate', 'affiliates', 'filter_name', 'filter_email', 'pkrRateValue', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
