@@ -34,7 +34,7 @@ class SubTitleController extends Controller
      */
     public function create(Request $request)
     {
-        $allSubTitles = SubTitle::all();
+        $allSubTitles = SubTitle::orderBy('name', 'asc')->get();
         return view('subTitles.create', compact('allSubTitles'));
     }
 
@@ -93,7 +93,7 @@ class SubTitleController extends Controller
     {
         $subTitle = SubTitle::find($id);
 
-        $allSubTitles = SubTitle::where('id', '!=', $id)->get();
+        $allSubTitles = SubTitle::where('id', '!=', $id)->orderBy('name', 'asc')->get();
 
         if (isset($subTitle->children) && is_string($subTitle->children)) {
             $subTitle->children = json_decode($subTitle->children, true);
