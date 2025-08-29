@@ -19,30 +19,12 @@ class SubTitleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(request $request)
+    public function index()
     {
-        $sort = $request->input('sort', 'name');
-        $direction = $request->input('direction', 'asc');
-        $filter = [
-            'name' => $request->name,
-        ];
-
-        $query = SubTitle::orderBy($sort, $direction);
-
-        if ($request->name) {
-            $query->where('name', 'like', '%' . $request->name . '%');
-        }
-
-        $total_sub_title = $query->count();
-
-        $subTitles = $query->paginate(config('app.paginate'));
-
-
-        $filters = $request->only(['name']);
-
-        $subTitles->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-        return view('subTitles.index', compact('total_sub_title', 'subTitles', 'filter', 'direction'))
-            ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $subTitles = SubTitle::query()
+            ->with(['parent', 'children'])
+            ->orderBy("name", "asc")->get();
+        return view('subTitles.index', compact('subTitles'));
     }
 
     /**
@@ -52,8 +34,8 @@ class SubTitleController extends Controller
      */
     public function create(Request $request)
     {
-
-        return view('subTitles.create');
+        $allSubTitles = SubTitle::all();
+        return view('subTitles.create', compact('allSubTitles'));
     }
 
     /**
@@ -68,7 +50,19 @@ class SubTitleController extends Controller
             'name' => 'required|string|unique:sub_titles,name',
         ]);
 
-        SubTitle::create($request->all());
+        $data = $request->all();
+        $data['parent_id'] = $request->input('parent_id');
+
+        $childSubtitles = $request->input('child_subtitles', []);
+        if (($key = array_search($data['parent_id'], $childSubtitles)) !== false) {
+            unset($childSubtitles[$key]);
+        }
+
+        $subTitle = SubTitle::create($data);
+
+        if (!empty($childSubtitles)) {
+            SubTitle::whereIn('id', $childSubtitles)->update(['parent_id' => $subTitle->id]);
+        }
 
         $homeController->appSubTitles();
 
@@ -99,7 +93,13 @@ class SubTitleController extends Controller
     {
         $subTitle = SubTitle::find($id);
 
-        return view('subTitles.edit', compact('subTitle'));
+        $allSubTitles = SubTitle::where('id', '!=', $id)->get();
+
+        if (isset($subTitle->children) && is_string($subTitle->children)) {
+            $subTitle->children = json_decode($subTitle->children, true);
+        }
+
+        return view('subTitles.edit', compact('subTitle', 'allSubTitles'));
     }
 
     public function update(Request $request, $id, HomeController $homeController)
@@ -110,7 +110,21 @@ class SubTitleController extends Controller
 
         $subTitle = SubTitle::find($id);
 
-        $subTitle->update($request->all());
+        $data = $request->all();
+        $childSubtitles = $request->input('child_subtitles', []);
+
+        if (($key = array_search($data['parent_id'], $childSubtitles)) !== false) {
+            unset($childSubtitles[$key]);
+        }
+
+        $subTitle->update($data);
+
+        SubTitle::where('parent_id', $id)
+            ->update(['parent_id' => null]);
+
+        if (!empty($childSubtitles)) {
+            SubTitle::whereIn('id', $childSubtitles)->update(['parent_id' => $subTitle->id]);
+        }
 
         $homeController->appSubTitles();
 
