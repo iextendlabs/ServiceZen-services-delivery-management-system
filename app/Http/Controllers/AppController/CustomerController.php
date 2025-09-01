@@ -277,6 +277,7 @@ class CustomerController extends Controller
                 return [
                     'id' => $service->id,
                     'name' => $service->name,
+                    'slug' => $service->slug,
                     'image' => $service->image,
                     'price' => $service->price,
                     'discount' => $service->discount,
@@ -906,6 +907,7 @@ class CustomerController extends Controller
                 $categoryIds = collect($service->categories)->pluck('id')->toArray();
                 return [
                     'id' => $service->id,
+                    'slug' => $service->slug,
                     'name' => $service->name,
                     'image' => $service->image,
                     'price' => $service->price,

@@ -321,6 +321,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
             $categoryIds = collect($service->categories)->pluck('id')->toArray();
             return [
                 'id' => $service->id,
+                'slug' => $service->slug,
                 'name' => $service->name,
                 'image' => $service->image,
                 'price' => $service->price,
@@ -456,6 +457,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
             return [
                 'id' => $service->id,
                 'name' => $service->name,
+                'slug' => $service->slug,
                 'image' => $service->image,
                 'price' => $service->price,
                 'discount' => $service->discount,
