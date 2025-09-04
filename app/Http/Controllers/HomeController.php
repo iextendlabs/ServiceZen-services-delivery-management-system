@@ -494,6 +494,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
             return [
                 'id' => $subTitle->id,
                 'name' => $subTitle->name,
+                'parent_id' => $subTitle->parent_id,
             ];
         })->toArray();
 
