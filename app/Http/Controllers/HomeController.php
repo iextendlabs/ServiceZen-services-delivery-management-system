@@ -543,6 +543,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
             return [
                 'id' => $zone->id,
                 'name' => $zone->name,
+                'country' => $zone->country ? $zone->country->name : null,
             ];
         })->toArray();
 
