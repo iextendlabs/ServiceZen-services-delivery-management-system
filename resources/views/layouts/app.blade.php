@@ -116,9 +116,11 @@
                     <a class="navbar-brand p-0 text-center" href="{{ url('/admin') }}">
                         Lipslay Admin
                     </a>
+                    @if(auth()->user())
                     <a class="btn btn-outline-primary btn-sm mt-1 btn-store-view text-center" href="https://lipslay.com/?cache=false" target="_blank">
                         Store View
                     </a>
+                    @endif
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
