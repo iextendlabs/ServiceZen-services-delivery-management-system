@@ -1,7 +1,7 @@
 <div class="col-md-6 offset-md-3 col-sm-12">
     <div class="form-group">
         <strong>Date:</strong>
-        <input required type="date" name="date" id="date" min="{{ date('Y-m-d') }}" value="{{ 
+        <input required type="date" name="date" id="date" @if(!auth()->user() || !auth()->user()->hasRole('Admin')) min="{{ date('Y-m-d') }}" @endif value="{{ 
             isset($selected_booking) && isset($selected_booking['date']) 
             ? $selected_booking['date'] 
             : (isset($date) ? $date : date('Y-m-d')) 
