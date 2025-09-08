@@ -676,15 +676,19 @@
             
             // Cache Clear AJAX
             $('#cacheClearBtn').on('click', function() {
-                $.ajax({
+                var req1 = $.ajax({
                     url: 'https://api.lipslay.com/api/clearcache',
-                    type: 'POST',
-                    success: function(response) {
-                        alert('Cache cleared successfully!');
-                    },
-                    error: function(xhr) {
-                        alert('Failed to clear cache.');
-                    }
+                    type: 'POST'
+                });
+                var req2 = $.ajax({
+                    url: '/clear-cache',
+                    type: 'GET'
+                });
+
+                $.when(req1, req2).done(function(r1, r2) {
+                    alert('Cache cleared successfully!');
+                }).fail(function() {
+                    alert('Failed to clear cache.');
                 });
             });
             
