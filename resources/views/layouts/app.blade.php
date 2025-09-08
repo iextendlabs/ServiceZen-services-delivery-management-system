@@ -97,6 +97,14 @@
             overflow-y: auto !important;
             max-height: 300px !important; /* Slightly less than container */
         }
+        .brand-stack {
+            min-width: 160px;
+        }
+        .brand-stack .btn-store-view {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left;
+        }
     </style>
 </head>
 
@@ -104,9 +112,14 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm no-print">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/admin') }}">
-                    Lip Slay Home Salon
-                </a>
+                <div class="d-flex flex-column align-items-center brand-stack">
+                    <a class="navbar-brand p-0 text-center" href="{{ url('/admin') }}">
+                        Lipslay Admin
+                    </a>
+                    <a class="btn btn-outline-primary btn-sm mt-1 btn-store-view text-center" href="https://lipslay.com/?cache=false" target="_blank">
+                        Store View
+                    </a>
+                </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -325,7 +338,6 @@
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
-                                <a class="dropdown-item" target="_blank" href="/">Your Store</a>
                                 <a class="dropdown-item" target="_blank" href="/sitemap.xml">Sitemap</a>
                                 @if(auth()->user()->hasRole("Admin"))
                                 <a class="dropdown-item" href="{{ route('backups.index') }}">Database Backups</a>
