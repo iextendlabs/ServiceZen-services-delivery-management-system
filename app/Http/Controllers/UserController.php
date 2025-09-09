@@ -205,4 +205,18 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function autocompleteName(Request $request)
+    {
+        $role = $request->get('role', 'Staff');
+        $search = $request->get('q', '');
+
+        $users = User::role($role)
+            ->where('name', 'like', "%$search%")
+            ->select('id', 'name as text')
+            ->limit(20)
+            ->get();
+        
+        return response()->json($users);
+    }
 }
