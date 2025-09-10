@@ -433,10 +433,14 @@
             }
 
             // Get initial country based on hidden field value or default to 'ae'
-            const initialNumberCountry = numberCountryInputField.value ? 
-                dialCodeToCountryCode(numberCountryInputField.value) : 'ae';
-            const initialWhatsappCountry = whatsappCountryInputField.value ? 
-                dialCodeToCountryCode(whatsappCountryInputField.value) : 'ae';
+            const initialNumberCountry = numberCountryInputField?.value
+                ? dialCodeToCountryCode(numberCountryInputField.value)
+                : 'ae';
+
+            const initialWhatsappCountry = whatsappCountryInputField?.value
+                ? dialCodeToCountryCode(whatsappCountryInputField.value)
+                : 'ae';
+
 
             // Initialize intl-tel-input
             const numberInput = window.intlTelInput(numberInputField, {

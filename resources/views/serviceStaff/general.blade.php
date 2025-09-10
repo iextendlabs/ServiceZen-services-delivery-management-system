@@ -79,6 +79,40 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <strong>Sort Order:</strong>
+                        <input type="number" name="sort" class="form-control"
+                            value="{{ old('sort', $serviceStaff->staff->sort ?? 0) }}">
+                        <small class="text-muted">Lower numbers appear first</small>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Feature Staff On Web:</strong>
+                        <div class="form-check form-switch">
+                            <!-- Hidden field ensures a value is sent when checkbox is unchecked -->
+                            <input type="hidden" name="feature" value="0">
+
+                            <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1"
+                                {{ old('feature', $serviceStaff->staff->feature ?? null) == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="feature">Enable featured staff</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Feature Staff On App:</strong>
+                        <div class="form-check form-switch">
+                            <!-- Hidden field ensures a value is sent when checkbox is unchecked -->
+                            <input type="hidden" name="feature_on_app" value="0">
+
+                            <input class="form-check-input" type="checkbox" name="feature_on_app" id="feature_on_app" value="1"
+                                {{ old('feature_on_app', $serviceStaff->staff->feature_on_app ?? null) == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="feature_on_app">Enable featured staff</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <strong>Online:</strong>
                         <select name="online" class="form-control">
                             <option value="1" {{ old('online', $serviceStaff->staff->online ?? null) == '1' ? 'selected' : '' }}>Online</option>

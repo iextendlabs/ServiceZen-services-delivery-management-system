@@ -2,6 +2,196 @@
 @section('content')
     <div class="container">
         <div class="row">
+            <div class="col-md-12">
+                <h3>Filters</h3>
+                <hr>
+                <form action="{{ route('serviceStaff.index') }}" method="GET" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <strong>Name:</strong>
+                                <input type="text" name="name" value="{{ $filter['name'] ?? '' }}"
+                                    class="form-control" placeholder="Name">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group position-relative">
+                                <strong>Email:</strong>
+                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter['email'] ?? '' }}" class="form-control" autocomplete="off">
+                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                <style>
+                                    #email-suggestions .list-group-item {
+                                        cursor: pointer !important;
+                                    }
+                                    #email-suggestions .list-group-item:hover {
+                                        background-color: #f0f0f0;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <strong>Status:</strong>
+                                <select name="status" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['status']) && $filter['status'] === '1' ? 'selected' : '' }}>Enabled
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['status']) && $filter['status'] === '0' ? 'selected' : '' }}>Disabled
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <strong>Feature On App:</strong>
+                                <select name="feature_on_app" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['feature_on_app']) && $filter['feature_on_app'] === '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['feature_on_app']) && $filter['feature_on_app'] === '0' ? 'selected' : '' }}>No
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <strong>Feature On Web:</strong>
+                                <select name="feature" class="form-control">
+                                    <option value="">-- All --</option>
+                                    <option value="1"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
+                                    </option>
+                                    <option value="0"
+                                        {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Zone Assignment:</strong></label>
+                                <select name="assignedZone" class="form-control">
+                                    <option value="">All Staff</option>
+                                    <option value="0" {{ ($filter['assignedZone'] ?? '') == '0' ? 'selected' : '' }}>
+                                        With Assigned Zone
+                                    </option>
+                                    <option value="1" {{ ($filter['assignedZone'] ?? '') == '1' ? 'selected' : '' }}>
+                                        Without Assigned Zone
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>TimeSlot Assignment:</strong></label>
+                                <select name="assignedTimeSlot" class="form-control">
+                                    <option value="">All Staff</option>
+                                    <option value="0"
+                                        {{ ($filter['assignedTimeSlot'] ?? '') == '0' ? 'selected' : '' }}>
+                                        With Assigned TimeSlot
+                                    </option>
+                                    <option value="1"
+                                        {{ ($filter['assignedTimeSlot'] ?? '') == '1' ? 'selected' : '' }}>
+                                        Without Assigned TimeSlot
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Sub Title / Designation:</strong></label>
+                                <select name="sub_title" class="form-control select2" id="sub_title">
+                                    <option value="">Select Designation</option>
+                                    @foreach ($sub_titles as $sub_title)
+                                        <option value="{{ $sub_title->id }}"
+                                            {{ $sub_title->id == $filter['sub_title'] ? 'selected' : '' }}>
+                                            {{ $sub_title->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Location:</strong></label>
+                                <select name="location" class="form-control select2" id="location">
+                                    <option value="">Select Location</option>
+                                    @foreach ($locations as $location)
+                                        <option value="{{ $location }}"
+                                            {{ $location == $filter['location'] ? 'selected' : '' }}>
+                                            {{ $location }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Zones:</strong></label>
+                                <select name="zone_id" class="form-control select2" id="zone_id">
+                                    <option value="">Select Zone</option>
+                                    @foreach ($staffZones as $zone)
+                                        <option value="{{ $zone->id }}"
+                                            {{ $zone->id == $filter['zone_id'] ? 'selected' : '' }}>
+                                            {{ $zone->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Minimum Order Value:</strong></label>
+                                <input type="number" class="form-control" name="min_order_value"
+                                    value="{{ $filter['min_order_value'] ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Services:</strong></label>
+                                <select name="service_id" class="form-control select2" id="service_id">
+                                    <option value="">Select Service</option>
+                                    @foreach ($services as $service)
+                                        <option value="{{ $service->id }}"
+                                            {{ $service->id == $filter['service_id'] ? 'selected' : '' }}>
+                                            {{ $service->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label><strong>Categories:</strong></label>
+                                <select name="category_id" class="form-control select2" id="category_id">
+                                    <option value="">Select Category</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ $category->id == $filter['category_id'] ? 'selected' : '' }}>
+                                            {{ $category->title }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group float-right d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary mr-2">
+                                    <i class="fas fa-filter"></i> Apply Filters
+                                </button>
+                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-sync-alt"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-12 d-flex justify-content-between align-items-center">
                 <h2>Service Staff ({{ $total_staff }})</h2>
                 <div class="d-flex">
@@ -31,9 +221,8 @@
                 <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <hr>
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-12">
                 <table class="table table-striped table-bordered">
                     <tr>
                         <th>
@@ -122,194 +311,6 @@
                 </table>
                 {!! $serviceStaff->links() !!}
 
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('serviceStaff.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter['name'] ?? '' }}"
-                                    class="form-control" placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter['email'] ?? '' }}" class="form-control" autocomplete="off">
-                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
-                                <style>
-                                    #email-suggestions .list-group-item {
-                                        cursor: pointer !important;
-                                    }
-                                    #email-suggestions .list-group-item:hover {
-                                        background-color: #f0f0f0;
-                                    }
-                                </style>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Status:</strong>
-                                <select name="status" class="form-control">
-                                    <option value="">-- All --</option>
-                                    <option value="1"
-                                        {{ isset($filter['status']) && $filter['status'] === '1' ? 'selected' : '' }}>Enabled
-                                    </option>
-                                    <option value="0"
-                                        {{ isset($filter['status']) && $filter['status'] === '0' ? 'selected' : '' }}>Disabled
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Feature On App:</strong>
-                                <select name="feature_on_app" class="form-control">
-                                    <option value="">-- All --</option>
-                                    <option value="1"
-                                        {{ isset($filter['feature_on_app']) && $filter['feature_on_app'] === '1' ? 'selected' : '' }}>Yes
-                                    </option>
-                                    <option value="0"
-                                        {{ isset($filter['feature_on_app']) && $filter['feature_on_app'] === '0' ? 'selected' : '' }}>No
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Feature On Web:</strong>
-                                <select name="feature" class="form-control">
-                                    <option value="">-- All --</option>
-                                    <option value="1"
-                                        {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
-                                    </option>
-                                    <option value="0"
-                                        {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Zone Assignment:</strong></label>
-                                <select name="assignedZone" class="form-control">
-                                    <option value="">All Staff</option>
-                                    <option value="0" {{ ($filter['assignedZone'] ?? '') == '0' ? 'selected' : '' }}>
-                                        With Assigned Zone
-                                    </option>
-                                    <option value="1" {{ ($filter['assignedZone'] ?? '') == '1' ? 'selected' : '' }}>
-                                        Without Assigned Zone
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>TimeSlot Assignment:</strong></label>
-                                <select name="assignedTimeSlot" class="form-control">
-                                    <option value="">All Staff</option>
-                                    <option value="0"
-                                        {{ ($filter['assignedTimeSlot'] ?? '') == '0' ? 'selected' : '' }}>
-                                        With Assigned TimeSlot
-                                    </option>
-                                    <option value="1"
-                                        {{ ($filter['assignedTimeSlot'] ?? '') == '1' ? 'selected' : '' }}>
-                                        Without Assigned TimeSlot
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Sub Title / Designation:</strong></label>
-                                <select name="sub_title" class="form-control select2" id="sub_title">
-                                    <option value="">Select Designation</option>
-                                    @foreach ($sub_titles as $sub_title)
-                                        <option value="{{ $sub_title->id }}"
-                                            {{ $sub_title->id == $filter['sub_title'] ? 'selected' : '' }}>
-                                            {{ $sub_title->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Location:</strong></label>
-                                <select name="location" class="form-control select2" id="location">
-                                    <option value="">Select Location</option>
-                                    @foreach ($locations as $location)
-                                        <option value="{{ $location }}"
-                                            {{ $location == $filter['location'] ? 'selected' : '' }}>
-                                            {{ $location }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Zones:</strong></label>
-                                <select name="zone_id" class="form-control select2" id="zone_id">
-                                    <option value="">Select Zone</option>
-                                    @foreach ($staffZones as $zone)
-                                        <option value="{{ $zone->id }}"
-                                            {{ $zone->id == $filter['zone_id'] ? 'selected' : '' }}>
-                                            {{ $zone->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Minimum Order Value:</strong></label>
-                                <input type="number" class="form-control" name="min_order_value"
-                                    value="{{ $filter['min_order_value'] ?? '' }}">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Services:</strong></label>
-                                <select name="service_id" class="form-control select2" id="service_id">
-                                    <option value="">Select Service</option>
-                                    @foreach ($services as $service)
-                                        <option value="{{ $service->id }}"
-                                            {{ $service->id == $filter['service_id'] ? 'selected' : '' }}>
-                                            {{ $service->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><strong>Categories:</strong></label>
-                                <select name="category_id" class="form-control select2" id="category_id">
-                                    <option value="">Select Category</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}"
-                                            {{ $category->id == $filter['category_id'] ? 'selected' : '' }}>
-                                            {{ $category->title }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group d-flex justify-content-between">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-filter"></i> Apply Filters
-                                </button>
-                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-sync-alt"></i> Reset
-                                </a>
-                            </div>
-                        </div>
-                </form>
             </div>
         </div>
     </div>
