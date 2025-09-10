@@ -57,26 +57,28 @@ class OrderController extends Controller
         $statuses = config('app.order_statuses');
         $driver_statuses = config('app.order_driver_statuses');
         $payment_methods = ['Cash-On-Delivery','Credit-Debit-Card'];
-        $users = User::all();
         $zones = StaffZone::pluck("name")->toArray();
-        $categories = ServiceCategory::get();
         $filter = [
             'status' => $request->status,
             'affiliate' => $request->affiliate_id,
+            'affiliate_name' => $request->affiliate_name,
             'customer' => $request->customer,
             'staff' => $request->staff_id,
+            'staff_name' => $request->staff_name,
             'payment_method' => $request->payment_method,
             'appointment_date' => $request->appointment_date,
             'created_at' => $request->created_at,
             'order_id' => $request->order_id,
             'driver_status' => $request->driver_status,
             'driver' => $request->driver_id,
+            'driver_name' => $request->driver_name,
             'zone' => $request->zone,
             'date_to' => $request->date_to,
             'date_from' => $request->date_from,
             'time_start' => $request->time_start,
             'time_end' => $request->time_end,
             'category_id' => $request->category_id,
+            'category_title' => $request->category_title,
         ];
         $currentUser = Auth::user();
         $query = Order::orderBy($sort, $direction);
@@ -275,7 +277,7 @@ class OrderController extends Controller
 
             $filters = $request->only(['time_start','time_end','date_from', 'date_to', 'zone', 'order_id', 'appointment_date', 'staff_id', 'status', 'affiliate_id', 'customer', 'payment_method', 'driver_status', 'driver_id', 'category_id']);
             $orders->appends($filters, ['sort' => $sort, 'direction' => $direction]);
-            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'users', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction', 'categories'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+            return view('orders.index', compact('orders', 'statuses', 'payment_methods', 'filter', 'driver_statuses', 'zones', 'total_order', 'direction'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
         }
     }
 

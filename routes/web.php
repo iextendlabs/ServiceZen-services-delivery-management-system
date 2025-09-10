@@ -424,5 +424,6 @@ Route::get('sitemap.xml', function () {
 });
 
 Route::get('/autocomplete-email', [UserController::class, 'autocompleteEmail'])->name('autocomplete.email');
-
+Route::get('/autocomplete-name', [UserController::class, 'autocompleteName'])->name('autocomplete.name');
+Route::get('/autocomplete-category', [ServiceCategoryController::class, 'autocomplete'])->name('autocomplete.category');
 // TODO : Remove number, whatsapp, gender from customer profile table and set from user table

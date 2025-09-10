@@ -382,4 +382,16 @@ class ServiceCategoryController extends Controller
         }
         return response()->json($data);
     }
+
+    public function autocomplete(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $users = ServiceCategory::where('title', 'like', "%$search%")
+            ->select('id', 'title as text')
+            ->limit(20)
+            ->get();
+        
+        return response()->json($users);
+    }
 }

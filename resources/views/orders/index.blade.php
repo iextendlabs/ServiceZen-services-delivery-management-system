@@ -160,51 +160,46 @@
                                     value="{{ $filter['appointment_date'] }}">
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group position-relative">
                                     <strong>Category:</strong>
-                                    <select name="category_id" class="form-control">
-                                        <option value="">Select</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}"
-                                                @if ($filter['category_id'] == $category->id) selected @endif>{{ $category->title }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <input type="text" id="category-autocomplete" name="category_title"
+                                        class="form-control" autocomplete="off"
+                                        value="{{ old('category_title', $filter['category_title']) }}">
+                                    <input type="hidden" id="category_id" name="category_id"
+                                        value="{{ $filter['category_id'] }}">
+                                    <ul id="category-suggestions" class="list-group position-absolute w-100"
+                                        style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
+                                    </ul>
                                 </div>
                             </div>
                             @if (!auth()->user()->hasRole('Staff'))
                                 <div class="col-md-4">
-                                    <div class="form-group">
+                                    <div class="form-group position-relative">
                                         <strong>Staff:</strong>
-                                        <select name="staff_id" class="form-control">
-                                            <option value="">Select</option>
-                                            @foreach ($users as $staff)
-                                                @if ($staff->hasRole('Staff'))
-                                                    <option value="{{ $staff->id }}"
-                                                        @if ($staff->id == $filter['staff']) selected @endif>
-                                                        {{ $staff->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
+                                        <input type="text" id="staff-autocomplete" name="staff_name"
+                                            class="form-control" autocomplete="off"
+                                            value="{{ old('staff_name', $filter['staff_name']) }}">
+                                        <input type="hidden" id="staff_id" name="staff_id"
+                                            value="{{ $filter['staff'] }}">
+                                        <ul id="staff-suggestions" class="list-group position-absolute w-100"
+                                            style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
+                                        </ul>
                                     </div>
                                 </div>
                             @endif
 
                             @if (auth()->user()->hasRole('Admin'))
                                 <div class="col-md-4">
-                                    <div class="form-group">
+                                    <div class="form-group position-relative">
                                         <strong>Affiliate:</strong>
-                                        <select name="affiliate_id" class="form-control">
-                                            <option value="">Select</option>
-                                            @foreach ($users as $affiliate)
-                                                @if ($affiliate->hasRole('Affiliate'))
-                                                    <option value="{{ $affiliate->id }}"
-                                                        @if ($affiliate->id == $filter['affiliate']) selected @endif>
-                                                        {{ $affiliate->name }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
+                                        <input type="text" id="affiliate-autocomplete" name="affiliate_name"
+                                            class="form-control" autocomplete="off"
+                                            value="{{ old('affiliate_name', $filter['affiliate_name']) }}">
+                                        <input type="hidden" id="affiliate_id" name="affiliate_id"
+                                            value="{{ $filter['affiliate'] }}">
+                                        <ul id="affiliate-suggestions" class="list-group position-absolute w-100"
+                                            style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
+                                        </ul>
                                     </div>
                                 </div>
                             @endif
@@ -216,18 +211,15 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group position-relative">
                                     <strong>Driver:</strong>
-                                    <select name="driver_id" class="form-control">
-                                        <option value="">Select</option>
-                                        @foreach ($users as $driver)
-                                            @if ($driver->hasRole('Driver'))
-                                                <option value="{{ $driver->id }}"
-                                                    @if ($driver->id == $filter['driver']) selected @endif>{{ $driver->name }}
-                                                </option>
-                                            @endif
-                                        @endforeach
-                                    </select>
+                                    <input type="text" id="driver-autocomplete" name="driver_name"
+                                        class="form-control" autocomplete="off"
+                                        value="{{ old('driver_name', $filter['driver_name']) }}">
+                                    <input type="hidden" id="driver_id" name="driver_id"
+                                        value="{{ $filter['driver'] }}">
+                                    <ul id="driver-suggestions" class="list-group position-absolute w-100"
+                                        style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;"></ul>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -325,16 +317,13 @@
                             @foreach (request()->except('page') as $key => $value)
                                 @if (!empty($value) && $key != '_token')
                                     @php
-                                        // Clean up the key names
+                                        // Only show name fields, skip id fields
+                                        if (in_array($key, ['staff_id', 'affiliate_id', 'driver_id', 'category_id'])) {
+                                            continue;
+                                        }
                                         $cleanKey = ucwords(str_replace(['_id', '_'], ['', ' '], $key));
-
-                                        // Get display value
                                         $displayValue = $value;
-                                        if ($key == 'category_id') {
-                                            $displayValue = $categories->firstWhere('id', $value)->title ?? $value;
-                                        } elseif (in_array($key, ['staff_id', 'affiliate_id', 'driver_id'])) {
-                                            $displayValue = $users->firstWhere('id', $value)->name ?? $value;
-                                        } elseif (in_array($key, ['date_from', 'date_to', 'appointment_date'])) {
+                                        if (in_array($key, ['date_from', 'date_to', 'appointment_date'])) {
                                             $displayValue = \Carbon\Carbon::parse($value)->format('M d, Y');
                                         } elseif (in_array($key, ['time_start', 'time_end'])) {
                                             $displayValue = \Carbon\Carbon::parse($value)->format('h:i A');
@@ -456,5 +445,125 @@
                 }
             });
         }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function setupUserAutocomplete(inputSelector, suggestionsSelector, role) {
+            var $input = $(inputSelector);
+            var $suggestions = $(suggestionsSelector);
+            $input.on('input', debounce(function() {
+                var query = $(this).val();
+                if (query.length < 2) {
+                    $suggestions.hide();
+                    return;
+                }
+                $.ajax({
+                    url: '{{ route('autocomplete.name') }}',
+                    data: {
+                        q: query,
+                        role: role
+                    },
+                    success: function(data) {
+                        $suggestions.empty();
+                        if (Array.isArray(data) && data.length) {
+                            data.forEach(function(user) {
+                                var $li = $(
+                                    '<li class="list-group-item list-group-item-action"></li>'
+                                    ).text(user.text);
+                                $li.on('click', function() {
+                                    $input.val(user.text);
+                                    $('#' + $input.attr('id').replace(
+                                        '-autocomplete', '_id')).val(user.id);
+                                    $suggestions.hide();
+                                });
+                                $suggestions.append($li);
+                            });
+                            $suggestions.show();
+                        } else {
+                            var $li = $('<li class="list-group-item text-muted"></li>').text(
+                                'No data found');
+                            $suggestions.append($li);
+                            $suggestions.show();
+                        }
+                    },
+                    error: function() {
+                        $suggestions.empty();
+                        var $li = $('<li class="list-group-item text-danger"></li>').text(
+                            'Error fetching data');
+                        $suggestions.append($li);
+                        $suggestions.show();
+                    }
+                });
+            }, 300));
+            $input.on('blur', function() {
+                setTimeout(function() {
+                    $suggestions.hide();
+                }, 200);
+            });
+        }
+
+        function categoryAutocomplete(inputSelector, suggestionsSelector) {
+            var $input = $(inputSelector);
+            var $suggestions = $(suggestionsSelector);
+            $input.on('input', debounce(function() {
+                var query = $(this).val();
+                if (query.length < 2) {
+                    $suggestions.hide();
+                    return;
+                }
+                $.ajax({
+                    url: '{{ route('autocomplete.category') }}',
+                    data: {
+                        q: query
+                    },
+                    success: function(data) {
+                        $suggestions.empty();
+                        if (Array.isArray(data) && data.length) {
+                            data.forEach(function(category) {
+                                var $li = $(
+                                    '<li class="list-group-item list-group-item-action"></li>'
+                                    ).text(category.text);
+                                $li.on('click', function() {
+                                    $input.val(category.text);
+                                    $('#' + $input.attr('id').replace(
+                                        '-autocomplete', '_id')).val(category.id);
+                                    $suggestions.hide();
+                                });
+                                $suggestions.append($li);
+                            });
+                            $suggestions.show();
+                        } else {
+                            var $li = $('<li class="list-group-item text-muted"></li>').text(
+                                'No data found');
+                            $suggestions.append($li);
+                            $suggestions.show();
+                        }
+                    },
+                    error: function() {
+                        $suggestions.empty();
+                        var $li = $('<li class="list-group-item text-danger"></li>').text(
+                            'Error fetching data');
+                        $suggestions.append($li);
+                        $suggestions.show();
+                    }
+                });
+            }, 300));
+            $input.on('blur', function() {
+                setTimeout(function() {
+                    $suggestions.hide();
+                }, 200);
+            });
+        }
+
+        setupUserAutocomplete('#staff-autocomplete', '#staff-suggestions', 'Staff');
+        setupUserAutocomplete('#affiliate-autocomplete', '#affiliate-suggestions', 'Affiliate');
+        setupUserAutocomplete('#driver-autocomplete', '#driver-suggestions', 'Driver');
+        categoryAutocomplete('#category-autocomplete', '#category-suggestions');
     </script>
 @endsection
