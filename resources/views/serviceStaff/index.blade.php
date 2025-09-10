@@ -85,8 +85,21 @@
                                         <a class="btn btn-warning" href="{{ route('serviceStaff.show', $staff->id) }}"><i
                                                 class="fa fa-eye"></i></a>
                                         @can('service-staff-edit')
-                                            <a class="btn btn-primary" href="{{ route('serviceStaff.edit', $staff->id) }}"><i
-                                                    class="fa fa-edit"></i></a>
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-edit"></i></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.general', $staff->id) }}">General</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.time-slots', $staff->id) }}">Time Slots</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.zones', $staff->id) }}">Zones</a></li>
+                                                @if($socialLinks)
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.social-links', $staff->id) }}">Social Links</a></li>
+                                                @endif
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.gallery', $staff->id) }}">Gallery</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-and-services', $staff->id) }}">Categories & Services</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.documents', $staff->id) }}">Documents</a></li>
+                                            </ul>
+                                        </div>
+                                            <!-- <a class="btn btn-primary" href="{{ route('serviceStaff.edit', $staff->id) }}"><i class="fa fa-edit"></i></a> -->
                                         @endcan
                                         @csrf
                                         @method('DELETE')

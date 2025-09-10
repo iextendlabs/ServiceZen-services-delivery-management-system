@@ -18,7 +18,7 @@
         </ul>
     </div>
     @endif
-    <form action="{{ route('serviceStaff.update',$serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('serviceStaff.update', $serviceStaff->id) }}" method="POST" enctype="multipart/form-data">
         <input type="hidden" value="{{ $serviceStaff->staff->id ?? "" }}" name="staff_id">
         <input type="hidden" value="{{ $freelancer_join }}" name="freelancer_join" />
         @csrf

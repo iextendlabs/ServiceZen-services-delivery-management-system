@@ -187,8 +187,10 @@ class ServiceStaffController extends Controller
         $total_staff = $query->count();
         $serviceStaff = $query->paginate(config('app.paginate'));
 
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+
         $serviceStaff->appends($filter, ['sort' => $sort, 'direction' => $direction]);
-        return view('serviceStaff.index', compact('total_staff', 'serviceStaff', 'filter', 'direction', 'sub_titles', 'locations', 'services', 'categories', 'staffZones', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.index', compact('total_staff', 'serviceStaff', 'filter', 'direction', 'sub_titles', 'locations', 'services', 'categories', 'staffZones', 'timeSlots', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     /**
@@ -428,6 +430,344 @@ class ServiceStaffController extends Controller
         $freelancer_groups = $freelancer_join ? FreelancerGroup::all() : [];
         return view('serviceStaff.edit', compact('serviceStaff', 'users', 'socialLinks', 'categories', 'services', 'freelancer_join', 'affiliates', 'membership_plans', 'documents', 'assignedDrivers', 'timeSlots', 'staffZones', 'subTitles', 'freelancer_groups'))
             ->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function ServicesStaffGeneral($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)->get()->groupBy('day');
+        $staffId = $serviceStaff->id;
+        $timeSlots = TimeSlot::all();
+        $subTitles = SubTitle::all();
+        $membership_plans = MembershipPlan::where('status', 1)->where('type', "Freelancer")->get();
+        $freelancer_join = $request->freelancer_join;
+        $affiliates = User::role('Affiliate')->orderBy('name')->get();
+        $drivers = User::role('Driver')->orderBy('name')->get();
+        $supervisors = User::role('Supervisor')->orderBy('name')->get();
+
+        return view('serviceStaff.general', compact('serviceStaff', 'drivers', 'supervisors', 'categories', 'services', 'assignedDrivers', 'timeSlots', 'membership_plans', 'affiliates', 'freelancer_join', 'subTitles'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffGeneral(Request $request, $id)
+    {
+        $rules = [
+            'name' => 'required',
+            'whatsapp' => 'required',
+            'phone' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password' => 'same:confirm-password',
+            'commission' => 'required',
+            'drivers' => 'required|array',
+        ];
+
+        if ($request->freelancer_join == 1) {
+            $rules['expiry_date'] = 'required';
+        }
+
+        // Custom validation for drivers array
+        Validator::make($request->all(), $rules)->after(function ($validator) use ($request) {
+            $drivers = $request->input('drivers', []);
+
+            foreach ($drivers as $day => $entries) {
+                foreach ($entries as $index => $entry) {
+                    $driverId = $entry['driver_id'] ?? null;
+                    $timeSlotId = $entry['time_slot_id'] ?? null;
+
+                    if (is_null($driverId) xor is_null($timeSlotId)) {
+                        $validator->errors()->add("drivers.{$day}.{$index}.driver_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
+                        $validator->errors()->add("drivers.{$day}.{$index}.time_slot_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
+                    }
+                }
+            }
+        })->validate();
+
+
+        $input = $request->all();
+        $input['phone'] = $request->number_country_code . $request->phone;
+        $input['whatsapp'] = $request->whatsapp_country_code . $request->whatsapp;
+        if (!empty($input['password'])) {
+            $input['password'] = Hash::make($input['password']);
+        } else {
+            $input = Arr::except($input, array('password'));
+        }
+
+        $serviceStaff = User::find($id);
+
+        $staff = Staff::find($input['staff_id']);
+
+        if (isset($request->image)) {
+            if ($staff && $staff->image && $staff->image !== "default.png"  && file_exists(public_path('staff-images') . '/' . $staff->image)) {
+                unlink(public_path('staff-images') . '/' . $staff->image);
+            }
+
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            $request->image->move(public_path('staff-images'), $filename);
+
+            $input['image'] = $filename;
+        }
+
+        $serviceStaff->subTitles()->sync($request->sub_titles);
+        if ($staff) {
+            $staff->update($input);
+        } else {
+            $input['user_id'] = $id;
+            Staff::create($input);
+        }
+        $serviceStaff->supervisors()->sync($request->ids);
+
+        if ($request->freelancer_join == 1) {
+            $input['freelancer_program'] = 1;
+        }
+        $serviceStaff->update($input);
+
+        $serviceStaff->assignRole('Staff');
+
+        StaffDriver::where('staff_id', $id)->delete();
+
+        foreach ($request->drivers as $day => $drivers) {
+            foreach ($drivers as $driver) {
+                if (!is_null($driver['driver_id']) && !is_null($driver['time_slot_id'])) {
+                    StaffDriver::create([
+                        'staff_id' => $id,
+                        'driver_id' => $driver['driver_id'],
+                        'day' => $day,
+                        'time_slot_id' => $driver['time_slot_id'],
+                    ]);
+                }
+            }
+        }
+
+        AffiliateCategory::where('affiliate_id', $id)->delete();
+
+        if ($request->categories) {
+            foreach ($request->categories as $categoryData) {
+                $affiliateCategory = AffiliateCategory::create([
+                    'affiliate_id' => $id,
+                    'category_id' => $categoryData['category_id'],
+                    'commission_type' => $categoryData['commission_type'],
+                    'commission' => $categoryData['category_commission'],
+                ]);
+
+                if (!empty($categoryData['services'])) {
+                    foreach ($categoryData['services'] as $serviceData) {
+                        AffiliateService::create([
+                            'affiliate_category_id' => $affiliateCategory->id,
+                            'service_id' => $serviceData['service_id'],
+                            'commission_type' => $serviceData['commission_type'],
+                            'commission' => $serviceData['service_commission'],
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $previousUrl = $request->url;
+
+        return redirect($previousUrl)->with('success', 'Service Staff General Updated Successfully');
+    }
+
+    public function ServicesStaffTimeSlots($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $timeSlots = TimeSlot::all();
+
+        return view('serviceStaff.timeslots', compact('serviceStaff', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffTimeSlots(Request $request, $id)
+    {
+
+        $serviceStaff = User::find($id);
+        $serviceStaff->staffTimeSlots()->sync([]);
+
+        $timeSlotIds = $this->handleTimeSlots($request, new HomeController());
+        if (!empty($timeSlotIds)) {
+            $serviceStaff->staffTimeSlots()->sync($timeSlotIds);
+        }
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Service Staff Time Slots Updated Successfully');
+    }
+
+    public function ServicesStaffZones($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $staffZones = StaffZone::all();
+
+        return view('serviceStaff.zones', compact('serviceStaff', 'staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffZones(Request $request, $id)
+    {
+        $serviceStaff = User::find($id);
+        $serviceStaff->staffZones()->sync([]);
+
+        $zoneIds = $this->handleZones($request, new HomeController());
+        if (!empty($zoneIds)) {
+            $serviceStaff->staffZones()->sync($zoneIds);
+        }
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Service Staff Zones Updated Successfully');
+    }
+
+    public function ServicesStaffSocialLinks($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+
+        return view('serviceStaff.social_links', compact('serviceStaff'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffSocialLinks(Request $request, $id)
+    {
+        $serviceStaff = User::find($id);
+
+        $socialLinks = [
+            'instagram' => $request->instagram,
+            'snapchat'  => $request->snapchat,
+            'facebook'  => $request->facebook,
+            'youtube'   => $request->youtube,
+            'tiktok'    => $request->tiktok,
+        ];
+
+        if ($serviceStaff->staff) {
+            $serviceStaff->staff->update($socialLinks);
+        }
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Service Staff Social Links Updated Successfully');
+    }
+
+    public function ServicesStaffGallery($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+
+        return view('serviceStaff.gallery', compact('serviceStaff'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffGallery(Request $request, $id)
+    {
+        $serviceStaff = User::find($id);
+        $input = $request->all();
+        $jsonCachePath = public_path('jsonCache/staff');
+        if ($serviceStaff && $serviceStaff->id) {
+            JsonCacheHelper::deleteJsonCacheFiles($serviceStaff->id, $jsonCachePath);
+        }
+
+        if ($request->gallery_images) {
+            $images = $request->gallery_images;
+
+            foreach ($images as $image) {
+                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
+
+                $image->move(public_path('staff-images'), $filename);
+                StaffImages::create([
+                    'image' => $filename,
+                    'staff_id' => $id,
+                ]);
+            }
+        }
+
+        if (isset($request->image)) {
+            if ($serviceStaff && $serviceStaff->image && $serviceStaff->image !== "default.png"  && file_exists(public_path('staff-images') . '/' . $serviceStaff->image)) {
+                unlink(public_path('staff-images') . '/' . $serviceStaff->image);
+            }
+
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+
+            $request->image->move(public_path('staff-images'), $filename);
+
+            $input['image'] = $filename;
+        }
+
+        if ($request->youtube_video) {
+            StaffYoutubeVideo::where('staff_id', $id)->delete();
+            foreach ($request->youtube_video as $youtube_video) {
+                if ($youtube_video) {
+                    StaffYoutubeVideo::create([
+                        'youtube_video' => $youtube_video,
+                        'staff_id' => $id,
+                    ]);
+                }
+            }
+        }
+
+        if ($serviceStaff) {
+            $serviceStaff->update($input);
+        } else {
+            $input['user_id'] = $id;
+            Staff::create($input);
+        }
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Service Staff Gallery Updated Successfully');
+    }
+
+    public function ServicesStaffCategoriesAndServices($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+
+        return view('serviceStaff.categories_and_services', compact('serviceStaff', 'categories', 'services'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffCategoriesAndServices(Request $request, $id)
+    {
+        $serviceStaff = User::find($id);
+        $serviceStaff->services()->sync($request->service_ids);
+        $serviceStaff->categories()->sync($request->category_ids);
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Service Staff Categories and Services Updated Successfully');
+    }
+
+    public function ServicesStaffDocuments($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $documents = $this->documents;
+
+        return view('serviceStaff.documents', compact('serviceStaff', 'documents'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffDocuments(Request $request, $id)
+    {
+        $input = $request->all();
+        $documentFields = $this->documents;
+
+        $userDocuments = UserDocument::where('user_id', $id)->first();
+
+        foreach ($documentFields as $fileField => $dbField) {
+            if ($request->hasFile($fileField)) {
+                $filename = mt_rand(1000, 9999) . '.' . $request->$fileField->getClientOriginalExtension();
+                $request->$fileField->move(public_path('staff-document'), $filename);
+
+                $input[$fileField] = $filename;
+
+                if ($userDocuments && $userDocuments->$fileField) {
+                    $oldFile = public_path('staff-document/' . $userDocuments->$fileField);
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+            } else {
+                $input[$fileField] = $userDocuments->$fileField ?? null;
+            }
+        }
+
+        if ($userDocuments) {
+            $userDocuments->update($input);
+        } else {
+            $input['user_id'] = $id;
+            UserDocument::create($input);
+        }
+
+        $previousUrl = $request->url;
+        return redirect($previousUrl)->with('success', 'Service Staff Documents Updated Successfully');
     }
 
     /**
