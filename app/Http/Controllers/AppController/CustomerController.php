@@ -321,8 +321,7 @@ class CustomerController extends Controller
                     'category_id' => $categoryIds,
                     'short_description' => $service->short_description,
                     'rating' => $service->averageRating(),
-                    'options' => $service->serviceOption,
-                    'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0
+                    'options' => $service->serviceOption
                 ];
             })->toArray();
 
@@ -930,8 +929,7 @@ class CustomerController extends Controller
                     'short_description' => $service->short_description,
                     'rating' => $service->averageRating(),
                     'quote' => $service->quote,
-                    'options' => $service->serviceOption,
-                    'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0,
+                    'options' => $service->serviceOption
                 ];
             })->toArray();
 

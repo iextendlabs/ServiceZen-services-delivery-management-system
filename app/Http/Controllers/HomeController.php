@@ -292,7 +292,7 @@ class HomeController extends Controller
 
         $categoryIds = $categoriesWithOrder->keys()->all();
 
-        $categories = ServiceCategory::findMany($categoryIds)->keyBy('id');
+        $categories = ServiceCategory::findMany($categoryIds)->where('status',1)->keyBy('id');
 
         $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
             $category = $categories->get($id);
@@ -331,7 +331,17 @@ class HomeController extends Controller
                 'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
                 'rating' => $service->averageRating(),
-                'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0,
+                'options' => $service->serviceOption->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'service_id' => $option->service_id,
+                        'option_name' => $option->option_name,
+                        'description' => $option->description,
+                        'option_price' => $option->option_price,
+                        'option_duration' => $option->option_duration,
+                        'image' => $option->image,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
 
@@ -416,7 +426,7 @@ class HomeController extends Controller
             'in_app_browsing' => $in_app_browsing
         ];
 
-        $this->saveJsonFile('AppHomeDataNew.json', $jsonData);
+        $this->saveJsonFile('AppHomeData.json', $jsonData);
 
         try {
             Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
@@ -454,6 +464,19 @@ class HomeController extends Controller
 
         $allServicesArray = $allServices->map(function ($service) {
             $categoryIds = collect($service->categories)->pluck('id')->toArray();
+            // only 5 
+
+            $optionsData = $service->serviceOption->take(5)->map(function ($option) {
+                return [
+                    'id' => $option->id,
+                    'service_id' => $option->service_id,
+                    'option_name' => preg_replace('/[\p{Emoji}\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}]+/u', '', substr($option->option_name,0,20)),
+                    'description' => $option->description,
+                    'option_price' => $option->option_price,
+                    'option_duration' => $option->option_duration,
+                    'image' => $option->image,
+                ];
+            })->toArray();
             return [
                 'id' => $service->id,
                 'name' => $service->name,
@@ -466,14 +489,15 @@ class HomeController extends Controller
                 'category_id' => $categoryIds,
                 'short_description' => "",
                 'rating' => $service->averageRating(),
-                'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0,
+                'options' => $optionsData,
             ];
         })->toArray();
 
         $jsonData = [
             'services' => $allServicesArray,
         ];
-        $this->saveJsonFile('AppServicesDataNew.json', $jsonData);
+
+        $this->saveJsonFile('AppServicesData.json', $jsonData);
 
         $this->updateVersion('services');
 
@@ -615,18 +639,12 @@ class HomeController extends Controller
 
             if (Storage::exists($filePath)) {
                 $backupFilename = "public/" . pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
-
                 Storage::copy($filePath, $backupFilename);
-
-                $currentData = json_decode(Storage::get($filePath), true);
-                $updatedData = array_merge($currentData, $data);
-
-                Storage::put($filePath, json_encode($updatedData, 0));
-
-                Storage::delete($backupFilename);
-            } else {
-                Storage::put($filePath, json_encode($data, 0));
             }
+
+            Storage::put($filePath, json_encode($data, 0));
+
+            
         } catch (\Exception $e) {
             if (isset($backupFilename) && Storage::exists($backupFilename)) {
                 Storage::move($backupFilename, $filePath);
