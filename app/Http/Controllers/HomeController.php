@@ -331,17 +331,7 @@ class HomeController extends Controller
                 'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
                 'rating' => $service->averageRating(),
-                'options' => $service->serviceOption->map(function ($option) {
-                    return [
-                        'id' => $option->id,
-                        'service_id' => $option->service_id,
-                        'option_name' => $option->option_name,
-                        'description' => $option->description,
-                        'option_price' => $option->option_price,
-                        'option_duration' => $option->option_duration,
-                        'image' => $option->image,
-                    ];
-                })->toArray(),
+                'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0,
             ];
         })->toArray();
 
@@ -426,7 +416,7 @@ class HomeController extends Controller
             'in_app_browsing' => $in_app_browsing
         ];
 
-        $this->saveJsonFile('AppHomeData.json', $jsonData);
+        $this->saveJsonFile('AppHomeDataNew.json', $jsonData);
 
         try {
             Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
@@ -476,22 +466,14 @@ class HomeController extends Controller
                 'category_id' => $categoryIds,
                 'short_description' => "",
                 'rating' => $service->averageRating(),
-                'options' => $service->serviceOption->map(function ($option) {
-                    return [
-                        'id' => $option->id,
-                        'option_name' => preg_replace('/[\p{Emoji}\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}]+/u', '', $option->option_name),
-                        'option_price' => $option->option_price,
-                        'option_duration' => $option->option_duration,
-                        'image' => $option->image,
-                    ];
-                })->toArray(),
+                'hasOption' => $service->serviceOption->count() > 0,
             ];
         })->toArray();
 
         $jsonData = [
             'services' => $allServicesArray,
         ];
-        $this->saveJsonFile('AppServicesData.json', $jsonData);
+        $this->saveJsonFile('AppServicesDataNew.json', $jsonData);
 
         $this->updateVersion('services');
 
