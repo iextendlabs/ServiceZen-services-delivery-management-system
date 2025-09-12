@@ -466,7 +466,7 @@ class HomeController extends Controller
                 'category_id' => $categoryIds,
                 'short_description' => "",
                 'rating' => $service->averageRating(),
-                'hasOption' => $service->serviceOption->count() > 0,
+                'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0,
             ];
         })->toArray();
 
