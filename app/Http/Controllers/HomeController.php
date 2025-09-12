@@ -464,16 +464,23 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
                 'duration' => $service->duration,
                 'quote' => $service->quote,
                 'category_id' => $categoryIds,
-                'short_description' => $service->short_description,
+                'short_description' => "",
                 'rating' => $service->averageRating(),
-                'options' => $service->serviceOption
+                'options' => $service->serviceOption->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'option_name' => $option->option_name,
+                        'option_price' => $option->option_price,
+                        'option_duration' => $option->option_duration,
+                        'image' => $option->image,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
 
         $jsonData = [
             'services' => $allServicesArray,
         ];
-
         $this->saveJsonFile('AppServicesData.json', $jsonData);
 
         $this->updateVersion('services');
