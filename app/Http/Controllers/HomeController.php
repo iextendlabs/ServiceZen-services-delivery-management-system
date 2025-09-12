@@ -257,8 +257,8 @@ class HomeController extends Controller
     public function appJsonData()
     {
         $this->appData();
-        $this->staffAppServicesData();
-        $this->appServicesData();
+        // $this->staffAppServicesData();
+        // $this->appServicesData();
         $this->appSubTitles();
         $this->appCategories();
         $this->appZoneData();
