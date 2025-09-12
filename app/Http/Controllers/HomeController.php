@@ -56,57 +56,57 @@ class HomeController extends Controller
 
             $userRole = $currentUser->getRoleNames()->first();
 
-$currentDate = Carbon::today()->toDateString(); // 'Y-m-d'
+            $currentDate = Carbon::today()->toDateString(); // 'Y-m-d'
 
-switch ($userRole) {
-    case 'Customer':
-    case 'Affiliate':
-        return redirect('/')
-            ->with('success', 'You have successfully logged in');
-        break;
+            switch ($userRole) {
+                case 'Customer':
+                case 'Affiliate':
+                    return redirect('/')
+                        ->with('success', 'You have successfully logged in');
+                    break;
 
-    case 'Manager':
-        $staffIds = $currentUser->getManagerStaffIds();
-        $orders = Order::whereIn('service_staff_id', $staffIds)
-            ->whereDate('date', $currentDate)
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
+                case 'Manager':
+                    $staffIds = $currentUser->getManagerStaffIds();
+                    $orders = Order::whereIn('service_staff_id', $staffIds)
+                        ->whereDate('date', $currentDate)
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
 
-    case 'Supervisor':
-        $staffIds = $currentUser->getSupervisorStaffIds();
-        $orders = Order::whereIn('service_staff_id', $staffIds)
-            ->whereDate('date', $currentDate)
-            ->where(function ($query) {
-                $query->whereDoesntHave('cashCollection');
-            })
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
+                case 'Supervisor':
+                    $staffIds = $currentUser->getSupervisorStaffIds();
+                    $orders = Order::whereIn('service_staff_id', $staffIds)
+                        ->whereDate('date', $currentDate)
+                        ->where(function ($query) {
+                            $query->whereDoesntHave('cashCollection');
+                        })
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
 
-    case 'Staff':
-        $orders = Order::where('service_staff_id', Auth::id())
-            ->whereDate('date', $currentDate)
-            ->where(function ($query) {
-                $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
-                    ->whereDoesntHave('cashCollection');
-            })
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
+                case 'Staff':
+                    $orders = Order::where('service_staff_id', Auth::id())
+                        ->whereDate('date', $currentDate)
+                        ->where(function ($query) {
+                            $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
+                                ->whereDoesntHave('cashCollection');
+                        })
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
 
-    default:
-        $orders = Order::whereDate('date', $currentDate)
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
-}
+                default:
+                    $orders = Order::whereDate('date', $currentDate)
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
+            }
 
-$orderCountToday = Order::whereDate('date', $currentDate)->count();
+            $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
             $affiliate_commission = DB::table('transactions')
                 ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')
@@ -331,7 +331,17 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
                 'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
                 'rating' => $service->averageRating(),
-                'options' => $service->serviceOption
+                'options' => $service->serviceOption->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'service_id' => $option->service_id,
+                        'option_name' => $option->option_name,
+                        'description' => $option->description,
+                        'option_price' => $option->option_price,
+                        'option_duration' => $option->option_duration,
+                        'image' => $option->image,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
 
@@ -469,7 +479,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
                 'options' => $service->serviceOption->map(function ($option) {
                     return [
                         'id' => $option->id,
-                        'option_name' => $option->option_name,
+                        'option_name' => preg_replace('/[\p{Emoji}\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}]+/u', '', $option->option_name),
                         'option_price' => $option->option_price,
                         'option_duration' => $option->option_duration,
                         'image' => $option->image,
@@ -629,11 +639,11 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
                 $currentData = json_decode(Storage::get($filePath), true);
                 $updatedData = array_merge($currentData, $data);
 
-                Storage::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
+                Storage::put($filePath, json_encode($updatedData, 0));
 
                 Storage::delete($backupFilename);
             } else {
-                Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+                Storage::put($filePath, json_encode($data, 0));
             }
         } catch (\Exception $e) {
             if (isset($backupFilename) && Storage::exists($backupFilename)) {
