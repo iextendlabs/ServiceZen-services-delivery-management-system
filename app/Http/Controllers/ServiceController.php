@@ -264,7 +264,6 @@ class ServiceController extends Controller
         }
 
         $homeController->appData();
-        $homeController->appServicesData();
         $homeController->staffAppServicesData();
 
         return redirect()->route('services.edit',$service->id)
@@ -569,7 +568,6 @@ class ServiceController extends Controller
         }
 
         $homeController->appData();
-        $homeController->appServicesData();
         $homeController->staffAppServicesData();
 
         $previousUrl = $request->url;
@@ -623,7 +621,6 @@ class ServiceController extends Controller
         $previousUrl = url()->previous();
 
         $homeController->appData();
-        $homeController->appServicesData();
         $homeController->staffAppServicesData();
 
         return redirect($previousUrl)
@@ -659,7 +656,6 @@ class ServiceController extends Controller
             }
 
             $homeController->appData();
-            $homeController->appServicesData();
             $homeController->staffAppServicesData();
 
             return response()->json(['message' => 'Selected items deleted successfully.']);
@@ -687,7 +683,6 @@ class ServiceController extends Controller
             }
 
             $homeController->appData();
-            $homeController->appServicesData();
             $homeController->staffAppServicesData();
 
             return response()->json(['message' => 'Selected items Copy successfully.']);
@@ -701,7 +696,6 @@ class ServiceController extends Controller
             $copiedService->save();
 
             $homeController->appData();
-            $homeController->appServicesData();
             $homeController->staffAppServicesData();
 
             return response()->json(['service_id' => $copiedService->id]);
@@ -725,7 +719,6 @@ class ServiceController extends Controller
             }
             
             $homeController->appData();
-            $homeController->appServicesData();
             $homeController->staffAppServicesData();
 
             return response()->json(['message' => 'Selected items Edit successfully.']);

@@ -27,6 +27,7 @@ use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -256,9 +257,9 @@ class HomeController extends Controller
 
     public function appJsonData()
     {
+        Cache::flush();
         $this->appData();
-        // $this->staffAppServicesData();
-        // $this->appServicesData();
+        $this->staffAppServicesData();
         $this->appSubTitles();
         $this->appCategories();
         $this->appZoneData();
@@ -271,6 +272,7 @@ class HomeController extends Controller
 
     public function appData()
     {
+        Cache::flush();
         $services = [];
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
@@ -456,57 +458,6 @@ class HomeController extends Controller
         $this->saveJsonFile('StaffAppServicesData.json', $jsonData);
 
         $this->updateVersion('services');
-    }
-
-    public function appServicesData()
-    {
-        $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-
-        $allServicesArray = $allServices->map(function ($service) {
-            $categoryIds = collect($service->categories)->pluck('id')->toArray();
-            // only 5 
-
-            $optionsData = $service->serviceOption->take(5)->map(function ($option) {
-                return [
-                    'id' => $option->id,
-                    'service_id' => $option->service_id,
-                    'option_name' => preg_replace('/[\p{Emoji}\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}]+/u', '', substr($option->option_name,0,20)),
-                    'description' => $option->description,
-                    'option_price' => $option->option_price,
-                    'option_duration' => $option->option_duration,
-                    'image' => $option->image,
-                ];
-            })->toArray();
-            return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'slug' => $service->slug,
-                'image' => $service->image,
-                'price' => $service->price,
-                'discount' => $service->discount,
-                'duration' => $service->duration,
-                'quote' => $service->quote,
-                'category_id' => $categoryIds,
-                'short_description' => "",
-                'rating' => $service->averageRating(),
-                'options' => $optionsData,
-            ];
-        })->toArray();
-
-        $jsonData = [
-            'services' => $allServicesArray,
-        ];
-
-        $this->saveJsonFile('AppServicesData.json', $jsonData);
-
-        $this->updateVersion('services');
-
-        try {
-            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
-            Log::info('Cache clear API called successfully.');
-        } catch (\Exception $e) {
-            Log::error('Cache clear API failed: ' . $e->getMessage());
-        }
     }
 
     public function appSubTitles()
