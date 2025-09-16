@@ -1,13 +1,39 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-    <div class="row">
-        <div class="col-md-12 margin-tb">
-            <div class="float-start">
-                <h2>Service Staff Documents</h2>
+    <div class="row align-items-center mb-4">
+        <div class="col-md-4 margin-tb">
+            <h2>Service Staff Documents</h2>
+        </div>
+        <div class="col-md-8 mt-2 mt-md-0">
+            <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.general', $serviceStaff->id) }}">
+                    General
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.time-slots', $serviceStaff->id) }}">
+                    Time Slots
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.zones', $serviceStaff->id) }}">
+                    Zones
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.gallery', $serviceStaff->id) }}">
+                    Gallery
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.categories-and-services', $serviceStaff->id) }}">
+                     Categories & Services
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.social-links', $serviceStaff->id) }}">
+                     Social Links
+                </a>
             </div>
         </div>
-    </div>
+    </div> 
     @if ($errors->any())
     <div class="alert alert-danger">
         <strong>Whoops!</strong> There were some problems with your input.<br><br>
