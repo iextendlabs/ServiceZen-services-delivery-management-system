@@ -446,8 +446,9 @@ class ServiceStaffController extends Controller
         $affiliates = User::role('Affiliate')->orderBy('name')->get();
         $drivers = User::role('Driver')->orderBy('name')->get();
         $supervisors = User::role('Supervisor')->orderBy('name')->get();
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.general', compact('serviceStaff', 'drivers', 'supervisors', 'categories', 'services', 'assignedDrivers', 'timeSlots', 'membership_plans', 'affiliates', 'freelancer_join', 'subTitles'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.general', compact('serviceStaff', 'drivers', 'supervisors', 'categories', 'services', 'assignedDrivers', 'timeSlots', 'membership_plans', 'affiliates', 'freelancer_join', 'subTitles', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffGeneral(Request $request, $id)
@@ -574,8 +575,9 @@ class ServiceStaffController extends Controller
     {
         $serviceStaff = User::find($id);
         $timeSlots = TimeSlot::all();
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.timeslots', compact('serviceStaff', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.timeslots', compact('serviceStaff', 'timeSlots', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffTimeSlots(Request $request, $id)
@@ -597,8 +599,9 @@ class ServiceStaffController extends Controller
     {
         $serviceStaff = User::find($id);
         $staffZones = StaffZone::all();
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.zones', compact('serviceStaff', 'staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.zones', compact('serviceStaff', 'staffZones', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffZones(Request $request, $id)
@@ -645,8 +648,9 @@ class ServiceStaffController extends Controller
     public function ServicesStaffGallery($id, Request $request)
     {
         $serviceStaff = User::find($id);
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.gallery', compact('serviceStaff'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.gallery', compact('serviceStaff', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffGallery(Request $request, $id)
@@ -712,8 +716,9 @@ class ServiceStaffController extends Controller
         $serviceStaff = User::find($id);
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.categories_and_services', compact('serviceStaff', 'categories', 'services'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.categories_and_services', compact('serviceStaff', 'categories', 'services', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffCategoriesAndServices(Request $request, $id)
@@ -730,8 +735,9 @@ class ServiceStaffController extends Controller
     {
         $serviceStaff = User::find($id);
         $documents = $this->documents;
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        return view('serviceStaff.documents', compact('serviceStaff', 'documents'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.documents', compact('serviceStaff', 'documents', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffDocuments(Request $request, $id)
