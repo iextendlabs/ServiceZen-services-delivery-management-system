@@ -27,10 +27,12 @@
                 href="{{ route('serviceStaff.categories-and-services', $serviceStaff->id) }}">
                      Categories & Services
                 </a>
+                @if($socialLinks)
                 <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
                 href="{{ route('serviceStaff.social-links', $serviceStaff->id) }}">
                      Social Links
                 </a>
+                @endif
             </div>
         </div>
     </div> 

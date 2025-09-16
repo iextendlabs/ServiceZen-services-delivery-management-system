@@ -15,10 +15,12 @@
                 href="{{ route('serviceStaff.zones', $serviceStaff->id) }}">
                     Zones
                 </a>
+                @if($socialLinks)
                 <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
                 href="{{ route('serviceStaff.social-links', $serviceStaff->id) }}">
                     Social Links
                 </a>
+                @endif
                 <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
                 href="{{ route('serviceStaff.gallery', $serviceStaff->id) }}">
                     Gallery
