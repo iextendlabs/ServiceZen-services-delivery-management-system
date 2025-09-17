@@ -7,6 +7,44 @@
                 <h2>Service Staff Commission and Categories base Commission</h2>
             </div>
         </div>
+        <div class="col-md-12 mt-2 mt-md-0 py-4">
+            <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.general', $serviceStaff->id) }}">
+                    General
+                </a>
+                @if($socialLinks)
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.social-links', $serviceStaff->id) }}">
+                    Social Links
+                </a>
+                @endif
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.time-slots', $serviceStaff->id) }}">
+                    Time Slots
+                </a>
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.assign-drivers', $serviceStaff->id) }}">
+                    Assign Drivers
+                </a>
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.zones', $serviceStaff->id) }}">
+                    Zones
+                </a>
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.gallery', $serviceStaff->id) }}">
+                    Gallery
+                </a>
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.categories-and-services', $serviceStaff->id) }}">
+                     Categories & Services
+                </a>
+                <a class="btn btn-outline-primary btn-md px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.documents', $serviceStaff->id) }}">
+                     Documents
+                </a>
+            </div>   
+        </div>
     </div>
     @if ($errors->any())
     <div class="alert alert-danger">

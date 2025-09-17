@@ -277,37 +277,42 @@
 
                                 <td>
                                     <form id="deleteForm{{ $staff->id }}"
-                                        action="{{ route('serviceStaff.destroy', $staff->id) }}" method="POST">
-                                        <a class="btn btn-warning" href="{{ route('serviceStaff.show', $staff->id) }}"><i
-                                                class="fa fa-eye"></i></a>
-                                        @can('service-staff-edit')
-                                        <div class="dropdown">
-                                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-edit"></i></button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.general', $staff->id) }}">General</a></li>
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-commission', $staff->id) }}">Categories Commission</a></li>
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.time-slots', $staff->id) }}">Time Slots</a></li>
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.assign-drivers', $staff->id) }}">Assign Drivers</a></li>
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.zones', $staff->id) }}">Zones</a></li>
-                                                @if($socialLinks)
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.social-links', $staff->id) }}">Social Links</a></li>
-                                                @endif
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.gallery', $staff->id) }}">Gallery</a></li>
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-and-services', $staff->id) }}">Categories & Services</a></li>
-                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.documents', $staff->id) }}">Documents</a></li>
-                                            </ul>
+                                        action="{{ route('serviceStaff.destroy', $staff->id) }}" method="POST" style="margin-bottom:0;">
+                                        <div class="btn-group" role="group" aria-label="Staff Actions">
+                                            <a class="btn btn-warning btn-md d-flex align-items-center" href="{{ route('serviceStaff.show', $staff->id) }}" title="View">
+                                                <i class="fa fa-eye me-1"></i>
+                                            </a>
+                                            @can('service-staff-edit')
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-primary btn-md dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false" title="Edit">
+                                                    <i class="fa fa-edit me-1"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.general', $staff->id) }}">General</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-commission', $staff->id) }}">Categories Commission</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.time-slots', $staff->id) }}">Time Slots</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.assign-drivers', $staff->id) }}">Assign Drivers</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.zones', $staff->id) }}">Zones</a></li>
+                                                    @if($socialLinks)
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.social-links', $staff->id) }}">Social Links</a></li>
+                                                    @endif
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.gallery', $staff->id) }}">Gallery</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-and-services', $staff->id) }}">Categories & Services</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('serviceStaff.documents', $staff->id) }}">Documents</a></li>
+                                                </ul>
+                                            </div>
+                                            @endcan
+                                            @csrf
+                                            @method('DELETE')
+                                            @can('service-staff-delete')
+                                            <button type="button" onclick="confirmDelete('{{ $staff->id }}')" class="btn btn-danger btn-md d-flex align-items-center" title="Delete">
+                                                <i class="fa fa-trash me-1"></i>
+                                            </button>
+                                            @endcan
+                                            <a class="btn btn-info btn-md d-flex align-items-center" href="{{ route('staffHolidays.create', ['staff' => $staff->id]) }}" title="Add Holiday">
+                                                <i class="fas fa-calendar me-1"></i>
+                                            </a>
                                         </div>
-                                            <!-- <a class="btn btn-primary" href="{{ route('serviceStaff.edit', $staff->id) }}"><i class="fa fa-edit"></i></a> -->
-                                        @endcan
-                                        @csrf
-                                        @method('DELETE')
-                                        @can('service-staff-delete')
-                                            <button type="button" onclick="confirmDelete('{{ $staff->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
-                                        @endcan
-                                        <a class="btn btn-primary"
-                                            href="{{ route('staffHolidays.create', ['staff' => $staff->id]) }}"
-                                            title="Add Holiday"><i class="fas fa-calendar"></i></a>
                                     </form>
                                 </td>
                             </tr>

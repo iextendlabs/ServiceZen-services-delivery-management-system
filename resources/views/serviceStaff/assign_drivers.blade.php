@@ -2,9 +2,47 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 margin-tb">
+        <div class="col-md-12 margin-tb py-2">
             <div class="float-start">
                 <h2>Service Staff Assign Drivers</h2>
+            </div>
+        </div>
+        <div class="col-md-12 mt-2 mt-md-0 pb-5">
+            <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.general', $serviceStaff->id) }}">
+                    General
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.categories-commission', $serviceStaff->id) }}">
+                    Categories Commission
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.time-slots', $serviceStaff->id) }}">
+                    Time Slots
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.zones', $serviceStaff->id) }}">
+                    Zones
+                </a>
+                @if($socialLinks)
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.social-links', $serviceStaff->id) }}">
+                    Social Links
+                </a>
+                @endif
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.gallery', $serviceStaff->id) }}">
+                    Gallery
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.categories-and-services', $serviceStaff->id) }}">
+                     Categories & Services
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.documents', $serviceStaff->id) }}">
+                     Documents
+                </a>
             </div>
         </div>
     </div>
@@ -26,7 +64,7 @@
         <div class="tab-pane fade show active" id="assign-drivers" role="tabpanel" aria-labelledby="assign-drivers-tab">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-group">
+                    <div class="form-group pb-2">
                         @if ($serviceStaff->staffTimeSlots->isEmpty())
                             <span class="alert alert-danger">
                                 This staff member doesn't have any assigned time slots. Please assign time slots first before assigning a driver.

@@ -412,8 +412,9 @@ class ServiceStaffController extends Controller
         $serviceStaff = User::find($id);
         $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
         $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-
-        return view('serviceStaff.categories_commission', compact('serviceStaff', 'categories', 'services'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        
+        return view('serviceStaff.categories_commission', compact('serviceStaff', 'categories', 'services', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffCategoriesCommission(Request $request, $id)
@@ -496,8 +497,9 @@ class ServiceStaffController extends Controller
         $staffId = $serviceStaff->id;
         $timeSlots = TimeSlot::all();
         $drivers = User::role('Driver')->orderBy('name')->get();
-
-        return view('serviceStaff.assign_drivers', compact('serviceStaff', 'drivers', 'assignedDrivers', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
+        
+        return view('serviceStaff.assign_drivers', compact('serviceStaff', 'drivers', 'assignedDrivers', 'timeSlots', 'socialLinks'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffAssignDrivers(Request $request, $id)

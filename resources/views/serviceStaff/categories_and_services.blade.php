@@ -2,14 +2,22 @@
 @section('content')
 <div class="container">
     <div class="row align-items-center mb-4">
-        <div class="col-md-4 margin-tb">
+        <div class="col-md-12 margin-tb">
             <h2>Service Staff Categories and Services</h2>
         </div>
-        <div class="col-md-8 mt-2 mt-md-0">
+        <div class="col-md-12 mt-2 mt-md-0 pt-2">
             <div class="d-flex flex-wrap justify-content-md-end gap-2">
                 <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
                 href="{{ route('serviceStaff.general', $serviceStaff->id) }}">
                     General
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.categories-commission', $serviceStaff->id) }}">
+                    Categories Commission
+                </a>
+                <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
+                href="{{ route('serviceStaff.assign-drivers', $serviceStaff->id) }}">
+                    Assign Drivers
                 </a>
                 <a class="btn btn-outline-primary px-4 py-2 shadow-sm"
                 href="{{ route('serviceStaff.time-slots', $serviceStaff->id) }}">
