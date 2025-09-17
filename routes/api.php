@@ -78,6 +78,8 @@ Route::get('getOrders', [CustomerController::class, 'getOrders']);
 Route::get('editOrder', [CustomerController::class, 'editOrder']);
 Route::get('getServiceDetails', [CustomerController::class, 'getServiceDetails']);
 Route::get('getCacheServiceDetail', [CustomerController::class, 'getCacheServiceDetail']);
+// User balance endpoints
+Route::post('updateUserBalance', [CustomerController::class, 'updateUserBalance']);
 Route::post('updateOrder', [CustomerController::class, 'updateOrder']);
 Route::post('updateCustomerInfo', [CustomerController::class, 'updateCustomerInfo']);
 Route::post('applyCouponAffiliate', [CustomerController::class, 'applyCouponAffiliate']);

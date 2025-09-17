@@ -260,8 +260,15 @@
                                 </td>
                                 <td>{{ $staff->email }}</td>
                                 <td>
-                                    @foreach ($staff->subTitles as $subTitle)
-                                        <span class="badge badge-info m-2">{{ $subTitle->name }}</span>
+                                    @php
+                                        $names = $staff->subTitles->pluck('name')->toArray();
+                                    @endphp
+                                    @foreach (array_chunk($names, 4) as $chunk)
+                                        <div>
+                                            @foreach ($chunk as $i => $name)
+                                                <span>{{ $name }}{{ $i < count($chunk) - 1 ? ',' : '' }}</span>
+                                            @endforeach
+                                        </div>
                                     @endforeach
                                 </td>
                                 <td>{{ $staff->staff->sort }}</td>

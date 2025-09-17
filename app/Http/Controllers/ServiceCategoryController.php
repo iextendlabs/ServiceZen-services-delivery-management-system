@@ -355,7 +355,8 @@ class ServiceCategoryController extends Controller
                 unlink(public_path('service-category-icons') . '/' . $service_category->icon);
             }
         }
-        $service_category->delete();
+        $service_category->status = 0;
+        $service_category->save();
 
         $homeController->appData();
         $homeController->appCategories();

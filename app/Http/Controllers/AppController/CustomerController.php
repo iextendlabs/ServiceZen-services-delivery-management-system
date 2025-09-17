@@ -51,6 +51,17 @@ use Illuminate\Support\Facades\Log;
 class CustomerController extends Controller
 
 {
+    public function updateUserBalance(Request $request)
+    {
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $user->balance = (int)$request->balance;
+        $user->save();
+        return response()->json(['balance' => $user->balance], 200);
+    }
+
     public function __construct()
     {
         $this->middleware('log.api');
@@ -286,7 +297,8 @@ class CustomerController extends Controller
                     'category_id' => $categoryIds,
                     'short_description' => $service->short_description,
                     'rating' => $service->averageRating(),
-                    'options' => $service->serviceOption
+                    'options' => $service->serviceOption,
+                    'hasOption' => $service->serviceOption->count() > 0 ? 1 : 0
                 ];
             })->toArray();
 

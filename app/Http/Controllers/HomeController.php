@@ -27,6 +27,7 @@ use App\Models\TimeSlot;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -56,57 +57,57 @@ class HomeController extends Controller
 
             $userRole = $currentUser->getRoleNames()->first();
 
-$currentDate = Carbon::today()->toDateString(); // 'Y-m-d'
+            $currentDate = Carbon::today()->toDateString(); // 'Y-m-d'
 
-switch ($userRole) {
-    case 'Customer':
-    case 'Affiliate':
-        return redirect('/')
-            ->with('success', 'You have successfully logged in');
-        break;
+            switch ($userRole) {
+                case 'Customer':
+                case 'Affiliate':
+                    return redirect('/')
+                        ->with('success', 'You have successfully logged in');
+                    break;
 
-    case 'Manager':
-        $staffIds = $currentUser->getManagerStaffIds();
-        $orders = Order::whereIn('service_staff_id', $staffIds)
-            ->whereDate('date', $currentDate)
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
+                case 'Manager':
+                    $staffIds = $currentUser->getManagerStaffIds();
+                    $orders = Order::whereIn('service_staff_id', $staffIds)
+                        ->whereDate('date', $currentDate)
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
 
-    case 'Supervisor':
-        $staffIds = $currentUser->getSupervisorStaffIds();
-        $orders = Order::whereIn('service_staff_id', $staffIds)
-            ->whereDate('date', $currentDate)
-            ->where(function ($query) {
-                $query->whereDoesntHave('cashCollection');
-            })
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
+                case 'Supervisor':
+                    $staffIds = $currentUser->getSupervisorStaffIds();
+                    $orders = Order::whereIn('service_staff_id', $staffIds)
+                        ->whereDate('date', $currentDate)
+                        ->where(function ($query) {
+                            $query->whereDoesntHave('cashCollection');
+                        })
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
 
-    case 'Staff':
-        $orders = Order::where('service_staff_id', Auth::id())
-            ->whereDate('date', $currentDate)
-            ->where(function ($query) {
-                $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
-                    ->whereDoesntHave('cashCollection');
-            })
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
+                case 'Staff':
+                    $orders = Order::where('service_staff_id', Auth::id())
+                        ->whereDate('date', $currentDate)
+                        ->where(function ($query) {
+                            $query->whereIn('status', ['Complete', 'Confirm', 'Accepted'])
+                                ->whereDoesntHave('cashCollection');
+                        })
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
 
-    default:
-        $orders = Order::whereDate('date', $currentDate)
-            ->orderBy('date', 'DESC')
-            ->take(10)
-            ->get();
-        break;
-}
+                default:
+                    $orders = Order::whereDate('date', $currentDate)
+                        ->orderBy('date', 'DESC')
+                        ->take(10)
+                        ->get();
+                    break;
+            }
 
-$orderCountToday = Order::whereDate('date', $currentDate)->count();
+            $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
             $affiliate_commission = DB::table('transactions')
                 ->join('affiliates', 'transactions.user_id', '=', 'affiliates.user_id')
@@ -256,9 +257,9 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
     public function appJsonData()
     {
+        Cache::flush();
         $this->appData();
         $this->staffAppServicesData();
-        $this->appServicesData();
         $this->appSubTitles();
         $this->appCategories();
         $this->appZoneData();
@@ -271,6 +272,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
     public function appData()
     {
+        Cache::flush();
         $services = [];
         $staffZones = StaffZone::orderBy('name', 'ASC')->pluck('name')->toArray();
 
@@ -292,7 +294,7 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
         $categoryIds = $categoriesWithOrder->keys()->all();
 
-        $categories = ServiceCategory::findMany($categoryIds)->keyBy('id');
+        $categories = ServiceCategory::findMany($categoryIds)->where('status',1)->keyBy('id');
 
         $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
             $category = $categories->get($id);
@@ -331,7 +333,17 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
                 'category_id' => $categoryIds,
                 'short_description' => $service->short_description,
                 'rating' => $service->averageRating(),
-                'options' => $service->serviceOption
+                'options' => $service->serviceOption->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'service_id' => $option->service_id,
+                        'option_name' => $option->option_name,
+                        'description' => $option->description,
+                        'option_price' => $option->option_price,
+                        'option_duration' => $option->option_duration,
+                        'image' => $option->image,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
 
@@ -446,44 +458,6 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
         $this->saveJsonFile('StaffAppServicesData.json', $jsonData);
 
         $this->updateVersion('services');
-    }
-
-    public function appServicesData()
-    {
-        $allServices = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-
-        $allServicesArray = $allServices->map(function ($service) {
-            $categoryIds = collect($service->categories)->pluck('id')->toArray();
-            return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'slug' => $service->slug,
-                'image' => $service->image,
-                'price' => $service->price,
-                'discount' => $service->discount,
-                'duration' => $service->duration,
-                'quote' => $service->quote,
-                'category_id' => $categoryIds,
-                'short_description' => $service->short_description,
-                'rating' => $service->averageRating(),
-                'options' => $service->serviceOption
-            ];
-        })->toArray();
-
-        $jsonData = [
-            'services' => $allServicesArray,
-        ];
-
-        $this->saveJsonFile('AppServicesData.json', $jsonData);
-
-        $this->updateVersion('services');
-
-        try {
-            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
-            Log::info('Cache clear API called successfully.');
-        } catch (\Exception $e) {
-            Log::error('Cache clear API failed: ' . $e->getMessage());
-        }
     }
 
     public function appSubTitles()
@@ -616,18 +590,12 @@ $orderCountToday = Order::whereDate('date', $currentDate)->count();
 
             if (Storage::exists($filePath)) {
                 $backupFilename = "public/" . pathinfo($filename, PATHINFO_FILENAME) . "_backup.json";
-
                 Storage::copy($filePath, $backupFilename);
-
-                $currentData = json_decode(Storage::get($filePath), true);
-                $updatedData = array_merge($currentData, $data);
-
-                Storage::put($filePath, json_encode($updatedData, JSON_PRETTY_PRINT));
-
-                Storage::delete($backupFilename);
-            } else {
-                Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
             }
+
+            Storage::put($filePath, json_encode($data, 0));
+
+            
         } catch (\Exception $e) {
             if (isset($backupFilename) && Storage::exists($backupFilename)) {
                 Storage::move($backupFilename, $filePath);
