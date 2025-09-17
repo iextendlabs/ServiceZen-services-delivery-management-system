@@ -103,8 +103,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('serviceStaff', ServiceStaffController::class);
     Route::get('serviceStaff/{id}/general', [ServiceStaffController::class, 'ServicesStaffGeneral'])->name('serviceStaff.general');
     Route::post('serviceStaff/{id}/general/update', [ServiceStaffController::class, 'updateServicesStaffGeneral'])->name('serviceStaff.general.update');
+    Route::get('serviceStaff/{id}/categories-commission', [ServiceStaffController::class, 'ServicesStaffCategoriesCommission'])->name('serviceStaff.categories-commission');
+    Route::post('serviceStaff/{id}/categories-commission/update', [ServiceStaffController::class, 'updateServicesStaffCategoriesCommission'])->name('serviceStaff.categories-commission.update');
     Route::get('serviceStaff/{id}/time-slots', [ServiceStaffController::class, 'ServicesStaffTimeSlots'])->name('serviceStaff.time-slots');
     Route::post('serviceStaff/{id}/time-slots/update', [ServiceStaffController::class, 'updateServicesStaffTimeSlots'])->name('serviceStaff.time-slots.update');
+    Route::get('serviceStaff/{id}/assign-drivers', [ServiceStaffController::class, 'ServicesStaffAssignDrivers'])->name('serviceStaff.assign-drivers');
+    Route::post('serviceStaff/{id}/assign-drivers/update', [ServiceStaffController::class, 'updateServicesStaffAssignDrivers'])->name('serviceStaff.assign-drivers.update');
     Route::get('serviceStaff/{id}/zones', [ServiceStaffController::class, 'ServicesStaffZones'])->name('serviceStaff.zones');
     Route::post('serviceStaff/{id}/zones/update', [ServiceStaffController::class, 'updateServicesStaffZones'])->name('serviceStaff.zones.update');
     Route::get('serviceStaff/{id}/social-links', [ServiceStaffController::class, 'ServicesStaffSocialLinks'])->name('serviceStaff.social-links');

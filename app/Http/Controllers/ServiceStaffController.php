@@ -200,16 +200,10 @@ class ServiceStaffController extends Controller
      */
     public function create()
     {
-        $users = User::all();
-        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
-        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-        $documents = $this->documents;
-        $subTitles = SubTitle::all();
+        $subTitles = SubTitle::orderBy('name', 'ASC')->get();
+        $supervisors = User::role('Supervisor')->orderBy('name')->get();
 
-        $staffZones = StaffZone::get();
-        $timeSlots = TimeSlot::get();
-        return view('serviceStaff.create', compact('users', 'socialLinks', 'categories', 'services', 'documents', 'subTitles', 'staffZones', 'timeSlots'));
+        return view('serviceStaff.create', compact('supervisors', 'subTitles'));
     }
 
     /**
@@ -218,7 +212,7 @@ class ServiceStaffController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, HomeController $homeController)
+    public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required',
@@ -226,14 +220,6 @@ class ServiceStaffController extends Controller
             'whatsapp' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
-            'commission' => 'required',
-            'id_card_front' => 'required',
-            'id_card_back' => 'required',
-            'passport' => 'required',
-            'time_slots' => 'sometimes|array',
-            'time_slots.*' => 'exists:time_slots,id',
-            'zones' => 'sometimes|array',
-            'zones.*' => 'exists:staff_zones,id',
         ]);
 
         $input = $request->all();
@@ -247,21 +233,6 @@ class ServiceStaffController extends Controller
         $input['user_id'] = $user_id;
 
         $ServiceStaff->assignRole('Staff');
-
-        if ($request->gallery_images) {
-            $images = $request->gallery_images;
-
-            foreach ($images as $image) {
-                $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
-
-                $image->move(public_path('staff-images'), $filename);
-                // dd($filename);
-                StaffImages::create([
-                    'image' => $filename,
-                    'staff_id' => $user_id,
-                ]);
-            }
-        }
 
         if ($request->image) {
             // create a unique filename for the image
@@ -279,87 +250,17 @@ class ServiceStaffController extends Controller
             }
         }
 
-        if ($request->youtube_video) {
-            foreach ($request->youtube_video as $youtube_video) {
-                if ($youtube_video) {
-                    StaffYoutubeVideo::create([
-                        'youtube_video' => $youtube_video,
-                        'staff_id' => $user_id,
-                    ]);
-                }
-            }
-        }
-
-        if (file_exists(public_path('staff-images') . '/' . "default.png")) {
-            $input['image'] = "default.png";
-        }
+        $staff = Staff::create($input);
 
         $ServiceStaff->subTitles()->sync($request->sub_titles);
 
-        $staff = Staff::create($input);
-        $ServiceStaff->services()->attach($request->service_ids);
-
-        $services = $ServiceStaff->services()->get();
-        $jsonCacheServicePath = public_path('jsonCache/services');
-
-        foreach ($services as $service) {
-            if ($service->slug) {
-                JsonCacheHelper::deleteJsonCacheFiles($service->slug, $jsonCacheServicePath);
-            }
-        }
-
-        $ServiceStaff->categories()->attach($request->category_ids);
-
         $ServiceStaff->supervisors()->attach($request->ids);
-        $documents = $this->documents;
-        foreach ($documents as $fileField => $dbField) {
-            if ($request->hasFile($fileField)) {
-                $filename = mt_rand(1000, 9999) . '.' . $request->$fileField->getClientOriginalExtension();
-                $request->$fileField->move(public_path('staff-document'), $filename);
-                $input[$fileField] = $filename;
-            }
-        }
 
-        UserDocument::create($input);
+        $socialLinks = Setting::where('key', 'Social Links of Staff')->value('value');
 
-        if ($request->categories) {
-            foreach ($request->categories as $categoryData) {
-                // Save Category Commission
-                $affiliateCategory = AffiliateCategory::create([
-                    'affiliate_id' => $user_id,
-                    'category_id' => $categoryData['category_id'],
-                    'commission_type' => $categoryData['commission_type'],
-                    'commission' => $categoryData['category_commission'],
-                ]);
+        $serviceStaff = User::find($user_id);
 
-                // Save Service Commissions (if any)
-                if (!empty($categoryData['services'])) {
-                    foreach ($categoryData['services'] as $serviceData) {
-                        AffiliateService::create([
-                            'affiliate_category_id' => $affiliateCategory->id,
-                            'service_id' => $serviceData['service_id'],
-                            'commission_type' => $serviceData['commission_type'],
-                            'commission' => $serviceData['service_commission'],
-                        ]);
-                    }
-                }
-            }
-        }
-
-        $timeSlotIds = $this->handleTimeSlots($request, new HomeController());
-        if (!empty($timeSlotIds)) {
-            $ServiceStaff->staffTimeSlots()->sync($timeSlotIds);
-        }
-
-        $zoneIds = $this->handleZones($request, new HomeController());
-        if (!empty($zoneIds)) {
-            $ServiceStaff->staffZones()->sync($zoneIds);
-        }
-
-        $homeController->appData();
-
-        return redirect()->route('serviceStaff.index')
-            ->with('success', 'Service Staff created successfully.');
+        return view('serviceStaff.success', compact('serviceStaff', 'user_id', 'socialLinks'))->with('success', 'Service Staff Created Successfully.');
     }
 
     /**
@@ -435,19 +336,13 @@ class ServiceStaffController extends Controller
     public function ServicesStaffGeneral($id, Request $request)
     {
         $serviceStaff = User::find($id);
-        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
-        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
-        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)->get()->groupBy('day');
-        $staffId = $serviceStaff->id;
-        $timeSlots = TimeSlot::all();
-        $subTitles = SubTitle::all();
+        $subTitles = SubTitle::orderBy('name', 'ASC')->get();
         $membership_plans = MembershipPlan::where('status', 1)->where('type', "Freelancer")->get();
         $freelancer_join = $request->freelancer_join;
         $affiliates = User::role('Affiliate')->orderBy('name')->get();
-        $drivers = User::role('Driver')->orderBy('name')->get();
         $supervisors = User::role('Supervisor')->orderBy('name')->get();
 
-        return view('serviceStaff.general', compact('serviceStaff', 'drivers', 'supervisors', 'categories', 'services', 'assignedDrivers', 'timeSlots', 'membership_plans', 'affiliates', 'freelancer_join', 'subTitles'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+        return view('serviceStaff.general', compact('serviceStaff', 'supervisors', 'membership_plans', 'affiliates', 'freelancer_join', 'subTitles'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
 
     public function updateServicesStaffGeneral(Request $request, $id)
@@ -459,31 +354,13 @@ class ServiceStaffController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'same:confirm-password',
-            'commission' => 'required',
-            'drivers' => 'required|array',
         ];
 
         if ($request->freelancer_join == 1) {
             $rules['expiry_date'] = 'required';
         }
 
-        // Custom validation for drivers array
-        Validator::make($request->all(), $rules)->after(function ($validator) use ($request) {
-            $drivers = $request->input('drivers', []);
-
-            foreach ($drivers as $day => $entries) {
-                foreach ($entries as $index => $entry) {
-                    $driverId = $entry['driver_id'] ?? null;
-                    $timeSlotId = $entry['time_slot_id'] ?? null;
-
-                    if (is_null($driverId) xor is_null($timeSlotId)) {
-                        $validator->errors()->add("drivers.{$day}.{$index}.driver_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
-                        $validator->errors()->add("drivers.{$day}.{$index}.time_slot_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
-                    }
-                }
-            }
-        })->validate();
-
+        Validator::make($request->all(), $rules)->validate();
 
         $input = $request->all();
         $input['phone'] = $request->number_country_code . $request->phone;
@@ -524,21 +401,38 @@ class ServiceStaffController extends Controller
         }
         $serviceStaff->update($input);
 
-        $serviceStaff->assignRole('Staff');
+        $previousUrl = $request->url;
 
-        StaffDriver::where('staff_id', $id)->delete();
+        return redirect($previousUrl)->with('success', 'Service Staff General Updated Successfully');
+    }
 
-        foreach ($request->drivers as $day => $drivers) {
-            foreach ($drivers as $driver) {
-                if (!is_null($driver['driver_id']) && !is_null($driver['time_slot_id'])) {
-                    StaffDriver::create([
-                        'staff_id' => $id,
-                        'driver_id' => $driver['driver_id'],
-                        'day' => $day,
-                        'time_slot_id' => $driver['time_slot_id'],
-                    ]);
-                }
-            }
+    public function ServicesStaffCategoriesCommission($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $categories = ServiceCategory::where('status', 1)->orderBy('title', 'ASC')->get();
+        $services = Service::where('status', 1)->orderBy('name', 'ASC')->get();
+
+        return view('serviceStaff.categories_commission', compact('serviceStaff', 'categories', 'services'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffCategoriesCommission(Request $request, $id)
+    {
+        $rules = [
+            'commission' => 'required',
+        ];
+
+        Validator::make($request->all(), $rules)->validate();
+
+        $input = $request->all();
+        $input['commission'] = $request->commission;
+
+        $staff = Staff::find($input['staff_id']);
+
+        if ($staff) {
+            $staff->update($input);
+        } else {
+            $input['user_id'] = $id;
+            Staff::create($input);
         }
 
         AffiliateCategory::where('affiliate_id', $id)->delete();
@@ -567,13 +461,13 @@ class ServiceStaffController extends Controller
 
         $previousUrl = $request->url;
 
-        return redirect($previousUrl)->with('success', 'Service Staff General Updated Successfully');
+        return redirect($previousUrl)->with('success', 'Service Staff Commission and Categories base Commission Updated Successfully');
     }
 
     public function ServicesStaffTimeSlots($id, Request $request)
     {
         $serviceStaff = User::find($id);
-        $timeSlots = TimeSlot::all();
+        $timeSlots = TimeSlot::orderBy('name', 'ASC')->get();
 
         return view('serviceStaff.timeslots', compact('serviceStaff', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }
@@ -593,10 +487,68 @@ class ServiceStaffController extends Controller
         return redirect($previousUrl)->with('success', 'Service Staff Time Slots Updated Successfully');
     }
 
+    public function ServicesStaffAssignDrivers($id, Request $request)
+    {
+        $serviceStaff = User::find($id);
+        $assignedDrivers = StaffDriver::where('staff_id', $serviceStaff->id)->get()->groupBy('day');
+        $staffId = $serviceStaff->id;
+        $timeSlots = TimeSlot::all();
+        $drivers = User::role('Driver')->orderBy('name')->get();
+
+        return view('serviceStaff.assign_drivers', compact('serviceStaff', 'drivers', 'assignedDrivers', 'timeSlots'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
+    }
+
+    public function updateServicesStaffAssignDrivers(Request $request, $id)
+    {
+        $rules = [
+            'drivers' => 'required|array',
+        ];
+
+        // Custom validation for drivers array
+        Validator::make($request->all(), $rules)->after(function ($validator) use ($request) {
+            $drivers = $request->input('drivers', []);
+
+            foreach ($drivers as $day => $entries) {
+                foreach ($entries as $index => $entry) {
+                    $driverId = $entry['driver_id'] ?? null;
+                    $timeSlotId = $entry['time_slot_id'] ?? null;
+
+                    if (is_null($driverId) xor is_null($timeSlotId)) {
+                        $validator->errors()->add("drivers.{$day}.{$index}.driver_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
+                        $validator->errors()->add("drivers.{$day}.{$index}.time_slot_id", "Both driver_id and time_slot_id must be provided together for {$day}.");
+                    }
+                }
+            }
+        })->validate();
+
+        $serviceStaff = User::find($id);
+
+        $serviceStaff->assignRole('Staff');
+
+        StaffDriver::where('staff_id', $id)->delete();
+
+        foreach ($request->drivers as $day => $drivers) {
+            foreach ($drivers as $driver) {
+                if (!is_null($driver['driver_id']) && !is_null($driver['time_slot_id'])) {
+                    StaffDriver::create([
+                        'staff_id' => $id,
+                        'driver_id' => $driver['driver_id'],
+                        'day' => $day,
+                        'time_slot_id' => $driver['time_slot_id'],
+                    ]);
+                }
+            }
+        }
+
+        $previousUrl = $request->url;
+
+        return redirect($previousUrl)->with('success', 'Service Staff Assign Drivers Updated Successfully');
+    }
+
     public function ServicesStaffZones($id, Request $request)
     {
         $serviceStaff = User::find($id);
-        $staffZones = StaffZone::all();
+        $staffZones = StaffZone::orderBy('name', 'ASC')->get();
 
         return view('serviceStaff.zones', compact('serviceStaff', 'staffZones'))->with('i', (request()->input('page', 1) - 1) * config('app.paginate'));
     }

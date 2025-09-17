@@ -278,7 +278,9 @@
                                             <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-edit"></i></button>
                                             <ul class="dropdown-menu">
                                                 <li><a class="dropdown-item" href="{{ route('serviceStaff.general', $staff->id) }}">General</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-commission', $staff->id) }}">Categories Commission</a></li>
                                                 <li><a class="dropdown-item" href="{{ route('serviceStaff.time-slots', $staff->id) }}">Time Slots</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('serviceStaff.assign-drivers', $staff->id) }}">Assign Drivers</a></li>
                                                 <li><a class="dropdown-item" href="{{ route('serviceStaff.zones', $staff->id) }}">Zones</a></li>
                                                 @if($socialLinks)
                                                 <li><a class="dropdown-item" href="{{ route('serviceStaff.social-links', $staff->id) }}">Social Links</a></li>

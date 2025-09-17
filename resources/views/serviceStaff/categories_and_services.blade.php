@@ -27,7 +27,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group scroll-div">
-                        <span style="color: red;">*</span><strong>Category:</strong>
+                        <strong>Category:</strong>
                         <input type="text" name="search-category" id="search-category" class="form-control" placeholder="Search Category">
                         <table class="table table-striped table-bordered category-table">
                             <thead>
@@ -53,7 +53,7 @@
 
                 <div class="col-md-12">
                     <div class="form-group scroll-div">
-                        <span style="color: red;">*</span><strong>Services:</strong>
+                        <strong>Services:</strong>
                         <input type="text" name="search-services" id="search-services" class="form-control" placeholder="Search Services">
                         <table class="table table-striped table-bordered services-table">
                             <thead>
