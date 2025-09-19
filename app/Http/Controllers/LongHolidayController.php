@@ -50,23 +50,7 @@ class LongHolidayController extends Controller
      */
     public function create(Request $request)
     {
-        $i = 0;
-        if (Auth::user()->hasRole('Supervisor')) {
-            $supervisor = User::find(Auth::id());
-
-            $staffIds = $supervisor->staffSupervisors->pluck('id')->toArray();
-
-            $staffs = User::whereIn('id', $staffIds)->get();
-        } elseif (Auth::user()->hasRole('Staff')) {
-            $staffs = User::where('id', Auth::id())->get();
-        } else {
-            $staffs = User::all();
-        }
-
-        $staff_id = $request->staff;
-
-
-        return view('longHolidays.create', compact('staffs', 'i', 'staff_id'));
+        return view('longHolidays.create');
     }
 
     /**
@@ -77,13 +61,18 @@ class LongHolidayController extends Controller
      */
     public function store(Request $request)
     {
-
-
-        request()->validate([
+        $request->validate([
             'date_start' => 'required|date',
             'date_end' => 'required|date|after:date_start',
-            'staff_id' => 'required'
+            'staff_id' => [
+                'required',
+                'exists:users,id'
+            ]
+        ], [
+            'staff_id.required' => 'You must select a staff member using the autocomplete field.',
+            'staff_id.exists' => 'The selected staff member does not exist. Please choose from the suggestions.'
         ]);
+
         $input = $request->all();
 
         LongHoliday::create($input);

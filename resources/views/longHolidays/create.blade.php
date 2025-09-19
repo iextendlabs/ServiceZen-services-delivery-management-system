@@ -34,13 +34,9 @@
         <div class="col-md-12">
             <div class="form-group">
                 <span style="color: red;">*</span><strong>Staff:</strong>
-                <select name="staff_id" class="form-control">
-                    @foreach ($staffs as $staff)
-                    @if($staff->hasRole("Staff"))
-                    <option value="{{ $staff->id }}" {{ old('staff_id') == $staff->id ? 'selected' : '' }}>{{ $staff->name }}</option>
-                    @endif
-                    @endforeach
-                </select>
+                <input type="text" id="staff-autocomplete" class="form-control" placeholder="Type staff name..." autocomplete="off" value="{{ old('staff_name') }}">
+                <input type="hidden" name="staff_id" id="staff-id" value="{{ old('staff_id') }}">
+                <div id="staff-suggestions" class="list-group" style="position: absolute; z-index: 1000;"></div>
             </div>
         </div>
         <div class="col-md-12 text-center">
@@ -71,6 +67,69 @@
                 }
             });
         });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function setupUserAutocomplete(inputSelector, suggestionsSelector, role) {
+            var $input = $(inputSelector);
+            var $suggestions = $(suggestionsSelector);
+            $input.on('input', debounce(function() {
+                var query = $(this).val();
+                if (query.length < 2) {
+                    $suggestions.hide();
+                    return;
+                }
+                $.ajax({
+                    url: '{{ route('autocomplete.name') }}',
+                    data: {
+                        q: query,
+                        role: role
+                    },
+                    success: function(data) {
+                        $suggestions.empty();
+                        if (Array.isArray(data) && data.length) {
+                            data.forEach(function(user) {
+                                var $li = $(
+                                    '<li class="list-group-item list-group-item-action"></li>'
+                                    ).text(user.text);
+                                $li.on('click', function() {
+                                    $input.val(user.text);
+                                    $('#staff-id').val(user.id); // <-- Fix: set staff_id hidden field
+                                    $suggestions.hide();
+                                });
+                                $suggestions.append($li);
+                            });
+                            $suggestions.show();
+                        } else {
+                            var $li = $('<li class="list-group-item text-muted"></li>').text(
+                                'No data found');
+                            $suggestions.append($li);
+                            $suggestions.show();
+                        }
+                    },
+                    error: function() {
+                        $suggestions.empty();
+                        var $li = $('<li class="list-group-item text-danger"></li>').text(
+                            'Error fetching data');
+                        $suggestions.append($li);
+                        $suggestions.show();
+                    }
+                });
+            }, 300));
+            $input.on('blur', function() {
+                setTimeout(function() {
+                    $suggestions.hide();
+                }, 200);
+            });
+        }
+
+        setupUserAutocomplete('#staff-autocomplete', '#staff-suggestions', 'Staff');
     });
 </script>
 @endsection
