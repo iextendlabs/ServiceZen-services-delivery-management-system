@@ -24,8 +24,9 @@ CREATE INDEX idx_order_services_service_id ON order_services(service_id);
 CREATE INDEX idx_order_services_order_id_service_id ON order_services(order_id, service_id);
 
 -- Indexes for the `reviews` table
-CREATE INDEX idx_reviews_user_id ON reviews(user_id);
+CREATE INDEX idx_reviews_staff_id ON reviews(staff_id);
 CREATE INDEX idx_reviews_service_id ON reviews(service_id);
+CREATE INDEX idx_reviews_order_id ON reviews(order_id);
 CREATE INDEX idx_reviews_rating ON reviews(rating);
 
 -- Indexes for the `transactions` table
