@@ -36,7 +36,8 @@
                 <span style="color: red;">*</span><strong>Staff:</strong>
                 <input type="text" id="staff-autocomplete" class="form-control" placeholder="Type staff name..." autocomplete="off" value="{{ old('staff_name') }}">
                 <input type="hidden" name="staff_id" id="staff-id" value="{{ old('staff_id') }}">
-                <div id="staff-suggestions" class="list-group" style="position: absolute; z-index: 1000;"></div>
+                <ul id="staff-suggestions" class="list-group position-absolute w-100"
+                                            style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
             </div>
         </div>
         <div class="col-md-12 text-center">
