@@ -32,8 +32,15 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <strong>Comment:</strong>
+                            <strong>Order Comment:</strong>
                             <textarea name="order_comment" cols="30" rows="8" class="form-control">{{ old('order_comment', $order->order_comment ?? '') }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Driver Comment:</strong>
+                            <textarea name="driver_comment" cols="30" rows="8" class="form-control">{{ old('driver_comment', $order->driver_comment ?? '') }}</textarea>
                         </div>
                     </div>
 

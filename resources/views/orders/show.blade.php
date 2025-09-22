@@ -36,7 +36,7 @@
                     @endcan
                     @can('order-comment-edit')
                         <a class="btn btn-success mb-2 ms-md-2"
-                            href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
+                            href="{{ route('orders.edit', $order->id) }}?edit=comment">Comments Edit</a>
                     @endcan
                     <a class="btn btn-secondary mb-2 ms-md-2"
                         href="{{ route('orders.edit', $order->id) }}?edit=services">Edit Services</a>
@@ -272,6 +272,14 @@
                     <th class="text-left font-weight-bold" colspan="4">Order Comment</th>
                     <tr>
                         <td class="text-left">{!! nl2br($order->order_comment) !!}</td>
+                    </tr>
+                </table>
+            @endif
+            @if ($order->driver_comment && $order->driver_comment != "null")
+                <table class="table table-striped table-bordered album bg-light">
+                    <th class="text-left font-weight-bold" colspan="4">Driver Comment</th>
+                    <tr>
+                        <td class="text-left">{!! nl2br($order->driver_comment) !!}</td>
                     </tr>
                 </table>
             @endif
