@@ -229,6 +229,11 @@ class ServiceCategoryController extends Controller
                     JsonCacheHelper::deleteJsonCacheFiles($newParentCategory->slug, $jsonCachePath);
                 }
             }
+        }elseif(($service_category->parent_id) && (($request->title !== $service_category->title) || ($request->description !== $service_category->description) || ($request->status !== $service_category->status) || ($request->image))){
+            $parentCategory = ServiceCategory::find($service_category->parent_id);
+            if ($parentCategory && $parentCategory->slug) {
+                JsonCacheHelper::deleteJsonCacheFiles($parentCategory->slug, $jsonCachePath);
+            }
         }
 
         $userIds = $service_category->users()->pluck('staff_id')->toArray();
