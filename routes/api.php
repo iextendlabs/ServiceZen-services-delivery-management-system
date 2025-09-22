@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('orders', [StaffAppController2::class, 'orders']);
 Route::get('ordersV2', [StaffAppController::class, 'orders']);
 Route::post('login', [StaffAppController2::class, 'login']);
+Route::post('updateDriverComment', [StaffAppController2::class, 'updateDriverComment']);
 Route::post('addOrderComment', [StaffAppController2::class, 'addComment']);
 Route::post('cashCollection', [StaffAppController2::class, 'cashCollection']);
 Route::post('orderStatusUpdate', [StaffAppController2::class, 'orderStatusUpdate']);

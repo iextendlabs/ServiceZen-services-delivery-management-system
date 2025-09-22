@@ -112,6 +112,20 @@ class StaffAppController2 extends Controller
         return response()->json(['success' => 'Comment Save Successfully']);
     }
 
+    public function updateDriverComment(Request $request)
+    {
+        $order = Order::find($request->order_id);
+
+        if (!$order) {
+            return response()->json(['error' => 'Order not found.'], 404);
+        }
+
+        $order->driver_comment = $request->driver_comment;
+        $order->save();
+
+        return response()->json(['success' => 'Driver comment updated successfully.'], 200);
+    }
+
     public function login(Request $request)
     {
         $credentials = [
