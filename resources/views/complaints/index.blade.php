@@ -59,7 +59,7 @@
                                     <form id="deleteForm{{ $complaint->id }}"
                                         action="{{ route('complaints.destroy', $complaint->id) }}" method="POST">
                                         <a class="btn btn-warning" href="{{ route('complaints.show', $complaint->id) }}"><i
-                                                class="fa fa-eye"></i></a>
+                                                class="fa fa-comment"></i></a>
                                         @can('complaint-edit')
                                             <a class="btn btn-primary" href="{{ route('complaints.edit', $complaint->id) }}"><i
                                                     class="fa fa-edit"></i></a>

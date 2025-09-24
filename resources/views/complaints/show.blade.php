@@ -58,6 +58,14 @@
                     </div>
                 </div>
             @endif
+            @if ($complaint->service_id)
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <strong>Service:</strong>
+                        {{ $complaint->service->name ?? '' }}
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="row">

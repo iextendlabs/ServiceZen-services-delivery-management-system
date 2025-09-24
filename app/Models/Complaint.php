@@ -9,7 +9,7 @@ class Complaint extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','title','order_id','description','status'];
+    protected $fillable = ['user_id','title','order_id','service_id','description','status'];
 
     public function user()
     {
@@ -19,6 +19,11 @@ class Complaint extends Model
     public function order()
     {
         return $this->hasOne(Order::class, 'id', 'order_id');
+    }
+
+    public function service()
+    {
+        return $this->hasOne(Service::class, 'id', 'service_id');
     }
 
     public function chats()
