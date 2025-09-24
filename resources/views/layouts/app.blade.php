@@ -110,280 +110,297 @@
 
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm no-print">
-            <div class="container">
-                <div class="d-flex flex-column align-items-center brand-stack">
-                    <a class="navbar-brand p-0 text-center" href="{{ url('/admin') }}">
-                        Lipslay Admin
-                    </a>
-                    @if(auth()->user())
-                    <a class="btn btn-outline-primary btn-sm mt-1 btn-store-view text-center" href="https://lipslay.com/?cache=false" target="_blank">
-                        Store View
-                    </a>
-                    @endif
-                </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto"></ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                        @if (Route::has('login'))
-                        <li class="nav-item">
-                            <a class="dropdown-item" href="{{ route('login') }}">{{ __('Login') }}</a>
-                        </li>
-                        @endif
-                        @if (Route::has('register'))
-                        <li class="nav-item">
-                            <a class="dropdown-item" href="{{ route('register') }}">{{ __('Register') }}</a>
-                        </li>
-                        @endif
-                        @else
-                        @if(auth()->user()->hasRole('Staff'))
-                        <li class="nav-item">
-                            <a class="nav-link p-0" aria-current="page" href="{{ route('stripe.staff.form') }}"><button class="btn btn-primary">Add Funds</button></a>
-                            
-                        </li>
-                        @endif
-                        @if(Auth::user()->affiliate_program == null && auth()->user()->hasRole("Staff") && !auth()->user()->hasRole("Affiliate"))
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('apply.affiliateProgram') }}">Join Affiliate Program</a>
-                        </li>
-                        @endif
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/rota">Rota</a>
-                        </li>
-                        @can('menu-new-joinee')
-                        
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Joinee Program
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <aside id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse sidebar-sticky no-print shadow-sm opencart-sidebar" style="min-height: 100vh;">
+                    <div class="position-sticky pt-3">
+                        <div class="d-flex flex-column align-items-center brand-stack mb-4">
+                            <a class="navbar-brand p-0 text-center fw-bold fs-4 text-primary" href="{{ url('/admin') }}">
+                                Lipslay Admin
                             </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @can('affiliate-program-list')
-                                <a class="dropdown-item" href="{{ route('affiliateProgram.index') }}">Affiliate</a>
-                                @endcan
-                                @can('freelancer-program-list')
-                                <a class="dropdown-item" href="{{ route('freelancerProgram.index') }}">Freelancer</a>
-                                @endcan
-                            </div>
-                        </li>
-                        @endcan
-                        @can('menu-maintenance')
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Maintenance
+                            @if(auth()->user())
+                            <a class="btn btn-outline-primary btn-sm mt-2 btn-store-view w-100" href="https://lipslay.com/?cache=false" target="_blank">
+                                <i class="fas fa-store"></i> Store View
                             </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('logs.view', ['file' => 'laravel']) }}">Laravel Log</a>
-                                <a class="dropdown-item" href="{{ route('logs.view', ['file' => 'app_error']) }}">Error Log</a>
-                                <a class="dropdown-item" href="{{ route('logs.view', ['file' => 'order_request']) }}">Order Request Log</a>
-                            </div>
-                        </li>
-                        @endcan
-                        @can('campaign-list')
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('campaigns.index')}}">Campaigns</a>
-                        </li>
-                        @endcan
-                        @can('chat-list')
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('chats.index')}}">Customer Support</a>
-                        </li>
-                        @endcan
-                        @can('menu-sales')
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Sales
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @can('order-list')
-                                <a class="dropdown-item" href="{{ route('orders.index') }}">Orders</a>
-                                @endcan
-                                @can('cash-collection-list')
-                                <a class="dropdown-item" href="{{ route('cashCollection.index') }}">Cash Collections</a>
-                                @endcan
-                                @if(auth()->user()->hasRole("Staff"))
-                                <a class="dropdown-item" href="{{ route('staffCashCollection') }}">Cash Collections</a>
+                            @endif
+                        </div>
+                        <ul class="nav flex-column opencart-menu">
+                            <!-- Authentication Links -->
+                            @guest
+                                @if (Route::has('login'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('login') }}">
+                                        <i class="fas fa-sign-in-alt me-2"></i> {{ __('Login') }}
+                                    </a>
+                                </li>
                                 @endif
-                                @can('coupon-list')
-                                <a class="dropdown-item" href="{{ route('coupons.index') }}">Coupons</a>
-                                @endcan
-                                @can('withdraw-list')
-                                <a class="dropdown-item" href="{{ route('withdraws.index') }}">Withdraws</a>
-                                @endcan
-                            </div>
-                        </li>
-                        @endcan
-                        @can('menu-catalog')
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Catalog
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-
-                                @can('time-slot-list')
-                                <a class="dropdown-item" href="{{ route('timeSlots.index') }}">Time Slots</a>
-                                @endcan
-                                @can('service-list')
-                                <a class="dropdown-item" href="{{ route('services.index') }}">Services</a>
-                                @endcan
-                                @can('service-category-list')
-                                <a class="dropdown-item" href="{{ route('serviceCategories.index') }}">Service Categories</a>
-                                @endcan
-                                @can('country-list')
-                                <a class="dropdown-item" href="{{ route('countries.index') }}">Countries</a>
-                                @endcan
-                                @can('staff-zone-list')
-                                <a class="dropdown-item" href="{{ route('staffZones.index') }}">Staff Zones</a>
-                                @endcan
-                                @can('FAQs-list')
-                                <a class="dropdown-item" href="{{ route('FAQs.index') }}">FAQs</a>
-                                @endcan
-                                @can('review-list')
-                                <a class="dropdown-item" href="{{ route('reviews.index') }}">Reviews</a>
-                                @endcan
-                                @can('information-list')
-                                <a class="dropdown-item" href="{{ route('information.index') }}">Information Page</a>
-                                @endcan
-                                @can('complaint-list')
-                                <a class="dropdown-item" href="{{ route('complaints.index') }}">Complaints</a>
-                                @endcan
-                                @can('membership-plan-list')
-                                <a class="dropdown-item" href="{{ route('membershipPlans.index') }}">Membership Plans</a>
-                                @endcan
-                                @can('quote-list')
-                                <a class="dropdown-item" href="{{ route('quotes.index') }}">Quotes</a>
-                                @endcan
-                                @can('crm-list')
-                                <a class="dropdown-item" href="{{ route('crms.index') }}">CRM</a>
-                                @endcan
-                                @can('staff-designation-list')
-                                <a class="dropdown-item" href="{{ route('subTitles.index') }}">Sub Title / Designation</a>
-                                @endcan
-                                @can('freelancer-group-list')
-                                <a class="dropdown-item" href="{{ route('freelancerGroups.index') }}">Freelancer Groups</a>
-                                @endcan
-                            </div>
-                        </li>
-                        @endcan
-                        @can('menu-store-config')
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Store Config
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @can('setting-list')
-                                <a class="dropdown-item" href="{{ route('settings.index') }}">Settings</a>
-                                @endcan
-                                @can('currency-list')
-                                <a class="dropdown-item" href="{{ route('currencies.index') }}">Currencies</a>
-                                @endcan
-                                @can('holiday-list')
-                                <a class="dropdown-item" href="/holidays">Holidays</a>
-                                @endcan
-                                @can('staff-holiday-list')
-                                <a class="dropdown-item" href="{{ route('staffHolidays.index') }}">Staff Holiday</a>
-                                <a class="dropdown-item" href="{{ route('longHolidays.index') }}">Long Holiday</a>
-                                <a class="dropdown-item" href="{{ route('shortHolidays.index') }}">Short Holiday</a>
-                                <a class="dropdown-item" href="{{ route('staffGeneralHolidays.index') }}">Staff General Holiday</a>
-                                @endcan
-                            </div>
-                        </li>
-                        @endcan
-                        @can('menu-user')
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                Users
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @can('service-staff-list')
-                                <a class="dropdown-item" href="{{ route('serviceStaff.index') }}">Staff</a>
-                                @endcan
-                                @can('customer-list')
-                                <a class="dropdown-item" href="{{ route('customers.index') }}">Customer</a>
-                                @endcan
-                                @can('affiliate-list')
-                                <a class="dropdown-item" href="{{ route('affiliates.index') }}">Affiliate</a>
-                                @endcan
-                                @can('manager-list')
-                                <a class="dropdown-item" href="{{ route('managers.index') }}">Manager</a>
-                                @endcan
-                                @can('supervisor-list')
-                                <a class="dropdown-item" href="{{ route('supervisors.index') }}">Supervisor</a>
-                                @endcan
-                                @can('assistant-supervisor-list')
-                                <a class="dropdown-item" href="{{ route('assistantSupervisors.index') }}">Assistant Supervisor</a>
-                                @endcan
-                                @can('driver-list')
-                                <a class="dropdown-item" href="{{ route('drivers.index') }}">Drivers</a>
-                                @endcan
-                                <a class="dropdown-item" href="{{ route('dataEntry.index') }}">Data Entry User</a>
-                                <a class="dropdown-item" href="{{ route('users.index') }}?role=Support team">Support team</a>
-                            </div>
-                        </li>
-                        @endcan
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }}
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">Profile</a>
-                                <a class="dropdown-item" target="_blank" href="/sitemap.xml">Sitemap</a>
-                                @if(auth()->user()->hasRole("Admin"))
-                                <a class="dropdown-item" href="{{ route('backups.index') }}">Database Backups</a>
+                                @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('register') }}">
+                                        <i class="fas fa-user-plus me-2"></i> {{ __('Register') }}
+                                    </a>
+                                </li>
                                 @endif
-                                @can('user-list')
-                                <a class="dropdown-item" href="{{ route('users.index') }}">Users</a>
+                            @else
+                                @if(auth()->user()->hasRole('Staff'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('stripe.staff.form') }}">
+                                        <button class="btn btn-primary w-100"><i class="fas fa-wallet me-2"></i> Add Funds</button>
+                                    </a>
+                                </li>
+                                @endif
+                                @if(Auth::user()->affiliate_program == null && auth()->user()->hasRole("Staff") && !auth()->user()->hasRole("Affiliate"))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('apply.affiliateProgram') }}">
+                                        <i class="fas fa-user-tag me-2"></i> Join Affiliate Program
+                                    </a>
+                                </li>
+                                @endif
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/rota">
+                                        <i class="fas fa-calendar-alt me-2"></i> Rota
+                                    </a>
+                                </li>
+                                @can('menu-new-joinee')
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#joineeProgramMenu" role="button" aria-expanded="false" aria-controls="joineeProgramMenu">
+                                        <i class="fas fa-users me-2"></i> Joinee Program <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="joineeProgramMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            @can('affiliate-program-list')
+                                            <li><a class="nav-link" href="{{ route('affiliateProgram.index') }}"><i class="fas fa-user-friends me-2"></i> Affiliate</a></li>
+                                            @endcan
+                                            @can('freelancer-program-list')
+                                            <li><a class="nav-link" href="{{ route('freelancerProgram.index') }}"><i class="fas fa-user-clock me-2"></i> Freelancer</a></li>
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                </li>
                                 @endcan
-                                @can('role-list')
-                                <a class="dropdown-item" href="{{ route('roles.index') }}">Role</a>
+                                @can('menu-maintenance')
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#maintenanceMenu" role="button" aria-expanded="false" aria-controls="maintenanceMenu">
+                                        <i class="fas fa-tools me-2"></i> Maintenance <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="maintenanceMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            <li><a class="nav-link" href="{{ route('logs.view', ['file' => 'laravel']) }}"><i class="fas fa-file-alt me-2"></i> Laravel Log</a></li>
+                                            <li><a class="nav-link" href="{{ route('logs.view', ['file' => 'app_error']) }}"><i class="fas fa-exclamation-triangle me-2"></i> Error Log</a></li>
+                                            <li><a class="nav-link" href="{{ route('logs.view', ['file' => 'order_request']) }}"><i class="fas fa-clipboard-list me-2"></i> Order Request Log</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
                                 @endcan
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
-                        </li>
-                        @endif
-
-                    </ul>
-                </div>
-
+                                @can('campaign-list')
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('campaigns.index')}}">
+                                        <i class="fas fa-bullhorn me-2"></i> Campaigns
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('chat-list')
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('chats.index')}}">
+                                        <i class="fas fa-comments me-2"></i> Customer Support
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('menu-sales')
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#salesMenu" role="button" aria-expanded="false" aria-controls="salesMenu">
+                                        <i class="fas fa-shopping-cart me-2"></i> Sales <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="salesMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            @can('order-list')
+                                            <li><a class="nav-link" href="{{ route('orders.index') }}"><i class="fas fa-box-open me-2"></i> Orders</a></li>
+                                            @endcan
+                                            @can('cash-collection-list')
+                                            <li><a class="nav-link" href="{{ route('cashCollection.index') }}"><i class="fas fa-money-bill-wave me-2"></i> Cash Collections</a></li>
+                                            @endcan
+                                            @if(auth()->user()->hasRole("Staff"))
+                                            <li><a class="nav-link" href="{{ route('staffCashCollection') }}"><i class="fas fa-money-check-alt me-2"></i> Cash Collections</a></li>
+                                            @endif
+                                            @can('coupon-list')
+                                            <li><a class="nav-link" href="{{ route('coupons.index') }}"><i class="fas fa-ticket-alt me-2"></i> Coupons</a></li>
+                                            @endcan
+                                            @can('withdraw-list')
+                                            <li><a class="nav-link" href="{{ route('withdraws.index') }}"><i class="fas fa-hand-holding-usd me-2"></i> Withdraws</a></li>
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                </li>
+                                @endcan
+                                @can('menu-catalog')
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#catalogMenu" role="button" aria-expanded="false" aria-controls="catalogMenu">
+                                        <i class="fas fa-book me-2"></i> Catalog <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="catalogMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            @can('time-slot-list')
+                                            <li><a class="nav-link" href="{{ route('timeSlots.index') }}"><i class="fas fa-clock me-2"></i> Time Slots</a></li>
+                                            @endcan
+                                            @can('service-list')
+                                            <li><a class="nav-link" href="{{ route('services.index') }}"><i class="fas fa-concierge-bell me-2"></i> Services</a></li>
+                                            @endcan
+                                            @can('service-category-list')
+                                            <li><a class="nav-link" href="{{ route('serviceCategories.index') }}"><i class="fas fa-list-alt me-2"></i> Service Categories</a></li>
+                                            @endcan
+                                            @can('country-list')
+                                            <li><a class="nav-link" href="{{ route('countries.index') }}"><i class="fas fa-globe me-2"></i> Countries</a></li>
+                                            @endcan
+                                            @can('staff-zone-list')
+                                            <li><a class="nav-link" href="{{ route('staffZones.index') }}"><i class="fas fa-map-marker-alt me-2"></i> Staff Zones</a></li>
+                                            @endcan
+                                            @can('FAQs-list')
+                                            <li><a class="nav-link" href="{{ route('FAQs.index') }}"><i class="fas fa-question-circle me-2"></i> FAQs</a></li>
+                                            @endcan
+                                            @can('review-list')
+                                            <li><a class="nav-link" href="{{ route('reviews.index') }}"><i class="fas fa-star me-2"></i> Reviews</a></li>
+                                            @endcan
+                                            @can('information-list')
+                                            <li><a class="nav-link" href="{{ route('information.index') }}"><i class="fas fa-info-circle me-2"></i> Information Page</a></li>
+                                            @endcan
+                                            @can('complaint-list')
+                                            <li><a class="nav-link" href="{{ route('complaints.index') }}"><i class="fas fa-exclamation-circle me-2"></i> Complaints</a></li>
+                                            @endcan
+                                            @can('membership-plan-list')
+                                            <li><a class="nav-link" href="{{ route('membershipPlans.index') }}"><i class="fas fa-id-card me-2"></i> Membership Plans</a></li>
+                                            @endcan
+                                            @can('quote-list')
+                                            <li><a class="nav-link" href="{{ route('quotes.index') }}"><i class="fas fa-file-invoice-dollar me-2"></i> Quotes</a></li>
+                                            @endcan
+                                            @can('crm-list')
+                                            <li><a class="nav-link" href="{{ route('crms.index') }}"><i class="fas fa-address-book me-2"></i> CRM</a></li>
+                                            @endcan
+                                            @can('staff-designation-list')
+                                            <li><a class="nav-link" href="{{ route('subTitles.index') }}"><i class="fas fa-user-tie me-2"></i> Sub Title / Designation</a></li>
+                                            @endcan
+                                            @can('freelancer-group-list')
+                                            <li><a class="nav-link" href="{{ route('freelancerGroups.index') }}"><i class="fas fa-users-cog me-2"></i> Freelancer Groups</a></li>
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                </li>
+                                @endcan
+                                @can('menu-store-config')
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#storeConfigMenu" role="button" aria-expanded="false" aria-controls="storeConfigMenu">
+                                        <i class="fas fa-cogs me-2"></i> Store Config <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="storeConfigMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            @can('setting-list')
+                                            <li><a class="nav-link" href="{{ route('settings.index') }}"><i class="fas fa-sliders-h me-2"></i> Settings</a></li>
+                                            @endcan
+                                            @can('currency-list')
+                                            <li><a class="nav-link" href="{{ route('currencies.index') }}"><i class="fas fa-coins me-2"></i> Currencies</a></li>
+                                            @endcan
+                                            @can('holiday-list')
+                                            <li><a class="nav-link" href="/holidays"><i class="fas fa-umbrella-beach me-2"></i> Holidays</a></li>
+                                            @endcan
+                                            @can('staff-holiday-list')
+                                            <li><a class="nav-link" href="{{ route('staffHolidays.index') }}"><i class="fas fa-user-clock me-2"></i> Staff Holiday</a></li>
+                                            <li><a class="nav-link" href="{{ route('longHolidays.index') }}"><i class="fas fa-calendar-plus me-2"></i> Long Holiday</a></li>
+                                            <li><a class="nav-link" href="{{ route('shortHolidays.index') }}"><i class="fas fa-calendar-minus me-2"></i> Short Holiday</a></li>
+                                            <li><a class="nav-link" href="{{ route('staffGeneralHolidays.index') }}"><i class="fas fa-calendar-day me-2"></i> Staff General Holiday</a></li>
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                </li>
+                                @endcan
+                                @can('menu-user')
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#usersMenu" role="button" aria-expanded="false" aria-controls="usersMenu">
+                                        <i class="fas fa-user-friends me-2"></i> Users <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="usersMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            @can('service-staff-list')
+                                            <li><a class="nav-link" href="{{ route('serviceStaff.index') }}"><i class="fas fa-user me-2"></i> Staff</a></li>
+                                            @endcan
+                                            @can('customer-list')
+                                            <li><a class="nav-link" href="{{ route('customers.index') }}"><i class="fas fa-user-tag me-2"></i> Customer</a></li>
+                                            @endcan
+                                            @can('affiliate-list')
+                                            <li><a class="nav-link" href="{{ route('affiliates.index') }}"><i class="fas fa-user-tie me-2"></i> Affiliate</a></li>
+                                            @endcan
+                                            @can('manager-list')
+                                            <li><a class="nav-link" href="{{ route('managers.index') }}"><i class="fas fa-user-shield me-2"></i> Manager</a></li>
+                                            @endcan
+                                            @can('supervisor-list')
+                                            <li><a class="nav-link" href="{{ route('supervisors.index') }}"><i class="fas fa-user-check me-2"></i> Supervisor</a></li>
+                                            @endcan
+                                            @can('assistant-supervisor-list')
+                                            <li><a class="nav-link" href="{{ route('assistantSupervisors.index') }}"><i class="fas fa-user-clock me-2"></i> Assistant Supervisor</a></li>
+                                            @endcan
+                                            @can('driver-list')
+                                            <li><a class="nav-link" href="{{ route('drivers.index') }}"><i class="fas fa-car me-2"></i> Drivers</a></li>
+                                            @endcan
+                                            <li><a class="nav-link" href="{{ route('dataEntry.index') }}"><i class="fas fa-keyboard me-2"></i> Data Entry User</a></li>
+                                            <li><a class="nav-link" href="{{ route('users.index') }}?role=Support team"><i class="fas fa-headset me-2"></i> Support team</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                @endcan
+                                <li class="nav-item">
+                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#profileMenu" role="button" aria-expanded="false" aria-controls="profileMenu">
+                                        <i class="fas fa-user-circle me-2"></i> {{ Auth::user()->name }} <span class="float-end"><i class="fas fa-angle-down"></i></span>
+                                    </a>
+                                    <div class="collapse" id="profileMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            <li><a class="nav-link" href="{{ route('profile', Auth::user()->id) }}"><i class="fas fa-id-badge me-2"></i> Profile</a></li>
+                                            <li><a class="nav-link" target="_blank" href="/sitemap.xml"><i class="fas fa-sitemap me-2"></i> Sitemap</a></li>
+                                            @if(auth()->user()->hasRole("Admin"))
+                                            <li><a class="nav-link" href="{{ route('backups.index') }}"><i class="fas fa-database me-2"></i> Database Backups</a></li>
+                                            @endif
+                                            @can('user-list')
+                                            <li><a class="nav-link" href="{{ route('users.index') }}"><i class="fas fa-users me-2"></i> Users</a></li>
+                                            @endcan
+                                            @can('role-list')
+                                            <li><a class="nav-link" href="{{ route('roles.index') }}"><i class="fas fa-user-tag me-2"></i> Role</a></li>
+                                            @endcan
+                                            <li>
+                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                                    @csrf
+                                                </form>
+                                                <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                    <i class="fas fa-sign-out-alt me-2"></i> {{ __('Logout') }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            @endif
+                        </ul>
+                        <!-- Sidebar Toggle Button (visible on small screens) -->
+                        <button class="btn btn-outline-secondary d-md-none mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle sidebar">
+                            <i class="fas fa-bars"></i> Menu
+                        </button>
+                    </div>
+                </aside>
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    @include('site.layout.locationPopup')
+                    @yield('content')
+                    <div id="addToCartPopup"></div>
+                </main>
             </div>
-        </nav>
-        @include('site.layout.locationPopup')
-        <main class="py-4">
-                @yield('content')
-        </main>
-        <div id="addToCartPopup"></div>
-    </div>
-    <footer class="text-muted">
-        <div class="container">
-            <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
-            <p class="float-right">
-                {{ date('Y-m-d H:i:s') }}
-                © 2023 {{ env('APP_NAME') }}
-            </p>
         </div>
-    </footer>
-
-    @yield('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+        <footer class="text-muted">
+            <div class="container">
+                <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
+                <p class="float-right">
+                    {{ date('Y-m-d H:i:s') }}
+                    © 2023 {{ env('APP_NAME') }}
+                </p>
+            </div>
+        </footer>
+        @yield('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <!-- Select dropdown -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>

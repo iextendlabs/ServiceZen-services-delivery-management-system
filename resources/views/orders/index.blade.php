@@ -2,27 +2,107 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="row">
-                    <div class="col-md-6 d-flex align-items-center">
-                        <h2>Orders</h2>
+            <div class="col-md-12 mb-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between">
+                    <div class="d-flex align-items-center mb-2 mb-md-0">
+                        <h2 class="fw-bold mb-3">Orders</h2>
                     </div>
-                    @can('order-edit')
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                <strong>Bulk Booking Update:</strong>
-                                <div>
-                                    <button id="bulkBookingUpdateBtn" class="btn btn-success" type="button">
-                                        <i class="fa fa-book"></i> Update Bookings
-                                    </button>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (!auth()->user()->hasRole('Supervisor'))
+                            @can('order-download')
+                                <a class="btn btn-outline-danger" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}">
+                                    <i class="fa fa-print"></i> PDF
+                                </a>
+                                <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-outline-success">
+                                    <i class="fa fa-download"></i> Excel
+                                </a>
+                            @endcan
+                        @endif
+
+                        @if (auth()->user()->hasRole('Admin'))
+                            <a class="btn btn-outline-secondary" href="/orders">
+                                <i class="fas fa-list"></i> All
+                            </a>
+                            <a class="btn btn-outline-danger" href="/orders?status=Canceled">
+                                <i class="fas fa-times"></i> Canceled
+                            </a>
+                        @endif
+
+                        @if (!auth()->user()->hasRole('Staff'))
+                            <a class="btn btn-outline-primary" href="/orders?status=Pending">
+                                <i class="fas fa-clock"></i> Pending
+                            </a>
+                            <a class="btn btn-outline-warning" href="/orders?status=Rejected">
+                                <i class="fas fa-times"></i> Rejected
+                            </a>
+                            <a class="btn btn-outline-info" href="/orders?status=Inprogress">
+                                <i class="fas fa-hourglass-split"></i> Inprogress
+                            </a>
+                            <a class="btn btn-outline-success" href="/orders?status=Complete">
+                                <i class="fas fa-check"></i> Complete
+                            </a>
+                            <a class="btn btn-outline-success" href="/orders?status=Accepted">
+                                <i class="fas fa-check"></i> Accepted
+                            </a>
+                            <a class="btn btn-outline-info" href="/orders?status=Confirm">
+                                <i class="fas fa-check"></i> Confirm
+                            </a>
+                            <a class="btn btn-outline-secondary"
+                                href="{{ route('logs.view', ['file' => 'order_request']) }}">
+                                <i class="fas fa-file-alt"></i> Order request log
+                            </a>
+                        @endif
+
+                        <a class="btn btn-outline-warning"
+                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
+                            <i class="fas fa-calendar"></i> Today's Drop Order
+                        </a>
+                        <a class="btn btn-outline-danger"
+                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Canceled">
+                            <i class="fas fa-calendar"></i> Today's Canceled Order
+                        </a>
+                        <a class="btn btn-outline-success"
+                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete">
+                            <i class="fas fa-calendar"></i> Today's Complete Order
+                        </a>
+                        <a class="btn btn-outline-secondary"
+                            href="{{ route('orders.index') }}?today_order={{ date('Y-m-d') }}">
+                            <i class="fas fa-calendar"></i> Today's Order
+                        </a>
+                        @can('order-create')
+                            <a class="btn btn-success" href="{{ route('orders.create') }}">
+                                <i class="fas fa-plus"></i> Create Order
+                            </a>
+                        @endcan
+                    </div>
+                </div>
+            </div>
+
+            @can('order-edit')
+            <div class="col-md-12 mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-book fa-lg text-success me-2"></i>
+                                    <strong>Bulk Booking Update</strong>
                                 </div>
+                                <button id="bulkBookingUpdateBtn" class="btn btn-success w-100" type="button">
+                                    <i class="fa fa-book"></i> Update Bookings
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <strong>Bulk Order Status Update:</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-save fa-lg text-primary me-2"></i>
+                                    <strong>Bulk Order Status Update</strong>
+                                </div>
                                 <div class="input-group">
-                                    <select name="bulk-status" class="form-control">
+                                    <select name="bulk-status" class="form-select">
                                         @foreach ($statuses as $status)
                                             <option value="{{ $status }}"
                                                 @if ($status == $filter['status']) selected @endif>
@@ -30,18 +110,22 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <div class="input-group-append">
-                                        <button id="bulkStatusBtn" class="btn btn-primary" type="button">
-                                            <i class="fa fa-save"></i>
-                                        </button>
-                                    </div>
+                                    <button id="bulkStatusBtn" class="btn btn-primary" type="button">
+                                        <i class="fa fa-save"></i>
+                                    </button>
                                 </div>
                             </div>
-
-                            <div class="mb-3">
-                                <strong>Bulk Order Driver Status Update:</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-save fa-lg text-info me-2"></i>
+                                    <strong>Bulk Order Driver Status Update</strong>
+                                </div>
                                 <div class="input-group">
-                                    <select name="bulk-driver-status" class="form-control">
+                                    <select name="bulk-driver-status" class="form-select">
                                         @foreach ($driver_statuses as $status)
                                             <option value="{{ $status }}"
                                                 @if ($status == $filter['status']) selected @endif>
@@ -49,87 +133,16 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <div class="input-group-append">
-                                        <button id="bulkDriverStatusBtn" class="btn btn-primary" type="button">
-                                            <i class="fa fa-save"></i>
-                                        </button>
-                                    </div>
+                                    <button id="bulkDriverStatusBtn" class="btn btn-info" type="button">
+                                        <i class="fa fa-save"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    @endcan
+                    </div>
                 </div>
             </div>
-            <div class="col-md-12 mb-3">
-                <div class="d-flex flex-wrap justify-content-md-end">
-                    @if (!auth()->user()->hasRole('Supervisor'))
-                        @can('order-download')
-                            <a class="btn btn-danger mb-2" href="{{ Request::fullUrlWithQuery(['print' => 1]) }}"><i
-                                    class="fa fa-print"></i> PDF</a>
-                            <a href="{{ Request::fullUrlWithQuery(['csv' => 1]) }}" class="btn btn-success mb-2 ms-md-2"><i
-                                    class="fa fa-download"></i> Excel</a>
-                        @endcan
-                    @endif
-
-                    @if (auth()->user()->hasRole('Admin'))
-                        <a class="btn btn-secondary mb-2 ms-md-2" href="/orders">
-                            <i class="fas fa-list"></i> All
-                        </a>
-                        <a class="btn btn-danger mb-2 ms-md-2" href="/orders?status=Canceled">
-                            <i class="fas fa-times"></i> Canceled
-                        </a>
-                    @endif
-
-                    @if (!auth()->user()->hasRole('Staff'))
-                        <a class="btn btn-primary mb-2 ms-md-2" href="/orders?status=Pending">
-                            <i class="fas fa-clock"></i> Pending
-                        </a>
-                        <a class="btn btn-warning mb-2 ms-md-2" href="/orders?status=Rejected">
-                            <i class="fas fa-times"></i> Rejected
-                        </a>
-                        <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Inprogress">
-                            <i class="fas fa-hourglass-split"></i> Inprogress
-                        </a>
-                        <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
-                            <i class="fas fa-check"></i> Complete
-                        </a>
-                        <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Accepted">
-                            <i class="fas fa-check"></i> Accepted
-                        </a>
-                        <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
-                            <i class="fas fa-check"></i> Confirm
-                        </a>
-                        <a class="btn btn-secondary mb-2 ms-md-2"
-                            href="{{ route('logs.view', ['file' => 'order_request']) }}">
-                            Order request log
-                        </a>
-                    @endif
-
-                    <a class="btn btn-warning mb-2 ms-md-2"
-                        href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
-                        <i class="fas fa-calendar"></i> Todays Drop Order
-                    </a>
-                    <a class="btn btn-danger mb-2 ms-md-2"
-                        href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Canceled">
-                        <i class="fas fa-calendar"></i> Todays Canceled Order
-                    </a>
-                    <a class="btn btn-success mb-2 ms-md-2"
-                        href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete">
-                        <i class="fas fa-calendar"></i> Todays Complete Order
-                    </a>
-                    <a class="btn btn-secondary mb-2 ms-md-2"
-                        href="{{ route('orders.index') }}?today_order={{ date('Y-m-d') }}">
-                        <i class="fas fa-calendar"></i> Todays Order
-                    </a>
-                    @can('order-create')
-                        <a class="btn btn-success mb-2 ms-md-2" href="{{ route('orders.create') }}">
-                            <i class="fas fa-plus"></i> Create Order
-                        </a>
-                    @endcan
-
-
-                </div>
-            </div>
+            @endcan
         </div>
 
         @if ($message = Session::get('success'))

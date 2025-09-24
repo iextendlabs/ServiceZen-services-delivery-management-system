@@ -2,10 +2,10 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-12 text-center mb-3">
+            <div class="col-md-6 text-left mt-3">
                 <h2>Cash Collection</h2>
             </div>
-            <div class="col-md-12 mb-3 no-print">
+            <div class="col-md-6 mt-3 no-print">
                 <div class="d-flex flex-wrap justify-content-md-end">
                     <a  href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger mb-2"><i
                             class="fa fa-print"></i> PDF</a>
@@ -32,11 +32,11 @@
         <hr>
         <div class="row no-print">
             <div class="col-md-12">
-                <h3>Filter</h3>
-                <hr>
+                {{-- <h3>Filter</h3> --}}
+                {{-- <hr> --}}
                 <form action="{{ route('cashCollection.index') }}" method="GET" enctype="multipart/form-data">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="offset-8 col-md-4">
                             <div class="form-group">
                                 <span style="color: red;">*</span><strong>Order ID:</strong>
                                 <div class="input-group mb-3">
