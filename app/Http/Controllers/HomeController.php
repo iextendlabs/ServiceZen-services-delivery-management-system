@@ -294,7 +294,7 @@ class HomeController extends Controller
 
         $categoryIds = $categoriesWithOrder->keys()->all();
 
-        $categories = ServiceCategory::findMany($categoryIds)->where('status',1)->keyBy('id');
+        $categories = ServiceCategory::findMany($categoryIds)->where('status', 1)->keyBy('id');
 
         $sortedCategories = $categoriesWithOrder->map(function ($order, $id) use ($categories) {
             $category = $categories->get($id);
@@ -430,12 +430,7 @@ class HomeController extends Controller
 
         $this->saveJsonFile('AppHomeData.json', $jsonData);
 
-        try {
-            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
-            Log::info('Cache clear API called successfully.');
-        } catch (\Exception $e) {
-            Log::error('Cache clear API failed: ' . $e->getMessage());
-        }
+        $this->deleteLipslayCache();
     }
 
     public function staffAppServicesData()
@@ -501,12 +496,8 @@ class HomeController extends Controller
 
         $this->updateVersion('categories');
 
-        try {
-            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
-            Log::info('Cache clear API called successfully.');
-        } catch (\Exception $e) {
-            Log::error('Cache clear API failed: ' . $e->getMessage());
-        }
+        $this->deleteLipslayCache();
+
     }
 
     public function appZoneData()
@@ -529,12 +520,7 @@ class HomeController extends Controller
 
         $this->updateVersion('zones');
 
-        try {
-            Http::withoutVerifying()->post('https://api.lipslay.com/api/clearcache');
-            Log::info('Cache clear API called successfully.');
-        } catch (\Exception $e) {
-            Log::error('Cache clear API failed: ' . $e->getMessage());
-        }
+        $this->deleteLipslayCache();
     }
 
     public function appTimeSlotsData()
@@ -594,8 +580,6 @@ class HomeController extends Controller
             }
 
             Storage::put($filePath, json_encode($data, 0));
-
-            
         } catch (\Exception $e) {
             if (isset($backupFilename) && Storage::exists($backupFilename)) {
                 Storage::move($backupFilename, $filePath);
@@ -621,5 +605,22 @@ class HomeController extends Controller
             $data[$var] = 1;
         }
         Storage::put($filePath, json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    public function deleteLipslayCache()
+    {
+        try {
+            $filePath = env('CACHE_PATH', '/var/www/html/lipslay-bacckend-services/.cache/lipslay-cache');
+            if (file_exists($filePath)) {
+                unlink($filePath);
+                Log::info('Lipslay cache file deleted successfully via route.');
+                return response()->json(['success' => true, 'message' => 'Lipslay cache file deleted successfully.']);
+            }
+            Log::error('Failed to delete Lipslay cache file via route. File may not exist.');
+            return response()->json(['success' => false, 'message' => 'Failed to delete Lipslay cache file. File may not exist.']);
+        } catch (\Exception $e) {
+            Log::error('Exception while deleting Lipslay cache file via route: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Exception: ' . $e->getMessage()]);
+        }
     }
 }

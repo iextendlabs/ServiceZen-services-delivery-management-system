@@ -247,10 +247,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('crms', CRMController::class);
 
-    Route::get('/clear-cache', function () {
-        Cache::flush(); // Clears all cache
-        return redirect()->back()->with('success', 'Cache cleared!');
-    })->name('cache.clear');
+    
 
     Route::get('/logs/view/{file}', [LogController::class, 'view'])->name('logs.view');
     Route::post('/logs/clear/{file}', [LogController::class, 'clear'])->name('logs.clear');
@@ -258,6 +255,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/adsense/update/{id}', [SettingController::class, 'adsUpdate'])->name('settings.adsUpdate');
     Route::put('/inAppBrowsing/update/{id}', [SettingController::class, 'appBrowsingUpdate'])->name('settings.appBrowsingUpdate');
 });
+
+Route::get('/clear-cache', function () {
+    Cache::flush(); // Clears all cache
+    return redirect()->back()->with('success', 'Cache cleared!');
+})->name('cache.clear');
+
+Route::get('/delete-lipslay-cache', [HomeController::class, 'deleteLipslayCache'])->name('delete.lipslay.cache');
 Route::get('/stripe-staff-form', [StripePaymentController::class, 'stripeStaffForm'])->name('stripe.staff.form');
 
 Route::get('/service-category-list', [ServiceCategoryController::class, 'listServiceCategory'])->name('service-category-list');

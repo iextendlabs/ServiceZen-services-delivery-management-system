@@ -677,8 +677,8 @@
             // Cache Clear AJAX
             $('#cacheClearBtn').on('click', function() {
                 var req1 = $.ajax({
-                    url: 'https://api.lipslay.com/api/clearcache',
-                    type: 'POST'
+                    url: '/delete-lipslay-cache',
+                    type: 'GET'
                 });
                 var req2 = $.ajax({
                     url: '/clear-cache',
