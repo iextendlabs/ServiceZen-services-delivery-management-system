@@ -109,40 +109,97 @@
 </head>
 
 <body>
+    <!-- Header Start -->
+    <header class="bg-light shadow-sm mb-3">
+        <div class="container-fluid">
+            <div class="d-flex flex-wrap align-items-center justify-content-between py-2">
+                <!-- Brand & Store View -->
+                <div class="d-flex flex-column align-items-center brand-stack mb-0">
+                    <a class="navbar-brand p-0 text-center fw-bold fs-4 text-primary" href="{{ url('/admin') }}">
+                        Lipslay Admin
+                    </a>
+                    @auth
+                    <a class="btn btn-outline-primary btn-sm mt-2 btn-store-view w-100" href="https://lipslay.com/?cache=false" target="_blank">
+                        <i class="fas fa-store"></i> Store View
+                    </a>
+                    @endauth
+                </div>
+                <!-- Auth/Guest Links -->
+                <div>
+                    @guest
+                        @if (Route::has('login'))
+                        <a class="btn btn-outline-primary me-2" href="{{ route('login') }}">
+                            <i class="fas fa-sign-in-alt me-2"></i> {{ __('Login') }}
+                        </a>
+                        @endif
+                        @if (Route::has('register'))
+                        <a class="btn btn-primary" href="{{ route('register') }}">
+                            <i class="fas fa-user-plus me-2"></i> {{ __('Register') }}
+                        </a>
+                        @endif
+                    @else
+                        <div class="dropdown d-inline-block">
+                            <a class="btn btn-outline-secondary dropdown-toggle" href="#" id="profileMenuHeader" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-2"></i> {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileMenuHeader">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('profile', Auth::user()->id) }}">
+                                        <i class="fas fa-id-badge me-2"></i> Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" target="_blank" href="/sitemap.xml">
+                                        <i class="fas fa-sitemap me-2"></i> Sitemap
+                                    </a>
+                                </li>
+                                @if(auth()->user()->hasRole("Admin"))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('backups.index') }}">
+                                        <i class="fas fa-database me-2"></i> Database Backups
+                                    </a>
+                                </li>
+                                @endif
+                                @can('user-list')
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('users.index') }}">
+                                        <i class="fas fa-users me-2"></i> Users
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('role-list')
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('roles.index') }}">
+                                        <i class="fas fa-user-tag me-2"></i> Role
+                                    </a>
+                                </li>
+                                @endcan
+                                <li>
+                                    <form id="logout-form-header" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-header').submit();">
+                                        <i class="fas fa-sign-out-alt me-2"></i> {{ __('Logout') }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endguest
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header End -->
+
     <div id="app">
         <div class="container-fluid">
             <div class="row">
-                <!-- Sidebar -->
+                @guest
+                @else
                 <aside id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse sidebar-sticky no-print shadow-sm opencart-sidebar" style="min-height: 100vh;">
                     <div class="position-sticky pt-3">
-                        <div class="d-flex flex-column align-items-center brand-stack mb-4">
-                            <a class="navbar-brand p-0 text-center fw-bold fs-4 text-primary" href="{{ url('/admin') }}">
-                                Lipslay Admin
-                            </a>
-                            @if(auth()->user())
-                            <a class="btn btn-outline-primary btn-sm mt-2 btn-store-view w-100" href="https://lipslay.com/?cache=false" target="_blank">
-                                <i class="fas fa-store"></i> Store View
-                            </a>
-                            @endif
-                        </div>
                         <ul class="nav flex-column opencart-menu">
-                            <!-- Authentication Links -->
-                            @guest
-                                @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">
-                                        <i class="fas fa-sign-in-alt me-2"></i> {{ __('Login') }}
-                                    </a>
-                                </li>
-                                @endif
-                                @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">
-                                        <i class="fas fa-user-plus me-2"></i> {{ __('Register') }}
-                                    </a>
-                                </li>
-                                @endif
-                            @else
+                            
                                 @if(auth()->user()->hasRole('Staff'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('stripe.staff.form') }}">
@@ -345,45 +402,20 @@
                                         </ul>
                                     </div>
                                 </li>
-                                @endcan
-                                <li class="nav-item">
-                                    <a class="nav-link collapsed" data-bs-toggle="collapse" href="#profileMenu" role="button" aria-expanded="false" aria-controls="profileMenu">
-                                        <i class="fas fa-user-circle me-2"></i> {{ Auth::user()->name }} <span class="float-end"><i class="fas fa-angle-down"></i></span>
-                                    </a>
-                                    <div class="collapse" id="profileMenu">
-                                        <ul class="nav flex-column ms-3">
-                                            <li><a class="nav-link" href="{{ route('profile', Auth::user()->id) }}"><i class="fas fa-id-badge me-2"></i> Profile</a></li>
-                                            <li><a class="nav-link" target="_blank" href="/sitemap.xml"><i class="fas fa-sitemap me-2"></i> Sitemap</a></li>
-                                            @if(auth()->user()->hasRole("Admin"))
-                                            <li><a class="nav-link" href="{{ route('backups.index') }}"><i class="fas fa-database me-2"></i> Database Backups</a></li>
-                                            @endif
-                                            @can('user-list')
-                                            <li><a class="nav-link" href="{{ route('users.index') }}"><i class="fas fa-users me-2"></i> Users</a></li>
-                                            @endcan
-                                            @can('role-list')
-                                            <li><a class="nav-link" href="{{ route('roles.index') }}"><i class="fas fa-user-tag me-2"></i> Role</a></li>
-                                            @endcan
-                                            <li>
-                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                                    @csrf
-                                                </form>
-                                                <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                                    <i class="fas fa-sign-out-alt me-2"></i> {{ __('Logout') }}
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-                            @endif
+                            @endcan
                         </ul>
-                        <!-- Sidebar Toggle Button (visible on small screens) -->
                         <button class="btn btn-outline-secondary d-md-none mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle sidebar">
                             <i class="fas fa-bars"></i> Menu
                         </button>
                     </div>
                 </aside>
-                <!-- Main Content -->
+                @endif
+                
+                @guest
+                <main class="col-md-12 ms-sm-auto col-lg-12 px-md-4 py-4">
+                @else
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                @endif
                     @include('site.layout.locationPopup')
                     @yield('content')
                     <div id="addToCartPopup"></div>
