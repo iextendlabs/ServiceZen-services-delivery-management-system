@@ -52,30 +52,50 @@ return [
 
     'channels' => [
         'order_request_log' => [
-            'driver' => 'single', // You can use 'single', 'daily', or other supported drivers
-            'path' => storage_path('logs/order_request.log'),
-            'level' => 'debug'
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/order_request.log'),
+            ],
+            'level' => 'debug',
         ],
         'kommo_log' => [
-            'driver' => 'single', // You can use 'single', 'daily', or other supported drivers
-            'path' => storage_path('logs/kommo.log'),
-            'level' => 'debug'
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/kommo.log'),
+            ],
+            'level' => 'debug',
         ],
         'app_error_log' => [
-            'driver' => 'single', // You can use 'single', 'daily', or other supported drivers
-            'path' => storage_path('logs/app_error.log'),
-            'level' => 'debug'
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/app_error.log'),
+            ],
+            'level' => 'debug',
         ],
         'app_errors' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/app_console_errors.log'),
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/app_console_errors.log'),
+            ],
             'level' => 'error',
         ],
         'api' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/api.log'),
-            'level' => 'debug', // Adjust the log level as needed
-            'days' => 14, // Adjust the number of log files to retain
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/api.log'),
+            ],
+            'level' => 'debug',
+            'days' => 14,
         ],
         'stack' => [
             'driver' => 'stack',
@@ -89,22 +109,34 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        'single' => [
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/laravel.log'),
+            ],
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
         'daily' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/laravel.log'),
+            ],
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
         ],
-
-        'slack' => [
-            'driver' => 'slack',
-            'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => 'Laravel Log',
-            'emoji' => ':boom:',
-            'level' => env('LOG_LEVEL', 'critical'),
-        ],
-
-        'papertrail' => [
+        'crons' => [
+            'driver' => 'monolog',
+            'handler' => App\Logging\NoDuplicateErrorHandler::class,
+            'formatter' => App\Logging\SingleLineErrorFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/crons.log'),
+            ],
+            'level' => 'info',
+            ],
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
@@ -149,6 +181,5 @@ return [
             'path' => storage_path('logs/crons.log'),
             'level' => 'info',
         ],
-    ],
+    ];
 
-];
