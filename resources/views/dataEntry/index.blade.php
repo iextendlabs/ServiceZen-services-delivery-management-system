@@ -1,18 +1,6 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2>Data Entry User ({{ $total_user }})</h2>
-                </div>
-                <div class="float-end">
-                    @can('data-entry-create')
-                        <a class="btn btn-success" href="{{ route('dataEntry.create') }}"> Create New Data Entry User</a>
-                    @endcan
-                </div>
-            </div>
-        </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
                 <span>{{ $message }}</span>
@@ -21,8 +9,53 @@
         @endif
         <hr>
         <div class="row">
-            <div class="col-md-9">
-                <table class="table table-striped table-bordered">
+            <div class="col-md-12">
+                <div class="card p-3 mb-3">
+                    <div class="card-header bg-white">
+                        <div class="float-end">
+                            @can('data-entry-create')
+                            <a class="btn font-weight-bold" href="{{ route('dataEntry.create') }}"><i class="fa fa-plus"></i> Add Data Entry User</a>
+                            @endcan
+                        </div>
+                        <h3>Filter</h3>
+                    </div>
+                <div class="card-body">
+                    <form action="{{ route('dataEntry.index') }}" method="GET" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <strong>Name:</strong>
+                                    <input type="text" name="name" value="{{ $filter_name }}" class="form-control"
+                                        placeholder="Name">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group position-relative">
+                                    <strong>Email:</strong>
+                                    <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
+                                    <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                    <style>
+                                        #email-suggestions .list-group-item {
+                                            cursor: pointer !important;
+                                        }
+                                        #email-suggestions .list-group-item:hover {
+                                            background-color: #f0f0f0;
+                                        }
+                                    </style>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mt-4">
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>            
+            <div class="col-md-12">
+                <div class="float-start">
+                    <h2 class="font-weight-bold">Data Entry User ({{ $total_user }})</h2>
+                </div>
+                <table class="table table-hover table-bordered">
                     <tr>
                         <th>Sr#</th>
                         <th><a class=" ml-2 text-decoration-none"
@@ -49,16 +82,16 @@
                                 <td>
                                     <form id="deleteForm{{ $user->id }}"
                                         action="{{ route('dataEntry.destroy', $user->id) }}" method="POST">
-                                        <a class="btn btn-info" href="{{ route('dataEntry.show', $user->id) }}"><i class="fa fa-eye"></i></a>
+                                        <a class="btn text-dark" href="{{ route('dataEntry.show', $user->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('data-entry-edit')
-                                            <a class="btn btn-primary"
+                                            <a class="btn text-dark"
                                                 href="{{ route('dataEntry.edit', $user->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('data-entry-delete')
                                             <button type="button" onclick="confirmDelete('{{ $user->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                                class="btn text-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -71,39 +104,6 @@
                     @endif
                 </table>
                 {!! $users->links() !!}
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('dataEntry.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter_name }}" class="form-control"
-                                    placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
-                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
-                                <style>
-                                    #email-suggestions .list-group-item {
-                                        cursor: pointer !important;
-                                    }
-                                    #email-suggestions .list-group-item:hover {
-                                        background-color: #f0f0f0;
-                                    }
-                                </style>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

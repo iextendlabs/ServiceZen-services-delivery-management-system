@@ -100,6 +100,7 @@
 <script>
     $(document).ready(function () {
         $('#categorySearch').on('keyup', function () {
+            console.log('categorySearch keyup:', $(this).val());
             let searchText = $(this).val().toLowerCase().trim();
 
             if (searchText === '') {

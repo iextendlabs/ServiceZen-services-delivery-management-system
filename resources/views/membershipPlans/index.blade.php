@@ -1,15 +1,13 @@
 @extends('layouts.app')
 @section('content')
+@section('page_title')
+<h3 class="">Membership Plans</h3>
+@endsection
     <div class="container">
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
                     <h2>Membership Plan ({{ $total_membership_plan }})</h2>
-                </div>
-                <div class="float-end">
-                    @can('membership-plan-create')
-                        <a class="btn btn-success" href="{{ route('membershipPlans.create') }}"><i class="fa fa-plus"></i></a>
-                    @endcan
                 </div>
             </div>
         </div>
@@ -21,10 +19,98 @@
         @endif
         <hr>
         <div class="row">
-            <div class="col-md-9">
-                <table class="table table-striped table-bordered">
-                    <tr>
-                        <th>Sr#</th>
+            <div class="col-md-12">
+                <div class="card p-3 mb-4">
+                    <div class="card-header bg-white mb-1">
+                        <div class="float-end">
+                            @can('membership-plan-create')
+                                <a class="btn text-dark" href="{{ route('membershipPlans.create') }}"><i class="fa fa-plus"></i> Add Membership Plan</a>
+                            @endcan
+                        </div>
+                        <h3>Filter</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('membershipPlans.index') }}" method="GET" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Plan Name:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-box-open text-muted"></i></span>
+                                            </div>
+                                            <input type="text" name="plan_name" value="{{ $filter['plan_name'] }}" class="form-control"
+                                                placeholder="Plan Name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Membership Fee:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-dollar-sign text-muted"></i></span>
+                                            </div>
+                                            <input type="number" name="membership_fee" value="{{ $filter['membership_fee'] }}"
+                                                class="form-control" placeholder="Membership Fee">
+                                        </div>        
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Expiry Date:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-calendar-alt text-muted"></i></span>
+                                            </div>
+                                            <input type="date" name="expiry_date" value="{{ $filter['expiry_date'] }}"
+                                                class="form-control" placeholder="Expiry Date">
+                                        </div>        
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <span style="color: red;">*</span>
+                                        <label class="small text-muted font-weight-medium mb-1">Type:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                                            </div>
+                                            <select name="type" class="form-control">
+                                                <option></option>
+                                                <option value="Affiliate" @if ($filter['type'] == 'Affiliate') selected @endif>Affiliate</option>
+                                                <option value="Freelancer" @if ($filter['type'] == 'Freelancer') selected @endif>Freelancer</option>
+                                            </select>
+                                        </div>    
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Status</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-clock text-muted"></i></span>
+                                            </div>
+                                            <select name="status" class="form-control">
+                                                <option></option>
+                                                <option value="1" @if ($filter['status'] == '1') selected @endif>Enable</option>
+                                                <option value="0" @if ($filter['status'] == '0') selected @endif>Disable</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mt-4 p-1">
+                                    <button type="submit" class="btn btn-sm btn-primary shadow-sm font-weight-bold"><i class="fas fa-filter"></i> Apply Filter</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>    
+                </div>    
+            </div>            
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <tr class="bg-white">
+                        <th class="text-primary">Sr#</th>
                         <th><a class=" ml-2 text-decoration-none"
                                 href="{{ route('membershipPlans.index', array_merge(request()->query(), ['sort' => 'plan_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Plan Name</a>
                             @if (request('sort') === 'plan_name')
@@ -55,7 +141,7 @@
                             <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                         @endif
                         </th>
-                        <th>Action</th>
+                        <th class="text-primary">Action</th>
                     </tr>
                     @if (count($membership_plans))
                         @foreach ($membership_plans as $membership_plan)
@@ -69,16 +155,16 @@
                                 <td>
                                     <form id="deleteForm{{ $membership_plan->id }}"
                                         action="{{ route('membershipPlans.destroy', $membership_plan->id) }}" method="POST">
-                                        <a class="btn btn-warning" href="{{ route('membershipPlans.show', $membership_plan->id) }}"><i
+                                        <a class="btn text-dark" href="{{ route('membershipPlans.show', $membership_plan->id) }}"><i
                                                 class="fa fa-eye"></i></a>
                                         @can('membership-plan-edit')
-                                            <a class="btn btn-primary" href="{{ route('membershipPlans.edit', $membership_plan->id) }}"><i
+                                            <a class="btn text-dark" href="{{ route('membershipPlans.edit', $membership_plan->id) }}"><i
                                                     class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('membership-plan-delete')
-                                            <button type="button" class="btn btn-danger"
+                                            <button type="button" class="btn text-danger"
                                                 onclick="confirmDelete('{{ $membership_plan->id }}')"><i
                                                     class="fa fa-trash"></i></button>
                                         @endcan
@@ -94,58 +180,6 @@
                 </table>
                 {!! $membership_plans->links() !!}
 
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('membershipPlans.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Plan Name:</strong>
-                                <input type="text" name="plan_name" value="{{ $filter['plan_name'] }}" class="form-control"
-                                    placeholder="Plan Name">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Membership Fee:</strong>
-                                <input type="number" name="membership_fee" value="{{ $filter['membership_fee'] }}"
-                                    class="form-control" placeholder="Membership Fee">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Expiry Date:</strong>
-                                <input type="date" name="expiry_date" value="{{ $filter['expiry_date'] }}"
-                                    class="form-control" placeholder="Expiry Date">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <span style="color: red;">*</span><strong>Type:</strong>
-                                <select name="type" class="form-control">
-                                    <option></option>
-                                    <option value="Affiliate" @if ($filter['type'] == 'Affiliate') selected @endif>Affiliate</option>
-                                    <option value="Freelancer" @if ($filter['type'] == 'Freelancer') selected @endif>Freelancer</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Status:</strong>
-                                <select name="status" class="form-control">
-                                    <option></option>
-                                    <option value="1" @if ($filter['status'] == '1') selected @endif>Enable</option>
-                                    <option value="0" @if ($filter['status'] == '0') selected @endif>Disable</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Filter</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

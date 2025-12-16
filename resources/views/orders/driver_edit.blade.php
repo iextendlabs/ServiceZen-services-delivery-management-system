@@ -29,19 +29,22 @@
                 @csrf
                 <input type="hidden" name="url" value="{{ url()->previous() }}">
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Driver:</strong>
-                            <select name="driver_id" class="form-control">
-                                <option></option>
-                                @foreach ($drivers as $driver)
-                                <option value="{{ $driver->id }}" {{ old('driver_id', $order->driver_id) == $driver->id  ? 'selected' : '' }}>{{ $driver->name }}</option>
-                                @endforeach
-                            </select>
+                <div class="row px-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Driver:</strong>
+                                    <select name="driver_id" class="form-control">
+                                        <option></option>
+                                        @foreach ($drivers as $driver)
+                                        <option value="{{ $driver->id }}" {{ old('driver_id', $order->driver_id) == $driver->id  ? 'selected' : '' }}>{{ $driver->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                     <div class="col-md-12 text-right no-print">
                         @can('order-edit')
                         <button type="submit" class="btn btn-primary">Update</button>

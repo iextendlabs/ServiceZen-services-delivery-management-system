@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 py-5 text-center">
+        <div class="col-md-12 py-2 text-center">
             <h2>Edit Order Comment</h2>
         </div>
     </div>
@@ -29,22 +29,26 @@
                 @csrf
                 <input type="hidden" name="url" value="{{ url()->previous() }}">
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Order Comment:</strong>
-                            <textarea name="order_comment" cols="30" rows="8" class="form-control">{{ old('order_comment', $order->order_comment ?? '') }}</textarea>
+                <div class="row px-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="col-md-12">                               
+                                <div class="form-group">
+                                    <strong>Order Comment:</strong>
+                                    <textarea name="order_comment" cols="30" rows="3" class="form-control">{{ old('order_comment', $order->order_comment ?? '') }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Driver Comment:</strong>
+                                    <textarea name="driver_comment" cols="30" rows="3" class="form-control">{{ old('driver_comment', $order->driver_comment ?? '') }}</textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Driver Comment:</strong>
-                            <textarea name="driver_comment" cols="30" rows="8" class="form-control">{{ old('driver_comment', $order->driver_comment ?? '') }}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 text-right no-print">
+                    <div class="col-md-12 text-right no-print mt-3">
                         @can('order-edit')
                         <button type="submit" class="btn btn-primary">Update</button>
                         @endcan

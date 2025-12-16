@@ -355,22 +355,93 @@
 
             <!-- Roles Section -->
             <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0">
-                            <i class="fas fa-user-shield"></i> Roles & Permissions
-                        </h5>
+                <div class="row">
+                    <div class="col-md-12">
+                      <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-shield"></i> Roles & Permissions
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (!empty($serviceStaff->getRoleNames()))
+                                @foreach ($serviceStaff->getRoleNames() as $v)
+                                    <span class="badge badge-pill badge-dark mr-1">{{ $v }}</span>
+                                @endforeach
+                            @else
+                                <p class="text-muted">No roles assigned</p>
+                            @endif
+                        </div>
+                      </div>
                     </div>
-                    <div class="card-body">
-                        @if (!empty($serviceStaff->getRoleNames()))
-                            @foreach ($serviceStaff->getRoleNames() as $v)
-                                <span class="badge badge-pill badge-dark mr-1">{{ $v }}</span>
-                            @endforeach
-                        @else
-                            <p class="text-muted">No roles assigned</p>
-                        @endif
-                    </div>
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header bg-orange text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-tags"></i> Sub Titles / Designations
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- Add search input at the top -->
+                                <div class="p-3 border-bottom">
+                                    <input type="text" id="subtitleSearch" class="form-control"
+                                        placeholder="Search Sub Titles / Designations ...">
+                                </div>
+
+                                @if (count($serviceStaff->subTitles) > 0)
+                                    <div class="subtitles-container" style="max-height: 300px; overflow-y: auto;">
+                                        <div class="row no-gutters" id="subtitlesList">
+                                            @foreach ($serviceStaff->subTitles as $subTitle)
+                                                <div class="subtitle-item p-3 border-bottom">
+                                                    <i class="fas fa-check-circle text-success mr-2"></i>
+                                                    <span class="subtitle-name">{{ $subTitle->name }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="p-3">
+                                        <p class="alert alert-info mb-0">No Sub Titles / Designations assigned</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header bg-orange text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-tags"></i> Categories
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- Add search input at the top -->
+                                <div class="p-3 border-bottom">
+                                    <input type="text" id="categorySearch" class="form-control"
+                                        placeholder="Search categories...">
+                                </div>
+
+                                @if (count($serviceStaff->categories) > 0)
+                                    <div class="categories-container" style="max-height: 300px; overflow-y: auto;">
+                                        <div class="row no-gutters" id="categoriesList">
+                                            @foreach ($serviceStaff->categories as $category)
+                                                <div class="category-item p-3 border-bottom">
+                                                    <i class="fas fa-check-circle text-success mr-2"></i>
+                                                    <span class="category-name">{{ $category->title }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="p-3">
+                                        <p class="alert alert-info mb-0">No categories assigned</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>                    
                 </div>
+
             </div>
         </div>
 
@@ -447,42 +518,8 @@
 
         <!-- Relationships Sections -->
         <div class="row mb-4">
-            <!-- Sub Titles / Designations -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header bg-orange text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-tags"></i> Sub Titles / Designations
-                        </h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <!-- Add search input at the top -->
-                        <div class="p-3 border-bottom">
-                            <input type="text" id="subtitleSearch" class="form-control"
-                                placeholder="Search Sub Titles / Designations ...">
-                        </div>
-
-                        @if (count($serviceStaff->subTitles) > 0)
-                            <div class="subtitles-container" style="max-height: 300px; overflow-y: auto;">
-                                <div class="row no-gutters" id="subtitlesList">
-                                    @foreach ($serviceStaff->subTitles as $subTitle)
-                                        <div class="subtitle-item p-3 border-bottom">
-                                            <i class="fas fa-check-circle text-success mr-2"></i>
-                                            <span class="subtitle-name">{{ $subTitle->name }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @else
-                            <div class="p-3">
-                                <p class="alert alert-info mb-0">No Sub Titles / Designations assigned</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
             <!-- Supervisors -->
-            <div class="col-md-4">
+            <div class="col-md-12">
                 <div class="card mb-4 h-100">
                     <div class="card-header bg-teal text-white">
                         <h5 class="mb-0">
@@ -498,39 +535,6 @@
                             </ul>
                         @else
                             <p class="alert alert-info mb-0">No supervisors assigned</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header bg-orange text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-tags"></i> Categories
-                        </h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <!-- Add search input at the top -->
-                        <div class="p-3 border-bottom">
-                            <input type="text" id="categorySearch" class="form-control"
-                                placeholder="Search categories...">
-                        </div>
-
-                        @if (count($serviceStaff->categories) > 0)
-                            <div class="categories-container" style="max-height: 300px; overflow-y: auto;">
-                                <div class="row no-gutters" id="categoriesList">
-                                    @foreach ($serviceStaff->categories as $category)
-                                        <div class="category-item p-3 border-bottom">
-                                            <i class="fas fa-check-circle text-success mr-2"></i>
-                                            <span class="category-name">{{ $category->title }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @else
-                            <div class="p-3">
-                                <p class="alert alert-info mb-0">No categories assigned</p>
-                            </div>
                         @endif
                     </div>
                 </div>

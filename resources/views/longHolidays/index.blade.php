@@ -8,11 +8,11 @@
                 </div>
                 <div class="float-end">
                     @can('staff-holiday-create')
-                        <a class="btn btn-success  float-end" href="{{ route('longHolidays.create') }}" style="margin-left: 5px;">
-                            <i class="fa fa-plus"></i></a>
+                        <a class="btn text-dark  float-end" href="{{ route('longHolidays.create') }}" style="margin-left: 5px;">
+                            <i class="fa fa-plus"></i> Add</a>
                     @endcan
                     @can('staff-holiday-delete')
-                        <button id="bulkDeleteBtn" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                        <button id="bulkDeleteBtn" class="btn text-danger"><i class="fa fa-trash"></i> Delete</button>
                     @endcan
                 </div>
             </div>
@@ -26,20 +26,20 @@
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
-                    <tr>
+                <table class="table table-bordered">
+                    <tr class="bg-white">
                         <th></th>
                         <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
+                        <th><i><a class=" ml-2 text-dark"
                                 href="{{ route('longHolidays.index', array_merge(request()->query(), ['sort' => 'date_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date
-                                Start</a>
+                                Start</a></i>
                             @if (request('sort') === 'date_start')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
+                        <th><i><a class=" ml-2 text-dark"
                                 href="{{ route('longHolidays.index', array_merge(request()->query(), ['sort' => 'date_end', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date
-                                End</a>
+                                End</a></i>
                             @if (request('sort') === 'date_end')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -64,7 +64,7 @@
                                         @method('DELETE')
                                         @can('staff-holiday-delete')
                                             <button type="button" onclick="confirmDelete('{{ $longHoliday->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                                class="btn text-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

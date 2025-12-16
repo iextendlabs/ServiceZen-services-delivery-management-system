@@ -1,60 +1,73 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+@section('page_title')
+<h3 class="">Settings</h3>
+@endsection
+    <div class="container-fluid px-1">
         <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2>Setting ({{ $total_setting }})</h2>
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">Setting ({{ $total_setting }})</h2>
                 </div>
             </div>
         </div>
+
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
                 <span>{{ $message }}</span>
                 <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <hr>
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table table-striped table-bordered">
-                    <tr>
-                        <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('settings.index', array_merge(request()->query(), ['sort' => 'key', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Key</a>
-                            @if (request('sort') === 'key')
-                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                            @endif
-                        </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('settings.index', array_merge(request()->query(), ['sort' => 'value', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Value</a>
-                            @if (request('sort') === 'value')
-                                <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
-                            @endif
-                        </th>
-                        <th width="280px">Action</th>
-                    </tr>
-                    @if (count($settings))
-                        @foreach ($settings as $setting)
+
+        <div class="card mt-3">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead>
                             <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ $setting->key }}</td>
-                                <td>{{ substr($setting->value, 0, 50) }}</td>
-                                <td>
-                                    @can('setting-edit')
-                                        <a class="btn btn-primary" href="{{ route('settings.edit', $setting->id) }}"><i class="fa fa-edit"></i></a>
-                                    @endcan
-                                </td>
+                                <th>Sr#</th>
+                                <th>
+                                    <i><a class="ml-2 text-dark" href="{{ route('settings.index', array_merge(request()->query(), ['sort' => 'key', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Key</a></i>
+                                    @if (request('sort') === 'key')
+                                        <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                                    @endif
+                                </th>
+                                <th>
+                                    <i><a class="ml-2 text-dark" href="{{ route('settings.index', array_merge(request()->query(), ['sort' => 'value', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Value</a></i>
+                                    @if (request('sort') === 'value')
+                                        <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
+                                    @endif
+                                </th>
+                                <th width="280px">Action</th>
                             </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="5" class="text-center">There is no Setting.</td>
-                        </tr>
-                    @endif
-                </table>
-                {!! $settings->links() !!}
+                        </thead>
+                        <tbody>
+                            @if (count($settings))
+                                @foreach ($settings as $setting)
+                                    <tr>
+                                        <td>{{ ++$i }}</td>
+                                        <td>{{ $setting->key }}</td>
+                                        <td>{{ substr($setting->value, 0, 50) }}</td>
+                                        <td>
+                                            @can('setting-edit')
+                                                <a class="btn text-dark" href="{{ route('settings.edit', $setting->id) }}"><i class="fa fa-edit"></i></a>
+                                            @endcan
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5" class="text-center">There is no Setting.</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+
+        <div class="mt-3">
+            {!! $settings->links() !!}
         </div>
     </div>
     <script>

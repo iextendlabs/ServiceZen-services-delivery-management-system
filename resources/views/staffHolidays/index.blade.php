@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+@section('page_title')
+<h3 class="">Staff Holidays</h3>
+@endsection
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -7,7 +10,7 @@
             </div>
             <div class="col-md-6">
                 @can('staff-holiday-create')
-                    <a class="btn btn-success  float-end" href="{{ route('staffHolidays.create') }}"> Create New Staff Holiday</a>
+                    <a class="btn text-dark  float-end" href="{{ route('staffHolidays.create') }}"><i class="fa fa-plus"></i> Create New Staff Holiday</a>
                 @endcan
             </div>
         </div>
@@ -20,11 +23,11 @@
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
-                    <tr>
+                <table class="table table-bordered">
+                    <tr class="bg-white">
                         <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('staffHolidays.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('staffHolidays.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date</a></i>
                             @if (request('sort') === 'date')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -46,7 +49,7 @@
                                         @method('DELETE')
                                         @can('staff-holiday-delete')
                                             <button type="button" onclick="confirmDelete('{{ $staffHoliday->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                                class="btn text-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>

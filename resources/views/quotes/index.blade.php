@@ -42,25 +42,28 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 margin-tb">
-                <div class="float-left">
-                    <h2>Quotes({{ $total_quote }})</h2>
-                </div>
+                @section('page_title')
+                <h3 class="text-bold">Quotes</h3>
+                @endsection
+                <h3 class="text-mute float-start">Filter</h3>
                 <div class="float-end d-flex align-items-center">
                     @can('quote-edit')
-                        <div class="input-group me-2">
-                            <select name="bulk-status" class="form-control">
+                        <div class="input-group me-2" style="min-width: 220px;">
+                            <select name="bulk-status" class="form-control form-select form-select-sm">
+                                <option value="">Bulk status</option>
                                 @foreach ($quote_statuses as $status)
                                     <option value="{{ $status }}" @if ($filter['status'] == $status) selected @endif>
-                                        {{ $status }}</option>
+                                        {{ $status }}
+                                    </option>
                                 @endforeach
                             </select>
-                            <div class="input-group-append">
-                                <button id="bulkStatusBtn" class="btn btn-primary" type="button"><i
-                                        class="fa fa-save"></i></button>
-                            </div>
+                            <button id="bulkStatusBtn" class="btn btn-primary btn-sm" type="button">
+                                <i class="fa fa-save"></i>
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-success" id="bulkAssignStaffBtn" style="margin-top: -8px">
-                            Assign Staff
+
+                        <button type="button" class="btn btn-success btn-sm w-50 py-2" id="bulkAssignStaffBtn">
+                            <i class="fas fa-user-plus"></i> Assign Staff
                         </button>
 
                         <!-- Staff Selection Modal -->
@@ -181,13 +184,13 @@
         <div class="row">
             @if (auth()->user()->hasRole('Admin'))
                 <div class="col-md-12">
-                    <h3>Filter</h3>
-                    <hr>
                     <form action="{{ route('quotes.index') }}" method="GET" enctype="multipart/form-data">
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <strong>User:</strong>
+                            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                                <label class="small text-muted font-weight-medium mb-1">User</label>
+                                <div class="form-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-users text-muted"></i></span>
                                     <select name="user_id" class="form-control select2">
                                         <option></option>
                                         @foreach ($users as $user)
@@ -196,57 +199,64 @@
                                                 {{ $user->name }}</option>
                                         @endforeach
                                     </select>
+                                    </div> 
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <strong>Services:</strong>
-                                    <select name="service_id" class="form-control select2">
-                                        <option></option>
-                                        @foreach ($services as $service)
-                                            <option value="{{ $service->id }}"
-                                                @if ($filter['service_id'] == $service->id) selected @endif>
-                                                {{ $service->name }}</option>
-                                        @endforeach
-                                    </select>
+
+                            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                                <label class="small text-muted font-weight-medium mb-1">Services</label>
+                                <div class="form-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-concierge-bell text-muted"></i></span>                                
+                                        <select name="service_id" class="form-control select2">
+                                            <option></option>
+                                            @foreach ($services as $service)
+                                                <option value="{{ $service->id }}"
+                                                    @if ($filter['service_id'] == $service->id) selected @endif>
+                                                    {{ $service->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <strong>Status:</strong>
-                                    <select name="status" class="form-control">
-                                        <option></option>
-                                        @foreach ($quote_statuses as $status)
-                                            <option value="{{ $status }}"
-                                                @if ($filter['status'] == $status) selected @endif>
-                                                {{ $status }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                                <label class="small text-muted font-weight-medium mb-1">Status</label>
+                                <div class="form-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-clock text-muted"></i></span>     
+                                        <select name="status" class="form-control">
+                                            <option></option>
+                                            @foreach ($quote_statuses as $status)
+                                                <option value="{{ $status }}"
+                                                    @if ($filter['status'] == $status) selected @endif>
+                                                    {{ $status }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <strong>Source:</strong>
-                                    <select name="source" class="form-control">
-                                        <option></option>
-                                        @foreach ($sources as $source)
-                                            <option value="{{ $source }}"
-                                                @if ($filter['source'] == $source) selected @endif>
-                                                {{ $source }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="col-12 col-sm-6 col-lg-3 mb-2">
+                                <label class="small text-muted font-weight-medium mb-1">Source</label>
+                                <div class="form-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-cog  text-muted"></i></span> 
+                                        <select name="source" class="form-control">
+                                            <option></option>
+                                            @foreach ($sources as $source)
+                                                <option value="{{ $source }}"
+                                                    @if ($filter['source'] == $source) selected @endif>
+                                                    {{ $source }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4 offset-md-8">
                                 <div class="d-flex flex-wrap justify-content-md-end">
-                                    <div class="col-md-3 mb-3">
-                                        <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
-                                    </div>
-                                    <div class="col-md-9 mb-3">
-                                        <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
-                                    </div>
+                                    <a href="{{ url()->current() }}" class="btn btn-sm btn-light border mr-2 font-weight-medium">Reset</a>
+                                    <button type="submit" class="btn btn-sm btn-primary shadow-sm font-weight-bold">Filter</button>
                                 </div>
                             </div>
                         </div>
@@ -254,8 +264,11 @@
                 </div>
             @endif
             <div class="col-md-12">
+                <div class="float-left text-mute">
+                    <h3>Quotes({{ $total_quote }})</h3>
+                </div>                
                 <div class="table-responsive">
-                    <table class="table table-borderless table-striped">
+                    <table class="table table-border table-hover">
                         <thead class="border-bottom">
                             <tr>
                                 <td>
@@ -347,7 +360,7 @@
                                                 action="{{ route('quotes.destroy', $quote->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <a class="btn btn-outline-primary"
+                                                <a class="btn text-primary"
                                                     href="{{ route('quotes.show', $quote->id) }}">
                                                     View Detail
                                                 </a>
@@ -355,17 +368,17 @@
 
                                                 @if (auth()->user()->hasRole('Staff'))
                                                     @if ($staffQuote && $staffQuote->pivot->status == 'Pending')
-                                                        <button type="button" class="btn btn-success accept-quote"
+                                                        <button type="button" class="btn text-success accept-quote"
                                                             data-id="{{ $quote->id }}"
                                                             data-amount="{{ $staffQuote->pivot->quote_amount }}"
                                                             data-commission="{{ $staffQuote->pivot->quote_commission }}">Accept</button>
-                                                        <button type="button" class="btn btn-danger reject-quote"
+                                                        <button type="button" class="btn text-danger reject-quote"
                                                             data-id="{{ $quote->id }}">Reject</button>
                                                     @endif
                                                     @if (is_null($quote->bid_id) || ($quote->bid && $quote->bid->staff_id == auth()->id()))
                                                         @if ($staffQuote->pivot->status == 'Accepted')
                                                             <a href="{{ route('quote.bid', ['quote_id' => $quote->id, 'staff_id' => auth()->id()]) }}"
-                                                                class="btn btn-primary">
+                                                                class="btn text-primary">
                                                                 Bid
                                                             </a>
                                                         @endif
@@ -373,13 +386,13 @@
                                                 @endif
                                                 @if (auth()->user()->hasRole('Admin'))
                                                     <a href="{{ route('quote.bids', ['quote_id' => $quote->id]) }}"
-                                                        class="btn btn-primary">
+                                                        class="btn text-primary">
                                                         <i class="fas fa-eye"></i> View Bids
                                                     </a>
                                                 @endif
                                                 @can('quote-delete')
                                                     <button type="button" onclick="confirmDelete('{{ $quote->id }}')"
-                                                        class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                                        class="btn text-danger"><i class="fas fa-trash"></i></button>
                                                 @endcan
                                             </form>
                                         </td>

@@ -1,5 +1,5 @@
 <!-- TODO Change edit dropdown to icon -->
-<table class="table-striped table-bordered table-responsive table">
+<table class="table-hover table-bordered table-responsive table">
     <tr>
         <td>
             <input type="checkbox" class="all-item-checkbox">
@@ -189,92 +189,93 @@
                 </td>
                 <td>{{ $order->created_at }}</td>
                 <td>
-                    @can('order-edit')
-                        <!-- <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
-                                <i class="fas fa-edit"></i>
-                            </a> -->
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class=" btn btn-primary" href="#" data-bs-toggle="dropdown">
-                                    <i class="fas fa-bars"></i>
+                    <div class="d-flex">
+                        @can('order-edit')
+                            <!-- <a class="btn btn-primary" href="{{ route('orders.edit', $order->id) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a> -->
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item dropdown">
+                                    <a id="navbarDropdown" class=" btn" href="#" data-bs-toggle="dropdown">
+                                        <i class="fas fa-bars"></i>
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        @can('order-booking-edit')
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
+                                        @endcan
+                                        @can('order-status-edit')
+                                            @if (auth()->user()->hasRole('Supervisor') && $order->status == 'Pending')
+                                                <a class="dropdown-item"
+                                                    href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                                            @elseif(!auth()->user()->hasRole('Supervisor'))
+                                                <a class="dropdown-item"
+                                                    href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
+                                            @endif
+                                        @endcan
+                                        @can('order-detail-edit')
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
+                                        @endcan
+                                        @can('order-affiliate-edit')
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.edit', $order->id) }}?edit=affiliate">Affiliate Edit</a>
+                                        @endcan
+                                        @can('order-comment-edit')
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
+                                        @endcan
+                                        @can('order-driver-status-edit')
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.edit', $order->id) }}?edit=driver">Driver Edit</a>
+                                        @endcan
+                                        @can('order-driver-status-edit')
+                                            <a class="dropdown-item"
+                                                href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver
+                                                Status Edit</a>
+                                        @endcan
+                                        <a class="dropdown-item"
+                                            href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom
+                                            Location</a>
+                                        @can('order-chat')
+                                            <a class="dropdown-item" href="{{ route('orders.chat', $order->id) }}">Chat</a>
+                                        @endcan
+                                        <a class="dropdown-item"
+                                            href="{{ route('orders.edit', $order->id) }}?edit=services">Edit Services</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        @endcan
+                        <form id="deleteForm{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}"
+                            method="POST">
+                            @csrf
+                            @method('DELETE')
+                            @can('order-delete')
+                                <button type="button" onclick="confirmDelete('{{ $order->id }}')" class="btn text-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            @endcan
+                        </form>
+                        @if ($order->status !== 'Complete' && Auth::User()->hasRole('Staff'))
+                            @if ($order->status == 'Confirm')
+                                <a class="btn btn-sm btn-success"
+                                    href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
+                                    <i class="fas fa-thumbs-up"></i>
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    @can('order-booking-edit')
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.edit', $order->id) }}?edit=booking">Booking Edit</a>
-                                    @endcan
-                                    @can('order-status-edit')
-                                        @if (auth()->user()->hasRole('Supervisor') && $order->status == 'Pending')
-                                            <a class="dropdown-item"
-                                                href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
-                                        @elseif(!auth()->user()->hasRole('Supervisor'))
-                                            <a class="dropdown-item"
-                                                href="{{ route('orders.edit', $order->id) }}?edit=status">Status Edit</a>
-                                        @endif
-                                    @endcan
-                                    @can('order-detail-edit')
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.edit', $order->id) }}?edit=address">Address Edit</a>
-                                    @endcan
-                                    @can('order-affiliate-edit')
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.edit', $order->id) }}?edit=affiliate">Affiliate Edit</a>
-                                    @endcan
-                                    @can('order-comment-edit')
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.edit', $order->id) }}?edit=comment">Comment Edit</a>
-                                    @endcan
-                                    @can('order-driver-status-edit')
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.edit', $order->id) }}?edit=driver">Driver Edit</a>
-                                    @endcan
-                                    @can('order-driver-status-edit')
-                                        <a class="dropdown-item"
-                                            href="{{ route('orders.edit', $order->id) }}?edit=order_driver_status">Order Driver
-                                            Status Edit</a>
-                                    @endcan
-                                    <a class="dropdown-item"
-                                        href="{{ route('orders.edit', $order->id) }}?edit=custom_location">Add Custom
-                                        Location</a>
-                                    @can('order-chat')
-                                        <a class="dropdown-item" href="{{ route('orders.chat', $order->id) }}">Chat</a>
-                                    @endcan
-                                    <a class="dropdown-item"
-                                        href="{{ route('orders.edit', $order->id) }}?edit=services">Edit Services</a>
-                                </div>
-                            </li>
-                        </ul>
-                    @endcan
-                    <form id="deleteForm{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}"
-                        method="POST">
-                        @csrf
-                        @method('DELETE')
-                        @can('order-delete')
-                            <button type="button" onclick="confirmDelete('{{ $order->id }}')" class="btn btn-danger">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        @endcan
-                    </form>
-                    @if ($order->status !== 'Complete' && Auth::User()->hasRole('Staff'))
-                        @if ($order->status == 'Confirm')
-                            <a class="btn btn-sm btn-success"
-                                href="{{ route('updateOrderStatus', $order->id) }}?status=Accepted">
-                                <i class="fas fa-thumbs-up"></i>
-                            </a>
-
-                            <a class="btn btn-sm btn-danger"
-                                href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">
-                                <i class="fas fa-thumbs-down"></i>
-                            </a>
+                                <a class="btn btn-sm btn-danger"
+                                    href="{{ route('updateOrderStatus', $order->id) }}?status=Rejected">
+                                    <i class="fas fa-thumbs-down"></i>
+                                </a>
+                            @endif
+                            @if ($order->status == 'Accepted')
+                                <a class="btn btn-sm btn-success"
+                                    href="{{ route('updateOrderStatus', $order->id) }}?status=Complete"><i
+                                        class="fas fa-check-circle"></i></a>
+                            @endif
                         @endif
-                        @if ($order->status == 'Accepted')
-                            <a class="btn btn-sm btn-success"
-                                href="{{ route('updateOrderStatus', $order->id) }}?status=Complete"><i
-                                    class="fas fa-check-circle"></i></a>
-                        @endif
-                    @endif
-
+                    </div>
                 </td>
             </tr>
         @endforeach

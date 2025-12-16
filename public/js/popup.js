@@ -336,8 +336,39 @@ function openBookingPopup(serviceId, option_id = null) {
         url: '/addToCartModal/' + serviceId+"?option_id="+option_id,
         type: 'GET',
         success: function(response) {
-            $('#addToCartPopup').html(response);
-            $('#addToCartModal').modal('show');
+            // If right side drawer exists, extract modal content and show inside drawer
+            var $drawer = $('#rightSideDrawer');
+            if ($drawer.length) {
+                var tmp = document.createElement('div');
+                tmp.innerHTML = response;
+                // Append any stylesheet links to head (if not already present)
+                var links = tmp.querySelectorAll('link[rel="stylesheet"]');
+                links.forEach(function(link){
+                    if (!$('link[href="'+link.href+'"]').length) {
+                        document.head.appendChild(link);
+                    }
+                });
+                // Append any script tags (external) to body if not already present
+                var scripts = tmp.querySelectorAll('script[src]');
+                scripts.forEach(function(s){
+                    if (!$('script[src="'+s.src+'"]').length) {
+                        var newS = document.createElement('script');
+                        newS.src = s.src;
+                        document.body.appendChild(newS);
+                    }
+                });
+                var modalContent = tmp.querySelector('.modal-content');
+                var contentHtml = modalContent ? modalContent.innerHTML : response;
+                $('#rightSideDrawerContent').html(contentHtml);
+                $('#rightSideDrawerTitle').text('Book Now');
+                $drawer.addClass('open');
+                // initialize any scripts that rely on elements inside drawer
+                if (typeof initDrawerContent === 'function') initDrawerContent();
+            } else {
+                // fallback to modal behaviour
+                $('#addToCartPopup').html(response);
+                $('#addToCartModal').modal('show');
+            }
         }
     });
 }
@@ -347,8 +378,55 @@ function openQuotePopup(serviceId) {
         url: '/quoteModal/' + serviceId,
         type: 'GET',
         success: function(response) {
-            $('#quotePopup').html(response);
-            $('#quoteModal').modal('show');
+            var $drawer = $('#rightSideDrawer');
+            if ($drawer.length) {
+                var tmp = document.createElement('div');
+                tmp.innerHTML = response;
+                var links = tmp.querySelectorAll('link[rel="stylesheet"]');
+                links.forEach(function(link){
+                    if (!$('link[href="'+link.href+'"]').length) {
+                        document.head.appendChild(link);
+                    }
+                });
+                var scripts = tmp.querySelectorAll('script[src]');
+                scripts.forEach(function(s){
+                    if (!$('script[src="'+s.src+'"]').length) {
+                        var newS = document.createElement('script');
+                        newS.src = s.src;
+                        document.body.appendChild(newS);
+                    }
+                });
+                var modalContent = tmp.querySelector('.modal-content');
+                var contentHtml = modalContent ? modalContent.innerHTML : response;
+                $('#rightSideDrawerContent').html(contentHtml);
+                $('#rightSideDrawerTitle').text('Request a Quote');
+                $drawer.addClass('open');
+                if (typeof initDrawerContent === 'function') initDrawerContent();
+            } else {
+                $('#quotePopup').html(response);
+                $('#quoteModal').modal('show');
+            }
         }
     });
+}
+
+// Called after drawer content injected to wire up simple interactions
+function initDrawerContent() {
+    // close buttons inside injected content
+    $('#rightSideDrawerContent').find('.close').off('click').on('click', function(){
+        $('#rightSideDrawer').removeClass('open');
+        setTimeout(function(){ $('#rightSideDrawerContent').html(''); }, 300);
+    });
+
+    // trigger change events for date/zone inputs so slots load
+    $('#rightSideDrawerContent').find('#date,#zone').trigger('change');
+
+    // ensure a service_staff_id is selected by default like original code
+    var $staffRadios = $('#rightSideDrawerContent').find('[name=service_staff_id]');
+    if ($staffRadios.length && $staffRadios.filter(':checked').length === 0) {
+        $staffRadios.first().prop('checked', true).trigger('change');
+    }
+
+    // call any global update if present
+    if (typeof updateTotal === 'function') updateTotal();
 }

@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+    @section('page_title')
+    <h3 class="text-mute">Review</h3>
+    @endsection
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -8,7 +11,7 @@
                 </div>
                 <div class="float-right">
                     @can('review-create')
-                        <a class="btn btn-success  float-end" href="{{ route('reviews.create') }}"> <i class="fa fa-plus"></i></a>
+                        <a class="btn text-dark  float-end" href="{{ route('reviews.create') }}"> <i class="fa fa-plus"></i> Add New</a>
                     @endcan
                 </div>
             </div>
@@ -20,9 +23,9 @@
             </div>
         @endif
         <hr>
-        <table class="table table-striped table-bordered">
-            <tr>
-                <th>Sr#</th>
+        <table class="table table-bordered">
+            <tr class="bg-white">
+                <th class="text-primary">Sr#</th>
                 <th><a class=" ml-2 text-decoration-none"
                         href="{{ route('reviews.index', array_merge(request()->query(), ['sort' => 'user_name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">User</a>
                     @if (request('sort') === 'user_name')
@@ -41,7 +44,7 @@
                         <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif
                 </th>
-                <th>Action</th>
+                <th class="text-primary">Action</th>
             </tr>
             @if (count($reviews))
                 @foreach ($reviews as $review)
@@ -61,17 +64,17 @@
                         <td>
                             <form id="deleteForm{{ $review->id }}" action="{{ route('reviews.destroy', $review->id) }}"
                                 method="POST">
-                                <a class="btn btn-warning" href="{{ route('reviews.show', $review->id) }}"><i
+                                <a class="btn text-dark" href="{{ route('reviews.show', $review->id) }}"><i
                                         class="fa fa-eye"></i></a>
                                 @can('review-edit')
-                                    <a class="btn btn-primary" href="{{ route('reviews.edit', $review->id) }}"><i
+                                    <a class="btn text-dark" href="{{ route('reviews.edit', $review->id) }}"><i
                                             class="fa fa-edit"></i></a>
                                 @endcan
                                 @csrf
                                 @method('DELETE')
                                 @can('review-delete')
                                     <button type="button" onclick="confirmDelete('{{ $review->id }}')"
-                                        class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                        class="btn text-danger"><i class="fas fa-trash"></i></button>
                                 @endcan
                             </form>
                         </td>

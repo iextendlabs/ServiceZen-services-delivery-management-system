@@ -1,18 +1,6 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h3>Affiliate ({{ $total_affiliate }})</h3>
-                </div>
-                <div class="float-end">
-                    @can('affiliate-create')
-                        <a class="btn btn-success" href="{{ route('affiliates.create') }}"><i class="fa fa-plus"></i></a>
-                    @endcan
-                </div>
-            </div>
-        </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
                 <span>{{ $message }}</span>
@@ -21,19 +9,78 @@
             </div>
         @endif
         <div class="row">
-            <div class="col-md-9">
-                <table class="table table-striped table-bordered">
-                    <tr>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3>Filter</h3>
+                            <div class="float-end">
+                                @can('affiliate-create')
+                                    <a class="btn text-dark" href="{{ route('affiliates.create') }}"><i class="fa fa-plus"></i> Create</a>
+                                @endcan
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">    
+                        <form action="{{ route('affiliates.index') }}" method="GET" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-4 ">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Name:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-user text-muted"></i></span>
+                                            </div>
+                                            <input type="text" name="name" value="{{ $filter_name }}"
+                                                class="form-control" placeholder="Name">
+                                        </div>    
+                                    </div>
+                                </div>
+                                <div class="col-md-4 ">
+                                    <div class="form-group position-relative">
+                                        <label class="small text-muted font-weight-medium mb-1">Email:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-envelope text-muted"></i></span>
+                                            </div>
+                                            <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
+                                            <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                            <style>
+                                                #email-suggestions .list-group-item {
+                                                    cursor: pointer !important;
+                                                }
+                                                #email-suggestions .list-group-item:hover {
+                                                    background-color: #f0f0f0;
+                                                }
+                                            </style>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 ">
+                                    <div class=" d-flex justify-content-between align-items-start mt-4">
+                                    <button type="submit" class="btn btn-md btn-primary mr-2"><i class="fas fa-filter"></i> Apply Filters</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>        
+            </div>            
+            <div class="col-md-12 px-1">
+                <div class="float-start">
+                    <h3>Affiliate ({{ $total_affiliate }})</h3>
+                </div>
+                <table class="table table-bordered">
+                    <tr class="bg-white">
                         <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('affiliates.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('affiliates.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a></i>
                             @if (request('sort') === 'name')
                                 <i
                                     class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('affiliates.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('affiliates.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a></i>
                             @if (request('sort') === 'email')
                                 <i
                                     class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -67,21 +114,17 @@
                                 </td>
                                 <td>
                                     <form id="deleteForm{{ $affiliate->id }}"
-                                        action="{{ route('affiliates.destroy', $affiliate->id) }}" method="POST">
-                                        <a class="btn btn-warning"
-                                            href="{{ route('affiliates.show', $affiliate->id) }}"><i
-                                                class="fa fa-eye"></i></a>
+                                          action="{{ route('affiliates.destroy', $affiliate->id) }}"
+                                          method="POST"
+                                          class="d-flex align-items-center gap-1 m-0">
+                                        <a class="btn text-dark btn-md" href="{{ route('affiliates.show', $affiliate->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('affiliate-edit')
-                                            <a class="btn btn-primary"
-                                                href="{{ route('affiliates.edit', $affiliate->id) }}"><i
-                                                    class="fa fa-edit"></i></a>
+                                            <a class="btn text-dark btn-md" href="{{ route('affiliates.edit', $affiliate->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('affiliate-delete')
-                                            <button type="button" class="btn btn-danger"
-                                                onclick="confirmDelete('{{ $affiliate->id }}')"><i
-                                                    class="fa fa-trash"></i></button>
+                                            <button type="button" class="btn text-danger btn-md" onclick="confirmDelete('{{ $affiliate->id }}')"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -95,39 +138,6 @@
                 </table>
                 {!! $affiliates->links() !!}
 
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('affiliates.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter_name }}"
-                                    class="form-control" placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
-                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
-                                <style>
-                                    #email-suggestions .list-group-item {
-                                        cursor: pointer !important;
-                                    }
-                                    #email-suggestions .list-group-item:hover {
-                                        background-color: #f0f0f0;
-                                    }
-                                </style>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Filter</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

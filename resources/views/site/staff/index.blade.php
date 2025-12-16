@@ -31,8 +31,6 @@
     </style>
     <div class="album py-5 bg-light">
         <div class="container">
-            <h3 class="text-center mb-4">Our Members</h3>
-
             <!-- Filter Section -->
             <div class="card shadow-sm mb-4 p-4">
                 <h4>Filter</h4>

@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 
 class StaffProfileController extends Controller
 {
@@ -181,6 +182,49 @@ class StaffProfileController extends Controller
             'averageRating',
             'app_flag'
         ));
+    }
+
+    /**
+     * Show a simple contact form for the staff member.
+     */
+    public function contact($id)
+    {
+        $user = User::findOrFail($id);
+        return view('site.staff.contact', compact('user'));
+    }
+
+    /**
+     * Handle contact form submission and send a simple email to the staff's email.
+     */
+    public function sendContact(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'message' => 'required|string',
+        ]);
+
+        // Send a plain text email to the staff member. If staff has no email, send to configured mail 'from'.
+        $to = $user->email ?: config('mail.from.address');
+
+        Mail::raw("Message from {$data['name']} ({$data['email']}):\n\n{$data['message']}", function ($m) use ($to) {
+            $m->to($to)->subject('Website Contact: New message from customer');
+        });
+
+        return redirect()->route('contact.staff', ['id' => $id])->with('success', 'Message sent successfully.');
+    }
+
+    /**
+     * List services belonging to a specific staff member.
+     */
+    public function servicesByStaff($id)
+    {
+        $user = User::findOrFail($id);
+        $services = $user->services()->where('status', 1)->get();
+
+        return view('site.staff.services', compact('user', 'services'));
     }
 
 

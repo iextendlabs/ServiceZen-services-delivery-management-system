@@ -1,93 +1,72 @@
 @extends('site.layout.app')
-<style>
-    .error-alert {
-    width: 100%;
-    padding: 9px 57px;
-    font-size: 80%;
-    color: #dc3545;
-    }
-    .success-alert {
-    width: 100%;
-    padding: 9px 57px;
-    font-size: 80%;
-    color: #199700;
-    }
-</style>
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
-                
-                @if(Session::has('error'))
-                    <span class="alert alert-danger" role="alert">
-                        <strong>{{ Session::get('error') }}</strong>
-                    </span>
-                @endif
-                @if(Session::has('success'))
-                <span class="alert alert-success" role="alert">
-                        <strong>{{ Session::get('success') }}</strong>
-                    </span>
-                @endif
-                <div class="card-body">
-                    <form method="POST" action="{{ route('customer.post-login') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
-
-                                
-                                <a class="btn btn-link" href="{{ route('customer.registration') }}">
-                                    Register
-                                </a><br>
-                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=Affiliate">
-                                    Register as Affiliate
-                                </a><br>
-                                <a class="btn btn-link" href="{{ route('customer.registration') }}?type=Freelancer">
-                                    Register as Freelancer
-                                </a><br>
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
-                </div>
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="p-6">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Welcome Back</h2>
+                <p class="text-sm text-gray-500 mt-1">Sign in to continue to your account</p>
             </div>
+
+            @if(Session::has('error'))
+                <div class="rounded-md bg-red-50 p-3 mb-4 text-sm text-red-700">{{ Session::get('error') }}</div>
+            @endif
+            @if(Session::has('success'))
+                <div class="rounded-md bg-green-50 p-3 mb-4 text-sm text-green-700">{{ Session::get('success') }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('customer.post-login') }}" class="space-y-4">
+                @csrf
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <div class="mt-1">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="email" autofocus class="w-full rounded-md border-gray-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                    </div>
+                    @error('email')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <div class="mt-1">
+                        <input id="password" name="password" type="password" required autocomplete="current-password" class="w-full rounded-md border-gray-200 shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                    </div>
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="inline-flex items-center text-sm">
+                        <input type="checkbox" name="remember" id="remember" class="rounded border-gray-200 text-indigo-600 shadow-sm" {{ old('remember') ? 'checked' : '' }}>
+                        <span class="ml-2 text-gray-600">Remember me</span>
+                    </label>
+
+                    @if (Route::has('password.request'))
+                        <a class="text-sm text-indigo-600 hover:underline" href="{{ route('password.request') }}">Forgot password?</a>
+                    @endif
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full inline-flex justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Login</button>
+                </div>
+
+                <div class="text-center text-sm text-gray-600">
+                    <span>Don't have an account?</span>
+                    <a href="{{ route('customer.registration') }}" class="text-indigo-600 hover:underline">Register</a>
+                </div>
+
+                <div class="pt-2 border-t mt-2">
+                    <div class="text-center text-sm text-gray-600 mb-2">Or register as</div>
+                    <div class="flex justify-center gap-3">
+                        <a href="{{ route('customer.registration') }}?type=Affiliate" class="text-sm text-indigo-600 hover:underline">Affiliate</a>
+                        <span class="text-gray-300">|</span>
+                        <a href="{{ route('customer.registration') }}?type=Freelancer" class="text-sm text-indigo-600 hover:underline">Freelancer</a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

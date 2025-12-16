@@ -1,711 +1,547 @@
 @extends('layouts.app')
+@section('content')
 <style>
-    .analytic {
-        line-height: 48px;
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f8;
     }
-
-    .analytic i {
-        font-size: 3rem;
-        opacity: 0.5;
+    .dribbble-card {
+      background-color: #fff;
+      border-radius: 16px;
+      border: 1px solid rgba(220, 220, 220, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease-in-out;
     }
-
-    .analytic span {
-        font-size: 2.5rem;
-        display: inline;
+    .dribbble-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     }
-    .staff-status .card {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 800;
     }
-    .staff-status .filter-btn.active {
-        font-weight: bold;
-        border-width: 2px;
+    .section-heading {
+      border-left: 4px solid #4f46e5;
+      padding-left: 0.5rem;
     }
-    .staff-status #staffSearch:focus {
-        box-shadow: none;
-        border-color: #86b7fe;
+    .bg-white-10 {
+        background-color: rgba(255, 255, 255, 0.1);
     }
-    .staff-status .input-group:focus-within {
-        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.25);
+    .bg-success-10 {
+        background-color: rgba(40, 167, 69, 0.1);
     }
-    .staff-status #clearAllFilters {
-        transition: all 0.2s ease;
-    }
-    .staff-status #clearAllFilters:hover {
-        background-color: #ffc107;
-        color: #212529;
-    }
-    .staff-status .input-group button {
-        border-left: none;
-    }
-    .staff-status .input-group button:last-child {
-        border-left: 1px solid #ced4da;
-    }
-    .hover-scale {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .hover-scale:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        cursor: pointer;
+    .bg-danger-10 {
+        background-color: rgba(220, 53, 69, 0.1);
     }
 </style>
-@section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <h2>Dashboard</h2>
-            </div>
-            <div class="col-md-6">
-                @if (auth()->user()->hasRole('Admin'))
-                    <a class="btn btn-success float-end" href="{{ route('appData') }}"> Refresh App</a>
-                    <a id="cacheClearBtn" class="btn btn-danger float-end mr-2" href="javascript:void(0)"> Cache Clear</a>
-                @endif
-                @if (auth()->user()->hasRole('Affiliate'))
-                    <a class="btn btn-success float-end" href="{{ route('affiliate_dashboard.index') }}">Affiliate DashBorad</a>
-                @endif
-            </div>
-            @if(isset(Auth::user()->affiliate_program) && Auth::user()->affiliate_program == 0)
-            <div class="alert alert-warning">
-                <span>Your request to join the affiliate program has been submitted and sent to the administrator for review.</span>
-            </div>
-            @endif
-            @if ($message = Session::get('success'))
-                <div class="alert alert-success">
-                    <span>{{ $message }}</span>
-                    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
 
-            @can('dashboard-report')
-                @if (auth()->user()->hasRole('Admin'))
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="row">
-                            <div class="col-md-6 mt-5">
-                                <div class="card">
-                                    <div class="card-header">TOTAL SALES</div>
-                                    <div class="card-body analytic">
-                                        <i class="fa fa-credit-card"></i>
-                                        <span class="float-md-end">@currency($sale,true)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-5">
-                                <div class="card">
-                                    <div class="card-header">TOTAL AFFILIATE COMMISSION</div>
-                                    <div class="card-body analytic">
-                                        <i class="fa fa-dollar-sign"></i>
-                                        <span class="float-md-end">@currency($affiliate_commission,true)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-5">
-                                <div class="card">
-                                    <div class="card-header">TOTAL STAFF COMMISSION</div>
-                                    <div class="card-body analytic">
-                                        <i class="fa fa-dollar-sign"></i>
-                                        <span class="float-md-end">@currency($staff_commission,true)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-5">
-                                <div class="card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <span>CRM Quotes Today</span>
-                                        <a href="{{ route('crms.index') }}" class="small text-primary text-decoration-none">See All</a>
-                                    </div>
-                                    <div class="card-body analytic">
-                                        <i class="fa fa-chart-bar"></i>
-                                        <span class="float-md-end">{{ $todayCrms }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <div class="card h-100"> <!-- Added h-100 for consistent height -->
-                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">Today's Application Report</span>
-                                <i class="fas fa-calendar-day"></i>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-4"> <!-- Added gutter spacing -->
-                                    <!-- Users Stats -->
-                                    <div class="col-12">
-                                        <div class="d-flex align-items-center p-2 bg-light rounded">
-                                            <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                                                <i class="fa fa-users text-white"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-bold">Total Registered Users</h6>
-                                                <p class="mb-0 fs-5">{{ $todayAppUser }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                    
-                                    <!-- Logged-in Users -->
-                                    <div class="col-12">
-                                        <div class="d-flex align-items-center p-2 bg-light rounded">
-                                            <div class="bg-success bg-opacity-10 p-2 rounded me-3">
-                                                <i class="fas fa-user-check text-white"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-bold">Active Users</h6>
-                                                <p class="mb-0 fs-5">{{ $todayLoginAppUser }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                    
-                                    <!-- Orders -->
-                                    <div class="col-12">
-                                        <div class="d-flex align-items-center p-2 bg-light rounded">
-                                            <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
-                                                <i class="fa fa-shopping-cart text-white"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-bold">Today's Orders</h6>
-                                                <p class="mb-0 fs-5">{{ $todayAppOrder }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                    
-                    
-                @endif
+<div class="container p-4">
+    @section('page_title')
+       <h3 class="font-weight-bold text-dark mt-2 text-center">Dashboard</h3>
+    @endsection
 
-                @if (auth()->user()->hasRole('Staff'))
-                    <div class="col-md-4 py-2">
-                        <div class="card">
-                            <div class="card-header">Salary</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-credit-card"></i>
-                                <span class="float-md-end">@currency(auth()->user()->staff->fix_salary,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 py-2">
-                        <div class="card">
-                            <div class="card-header">Total Balance</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-credit-card"></i>
-                                <span class="float-md-end">@currency($staff_total_balance,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 py-2">
-                        <div class="card">
-                            <div class="card-header">Product Sale of {{ now()->format('F') }}</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_product_sales,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 py-2">
-                        <div class="card">
-                            <div class="card-header">Total Bonus of {{ now()->format('F') }}</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_bonus,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 py-2">
-                        <div class="card">
-                            <div class="card-header">Total Order Commission of {{ now()->format('F') }}</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_order_commission,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 py-2">
-                        <div class="card">
-                            <div class="card-header">Other Income of {{ now()->format('F') }}</div>
-                            <div class="card-body analytic">
-                                <i class="fa fa-dollar-sign"></i>
-                                <span class="float-md-end">@currency($staff_other_income,true)</span>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @endcan
-        </div>
-        @if(auth()->user()->hasRole('Admin'))
-        <div class="row mt-3">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <span><i class="fas fa-user-plus mr-2"></i> New Joinee Report</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Freelancers Section -->
-                            <div class="col-md-6">
-                                <div class="card mb-3 mb-md-0">
-                                    <div class="card-header bg-transparent">
-                                        <h6 class="mb-0"><i class="fas fa-user-tie mr-1 text-primary"></i> Freelancers</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row text-center">
-                                            <div class="col-3">
-                                                <a href="{{ route('freelancerProgram.index') }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #f8f9fa;">
-                                                        <div class="h4 text-primary mb-0">{{ $totalFreelancer }}</div>
-                                                        <small class="text-muted">Total</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-3">
-                                                <a href="{{ route('freelancerProgram.index', ['status' => '2']) }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cfe3fc">
-                                                        <div class="h4 text-danger mb-0">{{ $newFreelancer }}</div>
-                                                        <small class="text-muted">New</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-3">
-                                                <a href="{{ route('freelancerProgram.index', ['status' => '1']) }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cffccf;">
-                                                        <div class="h4 text-success mb-0">{{ $acceptedFreelancer }}</div>
-                                                        <small class="text-muted">Accepted</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-3">
-                                                <a href="{{ route('freelancerProgram.index', ['status' => '0']) }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #fccfcf">
-                                                        <div class="h4 text-danger mb-0">{{ $rejectedFreelancer }}</div>
-                                                        <small class="text-muted">Rejected</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Affiliates Section -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header bg-transparent">
-                                        <h6 class="mb-0"><i class="fas fa-handshake mr-1 text-info"></i> Affiliates</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row text-center">
-                                            <div class="col-3">
-                                                <a href="{{ route('affiliateProgram.index') }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #f8f9fa;">
-                                                        <div class="h4 text-primary mb-0">{{ $totalAffiliate }}</div>
-                                                        <small class="text-muted">Total</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-3">
-                                                <a href="{{ route('affiliateProgram.index', ['status' => '2']) }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cfe3fc;">
-                                                        <div class="h4 text-danger mb-0">{{ $newAffiliate }}</div>
-                                                        <small class="text-muted">New</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-3">
-                                                <a href="{{ route('affiliateProgram.index', ['status' => '1']) }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #cffccf;">
-                                                        <div class="h4 text-success mb-0">{{ $acceptedAffiliate }}</div>
-                                                        <small class="text-muted">Accepted</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <div class="col-3">
-                                                <a href="{{ route('affiliateProgram.index', ['status' => '0']) }}" class="text-decoration-none">
-                                                    <div class="p-3 border rounded hover-scale" style="background-color: #fccfcf">
-                                                        <div class="h4 text-danger mb-0">{{ $rejectedAffiliate }}</div>
-                                                        <small class="text-muted">Rejected</small>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-<div class="row pt-3 staff-status">
-
-    
-    <div class="col-md-12">
-        <div class="row g-3">
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body">
-                        <h6 class="card-title text-muted mb-2">Total Staff</h6>
-                        <h3 class="card-text fw-bold text-primary">{{ $staffs->total() }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title text-muted mb-2">Online</h6>
-                            <h3 class="card-text fw-bold text-success">{{ $onlineCount }}</h3>
-                        </div>
-                        <div>
-                            <h6 class="card-title text-muted mb-2">Offline</h6>
-                            <h3 class="card-text fw-bold text-danger">{{ $offlineCount }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-12">
-                <div class="card d-block text-start h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-danger mb-0">Staff with No Zone</h6>
-                                <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="text-muted text-decoration-none">Click to view</a>
-                            </div>
-                            <span class="badge bg-danger rounded-pill fs-6">{{ $unassignedZoneCount }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-12 mt-3">
-                <div class="card d-block text-start h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-danger mb-0">Staff with No TimeSlot</h6>
-                                <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="text-muted text-decoration-none">Click to view</a>
-                            </div>
-                            <span class="badge bg-danger rounded-pill fs-6">{{ $unassignedTimeSlotCount }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    @if(isset(Auth::user()->affiliate_program) && Auth::user()->affiliate_program == 0)
+    <div class="alert alert-warning">
+        <span>Your request to join the affiliate program has been submitted and sent to the administrator for review.</span>
     </div>
-</div>
-        @endif
-        @if(auth()->user()->hasRole('Supervisor'))
-        <div class="row pt-3">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">Staffs</div>
-                    <div class="card-body">
-                        <div class="row">
-                            @php
-                                // Get the supervisor staff IDs
-                                $supervisorStaffIds = auth()->user()->getSupervisorStaffIds(); // Assuming you're using auth to get current user
-                            @endphp
-        
-                            @forelse ($staffs->whereIn('id', $supervisorStaffIds) as $staff)
-                                @if ($staff->staff) {{-- Ensure staff relationship exists --}}
-                                    <div class="col-md-3 mb-3"> <!-- 4 per row -->
-                                        <li class="list-group-item">
-                                            {{ $staff->name }}
-                                        </li>
-                                    </div>
-                                @endif
-                            @empty
-                                <li class="list-group-item text-center">No staff available.</li>
-                            @endforelse
+    @endif
+    @if ($message = Session::get('success'))
+        <div class="alert alert-success">
+            <span>{{ $message }}</span>
+            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @can('dashboard-report')
+        @if (auth()->user()->hasRole('Admin'))
+        <!-- Financial Metrics -->
+        <section class="mb-5">
+            <h2 class="h3 text-secondary mb-4 section-heading">Financial Performance</h2>
+            <div class="row">
+                <div class="col-sm-6 col-lg-3 mb-4">
+                    <div class="dribbble-card p-4">
+                        <p class="text-uppercase small text-muted mb-3">Total Sales</p>
+                        <div class="d-flex justify-content-between align-items-end">
+                            <p class="metric-value text-danger">@currency($sale,true)</p>
+                            <i data-lucide="line-chart" class="w-8 h-8 text-danger" style="opacity:0.6"></i>
                         </div>
                     </div>
                 </div>
+
+                <div class="col-sm-6 col-lg-3 mb-4">
+                    <div class="dribbble-card p-4">
+                        <p class="text-uppercase small text-muted mb-3">Affiliate Commission</p>
+                        <div class="d-flex justify-content-between align-items-end">
+                            <p class="metric-value text-success">@currency($affiliate_commission,true)</p>
+                            <i data-lucide="user-check" class="text-success" style="opacity:0.6"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3 mb-4">
+                    <div class="dribbble-card p-4">
+                        <p class="text-uppercase small text-muted mb-3">Staff Commission</p>
+                        <div class="d-flex justify-content-between align-items-end">
+                            <p class="metric-value text-primary">@currency($staff_commission,true)</p>
+                            <i data-lucide="users" class="text-primary" style="opacity:0.6"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3 mb-4">
+                    <div class="dribbble-card p-3">
+                            <p class="text-uppercase small text-muted mb-3">CRM Quotes Today</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-warning">{{ $todayCrms }}</p>
+                                <i data-lucide="file-text" class="text-warning" style="opacity:0.6"></i>
+                            </div>
+                            <a href="{{ route('crms.index') }}" class="small text-warning font-weight-bold d-block mt-2">See All Quotes →</a>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- User & Orders & Staff -->
+        <section class="row mb-5">
+            <div class="col-lg-4 mb-4">
+                <h2 class="h3 text-secondary mb-4 section-heading">User & Order Today</h2>
+                <div class="mb-4 dribbble-card text-center p-4">
+                    <i data-lucide="users-2" class="mb-3 text-muted"></i>
+                    <p class="text-uppercase small text-muted">Total Registered Users</p>
+                    <p class="display-4 font-weight-bold text-dark">{{ $todayAppUser }}</p>
+                </div>
+                <div class="mb-4 dribbble-card text-center p-4">
+                    <i data-lucide="zap" class="mb-3 text-muted"></i>
+                    <p class="text-uppercase small text-muted">Active Users</p>
+                    <p class="display-4 font-weight-bold text-dark">{{ $todayLoginAppUser }}</p>
+                </div>
+                <div class="dribbble-card text-center p-4">
+                    <i data-lucide="shopping-cart" class="mb-3 text-muted"></i>
+                    <p class="text-uppercase small text-muted">Today's Orders</p>
+                    <p class="display-4 font-weight-bold text-dark">{{ $todayAppOrder }}</p>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <h2 class="h3 text-secondary mb-4 section-heading">New Joinee Report</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="dribbble-card p-4 text-white" style="background: linear-gradient(135deg, #6366f1, #4338ca);">
+                            <div class="d-flex justify-content-between">
+                                <h3 class="h5 font-weight-bold"><i data-lucide="monitor" class="mr-2"></i> Freelancers</h3>
+                                <a href="{{ route('freelancerProgram.index') }}" class="badge badge-light">Total {{ $totalFreelancer }}</a>
+                            </div>
+                            <div class="row text-center mt-4">
+                                <div class="col p-2 bg-white-10 rounded">
+                                    <a href="{{ route('freelancerProgram.index', ['status' => '2']) }}" class="text-white text-decoration-none">
+                                        <p class="h3 font-weight-bold">{{ $newFreelancer }}</p>
+                                        <small>New</small>
+                                    </a>
+                                </div>
+                                <div class="col p-2 bg-white-10 rounded">
+                                    <a href="{{ route('freelancerProgram.index', ['status' => '1']) }}" class="text-white text-decoration-none">
+                                        <p class="h3 font-weight-bold">{{ $acceptedFreelancer }}</p>
+                                        <small>Accepted</small>
+                                    </a>
+                                </div>
+                                <div class="col p-2 bg-white-10 rounded">
+                                    <a href="{{ route('freelancerProgram.index', ['status' => '0']) }}" class="text-white text-decoration-none">
+                                        <p class="h3 font-weight-bold">{{ $rejectedFreelancer }}</p>
+                                        <small>Rejected</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="dribbble-card p-4 text-white" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">
+                            <div class="d-flex justify-content-between">
+                                <h3 class="h5 font-weight-bold"><i data-lucide="link" class="mr-2"></i> Affiliates</h3>
+                                <a href="{{ route('affiliateProgram.index') }}" class="badge badge-light">Total {{ $totalAffiliate }}</a>
+                            </div>
+                            <div class="row text-center mt-4">
+                                <div class="col p-2">
+                                    <a href="{{ route('affiliateProgram.index', ['status' => '2']) }}" class="text-white text-decoration-none">
+                                        <p class="h3 font-weight-bold">{{ $newAffiliate }}</p>
+                                        <small>New</small>
+                                    </a>
+                                </div>
+                                <div class="col p-2">
+                                    <a href="{{ route('affiliateProgram.index', ['status' => '1']) }}" class="text-white text-decoration-none">
+                                        <p class="h3 font-weight-bold">{{ $acceptedAffiliate }}</p>
+                                        <small>Accepted</small>
+                                    </a>
+                                </div>
+                                <div class="col p-2">
+                                    <a href="{{ route('affiliateProgram.index', ['status' => '0']) }}" class="text-white text-decoration-none">
+                                        <p class="h3 font-weight-bold">{{ $rejectedAffiliate }}</p>
+                                        <small>Rejected</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="h3 text-secondary mb-4 section-heading">Staff Availability</h2>
+                <div class="dribbble-card p-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                        <p class="text-muted mb-0">Total Staff Count</p>
+                        <span class="display-4 font-weight-bold text-dark">{{ $staffs->total() }}</span>
+                    </div>
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between align-items-center bg-success-10 p-3 mb-2 rounded">
+                            <div class="text-success font-weight-bold d-flex align-items-center">
+                                <i data-lucide="check-circle" class="mr-2"></i> Online
+                            </div>
+                            <span class="h5 mb-0 text-dark">{{ $onlineCount }}</span>
+                        </li>
+                        <li class="d-flex justify-content-between align-items-center bg-danger-10 p-3 mb-2 rounded">
+                            <div class="text-danger font-weight-bold d-flex align-items-center">
+                                <i data-lucide="x-circle" class="mr-2"></i> Offline
+                            </div>
+                            <span class="h5 mb-0 text-dark">{{ $offlineCount }}</span>
+                        </li>
+                    </ul>
+                    <div class="border-top pt-3 mt-3">
+                        <a href="{{ route('serviceStaff.index', ['assignedZone' => 1]) }}" class="d-flex justify-content-between align-items-center text-primary font-weight-bold">
+                            Staff with No Zone
+                            <span class="badge badge-primary">{{ $unassignedZoneCount }}</span>
+                        </a>
+                        <a href="{{ route('serviceStaff.index', ['assignedTimeSlot' => 1]) }}" class="d-flex justify-content-between align-items-center text-primary font-weight-bold mt-2">
+                            Staff with No TimeSlot
+                            <span class="badge badge-primary">{{ $unassignedTimeSlotCount }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
         @endif
 
-        @if(auth()->user()->hasRole('Manager'))
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">Supervisor and Their Staff</div>
-                    <div class="card-body">
-                        @if(count(auth()->user()->managerSupervisors) > 0)
-                            @foreach (auth()->user()->managerSupervisors as $managerSupervisor)
-                                @php
-                                    $supervisor = $managerSupervisor->supervisor;
-                                    $supervisorStaffIds = $supervisor ? $supervisor->getSupervisorStaffIds() : [];
-                                @endphp
-        
-                                @if ($supervisor)
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <strong>Supervisor:</strong> {{ $supervisor->name }}
-                                        </div>
-                                    </div>
-        
-                                    @if (count($supervisorStaffIds) > 0)
-                                        @php
-                                            $chunkedStaff = $staffs->whereIn('id', $supervisorStaffIds)->chunk(4);
-                                        @endphp
-        
-                                        @foreach ($chunkedStaff as $staffGroup)
-                                            <div class="col-md-12">
-                                                <div class="row">
-                                                    @foreach ($staffGroup as $staff)
-                                                        @if ($staff->staff)
-                                                            <div class="col-md-3 mb-3">
-                                                                <div class="list-group-item">
-                                                                    {{ $staff->name }}
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
+        @if (auth()->user()->hasRole('Staff'))
+            <section class="mb-5">
+                <h2 class="h3 text-secondary mb-4 section-heading">Staff Dashboard</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="dribbble-card p-4">
+                            <p class="text-uppercase small text-muted mb-3">Salary</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-primary">@currency(auth()->user()->staff->fix_salary,true)</p>
+                                <i data-lucide="wallet" class="text-primary" style="opacity:0.6"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="dribbble-card p-4">
+                            <p class="text-uppercase small text-muted mb-3">Total Balance</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-primary">@currency($staff_total_balance,true)</p>
+                                <i data-lucide="credit-card" class="text-primary" style="opacity:0.6"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="dribbble-card p-4">
+                            <p class="text-uppercase small text-muted mb-3">Product Sale of {{ now()->format('F') }}</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-success">@currency($staff_product_sales,true)</p>
+                                <i data-lucide="dollar-sign" class="text-success" style="opacity:0.6"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="dribbble-card p-4">
+                            <p class="text-uppercase small text-muted mb-3">Total Bonus of {{ now()->format('F') }}</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-success">@currency($staff_bonus,true)</p>
+                                <i data-lucide="award" class="text-success" style="opacity:0.6"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="dribbble-card p-4">
+                            <p class="text-uppercase small text-muted mb-3">Total Order Commission of {{ now()->format('F') }}</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-success">@currency($staff_order_commission,true)</p>
+                                <i data-lucide="briefcase" class="text-success" style="opacity:0.6"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="dribbble-card p-4">
+                            <p class="text-uppercase small text-muted mb-3">Other Income of {{ now()->format('F') }}</p>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <p class="metric-value text-success">@currency($staff_other_income,true)</p>
+                                <i data-lucide="trending-up" class="text-success" style="opacity:0.6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
+    @endcan
+
+    @if(auth()->user()->hasRole('Supervisor'))
+    <section class="mb-5">
+        <h2 class="h3 text-secondary mb-4 section-heading">My Staff</h2>
+        <div class="dribbble-card p-4">
+            <div class="row">
+                @php
+                    $supervisorStaffIds = auth()->user()->getSupervisorStaffIds();
+                @endphp
+                @forelse ($staffs->whereIn('id', $supervisorStaffIds) as $staff)
+                    @if ($staff->staff)
+                        <div class="col-md-3 mb-3">
+                            <div class="p-3 border rounded text-center">
+                                <i data-lucide="user" class="mb-2"></i>
+                                <div>{{ $staff->name }}</div>
+                            </div>
+                        </div>
+                    @endif
+                @empty
+                    <div class="col-12 text-center text-muted py-5">No staff available.</div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+    @endif
+
+    @if(auth()->user()->hasRole('Manager'))
+    <section class="mb-5">
+        <h2 class="h3 text-secondary mb-4 section-heading">Supervisor and Staff</h2>
+        <div class="dribbble-card p-4">
+            @if(count(auth()->user()->managerSupervisors) > 0)
+                @foreach (auth()->user()->managerSupervisors as $managerSupervisor)
+                    @php
+                        $supervisor = $managerSupervisor->supervisor;
+                        $supervisorStaffIds = $supervisor ? $supervisor->getSupervisorStaffIds() : [];
+                    @endphp
+
+                    @if ($supervisor)
+                        <div class="mb-4">
+                            <h5 class="font-weight-bold d-flex align-items-center"><i data-lucide="user-check" class="mr-2"></i> Supervisor: {{ $supervisor->name }}</h5>
+                            @if (count($supervisorStaffIds) > 0)
+                                <div class="row mt-3">
+                                    @foreach ($staffs->whereIn('id', $supervisorStaffIds) as $staff)
+                                        @if ($staff->staff)
+                                            <div class="col-md-3 mb-3">
+                                                <div class="p-3 border rounded text-center">
+                                                    <i data-lucide="user" class="mb-2"></i>
+                                                    <div>{{ $staff->name }}</div>
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-muted">No staff available for this supervisor.</p>
+                            @endif
+                        </div>
+                    @else
+                        <p class="text-muted">No supervisor available.</p>
+                    @endif
+                @endforeach
+            @else
+                <p class="text-muted">No supervisors available for this manager.</p>
+            @endif
+        </div>
+    </section>
+    @endif
+
+    @if(auth()->user()->hasRole('Staff'))
+    <section class="mb-5">
+        <h2 class="h3 text-secondary mb-4 section-heading">My Commissions</h2>
+        <div class="dribbble-card p-4">
+            @if(isset(auth()->user()->staff) && auth()->user()->staff->commission)
+                <div class="alert alert-info">
+                    <strong>Global Commission:</strong> {{ auth()->user()->staff->commission }}% applied.
+                </div>
+            @endif
+
+            @if(auth()->user()->affiliateCategories->isNotEmpty())
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Category</th>
+                            <th>Services</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(auth()->user()->affiliateCategories as $category)
+                            <tr>
+                                <td>{{ $category->category->title }}</td>
+                                <td>
+                                    @if($category->services->isNotEmpty())
+                                        <table class="table table-sm table-bordered mb-2">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Service</th>
+                                                    <th>Commission</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($category->services as $service)
+                                                    <tr>
+                                                        <td>{{ $service->service->name }}</td>
+                                                        <td>
+                                                            {{ $service->commission ?: auth()->user()->staff->commission }}
+                                                            {{ $service->commission_type == 'percentage' ? '%' : 'Fixed' }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <div class="alert alert-info p-2">
+                                            {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all other services.
+                                        </div>
                                     @else
-                                        <div class="row mb-3">
-                                            <div class="col-md-12">
-                                                <em>No staff available for this supervisor.</em>
-                                            </div>
+                                        <div class="alert alert-info p-2">
+                                            {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all services.
                                         </div>
                                     @endif
-                                @else
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <em>No supervisor available.</em>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-                        @else
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <em>No supervisor available for this manager.</em>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-        
-        @if(auth()->user()->hasRole('Staff'))
-        <div class="row py-5">
-            <div class="col-md-12">
-                <h4>Staff Commissions</h4>
-        
-                @if(isset(auth()->user()->staff) && auth()->user()->staff->commission)
-                    <div class="alert alert-info">
-                        <strong>Global Commission:</strong> {{ auth()->user()->staff->commission }}% 
-                        applied.
-                    </div>
-                @endif
-        
-                @if(auth()->user()->affiliateCategories->isNotEmpty()) 
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Services</th>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(auth()->user()->affiliateCategories as $category)
-                                <tr>
-                                    <td>{{ $category->category->title }}</td>
-                                    <td>
-                                        @if($category->services->isNotEmpty())
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Service</th>
-                                                        <th>Service Commission</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($category->services as $service)
-                                                        <tr>
-                                                            <td>{{ $service->service->name }}</td>
-                                                            <td>
-                                                                {{ $service->commission ?: auth()->user()->staff->commission }} 
-                                                                {{ $service->commission_type == 'percentage' ? '%' : 'Fixed' }}
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                            <div class="alert alert-info">
-                                                {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all other services.
-                                            </div>
-                                        @else
-                                            <div class="alert alert-info">
-                                                {{ $category->commission }} {{ $category->commission_type == 'percentage' ? '%' : 'Fixed' }} commission on all services.
-                                            </div>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @elseif(!isset(auth()->user()->staff) || !auth()->user()->staff->commission)
-                    <div class="alert alert-warning">
-                        No commissions available.
-                    </div>
-                @endif
-            </div>
-        </div>        
-        @endcan
-        @can('order-list')
-            <div class="py-2"></div>
-            <div class="row">
-                <div class="col-md-12 text-center mb-3">
-                    <h2>Orders | Today's Bookings  {{ $orderCountToday }}</h2>
+                        @endforeach
+                    </tbody>
+                </table>
+            @elseif(!isset(auth()->user()->staff) || !auth()->user()->staff->commission)
+                <div class="alert alert-warning text-center">
+                    No commissions available.
                 </div>
-                <div class="col-md-12 mb-3">
-                    <div class="d-flex flex-wrap justify-content-md-end">
-                        @if (!auth()->user()->hasRole('Supervisor'))
-                            @can('order-download')
-                                <a class="btn btn-danger mb-2" href="/orders?print=1"><i class="fa fa-print"></i> PDF</a>
-                                <a href="/orders?csv=1" class="btn btn-success mb-2 ms-md-2"><i class="fa fa-download"></i>
-                                    Excel</a>
-                            @endcan
-                        @endif
+            @endif
+        </div>
+    </section>
+    @endif
 
-                        @if (auth()->user()->hasRole('Admin'))
-                            <a class="btn btn-secondary mb-2 ms-md-2" href="/orders">
-                                <i class="fas fa-list"></i> All
-                            </a>
-                            <a class="btn btn-danger mb-2 ms-md-2" href="/orders?status=Canceled">
-                                <i class="fas fa-times"></i> Canceled
-                            </a>
-                        @endif
-
-                        @if (!auth()->user()->hasRole('Staff'))
-                            <a class="btn btn-primary mb-2 ms-md-2" href="/orders?status=Pending">
-                                <i class="fas fa-clock"></i> Pending
-                            </a>
-                            <a class="btn btn-warning mb-2 ms-md-2" href="/orders?status=Rejected">
-                                <i class="fas fa-times"></i> Rejected
-                            </a>
-                            <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Inprogress">
-                                <i class="fas fa-hourglass-split"></i> Inprogress
-                            </a>
-                            <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Complete">
-                                <i class="fas fa-check"></i> Complete
-                            </a>
-                            <a class="btn btn-success mb-2 ms-md-2" href="/orders?status=Accepted">
-                                <i class="fas fa-check"></i> Accepted
-                            </a>
-                            <a class="btn btn-info mb-2 ms-md-2" href="/orders?status=Confirm">
-                                <i class="fas fa-check"></i> Confirm
-                            </a>
-                        @endif
-
-                        
-
-                        @can('order-create')
-                            <a class="btn btn-success mb-2 ms-md-2" href="{{ route('orders.create') }}">
-                                <i class="fas fa-plus"></i> Create Order
-                            </a>
-                        @endcan
-                        <a class="btn btn-warning mb-2 ms-md-2"
-                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true">
-                            <i class="fas fa-calendar"></i> Todays Drop Order
-                        </a>
-                        <a class="btn btn-danger mb-2 ms-md-2"
-                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Canceled">
-                            <i class="fas fa-calendar"></i> Todays Canceled Order
-                        </a>
-                        <a class="btn btn-success mb-2 ms-md-2"
-                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete">
-                            <i class="fas fa-calendar"></i> Todays Complete Order
-                        </a>
-                        <a class="btn btn-secondary mb-2 ms-md-2"
-                            href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}">
-                            <i class="fas fa-calendar"></i> Todays Order
-                        </a>
+    @can('order-list')
+    <section>
+        <h2 class="h3 text-secondary mb-4 section-heading">Today's Bookings ({{ $orderCountToday }})</h2>
+        <div class="dribbble-card p-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" id="staffSearch" class="form-control" placeholder="Search orders...">
+                        <div class="input-group-append">
+                            <button id="searchButton" class="btn btn-primary" type="button"><i data-lucide="search"></i></button>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="d-flex flex-wrap justify-content-end">
+                    @can('order-create')
+                        <a class="btn btn-primary btn-sm mb-2 mr-2" href="{{ route('orders.create') }}"><i data-lucide="plus" class="mr-1"></i> Create Order</a>
+                    @endcan
 
+                    <div class="dropdown mb-2 mr-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="exportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i data-lucide="download" class="mr-1"></i> Export
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="exportDropdown">
+                            <a class="dropdown-item" href="/orders?print=1"><i data-lucide="file-text" class="mr-1"></i> PDF</a>
+                            <a class="dropdown-item" href="/orders?csv=1"><i data-lucide="file-spreadsheet" class="mr-1"></i> Excel</a>
+                        </div>
+                    </div>
+                    <div class="dropdown mb-2 mr-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="todayViewsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i data-lucide="calendar-day" class="mr-1"></i> Today's Views
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="todayViewsDropdown">
+                            <a class="dropdown-item" href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}"><i data-lucide="calendar-clock" class="mr-1"></i> All Today's Orders</a>
+                            <a class="dropdown-item" href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&driver_dropped=true"><i data-lucide="calendar" class="mr-1"></i> Dropped Orders</a>
+                            <a class="dropdown-item" href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Canceled"><i data-lucide="calendar-x" class="mr-1"></i> Canceled Orders</a>
+                            <a class="dropdown-item" href="{{ route('orders.index') }}?appointment_date={{ date('Y-m-d') }}&status=Complete"><i data-lucide="calendar-check" class="mr-1"></i> Completed Orders</a>
+                        </div>
+                    </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            @include('orders.list')
+                    <div class="dropdown mb-2 mr-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="statusFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i data-lucide="filter" class="mr-1"></i> Filter by Status
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="statusFilterDropdown">
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a class="dropdown-item" href="/orders"><i data-lucide="list" class="mr-1"></i> All</a>
+                                <a class="dropdown-item" href="/orders?status=Canceled"><i data-lucide="x" class="mr-1"></i> Canceled</a>
+                            @endif
+                            @if (!auth()->user()->hasRole('Staff'))
+                                <a class="dropdown-item" href="/orders?status=Pending"><i data-lucide="clock" class="mr-1"></i> Pending</a>
+                                <a class="dropdown-item" href="/orders?status=Rejected"><i data-lucide="x-circle" class="mr-1"></i> Rejected</a>
+                                <a class="dropdown-item" href="/orders?status=Inprogress"><i data-lucide="hourglass" class="mr-1"></i> Inprogress</a>
+                                <a class="dropdown-item" href="/orders?status=Complete"><i data-lucide="check-circle" class="mr-1"></i> Complete</a>
+                                <a class="dropdown-item" href="/orders?status=Accepted"><i data-lucide="check" class="mr-1"></i> Accepted</a>
+                                <a class="dropdown-item" href="/orders?status=Confirm"><i data-lucide="check-check" class="mr-1"></i> Confirm</a>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
-        @endcan
-    </div>
-    <script>
-        $(document).ready(function() {
-            $('#searchButton').on('click', function(e) {
-                if (e.type === 'click') {
-                    updateSearch();
-                }
-            });
-            
-            $('.filter-btn').on('click', function() {
-                const filter = $(this).data('filter');
-                $('.filter-btn').removeClass('active');
-                $(this).addClass('active');
-                updateSearch(filter === 'all' ? '' : filter);
-            });
-            
-            // Clear search input
-            $('#clearButton').on('click', function() {
-                $('#staffSearch').val('');
-                updateSearch();
-            });
-            
-            // Clear all filters
-            $('#clearAllFilters').on('click', function() {
-                window.location.href = window.location.pathname;
-            });
-            
-            // Cache Clear AJAX
-            $('#cacheClearBtn').on('click', function() {
-                var req1 = $.ajax({
-                    url: '/delete-lipslay-cache',
-                    type: 'GET'
-                });
-                var req2 = $.ajax({
-                    url: '/clear-cache',
-                    type: 'GET'
-                });
+            <div class="table-responsive">
+                @include('orders.list')
+            </div>
+        </div>
+    </section>
+    @endcan
+</div>
 
-                $.when(req1, req2).done(function(r1, r2) {
-                    alert('Cache cleared successfully!');
-                }).fail(function() {
-                    alert('Failed to clear cache.');
-                });
-            });
-            
-            function updateSearch(status = '{{ request('status') }}') {
-                const search = $('#staffSearch').val();
-                const params = new URLSearchParams(window.location.search);
-                
-                if (search) params.set('search', search);
-                else params.delete('search');
-                
-                if (status) params.set('status', status);
-                else params.delete('status');
-                
-                params.delete('page'); // Reset to first page when filtering
-                
-                window.location.href = window.location.pathname + '?' + params.toString();
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Your existing script logic
+        $('#searchButton').on('click', function(e) {
+            if (e.type === 'click') {
+                updateSearch();
             }
         });
-    </script>
+
+        $('.filter-btn').on('click', function() {
+            const filter = $(this).data('filter');
+            $('.filter-btn').removeClass('active');
+            $(this).addClass('active');
+            updateSearch(filter === 'all' ? '' : filter);
+        });
+
+        $('#clearButton').on('click', function() {
+            $('#staffSearch').val('');
+            updateSearch();
+        });
+
+        $('#clearAllFilters').on('click', function() {
+            window.location.href = window.location.pathname;
+        });
+
+        $('#cacheClearBtn').on('click', function() {
+            var req1 = $.ajax({
+                url: '/delete-lipslay-cache',
+                type: 'GET'
+            });
+            var req2 = $.ajax({
+                url: '/clear-cache',
+                type: 'GET'
+            });
+
+            $.when(req1, req2).done(function(r1, r2) {
+                alert('Cache cleared successfully!');
+            }).fail(function() {
+                alert('Failed to clear cache.');
+            });
+        });
+
+        function updateSearch(status = '{{ request('status') }}') {
+            const search = $('#staffSearch').val();
+            const params = new URLSearchParams(window.location.search);
+
+            if (search) params.set('search', search);
+            else params.delete('search');
+
+            if (status) params.set('status', status);
+            else params.delete('status');
+
+            params.delete('page');
+
+            window.location.href = window.location.pathname + '?' + params.toString();
+        }
+    });
+</script>
 @endsection

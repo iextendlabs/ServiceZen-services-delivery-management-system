@@ -131,7 +131,7 @@ class ServiceController extends Controller
         request()->validate([
             'name' => 'required|unique:services,name',
             'price' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'categoriesId' => 'required',
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',
@@ -313,7 +313,7 @@ class ServiceController extends Controller
         request()->validate([
             'name' => 'required|unique:services,name,' . $id,
             'price' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=1005,height=600',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'categoriesId' => 'required',
             'meta_title' => 'required|string|max:60',
             'meta_description' => 'nullable|string|max:160',

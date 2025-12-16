@@ -620,12 +620,15 @@ class ServiceStaffController extends Controller
             $images = $request->gallery_images;
 
             foreach ($images as $image) {
+                if ($image->getError() == UPLOAD_ERR_INI_SIZE) {
+                    return back()->withErrors(['gallery_images' => 'The image exceeds the maximum allowed size of 2MB.']);
+                }
                 $filename = mt_rand() . '.' . $image->getClientOriginalExtension();
 
                 $image->move(public_path('staff-images'), $filename);
                 StaffImages::create([
                     'image' => $filename,
-                    'staff_id' => $id,
+                    'staff_id' => $id
                 ]);
             }
         }

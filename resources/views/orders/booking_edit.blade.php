@@ -1,7 +1,6 @@
 @extends('layouts.app')
-<link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 @section('content')
-<div class="container">
+<div class="container px-3">
     <div class="row">
         <div class="col-md-12 py-5 text-center">
             <h2>Edit Order Time Slots</h2>

@@ -2,44 +2,108 @@
 @section('content')
 
     <div class="container">
-        <div class="row">
-            <div class="col-md-lg-12 margin-tb">
-                <div class="float-start">
-                    <h2>Users Management ({{ $total_user }})</h2>
-                </div>
-                <div class="float-end">
-                    @can('user-create')
-                        <a class="btn btn-success" href="{{ route('users.create') }}"> Create New User</a>
-                    @endcan
-                </div>
-            </div>
-        </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
                 <span>{{ $message }}</span>
                 <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <hr>
         <div class="row">
-            <div class="col-md-9">
-                <table class="table table-striped table-bordered">
-                    <tr>
+            <div class="col-md-12 mb-3">
+                <div class="card mb-3">
+                    <div class="card-header bg-white mb-3 d-flex align-items-center justify-content-between">
+                        <div class="float-start">
+                            <h3>Filter</h3>
+                        </div>
+                        <div class="float-end">
+                            @can('user-create')
+                                <a class="btn text-dark" href="{{ route('users.create') }}"><i class="fa fa-plus"></i> Create New User</a>
+                            @endcan
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('users.index') }}" method="GET" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Name:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-user text-muted"></i></span>
+                                            </div>
+                                            <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control"
+                                                placeholder="Name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group position-relative">
+                                        <label class="small text-muted font-weight-medium mb-1">Email:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-envelope text-muted"></i></span>
+                                            </div>
+                                            <input type="email" name="email" id="email-autocomplete" value="{{ $filter['email'] }}" class="form-control" autocomplete="off">
+                                            <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                            <style>
+                                                #email-suggestions .list-group-item {
+                                                    cursor: pointer !important;
+                                                }
+                                                #email-suggestions .list-group-item:hover {
+                                                    background-color: #f0f0f0;
+                                                }
+                                            </style>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Role:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-clock text-muted"></i></span>
+                                            </div>
+                                            <select name="role" class="form-control">
+                                                <option></option>
+                                                @foreach ($roles as $role)
+                                                    @if ($role->name == $filter['role'])
+                                                        <option value="{{ $role->name }}" selected>{{ $role->name }}</option>
+                                                    @else
+                                                        <option value="{{ $role->name }}">{{ $role->name }}</option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold"><i class="fa fa-filter"></i> Apply Filter</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+            </div>            
+            <div class="col-md-12 px-1">
+                <div class="d-flex align-items-center justify-content-between my-2">
+                    <h2>Users Management ({{ $total_user }})</h2>
+                </div>
+                <table class="table table-bordered">
+                    <tr class="bg-white">
                         <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('users.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('users.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a></i>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('users.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('users.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a></i>
                             @if (request('sort') === 'email')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('users.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc', 'table' => 'role'])) }}">Roles</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('users.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc', 'table' => 'role'])) }}">Roles</a></i>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -63,7 +127,7 @@
                                 <td>
                                     <form id="deleteForm{{ $user->id }}"
                                         action="{{ route('users.destroy', $user->id) }}" method="POST">
-                                        <a class="btn btn-warning" href="{{ route('users.show', $user->id) }}"><i
+                                        <a class="btn text-dark" href="{{ route('users.show', $user->id) }}"><i
                                                 class="fa fa-eye"></i></a>
                                         {{-- @can('user-edit')
                                             <a class="btn btn-primary" href="{{ route('users.edit', $user->id) }}"><i
@@ -73,7 +137,7 @@
                                         @method('DELETE')
                                         @can('user-delete')
                                             <button type="button" onclick="confirmDelete('{{ $user->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                                class="btn text-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -87,54 +151,6 @@
                 </table>
                 {!! $data->links() !!}
 
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('users.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control"
-                                    placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter['email'] }}" class="form-control" autocomplete="off">
-                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
-                                <style>
-                                    #email-suggestions .list-group-item {
-                                        cursor: pointer !important;
-                                    }
-                                    #email-suggestions .list-group-item:hover {
-                                        background-color: #f0f0f0;
-                                    }
-                                </style>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Role:</strong>
-                                <select name="role" class="form-control">
-                                    <option></option>
-                                    @foreach ($roles as $role)
-                                        @if ($role->name == $filter['role'])
-                                            <option value="{{ $role->name }}" selected>{{ $role->name }}</option>
-                                        @else
-                                            <option value="{{ $role->name }}">{{ $role->name }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

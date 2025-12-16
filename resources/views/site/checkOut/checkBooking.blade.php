@@ -1,148 +1,118 @@
 @extends('site.layout.app')
-<link href="{{ asset('css/checkout.css') }}?v={{ config('app.version') }}" rel="stylesheet">
-<style>
-    label {
-        display: contents;
-    }
-
-    tr:hover {
-        background-color: #f5f5f5;
-    }
-</style>
 @section('content')
-    <div class="album bg-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 py-2 text-center">
-                    <h2>Check Booking</h2>
-                </div>
+    <div class="bg-gray-50 py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-purple-800">Check Booking</h2>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    @if (Session::has('error') || Session::has('success'))
-                        <div class="text-center" style="margin-bottom: 20px;">
-                            @if (Session::has('error'))
-                                <span class="alert alert-danger" role="alert">
-                                    <strong>{{ Session::get('error') }}</strong>
-                                </span>
-                            @endif
-                            @if (Session::has('success'))
-                                <span class="alert alert-success" role="alert">
-                                    <strong>{{ Session::get('success') }}</strong>
-                                </span>
-                            @endif
+            <div class="mb-6">
+                @if (Session::has('error') || Session::has('success'))
+                    @if (Session::has('error'))
+                        <div class="rounded-md bg-red-50 p-4 mb-3">
+                            <p class="text-red-700">{{ Session::get('error') }}</p>
                         </div>
                     @endif
-                    @if (Session::has('cart-success'))
-                        <div class="alert alert-success" role="alert">
-                            <span>You have added service to your <a href="cart">shopping cart!</a></span><br>
-                            <span><a href="bookingStep">Go and Book Now!</a></span><br>
-                            <span>To add more service<a href="/"> Continue</a></span>
+                    @if (Session::has('success'))
+                        <div class="rounded-md bg-green-50 p-4 mb-3">
+                            <p class="text-green-700">{{ Session::get('success') }}</p>
                         </div>
                     @endif
+                @endif
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
+                @if (Session::has('cart-success'))
+                    <div class="rounded-md bg-green-50 p-4 mb-3">
+                        <p class="text-green-700">You have added service to your <a class="underline" href="cart">shopping cart</a>! <a class="ml-4 text-purple-800" href="bookingStep">Go and Book Now!</a></p>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="rounded-md bg-red-50 p-4">
+                        <p class="font-semibold text-red-700">Whoops! There were some problems with your input.</p>
+                        <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             </div>
 
             <div>
                 <form action="{{ route('addToCartServicesStaff') }}" method="POST">
                     @csrf
-                    <div class="row">
-                        <div class="col-md-12">
-                            <strong>Search services by categories </strong>
-                            <select name="category" id="category-select" class="form-control">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700">Search services by categories</label>
+                            <select name="category" id="category-select" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm">
                                 <option value="">All</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category') == $category->id ? 'selected' : '' }}> {{ $category->title }}</option>
+                                    <option value="{{ $category->id }}" {{ old('category') == $category->id ? 'selected' : '' }}> {{ $category->title}}</option>
                                 @endforeach
-                            </select><br>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <input type="text" id="search-service" class="form-control" placeholder="Search services...">
+                            </select>
                         </div>
                     </div>
 
-                    <div class="row scroll-div">
-                        <div class="col-md-12">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Price</th>
-                                        <th>Duration</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="services-list">
-                                    @foreach ($services as $service)
-                                        <tr data-category="{{ json_encode($service->categories->pluck('id')) }}">
-                                            <td>
-                                                <label style="display: contents;">
-                                                    <input required type="radio" name="service_id" class="checkBooking_service_id" 
-                                                           value="{{ $service->id }}" data-options="{{ $service->serviceOption }}" data-name="{{ $service->name }}"
-                                                           data-price="@if($service->discount) @currency($service->discount,false,true) @else @currency($service->price,false,true) @endif"
-                                                           data-duration="{{ $service->duration ?? "" }}">
-                                                    {{ $service->name }}
-                                            </td>
-                                            <td>
-                                                @if (isset($service->discount))
-                                                    <s>
-                                                @endif
+                    <div class="mb-4">
+                        <input type="text" id="search-service" class="w-full rounded-md border-gray-200 shadow-sm p-2" placeholder="Search services...">
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Name</th>
+                                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Price</th>
+                                    <th class="px-4 py-3 text-sm font-medium text-gray-600">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="services-list" class="divide-y">
+                                @foreach ($services as $service)
+                                    <tr data-category="{{ json_encode($service->categories->pluck('id')) }}" class="hover:bg-gray-50">
+                                        <td class="px-4 py-3">
+                                            <label class="flex items-center space-x-3 cursor-pointer">
+                                                <input required type="radio" name="service_id" class="checkBooking_service_id" value="{{ $service->id }}" data-options='@json($service->serviceOption)' data-name="{{ $service->name }}" data-price="@if($service->discount) @currency($service->discount,false,true) @else @currency($service->price,false,true) @endif" data-duration="{{ $service->duration ?? '' }}">
+                                                <span class="text-sm text-gray-800">{{ $service->name }}</span>
+                                            </label>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">
+                                            @if (isset($service->discount))
+                                                <s class="text-gray-400 mr-2">@currency($service->price,false,true)</s>
+                                                <span class="font-medium text-purple-800">@currency($service->discount,false,true)</span>
+                                            @else
                                                 @currency($service->price,false,true)
-                                                @if (isset($service->discount))
-                                                    </s>
-                                                @endif
-                                                @if (isset($service->discount))
-                                                    <b class="discount"> @currency($service->discount,false,true)</b>
-                                                @endif
-                                            </td>
-                                            <td>{{ $service->duration ?? "" }}</td>
-                                                </label>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-600">{{ $service->duration ?? '' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4">
+                        <div id="selected-service" class="hidden bg-gray-50 rounded-md p-4">
+                            <h4 class="font-semibold">Selected Service</h4>
+                            <p class="text-sm"><strong>Name:</strong> <span id="selected-service-name"></span></p>
+                            <p class="text-sm"><strong>Price:</strong> <span id="selected-service-price"></span></p>
+                            <p class="text-sm hidden"><strong>Duration:</strong> <span id="selected-service-duration"></span></p>
+                        </div>
+                        <div id="service-options" class="hidden bg-gray-50 rounded-md p-4 mt-3">
+                            <h4 class="font-semibold">Service Options</h4>
+                            <div id="service-options-list" class="mt-2"></div>
                         </div>
                     </div>
 
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <div id="selected-service" class="alert alert-secondary" style="display: none;">
-                                <h4>Selected Service</h4>
-                                <p><strong>Name:</strong> <span id="selected-service-name"></span></p>
-                                <p><strong>Price:</strong> <span id="selected-service-price"></span></p>
-                                <p style="display: none;"><strong>Duration:</strong> <span id="selected-service-duration"></span></p>
-                            </div>
-                            <div id="service-options" class="alert alert-info" style="display: none;">
-                                <h4>Service Options</h4>
-                                <div id="service-options-list"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="slots-container" class="col-md-12">
+                    <div id="slots-container" class="mt-6">
                         @include('site.checkOut.timeSlots')
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 offset-md-3 col-sm-12">
-                            <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Book Now</button>
-                        </div>
+
+                    <div class="mt-6 text-center">
+                        <button type="submit" class="inline-flex items-center px-6 py-2 bg-purple-800 text-white rounded-md hover:bg-purple-950">Book Now</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
     <script>
         $(document).ready(function() {
             function filterServices() {

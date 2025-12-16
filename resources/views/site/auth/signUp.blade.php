@@ -1,262 +1,132 @@
 @extends('site.layout.app')
 @section('content')
-<style>
-    .select2-container .select2-selection--single {
-        height: calc(2.25rem + 2px);
-        /* Match Bootstrap form-control height */
-        padding: .375rem .75rem;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-        font-size: 1rem;
-        line-height: 1.5;
-    }
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+        <div class="max-w-3xl w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="hidden md:flex flex-col justify-center bg-gradient-to-tr from-indigo-600 to-indigo-400 rounded-xl p-8 text-white">
+                <h3 class="text-2xl font-semibold">Join Lipslay</h3>
+                <p class="mt-4 text-sm">Create your account to book services, manage appointments and grow your business. Fast, secure and easy.</p>
+                <ul class="mt-6 space-y-2 text-sm">
+                    <li>• Simple booking flow</li>
+                    <li>• Secure payments</li>
+                    <li>• Dedicated support</li>
+                </ul>
+            </div>
 
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 1.5;
-        padding-left: 0;
-    }
-
-    .select2-container--default .select2-selection--single:focus {
-        outline: none;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
-        /* Bootstrap focus shadow */
-    }
-
-    .select2-container .select2-search__field {
-        width: 100% !important;
-        padding: 8px;
-        border-radius: 4px;
-        border: 1px solid #ced4da;
-    }
-</style>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">{{ __('Register') }}</div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ route('customer.post-registration') }}">
-                            @csrf
-
-                            <div class="row mb-3">
-                                <label for="name" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Name') }}</label>
-
-                                <div class="col-md-6">
-                                    <input id="name" type="text"
-                                        class="form-control @error('name') is-invalid @enderror" name="name"
-                                        value="{{ old('name') }}" autocomplete="name" required autofocus>
-
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label for="email"
-                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Email Address') }}</label>
-
-                                <div class="col-md-6">
-                                    <input id="email" type="email"
-                                        class="form-control @error('email') is-invalid @enderror" name="email"
-                                        value="{{ old('email') }}" autocomplete="email" required>
-
-                                    @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label for="password"
-                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Password') }}</label>
-
-                                <div class="col-md-6">
-                                    <input id="password" type="password"
-                                        class="form-control @error('password') is-invalid @enderror" name="password"
-                                        autocomplete="new-password" required>
-
-                                    @error('password')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label for="password-confirm"
-                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Confirm Password') }}</label>
-
-                                <div class="col-md-6">
-                                    <input id="password-confirm" type="password" class="form-control"
-                                        name="password_confirmation" autocomplete="new-password" required>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label for="type" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Login as:</label>
-
-                                <div class="col-md-6">
-                                    <select name="type" id="type" class="form-control">
-                                        <option value="customer">Customer</option>
-                                        <option value="Affiliate" @if ($type === 'Affiliate') selected @endif>Affiliate</option>
-                                        <option value="Freelancer" @if ($type === 'Freelancer') selected @endif>Freelancer</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label for="number" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Phone Number</label>
-
-                                <div class="col-md-6">
-                                    <input id="number_country_code" type="hidden" name="number_country_code" />
-                                    <input id="number" type="tel" required
-                                        class="form-control @error('number') is-invalid @enderror" name="number"
-                                        value="{{ old('number') }}" autocomplete="number">
-
-                                    @error('number')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label for="whatsapp" class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Whatsapp
-                                    whatsapp</label>
-
-                                <div class="col-md-6">
-                                    <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                                    <input id="whatsapp" type="tel" required
-                                        class="form-control @error('whatsapp') is-invalid @enderror" name="whatsapp"
-                                        value="{{ old('whatsapp') }}" autocomplete="whatsapp">
-
-                                    @error('whatsapp')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3 sub_title">
-                                
-                                <label for="sub_title"
-                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Sub Title / Designation:</label>
-
-                                <div class="col-md-6">
-                                    <select id="sub_title" class="form-control selectpicker" name="sub_titles[]"
-                                    multiple data-live-search="true" data-actions-box="true">
-                                        @foreach ($sub_titles as $sub_title)
-                                            <option value="{{ $sub_title->id }}">
-                                                {{ $sub_title->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('sub_title')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3 membership_plan_id">
-                                <label for="membership_plan_id"
-                                    class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>Membership Plan</label>
-                                    <div class="col-md-6">
-                                        <select name="membership_plan_id" id="membership_plan_id" class="form-control">
-                                            <option></option>
-                                            @foreach ($membership_plans as $membership_plan)
-                                                <option data-type="{{ $membership_plan->type }}" value="{{ $membership_plan->id }}">{{ $membership_plan->plan_name }} (@currency($membership_plan->membership_fee,true))</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label for="affiliate_code" class="col-md-4 col-form-label text-md-end affiliate_code">{{ __('Affiliate Code') }}</label>
-                                <label for="affiliate_code" class="col-md-4 col-form-label text-md-end parent_affiliate_code">Parent Affiliate Code</label>
-
-                                <div class="col-md-6">
-                                    <input id="affiliate_code" type="text"
-                                        class="form-control @error('affiliate_code') is-invalid @enderror"
-                                        name="affiliate_code" {{ $affiliate_code ? 'readonly' : null }}
-                                        value="{{ $affiliate_code ? $affiliate_code : old('affiliate_code') }}"
-                                        autocomplete="affiliate_code">
-
-                                    @error('affiliate_code')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-md-4 col-form-label text-md-end"><span style="color: red;">*</span>{{ __('Gender') }}</label>
-
-                                <div class="col-md-6">
-                                    @if($gender_permission === 'Male')
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                                   type="radio" name="gender" id="genderMale" value="Male"
-                                                   {{ old('gender') == 'Male' ? 'checked' : '' }} required>
-                                            <label class="form-check-label" for="genderMale">
-                                                {{ __('Male') }}
-                                            </label>
-                                        </div>
-                                        <br>
-                                        <strong class="text-danger">Sorry, No Female Services Listed in Our Store.</strong>
-                                    @elseif ($gender_permission === 'Female')
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                                   type="radio" name="gender" id="genderFemale" value="Female"
-                                                   {{ old('gender') == 'Female' ? 'checked' : '' }} required>
-                                            <label class="form-check-label" for="genderFemale">
-                                                {{ __('Female') }}
-                                            </label>
-                                        </div>
-                                        <br>
-                                        <strong class="text-danger">Sorry, No Male Services Listed in Our Store.</strong>
-                                    @elseif($gender_permission === 'Both')
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                                   type="radio" name="gender" id="genderMale" value="Male"
-                                                   {{ old('gender') == 'Male' ? 'checked' : '' }} required>
-                                            <label class="form-check-label" for="genderMale">
-                                                {{ __('Male') }}
-                                            </label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                                   type="radio" name="gender" id="genderFemale" value="Female"
-                                                   {{ old('gender') == 'Female' ? 'checked' : '' }} required>
-                                            <label class="form-check-label" for="genderFemale">
-                                                {{ __('Female') }}
-                                            </label>
-                                        </div>
-                                    @endif
-                                    @error('gender')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                                
-                            </div>
-                            <div class="row mb-0">
-                                <div class="col-md-6 offset-md-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ __('Register') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">Create an account</h2>
+                    <p class="text-sm text-gray-500 mt-1">Get started by filling the information below</p>
                 </div>
+
+                <form method="POST" action="{{ route('customer.post-registration') }}" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Name <span class="text-red-500">*</span></label>
+                        <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                        @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address <span class="text-red-500">*</span></label>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" required class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                        @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password <span class="text-red-500">*</span></label>
+                            <input id="password" name="password" type="password" required class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                            @error('password') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="password-confirm" class="block text-sm font-medium text-gray-700">Confirm Password <span class="text-red-500">*</span></label>
+                            <input id="password-confirm" name="password_confirmation" type="password" required class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="type" class="block text-sm font-medium text-gray-700">Login as <span class="text-red-500">*</span></label>
+                        <select name="type" id="type" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm">
+                            <option value="customer">Customer</option>
+                            <option value="Affiliate" @if ($type === 'Affiliate') selected @endif>Affiliate</option>
+                            <option value="Freelancer" @if ($type === 'Freelancer') selected @endif>Freelancer</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="number" class="block text-sm font-medium text-gray-700">Phone Number <span class="text-red-500">*</span></label>
+                            <input id="number_country_code" type="hidden" name="number_country_code" />
+                            <input id="number" name="number" type="tel" required value="{{ old('number') }}" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                            @error('number') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="whatsapp" class="block text-sm font-medium text-gray-700">Whatsapp <span class="text-red-500">*</span></label>
+                            <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                            <input id="whatsapp" name="whatsapp" type="tel" required value="{{ old('whatsapp') }}" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                            @error('whatsapp') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="sub_title">
+                        <label for="sub_title" class="block text-sm font-medium text-gray-700">Sub Title / Designation <span class="text-red-500">*</span></label>
+                        <select id="sub_title" name="sub_titles[]" multiple class="select2 mt-1 block w-full rounded-md border-gray-200 shadow-sm" data-live-search="true" data-actions-box="true">
+                            @foreach ($sub_titles as $sub_title)
+                                <option value="{{ $sub_title->id }}">{{ $sub_title->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('sub_title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="membership_plan_id">
+                        <label for="membership_plan_id" class="block text-sm font-medium text-gray-700">Membership Plan <span class="text-red-500">*</span></label>
+                        <select name="membership_plan_id" id="membership_plan_id" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm">
+                            <option></option>
+                            @foreach ($membership_plans as $membership_plan)
+                                <option data-type="{{ $membership_plan->type }}" value="{{ $membership_plan->id }}">{{ $membership_plan->plan_name }} (@currency($membership_plan->membership_fee,true))</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="affiliate_code">
+                            <label for="affiliate_code" class="block text-sm font-medium text-gray-700">Affiliate Code</label>
+                            <input id="affiliate_code" name="affiliate_code" type="text" value="{{ $affiliate_code ? $affiliate_code : old('affiliate_code') }}" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" {{ $affiliate_code ? 'readonly' : '' }} />
+                            @error('affiliate_code') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="parent_affiliate_code hidden">
+                            <label class="block text-sm font-medium text-gray-700">Parent Affiliate Code</label>
+                            <input type="text" class="mt-1 block w-full rounded-md border-gray-200 shadow-sm" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Gender <span class="text-red-500">*</span></label>
+                        <div class="mt-2 space-x-4">
+                            @if($gender_permission === 'Male')
+                                <label class="inline-flex items-center"><input class="rounded border-gray-200" type="radio" name="gender" id="genderMale" value="Male" {{ old('gender') == 'Male' ? 'checked' : '' }} required><span class="ml-2">Male</span></label>
+                                <div class="mt-2 text-sm text-red-600">Sorry, No Female Services Listed in Our Store.</div>
+                            @elseif ($gender_permission === 'Female')
+                                <label class="inline-flex items-center"><input class="rounded border-gray-200" type="radio" name="gender" id="genderFemale" value="Female" {{ old('gender') == 'Female' ? 'checked' : '' }} required><span class="ml-2">Female</span></label>
+                                <div class="mt-2 text-sm text-red-600">Sorry, No Male Services Listed in Our Store.</div>
+                            @elseif($gender_permission === 'Both')
+                                <label class="inline-flex items-center"><input class="rounded border-gray-200" type="radio" name="gender" id="genderMale" value="Male" {{ old('gender') == 'Male' ? 'checked' : '' }} required><span class="ml-2">Male</span></label>
+                                <label class="inline-flex items-center"><input class="rounded border-gray-200 ml-4" type="radio" name="gender" id="genderFemale" value="Female" {{ old('gender') == 'Female' ? 'checked' : '' }} required><span class="ml-2">Female</span></label>
+                            @endif
+                            @error('gender') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full inline-flex justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Register</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
     <script>
         $(document).ready(function() {
             $('.select2').select2({
@@ -277,17 +147,16 @@
                     }
                 }, 100);
             });
+
+            // Initialize visibility according to current selection
+            handleTypeChange($("#type").val());
         });
     </script>
     <script>
-        $(document).ready(function() {
-            handleTypeChange($("#type").val());
-        });
-    
         $(document).on("change", "#type", function() {
             handleTypeChange($(this).val());
         });
-    
+
         function handleTypeChange(selectedValue) {
             if (selectedValue == "Freelancer") {
                 $(".sub_title").show();

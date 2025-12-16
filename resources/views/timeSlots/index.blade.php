@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+    @section('page_title')
+    <h3 class="">Time Slots</h3>
+    @endsection
 <div class="container">
     <div class="row">
         <div class="col-md-6">
@@ -7,7 +10,7 @@
         </div>
         <div class="col-md-6">
             @can('time-slot-create')
-            <a class="btn btn-success  float-end" href="{{ route('timeSlots.create') }}"> Create New Time Slot</a>
+            <a class="btn btn-outline-primary rounded-3  float-end" href="{{ route('timeSlots.create') }}"> Create New Time Slot</a>
             @endcan
         </div>
     </div>
@@ -18,12 +21,12 @@
     </div>
     @endif
     <hr>
-    <table class="table table-striped table-bordered">
-        <tr>
+    <table class="table table-bordered">
+        <tr  class="text-center bg-primary text-white">
             <th>Sr#</th>
             <th>
                 <div class="d-flex">
-                    <a class="ml-2  text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                    <a class="ml-3  text-decoration-none text-white" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                     @if (request('sort') === 'name')
                     <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif
@@ -32,7 +35,7 @@
             </th>
             <th>
                 <div class="d-flex">
-                    <a class="ml-2  text-decoration-none" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time Start -- Time End</a>
+                    <a class="ml-3  text-decoration-none text-white" href="{{ route('timeSlots.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time Start -- Time End</a>
                     @if (request('sort') === 'time_start')
                     <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                     @endif
@@ -48,23 +51,23 @@
         <tr>
             <td>{{ ++$i }}</td>
             <td>@if($time_slot->status == 1)
-                <span class="text-success">{{ $time_slot->name }}</span>
+                <span class="text-info">{{ $time_slot->name }}</span>
                 @else
-                <span class="text-danger">{{ $time_slot->name }}</span>
+                <span class="text-dark">{{ $time_slot->name }}</span>
                 @endif</td>
             <td>{{ date('h:i A', strtotime($time_slot->time_start)) }} -- {{ date('h:i A', strtotime($time_slot->time_end)) }}</td>
             <td>{{ $time_slot->type }}</td>
             <td>{{ $time_slot->seat }}</td>
             <td>
                 <form id="deleteForm{{ $time_slot->id }}" action="{{ route('timeSlots.destroy',$time_slot->id) }}" method="POST">
-                    <a class="btn btn-info" href="{{ route('timeSlots.show',$time_slot->id) }}"><i class="fa fa-eye"></i></a>
+                    <a class="btn text-dark" href="{{ route('timeSlots.show',$time_slot->id) }}"><i class="fa fa-eye"></i></a>
                     @can('time-slot-edit')
-                    <a class="btn btn-primary" href="{{ route('timeSlots.edit',$time_slot->id) }}"><i class="fa fa-edit"></i></a>
+                    <a class="btn text-dark" href="{{ route('timeSlots.edit',$time_slot->id) }}"><i class="fa fa-edit"></i></a>
                     @endcan
                     @csrf
                     @method('DELETE')
                     @can('time-slot-delete')
-                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                    <button type="button" onclick="confirmDelete('{{ $time_slot->id }}')" class="btn text-danger"><i class="fa fa-trash"></i></button>
                     @endcan
                 </form>
             </td>

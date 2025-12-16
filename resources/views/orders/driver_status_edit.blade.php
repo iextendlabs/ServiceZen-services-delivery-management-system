@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 py-5 text-center">
+        <div class="col-md-12 py-2 text-center">
             <h2>Edit Order Driver Status</h2>
         </div>
     </div>

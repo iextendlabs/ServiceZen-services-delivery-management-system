@@ -1,16 +1,12 @@
 @extends('layouts.app')
 @section('content')
+@section('page_title')
+   <h2> Supervisors </h2>
+@endsection
     <div class="container">
         <div class="row">
             <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2>Supervisor ({{ $total_supervisors }})</h2>
-                </div>
-                <div class="float-end">
-                    @can('supervisor-create')
-                        <a class="btn btn-success" href="{{ route('supervisors.create') }}"> Create New Supervisor</a>
-                    @endcan
-                </div>
+              
             </div>
         </div>
 
@@ -20,20 +16,77 @@
                 <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <hr>
         <div class="row">
-            <div class="col-md-9">
-                <table class="table table-striped table-bordered">
-                    <tr>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h3>Filter</h3>
+                        <div class="float-end">
+                            @can('supervisor-create')
+                                <a class="btn text-dark" href="{{ route('supervisors.create') }}"><i class="fa fa-plus"></i> Create New Supervisor</a>
+                            @endcan
+                        </div>     
+                    </div>  
+                    <div class="card-body">         
+                        <form action="{{ route('supervisors.index') }}" method="GET" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="small text-muted font-weight-medium mb-1">Name:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-user text-muted"></i></span>
+                                            </div>
+                                            <input type="text" name="name" value="{{ $filter_name }}" class="form-control"
+                                            placeholder="Name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group position-relative">
+                                        <label class="small text-muted font-weight-medium mb-1">Email:</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-envelope text-muted"></i></span>
+                                            </div>
+                                            <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
+                                            <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                            <style>
+                                                #email-suggestions .list-group-item {
+                                                    cursor: pointer !important;
+                                                }
+                                                #email-suggestions .list-group-item:hover {
+                                                    background-color: #f0f0f0;
+                                                }
+                                            </style>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mt-4">
+                                        <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold"><i class="fa fa-filter"></i> Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>        
+            </div>            
+            <div class="col-md-12">
+                <div class="float-start my-3">
+                    <h2>Supervisor ({{ $total_supervisors }})</h2>
+                </div>
+                <table class="table table-bordered">
+                    <tr class="bg-white">
                         <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('supervisors.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('supervisors.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a></i>
                             @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('supervisors.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('supervisors.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a></i>
                             @if (request('sort') === 'email')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -49,17 +102,17 @@
                                 <td>
                                     <form id="deleteForm{{ $supervisor->id }}"
                                         action="{{ route('supervisors.destroy', $supervisor->id) }}" method="POST">
-                                        <a class="btn btn-info"
+                                        <a class="btn text-dark"
                                             href="{{ route('supervisors.show', $supervisor->id) }}"><i class="fa fa-eye"></i></a>
                                         @can('supervisor-edit')
-                                            <a class="btn btn-primary"
+                                            <a class="btn text-dark"
                                                 href="{{ route('supervisors.edit', $supervisor->id) }}"><i class="fa fa-edit"></i></a>
                                         @endcan
                                         @csrf
                                         @method('DELETE')
                                         @can('supervisor-delete')
                                             <button type="button" onclick="confirmDelete('{{ $supervisor->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                                class="btn text-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -72,39 +125,6 @@
                     @endif
                 </table>
                 {!! $supervisors->links() !!}
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('supervisors.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter_name }}" class="form-control"
-                                    placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filter_email }}" class="form-control" autocomplete="off">
-                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
-                                <style>
-                                    #email-suggestions .list-group-item {
-                                        cursor: pointer !important;
-                                    }
-                                    #email-suggestions .list-group-item:hover {
-                                        background-color: #f0f0f0;
-                                    }
-                                </style>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

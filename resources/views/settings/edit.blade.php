@@ -3,11 +3,11 @@
 @php
     $category_row = 0;
 @endphp
-<div class="container">
+<div class="container-fluid px-1">
     <div class="row">
-        <div class="col-md-12 margin-tb">
-            <div class="float-start">
-                <h2>Edit Setting</h2>
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <h2 class="mb-0">Edit Setting</h2>
             </div>
         </div>
     </div>
@@ -30,7 +30,9 @@
     <form action="{{ route('settings.update',$setting->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
-        <div class="row">
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="form-row">
             <div class="col-md-12">
                 <div class="form-group">
                     <span style="color: red;">*</span><strong>Key:</strong>
@@ -313,7 +315,9 @@
                 </div>
             </div>
             <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Update</button>
+            </div>
+                </div>
             </div>
         </div>
     </form>

@@ -65,7 +65,7 @@ class SiteController extends Controller
         $all_categories = Cache::remember('home_all_categories', 60, function () {
             return ServiceCategory::with('childCategories')
                 ->whereNull('parent_id')
-                ->where('status', 1)
+                ->where('status', 1)->take(4)
                 ->get()
                 ->filter(function ($category) {
                     return $category->childCategories->isNotEmpty() || is_null($category->parent_id);
@@ -81,6 +81,14 @@ class SiteController extends Controller
             $ads = $googleAds['home'];
         }
 
+        $featured_services = Cache::remember('home_featured_services', 60, function () {
+            return Service::where('status', 1)
+                ->where('feature', 1)
+                ->latest()
+                ->limit(4)
+                ->get();
+        });
+
         return view('site.home', compact(
             'address',
             'FAQs',
@@ -90,7 +98,8 @@ class SiteController extends Controller
             'review_char_limit',
             'all_categories',
             'app_flag',
-            'ads'
+            'ads',
+            'featured_services'
         ));
     }
 
@@ -300,5 +309,68 @@ class SiteController extends Controller
         }
 
         return response()->json($data)->header('Access-Control-Allow-Origin', '*');
+    }
+
+    /**
+     * Get category hierarchy with all levels for off-canvas drill-down
+     */
+    public function getCategoryHierarchy()
+    {
+        $categories = ServiceCategory::where('status', 1)
+            ->whereNull('parent_id')
+            ->with(['childCategories' => function ($q) {
+                $q->where('status', 1)
+                    ->with(['childCategories' => function ($q2) {
+                        $q2->where('status', 1);
+                    }, 'services' => function ($q2) {
+                        $q2->where('status', 1)->limit(100);
+                    }])
+                    ->with('services', function ($q2) {
+                        $q2->where('status', 1)->limit(100);
+                    });
+            }])
+            ->with('services', function ($q) {
+                $q->where('status', 1)->limit(100);
+            })
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'title' => $category->title,
+                    'image' => $category->image,
+                    'image_alt' => $category->image_alt ?? $category->title,
+                    'slug' => $category->slug,
+                    'children' => $category->childCategories->map(function ($child) {
+                        return [
+                            'id' => $child->id,
+                            'title' => $child->title,
+                            'slug' => $child->slug,
+                            'children' => $child->childCategories->map(function ($grandchild) {
+                                return [
+                                    'id' => $grandchild->id,
+                                    'title' => $grandchild->title,
+                                    'slug' => $grandchild->slug,
+                                ];
+                            })->values()->all(),
+                            'services' => $child->services->map(function ($service) {
+                                return [
+                                    'id' => $service->id,
+                                    'name' => $service->name,
+                                    'slug' => $service->slug,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                    'services' => $category->services->map(function ($service) {
+                        return [
+                            'id' => $service->id,
+                            'name' => $service->name,
+                            'slug' => $service->slug,
+                        ];
+                    })->values()->all(),
+                ];
+            });
+
+        return response()->json($categories)->header('Access-Control-Allow-Origin', '*');
     }
 }

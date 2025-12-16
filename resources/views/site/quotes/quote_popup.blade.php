@@ -1,109 +1,118 @@
 <!-- Quote Request Modal -->
-<style>
-    .form-text.text-muted {
-        color: #dc3545 !important;
-        /* Red color for emphasis */
-        font-size: 0.9em;
-        margin-top: 5px;
-    }
-</style>
 <div class="modal fade" id="quoteModal" tabindex="-1" role="dialog" aria-labelledby="quoteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="quoteModalLabel">Request a Quote</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <div id="detailError" class="alert alert-danger d-none" role="alert">
+        <div class="modal-content rounded-lg shadow-lg border-0">
+            <div class="modal-body p-4">
+                {{-- <h2 class="text-3xl font-bold text-purple-950 mb-6">Request a Quote</h2> --}}
+                
+                <div id="detailError" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
                     Your request contains contact details (phone number or email). Please remove them before submitting.
                 </div>
-                <form id="quoteForm" action="{{ route('siteQuotes.store') }}" method="POST"
-                    enctype="multipart/form-data">
+                
+                <form id="quoteForm" action="{{ route('siteQuotes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     <input type="hidden" id="service_id" name="service_id" value="{{ $service->id }}">
+                    
                     <!-- If user is not authenticated, show name and email fields -->
                     @if (!auth()->check())
-                        <div class="form-group">
-                            <span style="color: red;">*</span><label for="guest_name">Name</label>
-                            <input type="text" class="form-control" id="guest_name" name="guest_name"
-                                placeholder="Enter your name" required>
+                        <div>
+                            <label for="guest_name" class="block text-sm font-bold text-gray-700 mb-2">
+                                <span class="text-red-500">*</span> Name
+                            </label>
+                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                                id="guest_name" name="guest_name" placeholder="Enter your name" required>
                         </div>
 
-                        <div class="form-group">
-                            <span style="color: red;">*</span><label for="guest_email">Email</label>
-                            <input type="email" class="form-control" id="guest_email" name="guest_email"
-                                placeholder="Enter your email" required>
+                        <div>
+                            <label for="guest_email" class="block text-sm font-bold text-gray-700 mb-2">
+                                <span class="text-red-500">*</span> Email
+                            </label>
+                            <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                                id="guest_email" name="guest_email" placeholder="Enter your email" required>
                         </div>
                     @else
                         <input type="hidden" id="user_id" name="user_id" value="{{ auth()->user()->id ?? '' }}">
                     @endif
 
                     <!-- Service Name -->
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="service_name">Service Name</label>
-                        <input required type="text" class="form-control" id="service_name" name="service_name"
-                            value="{{ $service->name }}" readonly>
+                    <div>
+                        <label for="service_name" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> Service Name
+                        </label>
+                        <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                            id="service_name" name="service_name" value="{{ $service->name }}" readonly required>
                     </div>
 
                     <!-- Service Option -->
                     @if (count($service->serviceOption) > 0)
-                        <div class="form-group">
-                            <label for="service_option_id">Select Service Option</label>
-                            <select class="form-control selectpicker" id="service_option_id" name="service_option_id[]"
-                                multiple data-live-search="true" data-actions-box="true">
+                        <div>
+                            <label for="service_option_id" class="block text-sm font-bold text-gray-700 mb-2">
+                                Select Service Option
+                            </label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition selectpicker" 
+                                id="service_option_id" name="service_option_id[]" multiple data-live-search="true" data-actions-box="true">
                                 @foreach ($service->serviceOption as $option)
-                                    <option value="{{ $option->id }}">{{ $option->option_name }} (@currency($option->option_price, true))
-                                    </option>
+                                    <option value="{{ $option->id }}">{{ $option->option_name }} (@currency($option->option_price, true))</option>
                                 @endforeach
                             </select>
                         </div>
                     @endif
 
                     <!-- Detail -->
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="detail">Detail</label>
-                        <textarea style="height: 150px" class="form-control" id="detail" name="detail" rows="3"
-                            placeholder="Enter details" required></textarea>
-                        <small class="form-text text-muted">Please remove any contact details, it is against our
-                            policy.</small>
+                    <div>
+                        <label for="detail" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> Detail
+                        </label>
+                        <textarea class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition h-40" 
+                            id="detail" name="detail" rows="5" placeholder="Enter details" required></textarea>
+                        <p class="text-xs text-red-600 mt-2">Please remove any contact details, it is against our policy.</p>
                     </div>
 
                     <!-- Mobile -->
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="number">Phone Number</label>
+                    <div>
+                        <label for="number" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> Phone Number
+                        </label>
                         <input id="number_country_code" type="hidden" name="number_country_code" />
-                        <input type="tel" id="number" name="phone" class="form-control"
+                        <input type="tel" id="number" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition"
                             value="{{ auth()->user()->customerProfile->number ?? '' }}" required>
                     </div>
 
                     <!-- WhatsApp -->
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="whatsapp">WhatsApp Number</label>
+                    <div>
+                        <label for="whatsapp" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> WhatsApp Number
+                        </label>
                         <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                        <input type="tel" id="whatsapp" name="whatsapp" class="form-control"
+                        <input type="tel" id="whatsapp" name="whatsapp" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition"
                             value="{{ auth()->user()->customerProfile->whatsapp ?? '' }}" required>
                     </div>
 
                     <!-- Sourcing Quantity -->
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="sourcing_quantity">Sourcing Quantity</label>
-                        <input type="number" class="form-control" id="sourcing_quantity" name="sourcing_quantity"
-                            placeholder="Enter quantity" required>
+                    <div>
+                        <label for="sourcing_quantity" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> Sourcing Quantity
+                        </label>
+                        <input type="number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                            id="sourcing_quantity" name="sourcing_quantity" placeholder="Enter quantity" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="affiliate_code">Affiliate Code</label>
-                        <input type="text" class="form-control" id="affiliate_code" name="affiliate_code"
-                            placeholder="Enter Affiliate Code">
+                    <!-- Affiliate Code -->
+                    <div>
+                        <label for="affiliate_code" class="block text-sm font-bold text-gray-700 mb-2">
+                            Affiliate Code
+                        </label>
+                        <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                            id="affiliate_code" name="affiliate_code" placeholder="Enter Affiliate Code">
                     </div>
 
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="location">Zone</label>
-                        <select class="form-control" id="zone" name="zone" required>
+                    <!-- Zone -->
+                    <div>
+                        <label for="zone" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> Zone
+                        </label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                            id="zone" name="zone" required>
                             <option value="">Select Zone</option>
                             @foreach ($zones as $zone)
                                 <option value="{{ $zone }}" @if (isset($address) && isset($address['area']) && $address['area'] == $zone) selected @endif>{{ $zone }}</option>
@@ -111,36 +120,47 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <span style="color: red;">*</span><label for="location">Location</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="location" name="location"
-                                placeholder="Enter your location" required>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-primary" id="getLocationBtn">
-                                    📍 Use Current Location
-                                </button>
-                            </div>
+                    <!-- Location -->
+                    <div>
+                        <label for="location" class="block text-sm font-bold text-gray-700 mb-2">
+                            <span class="text-red-500">*</span> Location
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-950 focus:border-transparent transition" 
+                                id="location" name="location" placeholder="Enter your location" required>
+                            <button type="button" class="px-4 py-2 bg-purple-950 text-white rounded-lg hover:bg-purple-900 transition font-semibold" 
+                                id="getLocationBtn">
+                                📍
+                            </button>
                         </div>
                     </div>
 
                     <!-- Image Upload -->
-                    <div class="form-group">
-                        <label for="images" class="font-weight-bold">Upload Multiple Images</label>
-                        <div id="drop-area" class="border p-3 rounded text-center"
-                            style="border: 2px dashed #ccc; cursor: pointer;">
-                            <i class="fa fa-cloud-upload-alt fa-2x text-muted"></i>
-                            <p class="text-muted">Click to select images or drag & drop them here</p>
-                            <input type="file" id="images" name="images[]" accept="image/*" multiple
-                                class="d-none">
-                            <button type="button" class="btn btn-primary btn-sm" id="selectImagesBtn">Select
-                                Images</button>
+                    {{-- <div>
+                        <label for="images" class="block text-sm font-bold text-gray-700 mb-2">
+                            Upload Multiple Images
+                        </label>
+                        <div id="drop-area" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-purple-950 hover:bg-purple-50 transition">
+                            <i class="fa fa-cloud-upload-alt text-4xl text-gray-400 mb-2 block"></i>
+                            <p class="text-gray-500 mb-3">Click to select images or drag & drop them here</p>
+                            <input type="file" id="images" name="images[]" accept="image/*" multiple class="hidden">
+                            <button type="button" class="px-4 py-2 bg-purple-950 text-white rounded-lg hover:bg-purple-900 transition font-semibold text-sm" 
+                                id="selectImagesBtn">
+                                Select Images
+                            </button>
                         </div>
-                        <div id="imagePreviewContainer" class="mt-3 d-flex flex-wrap"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit Quote</button>
+                        <div id="imagePreviewContainer" class="mt-4 flex flex-wrap gap-3"></div>
+                    </div> --}}
+
+                    <!-- Modal Footer -->
+                    <div class="flex gap-3 justify-end pt-4 border-t border-gray-200">
+                        <button type="button" class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition font-semibold" 
+                            data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-purple-950 text-white rounded-lg hover:bg-purple-900 transition font-semibold">
+                            Submit Quote
+                        </button>
                     </div>
                 </form>
             </div>
@@ -157,12 +177,12 @@
 
             if (phoneRegex.test(detailValue) || emailRegex.test(detailValue)) {
                 e.preventDefault();
-                $('#detailError').removeClass('d-none');
+                $('#detailError').removeClass('hidden');
                 $('#quoteModal').animate({
                     scrollTop: 0
                 }, 500);
             } else {
-                $('#detailError').addClass('d-none');
+                $('#detailError').addClass('hidden');
 
                 e.preventDefault();
 
@@ -180,7 +200,7 @@
                             alert(response.message);
                         } else {
                             let errors = response.errors;
-                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            let errorHtml = '<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6"><ul class="list-disc list-inside">';
 
                             // Loop through the errors object
                             $.each(errors, function(field, messages) {
@@ -192,7 +212,7 @@
                             errorHtml += '</ul></div>';
 
                             // Remove any existing error messages
-                            $('#quoteModal .alert-danger').remove();
+                            $('#quoteModal .bg-red-50').remove();
 
                             // Prepend the new error messages to the modal body
                             $('#quoteModal .modal-body').prepend(errorHtml);
@@ -280,11 +300,6 @@
         });
     });
 
-    $('.custom-file-input').on('change', function(event) {
-        let fileName = $(this).val().split("\\").pop();
-        $(this).siblings('.custom-file-label').addClass("selected").html(fileName);
-    });
-
     $(document).ready(function() {
 
         $('.selectpicker').selectpicker();
@@ -301,16 +316,16 @@
         // Drag & Drop Feature
         $("#drop-area").on("dragover", function(event) {
             event.preventDefault();
-            $(this).css("border-color", "#007bff");
+            $(this).addClass('border-purple-950').addClass('bg-purple-50');
         });
 
         $("#drop-area").on("dragleave", function() {
-            $(this).css("border-color", "#ccc");
+            $(this).removeClass('border-purple-950').removeClass('bg-purple-50');
         });
 
         $("#drop-area").on("drop", function(event) {
             event.preventDefault();
-            $(this).css("border-color", "#ccc");
+            $(this).removeClass('border-purple-950').removeClass('bg-purple-50');
             let files = event.originalEvent.dataTransfer.files;
             previewImages(files);
         });
@@ -328,33 +343,19 @@
                 reader.onload = function(e) {
                     if (existingImages.includes(e.target.result)) return; // Skip duplicate images
 
-                    let imgWrapper = $("<div>").addClass("position-relative m-2").css({
-                        width: "120px",
-                        height: "120px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        overflow: "hidden",
-                        display: "inline-block",
-                        position: "relative"
-                    });
+                    let imgWrapper = $("<div>")
+                        .addClass("relative w-32 h-32 border border-gray-200 rounded-lg overflow-hidden inline-block");
 
-                    let img = $("<img>").attr("src", e.target.result).addClass("img-thumbnail")
-                        .css({
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover"
-                        });
+                    let img = $("<img>")
+                        .attr("src", e.target.result)
+                        .addClass("w-full h-full object-cover");
 
                     let removeBtn = $("<button>")
                         .html("&times;")
-                        .addClass("btn btn-sm btn-danger position-absolute")
-                        .css({
-                            top: "5px",
-                            right: "5px",
-                            borderRadius: "50%",
-                            padding: "2px 6px"
-                        })
-                        .click(function() {
+                        .attr("type", "button")
+                        .addClass("absolute top-1 right-1 rounded-full bg-red-500 text-white px-2 py-0 text-lg hover:bg-red-600 transition")
+                        .click(function(evt) {
+                            evt.preventDefault();
                             imgWrapper.remove();
                         });
 

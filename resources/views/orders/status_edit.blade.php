@@ -3,8 +3,8 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12 py-5 text-center">
-            <h2>Add Order status History</h2>
+        <div class="col-md-12 py-2 text-center">
+            <h2><b>Add Order status History</b></h2>
         </div>
     </div>
     <div class="container">
@@ -25,36 +25,39 @@
                 </ul>
             </div>
             @endif
-            <form action="{{ route('orders.status_edit',$order->id) }}" method="POST">
-                @csrf
-                <input type="hidden" name="url" value="{{ url()->previous() }}">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('orders.status_edit',$order->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="url" value="{{ url()->previous() }}">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Status:</strong>
+                                    <select name="status" class="form-control">
+                                        @foreach ($statuses as $status)
+                                        <option value="{{ $status }}" {{ old('status', $order->status) == $status ? 'selected' : '' }}>{{ $status }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Status:</strong>
-                            <select name="status" class="form-control">
-                                @foreach ($statuses as $status)
-                                <option value="{{ $status }}" {{ old('status', $order->status) == $status ? 'selected' : '' }}>{{ $status }}</option>
-                                @endforeach
-                            </select>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <strong>Comment:</strong>
+                                    <textarea name="comment" cols="20" rows="3" class="form-control">{{ old('comment') }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 text-right no-print">
+                                @can('order-edit')
+                                <button type="submit" class="btn btn-primary">Update</button>
+                                @endcan
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Comment:</strong>
-                            <textarea name="comment" cols="30" rows="8" class="form-control">{{ old('comment') }}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 text-right no-print">
-                        @can('order-edit')
-                        <button type="submit" class="btn btn-primary">Update</button>
-                        @endcan
-                    </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

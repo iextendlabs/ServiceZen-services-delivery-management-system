@@ -1,9 +1,11 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-1">
         <div class="row">
-            <div class="col-md-12 margin-tb">
-                <h2>Add New Sub Title / Designation</h2>
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">Add New Sub Title / Designation</h2>
+                </div>
             </div>
         </div>
         @if ($errors->any())
@@ -18,53 +20,52 @@
         @endif
         <form action="{{ route('subTitles.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Name:</strong>
-                        <input type="text" name="name" value="{{ old('name') }}" class="form-control"
-                            placeholder="Name">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Parent Subtitle:</strong>
-                        <select name="parent_id" class="form-control select2">
-                            <option value="">-- None --</option>
-                            @foreach ($allSubTitles as $subtitle)
-                                <option value="{{ $subtitle->id }}"
-                                    {{ old('parent_id') == $subtitle->id ? 'selected' : '' }}>{{ $subtitle->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group scroll-div">
-                        <strong>Child Subtitles:</strong>
-                        <input type="text" id="childSubtitleSearch" class="form-control mb-2"
-                            placeholder="Search Subtitles">
-                        <table class="table table-bordered" id="childSubtitlesTable">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold"><span class="text-danger">*</span> Name</label>
+                            <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Name">
+                        </div>
+
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold">Parent Subtitle</label>
+                            <select name="parent_id" class="form-control select2">
+                                <option value="">-- None --</option>
                                 @foreach ($allSubTitles as $subtitle)
-                                    <tr>
-                                        <td><input type="checkbox" name="child_subtitles[]" value="{{ $subtitle->id }}"
-                                                {{ is_array(old('child_subtitles')) && in_array($subtitle->id, old('child_subtitles', [])) ? 'checked' : '' }}>
-                                        </td>
-                                        <td>{{ $subtitle->name }}</td>
-                                    </tr>
+                                    <option value="{{ $subtitle->id }}" {{ old('parent_id') == $subtitle->id ? 'selected' : '' }}>{{ $subtitle->name }}</option>
                                 @endforeach
-                            </tbody>
-                        </table>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-12 mb-3 scroll-div">
+                            <label class="font-weight-bold">Child Subtitles</label>
+                            <input type="text" id="childSubtitleSearch" class="form-control mb-2" placeholder="Search Subtitles">
+                            <div class="table-responsive">
+                                <table class="table table-bordered mb-0" id="childSubtitlesTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:80px">Select</th>
+                                            <th>Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($allSubTitles as $subtitle)
+                                            <tr>
+                                                <td class="align-middle"><input type="checkbox" name="child_subtitles[]" value="{{ $subtitle->id }}" {{ is_array(old('child_subtitles')) && in_array($subtitle->id, old('child_subtitles', [])) ? 'checked' : '' }}></td>
+                                                <td class="align-middle">{{ $subtitle->name }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center mt-2">
+                            <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Submit</button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>

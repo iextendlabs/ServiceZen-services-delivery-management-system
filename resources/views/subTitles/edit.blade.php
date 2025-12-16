@@ -1,9 +1,14 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+@section('page_title')
+<h3 class="">Update Sub Title / Designation</h3>
+@endsection
+    <div class="container-fluid px-1">
         <div class="row">
-            <div class="col-md-12 margin-tb">
-                <h2>Update Sub Title / Designation</h2>
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">Update Sub Title / Designation</h2>
+                </div>
             </div>
         </div>
         @if ($errors->any())
@@ -20,54 +25,52 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="url" value="{{ url()->previous() }}">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Name:</strong>
-                        <input type="text" name="name" value="{{ old('name', $subTitle->name) }}" class="form-control"
-                            placeholder="Name">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Parent Subtitle:</strong>
-                        <select name="parent_id" class="form-control select2">
-                            <option value="">-- None --</option>
-                            @foreach ($allSubTitles as $subtitle)
-                                <option value="{{ $subtitle->id }}"
-                                    {{ old('parent_id', $subTitle->parent_id ?? '') == $subtitle->id ? 'selected' : '' }}>
-                                    {{ $subtitle->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group scroll-div">
-                        <strong>Child Subtitles:</strong>
-                        <input type="text" id="childSubtitleSearch" class="form-control mb-2"
-                            placeholder="Search Subtitles">
-                        <table class="table table-striped table-bordered" id="childSubtitlesTable">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold"><span class="text-danger">*</span> Name</label>
+                            <input type="text" name="name" value="{{ old('name', $subTitle->name) }}" class="form-control" placeholder="Name">
+                        </div>
+
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold">Parent Subtitle</label>
+                            <select name="parent_id" class="form-control select2">
+                                <option value="">-- None --</option>
                                 @foreach ($allSubTitles as $subtitle)
-                                    <tr>
-                                        <td><input type="checkbox" name="child_subtitles[]" value="{{ $subtitle->id }}"
-                                                {{ in_array($subtitle->id, old('child_subtitles', $subTitle->children->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
-                                        </td>
-                                        <td>{{ $subtitle->name }}</td>
-                                    </tr>
+                                    <option value="{{ $subtitle->id }}" {{ old('parent_id', $subTitle->parent_id ?? '') == $subtitle->id ? 'selected' : '' }}>{{ $subtitle->name }}</option>
                                 @endforeach
-                            </tbody>
-                        </table>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-12 mb-3 scroll-div">
+                            <label class="font-weight-bold">Child Subtitles</label>
+                            <input type="text" id="childSubtitleSearch" class="form-control mb-2" placeholder="Search Subtitles">
+                            <div class="table-responsive">
+                                <table class="table table-bordered mb-0" id="childSubtitlesTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:80px">Select</th>
+                                            <th>Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($allSubTitles as $subtitle)
+                                            <tr>
+                                                <td class="align-middle"><input type="checkbox" name="child_subtitles[]" value="{{ $subtitle->id }}" {{ in_array($subtitle->id, old('child_subtitles', $subTitle->children->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}></td>
+                                                <td class="align-middle">{{ $subtitle->name }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center mt-2">
+                            <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Update</button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </div>
         </form>
@@ -97,10 +100,6 @@
             });
 
             $('#childSubtitlesTable').on('change', 'input[name="child_subtitles[]"]', function() {
-                var checkedIds = [];
-                $('#childSubtitlesTable tbody input[name="child_subtitles[]"]:checked').each(function() {
-                    checkedIds.push($(this).val());
-                });
                 updateSelect2Options();
             });
 
@@ -124,26 +123,26 @@
                     $parentSelect.trigger('change.select2');
                 }
             }
+
+            function sortCheckedToTop(tableId, checkboxClass) {
+                const $table = $(tableId);
+                const $rows = $table.find('tr');
+
+                $rows.sort(function(a, b) {
+                    const aChecked = $(a).find(checkboxClass).is(':checked');
+                    const bChecked = $(b).find(checkboxClass).is(':checked');
+
+                    if (aChecked && !bChecked) return -1;
+                    if (!aChecked && bChecked) return 1;
+                    return 0;
+                });
+
+                $table.append($rows);
+            }
+
+            sortCheckedToTop('#childSubtitlesTable tbody', 'input[name="child_subtitles[]"]');
+            updateSelect2Options();
+            $parentSelect.trigger('change');
         });
-
-        function sortCheckedToTop(tableId, checkboxClass) {
-            const $table = $(tableId);
-            const $rows = $table.find('tr');
-
-            $rows.sort(function(a, b) {
-                const aChecked = $(a).find(checkboxClass).is(':checked');
-                const bChecked = $(b).find(checkboxClass).is(':checked');
-
-                if (aChecked && !bChecked) return -1;
-                if (!aChecked && bChecked) return 1;
-                return 0;
-            });
-
-            $table.append($rows);
-        }
-
-        sortCheckedToTop('#childSubtitlesTable tbody', 'input[name="child_subtitles[]"]');
-        updateSelect2Options();
-        $parentSelect.trigger('change');
     </script>
 @endsection

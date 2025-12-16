@@ -6,13 +6,16 @@
 </style>
 @section('content')
 <div class="container">
+            @section('page_title')
+            <h3 class="text-bold">Coupons</h3>
+            @endsection
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 text-secondary text-bold">
             <h2>Coupons   ({{ $total_coupons }})</h2>
         </div>
         <div class="col-md-6">
             @can('coupon-create')
-            <a class="btn btn-success  float-end" href="{{ route('coupons.create') }}"><i class="fa fa-plus"></i></a>
+            <a class="btn btn-primary rounded-3 btn-sm float-end" href="{{ route('coupons.create') }}"><i class="fa fa-plus"></i> Add Coupon</a>
             @endcan
         </div>
     </div>
@@ -97,14 +100,14 @@
                 @if($coupon->status == 1)Enable @else Disable @endif</td>
             <td class="text-right">
                 <form id="deleteForm{{ $coupon->id }}" action="{{ route('coupons.destroy',$coupon->id) }}" method="POST">
-                    <a class="btn btn-warning" href="{{ route('coupons.show',$coupon->id) }}"><i class="fa fa-eye"></i></a>
+                    <a class="btn" href="{{ route('coupons.show',$coupon->id) }}"><i class="fa fa-eye"></i></a>
                     @can('coupon-edit')
-                    <a class="btn btn-primary" href="{{ route('coupons.edit',$coupon->id) }}"><i class="fa fa-edit"></i></a>
+                    <a class="btn text-primary" href="{{ route('coupons.edit',$coupon->id) }}"><i class="fa fa-edit"></i></a>
                     @endcan
                     @csrf
                     @method('DELETE')
                     @can('coupon-delete')
-                    <button type="button" onclick="confirmDelete('{{ $coupon->id }}')" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                    <button type="button" onclick="confirmDelete('{{ $coupon->id }}')" class="btn text-danger"><i class="fa fa-trash"></i></button>
                     @endcan
                 </form>
             </td>

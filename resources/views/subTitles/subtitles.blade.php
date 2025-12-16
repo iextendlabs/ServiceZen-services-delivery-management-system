@@ -5,7 +5,7 @@
 @endphp
 
 <div class="subTitle-node" style="margin-left: {{ $marginLeft }}px;" data-name="{{ strtolower($subTitle->name) }}">
-    <div class="subTitle-header">
+    <div class="subTitle-header d-flex justify-content-between align-items-center">
         <div class="subTitle-title-wrapper">
             @if ($subTitle->children && $subTitle->children->count())
                 <span class="toggle-icon" data-bs-toggle="collapse" data-bs-target="#children-{{ $subTitle->id }}"

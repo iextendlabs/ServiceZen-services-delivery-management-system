@@ -2,26 +2,61 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-6 text-left mt-3">
-                <h2>Cash Collection</h2>
-            </div>
-            <div class="col-md-6 mt-3 no-print">
-                <div class="d-flex flex-wrap justify-content-md-end">
-                    <a  href="{{ request()->fullUrlWithQuery(['print' => '1']) }}" class="btn btn-danger mb-2"><i
-                            class="fa fa-print"></i> PDF</a>
-
-                    <a href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}" class="btn btn-success mb-2 ms-md-2"><i
-                            class="fa fa-download"></i> Excel</a>
-
-                    <a class="btn btn-danger mb-2 ms-md-2" href="{{ route('cashCollection.index') }}?status=Not Approved">
-                        <i class="fas fa-times"></i> Not Approved
-                    </a>
-
-                    <a class="btn btn-success mb-2 ms-md-2" href="{{ route('cashCollection.index') }}?status=Approved">
-                        <i class="fas fa-check"></i> Approved
-                    </a>
+            @section('page_title')
+            <h3 class="">Cash Collection</h3>
+            @endsection
+<div class="row align-items-center mt-3 no-print ml-1">
+    <!-- Filter Section -->
+    <div class="col-md-8 mb-3 mb-md-0">
+        <form action="{{ route('cashCollection.index') }}" method="GET" enctype="multipart/form-data">
+            <div class="form-row align-items-center">
+                <div class="col-md-8 mb-2 mb-md-0">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white border-right-0"  style="border-radius: 0.75rem 0 0 0.75rem;">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                        </div>
+                        <input type="number" name="order_id" class="form-control border-left-0"
+                            placeholder="Search by Order ID..." value="{{ $filter_order_id }}" style="border-left: 0; height: 2rem;">
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex">
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-sm btn-primary font-weight-bold mr-2">Apply Filter</button>
+                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light border font-weight-bold"><i class="fas fa-redo"></i> Reset</a>
+                        </div>
                 </div>
             </div>
+        </form>
+    </div>
+
+    <!-- Actions Dropdown -->
+    <div class="col-md-4 text-md-right">
+        <div class="dropdown">
+            <button class="btn dropdown-toggle px-4" type="button" id="actionDropdown" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-ellipsis-h"></i> Actions
+            </button>
+            <div class="dropdown-menu dropdown-menu-right shadow-sm border-0" aria-labelledby="actionDropdown">
+                <a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['print' => '1']) }}">
+                    <i class="fa fa-file-pdf mr-2"></i> Export PDF
+                </a>
+                <a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['csv' => '1']) }}">
+                    <i class="fa fa-file-excel mr-2"></i> Export Excel
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{{ route('cashCollection.index') }}?status=Not Approved">
+                    <i class="fas fa-times-circle mr-2"></i> Not Approved
+                </a>
+                <a class="dropdown-item " href="{{ route('cashCollection.index') }}?status=Approved">
+                    <i class="fas fa-check-circle mr-2"></i> Approved
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
         </div>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
@@ -30,33 +65,11 @@
             </div>
         @endif
         <hr>
-        <div class="row no-print">
-            <div class="col-md-12">
-                {{-- <h3>Filter</h3> --}}
-                {{-- <hr> --}}
-                <form action="{{ route('cashCollection.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="offset-8 col-md-4">
-                            <div class="form-group">
-                                <span style="color: red;">*</span><strong>Order ID:</strong>
-                                <div class="input-group mb-3">
-                                    <input type="number" name="order_id" class="form-control"
-                                        value="{{ $filter_order_id }}">
-
-                                </div>
-                                <div class="float-right">
-                                    <button type="submit" class="btn btn-primary">Filter</button>
-                                    <a href="{{ url()->current() }}" class="btn btn-secondary">Reset</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+        <div class="h3 text-secondary mb-4 section-heading font-weight-bold ml-3">
+            <h3>Cash Collections ({{ $total_cash_collection }})</h3>
         </div>
-        <h3>Cash Collections ({{ $total_cash_collection }})</h3>
         <div class="col-md-12">
-            <table class="table table-striped table-bordered table-responsive">
+            <table class="table table-hovere-bordered table-responsive">
                 <tr>
                     <th>SR#</th>
                     <th class="">
@@ -124,12 +137,12 @@
                                     action="{{ route('cashCollection.destroy', $cash_collection->id) }}" method="POST">
                                     @can('cash-collection-edit')
                                         @if ($cash_collection->status == 'Not Approved')
-                                            <a class="btn btn-sm btn-success"
+                                            <a class="btn btn-sm text-primary"
                                                 href="{{ route('cashCollectionUpdate', $cash_collection->id) }}?status=Approved">
                                                 <i class="fas fa-thumbs-up"></i>
                                             </a>
                                         @endif
-                                        <a class="btn btn-sm btn-danger"
+                                        <a class="btn btn-sm"
                                             href="{{ route('cashCollectionUpdate', $cash_collection->id) }}?status=Not Approved">
                                             <i class="fas fa-thumbs-down"></i>
                                         </a>
@@ -144,7 +157,7 @@
                                     @method('DELETE')
                                     @can('cash-collection-delete')
                                         <button type="button" onclick="confirmDelete('{{ $cash_collection->id }}')"
-                                            class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            class="btn btn-sm"><i class="fas fa-trash text-danger"></i></button>
                                     @endcan
                                 </form>
                             </td>

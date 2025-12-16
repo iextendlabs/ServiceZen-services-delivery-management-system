@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+    @section('page_title')
+    <h3 class="">Freelancer Program Joinee</h3>
+    @endsection
     <div class="container">
         <div class="row">
             <div class="col-md-12 margin-tb">
@@ -16,9 +19,95 @@
         @endif
         <hr>
         <div class="row">
-            <div class="col-md-9">
-                <table class="table table-striped table-bordered">
-                    <tr>
+            <div class="col-md-12">
+                <h3>Filter</h3>
+                <hr>
+                <form action="{{ route('freelancerProgram.index') }}" method="GET" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small text-muted font-weight-medium mb-1">Status</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-clock text-muted"></i></span>
+                                        </div>
+                                    <select name="status" class="form-control">
+                                        <option value="">-- Select Status --</option>
+                                        <option value="2" @if ($filters['status'] === '2') selected @endif>New
+                                        <option value="1" @if ($filters['status'] === '1') selected @endif>Accepted
+                                        </option>
+                                        <option value="0" @if ($filters['status'] === '0') selected @endif>Rejected
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                                        {{-- <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                                            <label class="small text-muted font-weight-medium mb-1">Status</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-clock text-muted"></i></span>
+                                                </div>
+                                                <select name="status" class="custom-select" style="border-left: 0;">
+                                                    <option value="">Select</option>
+                                                    @foreach ($statuses as $status)
+                                                        <option value="{{ $status }}" @if ($status == $filter['status']) selected @endif>{{ $status }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div> --}}
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small text-muted font-weight-medium mb-1">Name</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-user text-muted"></i></span>
+                                    </div>
+                                    <input type="text" name="name" value="{{ $filters['name'] }}" class="form-control" placeholder="Enter Name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small text-muted font-weight-medium mb-1">Email</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-envelope text-muted"></i></span>
+                                    </div>
+                                    <input type="email" name="email" id="email-autocomplete" value="{{ $filters['email'] }}" class="form-control" autocomplete="off" placeholder="Enter Email...">
+                                    <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
+                                    <style>
+                                        #email-suggestions .list-group-item {
+                                            cursor: pointer !important;
+                                        }
+                                        #email-suggestions .list-group-item:hover {
+                                            background-color: #f0f0f0;
+                                        }
+                                    </style>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="small text-muted font-weight-medium mb-1">Freelancer Group:</label>
+                                <select name="freelancer_group_id" class="form-control select2">
+                                    <option value="">-- Select Freelancer Group --</option>
+                                    @foreach ($freelancer_groups as $group)
+                                        <option value="{{ $group->id }}" @if ($filters['freelancer_group_id'] == $group->id) selected @endif>{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3 my-4 pt-2 text-end">
+                            <button type="submit" class="btn btn-primary w-50">Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>            
+            <div class="col-md-12">
+                <table class="table table-hover table-bordered">
+                    <tr class="table-white bg-primary text-white">
                         <th>Sr#</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -34,10 +123,10 @@
                                 <td>{{ $user->email }}</td>
                                 <td>
                                     @if ($user->freelancer_program === '1')
-                                        <span class="badge bg-success">Accepted</span>
+                                        <span class="badge bg-primary rounded-3">Accepted</span>
                                     @elseif($user->freelancer_program === '0')
                                         @if ($user->staff)
-                                            <span class="badge bg-warning text-dark">New</span>
+                                            <span class="badge bg-warning rounded-3 text-dark">New</span>
                                         @else
                                             <span class="badge bg-danger">Rejected</span>
                                         @endif
@@ -55,25 +144,25 @@
                                         action="{{ route('freelancerProgram.destroy', $user->id) }}" method="POST">
                                         @if ($user->freelancer_program === '0')
                                             @can('freelancer-program-edit')
-                                                <a class="btn btn-success"
+                                                <a class="btn text-dark"
                                                     href="{{ route('freelancerProgram.edit', $user->id) }}?status=Accepted">
                                                     <i class="fas fa-thumbs-up"></i>
                                                 </a>
                                             @endcan
                                         @elseif ($user->freelancer_program === '1')
                                             @can('freelancer-program-edit')
-                                                <a class="btn btn-danger"
+                                                <a class="btn text-dark"
                                                     href="{{ route('freelancerProgram.edit', $user->id) }}?status=Rejected">
                                                     <i class="fas fa-thumbs-down"></i>
                                                 </a>
-                                                <a class="btn btn-primary"
+                                                <a class="btn text-dark"
                                                     href="{{ route('serviceStaff.edit', $user->id) }}?freelancer_join=1">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             @endcan
                                         @endif
                                         @if ($user->staff)
-                                            <a class="btn btn-warning"
+                                            <a class="btn text-dark"
                                                 href="{{ route('serviceStaff.show', $user->id) }}?freelancer_join=1">
                                                 <i class="fas fa-eye"></i>
                                             </a>
@@ -82,7 +171,7 @@
                                         @can('freelancer-program-delete')
                                             @method('DELETE')
                                             <button type="button" onclick="confirmDelete('{{ $user->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                                class="btn text-danger"><i class="fa fa-trash"></i></button>
                                         @endcan
                                     </form>
                                 </td>
@@ -96,63 +185,6 @@
                 </table>
                 {!! $users->links() !!}
 
-            </div>
-            <div class="col-md-3">
-                <h3>Filter</h3>
-                <hr>
-                <form action="{{ route('freelancerProgram.index') }}" method="GET" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Status:</strong>
-                                <select name="status" class="form-control">
-                                    <option value="">-- Select Status --</option>
-                                    <option value="2" @if ($filters['status'] === '2') selected @endif>New
-                                    <option value="1" @if ($filters['status'] === '1') selected @endif>Accepted
-                                    </option>
-                                    <option value="0" @if ($filters['status'] === '0') selected @endif>Rejected
-                                    </option>
-                                </select>
-
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filters['name'] }}" class="form-control">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group position-relative">
-                                <strong>Email:</strong>
-                                <input type="email" name="email" id="email-autocomplete" value="{{ $filters['email'] }}" class="form-control" autocomplete="off">
-                                <ul id="email-suggestions" class="list-group" style="position:absolute; z-index:1000; width:100%; display:none; max-height:180px; overflow-y:auto;"></ul>
-                                <style>
-                                    #email-suggestions .list-group-item {
-                                        cursor: pointer !important;
-                                    }
-                                    #email-suggestions .list-group-item:hover {
-                                        background-color: #f0f0f0;
-                                    }
-                                </style>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <strong>Freelancer Group:</strong>
-                                <select name="freelancer_group_id" class="form-control select2">
-                                    <option value="">-- Select Freelancer Group --</option>
-                                    @foreach ($freelancer_groups as $group)
-                                        <option value="{{ $group->id }}" @if ($filters['freelancer_group_id'] == $group->id) selected @endif>{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Filter</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

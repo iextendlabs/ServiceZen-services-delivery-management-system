@@ -3,171 +3,153 @@
     $category_row = 0;
 @endphp
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2>Add New Affiliate</h2>
+@section('page_title')
+<h3 class="">Add New Affiliate</h3>
+@endsection
+<div class="container-fluid px-1">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="m-0 h5">Add New Affiliate</h2>
+                </div>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('affiliates.store') }}" method="POST">
+                        @csrf
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Name:</label>
+                                <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Name">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Email:</label>
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="abc@gmail.com">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Password:</label>
+                                <input type="password" name="password" class="form-control" placeholder="Password">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Confirm Password:</label>
+                                <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Status:</label>
+                                <select name="status" class="form-control">
+                                    <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
+                                    <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
+                                </select>
+                            </div>
+
+                            
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Code:</label>
+                                <input type="text" name="code" class="form-control" value="{{ old('code') }}" placeholder="Code">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Phone Number:</label>
+                                <input id="number_country_code" type="hidden" name="number_country_code"/>
+                                <input type="tel" id="number" name="number" class="form-control" value="{{ old('number') }}">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Whatsapp Number:</label>
+                                <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code"/>
+                                <input type="tel" id="whatsapp" name="whatsapp" class="form-control" value="{{ old('whatsapp') }}">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Commission:</label>
+                                <input type="number" name="commission" class="form-control" value="{{ old('commission') }}" placeholder="Commission In %">
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Expire after days:</label>
+                                <input type="number" name="expire" class="form-control" value="{{ old('expire') }}" placeholder="Enter days like 20">
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Fix Salary:</label>
+                                <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}" placeholder="Fix Salary">
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Parent Affiliate:</label>
+                                <select name="parent_affiliate_id" class="form-control">
+                                    <option value=""></option>
+                                    @foreach ($affiliates as $affiliate)
+                                        @if($affiliate->affiliate->status == 1)
+                                            <option value="{{ $affiliate->id }}" {{ old('parent_affiliate_id') == $affiliate->id ? 'selected' : '' }}>
+                                                {{ $affiliate->name }}
+                                            </option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                               <label class="font-weight-bold">Parent Affiliate Commission:</label>
+                                <input type="number" name="parent_affiliate_commission" class="form-control" value="{{ old('parent_affiliate_commission') }}" placeholder="Parent Affiliate Commission In %">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Membership Plan:</label>
+                                <select name="membership_plan_id" class="form-control">
+                                    <option value=""></option>
+                                    @foreach ($membership_plans as $membership_plan)
+                                        <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id') == $membership_plan->id ? 'selected' : '' }}>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-12 pt-2">
+                                <hr>
+                                <h4 class="mb-3"><strong>Categories base commission</strong></h4>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <table id="categoryTable" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Category Commission</th>
+                                                <th>Services</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                    <button id="addCategoryBtn" onclick="addCategoryRow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 text-center mt-3">
+                                <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Submit</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <form action="{{ route('affiliates.store') }}" method="POST">
-            @csrf
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Name:</strong>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}"
-                            placeholder="Name">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Email:</strong>
-                        <input type="email" name="email" class="form-control" value="{{ old('email') }}"
-                            placeholder="abc@gmail.com">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Password:</strong>
-                        <input type="password" name="password" class="form-control" placeholder="Password">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Confirm Password:</strong>
-                        <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Status:</strong>
-                        <select name="status" class="form-control">
-                            <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
-                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
-                        </select>
-                    </div>
-                </div>
-                <hr>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Phone Number:</strong>
-                        <input id="number_country_code" type="hidden" name="number_country_code"/>
-                        <input type="tel" id="number" name="number" class="form-control" value="{{ old('number') }}">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Whatsapp Number:</strong>
-                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code"/>
-                        <input type="tel" id="whatsapp" name="whatsapp" class="form-control" value="{{ old('whatsapp') }}">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Code:</strong>
-                        <input type="text" name="code" class="form-control" value="{{ old('code') }}"
-                            placeholder="Code">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Commission:</strong>
-                        <input type="number" name="commission" class="form-control" value="{{ old('commission') }}"
-                            placeholder="Commission In %">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Expire after days:</strong>
-                        <input type="number" name="expire" class="form-control" value="{{ old('expire') }}"
-                            placeholder="Enter days like 20">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Fix Salary:</strong>
-                        <input type="number" name="fix_salary" class="form-control" value="{{ old('fix_salary') }}"
-                            placeholder="Fix Salary">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Parent Affiliate:</strong>
-                        <select name="parent_affiliate_id" class="form-control">
-                            <option value=""></option>
-                            @foreach ($affiliates as $affiliate)
-                                @if($affiliate->affiliate->status == 1)
-                                    <option value="{{ $affiliate->id }}" 
-                                        {{ old('parent_affiliate_id') == $affiliate->id ? 'selected' : '' }}>
-                                        {{ $affiliate->name }}
-                                    </option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                       <strong>Parent Affiliate Commission:</strong>
-                        <input type="number" name="parent_affiliate_commission" class="form-control" value="{{ old('parent_affiliate_commission') }}"
-                            placeholder="Parent Affiliate Commission In %">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Membership Plan:</strong>
-                        <select name="membership_plan_id" class="form-control">
-                            <option value=""></option>
-                            @foreach ($membership_plans as $membership_plan)
-                                <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id') == $membership_plan->id ? 'selected' : '' }}>{{ $membership_plan->plan_name }} (AED{{$membership_plan->membership_fee}})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                {{-- <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Expiry Date:</strong>
-                        <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ old('expiry_date') }}>
-                    </div>
-                </div> --}}
-
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Categories base commission:</strong>
-                        <table id="categoryTable" class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Category Commission</th>
-                                    <th>Services</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                            </tbody>
-                        </table>
-                        <button id="addCategoryBtn" onclick="addCategoryRow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
-                    </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-        </form>
     </div>
+</div>
     <script>
         var category_row = {{ $category_row }};
     

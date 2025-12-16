@@ -8,11 +8,11 @@
                 </div>
                 <div class="float-end">
                     @can('staff-holiday-create')
-                        <a class="btn btn-success  float-end" href="{{ route('shortHolidays.create') }}" style="margin-left: 5px;">
-                            <i class="fa fa-plus"></i></a>
+                        <a class="btn text-dark  float-end" href="{{ route('shortHolidays.create') }}" style="margin-left: 5px;">
+                            <i class="fa fa-plus"></i> Add Short Holiday</a>
                     @endcan
                     @can('staff-holiday-delete')
-                        <button id="bulkDeleteBtn" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                        <button id="bulkDeleteBtn" class="btn text-danger"><i class="fa fa-trash"></i> Delete</button>
                     @endcan
                 </div>
             </div>
@@ -26,30 +26,30 @@
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
+                <table class="table table-bordered">
                     <tr>
                         <th></th>
                         <th>Sr#</th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'date', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Date</a></i>
                             @if (request('sort') === 'date')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
+                        <th><i><a class=" ml-2 text-dark"
                                 href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'time_start', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Time
-                                Start</a>
+                                Start</a></i>
                             @if (request('sort') === 'time_start')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'hours', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Hours</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'hours', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Hours</a></i>
                             @if (request('sort') === 'hours')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
+                        <th><i><a class=" ml-2 text-dark"
                                 href="{{ route('shortHolidays.index', array_merge(request()->query(), ['sort' => 'status', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Status</a>
                             @if (request('sort') === 'status')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
@@ -78,27 +78,27 @@
                                 </td>
                                 <td>{{ $shortHoliday->staff->name }}</td>
                                 <td>
-                                    @if ($shortHoliday->status == 1)
-                                        <a class="btn btn-sm btn-danger mb-2"
-                                            href="{{ route('updateStatus', $shortHoliday->id) }}?status=0">
-                                            <i class="fas fa-thumbs-down"></i>
-                                        </a>
-                                    @else
-                                        <a class="btn btn-sm btn-success mb-2"
-                                            href="{{ route('updateStatus', $shortHoliday->id) }}?status=1">
-                                            <i class="fas fa-thumbs-up"></i>
-                                        </a>
-                                    @endif
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ($shortHoliday->status == 1)
+                                            <a class="btn btn-sm text-danger" href="{{ route('updateStatus', $shortHoliday->id) }}?status=0">
+                                                <i class="fas fa-thumbs-down"></i>
+                                            </a>
+                                        @else
+                                            <a class="btn btn-sm text-dark" href="{{ route('updateStatus', $shortHoliday->id) }}?status=1">
+                                                <i class="fas fa-thumbs-up"></i>
+                                            </a>
+                                        @endif
 
-                                    <form id="deleteForm{{ $shortHoliday->id }}"
-                                        action="{{ route('shortHolidays.destroy', $shortHoliday->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        @can('staff-holiday-delete')
-                                            <button type="button" onclick="confirmDelete('{{ $shortHoliday->id }}')"
-                                                class="btn btn-danger"><i class="fa fa-trash"></i></button>
-                                        @endcan
-                                    </form>
+                                        <form id="deleteForm{{ $shortHoliday->id }}" action="{{ route('shortHolidays.destroy', $shortHoliday->id) }}" method="POST" class="m-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            @can('staff-holiday-delete')
+                                                <button type="button" onclick="confirmDelete('{{ $shortHoliday->id }}')" class="btn btn-sm text-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            @endcan
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

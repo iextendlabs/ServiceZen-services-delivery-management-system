@@ -1,19 +1,19 @@
 @extends('layouts.app')
 @section('content')
-<div class="container">
-    @if ($message = Session::get('success'))
-    <div class="alert alert-success">
-        <span>{{ $message }}</span>
-        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
+<div class="container-fluid px-1">
     <div class="row">
-        <div class="col-md-12 margin-tb">
-            <div class="float-start">
-                <h2> Show Customer</h2>
-            </div>
-        </div>
-    </div>
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="m-0 h5"><strong>Show Customer</strong></h2>
+                </div>
+                <div class="card-body">
+                    @if ($message = Session::get('success'))
+                    <div class="alert alert-success">
+                        <span>{{ $message }}</span>
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @endif
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
@@ -117,7 +117,7 @@
     </div>
     @endif
 
-    <div class="row">
+                    <div class="row">
         @if(isset($customer->coupons))
         <h3>Customer Coupon</h3>
         <div class="col-md-12">
@@ -156,6 +156,10 @@
             @endif
         </div>
         @endif
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script>

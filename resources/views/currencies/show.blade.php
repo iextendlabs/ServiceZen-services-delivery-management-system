@@ -1,11 +1,11 @@
 @extends('layouts.app')
 <link href="{{ asset('css/checkout.css') }}?v={{config('app.version')}}" rel="stylesheet">
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-3 px-md-4">
         <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2> Show Currency</h2>
+            <div class="col-12 mt-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">Show Currency</h2>
                 </div>
             </div>
         </div>
@@ -25,26 +25,31 @@
                 </ul>
             </div>
         @endif
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Currency:</strong>
-                    {{ $currency->name }}
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-4 mb-3">
+                        <div class="form-group">
+                            <strong>Currency:</strong>
+                            <div>{{ $currency->name }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 mb-3">
+                        <div class="form-group">
+                            <strong>Symbol:</strong>
+                            <div>{{ $currency->symbol }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 mb-3">
+                        <div class="form-group">
+                            <strong>Rate:</strong>
+                            <div>{{ $currency->rate }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Symbol:</strong>
-                    {{ $currency->symbol }}
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <strong>Rate:</strong>
-                    {{ $currency->rate }}
-                </div>
-            </div>
-            
         </div>
     </div>
 @endsection

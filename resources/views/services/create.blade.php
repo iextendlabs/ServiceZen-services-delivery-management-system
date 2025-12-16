@@ -8,6 +8,8 @@
 </style>    
 @section('content')
 <div class="container">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
     <div class="row">
         <div class="col-md-6 margin-tb">
             <h2>Add New Service</h2>
@@ -30,85 +32,82 @@
         @csrf
         <ul class="nav nav-tabs" id="myTabs" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+                <a class="nav-link active" id="general-tab" data-bs-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="seo-tab" data-toggle="tab" href="#seo" role="tab" aria-controls="seo" aria-selected="false">SEO</a>
+                <a class="nav-link" id="seo-tab" data-bs-toggle="tab" href="#seo" role="tab" aria-controls="seo" aria-selected="false">SEO</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="package-services-tab" data-toggle="tab" href="#package-services" role="tab" aria-controls="package-services" aria-selected="false">Package Services</a>
+                <a class="nav-link" id="package-services-tab" data-bs-toggle="tab" href="#package-services" role="tab" aria-controls="package-services" aria-selected="false">Package Services</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="add-ons-tab" data-toggle="tab" href="#add-ons" role="tab" aria-controls="add-ons" aria-selected="false">Add ONs</a>
+                <a class="nav-link" id="add-ons-tab" data-bs-toggle="tab" href="#add-ons" role="tab" aria-controls="add-ons" aria-selected="false">Add ONs</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="variant-tab" data-toggle="tab" href="#variant" role="tab" aria-controls="variant" aria-selected="false">Variant Services</a>
+                <a class="nav-link" id="variant-tab" data-bs-toggle="tab" href="#variant" role="tab" aria-controls="variant" aria-selected="false">Variant Services</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="options-tab" data-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Price Options</a>
+                <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Price Options</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="specifications-tab" data-toggle="tab" href="#specifications" role="tab" aria-controls="options" aria-selected="false">Service Attribute / Specifications</a>
+                <a class="nav-link" id="specifications-tab" data-bs-toggle="tab" href="#specifications" role="tab" aria-controls="options" aria-selected="false">Service Attribute / Specifications</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="additionalImages-tab" data-toggle="tab" href="#additionalImages" role="tab" aria-controls="additionalImages" aria-selected="false">Additional Images</a>
+                <a class="nav-link" id="additionalImages-tab" data-bs-toggle="tab" href="#additionalImages" role="tab" aria-controls="additionalImages" aria-selected="false">Additional Images</a>
             </li>
         </ul>
         <div class="tab-content mt-2" id="myTabsContent">
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <span style="color: red;">*</span><strong>Name:</strong>
-                            <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Name">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label"><span class="text-danger">*</span> Name</label>
+                            <input type="text" name="name" value="{{ old('name') }}" class="form-control rounded-3" placeholder="Name">
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <span style="color: red;">*</span><strong for="image">Upload Image</strong>
-                            <p class="text-danger"><strong>Note: </strong>Upload image with dimensions 1005 x 600px Thank you!</p>
-                            <input type="file" name="image" id="image" class="form-control-file ">
-                            <br>
-                            <img id="preview" src="/service-images/" height="130px">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label"><span class="text-danger">*</span> Upload Image <small class="text-muted">(1005 x 600px)</small></label>
+                            <input type="file" name="image" id="image" class="form-control">
+                            <div class="mt-2">
+                                <img id="preview" src="/service-images/" class="img-fluid rounded" style="max-height:140px">
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Status:</strong>
-                            <select name="status" class="form-control">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select rounded-3">
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Enable</option>
                                 <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Disable</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Feature Service:</strong>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1" {{ old('feature') == '1' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="feature">Enable featured service</label>
-                            </div>
+                    <div class="col-12 col-md-6 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="feature" id="feature" value="1" {{ old('feature') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label ms-2" for="feature">Enable featured service</label>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Quote:</strong>
-                            <select name="quote" class="form-control">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Quote</label>
+                            <select name="quote" class="form-select rounded-3">
                                 <option value="1" {{ old('quote') == '1' ? 'selected' : '' }}>Enable</option>
                                 <option value="0" {{ old('quote') == '0' ? 'selected' : '' }}>Disable</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Pipeline Id:</strong>
-                            <input type="number" value="{{ old('pipelineId') }}" name="pipelineId" class="form-control" placeholder="Pipeline Id">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Pipeline Id</label>
+                            <input type="number" value="{{ old('pipelineId') }}" name="pipelineId" class="form-control rounded-3" placeholder="Pipeline Id">
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Description:</strong>
-                            <textarea class="form-control" id="description_summernote" name="description" placeholder="Description">{{ old('description') }}</textarea>
+                    <div class="col-12">
+                        <div class="mb-2">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control rounded-3" id="description_summernote" name="description" placeholder="Description">{{ old('description') }}</textarea>
                             <script>
                                 (function($) {
                                     $('#description_summernote').summernote({
@@ -140,12 +139,12 @@
                                             }
                                         }
                                     });
-    
+
                                     function uploadImage(file) {
                                         let data = new FormData();
                                         data.append("file", file);
                                         data.append("_token", "{{ csrf_token() }}");
-    
+
                                         $.ajax({
                                             url: "{{ route('summerNote.upload') }}",
                                             method: "POST",
@@ -165,114 +164,56 @@
 
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Short Description:</strong>
-                            <textarea class="form-control" style="height:150px" id="short_description_summernote" name="short_description" placeholder="Short Description">{{old('short_description') }}</textarea>
-                            <script>
-                                (function($) {
-                                    $('#short_description_summernote').summernote({
-                                        tabsize: 2,
-                                        height: 250,
-                                        toolbar: [
-                                            ['style', ['style']],
-                                            ['font', ['bold', 'italic', 'underline', 'clear']],
-                                            ['fontname', ['fontname']],
-                                            ['fontsize', ['fontsize']],
-                                            ['color', ['color']],
-                                            ['para', ['ul', 'ol', 'paragraph']],
-                                            ['height', ['height']],
-                                            ['insert', ['picture', 'link', 'video', 'table']],
-                                            ['misc', ['undo', 'redo']], 
-                                            ['view', ['fullscreen', 'codeview', 'help']]
-                                        ],
-                                        popover: {
-                                            image: [
-                                                ['custom', ['imageAttributes']],
-                                                ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
-                                                ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                                                ['remove', ['removeMedia']]
-                                            ]
-                                        },
-                                        callbacks: {
-                                            onImageUpload: function(files) {
-                                                uploadImage(files[0]);
-                                            }
-                                        }
-                                    });
-    
-                                    function uploadImage(file) {
-                                        let data = new FormData();
-                                        data.append("file", file);
-                                        data.append("_token", "{{ csrf_token() }}");
-    
-                                        $.ajax({
-                                            url: "{{ route('summerNote.upload') }}",
-                                            method: "POST",
-                                            data: data,
-                                            processData: false,
-                                            contentType: false,
-                                            success: function(response) {
-                                                $('#short_description_summernote').summernote('insertImage', response.url);
-                                            },
-                                            error: function(response) {
-                                                console.error(response);
-                                            }
-                                        });
-                                    }
-                                })(jQuery);
-                            </script>
+                    <div class="col-12">
+                        <div class="mb-2">
+                            <label class="form-label">Short Description</label>
+                            <textarea class="form-control rounded-3" style="height:150px" id="short_description_summernote" name="short_description" placeholder="Short Description">{{old('short_description') }}</textarea>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <span style="color: red;">*</span><strong>Price:</strong>
-                            <input type="number" value="{{ old('price') }}" name="price" class="form-control" placeholder="Price">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label"><span class="text-danger">*</span> Price</label>
+                            <input type="number" value="{{ old('price') }}" name="price" class="form-control rounded-3" placeholder="Price">
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Discount Price:</strong>
-                            <input type="number" value="{{ old('discount') }}" name="discount" class="form-control" placeholder="Discount Price">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Discount Price</label>
+                            <input type="number" value="{{ old('discount') }}" name="discount" class="form-control rounded-3" placeholder="Discount Price">
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <strong>Duration:</strong>
-                            <input type="text" value="{{ old('duration') }}" name="duration" class="form-control" placeholder="Duration">
+                    <div class="col-12 col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label">Duration</label>
+                            <input type="text" value="{{ old('duration') }}" name="duration" class="form-control rounded-3" placeholder="Duration">
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group scroll-div">
-                            <span style="color: red;">*</span><strong>Category:</strong>
-                            <input type="text" name="categories-search" id="categories-search" class="form-control" placeholder="Search Category By Name">
-                            <table class="table table-striped table-bordered categories-table">
-                                <tr>
-                                    <th></th>
-                                    <th>Name</th>
-                                </tr>
-                                @foreach ($service_categories as $category)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" {{ in_array($category->id, old('categoriesId', [])) ? 'checked' : '' }}>
-                                    </td>
-                                    <td>{{ $category->title }}</td>
-                                </tr>
-                                @endforeach
-                            </table>
+                    <div class="col-12">
+                        <div class="mb-2" style="max-height:300px; overflow-y:auto;">
+                            <label class="form-label"><span class="text-danger">*</span> Category</label>
+                            <input type="text" name="categories-search" id="categories-search" class="form-control rounded-3" placeholder="Search Category By Name">
+                            <div class="table-responsive mt-2">
+                                <table class="table table-striped table-bordered categories-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:48px"></th>
+                                            <th>Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($service_categories as $category)
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="categoriesId[{{ ++$i }}]" value="{{ $category->id }}" {{ in_array($category->id, old('categoriesId', [])) ? 'checked' : '' }}>
+                                            </td>
+                                            <td>{{ $category->title }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <!-- <div class="col-md-12">
-                        <div class="form-group">
-                            <span style="color: red;">*</span><strong>Category:</strong>
-                            <select name="category_id" class="form-control">
-                                <option></option>
-                                @foreach($service_categories as $category)
-                                <option value="{{$category->id}}">{{$category->title}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div> -->
                 </div>
             </div>
             <div class="tab-pane fade show" id="seo" role="tabpanel" aria-labelledby="seo-tab">
@@ -483,11 +424,12 @@
                     </div>
                 </div>
             </div> --}}
-            <div class="col-md-12 text-center mt-4">
-                <button type="submit" class="btn btn-block btn-primary">Save</button>
+            <div class="d-grid gap-2 col-6 mx-auto mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Save</button>
             </div>
+        </form>
         </div>
-    </form>
+    </div>
 </div>
 <script>
     $(document).ready(function(){

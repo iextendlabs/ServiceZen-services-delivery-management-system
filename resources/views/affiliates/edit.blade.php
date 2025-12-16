@@ -3,321 +3,296 @@
     $category_row = 0;
 @endphp
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2>Edit Affiliate</h2>
+<div class="container-fluid px-1">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="m-0 h5"><strong>Edit Affiliate</strong></h2>
+                </div>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <strong>Whoops!</strong> There were some problems with your input.<br /><br />
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <form action="{{ route('affiliates.update', $affiliate->id) }}" method="POST">
+                        <input type="hidden" value="{{ $affiliate->affiliate->id ?? '' }}" name="affiliate_id" />
+                        <input type="hidden" value="{{ $affiliate_join }}" name="affiliate_join" />
+                        <input type="hidden" name="url" value="{{ url()->previous() }}" />
+                        @csrf @method('PUT')
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Name:</label>
+                                <input type="text" name="name" value="{{ old( 'name', $affiliate->name ) }}" class="form-control" placeholder="Name" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Email:</label>
+                                <input type="email" name="email" value="{{ old('email', $affiliate->email) }}" class="form-control" placeholder="abc@gmail.com" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Password:</label>
+                                <input type="password" name="password" class="form-control" placeholder="Password" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Confirm Password:</label>
+                                <input type="password" name="confirm-password" class="form-control" placeholder="Confirm Password" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Status:</label>
+                                <select name="status" class="form-control">
+                                    <option value="1" {{ old('status', $affiliate->affiliate->status ?? '') == "1" ? 'selected' : '' }}>Enable</option>
+                                    <option value="0"  {{ old('status', $affiliate->affiliate->status ?? '') == "0" ? 'selected' : '' }}>Disable</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Code:</label>
+                                <input type="text" name="code" value="{{ old( 'code', $affiliate->affiliate->code ?? '' ) }}" class="form-control" placeholder="Code" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-6">
+                                <label class="font-weight-bold">Phone Number:</label>
+                                <input id="number_country_code" type="hidden" name="number_country_code" />
+                                <input type="tel" id="number" name="number" value="{{ old( 'number' ,$affiliate->affiliate->number ?? '' ) }}" class="form-control">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6">
+                                <label class="font-weight-bold">Whatsapp Number:</label>
+                                <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
+                                <input type="tel" id="whatsapp" name="whatsapp" value="{{ old('whatsapp', $affiliate->affiliate->whatsapp ?? '') }}" class="form-control">
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold"><span class="text-danger">*</span> Commission:</label>
+                                <input type="number" name="commission" value="{{ old( 'commission' , $affiliate->affiliate->commission ?? '' )  }}" class="form-control" placeholder="Commission In %" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Expire after days:</label>
+                                <input type="number" name="expire" class="form-control" value="{{ old( 'expire' , $affiliate->affiliate->expire ?? '') }}" placeholder="Enter days like 20" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Fix Salary:</label>
+                                <input type="number" name="fix_salary" value="{{ old( 'fix_salary' , $affiliate->affiliate->fix_salary ?? '' ) }}" class="form-control" placeholder="Fix Salary" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-4 mb-3">
+                                <label class="font-weight-bold">Parent Affiliate:</label>
+                                <select name="parent_affiliate_id" class="form-control">
+                                    <option value=""></option>
+                                    @foreach ($affiliates as $single_affiliate)
+                                        @if ($single_affiliate->affiliate->status == 1 && $single_affiliate->id !== $affiliate->id)
+                                            <option value="{{ $single_affiliate->id }}" {{ old('parent_affiliate_id', $affiliate->affiliate->parent_affiliate_id ?? '') == $single_affiliate->id ? 'selected' : '' }}>
+                                                {{ $single_affiliate->name }}
+                                            </option>                                
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Parent Affiliate Commission:</label>
+                                <input type="number" name="parent_affiliate_commission" value="{{ old('parent_affiliate_commission', $affiliate->affiliate->parent_affiliate_commission ?? '') }}" class="form-control" placeholder="Parent Affiliate Commission In %" />
+                            </div>
+
+                            <div class="form-group col-12 col-md-6 mb-3">
+                                <label class="font-weight-bold">Membership Plan:</label>
+                                <select name="membership_plan_id" class="form-control">
+                                    <option value=""></option>
+                                    @foreach ($membership_plans as $membership_plan)
+                                        <option value="{{ $membership_plan->id }}" {{ old('membership_plan_id', optional($affiliate->affiliate)->membership_plan_id) == $membership_plan->id ? 'selected' : '' }}>
+                                            {{ $membership_plan->plan_name }} (AED{{ $membership_plan->membership_fee }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Categories base commission:</strong>
+                            <table id="categoryTable" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Category Commission</th>
+                                        <th>Services</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if($affiliate->affiliateCategories)
+                                        @foreach ($affiliate->affiliateCategories as $index => $affiliateCategory)
+                                        <tr>
+                                            <td>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <select name='categories[{{ $index }}][category_id]' class="form-control category-select" required>
+                                                            <option value="">Select Category</option>
+                                                            @foreach ($categories as $category)
+                                                                <option value="{{ $category->id }}" 
+                                                                    @if($affiliateCategory->category_id == $category->id) selected @endif>
+                                                                    {{ $category->title }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="col-md-12">
+                                                    <div class="form-group d-flex">
+                                                        <input type="number" name="categories[{{ $index }}][category_commission]" 
+                                                            value="{{ $affiliateCategory->commission }}" class="form-control category-commission" 
+                                                            placeholder="Commission" required min="1">
+                                                        <select name="categories[{{ $index }}][commission_type]" class="form-control commission-type">
+                                                            <option value="percentage" {{ $affiliateCategory->commission_type == 'percentage' ? 'selected' : '' }}>%</option>
+                                                            <option value="fixed" {{ $affiliateCategory->commission_type == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-success add-service" data-category-row="{{ $index }}">
+                                                    <i class="fa fa-plus-circle"></i> Add Service
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger remove-category">
+                                                    <i class="fa fa-minus-circle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr id="service-container-{{ $index }}">
+                                            <td colspan="4">
+                                                <div class="service-wrapper d-flex flex-wrap">
+                                                    @if($affiliateCategory->services)
+                                                        @foreach ($affiliateCategory->services as $serviceIndex => $service)
+                                                        <div class="service-box col-md-6 border-bottom mb-3 py-3">
+                                                            <div class="form-group">
+                                                                <select name="categories[{{ $index }}][services][{{ $serviceIndex }}][service_id]" 
+                                                                    class="form-control service-select select2" required>
+                                                                    <option value="">Select Service</option>
+                                                                    @foreach ($services as $serviceOption)
+                                                                        <option value="{{ $serviceOption->id }}" 
+                                                                            @if($service->service_id == $serviceOption->id) selected @endif>
+                                                                            {{ $serviceOption->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group d-flex">
+                                                                <input type="number" name="categories[{{ $index }}][services][{{ $serviceIndex }}][service_commission]" 
+                                                                    value="{{ $service->commission }}" class="form-control service-commission" required min="1">
+                                                                <select name="categories[{{ $index }}][services][{{ $serviceIndex }}][commission_type]" class="form-control commission-type">
+                                                                    <option value="percentage" {{ $service->commission_type == 'percentage' ? 'selected' : '' }}>%</option>
+                                                                    <option value="fixed" {{ $service->commission_type == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                                                                </select>
+                                                            </div>
+                                                            <button type="button" class="btn btn-danger remove-service"><i class="fa fa-minus-circle"></i></button>
+                                                        </div>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                            <button id="addCategoryBtn" onclick="addCategoryRow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
+                        </div>
+                    </div>
+                    {{-- <div class="col-md-12">
+                        <div class="form-group">
+                            <strong>Expiry Date:</strong>
+                            <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $affiliate->affiliate->expiry_date ?? "" }}>
+                        </div>
+                    </div> --}}
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span style="color: red">*</span><strong>Customer Display:</strong>
+                            <select name="display_type" id="display_type" class="form-control">
+                                <option value="1" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable
+                                </option>
+                                <option value="0" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 0) selected @endif>Disable
+                                </option>
+                                <option value="2" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 2) selected @endif>Selected Customer
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="display: none" id="customer">
+                        @if (count($affiliateUser) > 0)
+                            <div class="form-group @if (count($affiliateUser) > 6) scroll-div @endif">
+                                <span style="color: red">*</span><strong>Select Customer To Display:</strong>
+                                <input type="text" name="customer-search" id="customer-search" class="form-control"
+                                    placeholder="Search Customer By Name or Email" />
+                                <table class="table table-striped table-bordered customer-table">
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                    </tr>
+                                    @foreach ($affiliateUser as $user)
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="customer_checkbox"
+                                                    @if ($user->display == '1') checked @endif name="customerId[]"
+                                                    value="{{ $user->user_id }}"/>
+                                            </td>
+                                            <td>{{ $user->customer->name }}</td>
+                                            <td>{{ $user->customer->email }}</td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+
+                            <div class="form-group">
+                                <span style="color: red">*</span><strong>Selected Customer:</strong>
+                                <table class="table table-striped table-bordered selected-customer-table">
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                    </tr>
+                                        @if ($affiliateUser->where('display', 1)->count() > 0)
+                                            @foreach ($affiliateUser->where('display', 1) as $user)
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" class="selected_customer_checkbox" checked
+                                                            name="selectedCustomerId[]" value="{{ $user->user_id }}"/>
+                                                    </td>
+                                                    <td>{{ $user->customer->name }}</td>
+                                                    <td>{{ $user->customer->email }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center">
+                                <h4>There is no customer</h4>
+                            </div>
+                        @endif
+                    </div>
+                        <div class="col-md-12 text-center">
+                            <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Update</button>
+                        </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br /><br />
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <form action="{{ route('affiliates.update', $affiliate->id) }}" method="POST">
-            <input type="hidden" value="{{ $affiliate->affiliate->id ?? '' }}" name="affiliate_id" />
-            <input type="hidden" value="{{ $affiliate_join }}" name="affiliate_join" />
-            <input type="hidden" name="url" value="{{ url()->previous() }}" />
-            @csrf @method('PUT')
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red">*</span><strong>Name:</strong>
-                        <input type="text" name="name" value="{{ old( 'name', $affiliate->name ) }}" class="form-control"
-                            placeholder="Name" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red">*</span><strong>Email:</strong>
-                        <input type="email" name="email" value="{{ old('email', $affiliate->email) }}" class="form-control"
-                            placeholder="abc@gmail.com" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Password:</strong>
-                        <input type="password" name="password" class="form-control" placeholder="Password" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Confirm Password:</strong>
-                        <input type="password" name="confirm-password" class="form-control"
-                            placeholder="Confirm Password" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Status:</strong>
-                        <select name="status" class="form-control">
-                            <option value="1" {{ old('status', $affiliate->affiliate->status ?? '') == "1" ? 'selected' : '' }}>Enable</option>
-                            <option value="0"  {{ old('status', $affiliate->affiliate->status ?? '') == "0" ? 'selected' : '' }}>Disable</option>
-                        </select>
-                    </div>
-                </div>
-                <hr>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Phone Number:</strong>
-                        <input id="number_country_code" type="hidden" name="number_country_code" />
-                        <input type="tel" id="number" name="number" value="{{ old( 'number' ,$affiliate->affiliate->number ?? '' ) }}"
-                            class="form-control">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Whatsapp Number:</strong>
-                        <input id="whatsapp_country_code" type="hidden" name="whatsapp_country_code" />
-                        <input type="tel" id="whatsapp" name="whatsapp"
-                            value="{{ old('whatsapp', $affiliate->affiliate->whatsapp ?? '') }}" class="form-control">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red">*</span><strong>Code:</strong>
-                        <input type="text" name="code" value="{{ old( 'code', $affiliate->affiliate->code ?? '' ) }}"
-                            class="form-control" placeholder="Code" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red">*</span><strong>Commission:</strong>
-                        <input type="number" name="commission" value="{{ old( 'commission' , $affiliate->affiliate->commission ?? '' )  }}"
-                            class="form-control" placeholder="Commission In %" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Expire after days:</strong>
-                        <input type="number" name="expire" class="form-control"
-                            value="{{ old( 'expire' , $affiliate->affiliate->expire ?? '') }}" placeholder="Enter days like 20" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Fix Salary:</strong>
-                        <input type="number" name="fix_salary" value="{{ old( 'fix_salary' , $affiliate->affiliate->fix_salary ?? '' ) }}"
-                            class="form-control" placeholder="Fix Salary" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Parent Affiliate:</strong>
-                        <select name="parent_affiliate_id" class="form-control">
-                            <option value=""></option>
-                            @foreach ($affiliates as $single_affiliate)
-                                @if ($single_affiliate->affiliate->status == 1 && $single_affiliate->id !== $affiliate->id)
-                                    <option value="{{ $single_affiliate->id }}"
-                                        {{ old('parent_affiliate_id', $affiliate->affiliate->parent_affiliate_id ?? '') == $single_affiliate->id ? 'selected' : '' }}>
-                                        {{ $single_affiliate->name }}
-                                    </option>                                
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Parent Affiliate Commission:</strong>
-                        <input type="number" name="parent_affiliate_commission" value="{{ old('parent_affiliate_commission', $affiliate->affiliate->parent_affiliate_commission ?? '') }}"
-                            class="form-control" placeholder="Parent Affiliate Commission In %" />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Membership Plan:</strong>
-                        <select name="membership_plan_id" class="form-control">
-                            <option value=""></option>
-                            @foreach ($membership_plans as $membership_plan)
-                                <option value="{{ $membership_plan->id }}" 
-                                    {{ old('membership_plan_id', optional($affiliate->affiliate)->membership_plan_id) == $membership_plan->id ? 'selected' : '' }}>
-                                    {{ $membership_plan->plan_name }} (AED{{ $membership_plan->membership_fee }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Categories base commission:</strong>
-                        <table id="categoryTable" class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Category Commission</th>
-                                    <th>Services</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if($affiliate->affiliateCategories)
-                                    @foreach ($affiliate->affiliateCategories as $index => $affiliateCategory)
-                                    <tr>
-                                        <td>
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <select name='categories[{{ $index }}][category_id]' class="form-control category-select" required>
-                                                        <option value="">Select Category</option>
-                                                        @foreach ($categories as $category)
-                                                            <option value="{{ $category->id }}" 
-                                                                @if($affiliateCategory->category_id == $category->id) selected @endif>
-                                                                {{ $category->title }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="col-md-12">
-                                                <div class="form-group d-flex">
-                                                    <input type="number" name="categories[{{ $index }}][category_commission]" 
-                                                        value="{{ $affiliateCategory->commission }}" class="form-control category-commission" 
-                                                        placeholder="Commission" required min="1">
-                                                    <select name="categories[{{ $index }}][commission_type]" class="form-control commission-type">
-                                                        <option value="percentage" {{ $affiliateCategory->commission_type == 'percentage' ? 'selected' : '' }}>%</option>
-                                                        <option value="fixed" {{ $affiliateCategory->commission_type == 'fixed' ? 'selected' : '' }}>Fixed</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-success add-service" data-category-row="{{ $index }}">
-                                                <i class="fa fa-plus-circle"></i> Add Service
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-category">
-                                                <i class="fa fa-minus-circle"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr id="service-container-{{ $index }}">
-                                        <td colspan="4">
-                                            <div class="service-wrapper d-flex flex-wrap">
-                                                @if($affiliateCategory->services)
-                                                    @foreach ($affiliateCategory->services as $serviceIndex => $service)
-                                                    <div class="service-box col-md-6 border-bottom mb-3 py-3">
-                                                        <div class="form-group">
-                                                            <select name="categories[{{ $index }}][services][{{ $serviceIndex }}][service_id]" 
-                                                                class="form-control service-select select2" required>
-                                                                <option value="">Select Service</option>
-                                                                @foreach ($services as $serviceOption)
-                                                                    <option value="{{ $serviceOption->id }}" 
-                                                                        @if($service->service_id == $serviceOption->id) selected @endif>
-                                                                        {{ $serviceOption->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group d-flex">
-                                                            <input type="number" name="categories[{{ $index }}][services][{{ $serviceIndex }}][service_commission]" 
-                                                                value="{{ $service->commission }}" class="form-control service-commission" required min="1">
-                                                            <select name="categories[{{ $index }}][services][{{ $serviceIndex }}][commission_type]" class="form-control commission-type">
-                                                                <option value="percentage" {{ $service->commission_type == 'percentage' ? 'selected' : '' }}>%</option>
-                                                                <option value="fixed" {{ $service->commission_type == 'fixed' ? 'selected' : '' }}>Fixed</option>
-                                                            </select>
-                                                        </div>
-                                                        <button type="button" class="btn btn-danger remove-service"><i class="fa fa-minus-circle"></i></button>
-                                                    </div>
-                                                    @endforeach
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                        <button id="addCategoryBtn" onclick="addCategoryRow();" type="button" class="btn btn-primary float-right"><i class="fa fa-plus-circle"></i></button>
-                    </div>
-                </div>
-                {{-- <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Expiry Date:</strong>
-                        <input type="date" name="expiry_date" class="form-control" min="{{ date('Y-m-d') }}" value={{ $affiliate->affiliate->expiry_date ?? "" }}>
-                    </div>
-                </div> --}}
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red">*</span><strong>Customer Display:</strong>
-                        <select name="display_type" id="display_type" class="form-control">
-                            <option value="1" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 1) selected @endif>Enable
-                            </option>
-                            <option value="0" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 0) selected @endif>Disable
-                            </option>
-                            <option value="2" @if ($affiliate->affiliate && $affiliate->affiliate->display_type == 2) selected @endif>Selected Customer
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12" style="display: none" id="customer">
-                    @if (count($affiliateUser) > 0)
-                        <div class="form-group @if (count($affiliateUser) > 6) scroll-div @endif">
-                            <span style="color: red">*</span><strong>Select Customer To Display:</strong>
-                            <input type="text" name="customer-search" id="customer-search" class="form-control"
-                                placeholder="Search Customer By Name or Email" />
-                            <table class="table table-striped table-bordered customer-table">
-                                <tr>
-                                    <th></th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                </tr>
-                                @foreach ($affiliateUser as $user)
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox" class="customer_checkbox"
-                                                @if ($user->display == '1') checked @endif name="customerId[]"
-                                                value="{{ $user->user_id }}"/>
-                                        </td>
-                                        <td>{{ $user->customer->name }}</td>
-                                        <td>{{ $user->customer->email }}</td>
-                                    </tr>
-                                @endforeach
-                            </table>
-                        </div>
-
-                        <div class="form-group">
-                            <span style="color: red">*</span><strong>Selected Customer:</strong>
-                            <table class="table table-striped table-bordered selected-customer-table">
-                                <tr>
-                                    <th></th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                </tr>
-                                    @if ($affiliateUser->where('display', 1)->count() > 0)
-                                        @foreach ($affiliateUser->where('display', 1) as $user)
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox" class="selected_customer_checkbox" checked
-                                                        name="selectedCustomerId[]" value="{{ $user->user_id }}"/>
-                                                </td>
-                                                <td>{{ $user->customer->name }}</td>
-                                                <td>{{ $user->customer->email }}</td>
-                                            </tr>
-                                        @endforeach
-                                    @endif
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center">
-                            <h4>There is no customer</h4>
-                        </div>
-                    @endif
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-        </form>
     </div>
     <script>
         $(document).ready(function () {

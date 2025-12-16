@@ -1,114 +1,93 @@
 @extends('site.layout.app')
-<link href="{{ asset('css/checkout.css') }}?v={{ config('app.version') }}" rel="stylesheet">
 @section('content')
-    <div class="album bg-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 py-2 text-center">
-                    <h2>Booking</h2>
-                </div>
+    <div class="bg-gray-50 py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-6 text-center">
+                <h2 class="text-3xl font-semibold text-gray-800">Booking</h2>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    @if (Session::has('error') || Session::has('success'))
-                        <div class="text-center" style="margin-bottom: 20px;">
-                            @if (Session::has('error'))
-                                <span class="alert alert-danger" role="alert">
-                                    <strong>{{ Session::get('error') }}</strong>
-                                </span>
-                            @endif
-                            @if (Session::has('success'))
-                                <span class="alert alert-success" role="alert">
-                                    <strong>{{ Session::get('success') }}</strong>
-                                </span>
-                            @endif
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-            </div>
-            <div class="col-md-12 errorContainer">
-            </div>
-            <div class="row" id="selected-booking-staff-slot"
-                @if (count($formattedBookings) === 0) style="display:none;" @endif>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <table class="table table-striped table-bordered selected-services-table">
-
-                            @foreach ($formattedBookings as $booking)
-                                <tr>
-                                    <th>
-                                        <i class="fa fa-calendar m-3"> {{ $booking['date'] }} </i>
-                                        <i class="fa fa-user m-3"> {{ $booking['staff'] }} </i>
-                                        <i class="fa fa-clock m-3"> {{ $booking['slot'] }}</i>
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @foreach ($booking['services'] as $service)
-                                            <div class="row m-3 @if (Session::has('excludedServices') && in_array($service->id, session('excludedServices'))) alert alert-danger @endif"
-                                                role="alert" id="{{ $service->id }}">
-                                                <div class="col-md-6">
-                                                    <div><strong>Name:</strong> {{ $service->name }}</div>
-                                                    <div><strong>Price:</strong> 
-                                                        <span class="price">
-                                                            @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_price'] > 0)
-                                                                @currency($groupedBookingOption[$service->id]['total_price'],false,true)
-                                                            @else
-                                                                @if (isset($service->discount))
-                                                                    @currency($service->discount,false,true)
-                                                                @else
-                                                                    @currency($service->price,false,true)
-                                                                @endif
-                                                            @endif
-
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_duration'] != null)
-                                                            <strong>Duration:</strong> {{ $groupedBookingOption[$service->id]['total_duration'] }}
-                                                        @elseif($service->duration)
-                                                            <strong>Duration:</strong> {{ $service->duration }}
-                                                        @endif</div>
-                                                    @if(isset($groupedBookingOption[$service->id]) && count($groupedBookingOption[$service->id]['options']) > 0)
-                                                    <div>
-                                                        <strong>Option:</strong>
-                                                        <ul>
-                                                            @foreach ($groupedBookingOption[$service->id]['options'] as $option)
-                                                                <li>
-                                                                    {{ $option->option_name }}
-                                                                </li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </div>
-                                                    @endif
-                                                </div>
-                                                <div class="col-md-6 d-flex justify-content-end align-items-center">
-                                                    <button onclick="openBookingPopup('{{ $service->id }}')"
-                                                        type="button" class="btn btn-primary edit-booking">Edit</button>
-                                                </div>
-                                            </div>
-                                            <hr class="my-4">
-                                        @endforeach
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </table>
+            <div class="mb-6">
+                @if (Session::has('error') || Session::has('success'))
+                    <div class="mb-4">
+                        @if (Session::has('error'))
+                            <div class="rounded-md bg-red-50 p-4">
+                                <p class="text-red-700 font-medium">{{ Session::get('error') }}</p>
+                            </div>
+                        @endif
+                        @if (Session::has('success'))
+                            <div class="rounded-md bg-green-50 p-4 mt-3">
+                                <p class="text-green-700 font-medium">{{ Session::get('success') }}</p>
+                            </div>
+                        @endif
                     </div>
-                </div>
-                <div class="col-md-12 d-flex justify-content-end align-items-center">
-                    <a href="{{route('checkBooking')}}" class="btn btn-primary">Add More Services</a>
-                </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="rounded-md bg-red-50 p-4">
+                        <p class="font-semibold text-red-700">Whoops! There were some problems with your input.</p>
+                        <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
+            <div class="errorContainer mb-6"></div>
+
+            <div id="selected-booking-staff-slot" class="mb-8" @if (count($formattedBookings) === 0) style="display:none;" @endif>
+                @foreach ($formattedBookings as $booking)
+                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-sm text-gray-500">
+                                <i class="fa fa-calendar mr-2"></i> {{ $booking['date'] }}
+                                <span class="mx-3">•</span>
+                                <i class="fa fa-user mr-2"></i> {{ $booking['staff'] }}
+                                <span class="mx-3">•</span>
+                                <i class="fa fa-clock mr-2"></i> {{ $booking['slot'] }}
+                            </div>
+                            <a href="{{ route('checkBooking') }}" class="text-purple text-sm font-medium text-purple-800">Add More Services</a>
+                        </div>
+
+                        @foreach ($booking['services'] as $service)
+                            <div id="{{ $service->id }}" class="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-t">
+                                <div class="md:col-span-2">
+                                    <div class="text-lg font-medium text-gray-800">{{ $service->name }}</div>
+                                    <div class="text-sm text-gray-600 mt-1">
+                                        @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_price'] > 0)
+                                            @currency($groupedBookingOption[$service->id]['total_price'],false,true)
+                                        @else
+                                            @if (isset($service->discount))
+                                                @currency($service->discount,false,true)
+                                            @else
+                                                @currency($service->price,false,true)
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <div class="text-sm text-gray-500 mt-2">
+                                        @if(isset($groupedBookingOption[$service->id]) && $groupedBookingOption[$service->id]['total_duration'] != null)
+                                            <strong>Duration:</strong> {{ $groupedBookingOption[$service->id]['total_duration'] }}
+                                        @elseif($service->duration)
+                                            <strong>Duration:</strong> {{ $service->duration }}
+                                        @endif
+                                    </div>
+                                    @if(isset($groupedBookingOption[$service->id]) && count($groupedBookingOption[$service->id]['options']) > 0)
+                                        <div class="mt-3 text-sm text-gray-600">
+                                            <strong>Options:</strong>
+                                            <ul class="list-disc list-inside">
+                                                @foreach ($groupedBookingOption[$service->id]['options'] as $option)
+                                                    <li>{{ $option->option_name }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex items-center justify-end">
+                                    <button onclick="openBookingPopup('{{ $service->id }}')" type="button" class="inline-flex items-center px-4 py-2 bg-purple-800 text-white rounded-md shadow-sm hover:bg-purple-950">Edit</button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
             </div>
             <div id="booking-step">
                 <form id="booking-form" action="draftOrder" method="POST">
@@ -156,7 +135,7 @@
                                 </table>
                             </div>
                             <div class="col-md-12 d-flex justify-content-end align-items-center">
-                                <button type="button" id="newAddressBtn" class="btn btn-primary">New Address</button>
+                                <button type="button" id="newAddressBtn" class="px-4 py-2 bg-purple-800 text-white rounded-md shadow-sm hover:bg-purple-950">New Address</button>
                             </div>
                         </div>
                     @else
@@ -328,7 +307,7 @@
                                         placeholder="Coupon Code"
                                         value="{{ $coupon_code }}">
                                     <div class="input-group-append">
-                                        <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply
+                                        <button type="button" class="px-4 py-2 bg-purple-800 text-white rounded-md shadow-sm hover:bg-purple-950" id="applyCouponBtn">Apply
                                             Coupon</button>
                                     </div>
                                 </div>
@@ -353,7 +332,7 @@
                         </span>
 
                         <div class="col-md-12 text-center">
-                            <button type="submit" class="btn btn-block mt-2 mb-2 btn-success">Next</button>
+                            <button type="submit" class="px-4 py-2 bg-purple-800 text-white rounded-md shadow-sm hover:bg-purple-950">Next</button>
                         </div>
                     </div>
                 </form>
@@ -412,7 +391,7 @@
                             <div id="imagePreview" class="row"></div>
                         </div>
                         <div class="col-md-12 text-center">
-                            <button id="confirmOrder" type="submit" class="btn btn-primary">Confirm
+                            <button id="confirmOrder" type="submit" class="px-4 py-2 bg-purple-800 text-white rounded-md shadow-sm hover:bg-purple-950">Confirm
                                 Order</button><br><br>
                             {{-- @auth
                                 <a id="orderEdit" href="">
@@ -420,7 +399,7 @@
                                 </a>
                             @endauth --}}
                             <a id="orderCancel" href="">
-                                <button type="button" class="btn btn-primary">Cancel Order</button>
+                                <button type="button" class="px-4 py-2 bg-purple-800 text-white rounded-md shadow-sm hover:bg-purple-950">Cancel Order</button>
                             </a>
                         </div>
                     </div>

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+    <div class="container-fluid px-1">
         <div class="row">
-            <div class="col-md-12 margin-tb">
-                <div class="float-start">
-                    <h2>Add New Currency</h2>
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">Add New Currency</h2>
                 </div>
             </div>
         </div>
@@ -23,30 +23,29 @@
         </div>
         <form action="{{ route('currencies.store') }}" method="POST">
             @csrf
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Name:</strong>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}"
-                            placeholder="Name">
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-4 mb-3">
+                            <label class="font-weight-bold"><span class="text-danger">*</span> Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Name">
+                        </div>
+
+                        <div class="form-group col-12 col-md-4 mb-3">
+                            <label class="font-weight-bold"><span class="text-danger">*</span> Symbol</label>
+                            <input type="text" name="symbol" class="form-control" value="{{ old('symbol') }}" placeholder="Symbol">
+                        </div>
+
+                        <div class="form-group col-12 col-md-4 mb-3">
+                            <label class="font-weight-bold"><span class="text-danger">*</span> Rate</label>
+                            <input type="text" name="rate" class="form-control" value="{{ old('rate') }}" placeholder="Rate">
+                        </div>
+
+                        <div class="col-12 text-center mt-2">
+                            <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Submit</button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Symbol:</strong>
-                        <input type="text" name="symbol" class="form-control" value="{{ old('symbol') }}"
-                            placeholder="Symbol">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Rate:</strong>
-                        <input type="text" name="rate" class="form-control" value="{{ old('rate') }}"
-                            placeholder="Rate">
-                    </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>

@@ -1,11 +1,36 @@
 @extends('layouts.app')
+
+@push('styles')
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    /* Make cards, inputs and buttons a bit softer like Orders view */
+    .card, .form-control, .custom-select, .btn { border-radius: 0.75rem !important; }
+    .badge-chip { padding: 0.4rem 0.9rem !important; font-size: 0.85rem; font-weight:600; }
+    .scrollbar-thin { overflow-x: auto; white-space: nowrap; }
+    .scrollbar-thin::-webkit-scrollbar { height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #ced4da; border-radius: 10px; }
+    /* Ensure suggestion list appears above other elements */
+    #email-suggestions { z-index: 1200; }
+</style>
+@endpush
+
 @section('content')
+@section('page_title')
+   <h3>Staff</h3>
+@endsection
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h3>Filters</h3>
-                <hr>
-                <form action="{{ route('serviceStaff.index') }}" method="GET" enctype="multipart/form-data">
+                <section class="card shadow-sm mb-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Filters</h3>
+                        <button id="filter-toggle-btn" class="btn btn-sm btn-light" type="button" data-toggle="collapse" data-target="#filter-panel" aria-expanded="false" aria-controls="filter-panel">
+                            <i class="fas fa-filter"></i> Show Staff Filters
+                        </button>
+                    </div>
+                    <hr>
+                    <div class="collapse" id="filter-panel">
+                        <form action="{{ route('serviceStaff.index') }}" method="GET" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -178,27 +203,37 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="offset-6 col-md-3 mt-4">
                             <div class="form-group float-right d-flex justify-content-between">
-                                <button type="submit" class="btn btn-primary mr-2">
+                                <button type="submit" class="btn btn-md btn-primary mr-2">
                                     <i class="fas fa-filter"></i> Apply Filters
                                 </button>
-                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">
+                                <a href="{{ url()->current() }}" class="btn btn-md btn-outline-secondary">
                                     <i class="fas fa-sync-alt"></i> Reset
                                 </a>
                             </div>
                         </div>
-                </form>
+                        </form>
+                    </div>
+                </section>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <div class="col-md-12 d-flex justify-content-between align-items-center mb-2">
                 <h2>Service Staff ({{ $total_staff }})</h2>
                 <div class="d-flex">
+                        <style>
+                            /* Ensure dropdowns inside responsive tables are visible above the table container */
+                            .table-responsive .dropdown-menu { z-index: 3000; }
+                            /* Allow dropdowns to escape clipping in most admin views while keeping scroll behavior */
+                            @media (min-width: 768px) {
+                                .table-responsive { overflow: visible; }
+                            }
+                        </style>
                     <div class="btn-group me-2">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                        <button type="button" class="btn text-dark dropdown-toggle" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Bulk Actions
+                            <i class="fas fa-ellipsis-h"></i> Bulk Actions
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
@@ -208,7 +243,7 @@
                         </ul>
                     </div>
                     @can('service-staff-create')
-                        <a class="btn btn-success" href="{{ route('serviceStaff.create') }}">
+                        <a class="btn text-dark" href="{{ route('serviceStaff.create') }}">
                             <i class="fa fa-plus"></i> Add Staff
                         </a>
                     @endcan
@@ -223,19 +258,20 @@
         @endif
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
                     <tr>
                         <th>
                             <input type="checkbox" id="selectAll" />
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('serviceStaff.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
-                            @if (request('sort') === 'name')
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('serviceStaff.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a></i>                            @if (request('sort') === 'name')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th><a class=" ml-2 text-decoration-none"
-                                href="{{ route('serviceStaff.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a>
+                        <th><i><a class=" ml-2 text-dark"
+                                href="{{ route('serviceStaff.index', array_merge(request()->query(), ['sort' => 'email', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Email</a></i>
                             @if (request('sort') === 'email')
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
@@ -262,14 +298,14 @@
                                 <td>
                                     @php
                                         $names = $staff->subTitles->pluck('name')->toArray();
+                                        $displayNames = array_slice($names, 0, 4);
                                     @endphp
-                                    @foreach (array_chunk($names, 4) as $chunk)
-                                        <div>
-                                            @foreach ($chunk as $i => $name)
-                                                <span>{{ $name }}{{ $i < count($chunk) - 1 ? ',' : '' }}</span>
-                                            @endforeach
-                                        </div>
-                                    @endforeach
+                                    <span>
+                                        {{ implode(', ', $displayNames) }}
+                                        @if(count($names) > 4)
+                                            , ...
+                                        @endif
+                                    </span>
                                 </td>
                                 <td>{{ $staff->staff->sort }}</td>
                                 <td>{{ $staff->staff->feature ? 'Yes' : 'No' }}</td>
@@ -278,14 +314,17 @@
                                 <td>
                                     <form id="deleteForm{{ $staff->id }}"
                                         action="{{ route('serviceStaff.destroy', $staff->id) }}" method="POST" style="margin-bottom:0;">
-                                        <div class="btn-group" role="group" aria-label="Staff Actions">
-                                            <a class="btn btn-warning btn-md d-flex align-items-center" href="{{ route('serviceStaff.show', $staff->id) }}" title="View">
-                                                <i class="fa fa-eye me-1"></i>
+                                        <div class="staff-actions d-flex align-items-center">
+                                            <a class="btn text-dark btn-md d-flex align-items-center" 
+                                            href="{{ route('serviceStaff.show', $staff->id) }}" title="View">
+                                                <i class="fa fa-eye"></i>
                                             </a>
                                             @can('service-staff-edit')
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-primary btn-md dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false" title="Edit">
-                                                    <i class="fa fa-edit me-1"></i>
+                                            <div class="dropdown">
+                                                <button type="button" 
+                                                        class="btn text-dark btn-md d-flex align-items-center" 
+                                                        data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false" title="Edit">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item" href="{{ route('serviceStaff.general', $staff->id) }}">General</a></li>
@@ -299,19 +338,18 @@
                                                     <li><a class="dropdown-item" href="{{ route('serviceStaff.gallery', $staff->id) }}">Gallery</a></li>
                                                     <li><a class="dropdown-item" href="{{ route('serviceStaff.categories-and-services', $staff->id) }}">Categories & Services</a></li>
                                                     <li><a class="dropdown-item" href="{{ route('serviceStaff.documents', $staff->id) }}">Documents</a></li>
+                                                    <li><a class="dropdown-item" href="{{ route('staffHolidays.create', ['staff' => $staff->id]) }}">Add Holiday</a></li>
                                                 </ul>
                                             </div>
                                             @endcan
                                             @csrf
                                             @method('DELETE')
                                             @can('service-staff-delete')
-                                            <button type="button" onclick="confirmDelete('{{ $staff->id }}')" class="btn btn-danger btn-md d-flex align-items-center" title="Delete">
-                                                <i class="fa fa-trash me-1"></i>
+                                            <button type="button" onclick="confirmDelete('{{ $staff->id }}')" 
+                                                    class="btn text-danger btn-md d-flex align-items-center" title="Delete">
+                                                <i class="fa fa-trash"></i>
                                             </button>
                                             @endcan
-                                            <a class="btn btn-info btn-md d-flex align-items-center" href="{{ route('staffHolidays.create', ['staff' => $staff->id]) }}" title="Add Holiday">
-                                                <i class="fas fa-calendar me-1"></i>
-                                            </a>
                                         </div>
                                     </form>
                                 </td>
@@ -323,8 +361,12 @@
                         </tr>
                     @endif
                 </table>
-                {!! $serviceStaff->links() !!}
-
+                        </table>
+                    </div>
+                    <div class="p-3">
+                        {!! $serviceStaff->links() !!}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -637,5 +679,28 @@
             });
             return selectedIds;
         }
+    </script>
+    <script>
+        $(function() {
+            // initialize button text based on collapse state
+            function updateFilterButtonText() {
+                if ($('#filter-panel').hasClass('show')) {
+                    $('#filter-toggle-btn').icon('<i class="fas fa-filter"></i>').text('Hide Staff Filters');
+                } else {
+                    $('#filter-toggle-btn').icon('<i class="fas fa-filter"></i>').text('Show Staff Filters');
+                }
+            }
+
+            // on bootstrap collapse show/hide events
+            $('#filter-panel').on('shown.bs.collapse', function() {
+                $('#filter-toggle-btn').icon('<i class="fas fa-filter"></i>').text('Hide Staff Filters');
+            });
+            $('#filter-panel').on('hidden.bs.collapse', function() {
+                $('#filter-toggle-btn').icon('<i class="fas fa-filter"></i>').text('Show Staff Filters');
+            });
+
+            // set initial text
+            updateFilterButtonText();
+        });
     </script>
 @endsection

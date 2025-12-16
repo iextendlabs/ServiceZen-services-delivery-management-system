@@ -310,6 +310,10 @@ Route::post('deleteAccountMail', [CustomerAuthController::class, 'deleteAccountM
 Route::get('deleteAccountPage', [CustomerAuthController::class, 'deleteAccount'])->name('deleteAccountPage');
 
 Route::resource('staffProfile', StaffProfileController::class);
+// Public staff routes: contact form and services listing by staff
+Route::get('staff/{id}/contact', [StaffProfileController::class, 'contact'])->name('contact.staff');
+Route::post('staff/{id}/contact', [StaffProfileController::class, 'sendContact'])->name('contact.staff.send');
+Route::get('staff/{id}/services', [StaffProfileController::class, 'servicesByStaff'])->name('services.byStaff');
 Route::get('removeToCart/{id}', [CheckOutController::class, 'removeToCart']);
 Route::post('draftOrder', [CheckOutController::class, 'draftOrder']);
 Route::resource('cart', CheckOutController::class);
@@ -338,6 +342,7 @@ Route::resource('siteReviews', SiteReviewsController::class);
 Route::get('/category', function () {
     return view('site.categories.index');
 })->name('categories.index');
+Route::get('/api/category-hierarchy', [SiteController::class, 'getCategoryHierarchy'])->name('category.hierarchy');
 Route::get('category/{slug}', [SiteController::class, 'categoryShow'])->name('category.show');
 
 Route::get('/af', [CustomerAuthController::class, 'affiliateUrl'])->name('affiliateUrl');

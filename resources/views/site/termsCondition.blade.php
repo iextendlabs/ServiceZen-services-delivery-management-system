@@ -3,7 +3,12 @@
 @section('content')
     <div class="container">
         <section>
-            <p>{!! $termsCondition !!}</p>
+            <div class="py-5">
+                <div class="text-4xl font-bold text-purple-900 text-center mb-4">
+                    <h1>Terms and Conditions</h1> 
+                </div>
+                    <p>{!! $termsCondition !!}</p>
+            </div>
         </section>
     </div>
 @endsection

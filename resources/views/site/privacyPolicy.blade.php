@@ -3,7 +3,12 @@
 @section('content')
     <div class="container">
         <section>
+            <div class="py-5">
+                <div class="text-4xl font-bold text-purple-900 text-center mb-4">
+                    <h1>Privacy Policy</h1> 
+                </div>
             <p>{!! $privacyPolicy !!}</p>
+            </div>
         </section>
     </div>
 @endsection

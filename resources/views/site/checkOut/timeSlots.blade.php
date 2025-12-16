@@ -1,34 +1,84 @@
-<div class="col-md-6 offset-md-3 col-sm-12">
-    <div class="form-group">
-        <strong>Date:</strong>
-        <input required type="date" name="date" id="date" @if(!auth()->user() || !auth()->user()->hasRole('Admin')) min="{{ date('Y-m-d') }}" @endif value="{{ 
-            isset($selected_booking) && isset($selected_booking['date']) 
-            ? $selected_booking['date'] 
-            : (isset($date) ? $date : date('Y-m-d')) 
-        }}" class="form-control" placeholder="Date">
+<div class="row mb-4">
+    <div class="col-12 col-md-6 mb-3">
+        <label class="form-label">Date</label>
+        <input required type="date" name="date" id="date" @if(!auth()->user() || !auth()->user()->hasRole('Admin')) min="{{ date('Y-m-d') }}" @endif value="{{ isset($selected_booking) && isset($selected_booking['date']) ? $selected_booking['date'] : (isset($date) ? $date : date('Y-m-d')) }}" class="form-control" placeholder="Date">
     </div>
-</div>
-<div class="col-md-12" @if(isset($zoneShow) && $zoneShow == 0) style="display:none;"  @endif>
-    <div class="form-group">
-        <strong>Zone:</strong>
-        <select name="zone" id="zone" class="form-control" required>
+    <div class="col-12 col-md-6 mb-3" @if(isset($zoneShow) && $zoneShow == 0) style="display:none;"  @endif>
+        <label class="form-label">Zone</label>
+        <select name="zone" id="zone" class="form-select" required>
             <option value=""></option>
             @foreach($allZones as $zone)
-            <option value="{{ $zone->name }}" data-transport-charges="{{ isset($staffZone) &&  $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}"
-                @if(isset($staffZone) && $staffZone && $zone->id == $staffZone->id)
-                selected
-                @endif
-                >
+            <option value="{{ $zone->name }}" data-transport-charges="{{ isset($staffZone) &&  $staffZone->transport_charges ? $staffZone->transport_charges : 0 }}" @if(isset($staffZone) && $staffZone && $zone->id == $staffZone->id) selected @endif>
                 {{ $zone->name }}
             </option>
             @endforeach
         </select>
     </div>
 </div>
-<div class="col-md-12 text-center">
-    <h3>Available Staff based on Zone and Date Selected!</h3>
+<style>
+    /* Modal slot styles */
+    .slot-card {
+        border: 0;
+        box-shadow: 0 2px 8px rgba(16,24,40,0.06);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .slot-header {
+        background: linear-gradient(90deg,#e6f8ef,#ffffff);
+        padding: 8px 16px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+    }
+
+    .availability-bar {
+        height:8px;
+        background:#1abc9c;
+        border-radius:4px;
+        width:100%;
+        display:block;
+    }
+
+    .slot-body { padding: 18px; }
+
+    .staff-card {
+        cursor: pointer;
+        border-radius:8px;
+        transition: box-shadow .15s ease, transform .08s ease;
+        margin-bottom: 12px;
+    }
+
+    .staff-card:hover,
+    .staff-card:focus {
+        box-shadow: 0 6px 18px rgba(16,24,40,0.12);
+        transform: translateY(-2px);
+    }
+
+    .staff-avatar { width:72px; height:72px; object-fit:cover; border-radius:50%; border:1px solid #eee; }
+
+    .staff-info { margin-left:14px; }
+
+    .slot-time { font-weight:600; color:#111827; }
+
+    .slot-meta { color:#6b7280; font-size:13px }
+
+    .staff-details small { color:#6b7280; }
+
+    .staff-card .extra-charges { font-size:13px; color:#374151; }
+
+    .staff-selection-radio { display:none; }
+
+    .staff-card-selected { outline: 2px solid #7c3aed; }
+
+    @media (max-width:767px) {
+        .staff-info { margin-left:10px; }
+    }
+</style>
+<div class="text-center mb-4">
+    <h3 class="h5">Available Staff based on Zone and Date Selected</h3>
 </div>
-<div class="col-md-12 text-center">
+<div class="col-12 text-center">
     @php
     $staff_displayed = [];
     $staff_slots = [];
@@ -84,33 +134,39 @@
     @php 
     $staff_displayed[] = $staff->id;
     @endphp
-        <input required style="display: none;" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" class="form-check-input" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" data-serviceIds="{{ $staff->services ? $staff->services->pluck('id') : [] }}" data-categoryIds="{{ $staff->categories ?$staff->categories->pluck('id') : [] }}" value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @elseif(isset($selected_booking) && $selected_booking['service_staff_id'] == $staff->id) checked @endif >
-        <label class="staff-label" for="staff-{{$staff->id}}">
-            <div class="p-2">
-                <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100"><br>
-                <span class="text-center">{{ $staff->name }}</span><br>
-                <span class="text-center">{{ $staff->subTitles->pluck('name')->implode('/') }}</span><br>
-                @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges,$isAdmin)</b></span>@endif <br>
-                @php
-                    $rating = $staff->averageRating();
-                    $fullStars = floor($rating);
-                    $halfStar = $rating - $fullStars >= 0.5;
-                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
-                @endphp
-
-                @for ($i = 0; $i < $fullStars; $i++)
-                    <i class="fas fa-star text-warning fa-xs"></i>
-                @endfor
-
-                @if ($halfStar)
-                    <i class="fas fa-star-half-alt text-warning fa-xs"></i>
-                @endif
-
-                @for ($i = 0; $i < $emptyStars; $i++)
-                    <i class="far fa-star text-muted fa-xs"></i>
-                @endfor
-                <br>
-                ({{ count($staff->reviews)}} Reviews)
+        <input required class="d-none" onchange="$('.staff-time-drop').hide().removeAttr('required');$('#staff-time-{{$staff->id}}').show().attr('required',true)" type="radio" id="staff-{{$staff->id}}" name="service_staff_id" data-staff="{{ $staff->name }}" data-staff-charges="{{ $staff->staff->charges ? $staff->staff->charges : 0 }}" data-serviceIds='@json($staff->services ? $staff->services->pluck('id') : [])' data-categoryIds='@json($staff->categories ? $staff->categories->pluck('id') : [])' value="{{$staff->id}}" @if(isset($order) && $order->service_staff_id == $staff->id) checked @elseif(isset($selected_booking) && $selected_booking['service_staff_id'] == $staff->id) checked @endif >
+        <label class="staff-card card p-3 d-flex align-items-center" for="staff-{{$staff->id}}">
+            <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="staff-avatar" />
+            <div class="staff-info d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between" style="min-width:200px">
+                    <div>
+                        <div class="fw-bold">{{ $staff->name }}</div>
+                        <div class="small text-muted">{{ $staff->subTitles->pluck('name')->implode('/') }}</div>
+                    </div>
+                    @if($staff->staff->charges)
+                        <div class="extra-charges">+ @currency($staff->staff->charges,$isAdmin)</div>
+                    @endif
+                </div>
+                <div class="d-flex align-items-center mt-2">
+                    @php
+                        $rating = $staff->averageRating();
+                        $fullStars = floor($rating);
+                        $halfStar = $rating - $fullStars >= 0.5;
+                        $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                    @endphp
+                    <div class="me-2">
+                        @for ($i = 0; $i < $fullStars; $i++)
+                            <i class="fas fa-star text-warning"></i>
+                        @endfor
+                        @if ($halfStar)
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        @endif
+                        @for ($i = 0; $i < $emptyStars; $i++)
+                            <i class="far fa-star text-muted"></i>
+                        @endfor
+                    </div>
+                    <div class="small text-muted">({{ count($staff->reviews)}} Reviews)</div>
+                </div>
             </div>
         </label>
     @endif
@@ -118,18 +174,16 @@
     @endforeach
     @endforeach
     @if(count($staff_displayed ) == 0)
-        <div class="alert alert-danger">
-            No Staff Available
-        </div>
+        <div class="rounded-md bg-red-50 p-4 text-center">No Staff Available</div>
     @endif
-    <hr>
-    <h3>Available Time Slot for Selected Staff</h3>
-    <div class="row" > 
+    <hr class="my-4">
+    <h3 class="h5">Available Time Slot for Selected Staff</h3>
+    <div class="mt-3"> 
         @if(count($staff_slots ) == 0)
-        No Staff Availalbe for the Selected Date / Zone
+            <div class="small text-muted">No Staff Available for the Selected Date / Zone</div>
         @endif
         @foreach($staff_slots as $staff_id=>$staff_single_slot)
-        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @elseif(isset($selected_booking) && $staff_id == $selected_booking['service_staff_id']) style="display: block"  @else  style="display: none"  @endif class="form-control staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
+        <select @if(isset($order) && $staff_id == $order->service_staff_id) style="display: block"  @elseif(isset($selected_booking) && $staff_id == $selected_booking['service_staff_id']) style="display: block"  @else  style="display: none"  @endif class="form-select mt-2 staff-time-drop" name="time_slot_id[{{$staff_id}}]" id="staff-time-{{$staff_id}}">
             <option value="">Select Slot</option>
             @foreach($staff_single_slot as $staff_single_values)
             <option value="{{$staff_single_values[2]}}" @if(isset($order)  && $order->time_slot_id == $staff_single_values[2]) selected @elseif(isset($selected_booking)  && $selected_booking['time_slot_id'] == $staff_single_values[2]) selected @endif>{{$staff_single_values[1]}}</option>
@@ -139,30 +193,30 @@
     </div>
 </div>
 <br>
-<div class="col-12 text-center">
-    <h3 class="text-center">All Slot Data</h3>
-    <button onclick="$('#scheduleInfo,#showBtn').toggle()" id="showBtn" type="button" class="btn btn-outline-primary">Show</button>
+<div class="text-center mt-8">
+    <h3 class="text-lg font-medium">All Slot Data</h3>
+    <button onclick="$('#scheduleInfo,#showBtn').toggle()" id="showBtn" type="button" class="mt-3 inline-flex items-center px-4 py-2 border rounded-md">Show</button>
 </div>
-<div class="col-md-12 scroll-div" id="scheduleInfo" style="display: none">
-    <strong>Time Slots : {{ isset($order) ? $order->area : $area }}</strong>
+<div class="mt-4" id="scheduleInfo" style="display: none">
+    <strong class="small text-muted">Time Slots : {{ isset($order) ? $order->area : $area }}</strong>
     <input type="hidden" name="order_id" value="{{ isset($order) ? $order->id : null }}">
-    <div class="list-group" id="time-slots-container">
+    <div id="time-slots-container row" class="space-y-4">
         @if(isset($staffZone))
         @if(!count($holiday))
         @if(count($timeSlots))
         @foreach($timeSlots as $timeSlot)
-            <div class="col-md-12 text-center">
+            <div class="card col-md-12 mb-3 p-3">
                 @if(!$timeSlot->space_availability > 0 )
-                <p class="badge badge-unavailable">Unavailable</p>
+                    <span class="badge bg-danger">Unavailable</span>
                 @else
-                <p class="badge badge-available">Available</p>
+                    <span class="badge bg-success">Available</span>
                 @endif
 
-                <h4 id="selected_time"><i class="fa fa-clock"></i> {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </h4>
+                <h4 id="selected_time" class="mt-3"><i class="fa fa-clock me-2"></i> {{ date('h:i A', strtotime($timeSlot->time_start)) }} -- {{ date('h:i A', strtotime($timeSlot->time_end)) }} </h4>
                 @if(isset($timeSlot->space_availability))
-                <span style="font-size: 13px;">Space Availability:{{ $timeSlot->space_availability }}</span>
+                    <div class="small text-muted">Space Availability: {{ $timeSlot->space_availability }}</div>
                 @endif
-                <div class="col">
+                <div class="mt-3">
                     @php
                     $staff_counter = 0;
                     $holiday_counter = 0;
@@ -202,36 +256,37 @@
                     @php
                     $staff_counter ++
                     @endphp
-                    <label onclick="$('#staff-time-{{$staff->id}}').val('{{$timeSlot->id}}')" class="staff-label staff-only" for="staff-{{$staff->id}}">
-                        <div class="p-2">
-                            <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="rounded-circle shadow-image" width="100"><br>
-                            <span class="text-center">{{ $staff->name }}</span><br>
-                            <span class="text-center">{{ $staff->subTitles->pluck('name')->implode('/') }}</span><br>
-                            @if($staff->staff->charges)<span class="card-title">Extra Charges:<b>@currency($staff->staff->charges,$isAdmin)</b></span>@endif <br>
-                            @for($i = 1; $i <= 5; $i++) @if($i <=$staff->averageRating()) <span class="text-warning">&#9733;</span>
-                                @else
-                                <span class="text-muted">&#9734;</span>
-                                @endif
+                    <label onclick="$('#staff-time-{{$staff->id}}').val('{{$timeSlot->id}}')" class="staff-card card p-2 d-flex align-items-center" for="staff-{{$staff->id}}">
+                        <img src="/staff-images/{{$staff->staff->image}}" alt="@if(!$timeSlot->space_availability > 0) Not Available @endif" class="staff-avatar" />
+                        <div class="staff-info d-flex flex-column">
+                            <div class="fw-medium">{{ $staff->name }}</div>
+                            <div class="small text-muted">{{ $staff->subTitles->pluck('name')->implode('/') }}</div>
+                            @if($staff->staff->charges)<div class="extra-charges mt-1">Extra: <span class="fw-medium">@currency($staff->staff->charges,$isAdmin)</span></div>@endif
+                            <div class="mt-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $staff->averageRating())
+                                        <span class="text-warning">&#9733;</span>
+                                    @else
+                                        <span class="text-muted">&#9734;</span>
+                                    @endif
                                 @endfor
-                                <br>
-                                ({{ count($staff->reviews)}} Reviews)
+                            </div>
+                            <div class="small text-muted">({{ count($staff->reviews)}} Reviews)</div>
                         </div>
                     </label>
                     @endif
                     @endforeach
                     @if($staff_counter == 0)
-                    <div class="alert alert-danger">
+                    <div class="p-3 bg-light rounded">
                         @if( auth()->user() && (auth()->user()->hasRole("Supervisor")  || auth()->user()->hasRole("Manager") ))
-                        <strong>Whoops!</strong>All of Your Staff is Booked.
+                        <strong>Whoops!</strong> All of Your Staff is Booked.
                         @else
-                        <strong>Whoops! </strong> No Staff Available! 
+                        <strong>Whoops!</strong> No Staff Available!
                         @endif
-                        ( On Holiday : {{$holiday_counter}})
-
-                        ( On Booking : {{$booked_counter}})
+                        <div class="small text-muted mt-2">( On Holiday : {{$holiday_counter}}) ( On Booking : {{$booked_counter}})</div>
                     </div>
                     @endif
-                    <hr>
+                    <hr class="mt-4">
                 </div>
             </div>
         @endforeach

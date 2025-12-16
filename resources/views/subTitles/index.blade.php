@@ -1,11 +1,13 @@
 @extends('layouts.app')
-
 @section('content')
+@section('page_title')
+<h3 class="">Sub Titles</h3>
+@endsection
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>Sub Titles</h3>
+            <h3>Sub Titles/Designation</h3>
             @can('staff-designation-create')
-                <a class="btn btn-success" href="{{ route('subTitles.create') }}">Add Sub Title</a>
+                <a class="btn text-dark" href="{{ route('subTitles.create') }}"><i class="fas fa-plus"></i> Add SubTitle</a>
             @endcan
         </div>
 

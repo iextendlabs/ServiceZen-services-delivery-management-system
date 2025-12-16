@@ -1,8 +1,11 @@
 @extends('layouts.app')
 @section('content')
+    @section('page_title')
+     <h3 class="">Services</h3>
+    @endsection
     <div class="container">
         <div class="row">
-            <div class="col-md-12 margin-tb">
+            <div class="col-md-12 margin-tb d-flex justify-content-between align-items-center">
                 <div class="float-start">
                     <h2>Services</h2>
                 </div>
@@ -21,18 +24,16 @@
                     @endcan
 
                     @can('service-create')
-                        <a class="btn btn-primary me-2" href="{{ route('services.create') }}"><i class="fa fa-plus"></i></a>
+                        <a class="btn btn-primary ml-2" href="{{ route('services.create') }}"><i class="fa fa-plus"></i></a>
                     @endcan
 
-                    <button id="bulkCopyBtn" class="btn btn-secondary me-2" type="button"><i
+                    <button id="bulkCopyBtn" class="btn btn-secondary ml-2" type="button"><i
                             class="fa fa-copy"></i></button>
 
                     @can('service-delete')
-                        <button id="bulkDeleteBtn" class="btn btn-danger" type="button"><i class="fa fa-trash"></i></button>
+                        <button id="bulkDeleteBtn" class="btn btn-danger ml-2" type="button"><i class="fa fa-trash"></i></button>
                     @endcan
                 </div>
-
-
             </div>
         </div>
 
@@ -45,63 +46,77 @@
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <h3>Filter</h3>
-                <hr>
                 <form action="{{ route('services.index') }}" method="GET" enctype="multipart/form-data">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                <strong>Name:</strong>
-                                <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control"
-                                    placeholder="Name">
+                                <label class="small text-muted font-weight-medium mb-1">Name</label>
+                                <div class="input-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-user text-muted"></i></span>
+                                    </div>
+                                    <input type="text" name="name" value="{{ $filter['name'] }}" class="form-control"
+                                        placeholder="Name">
+                                </div>
+                            </div>    
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="small text-muted font-weight-medium mb-1">Price</label>
+                                <div class="input-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fas fa-dollar-sign text-muted"></i></span>
+                                    </div>
+                                    <input type="number" name="price" value="{{ $filter['price'] }}" class="form-control"
+                                        placeholder="Price">
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                <strong>Price:</strong>
-                                <input type="number" name="price" value="{{ $filter['price'] }}" class="form-control"
-                                    placeholder="Price">
+                                <label class="small text-muted font-weight-medium mb-1">Category:</label>
+                                <div class="input-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fa fa-list text-muted"></i></span>
+                                    </div>
+                                    <select name="category_id" class="form-control">
+                                        <option></option>
+                                        @foreach ($service_categories as $category)
+                                            @if ($category->id == $filter['category_id'])
+                                                <option value="{{ $category->id }}" selected>{{ $category->title }}</option>
+                                            @else
+                                                <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                <strong>Category:</strong>
-                                <select name="category_id" class="form-control">
-                                    <option></option>
-                                    @foreach ($service_categories as $category)
-                                        @if ($category->id == $filter['category_id'])
-                                            <option value="{{ $category->id }}" selected>{{ $category->title }}</option>
-                                        @else
-                                            <option value="{{ $category->id }}">{{ $category->title }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <strong>Feature:</strong>
-                                <select name="feature" class="form-control">
-                                    <option value="">-- All --</option>
-                                    <option value="1"
-                                        {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
-                                    </option>
-                                    <option value="0"
-                                        {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
-                                    </option>
-                                </select>
+                                <label class="small text-muted font-weight-medium mb-1">Feature:</label>
+                                <div class="input-group position-relative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0" style="border-radius: 0.75rem 0 0 0.75rem;"><i class="fa fa-star text-muted"></i></span>
+                                    </div>
+                                    <select name="feature" class="form-control">
+                                        <option value="">-- All --</option>
+                                        <option value="1"
+                                            {{ isset($filter['feature']) && $filter['feature'] === '1' ? 'selected' : '' }}>Yes
+                                        </option>
+                                        <option value="0"
+                                            {{ isset($filter['feature']) && $filter['feature'] === '0' ? 'selected' : '' }}>No
+                                        </option>
+                                    </select>
+                                </div>    
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 offset-md-8">
                             <div class="d-flex flex-wrap justify-content-md-end">
-                                <div class="col-md-3 mb-3">
-                                    <a href="{{ url()->current() }}" class="btn btn-lg btn-secondary">Reset</a>
-                                </div>
-                                <div class="col-md-9 mb-3">
-                                    <button type="submit" class="btn btn-lg btn-block btn-primary">Filter</button>
-                                </div>
+                                <a href="{{ url()->current() }}" class="btn btn-md btn-light border mr-2 font-weight-medium"><i class="fas fa-undo"></i> Reset</a>
+                                <button type="submit" class="btn btn-md btn-primary shadow-sm font-weight-bold"><i class="fas fa-filter"></i> Filter</button>
                             </div>
                         </div>
                     </div>
@@ -109,8 +124,8 @@
             </div>
             <h3>Services ({{ $total_service }})</h3>
             <div class="col-md-12">
-                <table class="table table-striped table-bordered">
-                    <tr>
+                <table class="table table-bordered">
+                    <tr class="text-center bg-white">
                         <th></th>
                         <th class="text-left"><a class=" text-decoration-none"
                                 href="{{ route('services.index', array_merge(request()->query(), ['sort' => 'name', 'direction' => request('direction', 'asc') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
@@ -154,7 +169,7 @@
                                 <i class="fa {{ $direction == 'asc' ? 'fa-arrow-down' : 'fa-arrow-up' }} px-2 py-2"></i>
                             @endif
                         </th>
-                        <th class="text-right">Action</th>
+                        <th class="text-right text-primary">Action</th>
                     </tr>
                     @if (count($services))
                         @foreach ($services as $service)
@@ -184,23 +199,57 @@
                                 <td class="text-right">
                                     <form id="deleteForm{{ $service->id }}"
                                         action="{{ route('services.destroy', $service->id) }}" method="POST">
-                                        @if($service->status)
-                                            <a class="btn btn-warning" href="https://lipslay.com/service/{{ $service->slug }}" target="_blank">View</a>
-                                        @endif
-                                        @can('FAQs-create')
-                                            <a class="btn btn-primary"
-                                                href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">Add FAQs</a>
-                                        @endcan
-                                        <a class="btn btn-warning" href="{{ route('services.show', $service->id) }}"><i
-                                                class="fa fa-eye"></i></a>
-                                        @can('service-edit')
-                                            <a class="btn btn-primary" href="{{ route('services.edit', $service->id) }}"><i
-                                                    class="fa fa-edit"></i></a>
-                                        @endcan
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-light dropdown-toggle" type="button" id="actionMenu{{ $service->id }}" data-bs-toggle="dropdown" aria-expanded="false" style="--bs-dropdown-toggle-icon: none;">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </button>
+                                            <style>
+                                                /* hide the bootstrap dropdown caret for this specific button */
+                                                #actionMenu{{ $service->id }}::after {
+                                                    display: none !important;
+                                                    content: none !important;
+                                                }
+                                            </style>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionMenu{{ $service->id }}">
+                                                @if($service->status)
+                                                    <li>
+                                                        <a class="dropdown-item" href="https://lipslay.com/service/{{ $service->slug }}" target="_blank">
+                                                            <i class="fa fa-external-link-alt me-2"></i>View On Store
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                                @can('FAQs-create')
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('FAQs.create', ['service_id' => $service->id]) }}">
+                                                            <i class="fa fa-question-circle me-2"></i>Add FAQs
+                                                        </a>
+                                                    </li>
+                                                @endcan
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('services.show', $service->id) }}">
+                                                        <i class="fa fa-eye me-2"></i>View
+                                                    </a>
+                                                </li>
+                                                @can('service-edit')
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('services.edit', $service->id) }}">
+                                                            <i class="fa fa-edit me-2"></i>Edit
+                                                        </a>
+                                                    </li>
+                                                @endcan
+                                            </ul>
+                                        </div>
+{{-- 
+                                        <style>
+                                            /* hide the original standalone delete button (keeps markup intact while removing duplicate visible button) */
+                                            #deleteForm{{ $service->id }} > button.btn-danger {
+                                                display: none !important;
+                                            }
+                                        </style> --}}
                                         @csrf
                                         @method('DELETE')
                                         @can('service-delete')
-                                            <button type="button" class="btn btn-danger"
+                                            <button type="button" class="btn text-danger"
                                                 onclick="confirmDelete('{{ $service->id }}')"><i
                                                     class="fa fa-trash"></i></button>
                                         @endcan

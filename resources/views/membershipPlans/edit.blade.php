@@ -1,5 +1,5 @@
 @extends('layouts.app') @section('content')
-    <div class="container">
+    <div class="container-fluid px-1">
         <div class="row">
             <div class="col-md-12 margin-tb">
                 <div class="float-start">
@@ -20,111 +20,109 @@
         <form action="{{ route('membershipPlans.update', $membership_plan->id) }}" method="POST">
             @csrf @method('PUT')
             <input type="hidden" name="url" value="{{ url()->previous() }}">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Plan Name:</strong>
-                        <input type="text" name="plan_name" class="form-control" value="{{ old('plan_name' ,$membership_plan->plan_name ) }}"
-                            placeholder="Plan Name">
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold"> <span class="text-danger">*</span> Plan Name</label>
+                            <input type="text" name="plan_name" class="form-control" value="{{ old('plan_name', $membership_plan->plan_name) }}" placeholder="Plan Name">
+                        </div>
+
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold"> <span class="text-danger">*</span> Membership Fee</label>
+                            <input type="number" name="membership_fee" class="form-control" value="{{ old('membership_fee', $membership_plan->membership_fee) }}" placeholder="Membership Fee">
+                        </div>
+
+                        <div class="form-group col-12 mb-3">
+                            <label class="font-weight-bold">Description</label>
+                            <textarea class="form-control" id="description_summernote" name="description" placeholder="Description">{{ old('description', $membership_plan->description) }}</textarea>
+                        </div>
+
+                        <div class="form-group col-12 col-md-6 mb-3">
+                            <label class="font-weight-bold">Expire after days</label>
+                            <input type="number" name="expire" class="form-control" value="{{ old('expire', $membership_plan->expire) }}" placeholder="Enter days like 20">
+                        </div>
+
+                        <div class="form-group col-12 col-md-3 mb-3">
+                            <label class="font-weight-bold"> <span class="text-danger">*</span> Type</label>
+                            <select name="type" class="form-control">
+                                <option></option>
+                                <option value="Affiliate" {{ old('type', $membership_plan->type) == 'Affiliate' ? 'selected' : '' }}>Affiliate</option>
+                                <option value="Freelancer" {{ old('type', $membership_plan->type) == 'Freelancer' ? 'selected' : '' }}>Freelancer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-12 col-md-3 mb-3">
+                            <label class="font-weight-bold"> <span class="text-danger">*</span> Status</label>
+                            <select name="status" class="form-control">
+                                <option></option>
+                                <option value="1" {{ old('status', $membership_plan->status) == '1' ? 'selected' : '' }}>Enable</option>
+                                <option value="0" {{ old('status', $membership_plan->status) == '0' ? 'selected' : '' }}>Disable</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 text-center mt-2">
+                            <button type="submit" class="btn btn-md btn-primary shadow-sm float-end font-weight-bold">Submit</button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Description:</strong>
-                        <textarea class="form-control" style="height:150px" id="description_summernote" name="description" placeholder="Description">{{old('description',$membership_plan->description)}}</textarea>
-                        <script>
-                            (function($) {
-                                $('#description_summernote').summernote({
-                                    tabsize: 2,
-                                    height: 250,
-                                    toolbar: [
-                                        ['style', ['style']],
-                                        ['font', ['bold', 'italic', 'underline', 'clear']],
-                                        ['fontname', ['fontname']],
-                                        ['fontsize', ['fontsize']],
-                                        ['color', ['color']],
-                                        ['para', ['ul', 'ol', 'paragraph']],
-                                        ['height', ['height']],
-                                        ['insert', ['picture', 'link', 'video', 'table']],
-                                        ['misc', ['undo', 'redo']], 
-                                        ['view', ['fullscreen', 'codeview', 'help']]
-                                    ],
-                                    popover: {
-                                        image: [
-                                            ['custom', ['imageAttributes']],
-                                            ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
-                                            ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                                            ['remove', ['removeMedia']]
-                                        ]
-                                    },
-                                    callbacks: {
-                                        onImageUpload: function(files) {
-                                            uploadImage(files[0]);
-                                        }
-                                    }
-                                });
-                        
-                                function uploadImage(file) {
-                                    let data = new FormData();
-                                    data.append("file", file);
-                                    data.append("_token", "{{ csrf_token() }}");
-                        
-                                    $.ajax({
-                                        url: "{{ route('summerNote.upload') }}",
-                                        method: "POST",
-                                        data: data,
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            $('#short_description_summernote').summernote('insertImage', response.url);
-                                        },
-                                        error: function(response) {
-                                            console.error(response);
-                                        }
-                                    });
-                                }
-                            })(jQuery);
-                        </script>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Membership Fee:</strong>
-                        <input type="number" name="membership_fee" class="form-control" value="{{ old('membership_fee',$membership_plan->membership_fee) }}"
-                            placeholder="membership_fee">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <strong>Expire after days:</strong>
-                        <input type="number" name="expire" class="form-control" value="{{ old('expire' ,$membership_plan->expire ) }}"
-                            placeholder="Enter days like 20">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Type:</strong>
-                        <select name="type" class="form-control">
-                            <option></option>
-                            <option value="Affiliate" {{ old('type', $membership_plan->type) == 'Affiliate' ? 'selected' : '' }}>Affiliate</option>
-                            <option value="Freelancer" {{ old('type', $membership_plan->type) == 'Freelancer' ? 'selected' : '' }}>Freelancer</option>                            
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <span style="color: red;">*</span><strong>Status:</strong>
-                        <select name="status" class="form-control">
-                            <option></option>
-                            <option value="1" {{ old('status', $membership_plan->status) == '1' ? 'selected' : '' }}>Enable</option>
-                            <option value="0" {{ old('status', $membership_plan->status) == '0' ? 'selected' : '' }}>Disable</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>
+
+        <script>
+            (function($) {
+                $('#description_summernote').summernote({
+                    tabsize: 2,
+                    height: 250,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['height', ['height']],
+                        ['insert', ['picture', 'link', 'video', 'table']],
+                        ['misc', ['undo', 'redo']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ],
+                    popover: {
+                        image: [
+                            ['custom', ['imageAttributes']],
+                            ['resize', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+                            ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                            ['remove', ['removeMedia']]
+                        ]
+                    },
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            uploadImage(files[0]);
+                        }
+                    }
+                });
+
+                function uploadImage(file) {
+                    let data = new FormData();
+                    data.append("file", file);
+                    data.append("_token", "{{ csrf_token() }}");
+
+                    $.ajax({
+                        url: "{{ route('summerNote.upload') }}",
+                        method: "POST",
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            $('#description_summernote').summernote('insertImage', response.url);
+                        },
+                        error: function(response) {
+                            console.error(response);
+                        }
+                    });
+                }
+            })(jQuery);
+        </script>
+
     </div>
 @endsection
