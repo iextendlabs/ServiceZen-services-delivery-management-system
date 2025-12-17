@@ -14,6 +14,8 @@ use App\Models\ServiceToUserNote;
 use App\Models\ServiceVariant;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 
 class ServiceController extends Controller
@@ -239,14 +241,29 @@ class ServiceController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-            
-            $request->image->move(public_path('service-images'), $filename);
 
-            $resizedImage = Image::make(public_path('service-images') . '/' . $filename)
-                ->resize(335, 200, function ($constraint) {
-                    $constraint->aspectRatio();
-                })
-                ->save(public_path('service-images/resized') . '/' . $filename);
+            $imageDir = public_path('service-images');
+            $resizedDir = $imageDir . '/resized';
+
+            if (!File::exists($imageDir)) {
+                File::makeDirectory($imageDir, 0755, true);
+            }
+            if (!File::exists($resizedDir)) {
+                File::makeDirectory($resizedDir, 0755, true);
+            }
+
+            $request->image->move($imageDir, $filename);
+
+            try {
+                Image::make($imageDir . '/' . $filename)
+                    ->resize(335, 200, function ($constraint) {
+                        $constraint->aspectRatio();
+                    })
+                    ->save($resizedDir . '/' . $filename);
+            } catch (\Exception $e) {
+                Log::error('Failed to resize image (store): ' . $e->getMessage());
+                @copy($imageDir . '/' . $filename, $resizedDir . '/' . $filename);
+            }
 
             $service->image = $filename;
             $service->save();
@@ -511,14 +528,29 @@ class ServiceController extends Controller
 
         if ($request->image) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
-            
-            $request->image->move(public_path('service-images'), $filename);
 
-            $resizedImage = Image::make(public_path('service-images') . '/' . $filename)
-                ->resize(335, 200, function ($constraint) {
-                    $constraint->aspectRatio();
-                })
-                ->save(public_path('service-images/resized') . '/' . $filename);
+            $imageDir = public_path('service-images');
+            $resizedDir = $imageDir . '/resized';
+
+            if (!File::exists($imageDir)) {
+                File::makeDirectory($imageDir, 0755, true);
+            }
+            if (!File::exists($resizedDir)) {
+                File::makeDirectory($resizedDir, 0755, true);
+            }
+
+            $request->image->move($imageDir, $filename);
+
+            try {
+                Image::make($imageDir . '/' . $filename)
+                    ->resize(335, 200, function ($constraint) {
+                        $constraint->aspectRatio();
+                    })
+                    ->save($resizedDir . '/' . $filename);
+            } catch (\Exception $e) {
+                Log::error('Failed to resize image (update): ' . $e->getMessage());
+                @copy($imageDir . '/' . $filename, $resizedDir . '/' . $filename);
+            }
 
             $service->image = $filename;
             $service->save();

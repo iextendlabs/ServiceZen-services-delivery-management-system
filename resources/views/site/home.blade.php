@@ -387,101 +387,101 @@
                 @foreach ($featured_services as $service)
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="card h-100 shadow-sm" style="border-radius:10px; overflow:hidden; border:1px solid #eef2f7; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)'; this.style.transform='translateY(-4px)';" onmouseout="this.style.boxShadow=''; this.style.transform='translateY(0)';">
-                    <a href="/service/{{ $service->slug }}" style="text-decoration:none; color:inherit; display:block; height:100%;">
-                        <div style="position:relative; height:200px; background:#fff; overflow:hidden;">
-                        @if ($service->image)
-                            <img
-                            src="{{ url('img/service-images/' . $service->image) }}?w=800&h=600&q=80&f=webp"
-                            srcset="{{ url('img/service-images/' . $service->image) }}?w=400&h=300&q=80&f=webp 1x,
-                                {{ url('img/service-images/' . $service->image) }}?w=800&h=600&q=80&f=webp 2x"
-                            alt="{{ $service->name }}"
-                            style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease;"
-                            loading="lazy" decoding="async"
-                            onmouseover="this.style.transform='scale(1.08)';"
-                            onmouseout="this.style.transform='scale(1)';"
-                            />
-                        @else
-                            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f8fafc;">
-                            <i class="fa fa-image" style="font-size:40px; color:#cbd5e1;"></i>
-                            </div>
-                        @endif
-
-                        </div>
-
-                        <div class="card-body d-flex flex-column" style="padding:16px;">
-                        <h5 style="margin:0 0 6px 0; font-size:16px; font-weight:700; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                            {{ $service->name }}
-                        </h5>
-
-                        @php
-                            // provider name fallback
-                            $providerName = $service->provider->name ?? $service->shop_name ?? $service->vendor_name ?? 'Provider';
-                            // rating and counts - try common properties, fallback to 0
-                            $rating = method_exists($service, 'averageRating') ? $service->averageRating() : ($service->rating ?? 0);
-                            $rating = $rating ? round($rating, 1) : 0;
-                            $ratingCount = $service->reviews_count ?? $service->ratings_count ?? ($service->review_count ?? 0);
-                            // lowest price
-                            $lowestPrice = null;
-                            if (!empty($service->serviceOption)) {
-                            foreach ($service->serviceOption as $option) {
-                                if (is_null($lowestPrice) || $option->option_price < $lowestPrice) {
-                                $lowestPrice = $option->option_price;
-                                }
-                            }
-                            }
-                        @endphp
-
-                        <div style="font-size:13px; color:#6b7280; margin-bottom:8px;">{{ $providerName }}</div>
-
-                        <div class="d-flex align-items-center" style="gap:8px; margin-bottom:10px;">
-                            <div style="display:flex; align-items:center; gap:2px;">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= floor($rating))
-                                <span style="color:#fbbf24; font-size:14px;">★</span>
-                                @elseif ($i - 0.5 <= $rating)
-                                <span style="color:#fbbf24; font-size:14px;">☆</span>
-                                @else
-                                <span style="color:#e5e7eb; font-size:14px;">★</span>
-                                @endif
-                            @endfor
-                            </div>
-                            <div style="font-size:13px; color:#374151; font-weight:600;">{{ $rating }}</div>
-                            <div style="font-size:13px; color:#9ca3af;">({{ $ratingCount }})</div>
-                        </div>
-
-                        <div style="display:flex; gap:14px; color:#6b7280; font-size:13px; margin-top:auto;">
-                            <div style="display:flex; align-items:center; gap:6px;">
-                            <i class="fa fa-map-marker" aria-hidden="true" style="color:#9ca3af;"></i>
-                            <span>{{ $service->distance ?? '2.5 km away' }}</span>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                            <i class="fa fa-clock-o" aria-hidden="true" style="color:#9ca3af;"></i>
-                            <span>{{ $service->duration ?? '30 mins' }}</span>
-                            </div>
-                        </div>
-
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
-                            @if (!is_null($lowestPrice))
-                            @php
-                                $priceDisplay = (floor($lowestPrice) == $lowestPrice) ? number_format($lowestPrice, 0) : number_format($lowestPrice, 2);
-                            @endphp
-                            <div style="color:#6b21a8; font-weight:800; font-size:18px;">
-                                ${{ $priceDisplay }}
-                            </div>
+                        <a href="/service/{{ $service->slug }}" style="text-decoration:none; color:inherit; display:block; height:100%;">
+                            <div style="position:relative; height:200px; background:#fff; overflow:hidden;">
+                            @if ($service->image)
+                                <img
+                                src="{{ url('img/service-images/' . $service->image) }}?w=800&h=600&q=80&f=webp"
+                                srcset="{{ url('img/service-images/' . $service->image) }}?w=400&h=300&q=80&f=webp 1x,
+                                    {{ url('img/service-images/' . $service->image) }}?w=800&h=600&q=80&f=webp 2x"
+                                alt="{{ $service->name }}"
+                                style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease;"
+                                loading="lazy" decoding="async"
+                                onmouseover="this.style.transform='scale(1.08)';"
+                                onmouseout="this.style.transform='scale(1)';"
+                                />
                             @else
-                            <div style="color:#6b21a8; font-weight:800; font-size:18px;">
-                                --
-                            </div>
+                                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f8fafc;">
+                                <i class="fa fa-image" style="font-size:40px; color:#cbd5e1;"></i>
+                                </div>
                             @endif
 
-                            <div>
-                            <a href="/service/{{ $service->slug }}" class="btn" style="background:#6b21a8; color:#fff; padding:8px 12px; border-radius:6px; font-weight:600; font-size:14px; text-decoration:none;">
-                                Book
-                            </a>
                             </div>
-                        </div>
-                        </div>
-                    </a>
+
+                            <div class="card-body d-flex flex-column" style="padding:16px;">
+                            <h5 style="margin:0 0 6px 0; font-size:16px; font-weight:700; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                {{ $service->name }}
+                            </h5>
+
+                            @php
+                                // provider name fallback
+                                $providerName = $service->provider->name ?? $service->shop_name ?? $service->vendor_name ?? 'Provider';
+                                // rating and counts - try common properties, fallback to 0
+                                $rating = method_exists($service, 'averageRating') ? $service->averageRating() : ($service->rating ?? 0);
+                                $rating = $rating ? round($rating, 1) : 0;
+                                $ratingCount = $service->reviews_count ?? $service->ratings_count ?? ($service->review_count ?? 0);
+                                // lowest price
+                                $lowestPrice = null;
+                                if (!empty($service->serviceOption)) {
+                                foreach ($service->serviceOption as $option) {
+                                    if (is_null($lowestPrice) || $option->option_price < $lowestPrice) {
+                                    $lowestPrice = $option->option_price;
+                                    }
+                                }
+                                }
+                            @endphp
+
+                            <div style="font-size:13px; color:#6b7280; margin-bottom:8px;">{{ $providerName }}</div>
+
+                            <div class="d-flex align-items-center" style="gap:8px; margin-bottom:10px;">
+                                <div style="display:flex; align-items:center; gap:2px;">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= floor($rating))
+                                    <span style="color:#fbbf24; font-size:14px;">★</span>
+                                    @elseif ($i - 0.5 <= $rating)
+                                    <span style="color:#fbbf24; font-size:14px;">☆</span>
+                                    @else
+                                    <span style="color:#e5e7eb; font-size:14px;">★</span>
+                                    @endif
+                                @endfor
+                                </div>
+                                <div style="font-size:13px; color:#374151; font-weight:600;">{{ $rating }}</div>
+                                <div style="font-size:13px; color:#9ca3af;">({{ $ratingCount }})</div>
+                            </div>
+
+                            <div style="display:flex; gap:14px; color:#6b7280; font-size:13px; margin-top:auto;">
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                <i class="fa fa-map-marker" aria-hidden="true" style="color:#9ca3af;"></i>
+                                <span>{{ $service->distance ?? '2.5 km away' }}</span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                <i class="fa fa-clock-o" aria-hidden="true" style="color:#9ca3af;"></i>
+                                <span>{{ $service->duration ?? '30 mins' }}</span>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+                                @if (!is_null($lowestPrice))
+                                @php
+                                    $priceDisplay = (floor($lowestPrice) == $lowestPrice) ? number_format($lowestPrice, 0) : number_format($lowestPrice, 2);
+                                @endphp
+                                <div style="color:#6b21a8; font-weight:800; font-size:18px;">
+                                    ${{ $priceDisplay }}
+                                </div>
+                                @else
+                                <div style="color:#6b21a8; font-weight:800; font-size:18px;">
+                                    --
+                                </div>
+                                @endif
+
+                                <div>
+                                <a href="/service/{{ $service->slug }}" class="btn" style="background:#6b21a8; color:#fff; padding:8px 12px; border-radius:6px; font-weight:600; font-size:14px; text-decoration:none;">
+                                    Book
+                                </a>
+                                </div>
+                            </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 @endforeach
